@@ -22,7 +22,14 @@ import { logger } from '@/lib/utils/logger'
 // 資料類型定義
 // ============================================
 
-type DataKey = 'tours' | 'orders' | 'members' | 'quotes' | 'itineraries' | 'toursSlim' | 'ordersSlim'
+type DataKey =
+  | 'tours'
+  | 'orders'
+  | 'members'
+  | 'quotes'
+  | 'itineraries'
+  | 'toursSlim'
+  | 'ordersSlim'
 
 interface GlobalDataConfig {
   table: string
@@ -74,10 +81,10 @@ const CACHE_KEY_PREFIX = 'entity'
 
 // SWR 配置：統一快取策略
 const SWR_CONFIG = {
-  revalidateOnFocus: false,      // 切換 tab 不重新載入
-  revalidateOnReconnect: true,   // 斷線重連時重新載入
-  dedupingInterval: 30000,       // 30 秒內不重複請求
-  errorRetryCount: 2,            // 錯誤重試 2 次
+  revalidateOnFocus: false, // 切換 tab 不重新載入
+  revalidateOnReconnect: true, // 斷線重連時重新載入
+  dedupingInterval: 30000, // 30 秒內不重複請求
+  errorRetryCount: 2, // 錯誤重試 2 次
 }
 
 // ============================================
@@ -90,7 +97,7 @@ async function fetchData<T>(config: GlobalDataConfig): Promise<T[]> {
     .from(config.table as 'tours')
     .select(config.select)
     .order(config.orderBy?.column || 'created_at', {
-      ascending: config.orderBy?.ascending ?? false
+      ascending: config.orderBy?.ascending ?? false,
     })
 
   const { data, error } = await query
@@ -250,17 +257,20 @@ export function useGlobalData(options: UseGlobalDataOptions): UseGlobalDataResul
       )
 
       // 整理成物件
-      return results.reduce((acc, { key, data }) => {
-        // toursSlim 和 ordersSlim 合併到 tours 和 orders
-        if (key === 'toursSlim') {
-          acc.tours = data as Tour[]
-        } else if (key === 'ordersSlim') {
-          acc.orders = data as Order[]
-        } else {
-          acc[key] = data
-        }
-        return acc
-      }, {} as Record<string, unknown[]>)
+      return results.reduce(
+        (acc, { key, data }) => {
+          // toursSlim 和 ordersSlim 合併到 tours 和 orders
+          if (key === 'toursSlim') {
+            acc.tours = data as Tour[]
+          } else if (key === 'ordersSlim') {
+            acc.orders = data as Order[]
+          } else {
+            acc[key] = data
+          }
+          return acc
+        },
+        {} as Record<string, unknown[]>
+      )
     },
     SWR_CONFIG
   )
@@ -273,7 +283,9 @@ export function useGlobalData(options: UseGlobalDataOptions): UseGlobalDataResul
     itineraries: (data?.itineraries as Itinerary[]) || [],
     loading: isLoading,
     error: error?.message || null,
-    refresh: async () => { await mutate() },
+    refresh: async () => {
+      await mutate()
+    },
   }
 }
 
@@ -317,12 +329,15 @@ export function usePreloadCommonData() {
 export function useTourDictionary() {
   const { tours, loading } = useToursSlimGlobal()
 
-  const dictionary = tours.reduce((acc, tour) => {
-    if (tour.id) {
-      acc[tour.id] = tour
-    }
-    return acc
-  }, {} as Record<string, Partial<Tour>>)
+  const dictionary = tours.reduce(
+    (acc, tour) => {
+      if (tour.id) {
+        acc[tour.id] = tour
+      }
+      return acc
+    },
+    {} as Record<string, Partial<Tour>>
+  )
 
   return {
     dictionary,
@@ -339,12 +354,15 @@ export function useTourDictionary() {
 export function useOrderDictionary() {
   const { orders, loading } = useOrdersSlimGlobal()
 
-  const dictionary = orders.reduce((acc, order) => {
-    if (order.id) {
-      acc[order.id] = order
-    }
-    return acc
-  }, {} as Record<string, Partial<Order>>)
+  const dictionary = orders.reduce(
+    (acc, order) => {
+      if (order.id) {
+        acc[order.id] = order
+      }
+      return acc
+    },
+    {} as Record<string, Partial<Order>>
+  )
 
   return {
     dictionary,

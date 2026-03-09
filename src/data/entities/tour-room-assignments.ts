@@ -16,17 +16,20 @@ export interface TourRoomAssignment {
   updated_at: string | null
 }
 
-export const tourRoomAssignmentEntity = createEntityHook<TourRoomAssignment>('tour_room_assignments', {
-  list: {
-    select: '*',
-    orderBy: { column: 'created_at', ascending: true },
-  },
-  slim: {
-    select: 'id,room_id,order_member_id',
-  },
-  detail: { select: '*' },
-  cache: CACHE_PRESETS.high,
-})
+export const tourRoomAssignmentEntity = createEntityHook<TourRoomAssignment>(
+  'tour_room_assignments',
+  {
+    list: {
+      select: '*',
+      orderBy: { column: 'created_at', ascending: true },
+    },
+    slim: {
+      select: 'id,room_id,order_member_id',
+    },
+    detail: { select: '*' },
+    cache: CACHE_PRESETS.high,
+  }
+)
 
 export const useTourRoomAssignments = tourRoomAssignmentEntity.useList
 export const useTourRoomAssignmentsSlim = tourRoomAssignmentEntity.useListSlim

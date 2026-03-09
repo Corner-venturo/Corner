@@ -48,8 +48,8 @@ interface ExistingMember {
 interface DuplicateCheckResult {
   isDuplicate: boolean
   reason: string
-  matchType?: 'exact' | 'name_only'  // exact = 完全重複, name_only = 只有姓名符合
-  matchedMember?: ExistingMember     // 符合的現有成員
+  matchType?: 'exact' | 'name_only' // exact = 完全重複, name_only = 只有姓名符合
+  matchedMember?: ExistingMember // 符合的現有成員
 }
 
 interface UsePassportOcrReturn {
@@ -83,8 +83,12 @@ export function usePassportOcr(): UsePassportOcrReturn {
       }
       const statusCode = response.status
       const statusMessage = response.statusText
-      logger.error(`OCR API 回應錯誤: status=${statusCode}, statusText=${statusMessage}, body=${errorText.slice(0, 500)}`)
-      throw new Error(`OCR 辨識失敗 (${statusCode}): ${errorText.slice(0, 100) || statusMessage || COMP_ORDERS_LABELS.未知錯誤}`)
+      logger.error(
+        `OCR API 回應錯誤: status=${statusCode}, statusText=${statusMessage}, body=${errorText.slice(0, 500)}`
+      )
+      throw new Error(
+        `OCR 辨識失敗 (${statusCode}): ${errorText.slice(0, 100) || statusMessage || COMP_ORDERS_LABELS.未知錯誤}`
+      )
     }
 
     const json = await response.json()
@@ -104,86 +108,86 @@ export function usePassportOcr(): UsePassportOcrReturn {
   }, [])
 
   // 檢查是否為重複成員
-  const checkDuplicate = useCallback((
-    customer: OcrCustomerData,
-    existingMembers: ExistingMember[]
-  ): DuplicateCheckResult => {
-    const passportNumber = customer.passport_number || ''
-    const idNumber = customer.national_id || ''
-    const birthDate = customer.birth_date || null
-    const chineseName = customer.name || ''
-    const cleanChineseName = chineseName.replace(/\([^)]+\)$/, '').trim()
-    const nameBirthKey = cleanChineseName && birthDate ? `${cleanChineseName}|${birthDate}` : ''
+  const checkDuplicate = useCallback(
+    (customer: OcrCustomerData, existingMembers: ExistingMember[]): DuplicateCheckResult => {
+      const passportNumber = customer.passport_number || ''
+      const idNumber = customer.national_id || ''
+      const birthDate = customer.birth_date || null
+      const chineseName = customer.name || ''
+      const cleanChineseName = chineseName.replace(/\([^)]+\)$/, '').trim()
+      const nameBirthKey = cleanChineseName && birthDate ? `${cleanChineseName}|${birthDate}` : ''
 
-    // 建立檢查集合
-    const existingPassports = new Set(existingMembers.map(m => m.passport_number).filter(Boolean))
-    const existingIdNumbers = new Set(existingMembers.map(m => m.id_number).filter(Boolean))
-    const existingNameBirthKeys = new Set(
-      existingMembers
-        .filter(m => m.chinese_name && m.birth_date)
-        .map(m => `${m.chinese_name}|${m.birth_date}`)
-    )
-
-    // 檢查重複 - 先找符合的成員
-    const findMatchedMember = (
-      field: 'passport_number' | 'id_number',
-      value: string
-    ): ExistingMember | undefined => {
-      return existingMembers.find(m => m[field] === value)
-    }
-
-    // 1. 護照號碼完全符合 → 跳過
-    if (passportNumber && existingPassports.has(passportNumber)) {
-      const matched = findMatchedMember('passport_number', passportNumber)
-      return {
-        isDuplicate: true,
-        reason: COMP_ORDERS_LABELS.護照號碼重複,
-        matchType: 'exact',
-        matchedMember: matched
-      }
-    }
-
-    // 2. 身分證號完全符合 → 跳過
-    if (idNumber && existingIdNumbers.has(idNumber)) {
-      const matched = findMatchedMember('id_number', idNumber)
-      return {
-        isDuplicate: true,
-        reason: COMP_ORDERS_LABELS.身分證號重複,
-        matchType: 'exact',
-        matchedMember: matched
-      }
-    }
-
-    // 3. 姓名+生日完全符合 → 跳過
-    if (nameBirthKey && existingNameBirthKeys.has(nameBirthKey)) {
-      const matched = existingMembers.find(
-        m => m.chinese_name === cleanChineseName && m.birth_date === birthDate
+      // 建立檢查集合
+      const existingPassports = new Set(existingMembers.map(m => m.passport_number).filter(Boolean))
+      const existingIdNumbers = new Set(existingMembers.map(m => m.id_number).filter(Boolean))
+      const existingNameBirthKeys = new Set(
+        existingMembers
+          .filter(m => m.chinese_name && m.birth_date)
+          .map(m => `${m.chinese_name}|${m.birth_date}`)
       )
-      return {
-        isDuplicate: true,
-        reason: COMP_ORDERS_LABELS.姓名_生日重複,
-        matchType: 'exact',
-        matchedMember: matched
-      }
-    }
 
-    // 4. 只有姓名符合（無生日比對） → 提示使用者選擇
-    if (cleanChineseName) {
-      const nameOnlyMatch = existingMembers.find(
-        m => m.chinese_name === cleanChineseName && !m.birth_date
-      )
-      if (nameOnlyMatch) {
+      // 檢查重複 - 先找符合的成員
+      const findMatchedMember = (
+        field: 'passport_number' | 'id_number',
+        value: string
+      ): ExistingMember | undefined => {
+        return existingMembers.find(m => m[field] === value)
+      }
+
+      // 1. 護照號碼完全符合 → 跳過
+      if (passportNumber && existingPassports.has(passportNumber)) {
+        const matched = findMatchedMember('passport_number', passportNumber)
         return {
-          isDuplicate: false,  // 不算重複，但需要使用者確認
-          reason: COMP_ORDERS_LABELS.發現同名成員_無生日資料,
-          matchType: 'name_only',
-          matchedMember: nameOnlyMatch
+          isDuplicate: true,
+          reason: COMP_ORDERS_LABELS.護照號碼重複,
+          matchType: 'exact',
+          matchedMember: matched,
         }
       }
-    }
 
-    return { isDuplicate: false, reason: '' }
-  }, [])
+      // 2. 身分證號完全符合 → 跳過
+      if (idNumber && existingIdNumbers.has(idNumber)) {
+        const matched = findMatchedMember('id_number', idNumber)
+        return {
+          isDuplicate: true,
+          reason: COMP_ORDERS_LABELS.身分證號重複,
+          matchType: 'exact',
+          matchedMember: matched,
+        }
+      }
+
+      // 3. 姓名+生日完全符合 → 跳過
+      if (nameBirthKey && existingNameBirthKeys.has(nameBirthKey)) {
+        const matched = existingMembers.find(
+          m => m.chinese_name === cleanChineseName && m.birth_date === birthDate
+        )
+        return {
+          isDuplicate: true,
+          reason: COMP_ORDERS_LABELS.姓名_生日重複,
+          matchType: 'exact',
+          matchedMember: matched,
+        }
+      }
+
+      // 4. 只有姓名符合（無生日比對） → 提示使用者選擇
+      if (cleanChineseName) {
+        const nameOnlyMatch = existingMembers.find(
+          m => m.chinese_name === cleanChineseName && !m.birth_date
+        )
+        if (nameOnlyMatch) {
+          return {
+            isDuplicate: false, // 不算重複，但需要使用者確認
+            reason: COMP_ORDERS_LABELS.發現同名成員_無生日資料,
+            matchType: 'name_only',
+            matchedMember: nameOnlyMatch,
+          }
+        }
+      }
+
+      return { isDuplicate: false, reason: '' }
+    },
+    []
+  )
 
   return {
     performOcr,

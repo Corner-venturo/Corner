@@ -29,7 +29,17 @@ import {
   cornerTravelV1MemoRight,
 } from '../definitions/corner-travel-v1-memo'
 import { logger } from '@/lib/utils/logger'
-import type { PageTemplate, TemplateData, TemplateOption, DailyItinerary, DailyDetailData, MemoSettings, CountryCode, HotelData, VehicleData } from '../definitions/types'
+import type {
+  PageTemplate,
+  TemplateData,
+  TemplateOption,
+  DailyItinerary,
+  DailyDetailData,
+  MemoSettings,
+  CountryCode,
+  HotelData,
+  VehicleData,
+} from '../definitions/types'
 import type { CanvasPage, CanvasElement } from '@/features/designer/components/types'
 import type { TimelineItineraryData, TimelineDay } from '@/types/timeline-itinerary.types'
 
@@ -41,7 +51,16 @@ export {
   getMemoItemsForPage,
   countryNames,
 } from '../definitions/country-presets'
-export type { MemoSettings, CountryCode, MemoItem, SeasonInfo, MemoInfoItem, HotelData, VehicleData, TemplateData } from '../definitions/types'
+export type {
+  MemoSettings,
+  CountryCode,
+  MemoItem,
+  SeasonInfo,
+  MemoInfoItem,
+  HotelData,
+  VehicleData,
+  TemplateData,
+} from '../definitions/types'
 
 // A5 尺寸
 // 設計尺寸（模板定義使用，96 DPI）
@@ -145,7 +164,7 @@ export const styleSeries: StyleSeries[] = [
  * 取得所有可用的範本選項（用於選擇器）
  */
 export function getAvailableTemplates(): TemplateOption[] {
-  return Object.values(templateRegistry).map((template) => ({
+  return Object.values(templateRegistry).map(template => ({
     id: template.id,
     name: template.name,
     thumbnailUrl: template.thumbnailUrl,
@@ -234,10 +253,7 @@ export function generatePageFromTemplate(
  *
  * 這是給「新建手冊」時使用的，讓使用者一開始就能看到完整的模板效果。
  */
-export function generateFullBrochure(
-  style: StyleSeries,
-  data: TemplateData
-): CanvasPage[] {
+export function generateFullBrochure(style: StyleSeries, data: TemplateData): CanvasPage[] {
   const pages: CanvasPage[] = []
 
   // 1. 封面
@@ -350,9 +366,7 @@ export function itineraryToTemplateData(itinerary: {
   daily_itinerary?: ItineraryDay[] | null
 }): TemplateData {
   // 組合地點
-  const destination = [itinerary.city, itinerary.country]
-    .filter(Boolean)
-    .join(', ')
+  const destination = [itinerary.city, itinerary.country].filter(Boolean).join(', ')
 
   // 組合日期
   let travelDates = ''
@@ -364,21 +378,26 @@ export function itineraryToTemplateData(itinerary: {
   }
 
   // 解析 JSON 欄位（可能是字串或物件）
-  const leader = typeof itinerary.leader === 'string'
-    ? JSON.parse(itinerary.leader) as ItineraryLeader
-    : itinerary.leader
-  const meetingInfo = typeof itinerary.meeting_info === 'string'
-    ? JSON.parse(itinerary.meeting_info) as ItineraryMeetingInfo
-    : itinerary.meeting_info
-  const outboundFlightData = typeof itinerary.outbound_flight === 'string'
-    ? JSON.parse(itinerary.outbound_flight) as ItineraryFlight
-    : itinerary.outbound_flight
-  const returnFlightData = typeof itinerary.return_flight === 'string'
-    ? JSON.parse(itinerary.return_flight) as ItineraryFlight
-    : itinerary.return_flight
-  const dailyItineraryData = typeof itinerary.daily_itinerary === 'string'
-    ? JSON.parse(itinerary.daily_itinerary) as ItineraryDay[]
-    : itinerary.daily_itinerary
+  const leader =
+    typeof itinerary.leader === 'string'
+      ? (JSON.parse(itinerary.leader) as ItineraryLeader)
+      : itinerary.leader
+  const meetingInfo =
+    typeof itinerary.meeting_info === 'string'
+      ? (JSON.parse(itinerary.meeting_info) as ItineraryMeetingInfo)
+      : itinerary.meeting_info
+  const outboundFlightData =
+    typeof itinerary.outbound_flight === 'string'
+      ? (JSON.parse(itinerary.outbound_flight) as ItineraryFlight)
+      : itinerary.outbound_flight
+  const returnFlightData =
+    typeof itinerary.return_flight === 'string'
+      ? (JSON.parse(itinerary.return_flight) as ItineraryFlight)
+      : itinerary.return_flight
+  const dailyItineraryData =
+    typeof itinerary.daily_itinerary === 'string'
+      ? (JSON.parse(itinerary.daily_itinerary) as ItineraryDay[])
+      : itinerary.daily_itinerary
 
   // 組合航班資訊
   let outboundFlight = ''
@@ -447,8 +466,9 @@ export function itineraryToTemplateData(itinerary: {
 
   if (totalDays > 0) {
     // 先將現有資料轉換成 map，方便查找
-    const existingDays = (dailyItineraryData || [])
-      .filter((day): day is ItineraryDay => day != null)
+    const existingDays = (dailyItineraryData || []).filter(
+      (day): day is ItineraryDay => day != null
+    )
 
     // 根據總天數建立每日行程
     dailyItineraries = Array.from({ length: totalDays }, (_, index) => {
@@ -599,7 +619,7 @@ export function timelineToTemplateData(timeline: TimelineItineraryData): Templat
   // 轉換每日行程（給行程總覽頁用）
   const dailyItineraries: DailyItinerary[] = (timeline.days || [])
     .filter((day): day is TimelineDay => day != null)
-    .map((day) => ({
+    .map(day => ({
       dayNumber: day.dayNumber,
       title: day.title || '',
       meals: {
@@ -613,7 +633,7 @@ export function timelineToTemplateData(timeline: TimelineItineraryData): Templat
   // 轉換每日詳細資料（給每日行程頁用）
   const dailyDetails: DailyDetailData[] = (timeline.days || [])
     .filter((day): day is TimelineDay => day != null)
-    .map((day) => {
+    .map(day => {
       // 建立時間軸項目（景點 + 餐食）
       const timelineItems: Array<{ time: string; activity: string; isHighlight: boolean }> = []
 

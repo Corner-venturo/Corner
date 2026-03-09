@@ -15,10 +15,27 @@ import { getCurrentWorkspaceId } from '@/lib/workspace-helpers'
 import type { Database } from '@/lib/supabase/types'
 import type { QueueStats, QueueType, QueueStatus } from '@/types/pnr.types'
 import { createPnrFareHistory, invalidatePnrFareHistory } from '@/data/entities/pnr-fare-history'
-import { createPnrFareAlert, updatePnrFareAlert, deletePnrFareAlert, invalidatePnrFareAlerts } from '@/data/entities/pnr-fare-alerts'
-import { createPnrFlightStatusHistory, invalidatePnrFlightStatusHistory } from '@/data/entities/pnr-flight-status'
-import { createPnrQueueItem, updatePnrQueueItem, deletePnrQueueItem, invalidatePnrQueueItems } from '@/data/entities/pnr-queue-items'
-import { createPnrScheduleChange, updatePnrScheduleChange, invalidatePnrScheduleChanges } from '@/data/entities/pnr-schedule-changes'
+import {
+  createPnrFareAlert,
+  updatePnrFareAlert,
+  deletePnrFareAlert,
+  invalidatePnrFareAlerts,
+} from '@/data/entities/pnr-fare-alerts'
+import {
+  createPnrFlightStatusHistory,
+  invalidatePnrFlightStatusHistory,
+} from '@/data/entities/pnr-flight-status'
+import {
+  createPnrQueueItem,
+  updatePnrQueueItem,
+  deletePnrQueueItem,
+  invalidatePnrQueueItems,
+} from '@/data/entities/pnr-queue-items'
+import {
+  createPnrScheduleChange,
+  updatePnrScheduleChange,
+  invalidatePnrScheduleChanges,
+} from '@/data/entities/pnr-schedule-changes'
 import { createPnrAiQuery, invalidatePnrAiQueries } from '@/data/entities/pnr-ai-queries'
 
 // Supabase 表格類型
@@ -27,7 +44,8 @@ type PnrFareHistoryInsert = Database['public']['Tables']['pnr_fare_history']['In
 type PnrFareAlert = Database['public']['Tables']['pnr_fare_alerts']['Row']
 type PnrFareAlertInsert = Database['public']['Tables']['pnr_fare_alerts']['Insert']
 type PnrFlightStatusHistory = Database['public']['Tables']['pnr_flight_status_history']['Row']
-type PnrFlightStatusHistoryInsert = Database['public']['Tables']['pnr_flight_status_history']['Insert']
+type PnrFlightStatusHistoryInsert =
+  Database['public']['Tables']['pnr_flight_status_history']['Insert']
 type PnrQueueItem = Database['public']['Tables']['pnr_queue_items']['Row']
 type PnrQueueItemInsert = Database['public']['Tables']['pnr_queue_items']['Insert']
 type PnrScheduleChange = Database['public']['Tables']['pnr_schedule_changes']['Row']
@@ -81,12 +99,15 @@ export function usePnrFareHistory(pnrId?: string) {
   const swrKey = pnrId ? `pnr_fare_history:${pnrId}` : 'pnr_fare_history'
   const { data: items = [], error, isLoading } = useSWR<PnrFareHistory[]>(swrKey, fetcher)
 
-  const create = useCallback(async (data: Omit<PnrFareHistoryInsert, 'id' | 'created_at'>) => {
-    const result = await createPnrFareHistory(data as Parameters<typeof createPnrFareHistory>[0])
-    mutate(swrKey)
-    await invalidatePnrFareHistory()
-    return result as unknown as PnrFareHistory
-  }, [swrKey])
+  const create = useCallback(
+    async (data: Omit<PnrFareHistoryInsert, 'id' | 'created_at'>) => {
+      const result = await createPnrFareHistory(data as Parameters<typeof createPnrFareHistory>[0])
+      mutate(swrKey)
+      await invalidatePnrFareHistory()
+      return result as unknown as PnrFareHistory
+    },
+    [swrKey]
+  )
 
   return { items, isLoading, error, create, refetch: () => mutate(swrKey) }
 }
@@ -125,24 +146,33 @@ export function usePnrFareAlerts(pnrId?: string) {
   const swrKey = pnrId ? `pnr_fare_alerts:${pnrId}` : 'pnr_fare_alerts'
   const { data: items = [], error, isLoading } = useSWR<PnrFareAlert[]>(swrKey, fetcher)
 
-  const create = useCallback(async (data: Omit<PnrFareAlertInsert, 'id' | 'created_at' | 'updated_at'>) => {
-    const result = await createPnrFareAlert(data as Parameters<typeof createPnrFareAlert>[0])
-    mutate(swrKey)
-    await invalidatePnrFareAlerts()
-    return result as unknown as PnrFareAlert
-  }, [swrKey])
+  const create = useCallback(
+    async (data: Omit<PnrFareAlertInsert, 'id' | 'created_at' | 'updated_at'>) => {
+      const result = await createPnrFareAlert(data as Parameters<typeof createPnrFareAlert>[0])
+      mutate(swrKey)
+      await invalidatePnrFareAlerts()
+      return result as unknown as PnrFareAlert
+    },
+    [swrKey]
+  )
 
-  const update = useCallback(async (id: string, updates: Partial<PnrFareAlert>) => {
-    await updatePnrFareAlert(id, updates as Parameters<typeof updatePnrFareAlert>[1])
-    mutate(swrKey)
-    await invalidatePnrFareAlerts()
-  }, [swrKey])
+  const update = useCallback(
+    async (id: string, updates: Partial<PnrFareAlert>) => {
+      await updatePnrFareAlert(id, updates as Parameters<typeof updatePnrFareAlert>[1])
+      mutate(swrKey)
+      await invalidatePnrFareAlerts()
+    },
+    [swrKey]
+  )
 
-  const remove = useCallback(async (id: string) => {
-    await deletePnrFareAlert(id)
-    mutate(swrKey)
-    await invalidatePnrFareAlerts()
-  }, [swrKey])
+  const remove = useCallback(
+    async (id: string) => {
+      await deletePnrFareAlert(id)
+      mutate(swrKey)
+      await invalidatePnrFareAlerts()
+    },
+    [swrKey]
+  )
 
   return { items, isLoading, error, create, update, delete: remove, refetch: () => mutate(swrKey) }
 }
@@ -181,12 +211,17 @@ export function usePnrFlightStatusHistory(pnrId?: string) {
   const swrKey = pnrId ? `pnr_flight_status_history:${pnrId}` : 'pnr_flight_status_history'
   const { data: items = [], error, isLoading } = useSWR<PnrFlightStatusHistory[]>(swrKey, fetcher)
 
-  const create = useCallback(async (data: Omit<PnrFlightStatusHistoryInsert, 'id' | 'recorded_at'>) => {
-    const result = await createPnrFlightStatusHistory(data as unknown as Parameters<typeof createPnrFlightStatusHistory>[0])
-    mutate(swrKey)
-    await invalidatePnrFlightStatusHistory()
-    return result as unknown as PnrFlightStatusHistory
-  }, [swrKey])
+  const create = useCallback(
+    async (data: Omit<PnrFlightStatusHistoryInsert, 'id' | 'recorded_at'>) => {
+      const result = await createPnrFlightStatusHistory(
+        data as unknown as Parameters<typeof createPnrFlightStatusHistory>[0]
+      )
+      mutate(swrKey)
+      await invalidatePnrFlightStatusHistory()
+      return result as unknown as PnrFlightStatusHistory
+    },
+    [swrKey]
+  )
 
   return { items, isLoading, error, create, refetch: () => mutate(swrKey) }
 }
@@ -194,7 +229,11 @@ export function usePnrFlightStatusHistory(pnrId?: string) {
 // =====================================================
 // PNR Queue Hook（核心 Hook）
 // =====================================================
-export function usePnrQueue(options?: { pnrId?: string; status?: QueueStatus; queueType?: QueueType }) {
+export function usePnrQueue(options?: {
+  pnrId?: string
+  status?: QueueStatus
+  queueType?: QueueType
+}) {
   const workspaceId = getCurrentWorkspaceId()
 
   const fetcher = async (): Promise<PnrQueueItem[]> => {
@@ -251,36 +290,48 @@ export function usePnrQueue(options?: { pnrId?: string; status?: QueueStatus; qu
     }
   }, [items])
 
-  const create = useCallback(async (data: Omit<PnrQueueItemInsert, 'id' | 'created_at' | 'updated_at'>) => {
-    const result = await createPnrQueueItem(data as Parameters<typeof createPnrQueueItem>[0])
-    mutate(swrKey)
-    await invalidatePnrQueueItems()
-    return result as unknown as PnrQueueItem
-  }, [swrKey])
+  const create = useCallback(
+    async (data: Omit<PnrQueueItemInsert, 'id' | 'created_at' | 'updated_at'>) => {
+      const result = await createPnrQueueItem(data as Parameters<typeof createPnrQueueItem>[0])
+      mutate(swrKey)
+      await invalidatePnrQueueItems()
+      return result as unknown as PnrQueueItem
+    },
+    [swrKey]
+  )
 
-  const update = useCallback(async (id: string, updates: Partial<PnrQueueItem>) => {
-    const { id: _id, created_at: _ca, ...clean_updates } = updates as Record<string, unknown>
-    await updatePnrQueueItem(id, clean_updates as Parameters<typeof updatePnrQueueItem>[1])
-    mutate(swrKey)
-    await invalidatePnrQueueItems()
-  }, [swrKey])
+  const update = useCallback(
+    async (id: string, updates: Partial<PnrQueueItem>) => {
+      const { id: _id, created_at: _ca, ...clean_updates } = updates as Record<string, unknown>
+      await updatePnrQueueItem(id, clean_updates as Parameters<typeof updatePnrQueueItem>[1])
+      mutate(swrKey)
+      await invalidatePnrQueueItems()
+    },
+    [swrKey]
+  )
 
-  const complete = useCallback(async (id: string, notes?: string, completedBy?: string) => {
-    await updatePnrQueueItem(id, {
-      status: 'completed',
-      completed_at: new Date().toISOString(),
-      completed_by: completedBy,
-      resolution_notes: notes,
-    } as Parameters<typeof updatePnrQueueItem>[1])
-    mutate(swrKey)
-    await invalidatePnrQueueItems()
-  }, [swrKey])
+  const complete = useCallback(
+    async (id: string, notes?: string, completedBy?: string) => {
+      await updatePnrQueueItem(id, {
+        status: 'completed',
+        completed_at: new Date().toISOString(),
+        completed_by: completedBy,
+        resolution_notes: notes,
+      } as Parameters<typeof updatePnrQueueItem>[1])
+      mutate(swrKey)
+      await invalidatePnrQueueItems()
+    },
+    [swrKey]
+  )
 
-  const remove = useCallback(async (id: string) => {
-    await deletePnrQueueItem(id)
-    mutate(swrKey)
-    await invalidatePnrQueueItems()
-  }, [swrKey])
+  const remove = useCallback(
+    async (id: string) => {
+      await deletePnrQueueItem(id)
+      mutate(swrKey)
+      await invalidatePnrQueueItems()
+    },
+    [swrKey]
+  )
 
   return {
     items,
@@ -333,22 +384,38 @@ export function usePnrScheduleChanges(options?: { pnrId?: string; status?: strin
   const swrKey = `pnr_schedule_changes:${JSON.stringify(options || {})}`
   const { data: items = [], error, isLoading } = useSWR<PnrScheduleChange[]>(swrKey, fetcher)
 
-  const create = useCallback(async (data: Omit<PnrScheduleChangeInsert, 'id' | 'created_at' | 'updated_at' | 'detected_at'>) => {
-    const result = await createPnrScheduleChange({
-      ...data,
-      detected_at: new Date().toISOString(),
-    } as Parameters<typeof createPnrScheduleChange>[0])
-    mutate(swrKey)
-    await invalidatePnrScheduleChanges()
-    return result as unknown as PnrScheduleChange
-  }, [swrKey])
+  const create = useCallback(
+    async (
+      data: Omit<PnrScheduleChangeInsert, 'id' | 'created_at' | 'updated_at' | 'detected_at'>
+    ) => {
+      const result = await createPnrScheduleChange({
+        ...data,
+        detected_at: new Date().toISOString(),
+      } as Parameters<typeof createPnrScheduleChange>[0])
+      mutate(swrKey)
+      await invalidatePnrScheduleChanges()
+      return result as unknown as PnrScheduleChange
+    },
+    [swrKey]
+  )
 
-  const update = useCallback(async (id: string, updates: Partial<PnrScheduleChange>) => {
-    const { id: _id, created_at: _ca, detected_at: _da, ...clean_updates } = updates as Record<string, unknown>
-    await updatePnrScheduleChange(id, clean_updates as Parameters<typeof updatePnrScheduleChange>[1])
-    mutate(swrKey)
-    await invalidatePnrScheduleChanges()
-  }, [swrKey])
+  const update = useCallback(
+    async (id: string, updates: Partial<PnrScheduleChange>) => {
+      const {
+        id: _id,
+        created_at: _ca,
+        detected_at: _da,
+        ...clean_updates
+      } = updates as Record<string, unknown>
+      await updatePnrScheduleChange(
+        id,
+        clean_updates as Parameters<typeof updatePnrScheduleChange>[1]
+      )
+      mutate(swrKey)
+      await invalidatePnrScheduleChanges()
+    },
+    [swrKey]
+  )
 
   return { items, isLoading, error, create, update, refetch: () => mutate(swrKey) }
 }
@@ -387,12 +454,15 @@ export function usePnrAiQueries(pnrId?: string) {
   const swrKey = pnrId ? `pnr_ai_queries:${pnrId}` : 'pnr_ai_queries'
   const { data: items = [], error, isLoading } = useSWR<PnrAiQuery[]>(swrKey, fetcher)
 
-  const create = useCallback(async (data: Omit<PnrAiQueryInsert, 'id' | 'created_at'>) => {
-    const result = await createPnrAiQuery(data as Parameters<typeof createPnrAiQuery>[0])
-    mutate(swrKey)
-    await invalidatePnrAiQueries()
-    return result as unknown as PnrAiQuery
-  }, [swrKey])
+  const create = useCallback(
+    async (data: Omit<PnrAiQueryInsert, 'id' | 'created_at'>) => {
+      const result = await createPnrAiQuery(data as Parameters<typeof createPnrAiQuery>[0])
+      mutate(swrKey)
+      await invalidatePnrAiQueries()
+      return result as unknown as PnrAiQuery
+    },
+    [swrKey]
+  )
 
   return { items, isLoading, error, create, refetch: () => mutate(swrKey) }
 }

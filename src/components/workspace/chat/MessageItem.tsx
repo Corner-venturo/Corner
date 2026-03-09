@@ -48,7 +48,15 @@ interface MessageItemProps {
 }
 
 // 使用 memo 避免不必要的重新渲染
-export const MessageItem = memo(function MessageItem({ message, currentUserId, employeeNameMap, onReaction, onDelete, onReply, replyCount = 0 }: MessageItemProps) {
+export const MessageItem = memo(function MessageItem({
+  message,
+  currentUserId,
+  employeeNameMap,
+  onReaction,
+  onDelete,
+  onReply,
+  replyCount = 0,
+}: MessageItemProps) {
   const handleDownloadAttachment = async (attachment: MessageAttachment) => {
     const fileName = attachment.fileName || attachment.name || COMP_WORKSPACE_LABELS.未命名檔案
     const targetUrl = resolveAttachmentUrl(attachment)
@@ -67,9 +75,10 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, e
   }
 
   // Resolve author name: prefer employee map lookup, fallback to snapshot
-  const resolvedAuthorName = (message.author_id && employeeNameMap?.get(message.author_id))
-    || message.author?.display_name
-    || COMP_WORKSPACE_LABELS.未知用戶
+  const resolvedAuthorName =
+    (message.author_id && employeeNameMap?.get(message.author_id)) ||
+    message.author?.display_name ||
+    COMP_WORKSPACE_LABELS.未知用戶
 
   return (
     <div className="flex gap-3 group hover:bg-morandi-container/5 -mx-2 px-3 py-1.5 rounded transition-colors">
@@ -89,7 +98,9 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, e
             {formatMessageTime(message.created_at)}
           </span>
           {message.edited_at && (
-            <span className="text-[11px] text-morandi-secondary/60">{COMP_WORKSPACE_LABELS.已編輯}</span>
+            <span className="text-[11px] text-morandi-secondary/60">
+              {COMP_WORKSPACE_LABELS.已編輯}
+            </span>
           )}
         </div>
 
@@ -97,7 +108,15 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, e
         {message.metadata?.message_type === 'ticket_status_card' ? (
           <TicketStatusCard
             tours={(message.metadata.tours as unknown as TourData[]) || []}
-            summary={(message.metadata.summary as unknown as TourStats) || { total: 0, ticketed: 0, needs_ticketing: 0, no_record: 0, self_arranged: 0 }}
+            summary={
+              (message.metadata.summary as unknown as TourStats) || {
+                total: 0,
+                ticketed: 0,
+                needs_ticketing: 0,
+                no_record: 0,
+                self_arranged: 0,
+              }
+            }
             generatedAt={message.metadata.generated_at as string | undefined}
           />
         ) : (
@@ -115,7 +134,8 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, e
                 attachment.fileType ||
                 attachment.type ||
                 'application/octet-stream'
-              const fileName = attachment.fileName || attachment.name || COMP_WORKSPACE_LABELS.未命名檔案
+              const fileName =
+                attachment.fileName || attachment.name || COMP_WORKSPACE_LABELS.未命名檔案
               const fileSize =
                 typeof attachment.fileSize === 'number'
                   ? attachment.fileSize
@@ -135,7 +155,8 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, e
                       rel="noopener noreferrer"
                       className="block max-w-sm rounded-lg overflow-hidden border border-morandi-container hover:border-morandi-gold/40 transition-colors"
                     >
-                      <img src={imageUrl}
+                      <img
+                        src={imageUrl}
                         alt={fileName}
                         className="max-w-full max-h-[300px] object-contain bg-morandi-container/10"
                         loading="lazy"
@@ -211,7 +232,9 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, e
             className="flex items-center gap-1.5 mt-2 text-xs text-morandi-gold hover:text-morandi-gold/80 hover:underline transition-colors"
           >
             <MessageSquare size={14} />
-            <span>{replyCount} {COMP_WORKSPACE_LABELS.回覆討論串}</span>
+            <span>
+              {replyCount} {COMP_WORKSPACE_LABELS.回覆討論串}
+            </span>
           </button>
         )}
 

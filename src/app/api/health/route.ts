@@ -49,7 +49,7 @@ export async function GET() {
         dbLatencyMs: null,
         memory: memoryMB,
       },
-      { status: 503 },
+      { status: 503 }
     )
   }
 }

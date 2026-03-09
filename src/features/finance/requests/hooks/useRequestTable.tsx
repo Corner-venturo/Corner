@@ -5,7 +5,11 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { statusLabels, statusColors } from '../types' // Assuming statusLabels and statusColors are now correctly typed
-import { REQUEST_DATE_INPUT_LABELS, REQUEST_DETAIL_DIALOG_LABELS, USE_REQUEST_TABLE_LABELS } from '../../constants/labels';
+import {
+  REQUEST_DATE_INPUT_LABELS,
+  REQUEST_DETAIL_DIALOG_LABELS,
+  USE_REQUEST_TABLE_LABELS,
+} from '../../constants/labels'
 
 export function useRequestTable(payment_requests: PaymentRequest[]) {
   // Table columns configuration
@@ -58,11 +62,7 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
         sortable: true,
         render: (value: unknown, row: PaymentRequest) => (
           <div className="text-sm">
-            <div
-              className={
-                row.is_special_billing ? 'text-morandi-gold font-medium' : ''
-              }
-            >
+            <div className={row.is_special_billing ? 'text-morandi-gold font-medium' : ''}>
               <DateCell date={value as string | null} showIcon={false} />
             </div>
             {row.is_special_billing && <div className="text-xs text-morandi-gold">⚠️ 特殊出帳</div>}
@@ -141,11 +141,10 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
   // Filter function
   const filterFunction = useCallback((data: PaymentRequest[], filters: Record<string, string>) => {
     return data.filter(request => {
-      const requestStatus = request.status || 'pending'; // Provide default for filtering
+      const requestStatus = request.status || 'pending' // Provide default for filtering
       const requestCode = request.code || request.request_number || ''
       return (
-        (!filters.code ||
-          requestCode.toLowerCase().includes(filters.code.toLowerCase())) &&
+        (!filters.code || requestCode.toLowerCase().includes(filters.code.toLowerCase())) &&
         (!filters.tour_name ||
           (request.tour_name || '').toLowerCase().includes(filters.tour_name.toLowerCase())) &&
         (!filters.order_number ||
@@ -176,10 +175,9 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
 
 // Helper function for status badge, explicitly typed
 function getStatusBadge(status: PaymentRequest['status']) {
-  const currentStatus = (status || 'pending') as 'pending' | 'confirmed' | 'billed'; // Default to 'pending' if null
+  const currentStatus = (status || 'pending') as 'pending' | 'confirmed' | 'billed' // Default to 'pending' if null
   return {
     label: statusLabels[currentStatus],
     color: statusColors[currentStatus],
   }
 }
-

@@ -12,16 +12,11 @@
       "completed": false,
       "creator": "677d2654-a6dc-421c-913e-6228e7cd97cf",
       "assignee": null,
-      "visibility": [
-        "677d2654-a6dc-421c-913e-6228e7cd97cf"
-      ],
+      "visibility": ["677d2654-a6dc-421c-913e-6228e7cd97cf"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-10-30T02:54:13.776+00:00",
       "updated_at": "2025-10-30T02:54:13.776+00:00"
@@ -35,16 +30,11 @@
       "completed": false,
       "creator": "e1347c5f-b868-48d2-bd62-300537c3f1a4",
       "assignee": null,
-      "visibility": [
-        "e1347c5f-b868-48d2-bd62-300537c3f1a4"
-      ],
+      "visibility": ["e1347c5f-b868-48d2-bd62-300537c3f1a4"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-10-28T06:12:59.036+00:00",
       "updated_at": "2025-10-28T06:12:59.036+00:00"
@@ -65,10 +55,7 @@
       "related_items": [],
       "sub_tasks": [],
       "notes": [],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-10-30T00:31:19.735+00:00",
       "updated_at": "2025-10-30T06:07:07.400308+00:00"
@@ -82,9 +69,7 @@
       "completed": true,
       "creator": "677d2654-a6dc-421c-913e-6228e7cd97cf",
       "assignee": null,
-      "visibility": [
-        "677d2654-a6dc-421c-913e-6228e7cd97cf"
-      ],
+      "visibility": ["677d2654-a6dc-421c-913e-6228e7cd97cf"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [
@@ -95,10 +80,7 @@
           "author_name": "William"
         }
       ],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-10-30T04:39:20.498+00:00",
       "updated_at": "2025-10-31T05:10:36.647224+00:00"
@@ -112,9 +94,7 @@
       "completed": false,
       "creator": "677d2654-a6dc-421c-913e-6228e7cd97cf",
       "assignee": null,
-      "visibility": [
-        "677d2654-a6dc-421c-913e-6228e7cd97cf"
-      ],
+      "visibility": ["677d2654-a6dc-421c-913e-6228e7cd97cf"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [
@@ -125,10 +105,7 @@
           "author_name": "William"
         }
       ],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-10-30T00:35:20.258+00:00",
       "updated_at": "2025-10-31T05:13:16.959676+00:00"
@@ -142,16 +119,11 @@
       "completed": true,
       "creator": "677d2654-a6dc-421c-913e-6228e7cd97cf",
       "assignee": null,
-      "visibility": [
-        "677d2654-a6dc-421c-913e-6228e7cd97cf"
-      ],
+      "visibility": ["677d2654-a6dc-421c-913e-6228e7cd97cf"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-10-31T00:30:48.536+00:00",
       "updated_at": "2025-10-31T05:18:33.585759+00:00"
@@ -165,16 +137,11 @@
       "completed": true,
       "creator": "677d2654-a6dc-421c-913e-6228e7cd97cf",
       "assignee": null,
-      "visibility": [
-        "677d2654-a6dc-421c-913e-6228e7cd97cf"
-      ],
+      "visibility": ["677d2654-a6dc-421c-913e-6228e7cd97cf"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-10-30T04:39:26.534+00:00",
       "updated_at": "2025-10-31T05:18:35.931116+00:00"
@@ -188,16 +155,11 @@
       "completed": false,
       "creator": "677d2654-a6dc-421c-913e-6228e7cd97cf",
       "assignee": null,
-      "visibility": [
-        "677d2654-a6dc-421c-913e-6228e7cd97cf"
-      ],
+      "visibility": ["677d2654-a6dc-421c-913e-6228e7cd97cf"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-10-31T06:06:28.792+00:00",
       "updated_at": "2025-10-31T06:06:28.792+00:00"
@@ -211,9 +173,7 @@
       "completed": false,
       "creator": "677d2654-a6dc-421c-913e-6228e7cd97cf",
       "assignee": null,
-      "visibility": [
-        "677d2654-a6dc-421c-913e-6228e7cd97cf"
-      ],
+      "visibility": ["677d2654-a6dc-421c-913e-6228e7cd97cf"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [
@@ -224,10 +184,7 @@
           "author_name": "William"
         }
       ],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-10-30T03:38:47.735+00:00",
       "updated_at": "2025-10-31T06:02:21.049625+00:00"
@@ -255,10 +212,7 @@
           "author_name": "William"
         }
       ],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-10-30T00:50:23.471+00:00",
       "updated_at": "2025-10-31T06:03:49.226112+00:00"
@@ -272,9 +226,7 @@
       "completed": false,
       "creator": "677d2654-a6dc-421c-913e-6228e7cd97cf",
       "assignee": null,
-      "visibility": [
-        "677d2654-a6dc-421c-913e-6228e7cd97cf"
-      ],
+      "visibility": ["677d2654-a6dc-421c-913e-6228e7cd97cf"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [
@@ -295,10 +247,7 @@
           "author_name": "William"
         }
       ],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-10-30T00:35:11.143+00:00",
       "updated_at": "2025-11-01T00:51:09.498932+00:00"
@@ -312,9 +261,7 @@
       "completed": false,
       "creator": "677d2654-a6dc-421c-913e-6228e7cd97cf",
       "assignee": null,
-      "visibility": [
-        "677d2654-a6dc-421c-913e-6228e7cd97cf"
-      ],
+      "visibility": ["677d2654-a6dc-421c-913e-6228e7cd97cf"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [
@@ -325,10 +272,7 @@
           "author_name": "William"
         }
       ],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-11-02T03:45:20.831+00:00",
       "updated_at": "2025-11-02T03:46:04.31848+00:00"
@@ -342,16 +286,11 @@
       "completed": true,
       "creator": "677d2654-a6dc-421c-913e-6228e7cd97cf",
       "assignee": null,
-      "visibility": [
-        "677d2654-a6dc-421c-913e-6228e7cd97cf"
-      ],
+      "visibility": ["677d2654-a6dc-421c-913e-6228e7cd97cf"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-10-30T02:54:07.578+00:00",
       "updated_at": "2025-11-05T02:51:35.435614+00:00"
@@ -365,9 +304,7 @@
       "completed": false,
       "creator": "677d2654-a6dc-421c-913e-6228e7cd97cf",
       "assignee": null,
-      "visibility": [
-        "677d2654-a6dc-421c-913e-6228e7cd97cf"
-      ],
+      "visibility": ["677d2654-a6dc-421c-913e-6228e7cd97cf"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [
@@ -384,10 +321,7 @@
           "author_name": "William"
         }
       ],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-10-29T15:56:56.176+00:00",
       "updated_at": "2025-11-02T06:25:43.494904+00:00"
@@ -401,9 +335,7 @@
       "completed": true,
       "creator": "677d2654-a6dc-421c-913e-6228e7cd97cf",
       "assignee": null,
-      "visibility": [
-        "677d2654-a6dc-421c-913e-6228e7cd97cf"
-      ],
+      "visibility": ["677d2654-a6dc-421c-913e-6228e7cd97cf"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [
@@ -414,10 +346,7 @@
           "author_name": "William"
         }
       ],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-10-30T00:30:45.49+00:00",
       "updated_at": "2025-11-02T13:51:25.956371+00:00"
@@ -431,9 +360,7 @@
       "completed": true,
       "creator": "677d2654-a6dc-421c-913e-6228e7cd97cf",
       "assignee": null,
-      "visibility": [
-        "677d2654-a6dc-421c-913e-6228e7cd97cf"
-      ],
+      "visibility": ["677d2654-a6dc-421c-913e-6228e7cd97cf"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [
@@ -444,10 +371,7 @@
           "author_name": "William"
         }
       ],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-10-31T02:19:53.7+00:00",
       "updated_at": "2025-11-05T02:51:38.857619+00:00"
@@ -461,9 +385,7 @@
       "completed": true,
       "creator": "677d2654-a6dc-421c-913e-6228e7cd97cf",
       "assignee": null,
-      "visibility": [
-        "677d2654-a6dc-421c-913e-6228e7cd97cf"
-      ],
+      "visibility": ["677d2654-a6dc-421c-913e-6228e7cd97cf"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [
@@ -486,10 +408,7 @@
           "author_name": "William"
         }
       ],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-10-26T07:16:31.019+00:00",
       "updated_at": "2025-11-05T02:43:40.602249+00:00"
@@ -503,16 +422,11 @@
       "completed": false,
       "creator": "677d2654-a6dc-421c-913e-6228e7cd97cf",
       "assignee": null,
-      "visibility": [
-        "677d2654-a6dc-421c-913e-6228e7cd97cf"
-      ],
+      "visibility": ["677d2654-a6dc-421c-913e-6228e7cd97cf"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-11-05T02:44:05.807+00:00",
       "updated_at": "2025-11-05T02:44:05.807+00:00"
@@ -526,9 +440,7 @@
       "completed": false,
       "creator": "677d2654-a6dc-421c-913e-6228e7cd97cf",
       "assignee": null,
-      "visibility": [
-        "677d2654-a6dc-421c-913e-6228e7cd97cf"
-      ],
+      "visibility": ["677d2654-a6dc-421c-913e-6228e7cd97cf"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [
@@ -539,10 +451,7 @@
           "author_name": "William"
         }
       ],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-11-05T02:43:52.806+00:00",
       "updated_at": "2025-11-05T02:48:38.578677+00:00"
@@ -556,16 +465,11 @@
       "completed": false,
       "creator": "677d2654-a6dc-421c-913e-6228e7cd97cf",
       "assignee": null,
-      "visibility": [
-        "677d2654-a6dc-421c-913e-6228e7cd97cf"
-      ],
+      "visibility": ["677d2654-a6dc-421c-913e-6228e7cd97cf"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-11-05T02:50:26.119+00:00",
       "updated_at": "2025-11-05T02:50:26.119+00:00"
@@ -579,16 +483,11 @@
       "completed": false,
       "creator": "677d2654-a6dc-421c-913e-6228e7cd97cf",
       "assignee": null,
-      "visibility": [
-        "677d2654-a6dc-421c-913e-6228e7cd97cf"
-      ],
+      "visibility": ["677d2654-a6dc-421c-913e-6228e7cd97cf"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-11-05T02:52:11.532+00:00",
       "updated_at": "2025-11-05T02:52:11.532+00:00"
@@ -602,9 +501,7 @@
       "completed": false,
       "creator": "677d2654-a6dc-421c-913e-6228e7cd97cf",
       "assignee": null,
-      "visibility": [
-        "677d2654-a6dc-421c-913e-6228e7cd97cf"
-      ],
+      "visibility": ["677d2654-a6dc-421c-913e-6228e7cd97cf"],
       "related_items": [],
       "sub_tasks": [],
       "notes": [
@@ -615,10 +512,7 @@
           "author_name": "William"
         }
       ],
-      "enabled_quick_actions": [
-        "receipt",
-        "quote"
-      ],
+      "enabled_quick_actions": ["receipt", "quote"],
       "needs_creator_notification": false,
       "created_at": "2025-11-05T03:06:29.303+00:00",
       "updated_at": "2025-11-05T03:10:54.43009+00:00"

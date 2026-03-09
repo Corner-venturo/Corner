@@ -4,7 +4,6 @@
  * 支援共享待辦的顏色區分
  */
 
-
 import React from 'react'
 import { Star, Calendar, Users, CheckCircle, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -47,9 +46,18 @@ export function TodoCard({
 
   // 狀態標籤 - 使用 Morandi 配色
   const statusConfig = {
-    pending: { label: TODO_STATUS_LABELS.pending, color: 'bg-morandi-container/30 text-morandi-secondary' },
-    in_progress: { label: TODO_STATUS_LABELS.in_progress, color: 'bg-morandi-gold/20 text-morandi-gold' },
-    completed: { label: TODO_STATUS_LABELS.completed, color: 'bg-morandi-green/20 text-morandi-green' },
+    pending: {
+      label: TODO_STATUS_LABELS.pending,
+      color: 'bg-morandi-container/30 text-morandi-secondary',
+    },
+    in_progress: {
+      label: TODO_STATUS_LABELS.in_progress,
+      color: 'bg-morandi-gold/20 text-morandi-gold',
+    },
+    completed: {
+      label: TODO_STATUS_LABELS.completed,
+      color: 'bg-morandi-green/20 text-morandi-green',
+    },
     cancelled: { label: TODO_STATUS_LABELS.cancelled, color: 'bg-morandi-red/20 text-morandi-red' },
   }
 
@@ -76,7 +84,9 @@ export function TodoCard({
           onClick={onToggleComplete}
           className={cn(
             'mt-0.5 flex-shrink-0 w-5 h-5 rounded-full border-2 transition-all',
-            isCompleted ? 'bg-status-success border-status-success' : 'border-border hover:border-status-success'
+            isCompleted
+              ? 'bg-status-success border-status-success'
+              : 'border-border hover:border-status-success'
           )}
         >
           {isCompleted && <CheckCircle className="w-full h-full text-white" strokeWidth={3} />}

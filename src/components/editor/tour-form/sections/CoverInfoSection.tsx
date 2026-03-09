@@ -101,7 +101,7 @@ export function CoverInfoSection({
     departureDate: data.departureDate || '2025/01/01',
     tourCode: data.tourCode || 'CODE',
     price: data.price || '',
-    priceNote: data.priceNote === '__hidden__' ? '' : (data.priceNote || COMP_EDITOR_LABELS.人),
+    priceNote: data.priceNote === '__hidden__' ? '' : data.priceNote || COMP_EDITOR_LABELS.人,
     country: selectedCountry || '',
     city: data.city || '',
     dailyItinerary: data.dailyItinerary,
@@ -145,7 +145,9 @@ export function CoverInfoSection({
           <Settings2 size={20} className="text-white" />
         </div>
         <div className="text-left flex-1">
-          <h2 className="text-base font-bold text-morandi-primary">{COMP_EDITOR_LABELS.SETTINGS_9115}</h2>
+          <h2 className="text-base font-bold text-morandi-primary">
+            {COMP_EDITOR_LABELS.SETTINGS_9115}
+          </h2>
           <p className="text-xs text-morandi-secondary">
             風格：{currentStyleOption?.label || COMP_EDITOR_LABELS.經典全屏}
             {airportCode && ` · ${airportCode}`}
@@ -155,58 +157,61 @@ export function CoverInfoSection({
 
       {/* 封面設定 Modal */}
       <Dialog open={showCoverSettings} onOpenChange={setShowCoverSettings}>
-        <DialogContent level={1} className="!flex !flex-row max-w-[95vw] h-[90vh] overflow-hidden p-0">
+        <DialogContent
+          level={1}
+          className="!flex !flex-row max-w-[95vw] h-[90vh] overflow-hidden p-0"
+        >
           {/* 左側：設定表單 */}
           <div className="w-1/2 min-w-0 p-6 overflow-y-auto overflow-x-hidden border-r border-morandi-container">
-              <DialogHeader className="mb-4">
-                <DialogTitle className="flex items-center gap-2">
-                  <div
-                    className="w-6 h-6 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: currentStyleColor }}
-                  >
-                    <Settings2 size={14} className="text-white" />
-                  </div>
-                  {COMP_EDITOR_LABELS.SETTINGS_9115}
-                </DialogTitle>
-              </DialogHeader>
-
-              <div className="space-y-4">
-                {/* 表單區塊 */}
-                <CoverInfoForm
-                  data={data}
-                  selectedCountry={selectedCountry}
-                  setSelectedCountry={setSelectedCountry}
-                  setSelectedCountryCode={setSelectedCountryCode}
-                  allDestinations={allDestinations}
-                  availableCities={availableCities}
-                  countryNameToCode={countryNameToCode}
-                  updateField={updateField}
-                  updateCity={updateCity}
-                  onChange={onChange}
-                  coverStyleOptions={coverStyleOptions}
-                  onCoverStyleChange={handleCoverStyleChange}
-                  templatesLoading={templatesLoading}
-                />
-
-                {/* 封面圖片 - 使用新的機場圖片庫 */}
-                <AirportImageLibrary
-                  airportCode={airportCode}
-                  selectedImage={data.coverImage}
-                  onImageSelect={handleImageSelect}
-                  onImageUpload={handleImageUpload}
-                  position={data.coverImagePosition as ImagePositionSettings}
-                  onPositionChange={(pos) => updateField('coverImagePosition', pos)}
-                />
-
-                {/* 完成按鈕 */}
-                <Button
-                  onClick={() => setShowCoverSettings(false)}
-                  className="w-full"
+            <DialogHeader className="mb-4">
+              <DialogTitle className="flex items-center gap-2">
+                <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center"
                   style={{ backgroundColor: currentStyleColor }}
                 >
-                  {COMP_EDITOR_LABELS.SETTINGS_6595}
-                </Button>
-              </div>
+                  <Settings2 size={14} className="text-white" />
+                </div>
+                {COMP_EDITOR_LABELS.SETTINGS_9115}
+              </DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              {/* 表單區塊 */}
+              <CoverInfoForm
+                data={data}
+                selectedCountry={selectedCountry}
+                setSelectedCountry={setSelectedCountry}
+                setSelectedCountryCode={setSelectedCountryCode}
+                allDestinations={allDestinations}
+                availableCities={availableCities}
+                countryNameToCode={countryNameToCode}
+                updateField={updateField}
+                updateCity={updateCity}
+                onChange={onChange}
+                coverStyleOptions={coverStyleOptions}
+                onCoverStyleChange={handleCoverStyleChange}
+                templatesLoading={templatesLoading}
+              />
+
+              {/* 封面圖片 - 使用新的機場圖片庫 */}
+              <AirportImageLibrary
+                airportCode={airportCode}
+                selectedImage={data.coverImage}
+                onImageSelect={handleImageSelect}
+                onImageUpload={handleImageUpload}
+                position={data.coverImagePosition as ImagePositionSettings}
+                onPositionChange={pos => updateField('coverImagePosition', pos)}
+              />
+
+              {/* 完成按鈕 */}
+              <Button
+                onClick={() => setShowCoverSettings(false)}
+                className="w-full"
+                style={{ backgroundColor: currentStyleColor }}
+              >
+                {COMP_EDITOR_LABELS.SETTINGS_6595}
+              </Button>
+            </div>
           </div>
 
           {/* 右側：實時預覽 */}

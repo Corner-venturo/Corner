@@ -26,6 +26,7 @@ ADD COLUMN closed_by UUID REFERENCES public.employees(id);
 ```
 
 **欄位說明**:
+
 - `closing_status`: 結團狀態
   - `open` - 進行中（尚未結團）
   - `closing` - 結團中（保留，目前未使用）
@@ -67,16 +68,17 @@ const netProfit = grossProfit - miscExpense - tax
 ### 2. 獎金計算
 
 #### 業務業績（可多人分配）
+
 ```typescript
 interface BonusRecipient {
-  employeeId: string  // 員工 ID
-  percentage: number  // 分配百分比
+  employeeId: string // 員工 ID
+  percentage: number // 分配百分比
 }
 
 // 業務業績可以有多個人
 const salesRecipients: BonusRecipient[] = [
-  { employeeId: 'emp-001', percentage: 3 },    // 業務 A 分 3%
-  { employeeId: 'emp-002', percentage: 2 },    // 業務 B 分 2%
+  { employeeId: 'emp-001', percentage: 3 }, // 業務 A 分 3%
+  { employeeId: 'emp-002', percentage: 2 }, // 業務 B 分 2%
 ]
 
 // 計算每個人的獎金金額
@@ -87,11 +89,12 @@ salesRecipients.forEach(recipient => {
 ```
 
 #### OP 獎金（可多人分配）
+
 ```typescript
 // OP 獎金也可以有多個人
 const opRecipients: BonusRecipient[] = [
-  { employeeId: 'emp-003', percentage: 2 },    // OP A 分 2%
-  { employeeId: 'emp-004', percentage: 1.5 },  // OP B 分 1.5%
+  { employeeId: 'emp-003', percentage: 2 }, // OP A 分 2%
+  { employeeId: 'emp-004', percentage: 1.5 }, // OP B 分 1.5%
 ]
 
 // 計算每個人的獎金金額
@@ -140,11 +143,11 @@ async function handleCloseTour() {
       const amount = Math.round(netProfit * (recipient.percentage / 100))
       await supabase.from('payment_requests').insert({
         order_id: firstOrderId,
-        supplier_type: 'bonus',        // ⭐ 關鍵：bonus 類型
+        supplier_type: 'bonus', // ⭐ 關鍵：bonus 類型
         supplier_name: '業務業績',
         amount,
         description: `業務業績 ${recipient.percentage}%`,
-        status: 'pending'
+        status: 'pending',
       })
     }
   }
@@ -155,20 +158,23 @@ async function handleCloseTour() {
       const amount = Math.round(netProfit * (recipient.percentage / 100))
       await supabase.from('payment_requests').insert({
         order_id: firstOrderId,
-        supplier_type: 'bonus',        // ⭐ 關鍵：bonus 類型
+        supplier_type: 'bonus', // ⭐ 關鍵：bonus 類型
         supplier_name: 'OP 獎金',
         amount,
         description: `OP 獎金 ${recipient.percentage}%`,
-        status: 'pending'
+        status: 'pending',
       })
     }
   }
 
   // 3. 更新團體狀態為已結團
-  await supabase.from('tours').update({
-    closing_status: 'closed',
-    closing_date: new Date().toISOString().split('T')[0]
-  }).eq('id', tour.id)
+  await supabase
+    .from('tours')
+    .update({
+      closing_status: 'closed',
+      closing_date: new Date().toISOString().split('T')[0],
+    })
+    .eq('id', tour.id)
 
   // ⭐ 這裡會觸發會計模組的自動拋轉
 }
@@ -185,6 +191,7 @@ async function handleCloseTour() {
 ### 需要產生的傳票
 
 #### 傳票 1：轉列收入
+
 ```
 借：預收團費 (2102)    $totalRevenue
 貸：團費收入 (4101)    $totalRevenue
@@ -192,6 +199,7 @@ async function handleCloseTour() {
 ```
 
 #### 傳票 2：轉列成本（依請款單類型分類）
+
 ```
 借：旅遊成本-交通 (5101)    $交通費用
 借：旅遊成本-住宿 (5102)    $住宿費用
@@ -204,6 +212,7 @@ async function handleCloseTour() {
 ```
 
 **成本分類對應**:
+
 - `supplier_type = 'transportation'` → 5101
 - `supplier_type = 'accommodation'` → 5102
 - `supplier_type = 'meal'` → 5103
@@ -213,6 +222,7 @@ async function handleCloseTour() {
 - `supplier_type = 'bonus'` → **不計入成本，另外處理**
 
 #### 傳票 3：公司雜支
+
 ```
 借：其他收入 (4102)    $memberCount × 10
 貸：應付帳款          $memberCount × 10
@@ -220,6 +230,7 @@ async function handleCloseTour() {
 ```
 
 #### 傳票 4：代收稅額
+
 ```
 借：代收稅額 (新科目)    $tax
 貸：應付稅捐             $tax
@@ -227,6 +238,7 @@ async function handleCloseTour() {
 ```
 
 #### 傳票 5：業務業績
+
 ```
 // 每個業務各一張傳票
 借：業務費用         $amount
@@ -235,6 +247,7 @@ async function handleCloseTour() {
 ```
 
 #### 傳票 6：OP 獎金
+
 ```
 // 每個 OP 各一張傳票
 借：OP 獎金費用      $amount
@@ -247,23 +260,22 @@ async function handleCloseTour() {
 ## 🔍 如何取得結團資料
 
 ### 查詢已結團的團體
+
 ```sql
 SELECT * FROM tours WHERE closing_status = 'closed';
 ```
 
 ### 查詢待結團的團體
+
 ```sql
 SELECT * FROM tours WHERE closing_status = 'open';
 ```
 
 ### 取得團體的完整財務資料
+
 ```typescript
 // 1. 取得團體資訊
-const { data: tour } = await supabase
-  .from('tours')
-  .select('*')
-  .eq('id', tourId)
-  .single()
+const { data: tour } = await supabase.from('tours').select('*').eq('id', tourId).single()
 
 // 2. 取得所有訂單
 const { data: orders } = await supabase
@@ -290,7 +302,7 @@ const costByType = {
   meal: 0,
   ticket: 0,
   insurance: 0,
-  other: 0
+  other: 0,
 }
 
 paymentRequests.forEach(pr => {
@@ -300,10 +312,7 @@ paymentRequests.forEach(pr => {
 })
 
 // 6. 取得團員人數
-const { data: members } = await supabase
-  .from('order_members')
-  .select('id')
-  .in('order_id', orderIds)
+const { data: members } = await supabase.from('order_members').select('id').in('order_id', orderIds)
 
 const memberCount = members.length
 
@@ -320,17 +329,21 @@ const { data: bonusRequests } = await supabase
 ## 📁 相關檔案
 
 ### 資料庫
+
 - `supabase/migrations/20251117140000_add_tour_closing_fields.sql` - 結團欄位
 - `supabase/migrations/20251117150000_add_bonus_to_payment_requests.sql` - bonus 類型
 
 ### 型別定義
+
 - `src/types/tour.types.ts` - Tour 介面（含 closing_status 等欄位）
 
 ### 組件
+
 - `src/components/tours/tour-close-dialog.tsx` - 結團對話框
 - `src/app/tours/[id]/page.tsx` - 旅遊團詳細頁面（含結團按鈕）
 
 ### 列表頁面
+
 - `src/features/tours/components/ToursPage.tsx` - 旅遊團列表（含封存分頁）
 
 ---
@@ -338,20 +351,24 @@ const { data: bonusRequests } = await supabase
 ## 🎯 重要提醒（給會計模組）
 
 ### 1. bonus 類型的請款單
+
 - `supplier_type = 'bonus'` 的請款單 **不計入旅遊成本**
 - 獎金另外拋轉成「業務費用」或「OP 獎金費用」
 
 ### 2. 百分比 (%)
+
 - 業務和 OP 的獎金是用「淨利潤」× 百分比計算
 - 百分比可以是小數（如 1.5%、2.5%）
 - 允許多人分配，總 % 數不限制
 
 ### 3. 結團狀態
+
 - 結團後 `closing_status = 'closed'`
 - 已結團的團體會移到「封存」分頁
 - 管理員可以解鎖（將 closed 改回 open）
 
 ### 4. 會計拋轉時機
+
 - **監聽 `tours.closing_status` 欄位變更**
 - 當變成 `closed` 時，自動產生傳票
 - 使用 Supabase Realtime 或 Database Triggers

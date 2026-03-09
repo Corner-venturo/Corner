@@ -9,6 +9,7 @@
 ## 📋 測試範圍
 
 ### 核心業務流程
+
 1. **客戶管理** → 建立客戶
 2. **報價管理** → 建立報價單
 3. **旅遊團管理** → 建立旅遊團
@@ -16,6 +17,7 @@
 5. **財務管理** → 收款、請款、出納
 
 ### 測試使用者
+
 - **使用者 A**: 業務人員 (完整建立流程)
 - **使用者 B**: 查看/編輯權限
 - **使用者 C**: 會計人員
@@ -27,12 +29,14 @@
 ### 🔴 嚴重問題 (Critical)
 
 #### 1. ✅ [已修復] AddReceiptDialog 沒有實作儲存邏輯
+
 **檔案**: `src/features/finance/payments/components/AddReceiptDialog.tsx`
 **發現日期**: 2025-11-19
 **問題**: handleSubmit 函數只有 TODO 註解，完全沒有呼叫 store.create()
 **影響**: 使用者點擊「新增收款單」按鈕後，對話框關閉並顯示成功訊息，但資料沒有儲存到 IndexedDB 或 Supabase
 **修復**: 實作完整儲存邏輯 (line 80-153)
 **修復內容**:
+
 ```typescript
 - 載入 useReceiptStore, useAuthStore
 - 取得 workspace code
@@ -46,8 +50,10 @@
 ### 🟡 中等問題 (Medium)
 
 #### 2. ✅ [已檢查] 其他建立對話框儲存邏輯
+
 **範圍**: 所有建立對話框已完成檢查
 **結果**:
+
 - ✅ BatchReceiptDialog: 呼叫 `createReceiptOrder()`
 - ✅ AddRequestDialog: 呼叫 `createRequest()` hook
 - ✅ DisbursementDialog: 呼叫 `onCreate` prop (實作於 `createDisbursementOrder`)
@@ -55,7 +61,8 @@
 - ✅ AddVisaDialog: 呼叫 `handleAddVisa` prop (實作於 `addVisa()`)
 
 **檢查方法**:
-1. 掃描所有 *Dialog.tsx 檔案
+
+1. 掃描所有 \*Dialog.tsx 檔案
 2. 檢查 handleSubmit/onCreate/onSubmit 是否呼叫儲存方法
 3. 追蹤 prop drilling 確認實際儲存邏輯
 
@@ -72,6 +79,7 @@
 ## 📊 測試進度
 
 ### Phase 1: 靜態程式碼檢查
+
 - [x] 客戶管理 ✅ 有實作
 - [x] 收款單 ✅ 已修復
 - [x] 批量收款單 ✅ 有實作
@@ -81,12 +89,14 @@
 - [x] 簽證 ✅ 有實作
 
 ### Phase 2: 實際操作測試
+
 - [ ] 使用者 A: 完整建立流程
 - [ ] 使用者 B: 編輯與查看
 - [ ] 使用者 C: 會計確認
 - [ ] 多使用者同步測試
 
 ### Phase 3: 邊界條件測試
+
 - [ ] 網路斷線時的行為
 - [ ] 重複建立的處理
 - [ ] 必填欄位驗證
@@ -97,6 +107,7 @@
 ## 🎯 測試計畫: 使用者 A 完整流程
 
 ### 情境: 業務人員接到新客戶詢問
+
 **角色**: 業務人員 (有完整權限)
 
 1. **建立客戶**
@@ -149,6 +160,7 @@
 ## 🔧 檢查方法
 
 ### 自動化檢查腳本
+
 ```bash
 # 搜尋所有包含 TODO 的 handle 函數
 grep -r "const handle.*TODO" src --include="*.tsx" --include="*.ts"
@@ -161,7 +173,9 @@ grep -r "\.create\(" src/features --include="*.tsx" -A 3 -B 3
 ```
 
 ### 手動檢查清單
+
 每個建立對話框檢查：
+
 - [ ] 是否有 handleSubmit/handleAdd/handleCreate 函數?
 - [ ] 函數中是否有呼叫 store.create() 或類似方法?
 - [ ] 是否有 TODO 註解未實作?
@@ -201,17 +215,20 @@ grep -r "\.create\(" src/features --include="*.tsx" -A 3 -B 3
 ## 🎬 下一步
 
 ### 立即行動
+
 1. ✅ 修復 AddReceiptDialog (已完成)
 2. ✅ 檢查所有其他建立對話框 (已完成 - 全部正常)
 3. ✅ 建立完整的問題清單 (已完成)
 4. ✅ 建立測試驗證腳本 (test-data-persistence.js)
 
 ### 中期計畫
+
 1. 建立自動化測試腳本
 2. 建立 E2E 測試
 3. 建立開發檢查清單 (PR template)
 
 ### 長期計畫
+
 1. 導入 unit testing
 2. 導入 integration testing
 3. 建立 CI/CD pipeline

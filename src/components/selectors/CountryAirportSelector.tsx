@@ -58,9 +58,7 @@ export function CountryAirportSelector({
   // 國家選項（優先使用外部傳入的）
   const countryOptions = useMemo(() => {
     if (externalCountries) {
-      return externalCountries
-        .filter(c => c.is_active)
-        .map(c => ({ value: c.name, label: c.name }))
+      return externalCountries.filter(c => c.is_active).map(c => ({ value: c.name, label: c.name }))
     }
     return hookCountries.map(c => ({ value: c, label: c }))
   }, [externalCountries, hookCountries])
@@ -68,9 +66,9 @@ export function CountryAirportSelector({
   // 根據國家取得機場列表
   const availableAirports = useMemo(() => {
     if (!country) return []
-    
+
     const airports = getAirportsByCountry(country)
-    
+
     // favorite 已經排在前面了（由 useAirports 處理）
     return airports.map(a => ({
       value: a.iata_code,
@@ -85,17 +83,23 @@ export function CountryAirportSelector({
   }
 
   // 處理國家變更
-  const handleCountryChange = useCallback((newCountry: string) => {
-    const isTaiwan = isTaiwanCountry(newCountry)
-    onCountryChange(newCountry, isTaiwan ? 'TW' : '')
-  }, [onCountryChange])
+  const handleCountryChange = useCallback(
+    (newCountry: string) => {
+      const isTaiwan = isTaiwanCountry(newCountry)
+      onCountryChange(newCountry, isTaiwan ? 'TW' : '')
+    },
+    [onCountryChange]
+  )
 
   // 處理機場代碼變更
-  const handleAirportChange = useCallback((code: string) => {
-    const airport = getAirport(code)
-    const cityName = airport?.city_name_zh || airport?.city_name_en || code
-    onAirportChange(code, cityName)
-  }, [getAirport, onAirportChange])
+  const handleAirportChange = useCallback(
+    (code: string) => {
+      const airport = getAirport(code)
+      const cityName = airport?.city_name_zh || airport?.city_name_en || code
+      onAirportChange(code, cityName)
+    },
+    [getAirport, onAirportChange]
+  )
 
   // 處理快速新增機場（Combobox onCreate 回調）
   const handleCreateAirport = useCallback(async (searchText: string) => {
@@ -205,10 +209,7 @@ export function CountryAirportSelector({
           <label className="text-sm font-medium text-morandi-primary mb-2 block">
             {SELECTORS_LABELS.LABEL_7192}
           </label>
-          <Input
-            value={newCityName}
-            onChange={e => setNewCityName(e.target.value)}
-          />
+          <Input value={newCityName} onChange={e => setNewCityName(e.target.value)} />
         </div>
         <div>
           <label className="text-sm font-medium text-morandi-primary mb-2 block">
@@ -216,7 +217,14 @@ export function CountryAirportSelector({
           </label>
           <Input
             value={newIataCode}
-            onChange={e => setNewIataCode(e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3))}
+            onChange={e =>
+              setNewIataCode(
+                e.target.value
+                  .toUpperCase()
+                  .replace(/[^A-Z]/g, '')
+                  .slice(0, 3)
+              )
+            }
             placeholder={SELECTORS_LABELS.EXAMPLE_7494}
             maxLength={3}
           />

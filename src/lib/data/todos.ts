@@ -28,7 +28,7 @@ export async function getAllTodos(workspaceId: string): Promise<Todo[]> {
   const { data, error } = await supabase
     .from('todos')
     .select('*')
-    .eq('workspace_id', workspaceId)  // 🔒 Workspace 過濾
+    .eq('workspace_id', workspaceId) // 🔒 Workspace 過濾
     .order('created_at', { ascending: false })
     .limit(500)
 
@@ -54,7 +54,7 @@ export async function getTodoById(id: string, workspaceId: string): Promise<Todo
     .from('todos')
     .select('*')
     .eq('id', id)
-    .eq('workspace_id', workspaceId)  // 🔒 Workspace 過濾
+    .eq('workspace_id', workspaceId) // 🔒 Workspace 過濾
     .single()
 
   if (error) {
@@ -79,7 +79,7 @@ export async function getTodosByStatus(status: string, workspaceId: string): Pro
     .from('todos')
     .select('*')
     .eq('status', status)
-    .eq('workspace_id', workspaceId)  // 🔒 Workspace 過濾
+    .eq('workspace_id', workspaceId) // 🔒 Workspace 過濾
     .order('created_at', { ascending: false })
     .limit(500)
 
@@ -105,7 +105,7 @@ export async function getTodosByAssignee(assigneeId: string, workspaceId: string
     .from('todos')
     .select('*')
     .eq('assignee', assigneeId)
-    .eq('workspace_id', workspaceId)  // 🔒 Workspace 過濾
+    .eq('workspace_id', workspaceId) // 🔒 Workspace 過濾
     .order('created_at', { ascending: false })
     .limit(500)
 
@@ -121,7 +121,11 @@ export async function getTodosByAssignee(assigneeId: string, workspaceId: string
  * 根據關聯實體取得待辦事項
  * 🔒 需要傳入 workspaceId
  */
-export async function getTodosByEntity(entityType: string, entityId: string, workspaceId: string): Promise<Todo[]> {
+export async function getTodosByEntity(
+  entityType: string,
+  entityId: string,
+  workspaceId: string
+): Promise<Todo[]> {
   if (!workspaceId) {
     logger.error('getTodosByEntity: workspaceId 必須提供')
     return []
@@ -133,7 +137,7 @@ export async function getTodosByEntity(entityType: string, entityId: string, wor
     .from('todos')
     .select('*')
     .contains('related_items', [{ type: entityType, id: entityId }])
-    .eq('workspace_id', workspaceId)  // 🔒 Workspace 過濾
+    .eq('workspace_id', workspaceId) // 🔒 Workspace 過濾
     .order('created_at', { ascending: false })
     .limit(500)
 

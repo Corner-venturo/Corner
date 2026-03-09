@@ -90,26 +90,41 @@ export function useMemberExport(members: OrderMember[]) {
             </tr>
           </thead>
           <tbody>
-            ${members.map((member, idx) => `
+            ${members
+              .map(
+                (member, idx) => `
               <tr>
                 <td class="text-center">${idx + 1}</td>
-                ${selectedCols.map(col => {
-                  let value = ''
-                  if (col === 'gender') {
-                    value = member.gender === 'M' ? EXPORT_DIALOG_LABELS.GENDER_MALE : member.gender === 'F' ? EXPORT_DIALOG_LABELS.GENDER_FEMALE : '-'
-                  } else if (col === 'balance') {
-                    value = ((member.total_payable || 0) - (member.deposit_amount || 0)).toLocaleString()
-                  } else if (col === 'total_payable' || col === 'deposit_amount') {
-                    const num = member[col as keyof OrderMember] as number
-                    value = num ? num.toLocaleString() : '-'
-                  } else {
-                    value = (member[col as keyof OrderMember] as string) || '-'
-                  }
-                  const align = ['total_payable', 'deposit_amount', 'balance'].includes(col) ? 'text-right' : ''
-                  return `<td class="${align}">${value}</td>`
-                }).join('')}
+                ${selectedCols
+                  .map(col => {
+                    let value = ''
+                    if (col === 'gender') {
+                      value =
+                        member.gender === 'M'
+                          ? EXPORT_DIALOG_LABELS.GENDER_MALE
+                          : member.gender === 'F'
+                            ? EXPORT_DIALOG_LABELS.GENDER_FEMALE
+                            : '-'
+                    } else if (col === 'balance') {
+                      value = (
+                        (member.total_payable || 0) - (member.deposit_amount || 0)
+                      ).toLocaleString()
+                    } else if (col === 'total_payable' || col === 'deposit_amount') {
+                      const num = member[col as keyof OrderMember] as number
+                      value = num ? num.toLocaleString() : '-'
+                    } else {
+                      value = (member[col as keyof OrderMember] as string) || '-'
+                    }
+                    const align = ['total_payable', 'deposit_amount', 'balance'].includes(col)
+                      ? 'text-right'
+                      : ''
+                    return `<td class="${align}">${value}</td>`
+                  })
+                  .join('')}
               </tr>
-            `).join('')}
+            `
+              )
+              .join('')}
           </tbody>
         </table>
       </body>
@@ -134,11 +149,7 @@ export function useMemberExport(members: OrderMember[]) {
   const toggleAllColumns = () => {
     const allSelected = Object.values(exportColumns).every(v => v)
     const newValue = !allSelected
-    setExportColumns(
-      Object.fromEntries(
-        Object.keys(exportColumns).map(k => [k, newValue])
-      )
-    )
+    setExportColumns(Object.fromEntries(Object.keys(exportColumns).map(k => [k, newValue])))
   }
 
   const handleExportExcel = async (tourName?: string) => {
@@ -156,11 +167,16 @@ export function useMemberExport(members: OrderMember[]) {
 
     // 轉換資料
     const data = members.map((member, idx) => {
-      const row: Record<string, string | number> = { '序': idx + 1 }
+      const row: Record<string, string | number> = { 序: idx + 1 }
       selectedCols.forEach(col => {
         const label = EXPORT_COLUMN_LABELS[col]
         if (col === 'gender') {
-          row[label] = member.gender === 'M' ? EXPORT_DIALOG_LABELS.GENDER_MALE : member.gender === 'F' ? EXPORT_DIALOG_LABELS.GENDER_FEMALE : ''
+          row[label] =
+            member.gender === 'M'
+              ? EXPORT_DIALOG_LABELS.GENDER_MALE
+              : member.gender === 'F'
+                ? EXPORT_DIALOG_LABELS.GENDER_FEMALE
+                : ''
         } else if (col === 'balance') {
           row[label] = (member.total_payable || 0) - (member.deposit_amount || 0)
         } else if (col === 'total_payable' || col === 'deposit_amount') {
@@ -192,9 +208,7 @@ export function useMemberExport(members: OrderMember[]) {
     worksheet['!cols'] = colWidths
 
     const today = new Date().toISOString().split('T')[0].replace(/-/g, '')
-    const fileName = tourName
-      ? `${tourName}_團員名單_${today}.xlsx`
-      : `團員名單_${today}.xlsx`
+    const fileName = tourName ? `${tourName}_團員名單_${today}.xlsx` : `團員名單_${today}.xlsx`
     XLSX.writeFile(workbook, fileName)
 
     setIsExportDialogOpen(false)

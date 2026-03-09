@@ -13,7 +13,11 @@ import { Combobox } from '@/components/ui/combobox'
 import { Trash2, Plus, Link2 } from 'lucide-react'
 import { RequestItem, categoryOptions } from '../types'
 import { CurrencyCell } from '@/components/table-cells'
-import { REQUEST_DETAIL_DIALOG_LABELS, REQUEST_ITEM_LIST_LABELS, LINK_CONFIRMATION_LABELS } from '../../constants/labels';
+import {
+  REQUEST_DETAIL_DIALOG_LABELS,
+  REQUEST_ITEM_LIST_LABELS,
+  LINK_CONFIRMATION_LABELS,
+} from '../../constants/labels'
 import { LinkConfirmationDialog } from './LinkConfirmationDialog'
 
 interface SupplierOption {
@@ -62,18 +66,34 @@ export function EditableRequestItemList({
 
   return (
     <div>
-      <h3 className="text-sm font-medium text-morandi-primary mb-3">{REQUEST_ITEM_LIST_LABELS.LABEL_475}</h3>
+      <h3 className="text-sm font-medium text-morandi-primary mb-3">
+        {REQUEST_ITEM_LIST_LABELS.LABEL_475}
+      </h3>
 
       {/* 表頭 */}
       <div className="border-b border-morandi-container/60">
         <div className="grid grid-cols-[80px_1fr_1fr_96px_64px_112px_40px_48px] px-2 py-2.5">
-          <span className="text-xs font-medium text-morandi-secondary">{REQUEST_ITEM_LIST_LABELS.LABEL_2946}</span>
-          <span className="text-xs font-medium text-morandi-secondary">{REQUEST_ITEM_LIST_LABELS.LABEL_561}</span>
-          <span className="text-xs font-medium text-morandi-secondary">{REQUEST_ITEM_LIST_LABELS.LABEL_6008}</span>
-          <span className="text-xs font-medium text-morandi-secondary text-right">{REQUEST_ITEM_LIST_LABELS.LABEL_9413}</span>
-          <span className="text-xs font-medium text-morandi-secondary text-center">{REQUEST_ITEM_LIST_LABELS.QUANTITY}</span>
-          <span className="text-xs font-medium text-morandi-secondary text-right">{REQUEST_ITEM_LIST_LABELS.LABEL_832}</span>
-          <span className="text-xs font-medium text-morandi-secondary text-center"><Link2 size={12} className="inline" /></span>
+          <span className="text-xs font-medium text-morandi-secondary">
+            {REQUEST_ITEM_LIST_LABELS.LABEL_2946}
+          </span>
+          <span className="text-xs font-medium text-morandi-secondary">
+            {REQUEST_ITEM_LIST_LABELS.LABEL_561}
+          </span>
+          <span className="text-xs font-medium text-morandi-secondary">
+            {REQUEST_ITEM_LIST_LABELS.LABEL_6008}
+          </span>
+          <span className="text-xs font-medium text-morandi-secondary text-right">
+            {REQUEST_ITEM_LIST_LABELS.LABEL_9413}
+          </span>
+          <span className="text-xs font-medium text-morandi-secondary text-center">
+            {REQUEST_ITEM_LIST_LABELS.QUANTITY}
+          </span>
+          <span className="text-xs font-medium text-morandi-secondary text-right">
+            {REQUEST_ITEM_LIST_LABELS.LABEL_832}
+          </span>
+          <span className="text-xs font-medium text-morandi-secondary text-center">
+            <Link2 size={12} className="inline" />
+          </span>
           <span></span>
         </div>
       </div>
@@ -81,7 +101,11 @@ export function EditableRequestItemList({
       {/* 項目區域 - 最小 4 列高度，超過則可滾動 */}
       <div
         className="overflow-visible"
-        style={{ minHeight: `${TABLE_HEIGHT}px`, maxHeight: `${TABLE_HEIGHT * 1.5}px`, overflowY: items.length > VISIBLE_ROWS ? 'auto' : 'visible' }}
+        style={{
+          minHeight: `${TABLE_HEIGHT}px`,
+          maxHeight: `${TABLE_HEIGHT * 1.5}px`,
+          overflowY: items.length > VISIBLE_ROWS ? 'auto' : 'visible',
+        }}
       >
         {items.map((item, index) => (
           <div
@@ -96,9 +120,7 @@ export function EditableRequestItemList({
                   updateItem(item.id, { category: value as RequestItem['category'] })
                 }
               >
-                <SelectTrigger
-                  className="input-no-focus h-9 border-0 shadow-none bg-transparent text-sm px-1"
-                >
+                <SelectTrigger className="input-no-focus h-9 border-0 shadow-none bg-transparent text-sm px-1">
                   <SelectValue placeholder="類別" />
                 </SelectTrigger>
                 <SelectContent>
@@ -145,9 +167,7 @@ export function EditableRequestItemList({
               <input
                 type="number"
                 value={item.unit_price || ''}
-                onChange={e =>
-                  updateItem(item.id, { unit_price: parseFloat(e.target.value) || 0 })
-                }
+                onChange={e => updateItem(item.id, { unit_price: parseFloat(e.target.value) || 0 })}
                 placeholder="0"
                 className={`${inputClass} text-right placeholder:text-morandi-muted`}
               />
@@ -158,9 +178,7 @@ export function EditableRequestItemList({
               <input
                 type="number"
                 value={item.quantity || ''}
-                onChange={e =>
-                  updateItem(item.id, { quantity: parseInt(e.target.value) || 1 })
-                }
+                onChange={e => updateItem(item.id, { quantity: parseInt(e.target.value) || 1 })}
                 placeholder="1"
                 className={`${inputClass} text-center placeholder:text-morandi-muted`}
               />
@@ -168,7 +186,10 @@ export function EditableRequestItemList({
 
             {/* Subtotal */}
             <div className="text-right pr-2">
-              <CurrencyCell amount={item.unit_price * item.quantity} className="text-morandi-gold" />
+              <CurrencyCell
+                amount={item.unit_price * item.quantity}
+                className="text-morandi-gold"
+              />
             </div>
 
             {/* Link to confirmation */}
@@ -183,11 +204,17 @@ export function EditableRequestItemList({
                     setLinkDialogOpen(true)
                   }}
                   className={`h-7 w-7 ${item.confirmation_item_id ? 'text-morandi-green' : 'text-morandi-muted hover:text-morandi-secondary'}`}
-                  title={item.confirmation_item_id ? LINK_CONFIRMATION_LABELS.LINKED : LINK_CONFIRMATION_LABELS.LINK_BUTTON}
+                  title={
+                    item.confirmation_item_id
+                      ? LINK_CONFIRMATION_LABELS.LINKED
+                      : LINK_CONFIRMATION_LABELS.LINK_BUTTON
+                  }
                 >
                   <Link2 size={14} />
                 </Button>
-              ) : <span />}
+              ) : (
+                <span />
+              )}
             </div>
 
             {/* Actions */}
@@ -195,7 +222,8 @@ export function EditableRequestItemList({
               {index === 0 ? (
                 <Button
                   variant="ghost"
-                  size="icon" aria-label="Button"
+                  size="icon"
+                  aria-label="Button"
                   onClick={addNewEmptyItem}
                   className="h-8 w-8 text-morandi-gold hover:bg-morandi-gold/10"
                   title={REQUEST_ITEM_LIST_LABELS.新增項目}
@@ -205,7 +233,8 @@ export function EditableRequestItemList({
               ) : (
                 <Button
                   variant="ghost"
-                  size="icon" aria-label="Delete"
+                  size="icon"
+                  aria-label="Delete"
                   onClick={() => removeItem(item.id)}
                   className="h-8 w-8 text-morandi-secondary hover:text-morandi-red hover:bg-morandi-red/10"
                   title={REQUEST_DETAIL_DIALOG_LABELS.刪除項目}
@@ -234,13 +263,14 @@ export function EditableRequestItemList({
               <div></div>
               <div></div>
             </div>
-          ))
-        }
+          ))}
       </div>
 
       {/* Total */}
       <div className="flex justify-end items-center gap-6 pt-4 mt-2">
-        <span className="text-sm text-morandi-secondary">{REQUEST_ITEM_LIST_LABELS.TOTAL_6550}</span>
+        <span className="text-sm text-morandi-secondary">
+          {REQUEST_ITEM_LIST_LABELS.TOTAL_6550}
+        </span>
         <CurrencyCell amount={total_amount} className="text-lg font-semibold text-morandi-gold" />
       </div>
 
@@ -252,7 +282,7 @@ export function EditableRequestItemList({
           tourId={tourId}
           category={linkingItem?.category}
           currentItemId={linkingItem?.confirmation_item_id ?? null}
-          onSelect={(confirmationItemId) => {
+          onSelect={confirmationItemId => {
             if (linkingItemId) {
               updateItem(linkingItemId, { confirmation_item_id: confirmationItemId })
             }

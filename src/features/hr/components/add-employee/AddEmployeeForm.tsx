@@ -18,7 +18,11 @@ import { PasswordAndRoleFields } from './PasswordAndRoleFields'
 import { JobInfoFields } from './JobInfoFields'
 import { SuccessDialog } from './SuccessDialog'
 import { AddEmployeeFormProps } from './types'
-import { getAvailableWorkspaces, isSuperAdmin as checkIsSuperAdmin, getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
+import {
+  getAvailableWorkspaces,
+  isSuperAdmin as checkIsSuperAdmin,
+  getCurrentWorkspaceCode,
+} from '@/lib/workspace-helpers'
 import { useWorkspaceStoreData } from '@/stores/workspace/workspace-store'
 import { hasFullFeatures } from '@/lib/feature-restrictions'
 import { COMP_HR_LABELS } from '@/features/hr/constants/labels'
@@ -61,7 +65,8 @@ export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
 
   // 只有完整功能的公司（TP/TC）的 super_admin 才能選擇不同 workspace
   const currentWorkspaceCode = getCurrentWorkspaceCode()
-  const showWorkspaceSelector = (isSuperAdmin || checkIsSuperAdmin()) &&
+  const showWorkspaceSelector =
+    (isSuperAdmin || checkIsSuperAdmin()) &&
     availableWorkspaces.length > 1 &&
     hasFullFeatures(currentWorkspaceCode)
 
@@ -73,7 +78,9 @@ export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
           <div className="bg-morandi-gold/10 border border-morandi-gold/30 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-3">
               <Building2 size={18} className="text-morandi-gold" />
-              <Label className="text-morandi-primary font-semibold">{COMP_HR_LABELS.LABEL_6548}</Label>
+              <Label className="text-morandi-primary font-semibold">
+                {COMP_HR_LABELS.LABEL_6548}
+              </Label>
             </div>
             <Select
               value={formData.workspace_id || ''}
@@ -83,16 +90,14 @@ export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
                 <SelectValue placeholder={COMP_HR_LABELS.請選擇辦公室} />
               </SelectTrigger>
               <SelectContent>
-                {availableWorkspaces.map((workspace) => (
+                {availableWorkspaces.map(workspace => (
                   <SelectItem key={workspace.id} value={workspace.id}>
                     {workspace.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-morandi-secondary mt-2">
-              {COMP_HR_LABELS.SELECT_8103}
-            </p>
+            <p className="text-xs text-morandi-secondary mt-2">{COMP_HR_LABELS.SELECT_8103}</p>
           </div>
         )}
 

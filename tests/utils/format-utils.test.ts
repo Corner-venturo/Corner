@@ -1,6 +1,17 @@
 import { describe, it, expect } from 'vitest'
 import { formatCurrency, formatMoney, formatTWD, formatUSD } from '@/lib/utils/format-currency'
-import { formatDate, formatDateTW, formatDateCompact, formatDateTime, isSameDay, daysBetween, parseLocalDate, toTaipeiDateString, formatWeekday, formatDateChinese } from '@/lib/utils/format-date'
+import {
+  formatDate,
+  formatDateTW,
+  formatDateCompact,
+  formatDateTime,
+  isSameDay,
+  daysBetween,
+  parseLocalDate,
+  toTaipeiDateString,
+  formatWeekday,
+  formatDateChinese,
+} from '@/lib/utils/format-date'
 import { formatTimeInput, isValidTimeFormat, fullWidthToHalf } from '@/lib/utils/format-time-input'
 
 describe('format-currency', () => {

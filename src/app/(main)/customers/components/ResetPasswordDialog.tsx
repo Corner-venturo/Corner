@@ -21,11 +21,7 @@ interface ResetPasswordDialogProps {
   customer: Customer | null
 }
 
-export function ResetPasswordDialog({
-  open,
-  onOpenChange,
-  customer,
-}: ResetPasswordDialogProps) {
+export function ResetPasswordDialog({ open, onOpenChange, customer }: ResetPasswordDialogProps) {
   const [newPassword, setNewPassword] = useState('')
   const [isResetting, setIsResetting] = useState(false)
 
@@ -45,14 +41,11 @@ export function ResetPasswordDialog({
       return
     }
 
-    const confirmed = await confirm(
-      L.confirm_msg(customer.name),
-      {
-        title: L.confirm_title,
-        confirmText: L.confirm_text,
-        cancelText: L.btn_cancel,
-      }
-    )
+    const confirmed = await confirm(L.confirm_msg(customer.name), {
+      title: L.confirm_title,
+      confirmText: L.confirm_text,
+      cancelText: L.btn_cancel,
+    })
 
     if (!confirmed) return
 
@@ -98,29 +91,32 @@ export function ResetPasswordDialog({
         <div className="py-4 space-y-4">
           <div>
             <p className="text-sm text-morandi-secondary mb-2">
-              {L.resetting_for} <span className="font-medium text-morandi-primary">{customer.name}</span> {L.reset_password_suffix}
+              {L.resetting_for}{' '}
+              <span className="font-medium text-morandi-primary">{customer.name}</span>{' '}
+              {L.reset_password_suffix}
             </p>
             <p className="text-xs text-morandi-secondary">
-              {L.account_label}{customer.email || L.no_email}
+              {L.account_label}
+              {customer.email || L.no_email}
             </p>
           </div>
 
           {customer.email ? (
             <div>
-              <label className="text-xs font-medium text-morandi-primary">{L.label_new_password}</label>
+              <label className="text-xs font-medium text-morandi-primary">
+                {L.label_new_password}
+              </label>
               <Input
                 type="password"
                 value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
+                onChange={e => setNewPassword(e.target.value)}
                 placeholder={L.placeholder_password}
                 className="mt-1"
               />
             </div>
           ) : (
             <div className="p-3 bg-status-warning-bg border border-status-warning/30 rounded-lg">
-              <p className="text-sm text-status-warning">
-                {L.no_email_warning}
-              </p>
+              <p className="text-sm text-status-warning">{L.no_email_warning}</p>
             </div>
           )}
         </div>

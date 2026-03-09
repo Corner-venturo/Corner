@@ -34,10 +34,7 @@ export function BatchVisaDialog({ open, onOpenChange, order }: BatchVisaDialogPr
     }
   }, [open, order, loadMembers])
 
-  const membersMap = useMemo(
-    () => new Map(members.map(m => [m.id, m])),
-    [members]
-  )
+  const membersMap = useMemo(() => new Map(members.map(m => [m.id, m])), [members])
 
   const typesArray = useMemo(() => Array.from(selectedTypes), [selectedTypes])
 
@@ -67,9 +64,7 @@ export function BatchVisaDialog({ open, onOpenChange, order }: BatchVisaDialogPr
   }, [])
 
   const handleSelectAll = useCallback(() => {
-    const allKeys = members.flatMap(m =>
-      typesArray.map(t => `${m.id}::${t}`)
-    )
+    const allKeys = members.flatMap(m => typesArray.map(t => `${m.id}::${t}`))
     setCheckedCells(new Set(allKeys))
   }, [members, typesArray])
 
@@ -91,9 +86,7 @@ export function BatchVisaDialog({ open, onOpenChange, order }: BatchVisaDialogPr
 
   const goToStep2 = useCallback(() => {
     // Pre-check all cells when entering step 2
-    const allKeys = members.flatMap(m =>
-      typesArray.map(t => `${m.id}::${t}`)
-    )
+    const allKeys = members.flatMap(m => typesArray.map(t => `${m.id}::${t}`))
     setCheckedCells(new Set(allKeys))
     setStep(2)
   }, [members, typesArray])
@@ -199,10 +192,7 @@ export function BatchVisaDialog({ open, onOpenChange, order }: BatchVisaDialogPr
               <Button variant="ghost" onClick={() => onOpenChange(false)}>
                 {L.btn_cancel}
               </Button>
-              <Button
-                onClick={goToStep2}
-                disabled={selectedTypes.size === 0}
-              >
+              <Button onClick={goToStep2} disabled={selectedTypes.size === 0}>
                 {L.btn_next}
                 <ArrowRight className="ml-1" size={16} />
               </Button>
@@ -213,10 +203,7 @@ export function BatchVisaDialog({ open, onOpenChange, order }: BatchVisaDialogPr
                 <ArrowLeft className="mr-1" size={16} />
                 {L.btn_back}
               </Button>
-              <Button
-                onClick={handleSubmit}
-                disabled={isSubmitting || checkedCells.size === 0}
-              >
+              <Button onClick={handleSubmit} disabled={isSubmitting || checkedCells.size === 0}>
                 {isSubmitting ? L.btn_submitting : L.btn_submit}
                 {!isSubmitting && <Send className="ml-1" size={16} />}
               </Button>

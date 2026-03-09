@@ -7,14 +7,15 @@ const supabase = createClient(
 
 async function updateCountries() {
   // 1. 新增沙烏地阿拉伯
-  const { error: insertError } = await supabase
-    .from('countries')
-    .upsert({
+  const { error: insertError } = await supabase.from('countries').upsert(
+    {
       id: 'saudi_arabia',
       name: '沙烏地阿拉伯',
       name_en: 'Saudi Arabia',
-      region: '中東'
-    }, { onConflict: 'id' })
+      region: '中東',
+    },
+    { onConflict: 'id' }
+  )
 
   if (insertError) {
     console.log('新增沙烏地阿拉伯錯誤:', insertError.message)
@@ -32,7 +33,7 @@ async function updateCountries() {
     { id: 'philippines', name: '菲律賓', name_en: 'Philippines', region: '東南亞' },
     { id: 'france', name: '法國', name_en: 'France', region: '歐洲' },
     { id: 'egypt', name: '埃及', name_en: 'Egypt', region: '中東' },
-    { id: 'turkey', name: '土耳其', name_en: 'Turkey', region: '中東' }
+    { id: 'turkey', name: '土耳其', name_en: 'Turkey', region: '中東' },
   ]
 
   for (const country of updates) {
@@ -49,10 +50,7 @@ async function updateCountries() {
   }
 
   // 3. 查看最終結果
-  const { data: countries } = await supabase
-    .from('countries')
-    .select('*')
-    .order('region, name')
+  const { data: countries } = await supabase.from('countries').select('*').order('region, name')
 
   console.log('')
   console.log('========================================')

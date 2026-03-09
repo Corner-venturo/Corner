@@ -116,9 +116,7 @@ export function DatePicker({
             className
           )}
         >
-          <span className="flex-1 truncate">
-            {value ? displayValue(value) : placeholder}
-          </span>
+          <span className="flex-1 truncate">{value ? displayValue(value) : placeholder}</span>
           <div className="flex items-center gap-1 ml-2">
             {clearable && value && (
               <span

@@ -70,7 +70,7 @@ export interface ImportConfig<T = Record<string, string | null>> {
  */
 export async function parseImportFile<T = Record<string, string | null>>(
   file: File,
-  config: ImportConfig<T>,
+  config: ImportConfig<T>
 ): Promise<ImportParseResult<T>> {
   const XLSX = await import('xlsx')
 
@@ -176,9 +176,7 @@ export async function parseImportFile<T = Record<string, string | null>>(
     .filter(c => c.required)
     .filter(c => !detected_headers.includes(c.header.trim()))
   if (required_missing.length > 0) {
-    global_errors.push(
-      `缺少必填欄位：${required_missing.map(c => c.header).join('、')}`,
-    )
+    global_errors.push(`缺少必填欄位：${required_missing.map(c => c.header).join('、')}`)
   }
 
   // 解析資料列
@@ -257,7 +255,7 @@ export async function parseImportFile<T = Record<string, string | null>>(
 export async function downloadImportTemplate(
   columns: ColumnMapping[],
   filename: string,
-  sheet_name: string = '匯入資料',
+  sheet_name: string = '匯入資料'
 ): Promise<void> {
   const XLSX = await import('xlsx')
 
@@ -278,7 +276,7 @@ export async function downloadImportTemplate(
 
 /** Email 格式驗證 */
 export const emailValidator: ValidationRule = {
-  validate: (value) => {
+  validate: value => {
     if (!value) return null
     const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return pattern.test(value) ? null : 'Email 格式不正確'
@@ -287,7 +285,7 @@ export const emailValidator: ValidationRule = {
 
 /** 電話格式驗證（寬鬆：允許數字、+、-、空格、括號） */
 export const phoneValidator: ValidationRule = {
-  validate: (value) => {
+  validate: value => {
     if (!value) return null
     const pattern = /^[+\d][\d\s\-()]{5,}$/
     return pattern.test(value) ? null : '電話格式不正確'
@@ -296,7 +294,7 @@ export const phoneValidator: ValidationRule = {
 
 /** 日期格式驗證（YYYY-MM-DD 或 YYYY/MM/DD） */
 export const dateValidator: ValidationRule = {
-  validate: (value) => {
+  validate: value => {
     if (!value) return null
     // 嘗試解析日期
     const normalized = value.replace(/\//g, '-')

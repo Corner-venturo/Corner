@@ -112,11 +112,7 @@ export class ReportBuilder {
       { key: 'profit', label: '利潤', type: 'currency' },
     ]
 
-    let query = supabase
-      .from('tours')
-      .select('*')
-      .eq('workspace_id', this.workspaceId)
-      .limit(500)
+    let query = supabase.from('tours').select('*').eq('workspace_id', this.workspaceId).limit(500)
 
     if (this.dateRange) {
       query = query
@@ -167,11 +163,7 @@ export class ReportBuilder {
       { key: 'created_at', label: '建立日期', type: 'date' },
     ]
 
-    let query = supabase
-      .from('orders')
-      .select('*')
-      .eq('workspace_id', this.workspaceId)
-      .limit(500)
+    let query = supabase.from('orders').select('*').eq('workspace_id', this.workspaceId).limit(500)
 
     if (this.dateRange) {
       query = query
@@ -227,13 +219,15 @@ export class ReportBuilder {
   toCSV(report: GeneratedReport): string {
     const headers = report.columns.map(c => c.label).join(',')
     const rows = report.rows.map(row =>
-      report.columns.map(col => {
-        const value = row[col.key]
-        if (typeof value === 'string' && value.includes(',')) {
-          return `"${value}"`
-        }
-        return String(value ?? '')
-      }).join(',')
+      report.columns
+        .map(col => {
+          const value = row[col.key]
+          if (typeof value === 'string' && value.includes(',')) {
+            return `"${value}"`
+          }
+          return String(value ?? '')
+        })
+        .join(',')
     )
 
     return [headers, ...rows].join('\n')

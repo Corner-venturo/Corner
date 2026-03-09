@@ -8,16 +8,8 @@ Please create the following files in your `/Users/williamchien/Projects/venturo-
 
 ```tsx
 // Placeholder for (public) layout
-export default function PublicLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <>
-      {children}
-    </>
-  );
+export default function PublicLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>
 }
 ```
 
@@ -33,7 +25,7 @@ export default function ArticlesPage() {
       <h1>文章列表</h1>
       <p>這裡將顯示文章列表。</p>
     </main>
-  );
+  )
 }
 ```
 
@@ -49,7 +41,7 @@ export default function ArticleDetailPage({ params }: { params: { slug: string }
       <h1>文章詳情: {params.slug}</h1>
       <p>這裡將顯示文章 {params.slug} 的內容。</p>
     </main>
-  );
+  )
 }
 ```
 
@@ -65,7 +57,7 @@ export default function DestinationsPage() {
       <h1>目的地列表</h1>
       <p>這裡將顯示目的地列表。</p>
     </main>
-  );
+  )
 }
 ```
 
@@ -81,7 +73,7 @@ export default function DestinationDetailPage({ params }: { params: { id: string
       <h1>目的地詳情: {params.id}</h1>
       <p>這裡將顯示目的地 {params.id} 的內容。</p>
     </main>
-  );
+  )
 }
 ```
 
@@ -91,16 +83,8 @@ export default function DestinationDetailPage({ params }: { params: { id: string
 
 ```tsx
 // Placeholder for (auth) layout
-export default function AuthLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      {children}
-    </div>
-  );
+export default function AuthLayout({ children }: { children: React.ReactNode }) {
+  return <div className="flex items-center justify-center min-h-screen">{children}</div>
 }
 ```
 
@@ -116,7 +100,7 @@ export default function LoginPage() {
       <h1>登入</h1>
       <p>這裡將是登入表單。</p>
     </main>
-  );
+  )
 }
 ```
 
@@ -132,7 +116,7 @@ export default function RegisterPage() {
       <h1>註冊</h1>
       <p>這裡將是註冊表單。</p>
     </main>
-  );
+  )
 }
 ```
 
@@ -142,18 +126,14 @@ export default function RegisterPage() {
 
 ```tsx
 // Placeholder for (protected) layout
-export default function ProtectedLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   return (
     <div>
       <header>導航欄</header>
       <main>{children}</main>
       <footer>頁腳</footer>
     </div>
-  );
+  )
 }
 ```
 
@@ -169,7 +149,7 @@ export default function MyOrdersPage() {
       <h1>我的訂單</h1>
       <p>這裡將顯示使用者的訂單列表。</p>
     </main>
-  );
+  )
 }
 ```
 
@@ -185,7 +165,7 @@ export default function MyOrderDetailPage({ params }: { params: { id: string } }
       <h1>訂單詳情: {params.id}</h1>
       <p>這裡將顯示訂單 {params.id} 的詳細資訊。</p>
     </main>
-  );
+  )
 }
 ```
 
@@ -201,7 +181,7 @@ export default function MyItinerariesPage() {
       <h1>我的行程</h1>
       <p>這裡將顯示使用者儲存的行程。</p>
     </main>
-  );
+  )
 }
 ```
 
@@ -217,7 +197,7 @@ export default function MyFavoritesPage() {
       <h1>我的收藏</h1>
       <p>這裡將顯示使用者的收藏項目。</p>
     </main>
-  );
+  )
 }
 ```
 
@@ -233,7 +213,7 @@ export default function MyProfilePage() {
       <h1>我的個人資料</h1>
       <p>這裡將顯示使用者的個人資料。</p>
     </main>
-  );
+  )
 }
 ```
 
@@ -249,7 +229,7 @@ export default function PlannerPage() {
       <h1>行程規劃器 (紙娃娃系統)</h1>
       <p>這裡將是行程規劃的拖放介面。</p>
     </main>
-  );
+  )
 }
 ```
 
@@ -259,10 +239,10 @@ export default function PlannerPage() {
 
 ```typescript
 // Placeholder for Auth API Route
-import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server'
 
 export async function GET() {
-  return NextResponse.json({ message: 'Auth API Route' });
+  return NextResponse.json({ message: 'Auth API Route' })
 }
 ```
 
@@ -272,10 +252,10 @@ export async function GET() {
 
 ```typescript
 // Placeholder for Orders API Route
-import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server'
 
 export async function GET() {
-  return NextResponse.json({ message: 'Orders API Route' });
+  return NextResponse.json({ message: 'Orders API Route' })
 }
 ```
 
@@ -285,10 +265,10 @@ export async function GET() {
 
 ```typescript
 // Placeholder for Itineraries API Route
-import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server'
 
 export async function GET() {
-  return NextResponse.json({ message: 'Itineraries API Route' });
+  return NextResponse.json({ message: 'Itineraries API Route' })
 }
 ```
 

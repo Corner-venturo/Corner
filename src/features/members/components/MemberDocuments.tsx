@@ -40,10 +40,17 @@ export function MemberDocuments({
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="bg-morandi-primary/5 border border-morandi-primary/20 rounded-lg p-3">
-            <h4 className="text-xs font-semibold text-morandi-primary mb-2">⚠️ {MEMBERS_LABELS.重要提醒}</h4>
+            <h4 className="text-xs font-semibold text-morandi-primary mb-2">
+              ⚠️ {MEMBERS_LABELS.重要提醒}
+            </h4>
             <ul className="text-xs text-morandi-secondary space-y-1">
-              <li>• {MEMBERS_LABELS.OCR辨識待驗證提示}<strong>「{MEMBERS_LABELS.待驗證}」</strong></li>
-              <li>• 請務必<strong>{MEMBERS_LABELS.LABEL_809}</strong></li>
+              <li>
+                • {MEMBERS_LABELS.OCR辨識待驗證提示}
+                <strong>「{MEMBERS_LABELS.待驗證}」</strong>
+              </li>
+              <li>
+                • 請務必<strong>{MEMBERS_LABELS.LABEL_809}</strong>
+              </li>
               <li>• {MEMBERS_LABELS.支援所有國家護照}</li>
             </ul>
           </div>
@@ -53,20 +60,20 @@ export function MemberDocuments({
               isDragging
                 ? 'border-morandi-gold bg-morandi-gold/20 scale-105'
                 : isProcessing
-                ? 'border-morandi-blue bg-morandi-blue/10'
-                : 'border-morandi-secondary/30 bg-morandi-container/20 hover:bg-morandi-container/40'
+                  ? 'border-morandi-blue bg-morandi-blue/10'
+                  : 'border-morandi-secondary/30 bg-morandi-container/20 hover:bg-morandi-container/40'
             }`}
-            onDragOver={(e) => {
+            onDragOver={e => {
               e.preventDefault()
               e.stopPropagation()
               setIsDragging(true)
             }}
-            onDragLeave={(e) => {
+            onDragLeave={e => {
               e.preventDefault()
               e.stopPropagation()
               setIsDragging(false)
             }}
-            onDrop={async (e) => {
+            onDrop={async e => {
               e.preventDefault()
               e.stopPropagation()
               setIsDragging(false)
@@ -86,7 +93,8 @@ export function MemberDocuments({
                 <>
                   <Upload className="w-6 h-6 mb-2 text-morandi-secondary" />
                   <p className="text-sm text-morandi-primary">
-                    <span className="font-semibold">{MEMBERS_LABELS.UPLOADING_9146}</span> {MEMBERS_LABELS.LABEL_591}
+                    <span className="font-semibold">{MEMBERS_LABELS.UPLOADING_9146}</span>{' '}
+                    {MEMBERS_LABELS.LABEL_591}
                   </p>
                   <p className="text-xs text-morandi-secondary">{MEMBERS_LABELS.支援格式}</p>
                 </>
@@ -113,7 +121,8 @@ export function MemberDocuments({
                     key={index}
                     className="flex items-center gap-2 p-2 bg-morandi-container/20 rounded"
                   >
-                    <img src={pf.preview}
+                    <img
+                      src={pf.preview}
                       alt={pf.file.name}
                       className="w-12 h-12 object-cover rounded flex-shrink-0"
                     />
@@ -130,7 +139,9 @@ export function MemberDocuments({
                       </div>
                       <span className="text-xs text-morandi-secondary">
                         {(pf.file.size / 1024).toFixed(1)} KB
-                        {pf.isPdf && <span className="ml-1 text-morandi-red">{MEMBERS_LABELS.從PDF轉換}</span>}
+                        {pf.isPdf && (
+                          <span className="ml-1 text-morandi-red">{MEMBERS_LABELS.從PDF轉換}</span>
+                        )}
                       </span>
                     </div>
                     <Button
@@ -150,7 +161,9 @@ export function MemberDocuments({
                 disabled={isUploading}
                 className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
-                {isUploading ? MEMBERS_LABELS.辨識中 : MEMBERS_LABELS.辨識並建立N位成員(processedFiles.length)}
+                {isUploading
+                  ? MEMBERS_LABELS.辨識中
+                  : MEMBERS_LABELS.辨識並建立N位成員(processedFiles.length)}
               </Button>
             </div>
           )}

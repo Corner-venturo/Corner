@@ -5,7 +5,6 @@
  * 用於在需求確認單中手動追加需求項目
  */
 
-
 import { PROPOSAL_FORM_LABELS } from '../constants/labels'
 
 import React, { useState, useCallback } from 'react'
@@ -43,7 +42,7 @@ import { RestaurantSelector, type CombinedRestaurant } from '@/components/editor
 import { HotelSelector } from '@/components/editor/hotel-selector'
 import { AttractionSelector } from '@/components/editor/attraction-selector'
 import { PROPOSAL_LABELS } from '../constants'
-import { ADD_MANUAL_REQUEST_DIALOG_LABELS } from '../constants/labels';
+import { ADD_MANUAL_REQUEST_DIALOG_LABELS } from '../constants/labels'
 
 // 需求類別（統一使用 accommodation/meal）
 const CATEGORIES = [
@@ -169,54 +168,64 @@ export function AddManualRequestDialog({
   }, [])
 
   // 處理飯店選擇
-  const handleHotelSelect = useCallback((hotels: Array<{
-    id: string
-    name: string
-    latitude?: number | null
-    longitude?: number | null
-    address?: string | null
-    google_maps_url?: string | null
-  }>) => {
-    if (hotels.length === 0) return
-    const hotel = hotels[0]
-    setFormData(prev => ({
-      ...prev,
-      resourceType: 'hotel',
-      resourceId: hotel.id,
-      resourceName: hotel.name,
-      title: prev.title || hotel.name,
-      supplierName: prev.supplierName || hotel.name,
-      latitude: hotel.latitude ?? null,
-      longitude: hotel.longitude ?? null,
-      googleMapsUrl: hotel.google_maps_url || '',
-    }))
-    setShowHotelSelector(false)
-  }, [])
+  const handleHotelSelect = useCallback(
+    (
+      hotels: Array<{
+        id: string
+        name: string
+        latitude?: number | null
+        longitude?: number | null
+        address?: string | null
+        google_maps_url?: string | null
+      }>
+    ) => {
+      if (hotels.length === 0) return
+      const hotel = hotels[0]
+      setFormData(prev => ({
+        ...prev,
+        resourceType: 'hotel',
+        resourceId: hotel.id,
+        resourceName: hotel.name,
+        title: prev.title || hotel.name,
+        supplierName: prev.supplierName || hotel.name,
+        latitude: hotel.latitude ?? null,
+        longitude: hotel.longitude ?? null,
+        googleMapsUrl: hotel.google_maps_url || '',
+      }))
+      setShowHotelSelector(false)
+    },
+    []
+  )
 
   // 處理景點選擇
-  const handleAttractionSelect = useCallback((attractions: Array<{
-    id: string
-    name: string
-    latitude?: number | null
-    longitude?: number | null
-    address?: string | null
-    google_maps_url?: string | null
-  }>) => {
-    if (attractions.length === 0) return
-    const attraction = attractions[0]
-    setFormData(prev => ({
-      ...prev,
-      resourceType: 'attraction',
-      resourceId: attraction.id,
-      resourceName: attraction.name,
-      title: prev.title || attraction.name,
-      supplierName: prev.supplierName || attraction.name,
-      latitude: attraction.latitude ?? null,
-      longitude: attraction.longitude ?? null,
-      googleMapsUrl: attraction.google_maps_url || '',
-    }))
-    setShowAttractionSelector(false)
-  }, [])
+  const handleAttractionSelect = useCallback(
+    (
+      attractions: Array<{
+        id: string
+        name: string
+        latitude?: number | null
+        longitude?: number | null
+        address?: string | null
+        google_maps_url?: string | null
+      }>
+    ) => {
+      if (attractions.length === 0) return
+      const attraction = attractions[0]
+      setFormData(prev => ({
+        ...prev,
+        resourceType: 'attraction',
+        resourceId: attraction.id,
+        resourceName: attraction.name,
+        title: prev.title || attraction.name,
+        supplierName: prev.supplierName || attraction.name,
+        latitude: attraction.latitude ?? null,
+        longitude: attraction.longitude ?? null,
+        googleMapsUrl: attraction.google_maps_url || '',
+      }))
+      setShowAttractionSelector(false)
+    },
+    []
+  )
 
   // 儲存需求
   const handleSave = useCallback(async () => {
@@ -265,9 +274,9 @@ export function AddManualRequestDialog({
         longitude: formData.longitude,
         google_maps_url: formData.googleMapsUrl || null,
         // 交通專用欄位
-        driver_name: formData.category === 'transport' ? (formData.driverName || null) : null,
-        plate_number: formData.category === 'transport' ? (formData.plateNumber || null) : null,
-        driver_phone: formData.category === 'transport' ? (formData.driverPhone || null) : null,
+        driver_name: formData.category === 'transport' ? formData.driverName || null : null,
+        plate_number: formData.category === 'transport' ? formData.plateNumber || null : null,
+        driver_phone: formData.category === 'transport' ? formData.driverPhone || null : null,
         // 狀態
         status: 'draft',
         handler_type: formData.recipientWorkspaceId ? 'external' : 'internal',
@@ -288,7 +297,18 @@ export function AddManualRequestDialog({
     } finally {
       setSaving(false)
     }
-  }, [formData, user, tourId, proposalPackageId, tourCode, tourName, toast, resetForm, onSuccess, onClose])
+  }, [
+    formData,
+    user,
+    tourId,
+    proposalPackageId,
+    tourCode,
+    tourName,
+    toast,
+    resetForm,
+    onSuccess,
+    onClose,
+  ])
 
   // 處理關閉
   const handleClose = useCallback(() => {
@@ -298,258 +318,287 @@ export function AddManualRequestDialog({
 
   return (
     <>
-    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent level={3} className="max-w-3xl">
-        <DialogHeader>
-          <DialogTitle>{PROPOSAL_FORM_LABELS.ADD_MANUAL}</DialogTitle>
-        </DialogHeader>
+      <Dialog open={isOpen} onOpenChange={open => !open && handleClose()}>
+        <DialogContent level={3} className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>{PROPOSAL_FORM_LABELS.ADD_MANUAL}</DialogTitle>
+          </DialogHeader>
 
-        <div className="grid grid-cols-2 gap-x-6 gap-y-4 py-4">
-          {/* 左欄 */}
-          <div className="space-y-4">
-            {/* 需求類別 */}
-            <div className="space-y-2">
-              <Label required>{PROPOSAL_FORM_LABELS.CATEGORY}</Label>
-              <Select
-                value={formData.category}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.選擇類別} />
-                </SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map((cat) => (
-                    <SelectItem key={cat.key} value={cat.key}>
-                      {cat.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* 項目說明 */}
-            <div className="space-y-2">
-              <Label required>{PROPOSAL_FORM_LABELS.ITEM_DESC}</Label>
-              <Input
-                value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.例如_機場接送_全程領隊}
-              />
-            </div>
-
-            {/* 供應商 */}
-            <div className="space-y-2">
-              <Label>{PROPOSAL_FORM_LABELS.SUPPLIER_NAME}</Label>
-              <Input
-                value={formData.supplierName}
-                onChange={(e) => setFormData(prev => ({ ...prev, supplierName: e.target.value }))}
-                placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.例如_車行名稱_領隊姓名}
-              />
-            </div>
-
-            {/* 跨公司需求：指定供應商 Workspace */}
-            {(formData.category === 'transport' || formData.category === 'guide') && (
+          <div className="grid grid-cols-2 gap-x-6 gap-y-4 py-4">
+            {/* 左欄 */}
+            <div className="space-y-4">
+              {/* 需求類別 */}
               <div className="space-y-2">
-                <Label>{PROPOSAL_FORM_LABELS.SEND_TO_SUPPLIER}</Label>
+                <Label required>{PROPOSAL_FORM_LABELS.CATEGORY}</Label>
                 <Select
-                  value={formData.recipientWorkspaceId}
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, recipientWorkspaceId: value === 'none' ? '' : value }))}
+                  value={formData.category}
+                  onValueChange={value => setFormData(prev => ({ ...prev, category: value }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder={loadingWorkspaces ? ADD_MANUAL_REQUEST_DIALOG_LABELS.載入中 : ADD_MANUAL_REQUEST_DIALOG_LABELS.選擇供應商_選填} />
+                    <SelectValue placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.選擇類別} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">{PROPOSAL_FORM_LABELS.NO_SEND}</SelectItem>
-                    {supplierWorkspaces.map((ws) => (
-                      <SelectItem key={ws.id} value={ws.id}>
-                        {ws.name}
-                        {ws.type && (
-                          <span className="ml-2 text-xs text-morandi-secondary">
-                            ({WORKSPACE_TYPE_CONFIG[ws.type as WorkspaceType]?.label || ws.type})
-                          </span>
-                        )}
+                    {CATEGORIES.map(cat => (
+                      <SelectItem key={cat.key} value={cat.key}>
+                        {cat.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-            )}
 
-            {/* 交通專用欄位：司機、車號、手機 */}
-            {formData.category === 'transport' && (
-              <div className="space-y-3 p-3 bg-morandi-container/20 rounded-lg">
-                <p className="text-xs text-morandi-secondary font-medium">{PROPOSAL_FORM_LABELS.VEHICLE_INFO}</p>
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="space-y-1">
-                    <Label className="text-xs">{PROPOSAL_FORM_LABELS.DRIVER}</Label>
-                    <Input
-                      value={formData.driverName}
-                      onChange={(e) => setFormData(prev => ({ ...prev, driverName: e.target.value }))}
-                      placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.司機姓名}
-                      className="h-8 text-sm"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs">{PROPOSAL_FORM_LABELS.PLATE}</Label>
-                    <Input
-                      value={formData.plateNumber}
-                      onChange={(e) => setFormData(prev => ({ ...prev, plateNumber: e.target.value }))}
-                      placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.車牌號碼}
-                      className="h-8 text-sm"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs">{PROPOSAL_FORM_LABELS.MOBILE}</Label>
-                    <Input
-                      value={formData.driverPhone}
-                      onChange={(e) => setFormData(prev => ({ ...prev, driverPhone: e.target.value }))}
-                      placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.司機電話}
-                      className="h-8 text-sm"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* 資源選擇（餐廳/飯店/景點）*/}
-            {(formData.category === 'meal' || formData.category === 'accommodation' || formData.category === 'activity') && (
+              {/* 項目說明 */}
               <div className="space-y-2">
-                <Label>{PROPOSAL_FORM_LABELS.SELECT_396}</Label>
-                <div className="flex items-center gap-2">
-                  {formData.resourceName ? (
-                    <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-morandi-container/30 rounded-lg">
-                      <span className="text-sm">{formData.resourceName}</span>
-                      <button
-                        type="button"
-                        onClick={() => setFormData(prev => ({
-                          ...prev,
-                          resourceType: '',
-                          resourceId: '',
-                          resourceName: '',
-                          latitude: null,
-                          longitude: null,
-                          googleMapsUrl: '',
-                        }))}
-                        className="ml-auto text-morandi-secondary hover:text-morandi-red"
-                      >
-                        <X size={14} />
-                      </button>
+                <Label required>{PROPOSAL_FORM_LABELS.ITEM_DESC}</Label>
+                <Input
+                  value={formData.title}
+                  onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.例如_機場接送_全程領隊}
+                />
+              </div>
+
+              {/* 供應商 */}
+              <div className="space-y-2">
+                <Label>{PROPOSAL_FORM_LABELS.SUPPLIER_NAME}</Label>
+                <Input
+                  value={formData.supplierName}
+                  onChange={e => setFormData(prev => ({ ...prev, supplierName: e.target.value }))}
+                  placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.例如_車行名稱_領隊姓名}
+                />
+              </div>
+
+              {/* 跨公司需求：指定供應商 Workspace */}
+              {(formData.category === 'transport' || formData.category === 'guide') && (
+                <div className="space-y-2">
+                  <Label>{PROPOSAL_FORM_LABELS.SEND_TO_SUPPLIER}</Label>
+                  <Select
+                    value={formData.recipientWorkspaceId}
+                    onValueChange={value =>
+                      setFormData(prev => ({
+                        ...prev,
+                        recipientWorkspaceId: value === 'none' ? '' : value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={
+                          loadingWorkspaces
+                            ? ADD_MANUAL_REQUEST_DIALOG_LABELS.載入中
+                            : ADD_MANUAL_REQUEST_DIALOG_LABELS.選擇供應商_選填
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">{PROPOSAL_FORM_LABELS.NO_SEND}</SelectItem>
+                      {supplierWorkspaces.map(ws => (
+                        <SelectItem key={ws.id} value={ws.id}>
+                          {ws.name}
+                          {ws.type && (
+                            <span className="ml-2 text-xs text-morandi-secondary">
+                              ({WORKSPACE_TYPE_CONFIG[ws.type as WorkspaceType]?.label || ws.type})
+                            </span>
+                          )}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* 交通專用欄位：司機、車號、手機 */}
+              {formData.category === 'transport' && (
+                <div className="space-y-3 p-3 bg-morandi-container/20 rounded-lg">
+                  <p className="text-xs text-morandi-secondary font-medium">
+                    {PROPOSAL_FORM_LABELS.VEHICLE_INFO}
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="space-y-1">
+                      <Label className="text-xs">{PROPOSAL_FORM_LABELS.DRIVER}</Label>
+                      <Input
+                        value={formData.driverName}
+                        onChange={e =>
+                          setFormData(prev => ({ ...prev, driverName: e.target.value }))
+                        }
+                        placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.司機姓名}
+                        className="h-8 text-sm"
+                      />
                     </div>
-                  ) : (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        if (formData.category === 'meal') setShowRestaurantSelector(true)
-                        else if (formData.category === 'accommodation') setShowHotelSelector(true)
-                        else if (formData.category === 'activity') setShowAttractionSelector(true)
-                      }}
-                      className="gap-2"
-                    >
-                      <Search size={16} />
-                      {formData.category === 'meal' && ADD_MANUAL_REQUEST_DIALOG_LABELS.選擇餐廳}
-                      {formData.category === 'accommodation' && ADD_MANUAL_REQUEST_DIALOG_LABELS.選擇飯店}
-                      {formData.category === 'activity' && ADD_MANUAL_REQUEST_DIALOG_LABELS.選擇景點}
-                    </Button>
-                  )}
+                    <div className="space-y-1">
+                      <Label className="text-xs">{PROPOSAL_FORM_LABELS.PLATE}</Label>
+                      <Input
+                        value={formData.plateNumber}
+                        onChange={e =>
+                          setFormData(prev => ({ ...prev, plateNumber: e.target.value }))
+                        }
+                        placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.車牌號碼}
+                        className="h-8 text-sm"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">{PROPOSAL_FORM_LABELS.MOBILE}</Label>
+                      <Input
+                        value={formData.driverPhone}
+                        onChange={e =>
+                          setFormData(prev => ({ ...prev, driverPhone: e.target.value }))
+                        }
+                        placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.司機電話}
+                        className="h-8 text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 資源選擇（餐廳/飯店/景點）*/}
+              {(formData.category === 'meal' ||
+                formData.category === 'accommodation' ||
+                formData.category === 'activity') && (
+                <div className="space-y-2">
+                  <Label>{PROPOSAL_FORM_LABELS.SELECT_396}</Label>
+                  <div className="flex items-center gap-2">
+                    {formData.resourceName ? (
+                      <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-morandi-container/30 rounded-lg">
+                        <span className="text-sm">{formData.resourceName}</span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setFormData(prev => ({
+                              ...prev,
+                              resourceType: '',
+                              resourceId: '',
+                              resourceName: '',
+                              latitude: null,
+                              longitude: null,
+                              googleMapsUrl: '',
+                            }))
+                          }
+                          className="ml-auto text-morandi-secondary hover:text-morandi-red"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          if (formData.category === 'meal') setShowRestaurantSelector(true)
+                          else if (formData.category === 'accommodation') setShowHotelSelector(true)
+                          else if (formData.category === 'activity') setShowAttractionSelector(true)
+                        }}
+                        className="gap-2"
+                      >
+                        <Search size={16} />
+                        {formData.category === 'meal' && ADD_MANUAL_REQUEST_DIALOG_LABELS.選擇餐廳}
+                        {formData.category === 'accommodation' &&
+                          ADD_MANUAL_REQUEST_DIALOG_LABELS.選擇飯店}
+                        {formData.category === 'activity' &&
+                          ADD_MANUAL_REQUEST_DIALOG_LABELS.選擇景點}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 右欄 */}
+            <div className="space-y-4">
+              {/* 日期範圍 */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>{PROPOSAL_FORM_LABELS.LABEL_4743}</Label>
+                  <Input
+                    type="date"
+                    value={formData.serviceDate}
+                    onChange={e => setFormData(prev => ({ ...prev, serviceDate: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>{PROPOSAL_FORM_LABELS.LABEL_9824}</Label>
+                  <Input
+                    type="date"
+                    value={formData.serviceDateEnd}
+                    onChange={e =>
+                      setFormData(prev => ({ ...prev, serviceDateEnd: e.target.value }))
+                    }
+                  />
                 </div>
               </div>
-            )}
-          </div>
 
-          {/* 右欄 */}
-          <div className="space-y-4">
-            {/* 日期範圍 */}
-            <div className="grid grid-cols-2 gap-3">
+              {/* 數量 */}
               <div className="space-y-2">
-                <Label>{PROPOSAL_FORM_LABELS.LABEL_4743}</Label>
+                <Label>{PROPOSAL_FORM_LABELS.QUANTITY}</Label>
                 <Input
-                  type="date"
-                  value={formData.serviceDate}
-                  onChange={(e) => setFormData(prev => ({ ...prev, serviceDate: e.target.value }))}
+                  type="number"
+                  min={1}
+                  value={formData.quantity}
+                  onChange={e =>
+                    setFormData(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))
+                  }
+                  className="w-24"
+                />
+                <p className="text-xs text-morandi-secondary">
+                  {formData.category === 'transport' && ADD_MANUAL_REQUEST_DIALOG_LABELS.台數}
+                  {formData.category === 'guide' && ADD_MANUAL_REQUEST_DIALOG_LABELS.人數}
+                  {formData.category === 'accommodation' && ADD_MANUAL_REQUEST_DIALOG_LABELS.間數}
+                  {formData.category === 'meal' && '人數'}
+                  {formData.category === 'activity' && '人數'}
+                  {formData.category === 'other' && ADD_MANUAL_REQUEST_DIALOG_LABELS.數量}
+                </p>
+              </div>
+
+              {/* 備註 */}
+              <div className="space-y-2">
+                <Label>{PROPOSAL_FORM_LABELS.LABEL_9909}</Label>
+                <Textarea
+                  value={formData.description}
+                  onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.其他需求說明}
+                  rows={4}
                 />
               </div>
-              <div className="space-y-2">
-                <Label>{PROPOSAL_FORM_LABELS.LABEL_9824}</Label>
-                <Input
-                  type="date"
-                  value={formData.serviceDateEnd}
-                  onChange={(e) => setFormData(prev => ({ ...prev, serviceDateEnd: e.target.value }))}
-                />
-              </div>
-            </div>
-
-            {/* 數量 */}
-            <div className="space-y-2">
-              <Label>{PROPOSAL_FORM_LABELS.QUANTITY}</Label>
-              <Input
-                type="number"
-                min={1}
-                value={formData.quantity}
-                onChange={(e) => setFormData(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
-                className="w-24"
-              />
-              <p className="text-xs text-morandi-secondary">
-                {formData.category === 'transport' && ADD_MANUAL_REQUEST_DIALOG_LABELS.台數}
-                {formData.category === 'guide' && ADD_MANUAL_REQUEST_DIALOG_LABELS.人數}
-                {formData.category === 'accommodation' && ADD_MANUAL_REQUEST_DIALOG_LABELS.間數}
-                {formData.category === 'meal' && '人數'}
-                {formData.category === 'activity' && '人數'}
-                {formData.category === 'other' && ADD_MANUAL_REQUEST_DIALOG_LABELS.數量}
-              </p>
-            </div>
-
-            {/* 備註 */}
-            <div className="space-y-2">
-              <Label>{PROPOSAL_FORM_LABELS.LABEL_9909}</Label>
-              <Textarea
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder={ADD_MANUAL_REQUEST_DIALOG_LABELS.其他需求說明}
-                rows={4}
-              />
             </div>
           </div>
-        </div>
 
-        {/* 底部按鈕 */}
-        <div className="flex justify-end gap-2 pt-4 border-t border-border">
-          <Button variant="outline" onClick={handleClose} className="gap-2">
-            <X size={16} />
-            {PROPOSAL_FORM_LABELS.CANCEL}
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={saving || !formData.title.trim()}
-            className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-          >
-            {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-            {PROPOSAL_FORM_LABELS.SAVE}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+          {/* 底部按鈕 */}
+          <div className="flex justify-end gap-2 pt-4 border-t border-border">
+            <Button variant="outline" onClick={handleClose} className="gap-2">
+              <X size={16} />
+              {PROPOSAL_FORM_LABELS.CANCEL}
+            </Button>
+            <Button
+              onClick={handleSave}
+              disabled={saving || !formData.title.trim()}
+              className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            >
+              {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+              {PROPOSAL_FORM_LABELS.SAVE}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-    {/* 餐廳選擇器 */}
-    <RestaurantSelector
-      isOpen={showRestaurantSelector}
-      onClose={() => setShowRestaurantSelector(false)}
-      onSelect={handleRestaurantSelect}
-    />
+      {/* 餐廳選擇器 */}
+      <RestaurantSelector
+        isOpen={showRestaurantSelector}
+        onClose={() => setShowRestaurantSelector(false)}
+        onSelect={handleRestaurantSelect}
+      />
 
-    {/* 飯店選擇器 */}
-    <HotelSelector
-      isOpen={showHotelSelector}
-      onClose={() => setShowHotelSelector(false)}
-      onSelect={handleHotelSelect}
-    />
+      {/* 飯店選擇器 */}
+      <HotelSelector
+        isOpen={showHotelSelector}
+        onClose={() => setShowHotelSelector(false)}
+        onSelect={handleHotelSelect}
+      />
 
-    {/* 景點選擇器 */}
-    <AttractionSelector
-      isOpen={showAttractionSelector}
-      onClose={() => setShowAttractionSelector(false)}
-      onSelect={handleAttractionSelect}
-    />
+      {/* 景點選擇器 */}
+      <AttractionSelector
+        isOpen={showAttractionSelector}
+        onClose={() => setShowAttractionSelector(false)}
+        onSelect={handleAttractionSelect}
+      />
     </>
   )
 }

@@ -2,7 +2,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
-import { LABELS , FLIGHT_FORM_LABELS } from '../constants/labels'
+import { LABELS, FLIGHT_FORM_LABELS } from '../constants/labels'
 import type { ConfirmationFormData, FlightData } from '@/types/confirmation.types'
 
 interface FlightFormProps {
@@ -33,7 +33,13 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
     updateData({
       passengers: [
         ...(data.passengers || []),
-        { nameEn: '', nameZh: '', cabin: FLIGHT_FORM_LABELS.DEFAULT_CABIN, ticketNumber: '', bookingCode: '' },
+        {
+          nameEn: '',
+          nameZh: '',
+          cabin: FLIGHT_FORM_LABELS.DEFAULT_CABIN,
+          ticketNumber: '',
+          bookingCode: '',
+        },
       ],
     })
   }
@@ -278,7 +284,9 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
 
       {/* 行李額度 */}
       <div className="space-y-4 p-4 bg-muted rounded-md">
-        <h3 className="font-semibold text-morandi-primary">{FLIGHT_FORM_LABELS.BAGGAGE_ALLOWANCE}</h3>
+        <h3 className="font-semibold text-morandi-primary">
+          {FLIGHT_FORM_LABELS.BAGGAGE_ALLOWANCE}
+        </h3>
         {(data.baggage || []).map((bag, index) => (
           <div key={index} className="space-y-2 p-3 bg-card rounded border">
             <div>
@@ -343,7 +351,9 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
         <h3 className="font-semibold text-morandi-primary">{FLIGHT_FORM_LABELS.IMPORTANT_INFO}</h3>
         {(data.importantNotes || []).map((note, index) => (
           <div key={index} className="space-y-2">
-            <Label>{FLIGHT_FORM_LABELS.NOTE_LABEL} #{index + 1}</Label>
+            <Label>
+              {FLIGHT_FORM_LABELS.NOTE_LABEL} #{index + 1}
+            </Label>
             <Input
               value={note}
               onChange={e => {
@@ -362,7 +372,9 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
 
       {/* 行李詳細資訊 */}
       <div className="space-y-4 p-4 bg-muted rounded-md">
-        <h3 className="font-semibold text-morandi-primary">{FLIGHT_FORM_LABELS.BAGGAGE_DETAIL_TITLE}</h3>
+        <h3 className="font-semibold text-morandi-primary">
+          {FLIGHT_FORM_LABELS.BAGGAGE_DETAIL_TITLE}
+        </h3>
         {(data.baggageDetails || []).map((detail, index) => (
           <div key={index} className="space-y-2 p-3 bg-card rounded border">
             <div>

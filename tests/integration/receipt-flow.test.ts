@@ -31,7 +31,11 @@ type QueryResult = { data: unknown; error: unknown; count?: number }
  */
 function createSupabaseMock() {
   const queryResults = new Map<string, QueryResult>()
-  const updateCalls: Array<{ table: string; data: Record<string, unknown>; filters: Record<string, unknown> }> = []
+  const updateCalls: Array<{
+    table: string
+    data: Record<string, unknown>
+    filters: Record<string, unknown>
+  }> = []
 
   function setQueryResult(key: string, result: QueryResult) {
     queryResults.set(key, result)
@@ -53,10 +57,11 @@ function createSupabaseMock() {
       const generalKey = `${table}.${method}`
       const tableKey = table
 
-      return queryResults.get(specificKey)
-        || queryResults.get(generalKey)
-        || queryResults.get(tableKey)
-        || { data: null, error: null }
+      return (
+        queryResults.get(specificKey) ||
+        queryResults.get(generalKey) ||
+        queryResults.get(tableKey) || { data: null, error: null }
+      )
     }
 
     const proxy: Record<string, (...args: unknown[]) => unknown> = {
@@ -135,10 +140,7 @@ describe('收款完整流程', () => {
   describe('recalculateOrderPayment 邏輯', () => {
     it('已確認收款覆蓋全額 → paid', () => {
       const orderTotal = 50000
-      const confirmedReceipts = [
-        { actual_amount: 30000 },
-        { actual_amount: 20000 },
-      ]
+      const confirmedReceipts = [{ actual_amount: 30000 }, { actual_amount: 20000 }]
       const totalPaid = confirmedReceipts.reduce((s, r) => s + (r.actual_amount || 0), 0)
 
       let status: string = 'unpaid'
@@ -259,9 +261,7 @@ describe('收款完整流程', () => {
       // 刪除 r1
       allReceipts[0].deleted_at = new Date().toISOString()
 
-      const activeConfirmed = allReceipts.filter(
-        r => r.status === '1' && r.deleted_at === null
-      )
+      const activeConfirmed = allReceipts.filter(r => r.status === '1' && r.deleted_at === null)
       const totalPaid = activeConfirmed.reduce((s, r) => s + (r.actual_amount || 0), 0)
 
       expect(totalPaid).toBe(20000)
@@ -274,9 +274,7 @@ describe('收款完整流程', () => {
 
       allReceipts[0].deleted_at = new Date().toISOString()
 
-      const activeConfirmed = allReceipts.filter(
-        r => r.status === '1' && r.deleted_at === null
-      )
+      const activeConfirmed = allReceipts.filter(r => r.status === '1' && r.deleted_at === null)
       const totalPaid = activeConfirmed.reduce((s, r) => s + (r.actual_amount || 0), 0)
 
       expect(totalPaid).toBe(0)
@@ -291,9 +289,7 @@ describe('收款完整流程', () => {
       // 刪除未確認的 r2
       allReceipts[1].deleted_at = new Date().toISOString()
 
-      const activeConfirmed = allReceipts.filter(
-        r => r.status === '1' && r.deleted_at === null
-      )
+      const activeConfirmed = allReceipts.filter(r => r.status === '1' && r.deleted_at === null)
       const totalPaid = activeConfirmed.reduce((s, r) => s + (r.actual_amount || 0), 0)
 
       expect(totalPaid).toBe(50000)

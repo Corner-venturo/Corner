@@ -24,4 +24,4 @@ export const COMPANY = {
 
   /** 公司 Email */
   email: 'info@venturo.com.tw',
-} as const;
+} as const

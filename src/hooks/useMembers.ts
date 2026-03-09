@@ -40,7 +40,9 @@ interface UseMembersReturn {
   /** 當前 workspace ID */
   workspaceId: string | null
   /** 建立成員 */
-  createMember: (data: Omit<Member, 'id' | 'created_at' | 'updated_at' | 'order_id'>) => Promise<Member>
+  createMember: (
+    data: Omit<Member, 'id' | 'created_at' | 'updated_at' | 'order_id'>
+  ) => Promise<Member>
   /** 更新成員 */
   updateMember: (id: string, updates: Partial<Member>) => Promise<void>
   /** 刪除成員 */
@@ -50,7 +52,10 @@ interface UseMembersReturn {
   /** 根據 ID 取得成員 */
   getMemberById: (id: string) => Member | undefined
   /** 上傳護照照片到 Supabase Storage */
-  uploadPassportImage: (fileName: string, file: File) => Promise<{
+  uploadPassportImage: (
+    fileName: string,
+    file: File
+  ) => Promise<{
     data: { publicUrl: string } | null
     error: Error | null
   }>
@@ -89,20 +94,22 @@ export function useMembers({ orderId, tourId }: UseMembersOptions = {}): UseMemb
   // 過濾出該上下文的成員
   const members = useMemo(
     () => {
-      let filtered = allMembers;
+      let filtered = allMembers
       if (orderId) {
-        filtered = filtered.filter(member => member.order_id === orderId);
+        filtered = filtered.filter(member => member.order_id === orderId)
       }
       // [Note] tourId 過濾需透過 OrderStore 取得相關訂單 ID
       // 目前僅支援 orderId 過濾，tourId 過濾待後續實作
-      return filtered;
+      return filtered
     },
     [allMembers, orderId, tourId] // Added tourId to dependencies for future use
   )
 
   // 建立成員（自動注入 order_id，如果存在）
   const createMember = useCallback(
-    async (data: Omit<Member, 'id' | 'created_at' | 'updated_at' | 'order_id'>): Promise<Member> => {
+    async (
+      data: Omit<Member, 'id' | 'created_at' | 'updated_at' | 'order_id'>
+    ): Promise<Member> => {
       const memberData = {
         ...data,
         order_id: orderId, // Inject orderId if available
@@ -131,7 +138,8 @@ export function useMembers({ orderId, tourId }: UseMembersOptions = {}): UseMemb
   )
 
   // 重新載入
-  const refetchMembers = useCallback(() => { // Renamed from refetch
+  const refetchMembers = useCallback(() => {
+    // Renamed from refetch
     fetchAll()
   }, [fetchAll])
 
@@ -199,4 +207,3 @@ export function useMembers({ orderId, tourId }: UseMembersOptions = {}): UseMemb
 }
 
 export default useMembers // Export default useMembers
-

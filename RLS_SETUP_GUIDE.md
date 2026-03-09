@@ -5,12 +5,14 @@
 請按照以下順序在 Supabase Dashboard 執行 SQL：
 
 ### Step 1: 為員工加上 workspace_id
+
 ```bash
 檔案：supabase/migrations/20251109125500_add_workspace_id_to_employees.sql
 目的：讓員工資料有歸屬分公司
 ```
 
 ### Step 2: 啟用 RLS 資料隔離
+
 ```bash
 檔案：supabase/migrations/20251109130000_complete_workspace_rls.sql
 目的：啟用 28 個業務表格的 RLS
@@ -23,6 +25,7 @@
 ### 方法 1: Supabase Dashboard（推薦）
 
 1. 打開 Supabase Dashboard
+
    ```
    https://supabase.com/dashboard/project/pfqvdacxowpgfamuvnsn
    ```
@@ -76,6 +79,7 @@ ORDER BY tablename;
 ```
 
 **預期結果**：
+
 ```
 tours       | true  (啟用 RLS)
 orders      | true  (啟用 RLS)
@@ -88,6 +92,7 @@ employees   | false (禁用 RLS，全域共享)
 ## 📊 RLS 表格清單
 
 ### 啟用 RLS（28 個業務表格）
+
 - tours, orders, itineraries, itinerary_items
 - tour_participants, customers, contacts
 - payments, refunds, receipts, finance_requests, ledgers
@@ -98,6 +103,7 @@ employees   | false (禁用 RLS，全域共享)
 - bulletins, esims, personal_canvases, linkpay_logs
 
 ### 禁用 RLS（6 個全域表格）
+
 - workspaces（工作空間主表）
 - employees（員工可跨公司查看）
 - user_roles（權限管理）
@@ -130,6 +136,7 @@ export function Header() {
 訪問：`/settings/workspaces`
 
 功能：
+
 - 新增 Workspace（台北、台中、台南等）
 - 啟用/停用 Workspace
 - 查看員工數統計
@@ -199,6 +206,7 @@ SELECT * FROM tours;  -- 結果應該有 1 筆
 **原因**：沒有設定 `current_workspace_id`
 
 **解決**：
+
 ```sql
 -- 手動設定 workspace
 SELECT set_current_workspace('taipei');
@@ -209,6 +217,7 @@ SELECT set_current_workspace('taipei');
 **原因**：表格已存在或欄位衝突
 
 **解決**：
+
 ```sql
 -- 檢查 employees 是否已有 workspace_id
 SELECT column_name, data_type
@@ -223,6 +232,7 @@ WHERE table_name = 'employees' AND column_name = 'workspace_id';
 **原因**：員工沒有 `workspace_id`
 
 **解決**：
+
 ```sql
 -- 為所有員工設定預設 workspace
 UPDATE employees
@@ -235,6 +245,7 @@ WHERE workspace_id IS NULL;
 ## 📞 需要協助？
 
 如果遇到問題，請提供：
+
 1. 錯誤訊息截圖
 2. 執行的 SQL 語句
 3. 資料庫 RLS 狀態（上方驗證查詢結果）

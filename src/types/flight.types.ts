@@ -1,6 +1,6 @@
 /**
  * 航班資訊統一類型定義
- * 
+ *
  * 所有欄位為 optional，各元件按需使用
  * 取代散落在各處的重複 FlightInfo interface
  */

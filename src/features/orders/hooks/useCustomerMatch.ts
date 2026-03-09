@@ -31,9 +31,7 @@ export function useCustomerMatch(
     }
 
     // 模糊搜尋：顧客姓名包含輸入的字串
-    const nameMatches = customers.filter(
-      c => c.name?.includes(name) || name.includes(c.name || '')
-    )
+    const nameMatches = customers.filter(c => c.name?.includes(name) || name.includes(c.name || ''))
 
     if (nameMatches.length > 0) {
       setMatchedCustomers(nameMatches)
@@ -78,29 +76,27 @@ export function useCustomerMatch(
       // 沒有顧客資料 + 身分證字號完整 → 自動辨識性別
       const secondChar = normalizedInput.charAt(1)
       let gender: string | null = null
-      
+
       if (secondChar === '1') {
         gender = 'M' // 男性
       } else if (secondChar === '2') {
         gender = 'F' // 女性
       }
-      
+
       if (gender) {
         const member = members[memberIndex]
         if (!member) return
-        
+
         // 更新本地狀態
-        const updatedMembers = members.map((m, idx) => 
-          idx === memberIndex ? { ...m, gender } : m
-        )
+        const updatedMembers = members.map((m, idx) => (idx === memberIndex ? { ...m, gender } : m))
         setMembers(updatedMembers)
-        
+
         // 儲存到資料庫
         const { error } = await supabase
           .from('order_members')
           .update({ gender })
           .eq('id', member.id)
-        
+
         if (error) {
           logger.error(COMP_ORDERS_LABELS.更新成員資料失敗, error)
         } else {

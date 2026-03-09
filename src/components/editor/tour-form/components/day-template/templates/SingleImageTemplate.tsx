@@ -50,7 +50,9 @@ export function SingleImageTemplate({
         {/* 漸層遮罩 + 標題 */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
         <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-          <div className="text-sm opacity-80 mb-1">{dateDisplay} • Day {dayIndex + 1}</div>
+          <div className="text-sm opacity-80 mb-1">
+            {dateDisplay} • Day {dayIndex + 1}
+          </div>
           <EditableText
             value={editingDay.title}
             fieldKey="title"
@@ -80,8 +82,14 @@ export function SingleImageTemplate({
         {/* 景點列表 */}
         <div className="space-y-2">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_2716}</span>
-            <button type="button" onClick={addActivity} className="text-xs text-[#c76d54] hover:underline flex items-center gap-1">
+            <span className="text-sm font-medium text-morandi-secondary">
+              {COMP_EDITOR_LABELS.LABEL_2716}
+            </span>
+            <button
+              type="button"
+              onClick={addActivity}
+              className="text-xs text-[#c76d54] hover:underline flex items-center gap-1"
+            >
               <Plus size={12} /> {COMP_EDITOR_LABELS.新增}
             </button>
           </div>

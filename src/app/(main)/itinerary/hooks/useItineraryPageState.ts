@@ -88,35 +88,38 @@ export function useItineraryPageState() {
   // 使用空依賴陣列的 useMemo，物件引用永遠穩定
   // 內部的 setter 來自 useState 本身就是穩定的
   // 內部的 getter 使用 ref 所以永遠能取得最新值
-  const stableApi = useMemo(() => ({
-    // Setters (stable from useState)
-    setStatusFilter,
-    setAuthorFilter,
-    setSearchTerm,
-    setIsTypeSelectOpen,
-    setIsPasswordDialogOpen,
-    setIsDuplicateDialogOpen,
-    setPasswordInput,
-    setPendingEditId,
-    setDuplicateSource,
-    setDuplicateTourCode,
-    setDuplicateTitle,
-    setIsDuplicating,
+  const stableApi = useMemo(
+    () => ({
+      // Setters (stable from useState)
+      setStatusFilter,
+      setAuthorFilter,
+      setSearchTerm,
+      setIsTypeSelectOpen,
+      setIsPasswordDialogOpen,
+      setIsDuplicateDialogOpen,
+      setPasswordInput,
+      setPendingEditId,
+      setDuplicateSource,
+      setDuplicateTourCode,
+      setDuplicateTitle,
+      setIsDuplicating,
 
-    // Getters (stable via refs)
-    getStatusFilter,
-    getAuthorFilter,
-    getSearchTerm,
-    getIsTypeSelectOpen,
-    getIsPasswordDialogOpen,
-    getIsDuplicateDialogOpen,
-    getPasswordInput,
-    getPendingEditId,
-    getDuplicateSource,
-    getDuplicateTourCode,
-    getDuplicateTitle,
-    getIsDuplicating,
-  }), []) // 空依賴 - 物件只創建一次
+      // Getters (stable via refs)
+      getStatusFilter,
+      getAuthorFilter,
+      getSearchTerm,
+      getIsTypeSelectOpen,
+      getIsPasswordDialogOpen,
+      getIsDuplicateDialogOpen,
+      getPasswordInput,
+      getPendingEditId,
+      getDuplicateSource,
+      getDuplicateTourCode,
+      getDuplicateTitle,
+      getIsDuplicating,
+    }),
+    []
+  ) // 空依賴 - 物件只創建一次
 
   // 返回穩定 API + 當前狀態值（用於渲染）
   return {

@@ -60,4 +60,4 @@ export const COMP_REQUIREMENTS_LABELS = {
   無需產生需求單: '沒有需要產生需求單的項目',
   產生中: '產生中...',
   已產生需求單: (n: number) => `已產生 ${n} 張需求單`,
-};
+}

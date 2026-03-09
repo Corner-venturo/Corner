@@ -17,18 +17,17 @@ const supabaseAdmin = createClient(
 )
 
 async function getWorkspaceId(channelId: string): Promise<string | null> {
-    const { data, error } = await supabaseAdmin
-        .from('channels')
-        .select('workspace_id')
-        .eq('id', channelId)
-        .single()
-    if (error) {
-        console.error('Error fetching workspace_id:', error)
-        return null
-    }
-    return data.workspace_id
+  const { data, error } = await supabaseAdmin
+    .from('channels')
+    .select('workspace_id')
+    .eq('id', channelId)
+    .single()
+  if (error) {
+    console.error('Error fetching workspace_id:', error)
+    return null
+  }
+  return data.workspace_id
 }
-
 
 /**
  * Checks if a user has permission to access a specific channel.
@@ -38,7 +37,7 @@ async function getWorkspaceId(channelId: string): Promise<string | null> {
  * @returns {Promise<boolean>} - True if the user has access, false otherwise.
  */
 async function canUserAccessChannel(userId: string, channelId: string): Promise<boolean> {
-  const workspace_id = await getWorkspaceId(channelId);
+  const workspace_id = await getWorkspaceId(channelId)
   if (!workspace_id) {
     return false
   }
@@ -62,17 +61,18 @@ async function canUserAccessChannel(userId: string, channelId: string): Promise<
 
 // Helper to get user from auth header
 async function getSupabaseUser(authHeader: string) {
-    const supabase = createClient(
-        Deno.env.get('SUPABASE_URL') ?? '',
-        Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-        { global: { headers: { Authorization: authHeader } } }
-    );
-    const { data: { user } } = await supabase.auth.getUser();
-    return user;
+  const supabase = createClient(
+    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+    { global: { headers: { Authorization: authHeader } } }
+  )
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  return user
 }
 
-
-serve(async (req) => {
+serve(async req => {
   const url = new URL(req.url)
   const path = url.pathname.replace('/workspace-api', '')
 
@@ -83,71 +83,93 @@ serve(async (req) => {
   try {
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Authorization header is required' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ error: 'Authorization header is required' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
     }
-    const user = await getSupabaseUser(authHeader);
+    const user = await getSupabaseUser(authHeader)
     if (!user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
     }
-    
+
     // --- ROUTE: GET /messages ---
     if (path === '/messages' && req.method === 'GET') {
-        const channel_id = url.searchParams.get('channel_id');
-        const cursor = url.searchParams.get('cursor'); // ISO timestamp
-        const limit = parseInt(url.searchParams.get('limit') || '50', 10);
+      const channel_id = url.searchParams.get('channel_id')
+      const cursor = url.searchParams.get('cursor') // ISO timestamp
+      const limit = parseInt(url.searchParams.get('limit') || '50', 10)
 
-        if (!channel_id) {
-            return new Response(JSON.stringify({ error: 'channel_id is required' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-        }
+      if (!channel_id) {
+        return new Response(JSON.stringify({ error: 'channel_id is required' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
 
-        const hasPermission = await canUserAccessChannel(user.id, channel_id);
-        if (!hasPermission) {
-            return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-        }
+      const hasPermission = await canUserAccessChannel(user.id, channel_id)
+      if (!hasPermission) {
+        return new Response(JSON.stringify({ error: 'Forbidden' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
 
-        let query = supabaseAdmin
-            .from('workspace_messages')
-            .select(`
+      let query = supabaseAdmin
+        .from('workspace_messages')
+        .select(
+          `
                 id,
                 content,
                 created_at,
                 user_id,
                 file_id,
                 workspace_files (*)
-            `)
-            .eq('channel_id', channel_id)
-            .order('created_at', { ascending: false })
-            .limit(limit);
+            `
+        )
+        .eq('channel_id', channel_id)
+        .order('created_at', { ascending: false })
+        .limit(limit)
 
-        if (cursor) {
-            query = query.lt('created_at', cursor);
-        }
+      if (cursor) {
+        query = query.lt('created_at', cursor)
+      }
 
-        const { data: messages, error } = await query;
+      const { data: messages, error } = await query
 
-        if (error) throw error;
-        
-        const nextCursor = messages.length === limit ? messages[messages.length - 1].created_at : null;
+      if (error) throw error
 
-        return new Response(JSON.stringify({ messages, nextCursor }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      const nextCursor = messages.length === limit ? messages[messages.length - 1].created_at : null
+
+      return new Response(JSON.stringify({ messages, nextCursor }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
     }
-
 
     // --- ROUTE: POST /files/signed-url ---
     if (path === '/files/signed-url' && req.method === 'POST') {
       const { channel_id, file_name, mime_type } = await req.json()
       if (!channel_id || !file_name || !mime_type) {
-        return new Response(JSON.stringify({ error: 'channel_id, file_name, and mime_type are required' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+        return new Response(
+          JSON.stringify({ error: 'channel_id, file_name, and mime_type are required' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
       }
 
       const hasPermission = await canUserAccessChannel(user.id, channel_id)
       if (!hasPermission) {
-        return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+        return new Response(JSON.stringify({ error: 'Forbidden' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
       }
-      
-      const workspace_id = await getWorkspaceId(channel_id);
-      const uniqueFileName = `${uuidv4()}-${file_name}`;
-      const storage_path = `${workspace_id}/${user.id}/${uniqueFileName}`;
+
+      const workspace_id = await getWorkspaceId(channel_id)
+      const uniqueFileName = `${uuidv4()}-${file_name}`
+      const storage_path = `${workspace_id}/${user.id}/${uniqueFileName}`
 
       const { data, error } = await supabaseAdmin.storage
         .from('workspace_files')
@@ -155,66 +177,85 @@ serve(async (req) => {
 
       if (error) throw error
 
-      return new Response(JSON.stringify({ ...data, path: storage_path }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ ...data, path: storage_path }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
     }
 
     // --- ROUTE: POST /files/upload-complete ---
     if (path === '/files/upload-complete' && req.method === 'POST') {
-        const { channel_id, path, file_name, mime_type, size_bytes } = await req.json();
-        if (!channel_id || !path || !file_name || !mime_type || !size_bytes) {
-            return new Response(JSON.stringify({ error: 'channel_id, path, file_name, mime_type, and size_bytes are required' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-        }
+      const { channel_id, path, file_name, mime_type, size_bytes } = await req.json()
+      if (!channel_id || !path || !file_name || !mime_type || !size_bytes) {
+        return new Response(
+          JSON.stringify({
+            error: 'channel_id, path, file_name, mime_type, and size_bytes are required',
+          }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
 
-        const hasPermission = await canUserAccessChannel(user.id, channel_id);
-        if (!hasPermission) {
-            return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-        }
-        
-        const workspace_id = await getWorkspaceId(channel_id);
+      const hasPermission = await canUserAccessChannel(user.id, channel_id)
+      if (!hasPermission) {
+        return new Response(JSON.stringify({ error: 'Forbidden' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
 
-        // 1. Insert file metadata
-        const { data: fileData, error: fileError } = await supabaseAdmin
-            .from('workspace_files')
-            .insert({
-                uploader_id: user.id,
-                workspace_id: workspace_id,
-                file_name: file_name,
-                storage_path: path,
-                mime_type: mime_type,
-                size_bytes: size_bytes,
-            })
-            .select()
-            .single();
+      const workspace_id = await getWorkspaceId(channel_id)
 
-        if (fileError) throw fileError;
+      // 1. Insert file metadata
+      const { data: fileData, error: fileError } = await supabaseAdmin
+        .from('workspace_files')
+        .insert({
+          uploader_id: user.id,
+          workspace_id: workspace_id,
+          file_name: file_name,
+          storage_path: path,
+          mime_type: mime_type,
+          size_bytes: size_bytes,
+        })
+        .select()
+        .single()
 
-        // 2. Create a message referencing the file
-        const { data: messageData, error: messageError } = await supabaseAdmin
-            .from('workspace_messages')
-            .insert({
-                channel_id: channel_id,
-                user_id: user.id,
-                file_id: fileData.id,
-            })
-            .select()
-            .single();
+      if (fileError) throw fileError
 
-        if (messageError) throw messageError;
+      // 2. Create a message referencing the file
+      const { data: messageData, error: messageError } = await supabaseAdmin
+        .from('workspace_messages')
+        .insert({
+          channel_id: channel_id,
+          user_id: user.id,
+          file_id: fileData.id,
+        })
+        .select()
+        .single()
 
-        return new Response(JSON.stringify(messageData), { status: 201, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      if (messageError) throw messageError
+
+      return new Response(JSON.stringify(messageData), {
+        status: 201,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
     }
-
 
     // --- ROUTE: POST /messages ---
     if (path === '/messages' && req.method === 'POST') {
       const { channel_id, content } = await req.json()
       if (!channel_id || !content) {
-        return new Response(JSON.stringify({ error: 'channel_id and content are required' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+        return new Response(JSON.stringify({ error: 'channel_id and content are required' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
       }
 
       const hasPermission = await canUserAccessChannel(user.id, channel_id)
       if (!hasPermission) {
-        return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+        return new Response(JSON.stringify({ error: 'Forbidden' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
       }
 
       const { data: newMessage, error: insertError } = await supabaseAdmin
@@ -229,11 +270,16 @@ serve(async (req) => {
 
       if (insertError) throw insertError
 
-      return new Response(JSON.stringify(newMessage), { status: 201, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify(newMessage), {
+        status: 201,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
     }
 
-    return new Response(JSON.stringify({ message: 'Not Found' }), { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
-
+    return new Response(JSON.stringify({ message: 'Not Found' }), {
+      status: 404,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
   } catch (err) {
     console.error(err)
     return new Response(JSON.stringify({ error: 'An internal error occurred' }), {

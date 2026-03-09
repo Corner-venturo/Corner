@@ -41,11 +41,7 @@ interface ItineraryVersionPickerProps {
   tour: Tour
 }
 
-export function ItineraryVersionPicker({
-  isOpen,
-  onClose,
-  tour,
-}: ItineraryVersionPickerProps) {
+export function ItineraryVersionPicker({ isOpen, onClose, tour }: ItineraryVersionPickerProps) {
   const router = useRouter()
   const { items: itineraries, loading } = useItineraries()
   const { items: countries } = useCountries()
@@ -150,28 +146,36 @@ export function ItineraryVersionPicker({
         features: [],
         focus_cards: [],
         outbound_flight: (() => {
-          const flight = Array.isArray(tour.outbound_flight) ? tour.outbound_flight[0] : tour.outbound_flight
-          return flight ? {
-            airline: flight.airline || '',
-            flightNumber: flight.flightNumber || '',
-            departureAirport: flight.departureAirport || 'TPE',
-            departureTime: flight.departureTime || '',
-            arrivalAirport: flight.arrivalAirport || '',
-            arrivalTime: flight.arrivalTime || '',
-            departureDate: flight.departureDate || '',
-          } : undefined
+          const flight = Array.isArray(tour.outbound_flight)
+            ? tour.outbound_flight[0]
+            : tour.outbound_flight
+          return flight
+            ? {
+                airline: flight.airline || '',
+                flightNumber: flight.flightNumber || '',
+                departureAirport: flight.departureAirport || 'TPE',
+                departureTime: flight.departureTime || '',
+                arrivalAirport: flight.arrivalAirport || '',
+                arrivalTime: flight.arrivalTime || '',
+                departureDate: flight.departureDate || '',
+              }
+            : undefined
         })(),
         return_flight: (() => {
-          const flight = Array.isArray(tour.return_flight) ? tour.return_flight[0] : tour.return_flight
-          return flight ? {
-            airline: flight.airline || '',
-            flightNumber: flight.flightNumber || '',
-            departureAirport: flight.departureAirport || '',
-            departureTime: flight.departureTime || '',
-            arrivalAirport: flight.arrivalAirport || 'TPE',
-            arrivalTime: flight.arrivalTime || '',
-            departureDate: flight.departureDate || '',
-          } : undefined
+          const flight = Array.isArray(tour.return_flight)
+            ? tour.return_flight[0]
+            : tour.return_flight
+          return flight
+            ? {
+                airline: flight.airline || '',
+                flightNumber: flight.flightNumber || '',
+                departureAirport: flight.departureAirport || '',
+                departureTime: flight.departureTime || '',
+                arrivalAirport: flight.arrivalAirport || 'TPE',
+                arrivalTime: flight.arrivalTime || '',
+                departureDate: flight.departureDate || '',
+              }
+            : undefined
         })(),
       } as unknown as Omit<Itinerary, 'id' | 'created_at' | 'updated_at'>)
 
@@ -225,12 +229,14 @@ export function ItineraryVersionPicker({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent level={1} className="max-w-[400px] max-h-[500px] overflow-hidden p-0">
         <DialogHeader className="px-4 py-3 border-b border-border bg-morandi-container/20">
           <div className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-morandi-primary" />
-            <DialogTitle className="font-medium text-morandi-primary">{DOCUMENTS_LABELS.MANAGE_6774}</DialogTitle>
+            <DialogTitle className="font-medium text-morandi-primary">
+              {DOCUMENTS_LABELS.MANAGE_6774}
+            </DialogTitle>
             <span className="text-sm text-morandi-secondary">- {tour.code}</span>
           </div>
         </DialogHeader>
@@ -255,7 +261,8 @@ export function ItineraryVersionPicker({
                     className={cn(
                       'group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors',
                       'hover:bg-morandi-primary/5 border border-transparent hover:border-morandi-primary/20',
-                      isConfirmedItinerary(itinerary) && 'bg-morandi-green/5 border-morandi-green/20'
+                      isConfirmedItinerary(itinerary) &&
+                        'bg-morandi-green/5 border-morandi-green/20'
                     )}
                   >
                     <div className="flex-1 min-w-0">
@@ -330,11 +337,7 @@ export function ItineraryVersionPicker({
               variant="ghost"
               className="w-full gap-2"
             >
-              {isCreating ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : (
-                <Plus size={14} />
-              )}
+              {isCreating ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
               新增
             </Button>
           </DialogFooter>

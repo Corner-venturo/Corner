@@ -28,7 +28,11 @@ import type {
   PreviewDayData,
   AccommodationStatus,
 } from './types'
-import { formatDailyItinerary, getPreviewDailyData as getPreviewData, generatePrintHtml } from './format-itinerary'
+import {
+  formatDailyItinerary,
+  getPreviewDailyData as getPreviewData,
+  generatePrintHtml,
+} from './format-itinerary'
 import { PROPOSAL_LABELS } from '../../constants'
 
 interface UsePackageItineraryOptions {
@@ -89,12 +93,12 @@ export function usePackageItinerary({
   // 航班查詢（使用共用 hook）
   const flightSearch = useFlightSearch({
     outboundFlight: searchOutboundFlight,
-    setOutboundFlight: (flight) => {
+    setOutboundFlight: flight => {
       setFormData(prev => ({ ...prev, outboundFlight: flight }))
       setOutboundFlightNumber('')
     },
     returnFlight: searchReturnFlight,
-    setReturnFlight: (flight) => {
+    setReturnFlight: flight => {
       setFormData(prev => ({ ...prev, returnFlight: flight }))
       setReturnFlightNumber('')
     },
@@ -140,86 +144,94 @@ export function usePackageItinerary({
   }, [pkg.start_date, pkg.end_date, pkg.days])
 
   // 從行程表載入每日資料
-  const loadDailyDataFromItinerary = useCallback((
-    itinerary: Itinerary,
-    versionIndex: number,
-    days: number
-  ) => {
-    const versionRecordsData = (itinerary.version_records || []) as ItineraryVersionRecord[]
+  const loadDailyDataFromItinerary = useCallback(
+    (itinerary: Itinerary, versionIndex: number, days: number) => {
+      const versionRecordsData = (itinerary.version_records || []) as ItineraryVersionRecord[]
 
-    type DailyData = Array<{
-      title?: string
-      meals?: { breakfast?: string; lunch?: string; dinner?: string }
-      accommodation?: string
-      activities?: Array<{ id?: string; title?: string; startTime?: string; endTime?: string }>
-    }>
+      type DailyData = Array<{
+        title?: string
+        meals?: { breakfast?: string; lunch?: string; dinner?: string }
+        accommodation?: string
+        activities?: Array<{ id?: string; title?: string; startTime?: string; endTime?: string }>
+      }>
 
-    let dailyData: DailyData | null = null
+      let dailyData: DailyData | null = null
 
-    if (versionIndex === -1) {
-      dailyData = (itinerary.daily_itinerary || []) as unknown as DailyData
-    } else if (versionRecordsData[versionIndex]) {
-      dailyData = (versionRecordsData[versionIndex].daily_itinerary || []) as unknown as DailyData
-    }
-
-    if (dailyData && dailyData.length > 0) {
-      const loadedSchedule = dailyData.map((day, idx) => {
-        const isHotelBreakfast = day.meals?.breakfast === '飯店早餐'
-        const isLunchSelf = day.meals?.lunch === '敬請自理' || day.meals?.lunch === '自理'
-        const isDinnerSelf = day.meals?.dinner === '敬請自理' || day.meals?.dinner === '自理'
-        let sameAsPrevious = false
-        if (idx > 0) {
-          const prevAccommodation = dailyData![idx - 1]?.accommodation
-          sameAsPrevious = Boolean(day.accommodation?.includes('同上')) ||
-            Boolean(prevAccommodation && day.accommodation === prevAccommodation)
-        }
-        const activities = (day.activities || []).map((act, actIdx) => ({
-          id: act.id || `activity-${idx}-${actIdx}`,
-          title: act.title || '',
-          startTime: act.startTime || '',
-          endTime: act.endTime || '',
-        }))
-        return {
-          day: idx + 1,
-          route: day.title || '',
-          meals: {
-            breakfast: isHotelBreakfast ? '' : (day.meals?.breakfast || ''),
-            lunch: isLunchSelf ? '' : (day.meals?.lunch || ''),
-            dinner: isDinnerSelf ? '' : (day.meals?.dinner || ''),
-          },
-          accommodation: sameAsPrevious ? '' : (day.accommodation || ''),
-          sameAsPrevious,
-          hotelBreakfast: isHotelBreakfast,
-          lunchSelf: isLunchSelf,
-          dinnerSelf: isDinnerSelf,
-          activities: activities.length > 0 ? activities : undefined,
-        }
-      })
-      setDailySchedule(loadedSchedule)
-      if (loadedSchedule.some(d => d.activities && d.activities.length > 0)) {
-        setIsTimelineMode(true)
+      if (versionIndex === -1) {
+        dailyData = (itinerary.daily_itinerary || []) as unknown as DailyData
+      } else if (versionRecordsData[versionIndex]) {
+        dailyData = (versionRecordsData[versionIndex].daily_itinerary || []) as unknown as DailyData
       }
-    } else {
-      setDailySchedule(Array.from({ length: days }, (_, i) => ({
-        day: i + 1,
-        route: '',
-        meals: { breakfast: '', lunch: '', dinner: '' },
-        accommodation: '',
-        sameAsPrevious: false,
-        hotelBreakfast: false,
-        lunchSelf: false,
-        dinnerSelf: false,
-        activities: undefined,
-      })))
-    }
 
-    setFormData(prev => ({
-      ...prev,
-      title: stripHtml(itinerary.title) || prev.title,
-      outboundFlight: itinerary.flight_info?.outbound || (itinerary as { outbound_flight?: FlightInfo }).outbound_flight || null,
-      returnFlight: itinerary.flight_info?.return || (itinerary as { return_flight?: FlightInfo }).return_flight || null,
-    }))
-  }, [])
+      if (dailyData && dailyData.length > 0) {
+        const loadedSchedule = dailyData.map((day, idx) => {
+          const isHotelBreakfast = day.meals?.breakfast === '飯店早餐'
+          const isLunchSelf = day.meals?.lunch === '敬請自理' || day.meals?.lunch === '自理'
+          const isDinnerSelf = day.meals?.dinner === '敬請自理' || day.meals?.dinner === '自理'
+          let sameAsPrevious = false
+          if (idx > 0) {
+            const prevAccommodation = dailyData![idx - 1]?.accommodation
+            sameAsPrevious =
+              Boolean(day.accommodation?.includes('同上')) ||
+              Boolean(prevAccommodation && day.accommodation === prevAccommodation)
+          }
+          const activities = (day.activities || []).map((act, actIdx) => ({
+            id: act.id || `activity-${idx}-${actIdx}`,
+            title: act.title || '',
+            startTime: act.startTime || '',
+            endTime: act.endTime || '',
+          }))
+          return {
+            day: idx + 1,
+            route: day.title || '',
+            meals: {
+              breakfast: isHotelBreakfast ? '' : day.meals?.breakfast || '',
+              lunch: isLunchSelf ? '' : day.meals?.lunch || '',
+              dinner: isDinnerSelf ? '' : day.meals?.dinner || '',
+            },
+            accommodation: sameAsPrevious ? '' : day.accommodation || '',
+            sameAsPrevious,
+            hotelBreakfast: isHotelBreakfast,
+            lunchSelf: isLunchSelf,
+            dinnerSelf: isDinnerSelf,
+            activities: activities.length > 0 ? activities : undefined,
+          }
+        })
+        setDailySchedule(loadedSchedule)
+        if (loadedSchedule.some(d => d.activities && d.activities.length > 0)) {
+          setIsTimelineMode(true)
+        }
+      } else {
+        setDailySchedule(
+          Array.from({ length: days }, (_, i) => ({
+            day: i + 1,
+            route: '',
+            meals: { breakfast: '', lunch: '', dinner: '' },
+            accommodation: '',
+            sameAsPrevious: false,
+            hotelBreakfast: false,
+            lunchSelf: false,
+            dinnerSelf: false,
+            activities: undefined,
+          }))
+        )
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        title: stripHtml(itinerary.title) || prev.title,
+        outboundFlight:
+          itinerary.flight_info?.outbound ||
+          (itinerary as { outbound_flight?: FlightInfo }).outbound_flight ||
+          null,
+        returnFlight:
+          itinerary.flight_info?.return ||
+          (itinerary as { return_flight?: FlightInfo }).return_flight ||
+          null,
+      }))
+    },
+    []
+  )
 
   // 載入行程表資料
   useEffect(() => {
@@ -255,7 +267,10 @@ export function usePackageItinerary({
             .single()
 
           if (!error && data) {
-            logger.log('[PackageItineraryDialog] 載入成功，版本數:', (data.version_records as unknown[])?.length || 0)
+            logger.log(
+              '[PackageItineraryDialog] 載入成功，版本數:',
+              (data.version_records as unknown[])?.length || 0
+            )
             setDirectLoadedItinerary(data as unknown as Itinerary)
           } else {
             logger.error('[PackageItineraryDialog] 載入失敗:', error)
@@ -266,15 +281,25 @@ export function usePackageItinerary({
         loadingRef.current = false
       }
 
-      loadData().catch((err) => logger.error('[loadData]', err))
+      loadData().catch(err => logger.error('[loadData]', err))
     } else if (!isOpen) {
       loadingRef.current = false
     }
-  }, [isOpen, pkg.itinerary_id, pkg.start_date, pkg.end_date, pkg.version_name, proposal.title, refresh])
+  }, [
+    isOpen,
+    pkg.itinerary_id,
+    pkg.start_date,
+    pkg.end_date,
+    pkg.version_name,
+    proposal.title,
+    refresh,
+  ])
 
   // 已關聯的行程表
   const linkedItineraries = useMemo(() => {
-    logger.log(`[PackageItineraryDialog] pkg.id = ${pkg.id}, pkg.itinerary_id = ${pkg.itinerary_id}`)
+    logger.log(
+      `[PackageItineraryDialog] pkg.id = ${pkg.id}, pkg.itinerary_id = ${pkg.itinerary_id}`
+    )
     const filtered = itineraries.filter(i => {
       if (i._deleted) return false
       return i.proposal_package_id === pkg.id || (pkg.itinerary_id && i.id === pkg.itinerary_id)
@@ -288,32 +313,44 @@ export function usePackageItinerary({
       hasInitializedDailyScheduleRef.current = true
       const days = calculateDays()
 
-      const itinerary = directLoadedItinerary || linkedItineraries.find(i =>
-        i.id === pkg.itinerary_id || i.proposal_package_id === pkg.id
-      )
+      const itinerary =
+        directLoadedItinerary ||
+        linkedItineraries.find(i => i.id === pkg.itinerary_id || i.proposal_package_id === pkg.id)
 
       if (itinerary) {
         loadDailyDataFromItinerary(itinerary, -1, days)
       } else {
-        setDailySchedule(Array.from({ length: days }, (_, i) => ({
-          day: i + 1,
-          route: '',
-          meals: { breakfast: '', lunch: '', dinner: '' },
-          accommodation: '',
-          sameAsPrevious: false,
-          hotelBreakfast: false,
-          lunchSelf: false,
-          dinnerSelf: false,
-          activities: undefined,
-        })))
+        setDailySchedule(
+          Array.from({ length: days }, (_, i) => ({
+            day: i + 1,
+            route: '',
+            meals: { breakfast: '', lunch: '', dinner: '' },
+            accommodation: '',
+            sameAsPrevious: false,
+            hotelBreakfast: false,
+            lunchSelf: false,
+            dinnerSelf: false,
+            activities: undefined,
+          }))
+        )
       }
     }
-  }, [isDataLoading, isOpen, directLoadedItinerary, linkedItineraries, pkg.itinerary_id, pkg.id, calculateDays, loadDailyDataFromItinerary])
+  }, [
+    isDataLoading,
+    isOpen,
+    directLoadedItinerary,
+    linkedItineraries,
+    pkg.itinerary_id,
+    pkg.id,
+    calculateDays,
+    loadDailyDataFromItinerary,
+  ])
 
   // 判斷是否為編輯模式
   const existingItinerary = useMemo(() => {
-    return directLoadedItinerary || linkedItineraries.find(i =>
-      i.id === pkg.itinerary_id || i.proposal_package_id === pkg.id
+    return (
+      directLoadedItinerary ||
+      linkedItineraries.find(i => i.id === pkg.itinerary_id || i.proposal_package_id === pkg.id)
     )
   }, [directLoadedItinerary, linkedItineraries, pkg.itinerary_id, pkg.id])
 
@@ -325,15 +362,25 @@ export function usePackageItinerary({
   }, [existingItinerary])
 
   // 處理版本切換
-  const handleVersionChange = useCallback((index: number) => {
-    setSelectedVersionIndex(index)
-    const itinerary = directLoadedItinerary || linkedItineraries.find(i =>
-      i.id === pkg.itinerary_id || i.proposal_package_id === pkg.id
-    )
-    if (itinerary) {
-      loadDailyDataFromItinerary(itinerary, index, calculateDays())
-    }
-  }, [directLoadedItinerary, linkedItineraries, pkg.itinerary_id, pkg.id, calculateDays, loadDailyDataFromItinerary])
+  const handleVersionChange = useCallback(
+    (index: number) => {
+      setSelectedVersionIndex(index)
+      const itinerary =
+        directLoadedItinerary ||
+        linkedItineraries.find(i => i.id === pkg.itinerary_id || i.proposal_package_id === pkg.id)
+      if (itinerary) {
+        loadDailyDataFromItinerary(itinerary, index, calculateDays())
+      }
+    },
+    [
+      directLoadedItinerary,
+      linkedItineraries,
+      pkg.itinerary_id,
+      pkg.id,
+      calculateDays,
+      loadDailyDataFromItinerary,
+    ]
+  )
 
   // 更新每日行程
   const updateDaySchedule = useCallback((index: number, field: string, value: string | boolean) => {
@@ -341,13 +388,18 @@ export function usePackageItinerary({
       const newSchedule = [...prev]
       if (field === 'route' || field === 'accommodation') {
         newSchedule[index] = { ...newSchedule[index], [field]: value }
-      } else if (field === 'sameAsPrevious' || field === 'hotelBreakfast' || field === 'lunchSelf' || field === 'dinnerSelf') {
+      } else if (
+        field === 'sameAsPrevious' ||
+        field === 'hotelBreakfast' ||
+        field === 'lunchSelf' ||
+        field === 'dinnerSelf'
+      ) {
         newSchedule[index] = { ...newSchedule[index], [field]: value as boolean }
       } else if (field.startsWith('meals.')) {
         const mealType = field.split('.')[1] as 'breakfast' | 'lunch' | 'dinner'
         newSchedule[index] = {
           ...newSchedule[index],
-          meals: { ...newSchedule[index].meals, [mealType]: value as string }
+          meals: { ...newSchedule[index].meals, [mealType]: value as string },
         }
       }
       return newSchedule
@@ -387,48 +439,57 @@ export function usePackageItinerary({
   }, [])
 
   // 從景點庫批次新增活動
-  const addActivitiesFromAttractions = useCallback((dayIndex: number, attractions: { name: string; id?: string }[]) => {
-    setDailySchedule(prev => {
-      const newSchedule = [...prev]
-      const existing = newSchedule[dayIndex].activities || []
-      const newActivities: SimpleActivity[] = attractions.map((attr, i) => ({
-        id: `activity-${dayIndex}-${Date.now()}-${i}`,
-        title: attr.name,
-        startTime: '',
-        endTime: '',
-        attractionId: attr.id,
-      }))
-      newSchedule[dayIndex] = {
-        ...newSchedule[dayIndex],
-        activities: [...existing, ...newActivities],
-      }
-      return newSchedule
-    })
-  }, [])
+  const addActivitiesFromAttractions = useCallback(
+    (dayIndex: number, attractions: { name: string; id?: string }[]) => {
+      setDailySchedule(prev => {
+        const newSchedule = [...prev]
+        const existing = newSchedule[dayIndex].activities || []
+        const newActivities: SimpleActivity[] = attractions.map((attr, i) => ({
+          id: `activity-${dayIndex}-${Date.now()}-${i}`,
+          title: attr.name,
+          startTime: '',
+          endTime: '',
+          attractionId: attr.id,
+        }))
+        newSchedule[dayIndex] = {
+          ...newSchedule[dayIndex],
+          activities: [...existing, ...newActivities],
+        }
+        return newSchedule
+      })
+    },
+    []
+  )
 
-  const updateActivity = useCallback((dayIndex: number, activityIndex: number, field: keyof SimpleActivity, value: string) => {
-    setDailySchedule(prev => {
-      const newSchedule = [...prev]
-      const activities = [...(newSchedule[dayIndex].activities || [])]
-      activities[activityIndex] = { ...activities[activityIndex], [field]: value }
-      newSchedule[dayIndex] = {
-        ...newSchedule[dayIndex],
-        activities,
-      }
-      return newSchedule
-    })
-  }, [])
+  const updateActivity = useCallback(
+    (dayIndex: number, activityIndex: number, field: keyof SimpleActivity, value: string) => {
+      setDailySchedule(prev => {
+        const newSchedule = [...prev]
+        const activities = [...(newSchedule[dayIndex].activities || [])]
+        activities[activityIndex] = { ...activities[activityIndex], [field]: value }
+        newSchedule[dayIndex] = {
+          ...newSchedule[dayIndex],
+          activities,
+        }
+        return newSchedule
+      })
+    },
+    []
+  )
 
   // 取得前一天住宿
-  const getPreviousAccommodation = useCallback((index: number): string => {
-    if (index === 0) return ''
-    for (let i = index - 1; i >= 0; i--) {
-      if (!dailySchedule[i].sameAsPrevious && dailySchedule[i].accommodation) {
-        return dailySchedule[i].accommodation
+  const getPreviousAccommodation = useCallback(
+    (index: number): string => {
+      if (index === 0) return ''
+      for (let i = index - 1; i >= 0; i--) {
+        if (!dailySchedule[i].sameAsPrevious && dailySchedule[i].accommodation) {
+          return dailySchedule[i].accommodation
+        }
       }
-    }
-    return ''
-  }, [dailySchedule])
+      return ''
+    },
+    [dailySchedule]
+  )
 
   // 住宿狀態
   const getAccommodationStatus = useCallback((): AccommodationStatus => {
@@ -465,7 +526,10 @@ export function usePackageItinerary({
       return firstVersion?.note || stripHtml(existingItinerary?.title) || '主版本'
     }
     const record = versionRecords[selectedVersionIndex]
-    return record?.note || PROPOSAL_LABELS.brochurePreview.versionLabel(record?.version || selectedVersionIndex + 1)
+    return (
+      record?.note ||
+      PROPOSAL_LABELS.brochurePreview.versionLabel(record?.version || selectedVersionIndex + 1)
+    )
   }, [selectedVersionIndex, versionRecords, existingItinerary])
 
   // 產生預覽資料
@@ -493,7 +557,17 @@ export function usePackageItinerary({
     printWindow.document.write(printContent)
     printWindow.document.close()
     printWindow.print()
-  }, [getPreviewDailyData, formData.title, formData.outboundFlight, formData.returnFlight, pkg.start_date, pkg.destination, pkg.country_id, currentUser?.workspace_code, isDomestic])
+  }, [
+    getPreviewDailyData,
+    formData.title,
+    formData.outboundFlight,
+    formData.returnFlight,
+    pkg.start_date,
+    pkg.destination,
+    pkg.country_id,
+    currentUser?.workspace_code,
+    isDomestic,
+  ])
 
   // 打開 AI 對話框
   const openAiDialog = useCallback(() => {
@@ -579,12 +653,13 @@ export function usePackageItinerary({
               dinner: aiDay.meals?.dinner || existingDay.meals.dinner,
             },
             hotelBreakfast: aiDay.meals?.breakfast === '飯店早餐',
-            activities: aiDay.activities?.map((act, actIdx) => ({
-              id: act.id || `ai-${index}-${actIdx}-${Date.now()}`,
-              title: act.title,
-              startTime: act.startTime || '',
-              endTime: act.endTime || '',
-            })) || existingDay.activities,
+            activities:
+              aiDay.activities?.map((act, actIdx) => ({
+                id: act.id || `ai-${index}-${actIdx}-${Date.now()}`,
+                title: act.title,
+                startTime: act.startTime || '',
+                endTime: act.endTime || '',
+              })) || existingDay.activities,
           }
         })
 
@@ -599,7 +674,17 @@ export function usePackageItinerary({
     } finally {
       setAiGenerating(false)
     }
-  }, [pkg.destination, pkg.start_date, pkg.main_city_id, pkg.country_id, aiArrivalTime, aiDepartureTime, aiTheme, dailySchedule, getAccommodationStatus])
+  }, [
+    pkg.destination,
+    pkg.start_date,
+    pkg.main_city_id,
+    pkg.country_id,
+    aiArrivalTime,
+    aiDepartureTime,
+    aiTheme,
+    dailySchedule,
+    getAccommodationStatus,
+  ])
 
   // 提交表單
   const handleSubmit = useCallback(async () => {
@@ -625,26 +710,30 @@ export function usePackageItinerary({
             daily_itinerary: formattedDailyItinerary,
             country: pkg.country_id || '',
             city: pkg.main_city_id || '',
-            outbound_flight: formData.outboundFlight ? {
-              airline: formData.outboundFlight.airline,
-              flightNumber: formData.outboundFlight.flightNumber,
-              departureAirport: formData.outboundFlight.departureAirport,
-              departureTime: formData.outboundFlight.departureTime,
-              departureDate: '',
-              arrivalAirport: formData.outboundFlight.arrivalAirport,
-              arrivalTime: formData.outboundFlight.arrivalTime,
-              duration: '',
-            } : null,
-            return_flight: formData.returnFlight ? {
-              airline: formData.returnFlight.airline,
-              flightNumber: formData.returnFlight.flightNumber,
-              departureAirport: formData.returnFlight.departureAirport,
-              departureTime: formData.returnFlight.departureTime,
-              departureDate: '',
-              arrivalAirport: formData.returnFlight.arrivalAirport,
-              arrivalTime: formData.returnFlight.arrivalTime,
-              duration: '',
-            } : null,
+            outbound_flight: formData.outboundFlight
+              ? {
+                  airline: formData.outboundFlight.airline,
+                  flightNumber: formData.outboundFlight.flightNumber,
+                  departureAirport: formData.outboundFlight.departureAirport,
+                  departureTime: formData.outboundFlight.departureTime,
+                  departureDate: '',
+                  arrivalAirport: formData.outboundFlight.arrivalAirport,
+                  arrivalTime: formData.outboundFlight.arrivalTime,
+                  duration: '',
+                }
+              : null,
+            return_flight: formData.returnFlight
+              ? {
+                  airline: formData.returnFlight.airline,
+                  flightNumber: formData.returnFlight.flightNumber,
+                  departureAirport: formData.returnFlight.departureAirport,
+                  departureTime: formData.returnFlight.departureTime,
+                  departureDate: '',
+                  arrivalAirport: formData.returnFlight.arrivalAirport,
+                  arrivalTime: formData.returnFlight.arrivalTime,
+                  duration: '',
+                }
+              : null,
             updated_at: new Date().toISOString(),
           })
           .eq('id', existingItinerary.id)
@@ -689,31 +778,37 @@ export function usePackageItinerary({
           focus_cards: [],
           proposal_package_id: pkg.id,
           workspace_id: workspaceId,
-          outbound_flight: formData.outboundFlight ? {
-            airline: formData.outboundFlight.airline,
-            flightNumber: formData.outboundFlight.flightNumber,
-            departureAirport: formData.outboundFlight.departureAirport,
-            departureTime: formData.outboundFlight.departureTime,
-            departureDate: '',
-            arrivalAirport: formData.outboundFlight.arrivalAirport,
-            arrivalTime: formData.outboundFlight.arrivalTime,
-            duration: '',
-          } : null,
-          return_flight: formData.returnFlight ? {
-            airline: formData.returnFlight.airline,
-            flightNumber: formData.returnFlight.flightNumber,
-            departureAirport: formData.returnFlight.departureAirport,
-            departureTime: formData.returnFlight.departureTime,
-            departureDate: '',
-            arrivalAirport: formData.returnFlight.arrivalAirport,
-            arrivalTime: formData.returnFlight.arrivalTime,
-            duration: '',
-          } : null,
+          outbound_flight: formData.outboundFlight
+            ? {
+                airline: formData.outboundFlight.airline,
+                flightNumber: formData.outboundFlight.flightNumber,
+                departureAirport: formData.outboundFlight.departureAirport,
+                departureTime: formData.outboundFlight.departureTime,
+                departureDate: '',
+                arrivalAirport: formData.outboundFlight.arrivalAirport,
+                arrivalTime: formData.outboundFlight.arrivalTime,
+                duration: '',
+              }
+            : null,
+          return_flight: formData.returnFlight
+            ? {
+                airline: formData.returnFlight.airline,
+                flightNumber: formData.returnFlight.flightNumber,
+                departureAirport: formData.returnFlight.departureAirport,
+                departureTime: formData.returnFlight.departureTime,
+                departureDate: '',
+                arrivalAirport: formData.returnFlight.arrivalAirport,
+                arrivalTime: formData.returnFlight.arrivalTime,
+                duration: '',
+              }
+            : null,
         }
 
         logger.log('建立行程表資料:', JSON.stringify(createData, null, 2))
 
-        const newItinerary = await create(createData as unknown as Omit<Itinerary, 'id' | 'created_at' | 'updated_at'>)
+        const newItinerary = await create(
+          createData as unknown as Omit<Itinerary, 'id' | 'created_at' | 'updated_at'>
+        )
 
         if (newItinerary?.id) {
           logger.log('行程表建立成功:', newItinerary.id)
@@ -738,7 +833,11 @@ export function usePackageItinerary({
         errorMessage = error.message
       } else if (error && typeof error === 'object') {
         const supabaseError = error as { message?: string; code?: string; details?: string }
-        errorMessage = supabaseError.message || supabaseError.code || supabaseError.details || JSON.stringify(error)
+        errorMessage =
+          supabaseError.message ||
+          supabaseError.code ||
+          supabaseError.details ||
+          JSON.stringify(error)
       }
       logger.error('建立行程表失敗:', JSON.stringify(error, null, 2))
       setCreateError(errorMessage)
@@ -746,7 +845,18 @@ export function usePackageItinerary({
     } finally {
       setIsCreating(false)
     }
-  }, [dailySchedule, pkg, formData, isEditMode, existingItinerary, currentUser, getPreviousAccommodation, onItineraryCreated, onClose, create])
+  }, [
+    dailySchedule,
+    pkg,
+    formData,
+    isEditMode,
+    existingItinerary,
+    currentUser,
+    getPreviousAccommodation,
+    onItineraryCreated,
+    onClose,
+    create,
+  ])
 
   // 另存新版本
   const handleSaveAsNewVersion = useCallback(async () => {
@@ -789,7 +899,7 @@ export function usePackageItinerary({
 
       if (error) throw error
 
-      setDirectLoadedItinerary(prev => prev ? { ...prev, version_records: updatedRecords } : null)
+      setDirectLoadedItinerary(prev => (prev ? { ...prev, version_records: updatedRecords } : null))
       setSelectedVersionIndex(updatedRecords.length - 1)
 
       toast.success('已另存為新版本')
@@ -800,7 +910,14 @@ export function usePackageItinerary({
     } finally {
       setIsCreating(false)
     }
-  }, [existingItinerary, dailySchedule, versionRecords, pkg.start_date, getPreviousAccommodation, onItineraryCreated])
+  }, [
+    existingItinerary,
+    dailySchedule,
+    versionRecords,
+    pkg.start_date,
+    getPreviousAccommodation,
+    onItineraryCreated,
+  ])
 
   return {
     // 狀態

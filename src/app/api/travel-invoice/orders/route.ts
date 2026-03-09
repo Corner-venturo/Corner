@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('查詢訂單失敗:', error)
-    captureException(error, { module: 'travel-invoice.orders' })
+      captureException(error, { module: 'travel-invoice.orders' })
       return ApiError.internal('查詢失敗')
     }
 

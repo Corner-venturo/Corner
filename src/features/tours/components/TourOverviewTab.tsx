@@ -34,7 +34,10 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
   const netProfit = grossProfit - grossProfit * 0.05
 
   // Budget vs actual expenses
-  const paymentRequests = paymentStore.payment_requests as Array<{ tour_id?: string; items?: Array<{ category: string; unit_price?: number; quantity?: number }> }>
+  const paymentRequests = paymentStore.payment_requests as Array<{
+    tour_id?: string
+    items?: Array<{ category: string; unit_price?: number; quantity?: number }>
+  }>
   const tourPaymentRequests = paymentRequests.filter(req => req?.tour_id === tour.id)
   const quoteBudget = tourQuote?.categories || []
 
@@ -54,7 +57,7 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
     items?: PaymentRequestItem[]
   }
 
-  const actualExpenses = (quoteBudget as QuoteCategory[]).map((category) => {
+  const actualExpenses = (quoteBudget as QuoteCategory[]).map(category => {
     const categoryTotal = tourPaymentRequests.reduce((sum, request: PaymentRequest) => {
       const categoryItems = request?.items?.filter(item => item.category === category.name) || []
       return (
@@ -103,7 +106,12 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
             </div>
             <div className="flex justify-between">
               <span className="text-morandi-secondary">{TOUR_OVERVIEW.label_created}</span>
-              <DateCell date={tour.created_at} fallback="-" showIcon={false} className="text-morandi-secondary text-sm" />
+              <DateCell
+                date={tour.created_at}
+                fallback="-"
+                showIcon={false}
+                className="text-morandi-secondary text-sm"
+              />
             </div>
           </div>
         </div>
@@ -201,7 +209,9 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
 
           {/* Status indicator */}
           <div className="mt-4 p-3 rounded-lg border border-border bg-morandi-container/10">
-            <div className="text-sm font-medium text-morandi-secondary mb-2">{TOUR_OVERVIEW.financial_status}</div>
+            <div className="text-sm font-medium text-morandi-secondary mb-2">
+              {TOUR_OVERVIEW.financial_status}
+            </div>
             <div className="flex items-center space-x-2">
               {netProfit >= 0 ? (
                 <div className="w-3 h-3 rounded-full bg-morandi-green"></div>
@@ -224,8 +234,12 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
       {/* Bottom section: Budget vs actual expenses table */}
       <div className="border border-border rounded-xl shadow-sm p-8">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-semibold text-morandi-primary">{TOUR_OVERVIEW.budget_title}</h3>
-          <div className="text-sm text-morandi-secondary">{TOUR_OVERVIEW.budget_basis(currentParticipants)}</div>
+          <h3 className="text-xl font-semibold text-morandi-primary">
+            {TOUR_OVERVIEW.budget_title}
+          </h3>
+          <div className="text-sm text-morandi-secondary">
+            {TOUR_OVERVIEW.budget_basis(currentParticipants)}
+          </div>
         </div>
 
         <div className="overflow-x-auto">
@@ -276,13 +290,18 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
                                 : 'bg-morandi-green/10 text-morandi-green'
                             )}
                           >
-                            {varianceRate > 20 ? TOUR_OVERVIEW.badge_over : TOUR_OVERVIEW.badge_save}
+                            {varianceRate > 20
+                              ? TOUR_OVERVIEW.badge_over
+                              : TOUR_OVERVIEW.badge_save}
                           </span>
                         )}
                       </div>
                     </td>
                     <td className="py-3 px-4 text-right text-morandi-secondary">
-                      <CurrencyCell amount={expense.budgetPerPerson} className="text-morandi-secondary" />
+                      <CurrencyCell
+                        amount={expense.budgetPerPerson}
+                        className="text-morandi-secondary"
+                      />
                     </td>
                     <td className="py-3 px-4 text-right text-morandi-primary font-medium">
                       <CurrencyCell amount={expense.budgetTotal} className="font-medium" />

@@ -4,7 +4,12 @@
  * 簡約、留白、優雅的日式設計風格
  */
 import type { PageTemplate, TemplateData } from './types'
-import type { CanvasElement, TextElement, ShapeElement, ImageElement } from '@/features/designer/components/types'
+import type {
+  CanvasElement,
+  TextElement,
+  ShapeElement,
+  ImageElement,
+} from '@/features/designer/components/types'
 
 // A5 尺寸
 const A5_WIDTH = 559
@@ -100,11 +105,13 @@ export const japaneseStyleV1: PageTemplate = {
           bottomRight: 4,
         },
         // 使用者調整的位置設定
-        position: data.coverImagePosition ? {
-          x: data.coverImagePosition.x,
-          y: data.coverImagePosition.y,
-          scale: data.coverImagePosition.scale,
-        } : undefined,
+        position: data.coverImagePosition
+          ? {
+              x: data.coverImagePosition.x,
+              y: data.coverImagePosition.y,
+              scale: data.coverImagePosition.scale,
+            }
+          : undefined,
       }
       elements.push(coverImage)
     } else {

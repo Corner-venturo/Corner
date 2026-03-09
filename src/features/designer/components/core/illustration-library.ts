@@ -18,7 +18,7 @@ export interface Illustration {
   id: string
   name: string
   category: IllustrationCategory
-  svg: string  // 完整 SVG 代碼
+  svg: string // 完整 SVG 代碼
   tags: string[]
 }
 
@@ -591,9 +591,10 @@ export function getIllustrationsByCategory(category: IllustrationCategory): Illu
  */
 export function searchIllustrations(query: string): Illustration[] {
   const lowerQuery = query.toLowerCase()
-  return ILLUSTRATIONS.filter(i =>
-    i.name.toLowerCase().includes(lowerQuery) ||
-    i.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+  return ILLUSTRATIONS.filter(
+    i =>
+      i.name.toLowerCase().includes(lowerQuery) ||
+      i.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
   )
 }
 

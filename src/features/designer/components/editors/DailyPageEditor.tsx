@@ -195,7 +195,7 @@ export function DailyPageEditor({
         </Label>
         <Input
           value={currentDay?.title || ''}
-          onChange={(e) => updateDailyDetail('title', e.target.value)}
+          onChange={e => updateDailyDetail('title', e.target.value)}
           placeholder={DESIGNER_LABELS.LABEL_2409}
           className="h-8 text-sm"
         />
@@ -210,7 +210,7 @@ export function DailyPageEditor({
         <Input
           type="date"
           value={currentDay?.date || ''}
-          onChange={(e) => updateDailyDetail('date', e.target.value)}
+          onChange={e => updateDailyDetail('date', e.target.value)}
           className="h-8 text-sm"
         />
       </div>
@@ -238,10 +238,10 @@ export function DailyPageEditor({
             <div
               key={idx}
               draggable
-              onDragStart={(e) => dragHandlers.onDragStart(e, idx)}
-              onDragOver={(e) => dragHandlers.onDragOver(e, idx)}
+              onDragStart={e => dragHandlers.onDragStart(e, idx)}
+              onDragOver={e => dragHandlers.onDragOver(e, idx)}
               onDragLeave={dragHandlers.onDragLeave}
-              onDrop={(e) => dragHandlers.onDrop(e, idx)}
+              onDrop={e => dragHandlers.onDrop(e, idx)}
               onDragEnd={dragHandlers.onDragEnd}
               className={cn(
                 'p-2 rounded border border-border/50 bg-morandi-container/10 transition-all',
@@ -258,13 +258,13 @@ export function DailyPageEditor({
 
                 <Input
                   value={item.time || ''}
-                  onChange={(e) => updateTimelineItem(idx, 'time', e.target.value)}
+                  onChange={e => updateTimelineItem(idx, 'time', e.target.value)}
                   placeholder="09:00"
                   className="w-16 h-7 text-xs"
                 />
                 <Input
                   value={item.activity || ''}
-                  onChange={(e) => updateTimelineItem(idx, 'activity', e.target.value)}
+                  onChange={e => updateTimelineItem(idx, 'activity', e.target.value)}
                   placeholder={DESIGNER_LABELS.LABEL_4055}
                   className="flex-1 h-7 text-xs"
                 />
@@ -308,28 +308,34 @@ export function DailyPageEditor({
         </Label>
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-morandi-secondary w-8">{DESIGNER_LABELS.LABEL_1347}</span>
+            <span className="text-[10px] text-morandi-secondary w-8">
+              {DESIGNER_LABELS.LABEL_1347}
+            </span>
             <Input
               value={currentDay?.meals?.breakfast || ''}
-              onChange={(e) => updateDailyDetail('meals.breakfast', e.target.value)}
+              onChange={e => updateDailyDetail('meals.breakfast', e.target.value)}
               placeholder={DESIGNER_LABELS.LABEL_5857}
               className="flex-1 h-7 text-xs"
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-morandi-secondary w-8">{DESIGNER_LABELS.LABEL_8515}</span>
+            <span className="text-[10px] text-morandi-secondary w-8">
+              {DESIGNER_LABELS.LABEL_8515}
+            </span>
             <Input
               value={currentDay?.meals?.lunch || ''}
-              onChange={(e) => updateDailyDetail('meals.lunch', e.target.value)}
+              onChange={e => updateDailyDetail('meals.lunch', e.target.value)}
               placeholder={DESIGNER_LABELS.LABEL_4196}
               className="flex-1 h-7 text-xs"
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-morandi-secondary w-8">{DESIGNER_LABELS.LABEL_8227}</span>
+            <span className="text-[10px] text-morandi-secondary w-8">
+              {DESIGNER_LABELS.LABEL_8227}
+            </span>
             <Input
               value={currentDay?.meals?.dinner || ''}
-              onChange={(e) => updateDailyDetail('meals.dinner', e.target.value)}
+              onChange={e => updateDailyDetail('meals.dinner', e.target.value)}
               placeholder={DESIGNER_LABELS.LABEL_2282}
               className="flex-1 h-7 text-xs"
             />

@@ -53,9 +53,14 @@ export function WidgetSettingsDialog({ activeWidgets, onToggleWidget }: WidgetSe
           {DASHBOARD_LABELS.SETTINGS_4196}
         </Button>
       </DialogTrigger>
-      <DialogContent level={1} className="sm:max-w-2xl border-morandi-gold/20 shadow-lg rounded-2xl">
+      <DialogContent
+        level={1}
+        className="sm:max-w-2xl border-morandi-gold/20 shadow-lg rounded-2xl"
+      >
         <DialogHeader>
-          <DialogTitle className="text-xl text-morandi-primary">{DASHBOARD_LABELS.SELECT_1019}</DialogTitle>
+          <DialogTitle className="text-xl text-morandi-primary">
+            {DASHBOARD_LABELS.SELECT_1019}
+          </DialogTitle>
           <p className="text-sm text-morandi-muted mt-1">{DASHBOARD_LABELS.LABEL_5024}</p>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-3 py-4">
@@ -75,7 +80,9 @@ export function WidgetSettingsDialog({ activeWidgets, onToggleWidget }: WidgetSe
                   <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-[#B5986A]/10 to-[#D4C4A8]/10 flex items-center justify-center shadow-sm flex-shrink-0">
                     <Icon className="h-4 w-4 text-morandi-gold" />
                   </div>
-                  <span className="font-medium text-morandi-primary text-sm truncate">{widget.name}</span>
+                  <span className="font-medium text-morandi-primary text-sm truncate">
+                    {widget.name}
+                  </span>
                 </div>
               </div>
             )

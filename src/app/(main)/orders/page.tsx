@@ -47,7 +47,6 @@ export default function OrdersPage() {
   // 🔥 載入 workspace（只執行一次）
   useEffect(() => {
     loadWorkspaces()
-   
   }, [])
 
   // 🔧 優化：建立 tour 出發日期 Map，避免排序時 O(n²) 查詢
@@ -63,7 +62,10 @@ export default function OrdersPage() {
     let matchesFilter: boolean
     switch (statusFilter) {
       case 'all':
-        matchesFilter = !(order.tour_name?.includes(ORDERS_PAGE_LABELS.VISA_TOUR) || order.tour_name?.includes(ORDERS_PAGE_LABELS.ESIM_TOUR))
+        matchesFilter = !(
+          order.tour_name?.includes(ORDERS_PAGE_LABELS.VISA_TOUR) ||
+          order.tour_name?.includes(ORDERS_PAGE_LABELS.ESIM_TOUR)
+        )
         break
       case 'visa-only':
         matchesFilter = order.tour_name?.includes(ORDERS_PAGE_LABELS.VISA_TOUR) ?? false
@@ -180,25 +182,25 @@ export default function OrdersPage() {
       addLabel={LABELS.ADD_ORDER}
       contentClassName="flex-1 overflow-auto flex flex-col"
     >
-        {/* 訂單列表 */}
-        <SimpleOrderTable
-          className="flex-1"
-          orders={sortedOrders}
-          tours={tours}
-          showTourInfo={true}
-          onQuickInvoice={order => {
-            setSelectedOrderForInvoice(order)
-            setIsInvoiceDialogOpen(true)
-          }}
-          onQuickVisa={order => {
-            setSelectedOrderForVisa(order)
-            setIsVisaDialogOpen(true)
-          }}
-          onEdit={order => {
-            setSelectedOrderForEdit(order)
-            setIsEditDialogOpen(true)
-          }}
-        />
+      {/* 訂單列表 */}
+      <SimpleOrderTable
+        className="flex-1"
+        orders={sortedOrders}
+        tours={tours}
+        showTourInfo={true}
+        onQuickInvoice={order => {
+          setSelectedOrderForInvoice(order)
+          setIsInvoiceDialogOpen(true)
+        }}
+        onQuickVisa={order => {
+          setSelectedOrderForVisa(order)
+          setIsVisaDialogOpen(true)
+        }}
+        onEdit={order => {
+          setSelectedOrderForEdit(order)
+          setIsEditDialogOpen(true)
+        }}
+      />
 
       {/* 新增訂單對話框 */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>

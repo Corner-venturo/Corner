@@ -2,7 +2,7 @@
 
 /**
  * 區塊元件庫
- * 
+ *
  * 提供預設區塊（每日行程、飯店卡片、航班資訊等）
  * 插入後會自動適應頁面寬度，可調整高度
  */
@@ -23,12 +23,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import type { CanvasElement, TextElement, ShapeElement, ImageElement, GroupElement } from './types'
 import { DESIGNER_LABELS } from './constants/labels'
 
@@ -44,9 +39,9 @@ interface BlockDefinition {
 }
 
 interface BlockOptions {
-  width: number      // 可用寬度（出血內）
-  x: number          // 起始 X
-  y: number          // 起始 Y
+  width: number // 可用寬度（出血內）
+  x: number // 起始 X
+  y: number // 起始 Y
   theme?: 'light' | 'dark'
 }
 
@@ -59,9 +54,9 @@ const COLORS = {
 }
 
 // A5 出血內尺寸
-const BLEED = 32  // 8mm = 32px at 96dpi
+const BLEED = 32 // 8mm = 32px at 96dpi
 const PAGE_WIDTH = 559
-const CONTENT_WIDTH = PAGE_WIDTH - BLEED * 2  // 495px
+const CONTENT_WIDTH = PAGE_WIDTH - BLEED * 2 // 495px
 
 /**
  * 每日行程區塊
@@ -484,26 +479,28 @@ function generateHeaderBlock(options: BlockOptions): CanvasElement[] {
  */
 function generateSingleImageBlock(options: BlockOptions): CanvasElement[] {
   const { width, x, y } = options
-  const height = width * 0.6  // 3:5 比例
+  const height = width * 0.6 // 3:5 比例
   const baseId = `block-img1-${Date.now()}`
 
-  return [{
-    id: `${baseId}-image`,
-    type: 'image',
-    name: '滿版圖片',
-    x,
-    y,
-    width,
-    height,
-    zIndex: 1,
-    rotation: 0,
-    opacity: 1,
-    locked: false,
-    visible: true,
-    src: '',  // 使用者需要自己上傳
-    objectFit: 'cover',
-    placeholder: true,
-  } as ImageElement]
+  return [
+    {
+      id: `${baseId}-image`,
+      type: 'image',
+      name: '滿版圖片',
+      x,
+      y,
+      width,
+      height,
+      zIndex: 1,
+      rotation: 0,
+      opacity: 1,
+      locked: false,
+      visible: true,
+      src: '', // 使用者需要自己上傳
+      objectFit: 'cover',
+      placeholder: true,
+    } as ImageElement,
+  ]
 }
 
 /**
@@ -513,7 +510,7 @@ function generateDualImageBlock(options: BlockOptions): CanvasElement[] {
   const { width, x, y } = options
   const gap = 8
   const imgWidth = (width - gap) / 2
-  const imgHeight = imgWidth * 0.75  // 4:3 比例
+  const imgHeight = imgWidth * 0.75 // 4:3 比例
   const baseId = `block-img2-${Date.now()}`
 
   return [
@@ -636,23 +633,26 @@ function generateGridImageBlock(options: BlockOptions): CanvasElement[] {
     { x: imgSize + gap, y: imgSize + gap, name: '右下' },
   ]
 
-  return positions.map((pos, i) => ({
-    id: `${baseId}-${i}`,
-    type: 'image',
-    name: pos.name,
-    x: x + pos.x,
-    y: y + pos.y,
-    width: imgSize,
-    height: imgSize,
-    zIndex: 1,
-    rotation: 0,
-    opacity: 1,
-    locked: false,
-    visible: true,
-    src: '',
-    objectFit: 'cover',
-    placeholder: true,
-  } as ImageElement))
+  return positions.map(
+    (pos, i) =>
+      ({
+        id: `${baseId}-${i}`,
+        type: 'image',
+        name: pos.name,
+        x: x + pos.x,
+        y: y + pos.y,
+        width: imgSize,
+        height: imgSize,
+        zIndex: 1,
+        rotation: 0,
+        opacity: 1,
+        locked: false,
+        visible: true,
+        src: '',
+        objectFit: 'cover',
+        placeholder: true,
+      }) as ImageElement
+  )
 }
 
 // 區塊定義列表
@@ -671,7 +671,7 @@ const BLOCKS: BlockDefinition[] = [
     description: '早/午/晚餐安排',
     icon: UtensilsCrossed,
     category: 'schedule',
-  generateElements: generateMealBlock,
+    generateElements: generateMealBlock,
   },
   {
     id: 'hotel-info',
@@ -744,7 +744,7 @@ interface BlockLibraryProps {
   isOpen: boolean
   onClose: () => void
   onInsertBlock: (elements: CanvasElement[]) => void
-  insertY?: number  // 插入位置 Y
+  insertY?: number // 插入位置 Y
 }
 
 export function BlockLibrary({ isOpen, onClose, onInsertBlock, insertY = 100 }: BlockLibraryProps) {

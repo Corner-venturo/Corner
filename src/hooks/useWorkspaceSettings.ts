@@ -23,7 +23,8 @@ const EMPTY_SETTINGS: WorkspaceSettings = {
   bank_account_name: '',
 }
 
-const SELECT_FIELDS = 'name, phone, address, bank_name, bank_branch, bank_account, bank_account_name' as const
+const SELECT_FIELDS =
+  'name, phone, address, bank_name, bank_branch, bank_account, bank_account_name' as const
 
 /**
  * 取得目前 workspace 的公司設定（銀行資訊、電話、地址等）

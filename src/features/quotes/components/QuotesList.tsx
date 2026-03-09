@@ -3,7 +3,6 @@
  * QuotesList - Displays quotes in a table format
  */
 
-
 import React, { useMemo } from 'react'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
@@ -15,7 +14,7 @@ import { QUOTE_STATUS_LABELS } from '@/lib/constants/quote-status'
 import { STATUS_COLORS } from '../constants'
 import { stripHtml } from '@/lib/utils/string-utils'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
-import { LOCAL_PRICING_DIALOG_LABELS, QUOTES_LIST_LABELS } from '../constants/labels';
+import { LOCAL_PRICING_DIALOG_LABELS, QUOTES_LIST_LABELS } from '../constants/labels'
 
 interface QuotesListProps {
   quotes: Quote[]
@@ -92,7 +91,8 @@ export const QuotesList: React.FC<QuotesListProps> = ({
                 STATUS_COLORS[quote.status || ''] || 'text-morandi-secondary'
               )}
             >
-              {QUOTE_STATUS_LABELS[quote.status as keyof typeof QUOTE_STATUS_LABELS] || quote.status}
+              {QUOTE_STATUS_LABELS[quote.status as keyof typeof QUOTE_STATUS_LABELS] ||
+                quote.status}
             </span>
           )
         },
@@ -126,7 +126,9 @@ export const QuotesList: React.FC<QuotesListProps> = ({
         sortable: true,
         render: (value, row) => {
           const quote = row as Quote
-          return <DateCell date={quote.created_at} showIcon={false} className="text-morandi-secondary" />
+          return (
+            <DateCell date={quote.created_at} showIcon={false} className="text-morandi-secondary" />
+          )
         },
       },
     ],
@@ -155,7 +157,9 @@ export const QuotesList: React.FC<QuotesListProps> = ({
                   ? 'text-morandi-gold hover:bg-morandi-gold/10'
                   : 'text-morandi-secondary hover:bg-morandi-secondary/10'
               )}
-              title={quote.is_pinned ? QUOTES_LIST_LABELS.取消置頂 : QUOTES_LIST_LABELS.設為置頂範本}
+              title={
+                quote.is_pinned ? QUOTES_LIST_LABELS.取消置頂 : QUOTES_LIST_LABELS.設為置頂範本
+              }
             >
               <Pin size={16} />
             </Button>

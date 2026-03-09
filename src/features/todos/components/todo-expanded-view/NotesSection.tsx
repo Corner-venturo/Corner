@@ -8,7 +8,12 @@ import { MessageSquare, Edit2, X, Save, Plus } from 'lucide-react'
 import { NotesSectionProps } from './types'
 import { useAuthStore } from '@/stores/auth-store'
 import { generateUUID } from '@/lib/utils/uuid'
-import { COMMON_LABELS, BUTTON_LABELS, PLACEHOLDER_LABELS, TOOLTIP_LABELS } from '@/features/todos/constants/labels'
+import {
+  COMMON_LABELS,
+  BUTTON_LABELS,
+  PLACEHOLDER_LABELS,
+  TOOLTIP_LABELS,
+} from '@/features/todos/constants/labels'
 
 export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
   const [newNote, setNewNote] = useState('')

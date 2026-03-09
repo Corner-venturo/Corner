@@ -8,11 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui/date-picker'
 import { CountryAirportSelector } from '@/components/selectors/CountryAirportSelector'
 import { X, Save } from 'lucide-react'
-import type {
-  Proposal,
-  CreateProposalData,
-  UpdateProposalData,
-} from '@/types/proposal.types'
+import type { Proposal, CreateProposalData, UpdateProposalData } from '@/types/proposal.types'
 import { createProposalSchema } from '@/lib/validations/schemas'
 import { alert } from '@/lib/ui/alert-dialog'
 import { PROPOSAL_LABELS } from '../constants'
@@ -142,7 +138,11 @@ export function ProposalDialog({
         aria-describedby={undefined}
       >
         <DialogHeader>
-          <DialogTitle>{mode === 'create' ? PROPOSAL_LABELS.proposalDialog.createTitle : PROPOSAL_LABELS.proposalDialog.editTitle}</DialogTitle>
+          <DialogTitle>
+            {mode === 'create'
+              ? PROPOSAL_LABELS.proposalDialog.createTitle
+              : PROPOSAL_LABELS.proposalDialog.editTitle}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto">
@@ -177,7 +177,8 @@ export function ProposalDialog({
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                  {PROPOSAL_LABELS.proposalDialog.versionNameLabel} <span className="text-morandi-red">{PROPOSAL_LABELS.required}</span>
+                  {PROPOSAL_LABELS.proposalDialog.versionNameLabel}{' '}
+                  <span className="text-morandi-red">{PROPOSAL_LABELS.required}</span>
                 </label>
                 <Input
                   value={versionName}
@@ -245,9 +246,7 @@ export function ProposalDialog({
                   type="number"
                   min={1}
                   value={groupSize || ''}
-                  onChange={e =>
-                    setGroupSize(e.target.value ? parseInt(e.target.value, 10) : null)
-                  }
+                  onChange={e => setGroupSize(e.target.value ? parseInt(e.target.value, 10) : null)}
                   placeholder={PROPOSAL_LABELS.proposalDialog.groupSizePlaceholder}
                 />
               </div>
@@ -284,7 +283,11 @@ export function ProposalDialog({
             className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
             <Save size={16} />
-            {submitting ? PROPOSAL_LABELS.proposalDialog.creating : mode === 'create' ? PROPOSAL_LABELS.proposalDialog.createProposal : PROPOSAL_LABELS.proposalDialog.save}
+            {submitting
+              ? PROPOSAL_LABELS.proposalDialog.creating
+              : mode === 'create'
+                ? PROPOSAL_LABELS.proposalDialog.createProposal
+                : PROPOSAL_LABELS.proposalDialog.save}
           </Button>
         </div>
       </DialogContent>

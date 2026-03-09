@@ -13,7 +13,7 @@ export function useRequestForm() {
   const { items: employees } = useEmployeesSlim()
 
   // 獲取當前登入用戶
-  const currentUser = useAuthStore(state => state.user)  
+  const currentUser = useAuthStore(state => state.user)
 
   const [formData, setFormData] = useState<RequestFormData>({
     request_category: 'tour', // 預設團體請款
@@ -100,7 +100,9 @@ export function useRequestForm() {
 
     // 過濾掉機器人（BOT001）
     const employeeList = employees
-      .filter(e => e.employee_number !== 'BOT001' && e.id !== '00000000-0000-0000-0000-000000000001')
+      .filter(
+        e => e.employee_number !== 'BOT001' && e.id !== '00000000-0000-0000-0000-000000000001'
+      )
       .map(e => ({
         id: e.id,
         name: e.display_name,

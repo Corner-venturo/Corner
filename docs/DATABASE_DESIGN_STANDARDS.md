@@ -47,13 +47,13 @@
      └───────────────── 新客戶加入 ◄──────────────────────────┘
 ```
 
-| 階段 | 系統 | 主要功能 |
-|------|------|---------|
-| **設計** | ERP | 員工設計行程、製作報價單、上傳景點照片 |
+| 階段     | 系統         | 主要功能                                 |
+| -------- | ------------ | ---------------------------------------- |
+| **設計** | ERP          | 員工設計行程、製作報價單、上傳景點照片   |
 | **銷售** | ERP + Online | 客戶瀏覽行程、線上報名、ERP 處理訂單收款 |
-| **出發** | Online | 旅客查看行程、領隊通知、團員互動 |
-| **回憶** | Online | 上傳照片、GPS 軌跡、生成回憶相簿 |
-| **推薦** | Online → ERP | 分享連結給親友、親友變新客戶 |
+| **出發** | Online       | 旅客查看行程、領隊通知、團員互動         |
+| **回憶** | Online       | 上傳照片、GPS 軌跡、生成回憶相簿         |
+| **推薦** | Online → ERP | 分享連結給親友、親友變新客戶             |
 
 ---
 
@@ -200,11 +200,11 @@ Venturo 是多租戶系統，每個「工作空間 (workspace)」代表一家公
 
 ### 3.2 三層資料分類
 
-| 分類 | 特徵 | 範例 | workspace_id | RLS |
-|------|------|------|--------------|-----|
-| **業務資料** | 屬於特定公司 | 旅遊團、訂單、報價單 | ✅ 必須有 | ✅ 啟用 |
-| **共用資料** | 所有公司共享 | 國家、城市、供應商 | ❌ 不需要 | ❌ 禁用 |
-| **會員資料** | 屬於特定旅客 | 旅客行程、聊天訊息 | 透過 user_id | ✅ 啟用 |
+| 分類         | 特徵         | 範例                 | workspace_id | RLS     |
+| ------------ | ------------ | -------------------- | ------------ | ------- |
+| **業務資料** | 屬於特定公司 | 旅遊團、訂單、報價單 | ✅ 必須有    | ✅ 啟用 |
+| **共用資料** | 所有公司共享 | 國家、城市、供應商   | ❌ 不需要    | ❌ 禁用 |
+| **會員資料** | 屬於特定旅客 | 旅客行程、聊天訊息   | 透過 user_id | ✅ 啟用 |
 
 ### 3.3 RLS (Row Level Security) 規則
 
@@ -235,156 +235,173 @@ USING (user_id = auth.uid());
 ### 4.1 業務資料表格（需要 workspace 隔離）
 
 #### 提案系統
-| 表格 | 中文 | 說明 | 生命週期 |
-|------|------|------|---------|
-| `proposals` | 提案 | 客戶詢價記錄 | 詢價→洽談→轉團或封存 |
+
+| 表格                | 中文 | 說明         | 生命週期              |
+| ------------------- | ---- | ------------ | --------------------- |
+| `proposals`         | 提案 | 客戶詢價記錄 | 詢價→洽談→轉團或封存  |
 | `proposal_packages` | 套件 | 報價版本方案 | 提案建立後→選定後轉團 |
 
 #### 旅遊團管理
-| 表格 | 中文 | 說明 | 生命週期 |
-|------|------|------|---------|
-| `tours` | 旅遊團 | 團號、日期、目的地 | 轉團建立→出團→結案 |
-| `orders` | 訂單 | 客戶訂購記錄 | 開團→收款→出團 |
-| `order_members` | 旅客 | 護照、聯絡方式 | 訂單建立後→出團後保留 |
-| `tour_leaders` | 領隊指派 | 領隊人員 | 出團前指派 |
-| `tour_addons` | 團體加購 | 保險、WiFi 等 | 開團設定 |
-| `tour_rooms` | 房間分配 | 住宿安排 | 出團前規劃 |
-| `tour_vehicles` | 交通安排 | 車輛安排 | 出團前規劃 |
-| `tour_departure_data` | 出發資訊 | 集合時間地點 | 出團前設定 |
-| `tour_control_forms` | 團控表 | 領隊管理表單 | 出團中使用 |
+
+| 表格                  | 中文     | 說明               | 生命週期              |
+| --------------------- | -------- | ------------------ | --------------------- |
+| `tours`               | 旅遊團   | 團號、日期、目的地 | 轉團建立→出團→結案    |
+| `orders`              | 訂單     | 客戶訂購記錄       | 開團→收款→出團        |
+| `order_members`       | 旅客     | 護照、聯絡方式     | 訂單建立後→出團後保留 |
+| `tour_leaders`        | 領隊指派 | 領隊人員           | 出團前指派            |
+| `tour_addons`         | 團體加購 | 保險、WiFi 等      | 開團設定              |
+| `tour_rooms`          | 房間分配 | 住宿安排           | 出團前規劃            |
+| `tour_vehicles`       | 交通安排 | 車輛安排           | 出團前規劃            |
+| `tour_departure_data` | 出發資訊 | 集合時間地點       | 出團前設定            |
+| `tour_control_forms`  | 團控表   | 領隊管理表單       | 出團中使用            |
 
 #### 行程與報價
-| 表格 | 中文 | 說明 | 生命週期 |
-|------|------|------|---------|
-| `itineraries` | 行程表 | 每日行程安排 | 提案→開團→出團後保留 |
-| `quotes` | 報價單 | 客戶報價 | 提案→確認→鎖定 |
-| `quote_items` | 報價項目 | 費用明細 | 隨報價單 |
-| `confirmations` | 確認書 | 客戶確認文件 | 確認後建立 |
+
+| 表格            | 中文     | 說明         | 生命週期             |
+| --------------- | -------- | ------------ | -------------------- |
+| `itineraries`   | 行程表   | 每日行程安排 | 提案→開團→出團後保留 |
+| `quotes`        | 報價單   | 客戶報價     | 提案→確認→鎖定       |
+| `quote_items`   | 報價項目 | 費用明細     | 隨報價單             |
+| `confirmations` | 確認書   | 客戶確認文件 | 確認後建立           |
 
 #### 需求採購
-| 表格 | 中文 | 說明 | 生命週期 |
-|------|------|------|---------|
-| `tour_requests` | 需求單 | 向供應商採購 | 開團→回覆→確認 |
-| `tour_request_items` | 需求項目 | 採購明細 | 隨需求單 |
-| `request_responses` | 供應商回覆 | 回覆報價 | 供應商回覆時 |
-| `request_response_items` | 回覆項目 | 回覆明細 | 隨回覆 |
+
+| 表格                     | 中文       | 說明         | 生命週期       |
+| ------------------------ | ---------- | ------------ | -------------- |
+| `tour_requests`          | 需求單     | 向供應商採購 | 開團→回覆→確認 |
+| `tour_request_items`     | 需求項目   | 採購明細     | 隨需求單       |
+| `request_responses`      | 供應商回覆 | 回覆報價     | 供應商回覆時   |
+| `request_response_items` | 回覆項目   | 回覆明細     | 隨回覆         |
 
 #### 財務管理
-| 表格 | 中文 | 說明 | 生命週期 |
-|------|------|------|---------|
-| `payment_requests` | 請款單 | 付給供應商 | 需求確認→付款 |
-| `payment_request_items` | 請款項目 | 費用明細 | 隨請款單 |
-| `receipt_orders` | 收款單 | 向客戶收款 | 訂單→收齊 |
-| `receipts` | 收據 | 單筆收款 | 每次收款 |
-| `disbursement_orders` | 出納單 | 公司支出 | 付款時 |
-| `payments` | 付款記錄 | 交易記錄 | 付款時 |
-| `travel_invoices` | 代轉發票 | 旅行業發票 | 開立時 |
+
+| 表格                    | 中文     | 說明       | 生命週期      |
+| ----------------------- | -------- | ---------- | ------------- |
+| `payment_requests`      | 請款單   | 付給供應商 | 需求確認→付款 |
+| `payment_request_items` | 請款項目 | 費用明細   | 隨請款單      |
+| `receipt_orders`        | 收款單   | 向客戶收款 | 訂單→收齊     |
+| `receipts`              | 收據     | 單筆收款   | 每次收款      |
+| `disbursement_orders`   | 出納單   | 公司支出   | 付款時        |
+| `payments`              | 付款記錄 | 交易記錄   | 付款時        |
+| `travel_invoices`       | 代轉發票 | 旅行業發票 | 開立時        |
 
 #### 會計系統
-| 表格 | 中文 | 說明 | 生命週期 |
-|------|------|------|---------|
-| `journal_vouchers` | 傳票 | 會計傳票 | 財務事件觸發 |
-| `journal_lines` | 傳票分錄 | 借貸明細 | 隨傳票 |
-| `accounting_events` | 會計事件 | 觸發事件 | 業務操作時 |
-| `chart_of_accounts` | 科目表 | 會計科目 | 初始設定 |
-| `erp_bank_accounts` | 銀行帳戶 | 帳戶資訊 | 初始設定 |
+
+| 表格                | 中文     | 說明     | 生命週期     |
+| ------------------- | -------- | -------- | ------------ |
+| `journal_vouchers`  | 傳票     | 會計傳票 | 財務事件觸發 |
+| `journal_lines`     | 傳票分錄 | 借貸明細 | 隨傳票       |
+| `accounting_events` | 會計事件 | 觸發事件 | 業務操作時   |
+| `chart_of_accounts` | 科目表   | 會計科目 | 初始設定     |
+| `erp_bank_accounts` | 銀行帳戶 | 帳戶資訊 | 初始設定     |
 
 #### 簽證管理
-| 表格 | 中文 | 說明 | 生命週期 |
-|------|------|------|---------|
-| `visas` | 簽證申請 | 代辦記錄 | 收件→送件→取件 |
-| `usa_esta` | 美國ESTA | 美簽申請 | 申請→核准 |
+
+| 表格       | 中文     | 說明     | 生命週期       |
+| ---------- | -------- | -------- | -------------- |
+| `visas`    | 簽證申請 | 代辦記錄 | 收件→送件→取件 |
+| `usa_esta` | 美國ESTA | 美簽申請 | 申請→核准      |
 
 #### PNR/機票
-| 表格 | 中文 | 說明 | 生命週期 |
-|------|------|------|---------|
-| `pnr_records` | PNR記錄 | Amadeus訂位 | 訂位→出票 |
-| `pnr_passengers` | PNR旅客 | 旅客名單 | 隨PNR |
-| `pnr_segments` | 航班段 | 航班資訊 | 隨PNR |
-| `pnrs` | 簡易PNR | 簡化訂位 | 快速建立 |
+
+| 表格             | 中文    | 說明        | 生命週期  |
+| ---------------- | ------- | ----------- | --------- |
+| `pnr_records`    | PNR記錄 | Amadeus訂位 | 訂位→出票 |
+| `pnr_passengers` | PNR旅客 | 旅客名單    | 隨PNR     |
+| `pnr_segments`   | 航班段  | 航班資訊    | 隨PNR     |
+| `pnrs`           | 簡易PNR | 簡化訂位    | 快速建立  |
 
 #### HR與排班
-| 表格 | 中文 | 說明 | 生命週期 |
-|------|------|------|---------|
-| `leader_schedules` | 領隊排班 | 值班表 | 每月排班 |
-| `leader_availability` | 領隊狀態 | 可用時段 | 領隊設定 |
-| `attendance_records` | 出勤記錄 | 打卡 | 每日 |
-| `leave_requests` | 請假申請 | 假期 | 申請→核准 |
-| `payroll_records` | 薪資記錄 | 月薪 | 每月 |
+
+| 表格                  | 中文     | 說明     | 生命週期  |
+| --------------------- | -------- | -------- | --------- |
+| `leader_schedules`    | 領隊排班 | 值班表   | 每月排班  |
+| `leader_availability` | 領隊狀態 | 可用時段 | 領隊設定  |
+| `attendance_records`  | 出勤記錄 | 打卡     | 每日      |
+| `leave_requests`      | 請假申請 | 假期     | 申請→核准 |
+| `payroll_records`     | 薪資記錄 | 月薪     | 每月      |
 
 #### 車隊管理
-| 表格 | 中文 | 說明 | 生命週期 |
-|------|------|------|---------|
-| `fleet_vehicles` | 車輛 | 車輛登記 | 購入→報廢 |
-| `fleet_drivers` | 司機 | 司機資料 | 入職→離職 |
-| `fleet_schedules` | 車輛排程 | 使用排程 | 出團前 |
+
+| 表格              | 中文     | 說明     | 生命週期  |
+| ----------------- | -------- | -------- | --------- |
+| `fleet_vehicles`  | 車輛     | 車輛登記 | 購入→報廢 |
+| `fleet_drivers`   | 司機     | 司機資料 | 入職→離職 |
+| `fleet_schedules` | 車輛排程 | 使用排程 | 出團前    |
 
 #### 協作溝通
-| 表格 | 中文 | 說明 | 生命週期 |
-|------|------|------|---------|
-| `channels` | 頻道 | 聊天頻道 | 建立→封存 |
-| `messages` | 訊息 | 聊天內容 | 發送 |
-| `todos` | 待辦 | 待辦事項 | 建立→完成 |
+
+| 表格              | 中文   | 說明     | 生命週期  |
+| ----------------- | ------ | -------- | --------- |
+| `channels`        | 頻道   | 聊天頻道 | 建立→封存 |
+| `messages`        | 訊息   | 聊天內容 | 發送      |
+| `todos`           | 待辦   | 待辦事項 | 建立→完成 |
 | `calendar_events` | 行事曆 | 日期提醒 | 建立→過期 |
 
 #### 客戶管理
-| 表格 | 中文 | 說明 | 生命週期 |
-|------|------|------|---------|
-| `customers` | 客戶 | 旅客資料 | 建立→長期 |
-| `customer_groups` | 客戶分組 | VIP分類 | 設定 |
-| `companies` | 廠商 | 供應商 | 建立→長期 |
+
+| 表格              | 中文     | 說明     | 生命週期  |
+| ----------------- | -------- | -------- | --------- |
+| `customers`       | 客戶     | 旅客資料 | 建立→長期 |
+| `customer_groups` | 客戶分組 | VIP分類  | 設定      |
+| `companies`       | 廠商     | 供應商   | 建立→長期 |
 
 ---
 
 ### 4.2 共用資料表格（禁用 RLS）
 
 #### 地理參考
-| 表格 | 中文 | 說明 |
-|------|------|------|
-| `countries` | 國家 | IATA 國家代碼 |
-| `cities` | 城市 | 全球城市 |
-| `regions` | 地區 | 區域分組 |
+
+| 表格           | 中文 | 說明          |
+| -------------- | ---- | ------------- |
+| `countries`    | 國家 | IATA 國家代碼 |
+| `cities`       | 城市 | 全球城市      |
+| `regions`      | 地區 | 區域分組      |
 | `ref_airports` | 機場 | IATA 機場代碼 |
 
 #### 航空參考
-| 表格 | 中文 | 說明 |
-|------|------|------|
-| `ref_airlines` | 航空公司 | IATA 代碼 |
-| `ref_booking_classes` | 艙等 | F/J/C/Y |
-| `ref_ssr_codes` | 特殊服務 | 餐食、輪椅 |
+
+| 表格                  | 中文     | 說明       |
+| --------------------- | -------- | ---------- |
+| `ref_airlines`        | 航空公司 | IATA 代碼  |
+| `ref_booking_classes` | 艙等     | F/J/C/Y    |
+| `ref_ssr_codes`       | 特殊服務 | 餐食、輪椅 |
 
 #### 系統設定
-| 表格 | 中文 | 說明 |
-|------|------|------|
-| `system_settings` | 系統設定 | 全域參數 |
+
+| 表格                    | 中文     | 說明     |
+| ----------------------- | -------- | -------- |
+| `system_settings`       | 系統設定 | 全域參數 |
 | `accounting_categories` | 會計分類 | 費用科目 |
 
 #### 模板
-| 表格 | 中文 | 說明 |
-|------|------|------|
-| `cover_templates` | 封面模板 | 行程表封面 |
-| `daily_templates` | 日程模板 | 每日行程 |
-| `flight_templates` | 航班模板 | 常用航班 |
+
+| 表格               | 中文     | 說明       |
+| ------------------ | -------- | ---------- |
+| `cover_templates`  | 封面模板 | 行程表封面 |
+| `daily_templates`  | 日程模板 | 每日行程   |
+| `flight_templates` | 航班模板 | 常用航班   |
 
 #### 供應商與景點
-| 表格 | 中文 | 說明 |
-|------|------|------|
-| `suppliers` | 供應商 | 食宿交通 |
-| `attractions` | 景點 | 旅遊景點 |
-| `restaurants` | 餐廳 | 用餐地點 |
-| `hotels` | 飯店 | 住宿選擇 |
+
+| 表格          | 中文   | 說明     |
+| ------------- | ------ | -------- |
+| `suppliers`   | 供應商 | 食宿交通 |
+| `attractions` | 景點   | 旅遊景點 |
+| `restaurants` | 餐廳   | 用餐地點 |
+| `hotels`      | 飯店   | 住宿選擇 |
 
 ---
 
 ### 4.3 會員資料表格（venturo-online）
 
-| 表格 | 中文 | 說明 | 隔離方式 |
-|------|------|------|---------|
-| `traveler_profiles` | 旅客檔案 | 會員資料 | user_id |
-| `traveler_trips` | 旅客行程 | 已購行程 | user_id |
-| `traveler_messages` | 旅客訊息 | 群組聊天 | conversation_id |
-| `traveler_expenses` | 旅客費用 | 分帳記錄 | user_id |
-| `customer_travel_cards` | 會員卡 | 點數卡 | customer_id |
+| 表格                    | 中文     | 說明     | 隔離方式        |
+| ----------------------- | -------- | -------- | --------------- |
+| `traveler_profiles`     | 旅客檔案 | 會員資料 | user_id         |
+| `traveler_trips`        | 旅客行程 | 已購行程 | user_id         |
+| `traveler_messages`     | 旅客訊息 | 群組聊天 | conversation_id |
+| `traveler_expenses`     | 旅客費用 | 分帳記錄 | user_id         |
+| `customer_travel_cards` | 會員卡   | 點數卡   | customer_id     |
 
 ---
 
@@ -392,19 +409,19 @@ USING (user_id = auth.uid());
 
 ### 5.1 表格命名
 
-| 規則 | 正確 | 錯誤 |
-|------|------|------|
-| snake_case | `tour_requests` | `TourRequests` |
-| 複數形式 | `orders` | `order` |
+| 規則       | 正確                          | 錯誤                  |
+| ---------- | ----------------------------- | --------------------- |
+| snake_case | `tour_requests`               | `TourRequests`        |
+| 複數形式   | `orders`                      | `order`               |
 | 有意義前綴 | `pnr_records`, `pnr_segments` | `records`, `segments` |
 
 ### 5.2 欄位命名
 
-| 規則 | 正確 | 錯誤 |
-|------|------|------|
-| snake_case | `created_at` | `createdAt` |
-| 外鍵加 _id | `tour_id` | `tour` |
-| 布林用 is_/has_ | `is_active` | `active` |
+| 規則            | 正確         | 錯誤        |
+| --------------- | ------------ | ----------- |
+| snake_case      | `created_at` | `createdAt` |
+| 外鍵加 \_id     | `tour_id`    | `tour`      |
+| 布林用 is*/has* | `is_active`  | `active`    |
 
 ### 5.3 標準欄位
 
@@ -428,32 +445,32 @@ CREATE TABLE public.example (
 
 ### 6.1 Workspace 隔離修復（2026-01-12 完成）
 
-| 表格 | 修復內容 | Migration |
-|------|---------|-----------|
-| `proposal_packages` | ✅ 添加 workspace_id | `20260112200000_workspace_isolation_complete.sql` |
-| `tour_addons` | ✅ 添加 workspace_id | `20260112210000_naming_convention_complete_fix.sql` |
+| 表格                     | 修復內容             | Migration                                           |
+| ------------------------ | -------------------- | --------------------------------------------------- |
+| `proposal_packages`      | ✅ 添加 workspace_id | `20260112200000_workspace_isolation_complete.sql`   |
+| `tour_addons`            | ✅ 添加 workspace_id | `20260112210000_naming_convention_complete_fix.sql` |
 | `request_response_items` | ✅ 添加 workspace_id | `20260112210000_naming_convention_complete_fix.sql` |
 
 ### 6.2 表格命名修復（2026-01-12 完成）
 
-| 舊名稱 | 新名稱 | Migration |
-|--------|--------|-----------|
+| 舊名稱                  | 新名稱                     | Migration                                           |
+| ----------------------- | -------------------------- | --------------------------------------------------- |
 | `Itinerary_Permissions` | ✅ `itinerary_permissions` | `20260112210000_naming_convention_complete_fix.sql` |
-| `Tour_Expenses` | ✅ `tour_expenses` | `20260112210000_naming_convention_complete_fix.sql` |
+| `Tour_Expenses`         | ✅ `tour_expenses`         | `20260112210000_naming_convention_complete_fix.sql` |
 
 ### 6.3 欄位命名修復（2026-01-12 已確認）
 
 以下欄位在 `20260112100000_consolidate_naming_convention.sql` 中已修復為 snake_case：
 
-| 表格 | 已修復欄位 |
-|------|-----------|
-| `payments` | ✅ created_at, order_id, payment_date, payment_number, payment_type, received_by, tour_id, updated_at |
-| `price_list_items` | ✅ created_at, item_code, item_name, minimum_order, supplier_id, unit_price, updated_at, valid_from, valid_until |
-| `quote_categories` | ✅ created_at, quote_id, updated_at |
-| `quote_versions` | ✅ change_note, created_at, created_by, quote_id |
-| `receipt_payment_items` | ✅ created_at, item_name, receipt_id |
-| `tour_refunds` | ✅ created_at, member_id, order_id, processed_by, processing_status, refund_amount, refund_date, refund_reason, tour_id, updated_at |
-| `payment_request_items` | ✅ unit_price |
+| 表格                    | 已修復欄位                                                                                                                          |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `payments`              | ✅ created_at, order_id, payment_date, payment_number, payment_type, received_by, tour_id, updated_at                               |
+| `price_list_items`      | ✅ created_at, item_code, item_name, minimum_order, supplier_id, unit_price, updated_at, valid_from, valid_until                    |
+| `quote_categories`      | ✅ created_at, quote_id, updated_at                                                                                                 |
+| `quote_versions`        | ✅ change_note, created_at, created_by, quote_id                                                                                    |
+| `receipt_payment_items` | ✅ created_at, item_name, receipt_id                                                                                                |
+| `tour_refunds`          | ✅ created_at, member_id, order_id, processed_by, processing_status, refund_amount, refund_date, refund_reason, tour_id, updated_at |
+| `payment_request_items` | ✅ unit_price                                                                                                                       |
 
 ### 6.4 目前狀態
 
@@ -485,4 +502,4 @@ CREATE TABLE public.example (
 
 ---
 
-*規範文件結束*
+_規範文件結束_

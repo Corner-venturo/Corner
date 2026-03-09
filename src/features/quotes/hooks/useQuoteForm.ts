@@ -37,7 +37,9 @@ const initialFormData: QuoteFormData = {
 }
 
 interface UseQuoteFormParams {
-  addQuote: (data: Omit<Quote, 'id' | 'created_at' | 'updated_at' | 'version' | 'versions'>) => Promise<Quote>
+  addQuote: (
+    data: Omit<Quote, 'id' | 'created_at' | 'updated_at' | 'version' | 'versions'>
+  ) => Promise<Quote>
 }
 
 export const useQuoteForm = ({ addQuote }: UseQuoteFormParams) => {
@@ -53,13 +55,20 @@ export const useQuoteForm = ({ addQuote }: UseQuoteFormParams) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  const initFormWithTour = (tour: { id: string; name: string; max_participants?: number | null; departure_date?: string; return_date?: string }) => {
+  const initFormWithTour = (tour: {
+    id: string
+    name: string
+    max_participants?: number | null
+    departure_date?: string
+    return_date?: string
+  }) => {
     // 計算天數（住宿天數 = 總天數 - 1）
     let accommodationDays = 0
     if (tour.departure_date && tour.return_date) {
       const startDate = new Date(tour.departure_date)
       const endDate = new Date(tour.return_date)
-      const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
+      const totalDays =
+        Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
       accommodationDays = Math.max(0, totalDays - 1) // 住宿天數 = 總天數 - 1
     }
 

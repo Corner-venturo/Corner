@@ -15,7 +15,8 @@ import type { Database } from '@/lib/supabase/types'
 import type { PNRSegment, BookingStatus, OperationalStatus } from '@/types/pnr.types'
 
 type PnrFlightStatusHistory = Database['public']['Tables']['pnr_flight_status_history']['Row']
-type PnrFlightStatusHistoryInsert = Database['public']['Tables']['pnr_flight_status_history']['Insert']
+type PnrFlightStatusHistoryInsert =
+  Database['public']['Tables']['pnr_flight_status_history']['Insert']
 type FlightStatusSubscription = Database['public']['Tables']['flight_status_subscriptions']['Row']
 
 // =====================================================
@@ -72,33 +73,33 @@ export interface StatusChange {
  * 訂位狀態代碼說明
  */
 export const BOOKING_STATUS_LABELS: Record<string, string> = {
-  'HK': '已確認',
-  'TK': '已開票',
-  'UC': '待確認',
-  'XX': '已取消',
-  'HL': '候補優先',
-  'HN': '候補',
-  'LL': '候補請求',
-  'WL': '等待名單',
-  'RR': '已開票確認',
-  'DK': '已確認（本地）',
-  'KK': '已確認（連線）',
-  'UN': '航空公司無法確認',
-  'NO': '拒絕',
-  'SC': '航班取消'
+  HK: '已確認',
+  TK: '已開票',
+  UC: '待確認',
+  XX: '已取消',
+  HL: '候補優先',
+  HN: '候補',
+  LL: '候補請求',
+  WL: '等待名單',
+  RR: '已開票確認',
+  DK: '已確認（本地）',
+  KK: '已確認（連線）',
+  UN: '航空公司無法確認',
+  NO: '拒絕',
+  SC: '航班取消',
 }
 
 /**
  * 營運狀態嚴重程度
  */
 const OPERATIONAL_STATUS_SEVERITY: Record<string, 'info' | 'warning' | 'critical'> = {
-  'ON_TIME': 'info',
-  'DEPARTED': 'info',
-  'ARRIVED': 'info',
-  'GATE_CHANGE': 'warning',
-  'DELAYED': 'warning',
-  'DIVERTED': 'critical',
-  'CANCELLED': 'critical'
+  ON_TIME: 'info',
+  DEPARTED: 'info',
+  ARRIVED: 'info',
+  GATE_CHANGE: 'warning',
+  DELAYED: 'warning',
+  DIVERTED: 'critical',
+  CANCELLED: 'critical',
 }
 
 /**
@@ -109,7 +110,7 @@ export function parseStatusFromTelegram(
 ): Array<{ segment: PNRSegment; bookingStatus: BookingStatus }> {
   return segments.map(segment => ({
     segment,
-    bookingStatus: segment.status as BookingStatus
+    bookingStatus: segment.status as BookingStatus,
   }))
 }
 
@@ -138,7 +139,7 @@ export function detectStatusChanges(
         newBookingStatus: newSeg.status as BookingStatus,
         changeType: 'booking',
         severity: 'info',
-        message: `新增航段 ${newSeg.airline}${newSeg.flightNumber} ${newSeg.origin}-${newSeg.destination}`
+        message: `新增航段 ${newSeg.airline}${newSeg.flightNumber} ${newSeg.origin}-${newSeg.destination}`,
       })
       continue
     }
@@ -156,7 +157,7 @@ export function detectStatusChanges(
         newBookingStatus: newSeg.status as BookingStatus,
         changeType: 'booking',
         severity,
-        message: `航班 ${newSeg.airline}${newSeg.flightNumber} 狀態從 ${BOOKING_STATUS_LABELS[oldSeg.status] || oldSeg.status} 變更為 ${BOOKING_STATUS_LABELS[newSeg.status] || newSeg.status}`
+        message: `航班 ${newSeg.airline}${newSeg.flightNumber} 狀態從 ${BOOKING_STATUS_LABELS[oldSeg.status] || oldSeg.status} 變更為 ${BOOKING_STATUS_LABELS[newSeg.status] || newSeg.status}`,
       })
     }
   }
@@ -176,7 +177,7 @@ export function detectStatusChanges(
         previousBookingStatus: oldSeg.status as BookingStatus,
         changeType: 'booking',
         severity: 'warning',
-        message: `航段 ${oldSeg.airline}${oldSeg.flightNumber} ${oldSeg.origin}-${oldSeg.destination} 已被移除`
+        message: `航段 ${oldSeg.airline}${oldSeg.flightNumber} ${oldSeg.origin}-${oldSeg.destination} 已被移除`,
       })
     }
   }
@@ -257,7 +258,7 @@ export async function recordStatusHistory(
       external_data: options?.externalData
         ? JSON.parse(JSON.stringify(options.externalData))
         : null,
-      recorded_at: new Date().toISOString()
+      recorded_at: new Date().toISOString(),
     }
 
     const { data, error } = await supabase
@@ -386,7 +387,7 @@ export async function createFlightSubscription(
         notify_employee_ids: options?.notifyEmployeeIds || null,
         external_provider: null,
         external_subscription_id: null,
-        is_active: true
+        is_active: true,
       })
       .select()
       .single()
@@ -406,9 +407,7 @@ export async function createFlightSubscription(
 /**
  * 取消航班訂閱
  */
-export async function cancelFlightSubscription(
-  subscriptionId: string
-): Promise<boolean> {
+export async function cancelFlightSubscription(subscriptionId: string): Promise<boolean> {
   try {
     const { error } = await supabase
       .from('flight_status_subscriptions')
@@ -430,9 +429,7 @@ export async function cancelFlightSubscription(
 /**
  * 取得 PNR 的所有訂閱
  */
-export async function getPnrSubscriptions(
-  pnrId: string
-): Promise<FlightStatusSubscription[]> {
+export async function getPnrSubscriptions(pnrId: string): Promise<FlightStatusSubscription[]> {
   try {
     const { data, error } = await supabase
       .from('flight_status_subscriptions')
@@ -470,7 +467,7 @@ export async function processPnrStatusUpdate(
 }> {
   const result = {
     statusChanges: [] as StatusChange[],
-    historyRecorded: 0
+    historyRecorded: 0,
   }
 
   // 1. 偵測狀態變更
@@ -479,7 +476,7 @@ export async function processPnrStatusUpdate(
   // 2. 記錄每個航段的狀態歷史
   for (const segment of newSegments) {
     const history = await recordStatusHistory(pnrId, segment, {
-      source: 'telegram'
+      source: 'telegram',
     })
 
     if (history) {
@@ -507,8 +504,18 @@ export async function processPnrStatusUpdate(
  */
 function convertAmadeusDate(amadeusDate: string): string {
   const monthMap: Record<string, string> = {
-    JAN: '01', FEB: '02', MAR: '03', APR: '04', MAY: '05', JUN: '06',
-    JUL: '07', AUG: '08', SEP: '09', OCT: '10', NOV: '11', DEC: '12'
+    JAN: '01',
+    FEB: '02',
+    MAR: '03',
+    APR: '04',
+    MAY: '05',
+    JUN: '06',
+    JUL: '07',
+    AUG: '08',
+    SEP: '09',
+    OCT: '10',
+    NOV: '11',
+    DEC: '12',
   }
 
   const day = amadeusDate.slice(0, 2)
@@ -557,5 +564,5 @@ export default {
   getPnrSubscriptions,
   processPnrStatusUpdate,
   formatFlightInfo,
-  BOOKING_STATUS_LABELS
+  BOOKING_STATUS_LABELS,
 }

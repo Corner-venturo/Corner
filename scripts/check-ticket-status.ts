@@ -51,7 +51,9 @@ async function checkTicketStatus() {
   const orderIds = orders.map(o => o.id)
   const { data: members } = await supabase
     .from('order_members')
-    .select('id, order_id, chinese_name, pnr, ticket_number, ticketing_deadline, flight_self_arranged')
+    .select(
+      'id, order_id, chinese_name, pnr, ticket_number, ticketing_deadline, flight_self_arranged'
+    )
     .in('order_id', orderIds)
 
   // 組織資料
@@ -65,15 +67,21 @@ async function checkTicketStatus() {
     for (const order of tourOrders) {
       const orderMembers = (members || []).filter(m => m.order_id === order.id)
 
-      const needsTicketing = orderMembers.filter(m => !m.flight_self_arranged && m.pnr && !m.ticket_number)
-      const noRecord = orderMembers.filter(m => !m.flight_self_arranged && !m.pnr && !m.ticket_number)
+      const needsTicketing = orderMembers.filter(
+        m => !m.flight_self_arranged && m.pnr && !m.ticket_number
+      )
+      const noRecord = orderMembers.filter(
+        m => !m.flight_self_arranged && !m.pnr && !m.ticket_number
+      )
       const ticketed = orderMembers.filter(m => m.ticket_number)
       const selfArranged = orderMembers.filter(m => m.flight_self_arranged)
 
       if (needsTicketing.length > 0 || noRecord.length > 0) {
         hasPendingTickets = true
         orderDetails.push('  訂單 ' + order.code + ' (' + order.contact_person + '):')
-        orderDetails.push('    業務: ' + (order.sales_person || '無') + ' | 助理: ' + (order.assistant || '無'))
+        orderDetails.push(
+          '    業務: ' + (order.sales_person || '無') + ' | 助理: ' + (order.assistant || '無')
+        )
         if (ticketed.length > 0) {
           orderDetails.push('    ✅ 已開票: ' + ticketed.length + '位')
         }

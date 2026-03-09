@@ -43,7 +43,10 @@ export function TourItinerarySectionLuxury({
   const [imageGallery, setImageGallery] = useState<ImageGalleryState | null>(null)
 
   // 開啟圖片瀏覽器
-  const openImageGallery = (images: { url: string; title?: string; description?: string }[], startIndex: number) => {
+  const openImageGallery = (
+    images: { url: string; title?: string; description?: string }[],
+    startIndex: number
+  ) => {
     setImageGallery({ images, currentIndex: startIndex })
   }
 
@@ -52,9 +55,10 @@ export function TourItinerarySectionLuxury({
     if (!imageGallery) return
     setImageGallery({
       ...imageGallery,
-      currentIndex: imageGallery.currentIndex > 0
-        ? imageGallery.currentIndex - 1
-        : imageGallery.images.length - 1
+      currentIndex:
+        imageGallery.currentIndex > 0
+          ? imageGallery.currentIndex - 1
+          : imageGallery.images.length - 1,
     })
   }
 
@@ -63,9 +67,10 @@ export function TourItinerarySectionLuxury({
     if (!imageGallery) return
     setImageGallery({
       ...imageGallery,
-      currentIndex: imageGallery.currentIndex < imageGallery.images.length - 1
-        ? imageGallery.currentIndex + 1
-        : 0
+      currentIndex:
+        imageGallery.currentIndex < imageGallery.images.length - 1
+          ? imageGallery.currentIndex + 1
+          : 0,
     })
   }
 
@@ -89,7 +94,7 @@ export function TourItinerarySectionLuxury({
               style={{
                 color: LUXURY.secondary,
                 fontFamily: "'Noto Serif TC', serif",
-                fontSize: isMobile ? '1rem' : '1.125rem'
+                fontSize: isMobile ? '1rem' : '1.125rem',
               }}
             >
               Day by Day
@@ -98,7 +103,7 @@ export function TourItinerarySectionLuxury({
               className={`font-medium ${isMobile ? 'text-2xl' : 'text-4xl'}`}
               style={{
                 color: LUXURY.text,
-                fontFamily: "'Noto Serif TC', serif"
+                fontFamily: "'Noto Serif TC', serif",
               }}
             >
               {TOURS_LABELS.LABEL_5020}
@@ -119,27 +124,34 @@ export function TourItinerarySectionLuxury({
             const dayColor = DAY_COLORS[index % DAY_COLORS.length]
             const dayNumber = dayLabels[index].replace('Day ', '')
             // 檢查圖片來源：1. day.images（需 showDailyImages=true） 2. activities 裡的 image
-            const dayImages = day.showDailyImages === true && day.images && day.images.length > 0 ? day.images : []
+            const dayImages =
+              day.showDailyImages === true && day.images && day.images.length > 0 ? day.images : []
             // 建構帶有標題和描述的圖片陣列
             const normalizedDayImages = dayImages.map((img, idx) => ({
               url: typeof img === 'string' ? img : img.url,
               title: day.activities?.[idx]?.title || '',
-              description: day.activities?.[idx]?.description || ''
+              description: day.activities?.[idx]?.description || '',
             }))
-            const activityImagesWithInfo = day.activities?.filter(a => a.image).map(a => ({
-              url: a.image!,
-              title: a.title || '',
-              description: a.description || ''
-            })) || []
+            const activityImagesWithInfo =
+              day.activities
+                ?.filter(a => a.image)
+                .map(a => ({
+                  url: a.image!,
+                  title: a.title || '',
+                  description: a.description || '',
+                })) || []
             // 合併所有圖片來源
-            const allImages = normalizedDayImages.length > 0 ? normalizedDayImages : activityImagesWithInfo
+            const allImages =
+              normalizedDayImages.length > 0 ? normalizedDayImages : activityImagesWithInfo
             const hasImages = allImages.length > 0
 
             return (
               <article
                 key={`day-${index}`}
                 id={`day-${index + 1}`}
-                ref={el => { dayRefs.current[index] = el as HTMLDivElement | null }}
+                ref={el => {
+                  dayRefs.current[index] = el as HTMLDivElement | null
+                }}
               >
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
@@ -150,7 +162,6 @@ export function TourItinerarySectionLuxury({
                   style={{ borderColor: '#f0f0f0' }}
                 >
                   <div className={`grid ${isMobile ? 'grid-cols-1' : 'lg:grid-cols-12'} h-full`}>
-
                     {/* 左側：日期區塊 */}
                     <div
                       className={`${isMobile ? 'p-4' : 'lg:col-span-2 p-8'} text-white ${isMobile ? 'flex flex-row items-center justify-between' : 'flex flex-col justify-between items-start'} relative overflow-hidden`}
@@ -162,7 +173,7 @@ export function TourItinerarySectionLuxury({
                           className="absolute -right-4 top-1/2 -translate-y-1/2 text-9xl font-bold select-none"
                           style={{
                             fontFamily: "'Noto Serif TC', serif",
-                            color: 'rgba(255,255,255,0.05)'
+                            color: 'rgba(255,255,255,0.05)',
                           }}
                         >
                           {dayNumber.padStart(2, '0')}
@@ -173,7 +184,9 @@ export function TourItinerarySectionLuxury({
                         {/* 日期標籤 - DEC 25 格式 */}
                         {(() => {
                           const numericDay = parseInt(dayNumber.split('-')[0], 10)
-                          const dateDisplay = formatDateShort(day.date) || calculateDayDate(data.departureDate, numericDay)
+                          const dateDisplay =
+                            formatDateShort(day.date) ||
+                            calculateDayDate(data.departureDate, numericDay)
                           return dateDisplay ? (
                             <span
                               className={`inline-block px-3 py-1.5 bg-card/10 backdrop-blur-sm rounded text-xs font-medium tracking-widest ${isMobile ? '' : 'mb-3'}`}
@@ -191,7 +204,9 @@ export function TourItinerarySectionLuxury({
                       </div>
 
                       <div className={`${isMobile ? 'text-right' : 'space-y-1'} z-10`}>
-                        <div className={`text-xs uppercase tracking-widest opacity-70 ${isMobile ? 'hidden' : ''}`}>
+                        <div
+                          className={`text-xs uppercase tracking-widest opacity-70 ${isMobile ? 'hidden' : ''}`}
+                        >
                           {day.isAlternative ? 'Alternative' : 'Location'}
                         </div>
                         <div
@@ -214,17 +229,18 @@ export function TourItinerarySectionLuxury({
                           className={`font-bold ${isMobile ? 'text-xl' : 'text-2xl'}`}
                           style={{
                             color: LUXURY.text,
-                            fontFamily: "'Noto Sans TC', sans-serif"
+                            fontFamily: "'Noto Sans TC', sans-serif",
                           }}
                         >
-                          {day.title || `${TOURS_LABELS.DAY_ITINERARY_PREFIX}${index + 1}${TOURS_LABELS.DAY_ITINERARY_SUFFIX}`}
+                          {day.title ||
+                            `${TOURS_LABELS.DAY_ITINERARY_PREFIX}${index + 1}${TOURS_LABELS.DAY_ITINERARY_SUFFIX}`}
                         </h3>
                         {day.isAlternative && (
                           <span
                             className="px-2 py-1 text-xs rounded-full"
                             style={{
                               backgroundColor: `${LUXURY.secondary}20`,
-                              color: LUXURY.secondary
+                              color: LUXURY.secondary,
                             }}
                           >
                             {TOURS_LABELS.LABEL_1234}
@@ -238,7 +254,7 @@ export function TourItinerarySectionLuxury({
                           className="flex items-start gap-3 mb-6 p-4 rounded-lg border-l-4"
                           style={{
                             backgroundColor: `${LUXURY.secondary}08`,
-                            borderColor: LUXURY.secondary
+                            borderColor: LUXURY.secondary,
                           }}
                         >
                           <Star
@@ -268,7 +284,7 @@ export function TourItinerarySectionLuxury({
                           className={`leading-loose mb-8 font-light whitespace-pre-line ${isMobile ? 'text-sm' : ''}`}
                           style={{
                             color: LUXURY.muted,
-                            fontFamily: "'Noto Sans TC', sans-serif"
+                            fontFamily: "'Noto Sans TC', sans-serif",
                           }}
                         >
                           {day.description}
@@ -280,13 +296,16 @@ export function TourItinerarySectionLuxury({
                         <div className="mb-6">
                           {/* 單張圖片：手機上下排列，桌面左圖右文 */}
                           {allImages.length === 1 && (
-                            <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-6`}>
+                            <div
+                              className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-6`}
+                            >
                               {/* 圖片 */}
                               <div
                                 className={`relative ${isMobile ? 'h-48' : 'h-56'} overflow-hidden rounded-md cursor-pointer group/img`}
                                 onClick={() => openImageGallery(allImages, 0)}
                               >
-                                <img src={allImages[0].url}
+                                <img
+                                  src={allImages[0].url}
                                   alt={allImages[0].title || TOURS_LABELS.ITINERARY_IMAGE}
                                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105"
                                 />
@@ -302,7 +321,7 @@ export function TourItinerarySectionLuxury({
                                   className="text-lg font-medium mb-3"
                                   style={{
                                     color: LUXURY.primary,
-                                    fontFamily: "'Noto Serif TC', serif"
+                                    fontFamily: "'Noto Serif TC', serif",
                                   }}
                                 >
                                   Highlight
@@ -314,11 +333,13 @@ export function TourItinerarySectionLuxury({
                                       key={actIdx}
                                       className="flex items-center gap-2 text-sm cursor-pointer hover:opacity-80"
                                       style={{ color: LUXURY.muted }}
-                                      onClick={() => setSelectedActivity({
-                                        title: activity.title || '',
-                                        description: activity.description,
-                                        image: activity.image
-                                      })}
+                                      onClick={() =>
+                                        setSelectedActivity({
+                                          title: activity.title || '',
+                                          description: activity.description,
+                                          image: activity.image,
+                                        })
+                                      }
                                     >
                                       <span
                                         className="w-1.5 h-1.5 rounded-full flex-shrink-0"
@@ -334,7 +355,7 @@ export function TourItinerarySectionLuxury({
                                     className="text-xs leading-relaxed border-t pt-3"
                                     style={{
                                       color: LUXURY.muted,
-                                      borderColor: '#e5e5e5'
+                                      borderColor: '#e5e5e5',
                                     }}
                                   >
                                     {day.activities[0].description}
@@ -347,14 +368,17 @@ export function TourItinerarySectionLuxury({
                           {/* 多張圖片：橫向排列，最多顯示3張 */}
                           {allImages.length >= 2 && (
                             <>
-                              <div className={`grid gap-4 ${allImages.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+                              <div
+                                className={`grid gap-4 ${allImages.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}
+                              >
                                 {allImages.slice(0, 3).map((img, imgIdx) => (
                                   <div
                                     key={imgIdx}
                                     className="relative h-44 overflow-hidden rounded-md cursor-pointer group/img"
                                     onClick={() => openImageGallery(allImages, imgIdx)}
                                   >
-                                    <img src={img.url}
+                                    <img
+                                      src={img.url}
                                       alt={img.title || ''}
                                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105"
                                     />
@@ -384,7 +408,10 @@ export function TourItinerarySectionLuxury({
                                     <span
                                       key={idx}
                                       className="text-xs font-medium px-2 py-1 rounded-full"
-                                      style={{ backgroundColor: `${LUXURY.secondary}20`, color: LUXURY.secondary }}
+                                      style={{
+                                        backgroundColor: `${LUXURY.secondary}20`,
+                                        color: LUXURY.secondary,
+                                      }}
                                     >
                                       {activity.title}
                                     </span>
@@ -416,14 +443,18 @@ export function TourItinerarySectionLuxury({
                               style={{ color: LUXURY.secondary }}
                               onClick={() => openImageGallery(allImages, 3)}
                             >
-                              <span>{TOURS_LABELS.VIEW_MORE_PREFIX}{allImages.length - 3}</span>
+                              <span>
+                                {TOURS_LABELS.VIEW_MORE_PREFIX}
+                                {allImages.length - 3}
+                              </span>
                               <ArrowRight className="w-4 h-4" />
                             </button>
                           )}
                         </div>
                       ) : (
                         /* 無圖片時：顯示 Highlight 景點列表 */
-                        day.activities && day.activities.length > 0 && (
+                        day.activities &&
+                        day.activities.length > 0 && (
                           <div
                             className="p-5 rounded-md mb-4"
                             style={{ backgroundColor: LUXURY.background }}
@@ -432,7 +463,7 @@ export function TourItinerarySectionLuxury({
                               className="text-base font-medium mb-3"
                               style={{
                                 color: LUXURY.primary,
-                                fontFamily: "'Noto Serif TC', serif"
+                                fontFamily: "'Noto Serif TC', serif",
                               }}
                             >
                               Highlight
@@ -442,13 +473,18 @@ export function TourItinerarySectionLuxury({
                                 <li
                                   key={actIdx}
                                   className="cursor-pointer hover:opacity-80"
-                                  onClick={() => setSelectedActivity({
-                                    title: activity.title || '',
-                                    description: activity.description,
-                                    image: activity.image
-                                  })}
+                                  onClick={() =>
+                                    setSelectedActivity({
+                                      title: activity.title || '',
+                                      description: activity.description,
+                                      image: activity.image,
+                                    })
+                                  }
                                 >
-                                  <div className="flex items-center gap-2 text-sm" style={{ color: LUXURY.text }}>
+                                  <div
+                                    className="flex items-center gap-2 text-sm"
+                                    style={{ color: LUXURY.text }}
+                                  >
                                     <span
                                       className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                                       style={{ backgroundColor: LUXURY.secondary }}
@@ -469,7 +505,6 @@ export function TourItinerarySectionLuxury({
                           </div>
                         )
                       )}
-
                     </div>
 
                     {/* 右側：餐食與住宿 */}
@@ -478,10 +513,7 @@ export function TourItinerarySectionLuxury({
                       style={{ backgroundColor: '#f9fafb' }}
                     >
                       {/* 餐食 */}
-                      <div
-                        className="relative pl-6 border-l"
-                        style={{ borderColor: '#E5E7EB' }}
-                      >
+                      <div className="relative pl-6 border-l" style={{ borderColor: '#E5E7EB' }}>
                         <span
                           className="absolute -left-1.5 top-0 w-3 h-3 rounded-full border-2 border-white"
                           style={{ backgroundColor: LUXURY.secondary }}
@@ -527,10 +559,7 @@ export function TourItinerarySectionLuxury({
 
                       {/* 住宿 - 最後一天（包含替代行程）不顯示 */}
                       {!isLastMainDay(dailyItinerary, index) && (
-                        <div
-                          className="relative pl-6 border-l"
-                          style={{ borderColor: '#E5E7EB' }}
-                        >
+                        <div className="relative pl-6 border-l" style={{ borderColor: '#E5E7EB' }}>
                           <span
                             className="absolute -left-1.5 top-0 w-3 h-3 rounded-full border-2 border-white"
                             style={{ backgroundColor: LUXURY.primary }}
@@ -551,20 +580,34 @@ export function TourItinerarySectionLuxury({
                                 <div className="flex items-center gap-2 mb-2">
                                   <div
                                     className="w-4 h-4 rounded border-2 flex items-center justify-center"
-                                    style={{ borderColor: LUXURY.secondary, backgroundColor: `${LUXURY.secondary}15` }}
+                                    style={{
+                                      borderColor: LUXURY.secondary,
+                                      backgroundColor: `${LUXURY.secondary}15`,
+                                    }}
                                   >
-                                    <svg className="w-3 h-3" style={{ color: LUXURY.secondary }} fill="currentColor" viewBox="0 0 20 20">
-                                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                    <svg
+                                      className="w-3 h-3"
+                                      style={{ color: LUXURY.secondary }}
+                                      fill="currentColor"
+                                      viewBox="0 0 20 20"
+                                    >
+                                      <path
+                                        fillRule="evenodd"
+                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                        clipRule="evenodd"
+                                      />
                                     </svg>
                                   </div>
-                                  <span className="text-xs" style={{ color: LUXURY.secondary }}>{TOURS_LABELS.LABEL_3005}</span>
+                                  <span className="text-xs" style={{ color: LUXURY.secondary }}>
+                                    {TOURS_LABELS.LABEL_3005}
+                                  </span>
                                 </div>
                               )}
                               <div
                                 className="font-bold text-lg mb-1"
                                 style={{
                                   fontFamily: "'Noto Serif TC', serif",
-                                  color: LUXURY.text
+                                  color: LUXURY.text,
                                 }}
                               >
                                 {day.accommodation}
@@ -590,7 +633,6 @@ export function TourItinerarySectionLuxury({
                         </div>
                       )}
                     </div>
-
                   </div>
                 </motion.div>
               </article>
@@ -605,14 +647,13 @@ export function TourItinerarySectionLuxury({
         onClose={() => setImageGallery(null)}
         onPrev={prevImage}
         onNext={nextImage}
-        onSelectIndex={(idx) => imageGallery && setImageGallery({ ...imageGallery, currentIndex: idx })}
+        onSelectIndex={idx =>
+          imageGallery && setImageGallery({ ...imageGallery, currentIndex: idx })
+        }
       />
 
       {/* Activity Detail Modal - 景點詳情彈窗（保留給無圖片的景點列表點擊） */}
-      <ActivityDetailModal
-        activity={selectedActivity}
-        onClose={() => setSelectedActivity(null)}
-      />
+      <ActivityDetailModal activity={selectedActivity} onClose={() => setSelectedActivity(null)} />
     </section>
   )
 }

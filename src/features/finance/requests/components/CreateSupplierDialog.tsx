@@ -1,9 +1,21 @@
 import { useState } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { createSupplier, invalidateSuppliers } from '@/data'
 import { useWorkspaceId } from '@/lib/workspace-context'
 import { alert } from '@/lib/ui/alert-dialog'
@@ -28,7 +40,12 @@ const SUPPLIER_TYPE_OPTIONS: { value: SupplierType; label: string }[] = [
   { value: 'other', label: '其他' },
 ]
 
-export function CreateSupplierDialog({ open, onOpenChange, defaultName, onSuccess }: CreateSupplierDialogProps) {
+export function CreateSupplierDialog({
+  open,
+  onOpenChange,
+  defaultName,
+  onSuccess,
+}: CreateSupplierDialogProps) {
   const workspaceId = useWorkspaceId()
   const [formData, setFormData] = useState({
     name: defaultName || '',
@@ -72,7 +89,7 @@ export function CreateSupplierDialog({ open, onOpenChange, defaultName, onSucces
         void alert('供應商建立成功', 'success')
         onSuccess?.(result.id)
         onOpenChange(false)
-        
+
         // 重置表單
         setFormData({
           name: '',
@@ -115,7 +132,12 @@ export function CreateSupplierDialog({ open, onOpenChange, defaultName, onSucces
           {/* 類別 */}
           <div>
             <Label>類別</Label>
-            <Select value={formData.type} onValueChange={(value) => setFormData(prev => ({ ...prev, type: value as SupplierType }))}>
+            <Select
+              value={formData.type}
+              onValueChange={value =>
+                setFormData(prev => ({ ...prev, type: value as SupplierType }))
+              }
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

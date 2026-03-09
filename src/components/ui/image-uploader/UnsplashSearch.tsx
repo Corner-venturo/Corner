@@ -102,10 +102,13 @@ export function UnsplashSearch({ onSelect, className }: UnsplashSearchProps) {
       {/* 搜尋框 */}
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary" />
+          <Search
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary"
+          />
           <Input
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={e => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={IMAGE_UPLOADER_LABELS.SEARCH_2570}
             className="pl-9 h-9"
@@ -128,23 +131,22 @@ export function UnsplashSearch({ onSelect, className }: UnsplashSearchProps) {
           </div>
         ) : images.length > 0 ? (
           <div className="grid grid-cols-3 gap-2 max-h-[300px] overflow-y-auto pr-1">
-            {images.map((image) => (
+            {images.map(image => (
               <button
                 key={image.id}
                 type="button"
                 onClick={() => handleSelect(image)}
                 className="relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-morandi-gold transition-all group"
               >
-                <img src={image.urls.small}
+                <img
+                  src={image.urls.small}
                   alt={image.alt_description || '圖片'}
                   className="w-full h-full object-cover"
                   loading="lazy"
                 />
                 {/* 攝影師署名 */}
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <p className="text-[10px] text-white truncate">
-                    by {image.user.name}
-                  </p>
+                  <p className="text-[10px] text-white truncate">by {image.user.name}</p>
                 </div>
               </button>
             ))}

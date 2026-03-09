@@ -6,10 +6,10 @@
 
 Venturo ERP 有兩套狀態管理系統並存：
 
-| 系統 | 技術 | 狀態 | 適用場景 |
-|------|------|------|----------|
-| `@/data` | SWR + createEntityHook | **新架構（推薦）** | CRUD 實體資料 |
-| `@/stores` | Zustand + createStore | **舊架構（維護中）** | 即時狀態、全局狀態 |
+| 系統       | 技術                   | 狀態                 | 適用場景           |
+| ---------- | ---------------------- | -------------------- | ------------------ |
+| `@/data`   | SWR + createEntityHook | **新架構（推薦）**   | CRUD 實體資料      |
+| `@/stores` | Zustand + createStore  | **舊架構（維護中）** | 即時狀態、全局狀態 |
 
 ---
 
@@ -18,6 +18,7 @@ Venturo ERP 有兩套狀態管理系統並存：
 ### 用在哪裡
 
 所有 CRUD 實體資料的讀寫，例如：
+
 - `useTours()` / `useTour(id)` — 旅遊團
 - `useOrders()` — 訂單
 - `useCustomers()` — 客戶
@@ -50,22 +51,22 @@ Venturo ERP 有兩套狀態管理系統並存：
 
 #### ✅ 正確使用 Zustand 的場景
 
-| Store | 原因 |
-|-------|------|
-| `useAuthStore` / `useUserStore` | **全局 auth 狀態** — 登入狀態需要在整個 app 同步，Zustand 是正確選擇 |
+| Store                                    | 原因                                                                             |
+| ---------------------------------------- | -------------------------------------------------------------------------------- |
+| `useAuthStore` / `useUserStore`          | **全局 auth 狀態** — 登入狀態需要在整個 app 同步，Zustand 是正確選擇             |
 | `useWorkspaceStore` + workspace 聊天系統 | **即時狀態管理** — 聊天訊息、頻道切換等需要即時同步的狀態，Zustand 比 SWR 更適合 |
-| `useThemeStore` / `useHomeSettingsStore` | **UI 偏好設定** — 純客戶端狀態，不需要伺服器快取 |
-| `useCalendarStore` | **複雜 UI 狀態** — 行事曆的篩選、設定等互動狀態 |
+| `useThemeStore` / `useHomeSettingsStore` | **UI 偏好設定** — 純客戶端狀態，不需要伺服器快取                                 |
+| `useCalendarStore`                       | **複雜 UI 狀態** — 行事曆的篩選、設定等互動狀態                                  |
 
 #### 🔄 待遷移的 Store
 
-| Store | 說明 |
-|-------|------|
-| `useTourStore` | 仍被 `tour.service.ts` 引用 |
-| `useOrderStore` | 被部分頁面引用 |
-| `useQuoteStore` | 被報價功能引用 |
-| `useEmployeeStore` | 被部分頁面引用 |
-| `useAccountingStore` | 複雜業務邏輯，待拆分 |
+| Store                | 說明                        |
+| -------------------- | --------------------------- |
+| `useTourStore`       | 仍被 `tour.service.ts` 引用 |
+| `useOrderStore`      | 被部分頁面引用              |
+| `useQuoteStore`      | 被報價功能引用              |
+| `useEmployeeStore`   | 被部分頁面引用              |
+| `useAccountingStore` | 複雜業務邏輯，待拆分        |
 
 ### 2026-02-14 清理記錄
 
@@ -85,13 +86,8 @@ Venturo ERP 有兩套狀態管理系統並存：
 // 在 src/data/entities/ 下新增
 import { createEntityHook } from '../core'
 
-export const {
-  useMyEntities,
-  useMyEntity,
-  createMyEntity,
-  updateMyEntity,
-  deleteMyEntity,
-} = createEntityHook('my_entities')
+export const { useMyEntities, useMyEntity, createMyEntity, updateMyEntity, deleteMyEntity } =
+  createEntityHook('my_entities')
 ```
 
 ### 🟡 用 Zustand（只有這些情況）

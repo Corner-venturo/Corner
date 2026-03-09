@@ -22,13 +22,22 @@ export default function RightPanel() {
   const [stats, setStats] = useState({ tours: 0, orders: 0, requests: 0, revenue: 0 })
   const [todayTours, setTodayTours] = useState<TourInfo[]>([])
   const [activities, setActivities] = useState<ActivityItem[]>([])
-  const [teamMembers, setTeamMembers] = useState<{ name: string; role: string; status: string; color: string }[]>([])
+  const [teamMembers, setTeamMembers] = useState<
+    { name: string; role: string; status: string; color: string }[]
+  >([])
 
   // Clock
   useEffect(() => {
     const tick = () => {
       const now = new Date()
-      setClock(now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }))
+      setClock(
+        now.toLocaleTimeString('en-US', {
+          hour12: false,
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        })
+      )
     }
     tick()
     const t = setInterval(tick, 1000)
@@ -58,21 +67,23 @@ export default function RightPanel() {
 
       // Today's tours
       const today = new Date().toISOString().split('T')[0]
-      const { data: toursData } = await supabase
+      const { data: toursData } = (await supabase
         .from('tours')
         .select('tour_code, status, departure_date')
         .eq('workspace_id', wid)
         .gte('departure_date', today)
         .lte('departure_date', today + 'T23:59:59')
-        .limit(5) as unknown as { data: { tour_code: string; status: string; departure_date: string }[] | null }
+        .limit(5)) as unknown as {
+        data: { tour_code: string; status: string; departure_date: string }[] | null
+      }
 
       // Team members (employees)
-      const { data: employees } = await supabase
+      const { data: employees } = (await supabase
         .from('employees')
         .select('display_name, position')
         .eq('workspace_id', wid)
         .eq('is_active', true)
-        .limit(6) as unknown as { data: { display_name: string; position: string }[] | null }
+        .limit(6)) as unknown as { data: { display_name: string; position: string }[] | null }
 
       setStats({
         tours: tourCount || 0,
@@ -82,21 +93,43 @@ export default function RightPanel() {
       })
 
       if (toursData) {
-        setTodayTours(toursData.map(t => ({
-          tour_code: t.tour_code || '',
-          status: t.status === 'in_progress' ? '已出發' : t.status === 'confirmed' ? '集合中' : t.status,
-        })))
+        setTodayTours(
+          toursData.map(t => ({
+            tour_code: t.tour_code || '',
+            status:
+              t.status === 'in_progress'
+                ? '已出發'
+                : t.status === 'confirmed'
+                  ? '集合中'
+                  : t.status,
+          }))
+        )
       }
 
       if (employees) {
-        const statusOptions = ['處理報價', '拜訪客戶', '等待回覆', '製作行程', '確認訂單', '整理資料']
-        const colors = ['text-emerald-400', 'text-blue-400', 'text-yellow-400', 'text-purple-400', 'text-cyan-400']
-        setTeamMembers(employees.map((e, i) => ({
-          name: e.display_name || '員工',
-          role: e.position || 'OP',
-          status: statusOptions[i % statusOptions.length],
-          color: colors[i % colors.length],
-        })))
+        const statusOptions = [
+          '處理報價',
+          '拜訪客戶',
+          '等待回覆',
+          '製作行程',
+          '確認訂單',
+          '整理資料',
+        ]
+        const colors = [
+          'text-emerald-400',
+          'text-blue-400',
+          'text-yellow-400',
+          'text-purple-400',
+          'text-cyan-400',
+        ]
+        setTeamMembers(
+          employees.map((e, i) => ({
+            name: e.display_name || '員工',
+            role: e.position || 'OP',
+            status: statusOptions[i % statusOptions.length],
+            color: colors[i % colors.length],
+          }))
+        )
       }
 
       setActivities([
@@ -110,9 +143,9 @@ export default function RightPanel() {
   }, [isAuthenticated, user?.workspace_id])
 
   const statusColors: Record<string, string> = {
-    '已出發': 'text-emerald-400',
-    '集合中': 'text-yellow-400',
-    'confirmed': 'text-blue-400',
+    已出發: 'text-emerald-400',
+    集合中: 'text-yellow-400',
+    confirmed: 'text-blue-400',
   }
 
   return (
@@ -123,9 +156,7 @@ export default function RightPanel() {
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-emerald-400 text-xs font-bold tracking-wider">ONLINE</span>
         </div>
-        <div className="text-4xl font-bold text-white tracking-widest text-center">
-          {clock}
-        </div>
+        <div className="text-4xl font-bold text-white tracking-widest text-center">{clock}</div>
       </div>
 
       {/* 今日概覽 */}
@@ -135,10 +166,26 @@ export default function RightPanel() {
           <span className="text-xs text-gray-500 font-bold">{GAME_OFFICE_LABELS.LABEL_8131}</span>
         </div>
         <div className="space-y-2">
-          <Row label={GAME_OFFICE_LABELS.LABEL_8538} value={`${stats.tours} 團`} color="text-emerald-400" />
-          <Row label={GAME_OFFICE_LABELS.CONFIRM_173} value={`${stats.orders} 筆`} color="text-yellow-400" />
-          <Row label={GAME_OFFICE_LABELS.PROCESSING_7916} value={`${stats.requests} 筆`} color="text-orange-400" />
-          <Row label={GAME_OFFICE_LABELS.LABEL_5096} value={stats.revenue ? `NT$ ${stats.revenue.toLocaleString()}` : '-'} color="text-emerald-400" />
+          <Row
+            label={GAME_OFFICE_LABELS.LABEL_8538}
+            value={`${stats.tours} 團`}
+            color="text-emerald-400"
+          />
+          <Row
+            label={GAME_OFFICE_LABELS.CONFIRM_173}
+            value={`${stats.orders} 筆`}
+            color="text-yellow-400"
+          />
+          <Row
+            label={GAME_OFFICE_LABELS.PROCESSING_7916}
+            value={`${stats.requests} 筆`}
+            color="text-orange-400"
+          />
+          <Row
+            label={GAME_OFFICE_LABELS.LABEL_5096}
+            value={stats.revenue ? `NT$ ${stats.revenue.toLocaleString()}` : '-'}
+            color="text-emerald-400"
+          />
         </div>
       </div>
 
@@ -152,7 +199,9 @@ export default function RightPanel() {
           <div className="space-y-2">
             {teamMembers.map((m, i) => (
               <div key={i} className="flex justify-between items-center">
-                <span className="text-gray-400">{m.name}（{m.role}）</span>
+                <span className="text-gray-400">
+                  {m.name}（{m.role}）
+                </span>
                 <span className={`flex items-center gap-1 ${m.color} font-bold`}>
                   <span className="w-1.5 h-1.5 rounded-full bg-current" />
                   {m.status}
@@ -192,16 +241,18 @@ export default function RightPanel() {
         <div className="space-y-2">
           <div className="bg-gray-900/50 rounded-lg p-3 border border-[var(--border)]">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-purple-400 font-bold">{GAME_OFFICE_LABELS.LABEL_8236}</span>
-              <span className="text-[10px] text-gray-600 bg-gray-800 px-1.5 py-0.5 rounded">0 人在線</span>
+              <span className="text-xs text-purple-400 font-bold">
+                {GAME_OFFICE_LABELS.LABEL_8236}
+              </span>
+              <span className="text-[10px] text-gray-600 bg-gray-800 px-1.5 py-0.5 rounded">
+                0 人在線
+              </span>
             </div>
             <button className="w-full py-1.5 text-xs text-gray-500 border border-dashed border-[var(--border)] rounded hover:border-purple-400 hover:text-purple-400 transition-colors">
               🚧 即將開放
             </button>
           </div>
-          <div className="text-[10px] text-gray-600">
-            {GAME_OFFICE_LABELS.LABEL_9095}
-          </div>
+          <div className="text-[10px] text-gray-600">{GAME_OFFICE_LABELS.LABEL_9095}</div>
         </div>
       </div>
 

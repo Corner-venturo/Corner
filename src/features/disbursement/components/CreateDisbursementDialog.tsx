@@ -9,7 +9,6 @@
  * - 下方：建立/儲存出納單按鈕
  */
 
-
 import { useCallback } from 'react'
 import {
   Dialog,
@@ -66,20 +65,27 @@ export function CreateDisbursementDialog({
   } = useCreateDisbursement({ pendingRequests, onSuccess, editingOrder })
 
   // 關閉時重置
-  const handleClose = useCallback((isOpen: boolean) => {
-    if (!isOpen) {
-      resetForm()
-    }
-    onOpenChange(isOpen)
-  }, [onOpenChange, resetForm])
+  const handleClose = useCallback(
+    (isOpen: boolean) => {
+      if (!isOpen) {
+        resetForm()
+      }
+      onOpenChange(isOpen)
+    },
+    [onOpenChange, resetForm]
+  )
 
   const handleSubmit = isEditMode ? handleUpdate : handleCreate
   const title = isEditMode
     ? `${DISBURSEMENT_LABELS.編輯出納單} ${editingOrder?.order_number || ''}`
     : DISBURSEMENT_LABELS.新增出納單
   const submitLabel = isEditMode
-    ? (isSubmitting ? DISBURSEMENT_LABELS.儲存中 : DISBURSEMENT_LABELS.儲存變更.replace('{count}', selectedRequestIds.length.toString()))
-    : (isSubmitting ? DISBURSEMENT_LABELS.建立中 : DISBURSEMENT_LABELS.建立出納單數量.replace('{count}', selectedRequestIds.length.toString()))
+    ? isSubmitting
+      ? DISBURSEMENT_LABELS.儲存中
+      : DISBURSEMENT_LABELS.儲存變更.replace('{count}', selectedRequestIds.length.toString())
+    : isSubmitting
+      ? DISBURSEMENT_LABELS.建立中
+      : DISBURSEMENT_LABELS.建立出納單數量.replace('{count}', selectedRequestIds.length.toString())
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>

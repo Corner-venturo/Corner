@@ -5,12 +5,17 @@
  * 編輯封面相關資訊：標題、副標題、封面圖片等
  */
 
-
 import { useCallback } from 'react'
 import { Input } from '@/components/ui/input'
 import { RichTextInput } from '@/components/ui/rich-text-input'
 import { ImageUploader } from '@/components/ui/image-uploader'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import type { CoverBlockData } from '../types'
 import type { CoverStyleType } from '@/components/editor/tour-form/types'
 import type { ImagePositionSettings } from '@/components/ui/image-position-editor'
@@ -22,19 +27,21 @@ interface CoverBlockEditorProps {
 }
 
 export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
-  const updateField = useCallback(<K extends keyof CoverBlockData>(
-    field: K,
-    value: CoverBlockData[K]
-  ) => {
-    onChange({ [field]: value })
-  }, [onChange])
+  const updateField = useCallback(
+    <K extends keyof CoverBlockData>(field: K, value: CoverBlockData[K]) => {
+      onChange({ [field]: value })
+    },
+    [onChange]
+  )
 
   return (
     <div className="space-y-4">
       {/* 基本資訊 */}
       <div className="grid grid-cols-2 gap-3">
         <div className="col-span-2">
-          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_1694}</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">
+            {COMP_EDITOR_LABELS.LABEL_1694}
+          </label>
           <RichTextInput
             value={data.tagline || ''}
             onChange={value => updateField('tagline', value)}
@@ -43,7 +50,9 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_147}</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">
+            {COMP_EDITOR_LABELS.LABEL_147}
+          </label>
           <RichTextInput
             value={data.title || ''}
             onChange={value => updateField('title', value)}
@@ -52,7 +61,9 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.副標題}</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">
+            {COMP_EDITOR_LABELS.副標題}
+          </label>
           <RichTextInput
             value={data.subtitle || ''}
             onChange={value => updateField('subtitle', value)}
@@ -61,7 +72,9 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
         </div>
 
         <div className="col-span-2">
-          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_3951}</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">
+            {COMP_EDITOR_LABELS.LABEL_3951}
+          </label>
           <RichTextInput
             value={data.description || ''}
             onChange={value => updateField('description', value)}
@@ -74,7 +87,9 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
       {/* 行程資訊 */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_4513}</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">
+            {COMP_EDITOR_LABELS.LABEL_4513}
+          </label>
           <Input
             type="text"
             value={data.departureDate || ''}
@@ -85,7 +100,9 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_1470}</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">
+            {COMP_EDITOR_LABELS.LABEL_1470}
+          </label>
           <Input
             type="text"
             value={data.tourCode || ''}
@@ -96,7 +113,9 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5040}</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">
+            {COMP_EDITOR_LABELS.LABEL_5040}
+          </label>
           <Input
             type="text"
             value={data.country || ''}
@@ -107,7 +126,9 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5461}</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">
+            {COMP_EDITOR_LABELS.LABEL_5461}
+          </label>
           <Input
             type="text"
             value={data.city || ''}
@@ -121,7 +142,9 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
       {/* 價格資訊 */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.價格}</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">
+            {COMP_EDITOR_LABELS.價格}
+          </label>
           <Input
             type="text"
             value={data.price || ''}
@@ -132,10 +155,12 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_9062}</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">
+            {COMP_EDITOR_LABELS.LABEL_9062}
+          </label>
           <Select
             value={data.priceNote || COMP_EDITOR_LABELS.人}
-            onValueChange={(value) => updateField('priceNote', value)}
+            onValueChange={value => updateField('priceNote', value)}
           >
             <SelectTrigger className="h-8 text-sm">
               <SelectValue placeholder={COMP_EDITOR_LABELS.選擇單位} />
@@ -152,10 +177,12 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
 
       {/* 封面風格 */}
       <div>
-        <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_1860}</label>
+        <label className="block text-xs font-medium text-morandi-primary mb-1">
+          {COMP_EDITOR_LABELS.LABEL_1860}
+        </label>
         <Select
           value={data.coverStyle || 'original'}
-          onValueChange={(value) => updateField('coverStyle', value as CoverStyleType)}
+          onValueChange={value => updateField('coverStyle', value as CoverStyleType)}
         >
           <SelectTrigger className="h-8 text-sm">
             <SelectValue placeholder={COMP_EDITOR_LABELS.選擇風格} />
@@ -174,12 +201,14 @@ export function CoverBlockEditor({ data, onChange }: CoverBlockEditorProps) {
 
       {/* 封面圖片 */}
       <div>
-        <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.封面圖片}</label>
+        <label className="block text-xs font-medium text-morandi-primary mb-1">
+          {COMP_EDITOR_LABELS.封面圖片}
+        </label>
         <ImageUploader
           value={data.coverImage}
-          onChange={(url) => updateField('coverImage', url)}
+          onChange={url => updateField('coverImage', url)}
           position={data.coverImagePosition as ImagePositionSettings}
-          onPositionChange={(pos) => updateField('coverImagePosition', pos)}
+          onPositionChange={pos => updateField('coverImagePosition', pos)}
           bucket="city-backgrounds"
           filePrefix="itinerary"
           previewHeight="80px"

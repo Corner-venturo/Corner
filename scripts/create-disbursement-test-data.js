@@ -1,7 +1,8 @@
 const { createClient } = require('@supabase/supabase-js')
 
 const supabaseUrl = 'https://pfqvdacxowpgfamuvnsn.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxMDgzMjAsImV4cCI6MjA3NDY4NDMyMH0.LIMG0qmHixTPcbdzJrh4h0yTp8mh3FlggeZ6Bi_NwtI'
+const supabaseKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxMDgzMjAsImV4cCI6MjA3NDY4NDMyMH0.LIMG0qmHixTPcbdzJrh4h0yTp8mh3FlggeZ6Bi_NwtI'
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
@@ -149,7 +150,10 @@ async function createTestData() {
   console.log('✅ 請款項目已建立:', createdItems.length, '筆')
 
   // 3. 先清除舊的出納單
-  await supabase.from('disbursement_orders').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+  await supabase
+    .from('disbursement_orders')
+    .delete()
+    .neq('id', '00000000-0000-0000-0000-000000000000')
 
   // 4. 建立出納單（包含前兩張請款單）
   console.log('建立出納單...')

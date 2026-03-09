@@ -3,7 +3,6 @@
  * QuotationInclusions - 費用包含/不包含說明
  */
 
-
 import React from 'react'
 import { MORANDI_COLORS } from '../shared/print-styles'
 import { QUOTATION_INCLUSIONS_LABELS } from '@/constants/labels'

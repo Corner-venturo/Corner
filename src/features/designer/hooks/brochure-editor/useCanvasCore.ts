@@ -2,11 +2,16 @@
 
 import { useRef, useCallback, useState } from 'react'
 import * as fabric from 'fabric'
-import type { TextEditEvent, FabricObjectWithId, FabricObjectWithData, FabricGuideLine } from './types'
+import type {
+  TextEditEvent,
+  FabricObjectWithId,
+  FabricObjectWithData,
+  FabricGuideLine,
+} from './types'
 
 /**
  * useCanvasCore - Canvas 核心初始化 Hook
- * 
+ *
  * 功能：
  * - Canvas 初始化和銷毀
  * - 全域控制點樣式設定
@@ -46,7 +51,7 @@ export function useCanvasCore(options: UseCanvasCoreOptions): UseCanvasCoreRetur
   // Apply Control Styles
   // ============================================
   const applyControlStyles = useCallback((canvas: fabric.Canvas) => {
-    canvas.getObjects().forEach((obj) => {
+    canvas.getObjects().forEach(obj => {
       obj.set({
         cornerSize: 6,
         cornerStyle: 'circle',
@@ -106,12 +111,12 @@ export function useCanvasCore(options: UseCanvasCoreOptions): UseCanvasCoreRetur
     canvas.on('object:removed', handleChange)
 
     // 選取事件
-    canvas.on('selection:created', (e) => {
+    canvas.on('selection:created', e => {
       const ids = e.selected?.map(getObjectId).filter(Boolean) as string[]
       setSelectedObjectIds(ids)
     })
 
-    canvas.on('selection:updated', (e) => {
+    canvas.on('selection:updated', e => {
       const ids = e.selected?.map(getObjectId).filter(Boolean) as string[]
       setSelectedObjectIds(ids)
     })
@@ -123,7 +128,7 @@ export function useCanvasCore(options: UseCanvasCoreOptions): UseCanvasCoreRetur
     // ============================================
     // 文字編輯完成事件（雙向綁定用）
     // ============================================
-    canvas.on('text:editing:exited', (e) => {
+    canvas.on('text:editing:exited', e => {
       const target = e.target as fabric.FabricObject & {
         text?: string
         id?: string
@@ -185,7 +190,7 @@ export function useCanvasCore(options: UseCanvasCoreOptions): UseCanvasCoreRetur
     let lastSnapX: number | null = null
     let lastSnapY: number | null = null
 
-    canvas.on('object:moving', (e) => {
+    canvas.on('object:moving', e => {
       const movingObj = e.target
       if (!movingObj) return
 
@@ -200,10 +205,13 @@ export function useCanvasCore(options: UseCanvasCoreOptions): UseCanvasCoreRetur
       }
 
       // 收集其他物件的邊緣（限制數量）
-      const otherObjects = canvas.getObjects().filter(obj => {
-        const isGuideLine = (obj as FabricGuideLine).isGuideLine
-        return obj !== movingObj && !isGuideLine && obj.type !== 'activeSelection'
-      }).slice(0, 20)
+      const otherObjects = canvas
+        .getObjects()
+        .filter(obj => {
+          const isGuideLine = (obj as FabricGuideLine).isGuideLine
+          return obj !== movingObj && !isGuideLine && obj.type !== 'activeSelection'
+        })
+        .slice(0, 20)
 
       otherObjects.forEach(obj => {
         const edges = getObjEdges(obj)

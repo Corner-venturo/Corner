@@ -7,7 +7,7 @@ const supabase = createClient(
 async function summary() {
   const requestIds = [
     'b8771f18-fe96-4a39-8d26-80255983f834',
-    '8765c5bb-4bb0-4070-8ef2-3b578c05405b'
+    '8765c5bb-4bb0-4070-8ef2-3b578c05405b',
   ]
 
   // 請款單
@@ -38,15 +38,19 @@ async function summary() {
     grouped[supplier].push(item)
   })
 
-  Object.keys(grouped).sort().forEach(supplier => {
-    const supplierItems = grouped[supplier]
-    const total = supplierItems.reduce((sum, i) => sum + i.subtotal, 0)
-    console.log(`\n【${supplier}】小計: ${total.toLocaleString()}`)
-    supplierItems.forEach(item => {
-      const req = requests.find(r => r.id === item.request_id)
-      console.log(`  - ${req?.code || '-'} | ${item.description} | ${item.subtotal.toLocaleString()}`)
+  Object.keys(grouped)
+    .sort()
+    .forEach(supplier => {
+      const supplierItems = grouped[supplier]
+      const total = supplierItems.reduce((sum, i) => sum + i.subtotal, 0)
+      console.log(`\n【${supplier}】小計: ${total.toLocaleString()}`)
+      supplierItems.forEach(item => {
+        const req = requests.find(r => r.id === item.request_id)
+        console.log(
+          `  - ${req?.code || '-'} | ${item.description} | ${item.subtotal.toLocaleString()}`
+        )
+      })
     })
-  })
 
   const grandTotal = items.reduce((sum, i) => sum + i.subtotal, 0)
   console.log(`\n=== TOTAL: ${grandTotal.toLocaleString()} ===`)

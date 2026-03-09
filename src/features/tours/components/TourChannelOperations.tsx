@@ -3,7 +3,6 @@
  * TourChannelOperations - Channel creation and tour unlock operations
  */
 
-
 import { useCallback } from 'react'
 import { Tour } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
@@ -132,7 +131,8 @@ export function useTourChannelOperations({ actions }: UseTourChannelOperationsPa
       toast.dismiss(loadingToast)
       toast.success(TOUR_CHANNEL_LABELS.CHANNEL_CREATED(channelName))
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : TOUR_CHANNEL_LABELS.UNKNOWN_ERROR
+      const errorMessage =
+        error instanceof Error ? error.message : TOUR_CHANNEL_LABELS.UNKNOWN_ERROR
       logger.error('❌ [建立頻道] 發生錯誤:', error)
       toast.dismiss(loadingToast)
       toast.error(TOUR_CHANNEL_LABELS.CREATE_FAILED(errorMessage))

@@ -12,7 +12,13 @@ import {
   Clock,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { DASHBOARD_LABELS } from './constants/labels'
 
 interface VisaResult {
@@ -313,12 +319,16 @@ export function VisaWidget() {
               {/* 路線資訊 */}
               <div className="flex items-center justify-center gap-3 pb-3 border-b border-morandi-container/30">
                 <div className="text-center">
-                  <p className="text-xs text-morandi-secondary mb-1">{DASHBOARD_LABELS.LABEL_997}</p>
+                  <p className="text-xs text-morandi-secondary mb-1">
+                    {DASHBOARD_LABELS.LABEL_997}
+                  </p>
                   <p className="font-bold text-base text-morandi-primary">{result.passportName}</p>
                 </div>
                 <div className="text-morandi-secondary">→</div>
                 <div className="text-center">
-                  <p className="text-xs text-morandi-secondary mb-1">{DASHBOARD_LABELS.DESTINATION}</p>
+                  <p className="text-xs text-morandi-secondary mb-1">
+                    {DASHBOARD_LABELS.DESTINATION}
+                  </p>
                   <p className="font-bold text-base text-morandi-primary">
                     {result.destinationName}
                   </p>
@@ -346,7 +356,9 @@ export function VisaWidget() {
                 {/* 停留期限 */}
                 {result.stayDuration && (
                   <div className="bg-card/50 rounded-lg p-3 mt-3">
-                    <p className="text-xs text-morandi-secondary mb-1">{DASHBOARD_LABELS.LABEL_3598}</p>
+                    <p className="text-xs text-morandi-secondary mb-1">
+                      {DASHBOARD_LABELS.LABEL_3598}
+                    </p>
                     <p className="font-semibold text-sm text-morandi-primary">
                       {result.stayDuration}
                     </p>
@@ -356,7 +368,9 @@ export function VisaWidget() {
                 {/* 備註 */}
                 {result.notes && (
                   <div className="bg-card/50 rounded-lg p-3 mt-3">
-                    <p className="text-xs text-morandi-secondary mb-1">{DASHBOARD_LABELS.LABEL_8733}</p>
+                    <p className="text-xs text-morandi-secondary mb-1">
+                      {DASHBOARD_LABELS.LABEL_8733}
+                    </p>
                     <p className="text-xs text-morandi-primary">{result.notes}</p>
                   </div>
                 )}
@@ -364,9 +378,7 @@ export function VisaWidget() {
 
               {/* 提示 */}
               <div className="bg-status-warning-bg rounded-lg p-3 border border-status-warning/30">
-                <p className="text-xs text-morandi-primary">
-                  {DASHBOARD_LABELS.VISA_DISCLAIMER}
-                </p>
+                <p className="text-xs text-morandi-primary">{DASHBOARD_LABELS.VISA_DISCLAIMER}</p>
               </div>
             </div>
           )}

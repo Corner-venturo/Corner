@@ -47,7 +47,7 @@ import {
   generateUniqueId,
 } from '@/features/quotes/utils/priceCalculations'
 import { costCategories, TierPricing } from '@/features/quotes/types'
-import { QUOTE_DETAIL_EMBED_LABELS } from '../constants/labels';
+import { QUOTE_DETAIL_EMBED_LABELS } from '../constants/labels'
 import { QUOTE_COMPONENT_LABELS } from '../constants/labels'
 
 interface QuoteDetailEmbedProps {
@@ -99,7 +99,7 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
   useEffect(() => {
     if (quote && !hasLoaded) {
       setCategories(
-        (quote.categories && quote.categories.length > 0)
+        quote.categories && quote.categories.length > 0
           ? quote.categories.map(cat => ({
               ...cat,
               total: cat.items.reduce((sum: number, item: CostItem) => sum + (item.total || 0), 0),
@@ -107,21 +107,25 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
           : costCategories
       )
       setAccommodationDays(quote.accommodation_days || 0)
-      setParticipantCounts(quote.participant_counts || {
-        adult: quote.group_size || 20,
-        child_with_bed: 0,
-        child_no_bed: 0,
-        single_room: 0,
-        infant: 0,
-      })
+      setParticipantCounts(
+        quote.participant_counts || {
+          adult: quote.group_size || 20,
+          child_with_bed: 0,
+          child_no_bed: 0,
+          single_room: 0,
+          infant: 0,
+        }
+      )
       setQuoteName(quote.name || '')
-      setSellingPrices(quote.selling_prices || {
-        adult: 0,
-        child_with_bed: 0,
-        child_no_bed: 0,
-        single_room: 0,
-        infant: 0,
-      })
+      setSellingPrices(
+        quote.selling_prices || {
+          adult: 0,
+          child_with_bed: 0,
+          child_no_bed: 0,
+          single_room: 0,
+          infant: 0,
+        }
+      )
       setTierPricings(quote.tier_pricings || [])
       setHasLoaded(true)
     }
@@ -129,18 +133,22 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
 
   // Group size calculations
   const groupSize = useMemo(() => {
-    return (participantCounts.adult || 0) +
+    return (
+      (participantCounts.adult || 0) +
       (participantCounts.child_with_bed || 0) +
       (participantCounts.child_no_bed || 0) +
       (participantCounts.single_room || 0)
+    )
   }, [participantCounts])
 
   const groupSizeForGuide = useMemo(() => {
-    return (participantCounts.adult || 0) +
+    return (
+      (participantCounts.adult || 0) +
       (participantCounts.child_with_bed || 0) +
       (participantCounts.child_no_bed || 0) +
       (participantCounts.single_room || 0) +
       (participantCounts.infant || 0)
+    )
   }, [participantCounts])
 
   // Category operations hook
@@ -200,33 +208,42 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
   const [showImportActivitiesDialog, setShowImportActivitiesDialog] = useState(false)
   const [showLocalPricingDialog, setShowLocalPricingDialog] = useState(false)
 
-  const [previewParticipantCounts, setPreviewParticipantCounts] = useState<ParticipantCounts | null>(null)
+  const [previewParticipantCounts, setPreviewParticipantCounts] =
+    useState<ParticipantCounts | null>(null)
   const [previewSellingPrices, setPreviewSellingPrices] = useState<SellingPrices | null>(null)
   const [previewTierLabel, setPreviewTierLabel] = useState<string | undefined>(undefined)
-  const [previewTierPricings, setPreviewTierPricings] = useState<Array<{
-    participant_count: number
-    selling_prices: SellingPrices
-  }>>([])
+  const [previewTierPricings, setPreviewTierPricings] = useState<
+    Array<{
+      participant_count: number
+      selling_prices: SellingPrices
+    }>
+  >([])
 
   // 處理確認狀態變更
-  const handleConfirmationStatusChange = useCallback(async (status: QuoteConfirmationStatus) => {
-    if (!quote) return
-    try {
-      await updateQuote(quote.id, { confirmation_status: status })
-    } catch {
-      toast.error(QUOTE_DETAIL_EMBED_LABELS.更新狀態失敗_請稍後再試)
-    }
-  }, [quote, updateQuote])
+  const handleConfirmationStatusChange = useCallback(
+    async (status: QuoteConfirmationStatus) => {
+      if (!quote) return
+      try {
+        await updateQuote(quote.id, { confirmation_status: status })
+      } catch {
+        toast.error(QUOTE_DETAIL_EMBED_LABELS.更新狀態失敗_請稍後再試)
+      }
+    },
+    [quote, updateQuote]
+  )
 
   // 處理狀態變更
-  const handleStatusChange = useCallback((status: 'proposed' | 'approved', showLinkDialog?: boolean) => {
-    if (!quote) return
-    if (status === 'approved' && showLinkDialog) {
-      setShowLinkTourDialog(true)
-    } else {
-      updateQuote(quote.id, { status })
-    }
-  }, [quote, updateQuote])
+  const handleStatusChange = useCallback(
+    (status: 'proposed' | 'approved', showLinkDialog?: boolean) => {
+      if (!quote) return
+      if (status === 'approved' && showLinkDialog) {
+        setShowLinkTourDialog(true)
+      } else {
+        updateQuote(quote.id, { status })
+      }
+    },
+    [quote, updateQuote]
+  )
 
   const handleGenerateQuotation = useCallback(
     (
@@ -284,7 +301,10 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
       const activitiesCategory = newCategories.find(cat => cat.id === 'activities')
       if (activitiesCategory) {
         activitiesCategory.items = [...activitiesCategory.items, ...items]
-        activitiesCategory.total = activitiesCategory.items.reduce((sum, item) => sum + (item.total || 0), 0)
+        activitiesCategory.total = activitiesCategory.items.reduce(
+          (sum, item) => sum + (item.total || 0),
+          0
+        )
       }
       return newCategories
     })
@@ -309,68 +329,73 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
 
   // 計算總人數
   const totalParticipants = useMemo(() => {
-    return (participantCounts.adult || 0) +
-           (participantCounts.child_with_bed || 0) +
-           (participantCounts.child_no_bed || 0) +
-           (participantCounts.single_room || 0)
+    return (
+      (participantCounts.adult || 0) +
+      (participantCounts.child_with_bed || 0) +
+      (participantCounts.child_no_bed || 0) +
+      (participantCounts.single_room || 0)
+    )
   }, [participantCounts])
 
   // Local pricing handler
-  const handleLocalPricingConfirm = useCallback((tiers: LocalTier[], _matchedTierIndex: number) => {
-    const sortedTiers = [...tiers].sort((a, b) => a.participants - b.participants)
-    let currentTierIdx = 0
-    for (let i = 0; i < sortedTiers.length; i++) {
-      if (sortedTiers[i].participants <= totalParticipants) {
-        currentTierIdx = i
-      }
-    }
-    const currentLocalPrice = sortedTiers[currentTierIdx]?.unitPrice || 0
-
-    const newTierPricings = sortedTiers.map((tier, index) => {
-      const participantCount = index === 0 ? totalParticipants : tier.participants
-      const localUnitPrice = index === 0 ? currentLocalPrice : tier.unitPrice
-      const newCounts = calculateTierParticipantCounts(participantCount, participantCounts)
-      const baseCosts = calculateTierCosts(categories, newCounts, participantCounts)
-      const newCosts = {
-        adult: baseCosts.adult + localUnitPrice,
-        child_with_bed: baseCosts.child_with_bed + localUnitPrice,
-        child_no_bed: baseCosts.child_no_bed + localUnitPrice,
-        single_room: baseCosts.single_room + localUnitPrice,
-        infant: baseCosts.infant,
-      }
-      return {
-        id: generateUniqueId(),
-        participant_count: participantCount,
-        participant_counts: newCounts,
-        identity_costs: newCosts,
-        selling_prices: { ...sellingPrices },
-        identity_profits: calculateIdentityProfits(sellingPrices, newCosts),
-      }
-    })
-
-    setCategories(prev => {
-      const newCategories = [...prev]
-      const groupTransportCategory = newCategories.find(cat => cat.id === 'group-transport')
-      if (groupTransportCategory) {
-        groupTransportCategory.items = groupTransportCategory.items.filter(
-          item => !item.name.startsWith(QUOTE_DETAIL_EMBED_LABELS.Local_報價)
-        )
-        const newItem: CostItem = {
-          id: `local-${Date.now()}`,
-          name: 'Local 報價',
-          quantity: 1,
-          unit_price: currentLocalPrice,
-          total: 0,
-          note: `目前適用: $${currentLocalPrice.toLocaleString()}/人 | ${sortedTiers.map(t => `${t.participants}人=$${t.unitPrice.toLocaleString()}`).join(' / ')}`,
+  const handleLocalPricingConfirm = useCallback(
+    (tiers: LocalTier[], _matchedTierIndex: number) => {
+      const sortedTiers = [...tiers].sort((a, b) => a.participants - b.participants)
+      let currentTierIdx = 0
+      for (let i = 0; i < sortedTiers.length; i++) {
+        if (sortedTiers[i].participants <= totalParticipants) {
+          currentTierIdx = i
         }
-        groupTransportCategory.items.push(newItem)
       }
-      return newCategories
-    })
+      const currentLocalPrice = sortedTiers[currentTierIdx]?.unitPrice || 0
 
-    setTierPricings(newTierPricings)
-    toast.success(`Local 報價已套用，產生 ${newTierPricings.length} 個檻次`)
-  }, [totalParticipants, participantCounts, categories, sellingPrices])
+      const newTierPricings = sortedTiers.map((tier, index) => {
+        const participantCount = index === 0 ? totalParticipants : tier.participants
+        const localUnitPrice = index === 0 ? currentLocalPrice : tier.unitPrice
+        const newCounts = calculateTierParticipantCounts(participantCount, participantCounts)
+        const baseCosts = calculateTierCosts(categories, newCounts, participantCounts)
+        const newCosts = {
+          adult: baseCosts.adult + localUnitPrice,
+          child_with_bed: baseCosts.child_with_bed + localUnitPrice,
+          child_no_bed: baseCosts.child_no_bed + localUnitPrice,
+          single_room: baseCosts.single_room + localUnitPrice,
+          infant: baseCosts.infant,
+        }
+        return {
+          id: generateUniqueId(),
+          participant_count: participantCount,
+          participant_counts: newCounts,
+          identity_costs: newCosts,
+          selling_prices: { ...sellingPrices },
+          identity_profits: calculateIdentityProfits(sellingPrices, newCosts),
+        }
+      })
+
+      setCategories(prev => {
+        const newCategories = [...prev]
+        const groupTransportCategory = newCategories.find(cat => cat.id === 'group-transport')
+        if (groupTransportCategory) {
+          groupTransportCategory.items = groupTransportCategory.items.filter(
+            item => !item.name.startsWith(QUOTE_DETAIL_EMBED_LABELS.Local_報價)
+          )
+          const newItem: CostItem = {
+            id: `local-${Date.now()}`,
+            name: 'Local 報價',
+            quantity: 1,
+            unit_price: currentLocalPrice,
+            total: 0,
+            note: `目前適用: $${currentLocalPrice.toLocaleString()}/人 | ${sortedTiers.map(t => `${t.participants}人=$${t.unitPrice.toLocaleString()}`).join(' / ')}`,
+          }
+          groupTransportCategory.items.push(newItem)
+        }
+        return newCategories
+      })
+
+      setTierPricings(newTierPricings)
+      toast.success(`Local 報價已套用，產生 ${newTierPricings.length} 個檻次`)
+    },
+    [totalParticipants, participantCounts, categories, sellingPrices]
+  )
 
   // Scroll handling effect
   useEffect(() => {
@@ -440,7 +465,7 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
             contact_phone: quote.contact_phone || '',
             contact_address: quote.contact_address || '',
           }}
-          onContactInfoChange={(info) => {
+          onContactInfoChange={info => {
             updateQuote(quote.id, {
               contact_person: info.contact_person,
               contact_phone: info.contact_phone,
@@ -510,7 +535,11 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
                         handleRemoveItem={categoryOps.handleRemoveItem}
                         onOpenMealsImportDialog={handleOpenMealsImportDialog}
                         onOpenActivitiesImportDialog={handleOpenActivitiesImportDialog}
-                        onOpenLocalPricingDialog={category.id === 'group-transport' ? () => setShowLocalPricingDialog(true) : undefined}
+                        onOpenLocalPricingDialog={
+                          category.id === 'group-transport'
+                            ? () => setShowLocalPricingDialog(true)
+                            : undefined
+                        }
                       />
                     ))}
                   </tbody>
@@ -571,7 +600,7 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
             handleCreateTour()
           }
         }}
-        onLinkExisting={async (tour) => {
+        onLinkExisting={async tour => {
           if (quote) {
             await updateQuote(quote.id, { status: '待出發', tour_id: tour.id })
             const { updateTour } = await import('@/data')

@@ -5,6 +5,7 @@
 ## 背景
 
 ERP 系統有多個財務相關的統計欄位：
+
 - 訂單：`paid_amount`、`remaining_amount`、`payment_status`
 - 團：`total_revenue`、`total_cost`、`profit`、`current_participants`
 
@@ -16,11 +17,13 @@ ERP 系統有多個財務相關的統計欄位：
 所有財務統計欄位都透過 **專用的 recalculate 函數** 從原始資料重新計算，不允許手動修改。
 
 核心函數：
+
 - `recalculateReceiptStats(orderId, tourId)` — 重算收款相關統計（paid_amount、payment_status、total_revenue、profit）
 - `recalculateExpenseStats(tourId)` — 重算請款相關統計（total_cost、profit）
 - `recalculateParticipants(tourId)` — 重算團員人數（current_participants）
 
 規則：
+
 1. 任何收款異動後，必須呼叫 `recalculateReceiptStats`
 2. 任何請款異動後，必須呼叫 `recalculateExpenseStats`
 3. 任何團員異動後，必須呼叫 `recalculateParticipants`
@@ -36,15 +39,18 @@ ERP 系統有多個財務相關的統計欄位：
 ## 後果
 
 ### 正面
+
 - 統計數據永遠正確（只要原始資料正確）
 - 新增異動場景時不需要額外計算邏輯，只要呼叫 recalculate
 - 可以寫排程 job 定期 recalculate 所有團的統計作為 safety net
 
 ### 負面
+
 - 每次異動都要重查原始資料，效能略差（目前規模可接受）
 - 如果忘記呼叫 recalculate，統計會暫時不一致（直到下次呼叫）
 - 大團（100+ 筆收款）的重算可能較慢
 
 ### 未來優化
+
 - 可以加 DB trigger 自動觸發 recalculate（但會增加 DB 複雜度）
 - 大規模資料可以改用 DB 的 materialized view

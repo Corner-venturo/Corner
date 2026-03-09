@@ -25,7 +25,10 @@ test.describe('訂單管理 - 創建流程測試', () => {
 
       // 1. 選擇旅遊團（Combobox）
       // 找到旅遊團選擇器並點擊
-      const tourCombobox = dialog.locator('button, input').filter({ hasText: /搜尋或選擇旅遊團|選擇旅遊團/ }).first()
+      const tourCombobox = dialog
+        .locator('button, input')
+        .filter({ hasText: /搜尋或選擇旅遊團|選擇旅遊團/ })
+        .first()
 
       if (await tourCombobox.isVisible()) {
         await tourCombobox.click()
@@ -52,7 +55,10 @@ test.describe('訂單管理 - 創建流程測試', () => {
       }
 
       // 3. 選擇業務人員（Combobox）
-      const salesCombobox = dialog.locator('button, input').filter({ hasText: /選擇業務|業務人員/ }).first()
+      const salesCombobox = dialog
+        .locator('button, input')
+        .filter({ hasText: /選擇業務|業務人員/ })
+        .first()
       if (await salesCombobox.isVisible()) {
         await salesCombobox.click()
         await page.waitForTimeout(300)
@@ -65,7 +71,10 @@ test.describe('訂單管理 - 創建流程測試', () => {
       }
 
       // 4. 選擇助理（可選）
-      const assistantCombobox = dialog.locator('button, input').filter({ hasText: /選擇助理|助理/ }).first()
+      const assistantCombobox = dialog
+        .locator('button, input')
+        .filter({ hasText: /選擇助理|助理/ })
+        .first()
       if (await assistantCombobox.isVisible()) {
         await assistantCombobox.click()
         await page.waitForTimeout(300)
@@ -101,7 +110,10 @@ test.describe('訂單管理 - 創建流程測試', () => {
           await page.waitForTimeout(1000)
 
           // 檢查是否有「E2E測試聯絡人」的訂單
-          const hasNewOrder = await page.locator('text=E2E測試聯絡人').isVisible().catch(() => false)
+          const hasNewOrder = await page
+            .locator('text=E2E測試聯絡人')
+            .isVisible()
+            .catch(() => false)
 
           // 記錄結果（不強制要求，因為可能需要刷新）
           console.log('訂單創建結果：', hasNewOrder ? '已顯示在列表' : '需要刷新查看')
@@ -165,7 +177,10 @@ test.describe('訂單管理 - 創建流程測試', () => {
       const dialog = page.locator('[role="dialog"]')
 
       // 選擇旅遊團
-      const tourCombobox = dialog.locator('button, input').filter({ hasText: /搜尋或選擇旅遊團|選擇旅遊團/ }).first()
+      const tourCombobox = dialog
+        .locator('button, input')
+        .filter({ hasText: /搜尋或選擇旅遊團|選擇旅遊團/ })
+        .first()
 
       if (await tourCombobox.isVisible()) {
         await tourCombobox.click()

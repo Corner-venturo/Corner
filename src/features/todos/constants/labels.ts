@@ -152,5 +152,5 @@ export const getPublicTodoMessages = () => ({
 })
 
 // 建立請款單按鈕文字函數
-export const createDisbursementButtonText = (itemCount: number, totalAmount: number) => 
+export const createDisbursementButtonText = (itemCount: number, totalAmount: number) =>
   `建立請款單 (${itemCount} 項，${totalAmount})`

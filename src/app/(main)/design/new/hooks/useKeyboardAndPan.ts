@@ -177,7 +177,23 @@ export function useKeyboardAndPan({
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [selectedDesignType, handleSave, undo, redo, copySelected, pasteClipboard, cutSelected, deleteSelected, moveSelected, zoomIn, zoomOut, resetZoom, selectAll, groupSelected, ungroupSelected])
+  }, [
+    selectedDesignType,
+    handleSave,
+    undo,
+    redo,
+    copySelected,
+    pasteClipboard,
+    cutSelected,
+    deleteSelected,
+    moveSelected,
+    zoomIn,
+    zoomOut,
+    resetZoom,
+    selectAll,
+    groupSelected,
+    ungroupSelected,
+  ])
 
   // 滾輪縮放（Ctrl/Cmd + 滾輪）
   useEffect(() => {

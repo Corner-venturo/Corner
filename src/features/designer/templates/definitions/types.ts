@@ -9,16 +9,16 @@ import type { CanvasElement } from '@/features/designer/components/types'
  * 餐食圖標類型（用於手動覆寫自動選擇的圖標）
  */
 export type MealIconType =
-  | 'bakery_dining'   // 麵包/早餐
-  | 'flight_class'    // 機上餐
-  | 'restaurant'      // 一般餐廳
-  | 'ramen_dining'    // 拉麵/日式
-  | 'soup_kitchen'    // 湯品
-  | 'skillet'         // 鍋物
-  | 'bento'           // 便當
-  | 'rice_bowl'       // 飯類
-  | 'coffee'          // 咖啡/輕食
-  | 'dinner_dining'   // 晚餐
+  | 'bakery_dining' // 麵包/早餐
+  | 'flight_class' // 機上餐
+  | 'restaurant' // 一般餐廳
+  | 'ramen_dining' // 拉麵/日式
+  | 'soup_kitchen' // 湯品
+  | 'skillet' // 鍋物
+  | 'bento' // 便當
+  | 'rice_bowl' // 飯類
+  | 'coffee' // 咖啡/輕食
+  | 'dinner_dining' // 晚餐
 
 /**
  * 時間軸項目（用於當日行程）
@@ -203,20 +203,20 @@ export interface CoverImagePosition {
  * 目錄項目（用於目錄編輯）
  */
 export interface TocItemData {
-  pageId: string       // 對應的頁面 ID
-  displayName: string  // 顯示名稱
-  icon: string         // 圖標 ID
-  enabled: boolean     // 是否顯示在目錄
-  pageNumber: number   // 頁碼（自動計算）
+  pageId: string // 對應的頁面 ID
+  displayName: string // 顯示名稱
+  icon: string // 圖標 ID
+  enabled: boolean // 是否顯示在目錄
+  pageNumber: number // 頁碼（自動計算）
 }
 
 /**
  * 目錄內容（用於模板渲染）
  */
 export interface TocContentItem {
-  name: string   // 顯示名稱
-  page: number   // 頁碼
-  icon?: string  // 圖標 ID
+  name: string // 顯示名稱
+  page: number // 頁碼
+  icon?: string // 圖標 ID
 }
 
 /**
@@ -270,7 +270,7 @@ export interface TemplateData {
   }
   // 通用
   currentPageNumber?: number // 當前頁碼
-  
+
   // Corner Travel 專用
   currentDayData?: DailyDetailData // 當前天數資料（每日行程頁用）
   hotelName?: string // 當天住宿名稱
@@ -296,7 +296,19 @@ export interface PageTemplate {
   name: string // e.g., '日系風格'
   description?: string // 範本描述
   thumbnailUrl: string // 用於選擇器中的預覽圖
-  category?: 'cover' | 'toc' | 'itinerary' | 'daily' | 'memo' | 'hotel' | 'hotelMulti' | 'attraction' | 'vehicle' | 'table' | 'info' | 'general' // 範本類別
+  category?:
+    | 'cover'
+    | 'toc'
+    | 'itinerary'
+    | 'daily'
+    | 'memo'
+    | 'hotel'
+    | 'hotelMulti'
+    | 'attraction'
+    | 'vehicle'
+    | 'table'
+    | 'info'
+    | 'general' // 範本類別
   // 核心：一個接收數據並回傳元素陣列的函式
   generateElements: (data: TemplateData) => CanvasElement[]
 }

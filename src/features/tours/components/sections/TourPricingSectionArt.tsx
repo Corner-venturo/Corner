@@ -39,9 +39,18 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
     <section className="py-24 relative overflow-hidden" style={{ backgroundColor: colors.paper }}>
       {/* 背景裝飾線條 */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-px h-full" style={{ backgroundColor: `${colors.ink}10` }} />
-        <div className="absolute top-0 right-1/4 w-px h-full" style={{ backgroundColor: `${colors.ink}10` }} />
-        <div className="absolute top-1/3 left-0 w-full h-px" style={{ backgroundColor: `${colors.ink}10` }} />
+        <div
+          className="absolute top-0 left-1/4 w-px h-full"
+          style={{ backgroundColor: `${colors.ink}10` }}
+        />
+        <div
+          className="absolute top-0 right-1/4 w-px h-full"
+          style={{ backgroundColor: `${colors.ink}10` }}
+        />
+        <div
+          className="absolute top-1/3 left-0 w-full h-px"
+          style={{ backgroundColor: `${colors.ink}10` }}
+        />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
@@ -136,7 +145,10 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                     >
                       {tier.name || tier.label || TOURS_LABELS.DEFAULT_PLAN}
                     </h3>
-                    <p className="text-sm text-morandi-secondary mb-8" style={{ fontFamily: "'Italiana', serif" }}>
+                    <p
+                      className="text-sm text-morandi-secondary mb-8"
+                      style={{ fontFamily: "'Italiana', serif" }}
+                    >
                       {tier.description || TOURS_LABELS.DEFAULT_PLAN_DESC}
                     </p>
 
@@ -147,9 +159,15 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                           className="text-4xl lg:text-5xl font-light"
                           style={{ fontFamily: "'Cinzel', serif", color: colors.clay }}
                         >
-                          {formatPrice(typeof tier.pricePerPerson === 'number' ? tier.pricePerPerson : Number(tier.pricePerPerson || tier.price) || 0)}
+                          {formatPrice(
+                            typeof tier.pricePerPerson === 'number'
+                              ? tier.pricePerPerson
+                              : Number(tier.pricePerPerson || tier.price) || 0
+                          )}
                         </span>
-                        <span className="text-sm text-morandi-secondary">{TOURS_LABELS.TWD_PER_PERSON}</span>
+                        <span className="text-sm text-morandi-secondary">
+                          {TOURS_LABELS.TWD_PER_PERSON}
+                        </span>
                       </div>
                     </div>
 
@@ -157,7 +175,11 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                     {tier.features && tier.features.length > 0 && (
                       <ul className="space-y-3 mb-8">
                         {tier.features.map((feature: string, idx: number) => (
-                          <li key={idx} className="flex items-start gap-3 text-sm" style={{ color: colors.ink }}>
+                          <li
+                            key={idx}
+                            className="flex items-start gap-3 text-sm"
+                            style={{ color: colors.ink }}
+                          >
                             <span
                               className="w-1 h-1 rounded-full mt-2 flex-shrink-0"
                               style={{ backgroundColor: colors.clay }}
@@ -176,11 +198,11 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                         borderColor: colors.ink,
                         color: colors.ink,
                       }}
-                      onMouseEnter={(e) => {
+                      onMouseEnter={e => {
                         e.currentTarget.style.backgroundColor = colors.ink
                         e.currentTarget.style.color = 'white'
                       }}
-                      onMouseLeave={(e) => {
+                      onMouseLeave={e => {
                         e.currentTarget.style.backgroundColor = 'transparent'
                         e.currentTarget.style.color = colors.ink
                       }}
@@ -211,7 +233,10 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                 backgroundColor: 'white',
               }}
             >
-              <div className="flex items-center gap-4 mb-6 pb-4 border-b" style={{ borderColor: `${colors.ink}20` }}>
+              <div
+                className="flex items-center gap-4 mb-6 pb-4 border-b"
+                style={{ borderColor: `${colors.ink}20` }}
+              >
                 <div
                   className="w-10 h-10 flex items-center justify-center"
                   style={{ backgroundColor: colors.ink }}
@@ -232,7 +257,11 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                 {pricingDetails.included_items
                   .filter(item => item.included)
                   .map((item, index) => (
-                    <li key={index} className="flex items-start gap-3 text-sm" style={{ color: colors.ink }}>
+                    <li
+                      key={index}
+                      className="flex items-start gap-3 text-sm"
+                      style={{ color: colors.ink }}
+                    >
                       <span
                         className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0"
                         style={{ backgroundColor: colors.accent }}
@@ -252,7 +281,10 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                 backgroundColor: 'white',
               }}
             >
-              <div className="flex items-center gap-4 mb-6 pb-4 border-b" style={{ borderColor: `${colors.ink}20` }}>
+              <div
+                className="flex items-center gap-4 mb-6 pb-4 border-b"
+                style={{ borderColor: `${colors.ink}20` }}
+              >
                 <div
                   className="w-10 h-10 flex items-center justify-center"
                   style={{ backgroundColor: colors.clay }}
@@ -273,7 +305,11 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                 {pricingDetails.excluded_items
                   .filter(item => !item.included)
                   .map((item, index) => (
-                    <li key={index} className="flex items-start gap-3 text-sm" style={{ color: colors.ink }}>
+                    <li
+                      key={index}
+                      className="flex items-start gap-3 text-sm"
+                      style={{ color: colors.ink }}
+                    >
                       <span
                         className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0"
                         style={{ backgroundColor: colors.clay }}
@@ -301,7 +337,10 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                 backgroundColor: 'white',
               }}
             >
-              <div className="flex items-center gap-4 mb-6 pb-4 border-b" style={{ borderColor: `${colors.ink}20` }}>
+              <div
+                className="flex items-center gap-4 mb-6 pb-4 border-b"
+                style={{ borderColor: `${colors.ink}20` }}
+              >
                 <span
                   className="text-xs tracking-[0.2em] uppercase px-3 py-1 border"
                   style={{
@@ -323,40 +362,44 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
               <div className={`grid ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2'} gap-8`}>
                 <div>
                   <ol className="space-y-3 text-sm" style={{ color: colors.ink }}>
-                    {pricingDetails.notes.slice(0, Math.ceil(pricingDetails.notes.length / 2)).map((note, index) => (
-                      <li key={index} className="flex gap-3">
-                        <span
-                          className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-xs border"
-                          style={{
-                            fontFamily: "'Cinzel', serif",
-                            borderColor: colors.ink,
-                            color: colors.ink,
-                          }}
-                        >
-                          {index + 1}
-                        </span>
-                        <span style={{ fontFamily: "'Noto Serif TC', serif" }}>{note}</span>
-                      </li>
-                    ))}
+                    {pricingDetails.notes
+                      .slice(0, Math.ceil(pricingDetails.notes.length / 2))
+                      .map((note, index) => (
+                        <li key={index} className="flex gap-3">
+                          <span
+                            className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-xs border"
+                            style={{
+                              fontFamily: "'Cinzel', serif",
+                              borderColor: colors.ink,
+                              color: colors.ink,
+                            }}
+                          >
+                            {index + 1}
+                          </span>
+                          <span style={{ fontFamily: "'Noto Serif TC', serif" }}>{note}</span>
+                        </li>
+                      ))}
                   </ol>
                 </div>
                 <div>
                   <ol className="space-y-3 text-sm" style={{ color: colors.ink }}>
-                    {pricingDetails.notes.slice(Math.ceil(pricingDetails.notes.length / 2)).map((note, index) => (
-                      <li key={index} className="flex gap-3">
-                        <span
-                          className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-xs border"
-                          style={{
-                            fontFamily: "'Cinzel', serif",
-                            borderColor: colors.ink,
-                            color: colors.ink,
-                          }}
-                        >
-                          {Math.ceil(pricingDetails.notes.length / 2) + index + 1}
-                        </span>
-                        <span style={{ fontFamily: "'Noto Serif TC', serif" }}>{note}</span>
-                      </li>
-                    ))}
+                    {pricingDetails.notes
+                      .slice(Math.ceil(pricingDetails.notes.length / 2))
+                      .map((note, index) => (
+                        <li key={index} className="flex gap-3">
+                          <span
+                            className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-xs border"
+                            style={{
+                              fontFamily: "'Cinzel', serif",
+                              borderColor: colors.ink,
+                              color: colors.ink,
+                            }}
+                          >
+                            {Math.ceil(pricingDetails.notes.length / 2) + index + 1}
+                          </span>
+                          <span style={{ fontFamily: "'Noto Serif TC', serif" }}>{note}</span>
+                        </li>
+                      ))}
                   </ol>
                 </div>
               </div>

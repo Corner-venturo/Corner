@@ -99,7 +99,11 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
         if (customerError) {
           logger.error(COMP_ORDERS_LABELS.更新顧客失敗, customerError)
         }
-      } else if (editFormData.chinese_name || editFormData.passport_number || editFormData.id_number) {
+      } else if (
+        editFormData.chinese_name ||
+        editFormData.passport_number ||
+        editFormData.id_number
+      ) {
         // 2b. 沒有關聯顧客但有填寫資料，嘗試比對或建立新顧客
         const passportNumber = editFormData.passport_number?.trim() || null
         const idNumber = editFormData.id_number?.trim() || null
@@ -113,9 +117,13 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
           // 2. 其次用身分證比對
           if (idNumber && c.national_id === idNumber) return true
           // 3. 備用：姓名+生日比對
-          if (cleanChineseName && birthDate &&
-              c.name?.replace(/\([^)]+\)$/, '').trim() === cleanChineseName &&
-              c.birth_date === birthDate) return true
+          if (
+            cleanChineseName &&
+            birthDate &&
+            c.name?.replace(/\([^)]+\)$/, '').trim() === cleanChineseName &&
+            c.birth_date === birthDate
+          )
+            return true
           return false
         })
 
@@ -127,10 +135,7 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
           if (existingCustomer.passport_image_url && !editingMember.passport_image_url) {
             memberUpdate.passport_image_url = existingCustomer.passport_image_url
           }
-          await supabase
-            .from('order_members')
-            .update(memberUpdate)
-            .eq('id', editingMember.id)
+          await supabase.from('order_members').update(memberUpdate).eq('id', editingMember.id)
 
           // 同時更新顧客資料
           await supabase
@@ -180,25 +185,34 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
 
       // 3. 更新本地狀態（儲存後即為已驗證）
       // 注意：同時同步 passport_image_url（可能在編輯過程中被裁剪/旋轉更新）
-      setMembers(members.map(m =>
-        m.id === editingMember.id
-          ? {
-              ...m,
-              ...memberUpdateData,
-              passport_image_url: editingMember.passport_image_url,
-              customer_id: newCustomerId || editingMember.customer_id,
-              customer_verification_status: 'verified',
-            }
-          : m
-      ))
+      setMembers(
+        members.map(m =>
+          m.id === editingMember.id
+            ? {
+                ...m,
+                ...memberUpdateData,
+                passport_image_url: editingMember.passport_image_url,
+                customer_id: newCustomerId || editingMember.customer_id,
+                customer_verification_status: 'verified',
+              }
+            : m
+        )
+      )
 
       // 4. 關閉彈窗
       setIsEditDialogOpen(false)
       setEditingMember(null)
-      void alert(editMode === 'verify' ? COMP_ORDERS_LABELS.驗證完成 : COMP_ORDERS_LABELS.儲存成功, 'success')
+      void alert(
+        editMode === 'verify' ? COMP_ORDERS_LABELS.驗證完成 : COMP_ORDERS_LABELS.儲存成功,
+        'success'
+      )
     } catch (error) {
       logger.error(COMP_ORDERS_LABELS.儲存失敗_2, error)
-      void alert(COMP_ORDERS_LABELS.儲存失敗_3 + (error instanceof Error ? error.message : COMP_ORDERS_LABELS.未知錯誤), 'error')
+      void alert(
+        COMP_ORDERS_LABELS.儲存失敗_3 +
+          (error instanceof Error ? error.message : COMP_ORDERS_LABELS.未知錯誤),
+        'error'
+      )
     } finally {
       setIsSaving(false)
     }

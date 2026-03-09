@@ -1,4 +1,5 @@
 # UX 問題優化方案
+
 **日期**: 2026-03-09  
 **問題**: 按鈕不見、無法按、存檔失敗
 
@@ -42,6 +43,7 @@ William 提到的不是單純的程式碼 bug，而是**系統性的使用者體
 ### 資料庫層（正常）
 
 #### ✅ RLS 政策完整
+
 - tours: 13 個政策
 - orders: 13 個政策
 - customers: 13 個政策
@@ -53,14 +55,18 @@ William 提到的不是單純的程式碼 bug，而是**系統性的使用者體
 所有核心表都有 RLS 政策。
 
 #### ✅ NOT NULL 約束完整
+
 所有核心欄位都有 NOT NULL 約束（今天剛修復）：
+
 - workspace_id (5 tables)
 - created_at (5 tables)
 - updated_at (5 tables)
 - status (4 tables)
 
 #### ✅ Foreign Keys 完整
+
 核心表共 32 個 Foreign Keys：
+
 - tours: 10 FKs
 - payment_requests: 6 FKs
 - orders: 5 FKs
@@ -79,12 +85,14 @@ William 提到的不是單純的程式碼 bug，而是**系統性的使用者體
 建立了完整的錯誤追蹤系統：
 
 #### 檔案
+
 1. `src/lib/monitoring/error-tracker.ts` - 錯誤追蹤器
 2. `src/lib/monitoring/usage-examples.md` - 使用範例
 3. `docs/UX_HEALTH_CHECK.md` - 完整檢查清單
 4. `scripts/diagnose-ux-issues.sh` - 一鍵診斷腳本
 
 #### 功能
+
 - 追蹤按鈕狀態（顯示/隱藏/disabled）
 - 追蹤存檔失敗
 - 追蹤 RLS 錯誤
@@ -99,6 +107,7 @@ William 提到的不是單純的程式碼 bug，而是**系統性的使用者體
 在關鍵頁面加入錯誤追蹤：
 
 #### 優先級 P0 - 立即加入
+
 1. **Tours 編輯頁面**
    - 儲存按鈕
    - 狀態轉換按鈕
@@ -123,7 +132,7 @@ import { errorTracker } from '@/lib/monitoring/error-tracker';
 function SaveButton() {
   const { tour, isLoading } = useTour();
   const canEdit = tour?.status === 'proposal';
-  
+
   // 追蹤按鈕狀態
   useEffect(() => {
     errorTracker.trackButton({
@@ -136,7 +145,7 @@ function SaveButton() {
       reason: !canEdit ? `status=${tour?.status}` : undefined,
     });
   }, [tour, canEdit, isLoading]);
-  
+
   async function handleSave() {
     try {
       await saveTour(data);
@@ -153,7 +162,7 @@ function SaveButton() {
       throw error;
     }
   }
-  
+
   return <button disabled={!canEdit || isLoading} onClick={handleSave}>儲存</button>;
 }
 ```
@@ -165,6 +174,7 @@ function SaveButton() {
 #### 收集錯誤日誌
 
 **在瀏覽器 Console 執行**:
+
 ```javascript
 // 查看錯誤報告
 errorTracker.generateReport()
@@ -191,6 +201,7 @@ console.log(errorTracker.export())
 #### 修復問題
 
 根據錯誤日誌，針對性修復：
+
 - 狀態管理問題 → 重構 Zustand store
 - UI 邏輯問題 → 簡化條件判斷
 - RLS 問題 → 調整政策
@@ -201,15 +212,18 @@ console.log(errorTracker.export())
 ## 📊 預期效果
 
 ### 短期（1-2 天）
+
 - 知道哪些頁面最常出錯
 - 知道哪些功能最有問題
 - 有具體的錯誤日誌可以分析
 
 ### 中期（1 週）
+
 - 修復最常見的問題
 - 降低 70-80% 的使用者回報
 
 ### 長期（1 個月）
+
 - 建立完整的錯誤監控機制
 - 新功能上線前先用 Error Tracker 測試
 - 主動發現問題，而不是被動回應
@@ -221,6 +235,7 @@ console.log(errorTracker.export())
 ### William 可以立即做的（5 分鐘）
 
 1. **在瀏覽器 Console 執行**:
+
    ```javascript
    // 檢查是否有錯誤（之前可能已經有了）
    errorTracker.generateReport()
@@ -250,6 +265,7 @@ console.log(errorTracker.export())
 ## 📝 文檔
 
 ### 已建立
+
 1. `src/lib/monitoring/error-tracker.ts` - 錯誤追蹤器（5698 bytes）
 2. `src/lib/monitoring/usage-examples.md` - 使用範例（6638 bytes）
 3. `docs/UX_HEALTH_CHECK.md` - 完整檢查清單（8023 bytes）
@@ -257,6 +273,7 @@ console.log(errorTracker.export())
 5. `reports/ux-issues-solution.md` - 本文件
 
 ### 參考資料
+
 - 資料庫診斷結果：所有約束正常
 - RLS 政策：所有核心表都有
 - FK 覆蓋率：94.9%（32 個核心 FK）

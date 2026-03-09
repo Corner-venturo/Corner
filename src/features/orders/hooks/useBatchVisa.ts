@@ -28,7 +28,11 @@ function calculateFee(visaType: string): number {
   if (visaType.includes('ESTA')) return 1000
   if (visaType.includes(EXPORT_DIALOG_LABELS.VISA_CHILD)) return 1500
   if (visaType.includes(EXPORT_DIALOG_LABELS.VISA_FIRST)) return 800
-  if (visaType.includes(EXPORT_DIALOG_LABELS.VISA_TW_PASS) && visaType.includes(EXPORT_DIALOG_LABELS.VISA_LOST)) return 2900
+  if (
+    visaType.includes(EXPORT_DIALOG_LABELS.VISA_TW_PASS) &&
+    visaType.includes(EXPORT_DIALOG_LABELS.VISA_LOST)
+  )
+    return 2900
   return 1800
 }
 
@@ -57,11 +61,7 @@ export function useBatchVisa() {
   }, [])
 
   const submitBatchVisa = useCallback(
-    async (
-      order: Order,
-      selections: VisaSelection[],
-      membersMap: Map<string, MemberRow>
-    ) => {
+    async (order: Order, selections: VisaSelection[], membersMap: Map<string, MemberRow>) => {
       if (selections.length === 0) {
         toast.warning(L.toast_no_selection)
         return false

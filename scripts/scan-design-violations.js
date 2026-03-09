@@ -8,9 +8,9 @@
  * @see docs/DESIGN_SYSTEM.md
  */
 
-const fs = require('fs');
-const path = require('path');
-const { glob } = require('glob');
+const fs = require('fs')
+const path = require('path')
+const { glob } = require('glob')
 
 // 違規模式定義
 const VIOLATION_RULES = {
@@ -139,12 +139,12 @@ const VIOLATION_RULES = {
       severity: 'warn',
     },
   ],
-};
+}
 
 // 頁面佈局檢查
 async function checkPageLayouts() {
-  const pageFiles = await glob('src/app/**/page.tsx', { cwd: process.cwd() });
-  const violations = [];
+  const pageFiles = await glob('src/app/**/page.tsx', { cwd: process.cwd() })
+  const violations = []
 
   for (const file of pageFiles) {
     // 排除特殊頁面
@@ -155,26 +155,23 @@ async function checkPageLayouts() {
       file.includes('/confirm/') ||
       file.includes('/m/')
     ) {
-      continue;
+      continue
     }
 
-    const content = fs.readFileSync(file, 'utf-8');
+    const content = fs.readFileSync(file, 'utf-8')
 
-    if (
-      !content.includes('StandardPageLayout') &&
-      !content.includes('ListPageLayout')
-    ) {
+    if (!content.includes('StandardPageLayout') && !content.includes('ListPageLayout')) {
       violations.push({
         file,
         line: 1,
         rule: 'prefer-standard-layout',
         message: '頁面應使用 StandardPageLayout 或 ListPageLayout',
         severity: 'warn',
-      });
+      })
     }
   }
 
-  return violations;
+  return violations
 }
 
 // 掃描檔案中的違規
@@ -182,19 +179,19 @@ async function scanFiles() {
   const files = await glob('src/**/*.{tsx,ts}', {
     cwd: process.cwd(),
     ignore: ['**/node_modules/**', '**/*.test.*', '**/*.spec.*'],
-  });
+  })
 
-  const allViolations = [];
+  const allViolations = []
 
   for (const file of files) {
-    const content = fs.readFileSync(file, 'utf-8');
-    const lines = content.split('\n');
+    const content = fs.readFileSync(file, 'utf-8')
+    const lines = content.split('\n')
 
     // 檢查每個規則
     for (const category of Object.keys(VIOLATION_RULES)) {
       for (const rule of VIOLATION_RULES[category]) {
         lines.forEach((line, index) => {
-          const matches = line.matchAll(rule.pattern);
+          const matches = line.matchAll(rule.pattern)
           for (const match of matches) {
             allViolations.push({
               file,
@@ -204,102 +201,109 @@ async function scanFiles() {
               match: match[0],
               message: rule.message,
               severity: rule.severity,
-            });
+            })
           }
-        });
+        })
       }
     }
   }
 
-  return allViolations;
+  return allViolations
 }
 
 // 主函數
 async function main() {
-  console.log('🔍 Venturo Design System Violation Scanner\n');
-  console.log('='.repeat(60));
+  console.log('🔍 Venturo Design System Violation Scanner\n')
+  console.log('='.repeat(60))
 
   // 掃描檔案違規
-  console.log('\n📁 掃描 CSS 類別和字體違規...');
-  console.log('🔲 掃描自訂 Modal/Dialog 實現...');
-  console.log('🔘 掃描按鈕圖標違規...');
-  console.log('🏷️  掃描表單標籤一致性...');
-  const fileViolations = await scanFiles();
+  console.log('\n📁 掃描 CSS 類別和字體違規...')
+  console.log('🔲 掃描自訂 Modal/Dialog 實現...')
+  console.log('🔘 掃描按鈕圖標違規...')
+  console.log('🏷️  掃描表單標籤一致性...')
+  const fileViolations = await scanFiles()
 
   // 檢查頁面佈局
-  console.log('📄 檢查頁面佈局...');
-  const layoutViolations = await checkPageLayouts();
+  console.log('📄 檢查頁面佈局...')
+  const layoutViolations = await checkPageLayouts()
 
   // 合併所有違規
-  const allViolations = [...fileViolations, ...layoutViolations];
+  const allViolations = [...fileViolations, ...layoutViolations]
 
   // 統計
   const stats = {
     error: allViolations.filter(v => v.severity === 'error').length,
     warn: allViolations.filter(v => v.severity === 'warn').length,
     info: allViolations.filter(v => v.severity === 'info').length,
-  };
+  }
 
   // 按檔案分組輸出
-  console.log('\n' + '='.repeat(60));
-  console.log('📊 違規統計\n');
+  console.log('\n' + '='.repeat(60))
+  console.log('📊 違規統計\n')
 
-  console.log(`❌ 錯誤 (Error): ${stats.error}`);
-  console.log(`⚠️  警告 (Warn):  ${stats.warn}`);
-  console.log(`ℹ️  資訊 (Info):  ${stats.info}`);
-  console.log(`📝 總計:         ${allViolations.length}`);
+  console.log(`❌ 錯誤 (Error): ${stats.error}`)
+  console.log(`⚠️  警告 (Warn):  ${stats.warn}`)
+  console.log(`ℹ️  資訊 (Info):  ${stats.info}`)
+  console.log(`📝 總計:         ${allViolations.length}`)
 
   // 按規則分組
-  console.log('\n' + '-'.repeat(60));
-  console.log('📋 按規則分組\n');
+  console.log('\n' + '-'.repeat(60))
+  console.log('📋 按規則分組\n')
 
-  const byRule = {};
+  const byRule = {}
   for (const v of allViolations) {
-    if (!byRule[v.rule]) byRule[v.rule] = [];
-    byRule[v.rule].push(v);
+    if (!byRule[v.rule]) byRule[v.rule] = []
+    byRule[v.rule].push(v)
   }
 
   for (const [rule, violations] of Object.entries(byRule)) {
-    const severity = violations[0].severity;
-    const icon = severity === 'error' ? '❌' : severity === 'warn' ? '⚠️' : 'ℹ️';
-    console.log(`${icon} ${rule}: ${violations.length} 處`);
-    console.log(`   ${violations[0].message}`);
+    const severity = violations[0].severity
+    const icon = severity === 'error' ? '❌' : severity === 'warn' ? '⚠️' : 'ℹ️'
+    console.log(`${icon} ${rule}: ${violations.length} 處`)
+    console.log(`   ${violations[0].message}`)
     if (violations.length <= 5) {
       for (const v of violations) {
-        console.log(`   - ${v.file}:${v.line}`);
+        console.log(`   - ${v.file}:${v.line}`)
       }
     } else {
       for (const v of violations.slice(0, 3)) {
-        console.log(`   - ${v.file}:${v.line}`);
+        console.log(`   - ${v.file}:${v.line}`)
       }
-      console.log(`   ... 還有 ${violations.length - 3} 處`);
+      console.log(`   ... 還有 ${violations.length - 3} 處`)
     }
-    console.log('');
+    console.log('')
   }
 
   // 輸出 JSON 報告
-  const reportPath = 'design-violations-report.json';
-  fs.writeFileSync(reportPath, JSON.stringify({
-    timestamp: new Date().toISOString(),
-    stats,
-    violations: allViolations,
-  }, null, 2));
-  console.log(`\n📄 詳細報告已輸出至: ${reportPath}`);
+  const reportPath = 'design-violations-report.json'
+  fs.writeFileSync(
+    reportPath,
+    JSON.stringify(
+      {
+        timestamp: new Date().toISOString(),
+        stats,
+        violations: allViolations,
+      },
+      null,
+      2
+    )
+  )
+  console.log(`\n📄 詳細報告已輸出至: ${reportPath}`)
 
   // 退出碼
   if (stats.error > 0) {
-    console.log('\n❌ 發現錯誤級別違規，請修復後再提交');
-    process.exit(1);
+    console.log('\n❌ 發現錯誤級別違規，請修復後再提交')
+    process.exit(1)
   } else if (stats.warn > 0) {
-    console.log('\n⚠️ 發現警告級別違規，建議修復');
-    process.exit(0);
+    console.log('\n⚠️ 發現警告級別違規，建議修復')
+    process.exit(0)
   } else {
-    console.log('\n✅ 沒有發現違規！');
-    process.exit(0);
+    console.log('\n✅ 沒有發現違規！')
+    process.exit(0)
   }
 }
 
 main().catch(err => {
-  console.error('掃描發生錯誤:', err);
-  process.exit(1);
-});
+  console.error('掃描發生錯誤:', err)
+  process.exit(1)
+})

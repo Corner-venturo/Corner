@@ -144,9 +144,10 @@ export default function EditConfirmationPage() {
       segments,
       baggage: [],
       importantNotes: [],
-      ...(('airlineContacts' in parsed && parsed.airlineContacts) && {
-        airlineContacts: parsed.airlineContacts,
-      }),
+      ...('airlineContacts' in parsed &&
+        parsed.airlineContacts && {
+          airlineContacts: parsed.airlineContacts,
+        }),
     }
 
     // 更新表單
@@ -204,20 +205,12 @@ export default function EditConfirmationPage() {
       headerActions={
         <div className="flex gap-2">
           {formData.type === 'flight' && (
-            <Button
-              variant="outline"
-              onClick={() => setIsImportDialogOpen(true)}
-              className="gap-2"
-            >
+            <Button variant="outline" onClick={() => setIsImportDialogOpen(true)} className="gap-2">
               <Upload className="h-4 w-4" />
               {LABELS.IMPORT_PNR}
             </Button>
           )}
-          <Button
-            variant="outline"
-            onClick={() => setIsPrintDialogOpen(true)}
-            className="gap-2"
-          >
+          <Button variant="outline" onClick={() => setIsPrintDialogOpen(true)} className="gap-2">
             <Printer className="h-4 w-4" />
             {LABELS.PRINT}
           </Button>
@@ -225,7 +218,11 @@ export default function EditConfirmationPage() {
             <X size={16} />
             {LABELS.CANCEL}
           </Button>
-          <Button onClick={handleSave} disabled={isSaving} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+          <Button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
+          >
             <Save size={16} />
             {isSaving ? LABELS.SAVE : LABELS.UPDATE_CONFIRMATION}
           </Button>

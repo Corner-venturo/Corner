@@ -16,10 +16,7 @@ describe('receipt-core.service', () => {
       orderTotalAmount: number,
       confirmedReceipts: { actual_amount: number | null }[]
     ) {
-      const totalPaid = confirmedReceipts.reduce(
-        (sum, r) => sum + (r.actual_amount || 0),
-        0
-      )
+      const totalPaid = confirmedReceipts.reduce((sum, r) => sum + (r.actual_amount || 0), 0)
       let paymentStatus: 'unpaid' | 'partial' | 'paid' = 'unpaid'
       if (totalPaid >= orderTotalAmount && orderTotalAmount > 0) {
         paymentStatus = 'paid'
@@ -34,10 +31,7 @@ describe('receipt-core.service', () => {
     }
 
     it('should calculate paid status when receipts cover full amount', () => {
-      const result = calcPaymentStatus(10000, [
-        { actual_amount: 5000 },
-        { actual_amount: 5000 },
-      ])
+      const result = calcPaymentStatus(10000, [{ actual_amount: 5000 }, { actual_amount: 5000 }])
       expect(result.totalPaid).toBe(10000)
       expect(result.paymentStatus).toBe('paid')
       expect(result.remainingAmount).toBe(0)
@@ -73,10 +67,7 @@ describe('receipt-core.service', () => {
     // === 新增邊界測試 ===
 
     it('超額收款處理：paid_amount > total_amount，remaining_amount = 0', () => {
-      const result = calcPaymentStatus(10000, [
-        { actual_amount: 8000 },
-        { actual_amount: 5000 },
-      ])
+      const result = calcPaymentStatus(10000, [{ actual_amount: 8000 }, { actual_amount: 5000 }])
       expect(result.totalPaid).toBe(13000)
       expect(result.paymentStatus).toBe('paid')
       expect(result.remainingAmount).toBe(0) // Math.max(0, 10000-13000) = 0
@@ -127,10 +118,7 @@ describe('receipt-core.service', () => {
     })
 
     it('所有收款都是 null', () => {
-      const result = calcPaymentStatus(10000, [
-        { actual_amount: null },
-        { actual_amount: null },
-      ])
+      const result = calcPaymentStatus(10000, [{ actual_amount: null }, { actual_amount: null }])
       expect(result.totalPaid).toBe(0)
       expect(result.paymentStatus).toBe('unpaid')
     })
@@ -143,9 +131,7 @@ describe('receipt-core.service', () => {
     })
 
     it('極大金額收款', () => {
-      const result = calcPaymentStatus(999999999, [
-        { actual_amount: 999999999 },
-      ])
+      const result = calcPaymentStatus(999999999, [{ actual_amount: 999999999 }])
       expect(result.paymentStatus).toBe('paid')
       expect(result.remainingAmount).toBe(0)
     })
@@ -171,10 +157,7 @@ describe('receipt-core.service', () => {
 
     it('should handle empty receipts for revenue calculation', () => {
       const receiptsData: { actual_amount: number }[] = []
-      const totalRevenue = receiptsData.reduce(
-        (sum, r) => sum + (r.actual_amount || 0),
-        0
-      )
+      const totalRevenue = receiptsData.reduce((sum, r) => sum + (r.actual_amount || 0), 0)
       expect(totalRevenue).toBe(0)
     })
 
@@ -197,10 +180,7 @@ describe('receipt-core.service', () => {
         { actual_amount: 15000 },
         { actual_amount: 5000 },
       ]
-      const totalRevenue = receipts.reduce(
-        (sum, r) => sum + (r.actual_amount || 0),
-        0
-      )
+      const totalRevenue = receipts.reduce((sum, r) => sum + (r.actual_amount || 0), 0)
       expect(totalRevenue).toBe(50000)
     })
   })

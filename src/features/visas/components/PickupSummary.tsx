@@ -33,7 +33,8 @@ export function PickupSummary({
       {/* 待取件簽證提示 */}
       <div className="bg-status-info-bg border border-status-info/30 rounded-lg p-3">
         <p className="text-sm text-morandi-primary">
-          {L.pending_prefix} <span className="font-semibold">{pendingVisasCount}</span> {L.pending_suffix}
+          {L.pending_prefix} <span className="font-semibold">{pendingVisasCount}</span>{' '}
+          {L.pending_suffix}
         </p>
       </div>
     </div>

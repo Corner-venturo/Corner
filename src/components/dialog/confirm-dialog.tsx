@@ -4,7 +4,6 @@
  * 用於刪除、警告、確認等操作
  */
 
-
 import React from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -105,7 +104,13 @@ export function ConfirmDialog({
         </div>
 
         <div className="flex justify-end gap-2 pt-2">
-          <Button type="button" variant="outline" onClick={handleCancel} disabled={loading} className="gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleCancel}
+            disabled={loading}
+            className="gap-2"
+          >
             <X size={16} />
             {cancelLabel}
           </Button>

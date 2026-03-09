@@ -3,7 +3,6 @@
  * 薪資管理頁面
  */
 
-
 import React, { useState, useEffect, useRef } from 'react'
 import {
   DollarSign,
@@ -21,7 +20,13 @@ import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, type Column } from '@/components/ui/enhanced-table'
 import { CurrencyCell, ActionCell, StatusCell } from '@/components/table-cells'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DIALOG_SIZES } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DIALOG_SIZES,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
@@ -79,7 +84,10 @@ export function PayrollManagementPage() {
       width: '150px',
       render: (_, row) => (
         <span className="font-medium text-morandi-primary">
-          {row.year}{L.year_suffix}{row.month}{L.month_suffix}
+          {row.year}
+          {L.year_suffix}
+          {row.month}
+          {L.month_suffix}
         </span>
       ),
     },
@@ -248,10 +256,10 @@ export function PayrollManagementPage() {
   }
 
   const handleCalculate = async (period: PayrollPeriod) => {
-    const confirmed = await confirm(
-      L.confirm_calculate_message(period.year, period.month),
-      { title: L.confirm_calculate_title, type: 'warning' }
-    )
+    const confirmed = await confirm(L.confirm_calculate_message(period.year, period.month), {
+      title: L.confirm_calculate_title,
+      type: 'warning',
+    })
     if (!confirmed) return
 
     const success = await calculatePayroll(period.id)
@@ -262,10 +270,10 @@ export function PayrollManagementPage() {
   }
 
   const handleConfirm = async (period: PayrollPeriod) => {
-    const confirmed = await confirm(
-      L.confirm_confirm_message(period.year, period.month),
-      { title: L.confirm_confirm_title, type: 'warning' }
-    )
+    const confirmed = await confirm(L.confirm_confirm_message(period.year, period.month), {
+      title: L.confirm_confirm_title,
+      type: 'warning',
+    })
     if (!confirmed) return
 
     const success = await confirmPeriod(period.id)
@@ -275,10 +283,10 @@ export function PayrollManagementPage() {
   }
 
   const handleMarkPaid = async (period: PayrollPeriod) => {
-    const confirmed = await confirm(
-      L.confirm_paid_message(period.year, period.month),
-      { title: L.confirm_paid_title, type: 'info' }
-    )
+    const confirmed = await confirm(L.confirm_paid_message(period.year, period.month), {
+      title: L.confirm_paid_title,
+      type: 'info',
+    })
     if (!confirmed) return
 
     const success = await markAsPaid(period.id)
@@ -314,7 +322,6 @@ export function PayrollManagementPage() {
         </Button>
       }
     >
-
       {/* 年度篩選 */}
       <div className="p-4 bg-card border-b border-border">
         <div className="flex items-center gap-4">
@@ -322,11 +329,13 @@ export function PayrollManagementPage() {
             <Calendar size={16} className="text-morandi-secondary" />
             <select
               value={selectedYear}
-              onChange={(e) => setSelectedYear(Number(e.target.value))}
+              onChange={e => setSelectedYear(Number(e.target.value))}
               className="px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-morandi-gold"
             >
               {Array.from({ length: 5 }, (_, i) => currentYear - 2 + i).map(year => (
-                <option key={year} value={year}>{year} {L.year_suffix}</option>
+                <option key={year} value={year}>
+                  {year} {L.year_suffix}
+                </option>
               ))}
             </select>
           </div>
@@ -335,11 +344,7 @@ export function PayrollManagementPage() {
 
       {/* 表格 */}
       <div className="flex-1 overflow-auto p-4">
-        <EnhancedTable
-          data={periods}
-          columns={periodColumns}
-          loading={loading}
-        />
+        <EnhancedTable data={periods} columns={periodColumns} loading={loading} />
 
         {periods.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -368,11 +373,13 @@ export function PayrollManagementPage() {
                 <Label required>{L.label_year}</Label>
                 <select
                   value={formYear}
-                  onChange={(e) => setFormYear(Number(e.target.value))}
+                  onChange={e => setFormYear(Number(e.target.value))}
                   className="w-full mt-1 px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-morandi-gold"
                 >
                   {Array.from({ length: 5 }, (_, i) => currentYear - 2 + i).map(year => (
-                    <option key={year} value={year}>{year}</option>
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -380,21 +387,20 @@ export function PayrollManagementPage() {
                 <Label required>{L.label_month}</Label>
                 <select
                   value={formMonth}
-                  onChange={(e) => setFormMonth(Number(e.target.value))}
+                  onChange={e => setFormMonth(Number(e.target.value))}
                   className="w-full mt-1 px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-morandi-gold"
                 >
                   {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
-                    <option key={month} value={month}>{month} {L.month_suffix}</option>
+                    <option key={month} value={month}>
+                      {month} {L.month_suffix}
+                    </option>
                   ))}
                 </select>
               </div>
             </div>
 
             <div className="flex justify-end gap-2 pt-4 border-t border-border">
-              <Button
-                variant="outline"
-                onClick={() => setShowCreateDialog(false)}
-              >
+              <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
                 <X size={16} className="mr-2" />
                 {L.btn_cancel}
               </Button>
@@ -416,7 +422,9 @@ export function PayrollManagementPage() {
         <DialogContent level={1} className={DIALOG_SIZES['2xl']}>
           <DialogHeader>
             <DialogTitle>
-              {selectedPeriod ? L.records_dialog_title(selectedPeriod.year, selectedPeriod.month) : L.records_dialog_title_default}
+              {selectedPeriod
+                ? L.records_dialog_title(selectedPeriod.year, selectedPeriod.month)
+                : L.records_dialog_title_default}
             </DialogTitle>
           </DialogHeader>
           <div className="py-4">
@@ -457,17 +465,11 @@ export function PayrollManagementPage() {
 
             {/* 表格 */}
             <div className="max-h-[400px] overflow-auto">
-              <EnhancedTable
-                data={records}
-                columns={recordColumns}
-                loading={loading}
-              />
+              <EnhancedTable data={records} columns={recordColumns} loading={loading} />
             </div>
 
             {records.length === 0 && !loading && (
-              <div className="text-center py-8 text-morandi-secondary">
-                {L.empty_records}
-              </div>
+              <div className="text-center py-8 text-morandi-secondary">{L.empty_records}</div>
             )}
           </div>
         </DialogContent>
@@ -528,12 +530,23 @@ function PayslipContent({ record, period }: { record: PayrollRecord; period: Pay
       <div ref={printRef}>
         <div className="text-center mb-4">
           <h2 className="text-xl font-bold">{L.payslip_title}</h2>
-          <p className="text-morandi-secondary">{period.year}{L.year_suffix}{period.month}{L.month_suffix}</p>
+          <p className="text-morandi-secondary">
+            {period.year}
+            {L.year_suffix}
+            {period.month}
+            {L.month_suffix}
+          </p>
         </div>
 
         <div className="mb-4 p-3 bg-morandi-container/30 rounded-lg">
-          <p><strong>{L.payslip_employee_name}</strong>{record.employee_name}</p>
-          <p><strong>{L.payslip_period}</strong>{period.start_date} ~ {period.end_date}</p>
+          <p>
+            <strong>{L.payslip_employee_name}</strong>
+            {record.employee_name}
+          </p>
+          <p>
+            <strong>{L.payslip_period}</strong>
+            {period.start_date} ~ {period.end_date}
+          </p>
         </div>
 
         <table className="w-full border-collapse">
@@ -546,39 +559,63 @@ function PayslipContent({ record, period }: { record: PayrollRecord; period: Pay
           <tbody>
             <tr>
               <td className="border border-border p-2">{L.payslip_base_salary}</td>
-              <td className="border border-border p-2 text-right">{record.base_salary.toLocaleString()}</td>
+              <td className="border border-border p-2 text-right">
+                {record.base_salary.toLocaleString()}
+              </td>
             </tr>
             <tr>
-              <td className="border border-border p-2">{L.payslip_overtime(record.overtime_hours.toFixed(1))}</td>
-              <td className="border border-border p-2 text-right">{record.overtime_pay.toLocaleString()}</td>
+              <td className="border border-border p-2">
+                {L.payslip_overtime(record.overtime_hours.toFixed(1))}
+              </td>
+              <td className="border border-border p-2 text-right">
+                {record.overtime_pay.toLocaleString()}
+              </td>
             </tr>
             <tr>
               <td className="border border-border p-2">{L.payslip_bonus}</td>
-              <td className="border border-border p-2 text-right">{record.bonus.toLocaleString()}</td>
+              <td className="border border-border p-2 text-right">
+                {record.bonus.toLocaleString()}
+              </td>
             </tr>
             <tr>
               <td className="border border-border p-2">{L.payslip_allowances}</td>
-              <td className="border border-border p-2 text-right">{record.allowances.toLocaleString()}</td>
+              <td className="border border-border p-2 text-right">
+                {record.allowances.toLocaleString()}
+              </td>
             </tr>
             <tr>
               <td className="border border-border p-2">{L.payslip_other_additions}</td>
-              <td className="border border-border p-2 text-right">{record.other_additions.toLocaleString()}</td>
+              <td className="border border-border p-2 text-right">
+                {record.other_additions.toLocaleString()}
+              </td>
             </tr>
             <tr className="bg-morandi-container/20">
               <td className="border border-border p-2 font-medium">{L.payslip_gross}</td>
-              <td className="border border-border p-2 text-right font-medium">{record.gross_salary.toLocaleString()}</td>
+              <td className="border border-border p-2 text-right font-medium">
+                {record.gross_salary.toLocaleString()}
+              </td>
             </tr>
             <tr>
-              <td className="border border-border p-2 text-morandi-red">{L.payslip_unpaid_leave(record.unpaid_leave_days)}</td>
-              <td className="border border-border p-2 text-right text-morandi-red">-{record.unpaid_leave_deduction.toLocaleString()}</td>
+              <td className="border border-border p-2 text-morandi-red">
+                {L.payslip_unpaid_leave(record.unpaid_leave_days)}
+              </td>
+              <td className="border border-border p-2 text-right text-morandi-red">
+                -{record.unpaid_leave_deduction.toLocaleString()}
+              </td>
             </tr>
             <tr>
-              <td className="border border-border p-2 text-morandi-red">{L.payslip_other_deductions}</td>
-              <td className="border border-border p-2 text-right text-morandi-red">-{record.other_deductions.toLocaleString()}</td>
+              <td className="border border-border p-2 text-morandi-red">
+                {L.payslip_other_deductions}
+              </td>
+              <td className="border border-border p-2 text-right text-morandi-red">
+                -{record.other_deductions.toLocaleString()}
+              </td>
             </tr>
             <tr className="bg-morandi-gold/10">
               <td className="border border-border p-2 font-bold text-lg">{L.payslip_net}</td>
-              <td className="border border-border p-2 text-right font-bold text-lg text-morandi-green">{record.net_salary.toLocaleString()}</td>
+              <td className="border border-border p-2 text-right font-bold text-lg text-morandi-green">
+                {record.net_salary.toLocaleString()}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -602,4 +639,3 @@ function PayslipContent({ record, period }: { record: PayrollRecord; period: Pay
     </div>
   )
 }
-

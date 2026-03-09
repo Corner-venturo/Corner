@@ -55,7 +55,6 @@ export async function GET(request: NextRequest) {
       message: 'Ticket status check completed',
       ...result.data,
     })
-
   } catch (error) {
     logger.error('開票狀態檢查 Cron 錯誤:', error)
 

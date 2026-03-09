@@ -123,7 +123,11 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
   if (hasNoContent) {
     return (
       <div className="flex-1 flex items-center justify-center bg-card">
-        <EmptyState channelName={channelName} channelType={channelType} currentUserId={currentUserId} />
+        <EmptyState
+          channelName={channelName}
+          channelType={channelType}
+          currentUserId={currentUserId}
+        />
       </div>
     )
   }
@@ -159,7 +163,9 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
                   <AdvanceListCard
                     key={item.data.id}
                     advanceList={item.data}
-                    userName={item.data.author?.display_name || getEmployeeName(item.data.created_by)}
+                    userName={
+                      item.data.author?.display_name || getEmployeeName(item.data.created_by)
+                    }
                     currentUserId={currentUserId || ''}
                     userRole="admin"
                     onCreatePayment={onCreatePayment || (() => {})}
@@ -171,7 +177,9 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
                   <OrderListCard
                     key={item.data.id}
                     orderList={item.data}
-                    userName={item.data.author?.display_name || getEmployeeName(item.data.created_by)}
+                    userName={
+                      item.data.author?.display_name || getEmployeeName(item.data.created_by)
+                    }
                     currentUserId={currentUserId || ''}
                     userRole="admin"
                     onCreateReceipt={onCreateReceipt || (() => {})}

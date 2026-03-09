@@ -17,7 +17,10 @@ import { formatDateChineseWithWeekday, formatDate } from '@/lib/utils/format-dat
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Search, Loader2, Plane, Clock, MapPin } from 'lucide-react'
-import { searchAirportDeparturesAction, AirportFlightItem } from '@/features/dashboard/actions/flight-actions'
+import {
+  searchAirportDeparturesAction,
+  AirportFlightItem,
+} from '@/features/dashboard/actions/flight-actions'
 import { alert } from '@/lib/ui/alert-dialog'
 import { cn } from '@/lib/utils'
 import { COMP_EDITOR_LABELS } from '../../constants/labels'
@@ -25,9 +28,9 @@ import { COMP_EDITOR_LABELS } from '../../constants/labels'
 interface FlightRouteSearchDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  defaultOrigin?: string      // 預設出發機場 (如 TPE)
+  defaultOrigin?: string // 預設出發機場 (如 TPE)
   defaultDestination?: string // 預設目的地 (如 DAD)
-  defaultDate?: string        // 預設日期 YYYY-MM-DD
+  defaultDate?: string // 預設日期 YYYY-MM-DD
   onSelectFlight: (flight: {
     flightNumber: string
     airline: string
@@ -117,17 +120,20 @@ export function FlightRouteSearchDialog({
   }, [origin, destination, searchDate])
 
   // 選擇航班
-  const handleSelectFlight = useCallback((flight: AirportFlightItem) => {
-    onSelectFlight({
-      flightNumber: flight.flightNumber,
-      airline: flight.airline,
-      departureAirport: origin.toUpperCase(),
-      arrivalAirport: flight.destinationIata,
-      departureTime: flight.scheduledTime,
-      arrivalTime: '', // API 沒有提供抵達時間，需要另外查詢
-    })
-    onOpenChange(false)
-  }, [origin, onSelectFlight, onOpenChange])
+  const handleSelectFlight = useCallback(
+    (flight: AirportFlightItem) => {
+      onSelectFlight({
+        flightNumber: flight.flightNumber,
+        airline: flight.airline,
+        departureAirport: origin.toUpperCase(),
+        arrivalAirport: flight.destinationIata,
+        departureTime: flight.scheduledTime,
+        arrivalTime: '', // API 沒有提供抵達時間，需要另外查詢
+      })
+      onOpenChange(false)
+    },
+    [origin, onSelectFlight, onOpenChange]
+  )
 
   // 格式化日期顯示
   const formatDateDisplay = (dateStr: string) => {
@@ -192,11 +198,7 @@ export function FlightRouteSearchDialog({
                   disabled={loading || !origin}
                   className="w-full h-9 bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1"
                 >
-                  {loading ? (
-                    <Loader2 size={14} className="animate-spin" />
-                  ) : (
-                    <Search size={14} />
-                  )}
+                  {loading ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
                   查詢
                 </Button>
               </div>
@@ -209,9 +211,7 @@ export function FlightRouteSearchDialog({
                   查詢 {origin} → {destination} 的直飛航班
                 </div>
               )}
-              <div className="text-status-warning">
-                ⚠️ 航班 API 只能查詢 14 天內的航班
-              </div>
+              <div className="text-status-warning">⚠️ 航班 API 只能查詢 14 天內的航班</div>
             </div>
           </div>
 
@@ -221,9 +221,7 @@ export function FlightRouteSearchDialog({
               <Clock size={14} />
               {formatDateDisplay(searchDate)} 的航班
               {flights.length > 0 && (
-                <span className="text-morandi-gold font-medium">
-                  （共 {flights.length} 班）
-                </span>
+                <span className="text-morandi-gold font-medium">（共 {flights.length} 班）</span>
               )}
             </div>
           )}
@@ -233,7 +231,9 @@ export function FlightRouteSearchDialog({
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-6 h-6 animate-spin text-morandi-gold" />
-                <span className="ml-2 text-morandi-secondary">{COMP_EDITOR_LABELS.QUERYING_974}</span>
+                <span className="ml-2 text-morandi-secondary">
+                  {COMP_EDITOR_LABELS.QUERYING_974}
+                </span>
               </div>
             ) : searched && flights.length === 0 ? (
               <div className="text-center py-12 text-morandi-secondary">
@@ -263,9 +263,7 @@ export function FlightRouteSearchDialog({
                           </span>
                         </div>
                         {/* 航空公司 */}
-                        <span className="text-sm text-morandi-primary">
-                          {flight.airline}
-                        </span>
+                        <span className="text-sm text-morandi-primary">{flight.airline}</span>
                       </div>
                       {/* 時間 */}
                       <div className="text-right">
@@ -283,27 +281,32 @@ export function FlightRouteSearchDialog({
                       <div className="flex items-center gap-1">
                         <MapPin size={10} />
                         {origin} → {flight.destinationIata}
-                        <span className="ml-1 text-morandi-secondary">
-                          ({flight.destination})
-                        </span>
+                        <span className="ml-1 text-morandi-secondary">({flight.destination})</span>
                       </div>
                       <div className="flex items-center gap-2">
                         {flight.terminal && (
-                          <span>{COMP_EDITOR_LABELS.LABEL_3761} {flight.terminal}</span>
+                          <span>
+                            {COMP_EDITOR_LABELS.LABEL_3761} {flight.terminal}
+                          </span>
                         )}
                         {flight.gate && (
-                          <span>{COMP_EDITOR_LABELS.LABEL_785} {flight.gate}</span>
+                          <span>
+                            {COMP_EDITOR_LABELS.LABEL_785} {flight.gate}
+                          </span>
                         )}
-                        <span className={cn(
-                          'px-1.5 py-0.5 rounded text-[10px]',
-                          flight.status === COMP_EDITOR_LABELS.預計 || flight.status === COMP_EDITOR_LABELS.準時
-                            ? 'bg-status-success-bg text-status-success'
-                            : flight.status === COMP_EDITOR_LABELS.延誤
-                            ? 'bg-status-warning-bg text-status-warning'
-                            : flight.status === COMP_EDITOR_LABELS.已取消
-                            ? 'bg-status-danger-bg text-status-danger'
-                            : 'bg-morandi-container text-morandi-primary'
-                        )}>
+                        <span
+                          className={cn(
+                            'px-1.5 py-0.5 rounded text-[10px]',
+                            flight.status === COMP_EDITOR_LABELS.預計 ||
+                              flight.status === COMP_EDITOR_LABELS.準時
+                              ? 'bg-status-success-bg text-status-success'
+                              : flight.status === COMP_EDITOR_LABELS.延誤
+                                ? 'bg-status-warning-bg text-status-warning'
+                                : flight.status === COMP_EDITOR_LABELS.已取消
+                                  ? 'bg-status-danger-bg text-status-danger'
+                                  : 'bg-morandi-container text-morandi-primary'
+                          )}
+                        >
                           {flight.status}
                         </span>
                       </div>

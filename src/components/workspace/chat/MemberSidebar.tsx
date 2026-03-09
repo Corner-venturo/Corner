@@ -23,7 +23,11 @@ interface MemberSidebarProps {
 
 export function MemberSidebar({ isOpen }: MemberSidebarProps) {
   const { selectedChannel, currentWorkspace } = useWorkspaceChannels()
-  const { items: channelMembers, fetchAll: fetchChannelMembers, create: addMember } = useChannelMemberStore()
+  const {
+    items: channelMembers,
+    fetchAll: fetchChannelMembers,
+    create: addMember,
+  } = useChannelMemberStore()
   const { items: employees } = useEmployees()
   const { user } = useAuthStore()
   const [showAddMemberDialog, setShowAddMemberDialog] = useState(false)
@@ -51,12 +55,14 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
           employeeId: member.employee_id,
           role: member.role,
           status: member.status,
-          profile: employee ? {
-            displayName: employee.display_name,
-            englishName: employee.english_name,
-            email: employee.personal_info?.email,
-            status: employee.status,
-          } : null,
+          profile: employee
+            ? {
+                displayName: employee.display_name,
+                englishName: employee.english_name,
+                email: employee.personal_info?.email,
+                status: employee.status,
+              }
+            : null,
         }
       })
   }, [channelMembers, employees, selectedChannel?.id])
@@ -182,9 +188,13 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-morandi-primary truncate">
-                    {member.profile?.displayName || member.profile?.englishName || COMP_WORKSPACE_LABELS.未知成員}
+                    {member.profile?.displayName ||
+                      member.profile?.englishName ||
+                      COMP_WORKSPACE_LABELS.未知成員}
                   </p>
-                  <p className="text-xs text-morandi-secondary truncate">{member.role || COMP_WORKSPACE_LABELS.成員}</p>
+                  <p className="text-xs text-morandi-secondary truncate">
+                    {member.role || COMP_WORKSPACE_LABELS.成員}
+                  </p>
                 </div>
               </div>
             ))}
@@ -196,7 +206,9 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
       <Dialog open={showAddMemberDialog} onOpenChange={setShowAddMemberDialog}>
         <DialogContent level={1} className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-morandi-primary">{COMP_WORKSPACE_LABELS.ADD_6814}</DialogTitle>
+            <DialogTitle className="text-morandi-primary">
+              {COMP_WORKSPACE_LABELS.ADD_6814}
+            </DialogTitle>
           </DialogHeader>
 
           {/* 搜尋框 */}

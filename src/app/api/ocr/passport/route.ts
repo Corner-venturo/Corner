@@ -4,7 +4,11 @@ import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { callOcrSpace, callGoogleVision, type GoogleVisionResult } from './ocr-clients'
-import { getGoogleVisionKeys, checkGoogleVisionUsage, updateGoogleVisionUsage } from './google-vision-usage'
+import {
+  getGoogleVisionKeys,
+  checkGoogleVisionUsage,
+  updateGoogleVisionUsage,
+} from './google-vision-usage'
 import { parsePassportText } from './passport-parser'
 
 /**
@@ -68,21 +72,21 @@ export async function POST(request: NextRequest) {
     }
 
     // 檢查 Google Vision 使用量並取得可用的 Key
-    const { canUseGoogleVision, availableKey, currentUsage, totalLimit, warning } = await checkGoogleVisionUsage(
-      base64Images.length,
-      googleVisionKeys
-    )
+    const { canUseGoogleVision, availableKey, currentUsage, totalLimit, warning } =
+      await checkGoogleVisionUsage(base64Images.length, googleVisionKeys)
 
     // 批次辨識所有護照
     let googleVisionError: string | null = null
 
     const results = await Promise.all(
-      base64Images.map(async (img) => {
+      base64Images.map(async img => {
         try {
           const noVision: GoogleVisionResult = { text: '', error: undefined }
           const [ocrSpaceResult, gvResult] = await Promise.all([
             ocrSpaceKey ? callOcrSpace(img.data, ocrSpaceKey) : Promise.resolve(''),
-            (availableKey && canUseGoogleVision) ? callGoogleVision(img.data, availableKey) : Promise.resolve(noVision),
+            availableKey && canUseGoogleVision
+              ? callGoogleVision(img.data, availableKey)
+              : Promise.resolve(noVision),
           ])
 
           // 記錄 Google Vision 錯誤（只記一次）

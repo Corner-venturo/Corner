@@ -14,7 +14,13 @@ import {
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { DateCell } from '@/components/table-cells'
 import { CUSTOMER_MATCH_LABELS as CL, ADD_CUSTOMER_FORM_LABELS as FL } from '../constants/labels'
 
@@ -50,7 +56,7 @@ export function CustomerMatchDialog({
   onSkipAll,
 }: CustomerMatchDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onSkipAll()}>
+    <Dialog open={open} onOpenChange={isOpen => !isOpen && onSkipAll()}>
       <DialogContent level={1} className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -63,10 +69,12 @@ export function CustomerMatchDialog({
             )}
           </DialogTitle>
           <DialogDescription>
-            {currentPerson?.matchedCustomers.length ?? 0 > 0
-              ? CL.found_match(currentPerson?.matchedCustomers.length ?? 0, currentPerson?.name ?? '')
-              : CL.new_customer(currentPerson?.name ?? '')
-            }
+            {(currentPerson?.matchedCustomers.length ?? 0 > 0)
+              ? CL.found_match(
+                  currentPerson?.matchedCustomers.length ?? 0,
+                  currentPerson?.name ?? ''
+                )
+              : CL.new_customer(currentPerson?.name ?? '')}
           </DialogDescription>
         </DialogHeader>
 
@@ -74,7 +82,7 @@ export function CustomerMatchDialog({
           {/* 有同名客戶時，列出供選擇 */}
           {(currentPerson?.matchedCustomers.length ?? 0) > 0 ? (
             <div className="space-y-3">
-              {currentPerson?.matchedCustomers.map((customer) => (
+              {currentPerson?.matchedCustomers.map(customer => (
                 <div
                   key={customer.id}
                   className="p-4 border border-border rounded-lg hover:border-morandi-gold/50 hover:bg-morandi-container/20 transition-colors cursor-pointer"
@@ -90,7 +98,11 @@ export function CustomerMatchDialog({
                         <div className="text-sm text-morandi-secondary space-x-3">
                           {customer.phone && <span>{customer.phone}</span>}
                           {customer.birth_date && (
-                            <DateCell date={customer.birth_date} showIcon={false} className="inline text-sm text-morandi-secondary" />
+                            <DateCell
+                              date={customer.birth_date}
+                              showIcon={false}
+                              className="inline text-sm text-morandi-secondary"
+                            />
                           )}
                           {customer.national_id && <span>{customer.national_id}</span>}
                         </div>
@@ -99,7 +111,11 @@ export function CustomerMatchDialog({
                         )}
                       </div>
                     </div>
-                    <Button size="sm" variant="outline" className="text-morandi-gold border-morandi-gold/50">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-morandi-gold border-morandi-gold/50"
+                    >
                       {CL.btn_is_this}
                     </Button>
                   </div>
@@ -118,10 +134,16 @@ export function CustomerMatchDialog({
                     </div>
                     <div>
                       <div className="font-medium text-morandi-primary">{CL.not_any}</div>
-                      <div className="text-sm text-morandi-secondary">{CL.create_new(currentPerson?.name ?? '')}</div>
+                      <div className="text-sm text-morandi-secondary">
+                        {CL.create_new(currentPerson?.name ?? '')}
+                      </div>
                     </div>
                   </div>
-                  <Button size="sm" variant="outline" className="text-morandi-green border-morandi-green/50 gap-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-morandi-green border-morandi-green/50 gap-1"
+                  >
                     <Plus size={16} />
                     {CL.btn_add}
                   </Button>
@@ -137,9 +159,7 @@ export function CustomerMatchDialog({
               <div className="text-lg font-medium text-morandi-primary mb-2">
                 {currentPerson?.name}
               </div>
-              <div className="text-sm text-morandi-secondary mb-4">
-                {CL.new_customer_label}
-              </div>
+              <div className="text-sm text-morandi-secondary mb-4">{CL.new_customer_label}</div>
             </div>
           )}
         </div>
@@ -196,16 +216,14 @@ export function AddCustomerFormDialog({
   onBack,
 }: AddCustomerFormDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onBack()}>
+    <Dialog open={open} onOpenChange={isOpen => !isOpen && onBack()}>
       <DialogContent level={1} className="sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <UserPlus className="h-5 w-5 text-morandi-gold" />
             {FL.title}
           </DialogTitle>
-          <DialogDescription>
-            {FL.desc(customerName)}
-          </DialogDescription>
+          <DialogDescription>{FL.desc(customerName)}</DialogDescription>
         </DialogHeader>
 
         <div className="py-4 grid grid-cols-2 gap-6 max-h-[65vh] overflow-y-auto">
@@ -217,7 +235,7 @@ export function AddCustomerFormDialog({
                 <Label className="text-xs">{FL.label_name}</Label>
                 <Input
                   value={formData.name}
-                  onChange={(e) => onUpdateField('name', e.target.value)}
+                  onChange={e => onUpdateField('name', e.target.value)}
                   className="bg-morandi-container/30 h-9"
                 />
               </div>
@@ -225,7 +243,7 @@ export function AddCustomerFormDialog({
                 <Label className="text-xs">{FL.label_phone}</Label>
                 <Input
                   value={formData.phone}
-                  onChange={(e) => onUpdateField('phone', e.target.value)}
+                  onChange={e => onUpdateField('phone', e.target.value)}
                   placeholder={FL.placeholder_optional}
                   className="h-9"
                 />
@@ -238,7 +256,7 @@ export function AddCustomerFormDialog({
                 <Input
                   type="email"
                   value={formData.email}
-                  onChange={(e) => onUpdateField('email', e.target.value)}
+                  onChange={e => onUpdateField('email', e.target.value)}
                   placeholder={FL.placeholder_optional}
                   className="h-9"
                 />
@@ -247,7 +265,7 @@ export function AddCustomerFormDialog({
                 <Label className="text-xs">{FL.label_national_id}</Label>
                 <Input
                   value={formData.national_id}
-                  onChange={(e) => onUpdateField('national_id', e.target.value)}
+                  onChange={e => onUpdateField('national_id', e.target.value)}
                   placeholder={FL.placeholder_optional}
                   className="h-9"
                 />
@@ -262,7 +280,7 @@ export function AddCustomerFormDialog({
                   <Label className="text-xs">{FL.label_passport_number}</Label>
                   <Input
                     value={formData.passport_number}
-                    onChange={(e) => onUpdateField('passport_number', e.target.value)}
+                    onChange={e => onUpdateField('passport_number', e.target.value)}
                     placeholder={FL.placeholder_optional}
                     className="h-9"
                   />
@@ -271,7 +289,7 @@ export function AddCustomerFormDialog({
                   <Label className="text-xs">{FL.label_passport_name}</Label>
                   <Input
                     value={formData.passport_name}
-                    onChange={(e) => onUpdateField('passport_name', e.target.value.toUpperCase())}
+                    onChange={e => onUpdateField('passport_name', e.target.value.toUpperCase())}
                     placeholder="WANG/XIAOMING"
                     className="h-9"
                   />
@@ -282,7 +300,7 @@ export function AddCustomerFormDialog({
                   <Label className="text-xs">{FL.label_passport_expiry}</Label>
                   <DatePicker
                     value={formData.passport_expiry}
-                    onChange={(date) => onUpdateField('passport_expiry', date)}
+                    onChange={date => onUpdateField('passport_expiry', date)}
                     className="h-9"
                     placeholder={FL.placeholder_date}
                   />
@@ -291,7 +309,7 @@ export function AddCustomerFormDialog({
                   <Label className="text-xs">{FL.label_birth_date}</Label>
                   <DatePicker
                     value={formData.birth_date}
-                    onChange={(date) => onUpdateField('birth_date', date)}
+                    onChange={date => onUpdateField('birth_date', date)}
                     className="h-9"
                     placeholder={FL.placeholder_date}
                   />
@@ -305,7 +323,7 @@ export function AddCustomerFormDialog({
                 <Label className="text-xs">{FL.label_gender}</Label>
                 <Select
                   value={formData.gender}
-                  onValueChange={(value) => onUpdateField('gender', value)}
+                  onValueChange={value => onUpdateField('gender', value)}
                 >
                   <SelectTrigger className="w-full h-9">
                     <SelectValue placeholder={FL.placeholder_optional} />
@@ -320,7 +338,7 @@ export function AddCustomerFormDialog({
                 <Label className="text-xs">{FL.label_notes}</Label>
                 <Input
                   value={formData.notes}
-                  onChange={(e) => onUpdateField('notes', e.target.value)}
+                  onChange={e => onUpdateField('notes', e.target.value)}
                   placeholder={FL.placeholder_optional}
                   className="h-9"
                 />
@@ -338,11 +356,11 @@ export function AddCustomerFormDialog({
                   : 'border-border hover:border-morandi-gold/50 hover:bg-morandi-container/20'
               }`}
               style={{ minHeight: '280px' }}
-              onDragOver={(e) => {
+              onDragOver={e => {
                 e.preventDefault()
                 e.stopPropagation()
               }}
-              onDrop={(e) => {
+              onDrop={e => {
                 e.preventDefault()
                 e.stopPropagation()
                 const file = e.dataTransfer.files?.[0]
@@ -353,7 +371,8 @@ export function AddCustomerFormDialog({
             >
               {formData.passport_image_url ? (
                 <>
-                  <img src={formData.passport_image_url}
+                  <img
+                    src={formData.passport_image_url}
                     alt={FL.alt_passport_scan}
                     className="w-full h-full object-contain rounded-lg"
                     style={{ maxHeight: '280px' }}
@@ -375,14 +394,16 @@ export function AddCustomerFormDialog({
                     <>
                       <Upload size={32} className="text-morandi-secondary/50 mb-2" />
                       <span className="text-sm text-morandi-secondary">{FL.upload_hint}</span>
-                      <span className="text-xs text-morandi-secondary/60 mt-1">{FL.upload_formats}</span>
+                      <span className="text-xs text-morandi-secondary/60 mt-1">
+                        {FL.upload_formats}
+                      </span>
                     </>
                   )}
                   <input
                     ref={fileInputRef}
                     type="file"
                     accept="image/*"
-                    onChange={(e) => {
+                    onChange={e => {
                       const file = e.target.files?.[0]
                       if (file) {
                         onUploadImage(file)
@@ -394,18 +415,12 @@ export function AddCustomerFormDialog({
                 </label>
               )}
             </div>
-            <p className="text-xs text-morandi-secondary/60">
-              {FL.upload_note}
-            </p>
+            <p className="text-xs text-morandi-secondary/60">{FL.upload_note}</p>
           </div>
         </div>
 
         <DialogFooter className="gap-2">
-          <Button
-            variant="outline"
-            onClick={onBack}
-            className="gap-2"
-          >
+          <Button variant="outline" onClick={onBack} className="gap-2">
             <X size={16} />
             {FL.btn_cancel}
           </Button>

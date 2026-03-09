@@ -38,7 +38,8 @@ export function useQuickQuoteDetail({ quote, onUpdate }: UseQuickQuoteDetailProp
     handler_name: quote.handler_name || 'William',
     issue_date: quote.issue_date || getTodayString(),
     received_amount: quote.received_amount || 0,
-    expense_description: (quote as typeof quote & { expense_description?: string }).expense_description || '',
+    expense_description:
+      (quote as typeof quote & { expense_description?: string }).expense_description || '',
   })
 
   // 項目管理
@@ -82,7 +83,11 @@ export function useQuickQuoteDetail({ quote, onUpdate }: UseQuickQuoteDetailProp
     setItems(prev => prev.filter(item => item.id !== id))
   }
 
-  const updateItem = <K extends keyof QuickQuoteItem>(id: string, field: K, value: QuickQuoteItem[K]) => {
+  const updateItem = <K extends keyof QuickQuoteItem>(
+    id: string,
+    field: K,
+    value: QuickQuoteItem[K]
+  ) => {
     setItems(prev =>
       prev.map(item => {
         if (item.id === id) {

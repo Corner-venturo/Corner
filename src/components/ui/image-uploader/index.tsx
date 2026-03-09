@@ -114,9 +114,9 @@ export function ImageUploader({
           showPositionEditor={showPositionEditor}
           showDeleteButton={showDeleteButton}
           onPositionChange={onPositionChange}
-          onDragOver={(e) => handleDragOver(e, disabled)}
+          onDragOver={e => handleDragOver(e, disabled)}
           onDragLeave={handleDragLeave}
-          onDrop={(e) => handleDrop(e, disabled)}
+          onDrop={e => handleDrop(e, disabled)}
           onUploadClick={() => handleClick(disabled, uploading)}
           onPositionClick={() => setShowEditor(true)}
           onDelete={handleDelete}
@@ -130,9 +130,9 @@ export function ImageUploader({
           placeholder={placeholder}
           maxSize={maxSize}
           onClick={() => handleClick(disabled, uploading)}
-          onDragOver={(e) => handleDragOver(e, disabled)}
+          onDragOver={e => handleDragOver(e, disabled)}
           onDragLeave={handleDragLeave}
-          onDrop={(e) => handleDrop(e, disabled)}
+          onDrop={e => handleDrop(e, disabled)}
         />
       )}
 
@@ -209,12 +209,10 @@ export function MultiImageUploader({
       const fileExt = file.name.split('.').pop() || 'jpg'
       const fileName = `${filePrefix}_${timestamp}_${randomStr}.${fileExt}`
 
-      const { error: uploadError } = await supabase.storage
-        .from(bucket)
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false,
-        })
+      const { error: uploadError } = await supabase.storage.from(bucket).upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false,
+      })
 
       if (uploadError) throw uploadError
 
@@ -261,11 +259,14 @@ export function MultiImageUploader({
     event.target.value = ''
   }
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (!disabled) setIsDragOver(true)
-  }, [disabled])
+  const handleDragOver = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      if (!disabled) setIsDragOver(true)
+    },
+    [disabled]
+  )
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -273,18 +274,21 @@ export function MultiImageUploader({
     setIsDragOver(false)
   }, [])
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragOver(false)
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      setIsDragOver(false)
 
-    if (disabled) return
+      if (disabled) return
 
-    const files = e.dataTransfer.files
-    if (files.length > 0) {
-      void handleFilesSelect(files)
-    }
-  }, [disabled, value.length, maxCount])
+      const files = e.dataTransfer.files
+      if (files.length > 0) {
+        void handleFilesSelect(files)
+      }
+    },
+    [disabled, value.length, maxCount]
+  )
 
   const handleRemove = async (index: number) => {
     const urlToRemove = value[index]
@@ -329,10 +333,7 @@ export function MultiImageUploader({
               className="relative group rounded-lg overflow-hidden border border-morandi-container"
               style={{ width: previewHeight, height: previewHeight }}
             >
-              <img src={url}
-                alt={`圖片 ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
+              <img src={url} alt={`圖片 ${index + 1}`} className="w-full h-full object-cover" />
               <button
                 type="button"
                 onClick={() => handleRemove(index)}

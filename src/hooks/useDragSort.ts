@@ -97,16 +97,10 @@ export function useDragSort({
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
 
   // 預設所有項目都可拖曳
-  const canDrag = useCallback(
-    (index: number) => (canDragFn ? canDragFn(index) : true),
-    [canDragFn]
-  )
+  const canDrag = useCallback((index: number) => (canDragFn ? canDragFn(index) : true), [canDragFn])
 
   // 預設所有位置都可放置
-  const canDrop = useCallback(
-    (index: number) => (canDropFn ? canDropFn(index) : true),
-    [canDropFn]
-  )
+  const canDrop = useCallback((index: number) => (canDropFn ? canDropFn(index) : true), [canDropFn])
 
   // 拖曳開始
   const onDragStart = useCallback(
@@ -159,15 +153,9 @@ export function useDragSort({
   }, [])
 
   // 狀態檢查函式
-  const isDragging = useCallback(
-    (index: number) => draggedIndex === index,
-    [draggedIndex]
-  )
+  const isDragging = useCallback((index: number) => draggedIndex === index, [draggedIndex])
 
-  const isDragOver = useCallback(
-    (index: number) => dragOverIndex === index,
-    [dragOverIndex]
-  )
+  const isDragOver = useCallback((index: number) => dragOverIndex === index, [dragOverIndex])
 
   return {
     dragState: {

@@ -3,7 +3,6 @@
  * CompanyAssetsDialog - 公司資源對話框
  */
 
-
 import React from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
@@ -51,7 +50,13 @@ export const CompanyAssetsDialog: React.FC<CompanyAssetsDialogProps> = ({
       title={isEditMode ? COMPANY_ASSETS_LABELS.編輯資源 : COMPANY_ASSETS_LABELS.新增資源}
       subtitle={COMPANY_ASSETS_LABELS.管理公司_Logo_合約章_發票章_文件等資源}
       onSubmit={onSubmit}
-      submitLabel={isLoading ? COMPANY_ASSETS_LABELS.儲存中 : isEditMode ? COMPANY_ASSETS_LABELS.更新 : COMPANY_ASSETS_LABELS.新增}
+      submitLabel={
+        isLoading
+          ? COMPANY_ASSETS_LABELS.儲存中
+          : isEditMode
+            ? COMPANY_ASSETS_LABELS.更新
+            : COMPANY_ASSETS_LABELS.新增
+      }
       submitDisabled={!formData.name || (!isEditMode && !formData.file) || isLoading}
       maxWidth="md"
     >

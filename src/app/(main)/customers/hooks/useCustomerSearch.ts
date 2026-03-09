@@ -56,9 +56,7 @@ export function useCustomerSearch(customers: Customer[]) {
     // 護照拼音
     if (searchParams.passport_name) {
       result = result.filter(c =>
-        c.passport_name
-          ?.toLowerCase()
-          .includes(searchParams.passport_name!.toLowerCase())
+        c.passport_name?.toLowerCase().includes(searchParams.passport_name!.toLowerCase())
       )
     }
 

@@ -27,7 +27,15 @@ function getWeekRange(weekOffset = 0): { start: Date; end: Date } {
 function getMonthRange(monthOffset = 0): { start: Date; end: Date } {
   const today = new Date()
   const monthStart = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1)
-  const monthEnd = new Date(today.getFullYear(), today.getMonth() + monthOffset + 1, 0, 23, 59, 59, 999)
+  const monthEnd = new Date(
+    today.getFullYear(),
+    today.getMonth() + monthOffset + 1,
+    0,
+    23,
+    59,
+    59,
+    999
+  )
   return { start: monthStart, end: monthEnd }
 }
 
@@ -80,14 +88,36 @@ export function useStatsData() {
 
     // 本週/本月出團數量
     const toursThisWeek = filterToursByDateRange(normalTours, thisWeek.start, thisWeek.end).length
-    const toursThisMonth = filterToursByDateRange(normalTours, thisMonth.start, thisMonth.end).length
+    const toursThisMonth = filterToursByDateRange(
+      normalTours,
+      thisMonth.start,
+      thisMonth.end
+    ).length
 
     // 本週/下週請款金額
-    const paymentsThisWeek = sumOrderAmountByTourDateRange(orders, normalTours, thisWeek.start, thisWeek.end, 'total_amount')
-    const paymentsNextWeek = sumOrderAmountByTourDateRange(orders, normalTours, nextWeek.start, nextWeek.end, 'total_amount')
+    const paymentsThisWeek = sumOrderAmountByTourDateRange(
+      orders,
+      normalTours,
+      thisWeek.start,
+      thisWeek.end,
+      'total_amount'
+    )
+    const paymentsNextWeek = sumOrderAmountByTourDateRange(
+      orders,
+      normalTours,
+      nextWeek.start,
+      nextWeek.end,
+      'total_amount'
+    )
 
     // 本週甲存金額
-    const depositsThisWeek = sumOrderAmountByTourDateRange(orders, normalTours, thisWeek.start, thisWeek.end, 'paid_amount')
+    const depositsThisWeek = sumOrderAmountByTourDateRange(
+      orders,
+      normalTours,
+      thisWeek.start,
+      thisWeek.end,
+      'paid_amount'
+    )
 
     // 待辦事項數量（未收齊款且 14 天內出發的訂單）
     const tourIdSet = new Set(normalTours.map(t => t.id))
@@ -97,7 +127,9 @@ export function useStatsData() {
       const tour = normalTours.find(t => t.id === order.tour_id)
       if (!tour) return false
       const departureDate = new Date(tour.departure_date)
-      const daysUntilDeparture = Math.ceil((departureDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+      const daysUntilDeparture = Math.ceil(
+        (departureDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+      )
       return daysUntilDeparture <= 14 && daysUntilDeparture >= 0
     }).length
 

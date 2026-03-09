@@ -79,13 +79,17 @@ export function InvoiceForm({
                   <td className="py-1 px-2 border border-border">
                     <Combobox
                       value={selectedTourId}
-                      onChange={(value) => {
+                      onChange={value => {
                         setSelectedTourId(value)
                         setSelectedOrderId('')
                       }}
                       options={tourOptions}
-                      placeholder={toursLoading ? INVOICE_LABELS.LOADING : INVOICE_LABELS.SEARCH_TOUR}
-                      emptyMessage={toursLoading ? INVOICE_LABELS.LOADING : INVOICE_LABELS.TOUR_NOT_FOUND}
+                      placeholder={
+                        toursLoading ? INVOICE_LABELS.LOADING : INVOICE_LABELS.SEARCH_TOUR
+                      }
+                      emptyMessage={
+                        toursLoading ? INVOICE_LABELS.LOADING : INVOICE_LABELS.TOUR_NOT_FOUND
+                      }
                       showSearchIcon={true}
                       showClearButton={true}
                       disabled={toursLoading}
@@ -104,8 +108,16 @@ export function InvoiceForm({
                       value={selectedOrderId}
                       onChange={setSelectedOrderId}
                       options={orderOptions}
-                      placeholder={ordersLoading ? INVOICE_LABELS.LOADING : (selectedTourId || fixedTour ? INVOICE_LABELS.SEARCH_ORDER : INVOICE_LABELS.SELECT_TOUR_FIRST)}
-                      emptyMessage={ordersLoading ? INVOICE_LABELS.LOADING : INVOICE_LABELS.ORDER_NOT_FOUND}
+                      placeholder={
+                        ordersLoading
+                          ? INVOICE_LABELS.LOADING
+                          : selectedTourId || fixedTour
+                            ? INVOICE_LABELS.SEARCH_ORDER
+                            : INVOICE_LABELS.SELECT_TOUR_FIRST
+                      }
+                      emptyMessage={
+                        ordersLoading ? INVOICE_LABELS.LOADING : INVOICE_LABELS.ORDER_NOT_FOUND
+                      }
                       showSearchIcon={true}
                       showClearButton={true}
                       disabled={(!selectedTourId && !fixedTour) || ordersLoading}
@@ -125,7 +137,7 @@ export function InvoiceForm({
             <td className="py-1 px-2 border border-border">
               <DatePicker
                 value={invoiceDate}
-                onChange={(date) => setInvoiceDate(date)}
+                onChange={date => setInvoiceDate(date)}
                 placeholder={INVOICE_LABELS.SELECT_5234}
                 className="input-no-focus [&_button]:border-0 [&_button]:shadow-none [&_button]:bg-transparent"
               />
@@ -138,7 +150,11 @@ export function InvoiceForm({
                 type="text"
                 value={buyerInfo.buyerName}
                 onChange={e => setBuyerInfo({ ...buyerInfo, buyerName: e.target.value })}
-                placeholder={isB2B ? INVOICE_LABELS.COMPANY_NAME_PLACEHOLDER : INVOICE_LABELS.BUYER_NAME_PLACEHOLDER}
+                placeholder={
+                  isB2B
+                    ? INVOICE_LABELS.COMPANY_NAME_PLACEHOLDER
+                    : INVOICE_LABELS.BUYER_NAME_PLACEHOLDER
+                }
                 className="input-no-focus w-full h-9 px-2 bg-transparent text-sm"
               />
             </td>
@@ -225,11 +241,21 @@ export function InvoiceForm({
       <table className="w-full border-collapse border border-border">
         <thead>
           <tr className="text-sm text-morandi-primary font-medium bg-muted/30">
-            <th className="text-left py-2 px-3 border border-border">{INVOICE_LABELS.LABEL_9447}</th>
-            <th className="text-center py-2 px-3 border border-border w-20">{INVOICE_LABELS.QUANTITY}</th>
-            <th className="text-center py-2 px-3 border border-border w-24">{INVOICE_LABELS.LABEL_9413}</th>
-            <th className="text-center py-2 px-3 border border-border w-16">{INVOICE_LABELS.LABEL_9062}</th>
-            <th className="text-right py-2 px-3 border border-border w-24">{INVOICE_LABELS.AMOUNT}</th>
+            <th className="text-left py-2 px-3 border border-border">
+              {INVOICE_LABELS.LABEL_9447}
+            </th>
+            <th className="text-center py-2 px-3 border border-border w-20">
+              {INVOICE_LABELS.QUANTITY}
+            </th>
+            <th className="text-center py-2 px-3 border border-border w-24">
+              {INVOICE_LABELS.LABEL_9413}
+            </th>
+            <th className="text-center py-2 px-3 border border-border w-16">
+              {INVOICE_LABELS.LABEL_9062}
+            </th>
+            <th className="text-right py-2 px-3 border border-border w-24">
+              {INVOICE_LABELS.AMOUNT}
+            </th>
             <th className="border border-border w-10"></th>
           </tr>
         </thead>

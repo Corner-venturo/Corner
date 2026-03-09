@@ -3,7 +3,18 @@
 import { CONTRACT_DIALOG_LABELS } from '../constants/labels'
 
 import React, { useEffect, useState } from 'react'
-import { FileSignature, Save, Printer, X, Plus, ArrowLeft, Edit2, Loader2, Users, Check } from 'lucide-react'
+import {
+  FileSignature,
+  Save,
+  Printer,
+  X,
+  Plus,
+  ArrowLeft,
+  Edit2,
+  Loader2,
+  Users,
+  Check,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DateCell } from '@/components/table-cells'
 import {
@@ -16,7 +27,13 @@ import {
 import { DatePicker } from '@/components/ui/date-picker'
 import { ContractTemplate } from '@/types/tour.types'
 import { ContractDialogProps } from './types'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useContractForm } from './useContractForm'
 import { ContractFormFields } from './ContractFormFields'
 import { COMP_CONTRACTS_LABELS } from '../constants/labels'
@@ -83,9 +100,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
   // 切換旅客選擇
   const toggleMemberSelection = (memberId: string) => {
     setSelectedMemberIds(prev =>
-      prev.includes(memberId)
-        ? prev.filter(id => id !== memberId)
-        : [...prev, memberId]
+      prev.includes(memberId) ? prev.filter(id => id !== memberId) : [...prev, memberId]
     )
   }
 
@@ -144,8 +159,14 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent level={2} className={viewMode === 'form' ? "max-w-4xl max-h-[90vh] overflow-hidden" : "max-w-md h-[500px] flex flex-col overflow-hidden"}>
-
+      <DialogContent
+        level={2}
+        className={
+          viewMode === 'form'
+            ? 'max-w-4xl max-h-[90vh] overflow-hidden'
+            : 'max-w-md h-[500px] flex flex-col overflow-hidden'
+        }
+      >
         {/* ==================== 主視圖 ==================== */}
         {viewMode === 'main' && (
           <>
@@ -163,9 +184,13 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
               <div className="flex-shrink-0 px-4 py-3">
                 <div className="flex items-center gap-2">
                   <FileSignature className="w-4 h-4 text-morandi-primary" />
-                  <span className="text-sm font-medium text-morandi-primary">{CONTRACT_DIALOG_LABELS.CONTRACT}</span>
+                  <span className="text-sm font-medium text-morandi-primary">
+                    {CONTRACT_DIALOG_LABELS.CONTRACT}
+                  </span>
                 </div>
-                <p className="text-xs text-morandi-secondary mt-1">{CONTRACT_DIALOG_LABELS.MANAGE_DESC}</p>
+                <p className="text-xs text-morandi-secondary mt-1">
+                  {CONTRACT_DIALOG_LABELS.MANAGE_DESC}
+                </p>
               </div>
 
               {/* 分割線 */}
@@ -192,14 +217,20 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                         </span>
                         <div className="flex-1 min-w-0">
                           <div className="text-sm text-morandi-primary truncate">
-                            {tour.contract_template && CONTRACT_TEMPLATE_LABELS[tour.contract_template as ContractTemplate]}
+                            {tour.contract_template &&
+                              CONTRACT_TEMPLATE_LABELS[tour.contract_template as ContractTemplate]}
                           </div>
                           <div className="flex items-center gap-3 text-xs text-morandi-secondary mt-0.5">
                             {membersWithContract.length > 0 && (
                               <span>{membersWithContract.length} 位旅客</span>
                             )}
                             {tour.contract_created_at && (
-                              <DateCell date={tour.contract_created_at} format="short" showIcon={false} className="text-xs" />
+                              <DateCell
+                                date={tour.contract_created_at}
+                                format="short"
+                                showIcon={false}
+                                className="text-xs"
+                              />
                             )}
                           </div>
                         </div>
@@ -268,15 +299,21 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                 <div>
                   <div className="flex items-center gap-2">
                     <Users className="w-4 h-4 text-morandi-primary" />
-                    <span className="text-sm font-medium text-morandi-primary">{CONTRACT_DIALOG_LABELS.PASSENGER}</span>
+                    <span className="text-sm font-medium text-morandi-primary">
+                      {CONTRACT_DIALOG_LABELS.PASSENGER}
+                    </span>
                   </div>
-                  <p className="text-xs text-morandi-secondary mt-1">{CONTRACT_DIALOG_LABELS.SELECT_DESC}</p>
+                  <p className="text-xs text-morandi-secondary mt-1">
+                    {CONTRACT_DIALOG_LABELS.SELECT_DESC}
+                  </p>
                 </div>
                 <button
                   onClick={toggleSelectAll}
                   className="text-xs text-morandi-gold hover:underline"
                 >
-                  {selectedMemberIds.length === membersWithoutContract.length ? COMP_CONTRACTS_LABELS.取消全選 : COMP_CONTRACTS_LABELS.全選}
+                  {selectedMemberIds.length === membersWithoutContract.length
+                    ? COMP_CONTRACTS_LABELS.取消全選
+                    : COMP_CONTRACTS_LABELS.全選}
                 </button>
               </div>
 
@@ -288,52 +325,62 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
               {/* 列表內容 */}
               <div className="flex-1 overflow-y-auto p-4">
                 <div className="space-y-3">
-                  {membersByOrder.map(({ order, members }) => (
-                    members.length > 0 && (
-                      <div key={order.id}>
-                        <div className="text-xs text-morandi-secondary mb-2 px-1">
-                          {order.order_number} - {order.contact_person}
-                        </div>
-                        <div className="space-y-1">
-                          {members.map(member => {
-                            const memberData = member as unknown as { chinese_name?: string; passport_name?: string; id_number?: string }
-                            const displayName = memberData.chinese_name || memberData.passport_name || COMP_CONTRACTS_LABELS.未命名
-                            const isSelected = selectedMemberIds.includes(member.id)
+                  {membersByOrder.map(
+                    ({ order, members }) =>
+                      members.length > 0 && (
+                        <div key={order.id}>
+                          <div className="text-xs text-morandi-secondary mb-2 px-1">
+                            {order.order_number} - {order.contact_person}
+                          </div>
+                          <div className="space-y-1">
+                            {members.map(member => {
+                              const memberData = member as unknown as {
+                                chinese_name?: string
+                                passport_name?: string
+                                id_number?: string
+                              }
+                              const displayName =
+                                memberData.chinese_name ||
+                                memberData.passport_name ||
+                                COMP_CONTRACTS_LABELS.未命名
+                              const isSelected = selectedMemberIds.includes(member.id)
 
-                            return (
-                              <button
-                                key={member.id}
-                                onClick={() => toggleMemberSelection(member.id)}
-                                className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-colors text-left ${
-                                  isSelected
-                                    ? 'border-morandi-gold bg-morandi-gold/5'
-                                    : 'border-border/50 hover:border-morandi-gold/50'
-                                }`}
-                              >
-                                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                                  isSelected
-                                    ? 'bg-morandi-gold border-morandi-gold'
-                                    : 'border-border'
-                                }`}>
-                                  {isSelected && <Check size={14} className="text-white" />}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="text-sm text-morandi-primary truncate">
-                                    {displayName}
+                              return (
+                                <button
+                                  key={member.id}
+                                  onClick={() => toggleMemberSelection(member.id)}
+                                  className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-colors text-left ${
+                                    isSelected
+                                      ? 'border-morandi-gold bg-morandi-gold/5'
+                                      : 'border-border/50 hover:border-morandi-gold/50'
+                                  }`}
+                                >
+                                  <div
+                                    className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                                      isSelected
+                                        ? 'bg-morandi-gold border-morandi-gold'
+                                        : 'border-border'
+                                    }`}
+                                  >
+                                    {isSelected && <Check size={14} className="text-white" />}
                                   </div>
-                                  {memberData.id_number && (
-                                    <div className="text-xs text-morandi-secondary">
-                                      {memberData.id_number}
+                                  <div className="flex-1 min-w-0">
+                                    <div className="text-sm text-morandi-primary truncate">
+                                      {displayName}
                                     </div>
-                                  )}
-                                </div>
-                              </button>
-                            )
-                          })}
+                                    {memberData.id_number && (
+                                      <div className="text-xs text-morandi-secondary">
+                                        {memberData.id_number}
+                                      </div>
+                                    )}
+                                  </div>
+                                </button>
+                              )
+                            })}
+                          </div>
                         </div>
-                      </div>
-                    )
-                  ))}
+                      )
+                  )}
                 </div>
               </div>
 
@@ -382,26 +429,38 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                 {/* 旅遊團資訊 */}
                 <div className="border border-border rounded-lg overflow-hidden bg-card">
                   <div className="bg-morandi-container/50 border-b border-border/60 px-4 py-2">
-                    <span className="text-sm font-medium text-morandi-primary">{CONTRACT_DIALOG_LABELS.TOUR_INFO}</span>
+                    <span className="text-sm font-medium text-morandi-primary">
+                      {CONTRACT_DIALOG_LABELS.TOUR_INFO}
+                    </span>
                   </div>
                   <div className="p-4 grid grid-cols-2 gap-3">
                     <div>
-                      <div className="text-xs text-morandi-secondary">{CONTRACT_DIALOG_LABELS.TOUR_CODE}</div>
+                      <div className="text-xs text-morandi-secondary">
+                        {CONTRACT_DIALOG_LABELS.TOUR_CODE}
+                      </div>
                       <div className="text-sm text-morandi-primary font-medium">{tour.code}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-morandi-secondary">{CONTRACT_DIALOG_LABELS.LABEL_4272}</div>
+                      <div className="text-xs text-morandi-secondary">
+                        {CONTRACT_DIALOG_LABELS.LABEL_4272}
+                      </div>
                       <div className="text-sm text-morandi-primary font-medium">{tour.name}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-morandi-secondary">{CONTRACT_DIALOG_LABELS.LABEL_4513}</div>
+                      <div className="text-xs text-morandi-secondary">
+                        {CONTRACT_DIALOG_LABELS.LABEL_4513}
+                      </div>
                       <div className="text-sm text-morandi-primary font-medium">
                         <DateCell date={tour.departure_date} showIcon={false} />
                       </div>
                     </div>
                     <div>
-                      <div className="text-xs text-morandi-secondary">{CONTRACT_DIALOG_LABELS.LABEL_5475}</div>
-                      <div className="text-sm text-morandi-primary font-medium">{tour.location}</div>
+                      <div className="text-xs text-morandi-secondary">
+                        {CONTRACT_DIALOG_LABELS.LABEL_5475}
+                      </div>
+                      <div className="text-sm text-morandi-primary font-medium">
+                        {tour.location}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -430,7 +489,9 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                 {/* 選擇範本 */}
                 {!hasContract && (
                   <div>
-                    <label className="text-sm font-medium text-morandi-primary mb-3 block">{CONTRACT_DIALOG_LABELS.SELECT_4327}</label>
+                    <label className="text-sm font-medium text-morandi-primary mb-3 block">
+                      {CONTRACT_DIALOG_LABELS.SELECT_4327}
+                    </label>
                     <div className="grid grid-cols-3 gap-3">
                       {CONTRACT_TEMPLATES.map(template => (
                         <button
@@ -458,14 +519,17 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                   onFieldChange={handleFieldChange}
                   members={tourMembers.map(m => ({
                     id: m.id,
-                    name: (m as unknown as { chinese_name?: string; passport_name?: string }).chinese_name ||
-                          (m as unknown as { chinese_name?: string; passport_name?: string }).passport_name ||
-                          COMP_CONTRACTS_LABELS.未命名,
+                    name:
+                      (m as unknown as { chinese_name?: string; passport_name?: string })
+                        .chinese_name ||
+                      (m as unknown as { chinese_name?: string; passport_name?: string })
+                        .passport_name ||
+                      COMP_CONTRACTS_LABELS.未命名,
                     idNumber: (m as unknown as { id_number?: string }).id_number || undefined,
                     phone: (m as unknown as { phone?: string }).phone || undefined,
                   }))}
                   selectedMemberIds={selectedMemberIds}
-                  onSelectMembers={(memberIds) => {
+                  onSelectMembers={memberIds => {
                     setSelectedMemberIds(memberIds)
                     if (memberIds.length > 0) {
                       setSelectedMemberId(memberIds[0])
@@ -479,7 +543,9 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
 
                 {/* 備註 */}
                 <div>
-                  <label className="text-sm font-medium text-morandi-primary mb-2 block">{CONTRACT_DIALOG_LABELS.REMARKS}</label>
+                  <label className="text-sm font-medium text-morandi-primary mb-2 block">
+                    {CONTRACT_DIALOG_LABELS.REMARKS}
+                  </label>
                   <textarea
                     value={contractNotes}
                     onChange={e => setContractNotes(e.target.value)}
@@ -498,11 +564,15 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                         onChange={e => setContractCompleted(e.target.checked)}
                         className="w-4 h-4 text-morandi-gold focus:ring-morandi-gold/50 rounded"
                       />
-                      <span className="text-sm text-morandi-primary">{CONTRACT_DIALOG_LABELS.LABEL_7282}</span>
+                      <span className="text-sm text-morandi-primary">
+                        {CONTRACT_DIALOG_LABELS.LABEL_7282}
+                      </span>
                     </label>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-morandi-primary mb-2 block">{CONTRACT_DIALOG_LABELS.LABEL_815}</label>
+                    <label className="text-sm font-medium text-morandi-primary mb-2 block">
+                      {CONTRACT_DIALOG_LABELS.LABEL_815}
+                    </label>
                     <DatePicker
                       value={archivedDate}
                       onChange={date => setArchivedDate(date)}
@@ -515,13 +585,26 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
             </div>
 
             <DialogFooter className="flex-shrink-0 border-t pt-4">
-              <Button variant="outline" onClick={handleBackToMain} disabled={saving} className="gap-2">
+              <Button
+                variant="outline"
+                onClick={handleBackToMain}
+                disabled={saving}
+                className="gap-2"
+              >
                 <X size={16} />
                 {CONTRACT_DIALOG_LABELS.CANCEL}
               </Button>
-              <Button onClick={onSave} disabled={saving || (!hasContract && !selectedTemplate)} className="gap-2">
+              <Button
+                onClick={onSave}
+                disabled={saving || (!hasContract && !selectedTemplate)}
+                className="gap-2"
+              >
                 <Save size={16} />
-                {saving ? COMP_CONTRACTS_LABELS.儲存中 : hasContract ? COMP_CONTRACTS_LABELS.儲存 : COMP_CONTRACTS_LABELS.建立合約}
+                {saving
+                  ? COMP_CONTRACTS_LABELS.儲存中
+                  : hasContract
+                    ? COMP_CONTRACTS_LABELS.儲存
+                    : COMP_CONTRACTS_LABELS.建立合約}
               </Button>
               <Button
                 onClick={handlePrint}

@@ -13,9 +13,9 @@ const CACHE_STORAGE_KEY = `${CACHE_KEY}-${CACHE_VERSION}`
 
 // 快取過期時間（毫秒）
 const CACHE_TTL = {
-  DEFAULT: 5 * 60 * 1000,      // 5 分鐘
-  STATIC: 30 * 60 * 1000,      // 30 分鐘（靜態資料）
-  DYNAMIC: 1 * 60 * 1000,      // 1 分鐘（動態資料）
+  DEFAULT: 5 * 60 * 1000, // 5 分鐘
+  STATIC: 30 * 60 * 1000, // 30 分鐘（靜態資料）
+  DYNAMIC: 1 * 60 * 1000, // 1 分鐘（動態資料）
 }
 
 // ============================================
@@ -40,13 +40,15 @@ interface StoredCache {
 export function localStorageProvider() {
   // 初始化：從 localStorage 讀取快取
   const stored = loadFromStorage()
-  const map = new Map<string, unknown>(Object.entries(stored).map(([key, entry]) => {
-    // 檢查是否過期
-    if (isExpired(entry)) {
-      return [key, undefined]
-    }
-    return [key, entry.data]
-  }))
+  const map = new Map<string, unknown>(
+    Object.entries(stored).map(([key, entry]) => {
+      // 檢查是否過期
+      if (isExpired(entry)) {
+        return [key, undefined]
+      }
+      return [key, entry.data]
+    })
+  )
 
   // 定期清理過期快取
   if (typeof window !== 'undefined') {
@@ -190,7 +192,7 @@ const requestIdleCallback =
 export const CACHE_STRATEGY = {
   // 靜態資料：長時間快取，不需要即時更新
   STATIC: {
-    dedupingInterval: 60 * 1000,      // 60 秒
+    dedupingInterval: 60 * 1000, // 60 秒
     revalidateOnFocus: false,
     revalidateOnReconnect: true,
     errorRetryCount: 3,
@@ -198,7 +200,7 @@ export const CACHE_STRATEGY = {
 
   // 動態資料：短時間快取，需要較頻繁更新
   DYNAMIC: {
-    dedupingInterval: 10 * 1000,      // 10 秒
+    dedupingInterval: 10 * 1000, // 10 秒
     revalidateOnFocus: false,
     revalidateOnReconnect: true,
     errorRetryCount: 3,
@@ -206,7 +208,7 @@ export const CACHE_STRATEGY = {
 
   // 即時資料：最短快取，需要即時更新
   REALTIME: {
-    dedupingInterval: 3 * 1000,       // 3 秒
+    dedupingInterval: 3 * 1000, // 3 秒
     revalidateOnFocus: true,
     revalidateOnReconnect: true,
     errorRetryCount: 2,
@@ -220,14 +222,14 @@ export const CACHE_STRATEGY = {
  */
 export const swrConfig: SWRConfiguration = {
   // 預設設定（較保守）
-  dedupingInterval: 30 * 1000,        // 30 秒內相同請求不重複發送
-  revalidateOnFocus: false,           // 關閉！避免切 tab 時瘋狂請求
-  revalidateOnReconnect: true,        // 網路恢復時重新驗證
-  revalidateIfStale: true,            // 快取過期時重新驗證
+  dedupingInterval: 30 * 1000, // 30 秒內相同請求不重複發送
+  revalidateOnFocus: false, // 關閉！避免切 tab 時瘋狂請求
+  revalidateOnReconnect: true, // 網路恢復時重新驗證
+  revalidateIfStale: true, // 快取過期時重新驗證
 
   // 錯誤處理
-  errorRetryCount: 3,                 // 最多重試 3 次
-  errorRetryInterval: 5000,           // 重試間隔 5 秒
+  errorRetryCount: 3, // 最多重試 3 次
+  errorRetryInterval: 5000, // 重試間隔 5 秒
 
   // 全域錯誤處理
   onError: (error, key) => {

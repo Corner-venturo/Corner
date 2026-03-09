@@ -61,22 +61,23 @@ Venturo 公司
 
 **原則**: 台北看不到台中，台中看不到台北（除非是超級管理員）
 
-| 表格 | 說明 | workspace_id 欄位 | RLS Policy |
-|------|------|------------------|------------|
-| **orders** | 訂單 | ✅ 有 | 完全隔離 |
-| **tours** | 旅遊團 | ✅ 有 | 完全隔離 |
-| **customers** | 客戶 | ✅ 有 | 完全隔離 |
-| **payments** | 付款記錄 | ✅ 有 | 完全隔離 |
-| **payment_requests** | 付款申請 | ✅ 有 | 完全隔離 |
-| **disbursement_orders** | 請款單 | ✅ 有 | 完全隔離 |
-| **receipts** | 收據 | ✅ 有 | 完全隔離 |
-| **quotes** | 報價單 | ✅ 有 | 完全隔離 |
-| **contracts** | 合約 | ✅ 有 | 完全隔離 |
-| **itineraries** | 行程表 | ✅ 有 | 完全隔離 |
-| **visas** | 簽證 | ✅ 有 | 完全隔離 |
-| **vendor_costs** | 供應商成本 | ✅ 有 | 完全隔離 |
+| 表格                    | 說明       | workspace_id 欄位 | RLS Policy |
+| ----------------------- | ---------- | ----------------- | ---------- |
+| **orders**              | 訂單       | ✅ 有             | 完全隔離   |
+| **tours**               | 旅遊團     | ✅ 有             | 完全隔離   |
+| **customers**           | 客戶       | ✅ 有             | 完全隔離   |
+| **payments**            | 付款記錄   | ✅ 有             | 完全隔離   |
+| **payment_requests**    | 付款申請   | ✅ 有             | 完全隔離   |
+| **disbursement_orders** | 請款單     | ✅ 有             | 完全隔離   |
+| **receipts**            | 收據       | ✅ 有             | 完全隔離   |
+| **quotes**              | 報價單     | ✅ 有             | 完全隔離   |
+| **contracts**           | 合約       | ✅ 有             | 完全隔離   |
+| **itineraries**         | 行程表     | ✅ 有             | 完全隔離   |
+| **visas**               | 簽證       | ✅ 有             | 完全隔離   |
+| **vendor_costs**        | 供應商成本 | ✅ 有             | 完全隔離   |
 
 **RLS Policy 範例**:
+
 ```sql
 -- SELECT: 看自己分公司 OR 超級管理員
 CREATE POLICY "orders_select" ON orders FOR SELECT
@@ -101,11 +102,12 @@ USING (
 
 ### 分類 2：行事曆（特殊可見性）
 
-| 表格 | 新增欄位 | 可見性規則 |
-|------|---------|-----------|
+| 表格                | 新增欄位     | 可見性規則                         |
+| ------------------- | ------------ | ---------------------------------- |
 | **calendar_events** | `visibility` | private / workspace / company_wide |
 
 **可見性規則**:
+
 ```sql
 CREATE TYPE calendar_visibility AS ENUM ('private', 'workspace', 'company_wide');
 
@@ -120,6 +122,7 @@ COMMENT ON COLUMN calendar_events.visibility IS '
 ```
 
 **RLS Policy**:
+
 ```sql
 CREATE POLICY "calendar_events_select" ON calendar_events FOR SELECT
 USING (
@@ -144,13 +147,14 @@ WITH CHECK (
 
 ### 分類 3：通訊系統（Channel Members 控制）
 
-| 表格 | 說明 | RLS 規則 |
-|------|------|---------|
-| **channels** | 頻道 | 基於 channel_members |
-| **messages** | 訊息 | 基於 channel_members |
+| 表格                | 說明   | RLS 規則             |
+| ------------------- | ------ | -------------------- |
+| **channels**        | 頻道   | 基於 channel_members |
+| **messages**        | 訊息   | 基於 channel_members |
 | **channel_threads** | 討論串 | 基於 channel_members |
 
 **RLS Policy**:
+
 ```sql
 -- Channels: 只能看自己是成員的頻道
 CREATE POLICY "channels_select" ON channels FOR SELECT
@@ -178,12 +182,13 @@ USING (
 
 ### 分類 4：個人資料（User-based）
 
-| 表格 | 說明 | RLS 規則 |
-|------|------|---------|
-| **user_preferences** | 用戶偏好設定 | 只能存取自己的 |
-| **personal_canvases** | 個人畫布 | 只能存取自己的 |
+| 表格                  | 說明         | RLS 規則       |
+| --------------------- | ------------ | -------------- |
+| **user_preferences**  | 用戶偏好設定 | 只能存取自己的 |
+| **personal_canvases** | 個人畫布     | 只能存取自己的 |
 
 **RLS Policy**:
+
 ```sql
 CREATE POLICY "user_preferences_all" ON user_preferences FOR ALL
 USING (user_id = auth.uid())
@@ -194,20 +199,21 @@ WITH CHECK (user_id = auth.uid());
 
 ### 分類 5：全公司共用（無 RLS）
 
-| 表格 | 說明 | 為什麼不需要 RLS |
-|------|------|----------------|
-| **workspaces** | 工作空間 | 全公司共用的基礎資料 |
-| **employees** | 員工 | 全公司共用（但有 workspace_id 標記所屬） |
-| **user_roles** | 用戶角色 | 權限系統基礎資料 |
-| **destinations** | 目的地 | 旅遊基礎資料 |
-| **airlines** | 航空公司 | 旅遊基礎資料 |
-| **hotels** | 飯店 | 旅遊基礎資料 |
-| **suppliers** | 供應商 | 共用資料 |
-| **cities** | 城市 | 基礎資料 |
-| **countries** | 國家 | 基礎資料 |
-| **attractions** | 景點 | 旅遊基礎資料 |
+| 表格             | 說明     | 為什麼不需要 RLS                         |
+| ---------------- | -------- | ---------------------------------------- |
+| **workspaces**   | 工作空間 | 全公司共用的基礎資料                     |
+| **employees**    | 員工     | 全公司共用（但有 workspace_id 標記所屬） |
+| **user_roles**   | 用戶角色 | 權限系統基礎資料                         |
+| **destinations** | 目的地   | 旅遊基礎資料                             |
+| **airlines**     | 航空公司 | 旅遊基礎資料                             |
+| **hotels**       | 飯店     | 旅遊基礎資料                             |
+| **suppliers**    | 供應商   | 共用資料                                 |
+| **cities**       | 城市     | 基礎資料                                 |
+| **countries**    | 國家     | 基礎資料                                 |
+| **attractions**  | 景點     | 旅遊基礎資料                             |
 
 **處理方式**:
+
 ```sql
 -- 明確禁用 RLS
 ALTER TABLE workspaces DISABLE ROW LEVEL SECURITY;
@@ -222,26 +228,28 @@ ALTER TABLE employees DISABLE ROW LEVEL SECURITY;
 ### 使用情境
 
 #### 情境 1：個人行事曆
+
 ```typescript
 // 員工 A 建立個人提醒
 createCalendarEvent({
   title: '記得打電話給客戶',
   visibility: 'private',
   workspace_id: 'taipei',
-  created_by: 'user_a_id'
+  created_by: 'user_a_id',
 })
 
 // 結果：只有員工 A 看得到
 ```
 
 #### 情境 2：分公司行事曆
+
 ```typescript
 // 台北分公司員工建立
 createCalendarEvent({
   title: '台北辦公室例會',
   visibility: 'workspace',
   workspace_id: 'taipei',
-  created_by: 'user_a_id'
+  created_by: 'user_a_id',
 })
 
 // 結果：
@@ -250,13 +258,14 @@ createCalendarEvent({
 ```
 
 #### 情境 3：公司行事曆
+
 ```typescript
 // 超級管理員建立
 createCalendarEvent({
   title: '公司尾牙',
   visibility: 'company_wide',
   workspace_id: null, // 可以是 null 或任何值
-  created_by: 'admin_id'
+  created_by: 'admin_id',
 })
 
 // 結果：
@@ -304,15 +313,11 @@ $$;
 
 ```typescript
 // 一般員工
-const orders = await supabase
-  .from('orders')
-  .select('*')
+const orders = await supabase.from('orders').select('*')
 // RLS 自動過濾 → 只回傳 workspace_id = 'taipei'
 
 // 超級管理員
-const orders = await supabase
-  .from('orders')
-  .select('*')
+const orders = await supabase.from('orders').select('*')
 // RLS 允許 → 回傳所有分公司的資料
 ```
 
@@ -342,6 +347,7 @@ export function WorkspaceFilter() {
 ```
 
 **使用範例**:
+
 ```typescript
 // src/app/orders/page.tsx
 export default function OrdersPage() {
@@ -419,29 +425,29 @@ employees:
 
 ```typescript
 // 新增員工時自動驗證
-const createEmployee = async (data) => {
+const createEmployee = async data => {
   // 驗證 1: workspace_id 必須存在
   const { data: workspace } = await supabase
     .from('workspaces')
     .select('id')
     .eq('id', data.workspace_id)
-    .single();
+    .single()
 
   if (!workspace) {
-    throw new Error('無效的分公司');
+    throw new Error('無效的分公司')
   }
 
   // 驗證 2: 一般管理員只能建立自己分公司的員工
   if (!user.isSuperAdmin && data.workspace_id !== user.workspace_id) {
-    throw new Error('您只能建立自己分公司的員工');
+    throw new Error('您只能建立自己分公司的員工')
   }
 
   // 建立員工
   await supabase.from('employees').insert({
     ...data,
-    workspace_id: data.workspace_id
-  });
-};
+    workspace_id: data.workspace_id,
+  })
+}
 ```
 
 ---
@@ -454,22 +460,24 @@ const createEmployee = async (data) => {
 // src/stores/auth-store.ts
 const login = async (email, password) => {
   // 1. Supabase 登入
-  const { data: { user } } = await supabase.auth.signInWithPassword({
+  const {
+    data: { user },
+  } = await supabase.auth.signInWithPassword({
     email,
-    password
-  });
+    password,
+  })
 
   // 2. 取得員工資料（包含 workspace_id）
   const { data: employee } = await supabase
     .from('employees')
     .select('*, workspaces(*)')
     .eq('user_id', user.id)
-    .single();
+    .single()
 
   // 3. 設定當前 workspace_id 到 Supabase session
   await supabase.rpc('set_current_workspace', {
-    workspace_id: employee.workspace_id
-  });
+    workspace_id: employee.workspace_id,
+  })
 
   // 4. 儲存到 store
   set({
@@ -477,30 +485,31 @@ const login = async (email, password) => {
       ...user,
       employee: employee,
       workspace_id: employee.workspace_id,
-      isSuperAdmin: employee.roles?.includes('super_admin')
-    }
-  });
-};
+      isSuperAdmin: employee.roles?.includes('super_admin'),
+    },
+  })
+}
 ```
 
 ### 2. 所有資料建立時自動帶入 workspace_id
 
 ```typescript
 // src/stores/order-store.ts
-const create = async (orderData) => {
-  const { user } = useAuthStore.getState();
+const create = async orderData => {
+  const { user } = useAuthStore.getState()
 
   return await supabase.from('orders').insert({
     ...orderData,
     workspace_id: user.workspace_id, // 自動帶入
-    created_by: user.id
-  });
-};
+    created_by: user.id,
+  })
+}
 ```
 
 ### 3. 超級管理員的篩選器
 
 需要在以下頁面加入分公司篩選：
+
 - ✅ 訂單列表 (`/orders`)
 - ✅ 旅遊團列表 (`/tours`)
 - ✅ 客戶列表 (`/customers`)

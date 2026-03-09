@@ -39,9 +39,7 @@ export function DesignerSidebar({
       )}
 
       {/* 面板內容區 - 可滾動 */}
-      <div className="flex-1 overflow-y-auto">
-        {children}
-      </div>
+      <div className="flex-1 overflow-y-auto">{children}</div>
     </aside>
   )
 }
@@ -50,9 +48,7 @@ export function DesignerSidebar({
  * 側邊欄區段分隔線
  */
 export function SidebarDivider({ className }: { className?: string }) {
-  return (
-    <div className={cn('h-px bg-border/50 my-1', className)} />
-  )
+  return <div className={cn('h-px bg-border/50 my-1', className)} />
 }
 
 /**
@@ -65,7 +61,12 @@ interface SidebarSectionTitleProps {
 
 export function SidebarSectionTitle({ children, className }: SidebarSectionTitleProps) {
   return (
-    <div className={cn('px-3 py-2 text-[10px] uppercase tracking-wider text-morandi-muted font-semibold', className)}>
+    <div
+      className={cn(
+        'px-3 py-2 text-[10px] uppercase tracking-wider text-morandi-muted font-semibold',
+        className
+      )}
+    >
       {children}
     </div>
   )

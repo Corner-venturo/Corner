@@ -23,7 +23,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     if (itinerary) {
       // LINE 預覽標題：只顯示團名
       const title = itinerary.title || PUBLIC_VIEW_LABELS.METADATA_TITLE_FALLBACK
-      const description = itinerary.description || 
+      const description =
+        itinerary.description ||
         PUBLIC_VIEW_LABELS.METADATA_DESCRIPTION_TEMPLATE.replace(
           '{title}',
           itinerary.title || PUBLIC_VIEW_LABELS.ITINERARY_FALLBACK

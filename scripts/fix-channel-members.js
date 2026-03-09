@@ -30,7 +30,9 @@ async function fixChannelMembers() {
     console.log(`📊 找到 ${employees.length} 位員工\n`)
 
     // 2. 取得所有頻道
-    const { data: channels, error: channelsError } = await supabase.from('channels').select('id, name, workspace_id')
+    const { data: channels, error: channelsError } = await supabase
+      .from('channels')
+      .select('id, name, workspace_id')
 
     if (channelsError) throw channelsError
 
@@ -44,9 +46,7 @@ async function fixChannelMembers() {
     if (existingError) throw existingError
 
     // 建立已加入的 Set（用於快速查詢）
-    const membershipSet = new Set(
-      existingMembers.map(m => `${m.channel_id}:${m.employee_id}`)
-    )
+    const membershipSet = new Set(existingMembers.map(m => `${m.channel_id}:${m.employee_id}`))
 
     console.log(`📊 現有 ${existingMembers.length} 筆成員記錄\n`)
 
@@ -105,7 +105,9 @@ async function fixChannelMembers() {
 
     // 6. 顯示統計
     console.log('\n📊 最終統計：')
-    const { data: finalMembers } = await supabase.from('channel_members').select('id', { count: 'exact', head: true })
+    const { data: finalMembers } = await supabase
+      .from('channel_members')
+      .select('id', { count: 'exact', head: true })
 
     console.log(`   總成員記錄數: ${finalMembers?.length || 0}`)
   } catch (error) {

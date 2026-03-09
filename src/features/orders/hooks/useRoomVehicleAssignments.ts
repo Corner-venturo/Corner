@@ -10,11 +10,14 @@ import { MEMBER_DATA_LABELS } from '../constants/labels'
 
 interface UseRoomVehicleAssignmentsParams {
   tourId: string
-  departureDate?: string | null  // 出發日期，用於計算成員年齡
+  departureDate?: string | null // 出發日期，用於計算成員年齡
 }
 
 // 根據出生日期和出發日期計算年齡
-function calculateAge(birthDate: string | null | undefined, referenceDate: string | null | undefined): number | null {
+function calculateAge(
+  birthDate: string | null | undefined,
+  referenceDate: string | null | undefined
+): number | null {
   if (!birthDate) return null
   const birth = new Date(birthDate)
   const ref = referenceDate ? new Date(referenceDate) : new Date()
@@ -27,22 +30,28 @@ function calculateAge(birthDate: string | null | undefined, referenceDate: strin
 }
 
 // 判斷是否為不佔床的成員（嬰兒或6歲以下幼童）
-export function isChildNotOccupyingBed(birthDate: string | null | undefined, referenceDate: string | null | undefined): boolean {
+export function isChildNotOccupyingBed(
+  birthDate: string | null | undefined,
+  referenceDate: string | null | undefined
+): boolean {
   const age = calculateAge(birthDate, referenceDate)
   return age !== null && age < 6
 }
 
 // 判斷是否為嬰兒（2歲以下）
-export function isInfant(birthDate: string | null | undefined, referenceDate: string | null | undefined): boolean {
+export function isInfant(
+  birthDate: string | null | undefined,
+  referenceDate: string | null | undefined
+): boolean {
   const age = calculateAge(birthDate, referenceDate)
   return age !== null && age < 2
 }
 
 // 飯店欄位資訊
 export interface HotelColumn {
-  id: string  // hotel_name 作為 id
+  id: string // hotel_name 作為 id
   name: string
-  shortName: string  // 縮寫（前2字）
+  shortName: string // 縮寫（前2字）
   checkIn: string
   checkOut: string
   nightNumbers: number[]
@@ -52,17 +61,17 @@ export interface HotelColumn {
 export interface RoomOption {
   id: string
   roomType: string
-  roomNumber: number  // 同類型的第幾間
+  roomNumber: number // 同類型的第幾間
   capacity: number
   assignedCount: number
-  label: string  // 顯示文字：「豪華雙床房1 (剩1床)」
+  label: string // 顯示文字：「豪華雙床房1 (剩1床)」
 }
 
 // 房間內的成員資訊
 export interface RoomMemberInfo {
   id: string
   name: string
-  isChild: boolean  // 6歲以下不佔床
+  isChild: boolean // 6歲以下不佔床
 }
 
 interface UseRoomVehicleAssignmentsReturn {
@@ -74,18 +83,23 @@ interface UseRoomVehicleAssignmentsReturn {
   setShowRoomColumn: (show: boolean) => void
   showVehicleColumn: boolean
   setShowVehicleColumn: (show: boolean) => void
-  roomAssignments: Record<string, string>  // 舊格式，合併顯示
-  roomAssignmentsByHotel: Record<string, Record<string, string>>  // 新格式：hotelName -> memberId -> 房型
-  roomIdByHotelMember: Record<string, Record<string, string>>  // hotelName -> memberId -> roomId
-  roomMembersByHotelRoom: Record<string, Record<string, RoomMemberInfo[]>>  // hotelName -> roomId -> 成員列表
-  hotelColumns: HotelColumn[]  // 飯店欄位列表
-  roomOptionsByHotel: Record<string, RoomOption[]>  // 每個飯店的房間選項
+  roomAssignments: Record<string, string> // 舊格式，合併顯示
+  roomAssignmentsByHotel: Record<string, Record<string, string>> // 新格式：hotelName -> memberId -> 房型
+  roomIdByHotelMember: Record<string, Record<string, string>> // hotelName -> memberId -> roomId
+  roomMembersByHotelRoom: Record<string, Record<string, RoomMemberInfo[]>> // hotelName -> roomId -> 成員列表
+  hotelColumns: HotelColumn[] // 飯店欄位列表
+  roomOptionsByHotel: Record<string, RoomOption[]> // 每個飯店的房間選項
   roomSortKeys: Record<string, number>
   vehicleAssignments: Record<string, string>
   loadRoomAssignments: () => Promise<void>
   loadVehicleAssignments: () => Promise<void>
-  assignMemberToRoom: (memberId: string, hotelName: string, roomId: string | null, memberBirthDate?: string | null) => Promise<void>
-  removeMemberFromRoom: (memberId: string, hotelName: string) => Promise<void>  // 移除單一成員（不影響室友）
+  assignMemberToRoom: (
+    memberId: string,
+    hotelName: string,
+    roomId: string | null,
+    memberBirthDate?: string | null
+  ) => Promise<void>
+  removeMemberFromRoom: (memberId: string, hotelName: string) => Promise<void> // 移除單一成員（不影響室友）
   reorderRoomsByMembers: (memberIds: string[]) => Promise<void>
 }
 
@@ -99,9 +113,15 @@ export function useRoomVehicleAssignments({
   const [showRoomColumn, setShowRoomColumn] = useState(false)
   const [showVehicleColumn, setShowVehicleColumn] = useState(false)
   const [roomAssignments, setRoomAssignments] = useState<Record<string, string>>({})
-  const [roomAssignmentsByHotel, setRoomAssignmentsByHotel] = useState<Record<string, Record<string, string>>>({})
-  const [roomIdByHotelMember, setRoomIdByHotelMember] = useState<Record<string, Record<string, string>>>({})
-  const [roomMembersByHotelRoom, setRoomMembersByHotelRoom] = useState<Record<string, Record<string, RoomMemberInfo[]>>>({})
+  const [roomAssignmentsByHotel, setRoomAssignmentsByHotel] = useState<
+    Record<string, Record<string, string>>
+  >({})
+  const [roomIdByHotelMember, setRoomIdByHotelMember] = useState<
+    Record<string, Record<string, string>>
+  >({})
+  const [roomMembersByHotelRoom, setRoomMembersByHotelRoom] = useState<
+    Record<string, Record<string, RoomMemberInfo[]>>
+  >({})
   const [hotelColumns, setHotelColumns] = useState<HotelColumn[]>([])
   const [roomOptionsByHotel, setRoomOptionsByHotel] = useState<Record<string, RoomOption[]>>({})
   const [roomSortKeys, setRoomSortKeys] = useState<Record<string, number>>({})
@@ -125,7 +145,9 @@ export function useRoomVehicleAssignments({
       }
 
       // 修復負數或過大的 display_order（之前程式碼可能造成的問題）
-      const roomsToFix = rooms.filter(r => r.display_order === null || r.display_order < 0 || r.display_order >= 10000)
+      const roomsToFix = rooms.filter(
+        r => r.display_order === null || r.display_order < 0 || r.display_order >= 10000
+      )
       if (roomsToFix.length > 0) {
         logger.info(`修復 ${roomsToFix.length} 個房間的 display_order`)
         // 按飯店分組修復
@@ -137,16 +159,29 @@ export function useRoomVehicleAssignments({
         })
         // 為每個飯店重新分配 display_order
         for (const [hotelName, hotelRooms] of Object.entries(byHotel)) {
-          const goodRooms = rooms.filter(r => r.hotel_name === hotelName && r.display_order !== null && r.display_order >= 0 && r.display_order < 10000)
-          let nextOrder = goodRooms.length > 0 ? Math.max(...goodRooms.map(r => r.display_order!)) + 1 : 0
+          const goodRooms = rooms.filter(
+            r =>
+              r.hotel_name === hotelName &&
+              r.display_order !== null &&
+              r.display_order >= 0 &&
+              r.display_order < 10000
+          )
+          let nextOrder =
+            goodRooms.length > 0 ? Math.max(...goodRooms.map(r => r.display_order!)) + 1 : 0
           for (const room of hotelRooms) {
             // 對於負數，恢復原本的值
-            const originalOrder = room.display_order !== null && room.display_order < 0
-              ? (room.display_order >= -1999 ? -(room.display_order + 1000) : room.display_order - 10000)
-              : nextOrder++
+            const originalOrder =
+              room.display_order !== null && room.display_order < 0
+                ? room.display_order >= -1999
+                  ? -(room.display_order + 1000)
+                  : room.display_order - 10000
+                : nextOrder++
             await supabase
               .from('tour_rooms')
-              .update({ display_order: originalOrder >= 0 && originalOrder < 10000 ? originalOrder : nextOrder++ })
+              .update({
+                display_order:
+                  originalOrder >= 0 && originalOrder < 10000 ? originalOrder : nextOrder++,
+              })
               .eq('id', room.id)
           }
         }
@@ -166,7 +201,8 @@ export function useRoomVehicleAssignments({
       // 查詢分配資訊，包含成員姓名和出生日期
       const { data: assignments } = await supabase
         .from('tour_room_assignments')
-        .select(`
+        .select(
+          `
           order_member_id,
           room_id,
           order_members:order_member_id (
@@ -175,18 +211,25 @@ export function useRoomVehicleAssignments({
             passport_name,
             birth_date
           )
-        `)
-        .in('room_id', rooms.map(r => r.id))
+        `
+        )
+        .in(
+          'room_id',
+          rooms.map(r => r.id)
+        )
 
       if (assignments) {
         const map: Record<string, string> = {}
         const sortKeys: Record<string, number> = {}
 
         // 收集所有不同的飯店（按 night_number 排序）
-        const uniqueHotels = [...new Map(
-          rooms.sort((a, b) => a.night_number - b.night_number)
-               .map(r => [r.hotel_name, r.night_number])
-        ).entries()]
+        const uniqueHotels = [
+          ...new Map(
+            rooms
+              .sort((a, b) => a.night_number - b.night_number)
+              .map(r => [r.hotel_name, r.night_number])
+          ).entries(),
+        ]
 
         // 為每個飯店創建縮寫（取前2個字）
         const hotelAbbrev: Record<string, string> = {}
@@ -197,12 +240,15 @@ export function useRoomVehicleAssignments({
         })
 
         // 按成員分組所有房間分配
-        const memberRooms: Record<string, { hotel: string; type: string; num: number; nightNum: number }[]> = {}
+        const memberRooms: Record<
+          string,
+          { hotel: string; type: string; num: number; nightNum: number }[]
+        > = {}
 
         // 計算每個飯店內的房間編號（簡化版：直接按順序編號）
         const roomNumbers: Record<string, number> = {}
         const counters: Record<string, number> = {}
-        
+
         // 房間已按 night_number + display_order 排序（來自 SQL）
         rooms.forEach(room => {
           // 用「飯店+房型+晚數」作為分組 key
@@ -228,21 +274,23 @@ export function useRoomVehicleAssignments({
             if (!memberRooms[memberId]) {
               memberRooms[memberId] = []
             }
-            
+
             // 房型標籤（完整名稱）
             const typeLabel = room.room_type
-            
+
             memberRooms[memberId].push({
               hotel: room.hotel_name || '',
               type: typeLabel,
               num: roomNumbers[room.id] || 1,
-              nightNum: room.night_number
+              nightNum: room.night_number,
             })
 
             // 用第一晚的房間做排序
             if (room.night_number === 1) {
               const roomOrder = roomOrderMap[room.id] ?? 999
-              const existingSortKeys = Object.values(sortKeys).filter(v => Math.floor(v / 10) === roomOrder)
+              const existingSortKeys = Object.values(sortKeys).filter(
+                v => Math.floor(v / 10) === roomOrder
+              )
               sortKeys[memberId] = roomOrder * 10 + existingSortKeys.length
             }
           }
@@ -254,7 +302,7 @@ export function useRoomVehicleAssignments({
           const uniqueByHotel = roomList
             .sort((a, b) => a.nightNum - b.nightNum)
             .filter((r, i, arr) => arr.findIndex(x => x.hotel === r.hotel) === i)
-          
+
           if (uniqueByHotel.length === 1) {
             // 只有一間飯店，顯示房型+編號
             const r = uniqueByHotel[0]
@@ -275,10 +323,10 @@ export function useRoomVehicleAssignments({
             hotelColsMap.set(hotelName, {
               id: hotelName,
               name: hotelName,
-              shortName: hotelName.slice(0, 4),  // 取前4字作為縮寫
+              shortName: hotelName.slice(0, 4), // 取前4字作為縮寫
               checkIn: '',
               checkOut: '',
-              nightNumbers: []
+              nightNumbers: [],
             })
           }
           const col = hotelColsMap.get(hotelName)!
@@ -286,11 +334,12 @@ export function useRoomVehicleAssignments({
             col.nightNumbers.push(room.night_number)
           }
         })
-        
+
         // 排序並計算入住/退房日期
-        const sortedHotelCols = Array.from(hotelColsMap.values())
-          .sort((a, b) => Math.min(...a.nightNumbers) - Math.min(...b.nightNumbers))
-        
+        const sortedHotelCols = Array.from(hotelColsMap.values()).sort(
+          (a, b) => Math.min(...a.nightNumbers) - Math.min(...b.nightNumbers)
+        )
+
         // 按飯店分組的分房資料
         const byHotel: Record<string, Record<string, string>> = {}
         const idByHotelMember: Record<string, Record<string, string>> = {}
@@ -298,7 +347,10 @@ export function useRoomVehicleAssignments({
         // 按飯店分組房間（只取每個飯店的第一晚，因為續住房間相同）
         const firstNightByHotel: Record<string, number> = {}
         rooms.forEach(r => {
-          if (r.hotel_name && (!firstNightByHotel[r.hotel_name] || r.night_number < firstNightByHotel[r.hotel_name])) {
+          if (
+            r.hotel_name &&
+            (!firstNightByHotel[r.hotel_name] || r.night_number < firstNightByHotel[r.hotel_name])
+          ) {
             firstNightByHotel[r.hotel_name] = r.night_number
           }
         })
@@ -306,7 +358,11 @@ export function useRoomVehicleAssignments({
         // 建立 display_order -> 第一晚房間 ID 的對照表（按飯店）
         const firstNightRoomByOrder: Record<string, Record<number, string>> = {}
         rooms.forEach(r => {
-          if (r.hotel_name && r.night_number === firstNightByHotel[r.hotel_name] && r.display_order !== null) {
+          if (
+            r.hotel_name &&
+            r.night_number === firstNightByHotel[r.hotel_name] &&
+            r.display_order !== null
+          ) {
             if (!firstNightRoomByOrder[r.hotel_name]) {
               firstNightRoomByOrder[r.hotel_name] = {}
             }
@@ -366,7 +422,9 @@ export function useRoomVehicleAssignments({
         })
 
         Object.entries(firstNightByHotel).forEach(([hotelName, firstNight]) => {
-          const hotelRooms = rooms.filter(r => r.hotel_name === hotelName && r.night_number === firstNight)
+          const hotelRooms = rooms.filter(
+            r => r.hotel_name === hotelName && r.night_number === firstNight
+          )
           optionsByHotel[hotelName] = hotelRooms.map(room => {
             const assigned = roomAssignedCount[room.id] || 0
             const remaining = room.capacity - assigned
@@ -393,10 +451,16 @@ export function useRoomVehicleAssignments({
           if (!firstNightRoomId) return
 
           // 取得成員資訊
-          const memberData = a.order_members as { id: string; chinese_name: string | null; passport_name: string | null; birth_date: string | null } | null
+          const memberData = a.order_members as {
+            id: string
+            chinese_name: string | null
+            passport_name: string | null
+            birth_date: string | null
+          } | null
           if (!memberData) return
 
-          const memberName = memberData.chinese_name || memberData.passport_name || COMP_ORDERS_LABELS.未命名
+          const memberName =
+            memberData.chinese_name || memberData.passport_name || COMP_ORDERS_LABELS.未命名
           const isChild = isChildNotOccupyingBed(memberData.birth_date, departureDate)
 
           if (!membersByHotelRoom[room.hotel_name]) {
@@ -407,7 +471,9 @@ export function useRoomVehicleAssignments({
           }
 
           // 避免重複加入（因為可能有多晚分配）
-          const existing = membersByHotelRoom[room.hotel_name][firstNightRoomId].find(m => m.id === a.order_member_id)
+          const existing = membersByHotelRoom[room.hotel_name][firstNightRoomId].find(
+            m => m.id === a.order_member_id
+          )
           if (!existing) {
             membersByHotelRoom[room.hotel_name][firstNightRoomId].push({
               id: a.order_member_id,
@@ -448,14 +514,18 @@ export function useRoomVehicleAssignments({
       const { data: assignments } = await supabase
         .from('tour_vehicle_assignments')
         .select('order_member_id, vehicle_id')
-        .in('vehicle_id', vehicles.map(v => v.id))
+        .in(
+          'vehicle_id',
+          vehicles.map(v => v.id)
+        )
 
       if (assignments) {
         const map: Record<string, string> = {}
         assignments.forEach(a => {
           const vehicle = vehicles.find(v => v.id === a.vehicle_id)
           if (vehicle) {
-            map[a.order_member_id] = vehicle.vehicle_name || vehicle.vehicle_type || COMP_ORDERS_LABELS.已分車
+            map[a.order_member_id] =
+              vehicle.vehicle_name || vehicle.vehicle_type || COMP_ORDERS_LABELS.已分車
           }
         })
         setVehicleAssignments(map)
@@ -472,7 +542,12 @@ export function useRoomVehicleAssignments({
   // 分配成員到房間（或取消分配）
   // 當取消分配（roomId 為 null）時，會一併取消同房所有成員的分配
   // memberBirthDate: 用於判斷是否為幼童（6歲以下不佔床）
-  const assignMemberToRoom = async (memberId: string, hotelName: string, roomId: string | null, memberBirthDate?: string | null) => {
+  const assignMemberToRoom = async (
+    memberId: string,
+    hotelName: string,
+    roomId: string | null,
+    memberBirthDate?: string | null
+  ) => {
     if (!tourId) return
 
     try {
@@ -651,7 +726,10 @@ export function useRoomVehicleAssignments({
       const { data: assignments } = await supabase
         .from('tour_room_assignments')
         .select('order_member_id, room_id')
-        .in('room_id', rooms.map(r => r.id))
+        .in(
+          'room_id',
+          rooms.map(r => r.id)
+        )
 
       if (!assignments || assignments.length === 0) {
         await loadRoomAssignments()
@@ -661,16 +739,27 @@ export function useRoomVehicleAssignments({
       // 找出每個飯店的第一晚（用於判斷 display_order）
       const firstNightByHotel: Record<string, number> = {}
       rooms.forEach(r => {
-        if (r.hotel_name && (!firstNightByHotel[r.hotel_name] || r.night_number < firstNightByHotel[r.hotel_name])) {
+        if (
+          r.hotel_name &&
+          (!firstNightByHotel[r.hotel_name] || r.night_number < firstNightByHotel[r.hotel_name])
+        ) {
           firstNightByHotel[r.hotel_name] = r.night_number
         }
       })
 
       // 建立 memberId -> 第一晚房間的對應
-      const memberToFirstNightRoom: Record<string, { roomId: string; displayOrder: number; hotelName: string }> = {}
+      const memberToFirstNightRoom: Record<
+        string,
+        { roomId: string; displayOrder: number; hotelName: string }
+      > = {}
       assignments.forEach(a => {
         const room = rooms.find(r => r.id === a.room_id)
-        if (room && room.hotel_name && room.night_number === firstNightByHotel[room.hotel_name] && room.display_order !== null) {
+        if (
+          room &&
+          room.hotel_name &&
+          room.night_number === firstNightByHotel[room.hotel_name] &&
+          room.display_order !== null
+        ) {
           memberToFirstNightRoom[a.order_member_id] = {
             roomId: room.id,
             displayOrder: room.display_order,
@@ -681,7 +770,11 @@ export function useRoomVehicleAssignments({
 
       // 根據新的成員順序，計算每個房間的新 display_order
       // 同一個房間（display_order 相同）只需要更新一次
-      const roomUpdates: Array<{ displayOrder: number; newDisplayOrder: number; hotelName: string }> = []
+      const roomUpdates: Array<{
+        displayOrder: number
+        newDisplayOrder: number
+        hotelName: string
+      }> = []
       const processedRooms = new Set<string>() // 用「hotelName-displayOrder」作為 key，避免重複
 
       let newOrder = 0

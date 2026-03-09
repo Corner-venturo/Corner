@@ -16,7 +16,7 @@ async function addSaudiCities() {
     { id: 'neom', name: 'NEOM未來城', name_en: 'NEOM', country_id: 'saudi_arabia' },
     { id: 'abha', name: '艾卜哈', name_en: 'Abha', country_id: 'saudi_arabia' },
     { id: 'taif', name: '塔伊夫', name_en: 'Taif', country_id: 'saudi_arabia' },
-    { id: 'tabuk', name: '塔布克', name_en: 'Tabuk', country_id: 'saudi_arabia' }
+    { id: 'tabuk', name: '塔布克', name_en: 'Tabuk', country_id: 'saudi_arabia' },
   ]
 
   console.log('========================================')
@@ -25,9 +25,7 @@ async function addSaudiCities() {
   console.log('')
 
   for (const city of cities) {
-    const { error } = await supabase
-      .from('cities')
-      .upsert(city, { onConflict: 'id' })
+    const { error } = await supabase.from('cities').upsert(city, { onConflict: 'id' })
 
     if (error) {
       console.log('❌ ' + city.name + ': ' + error.message)

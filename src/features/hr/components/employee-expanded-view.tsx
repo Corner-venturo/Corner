@@ -2,12 +2,7 @@
 
 import React, { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useUserStore } from '@/stores/user-store'
 import { cn } from '@/lib/utils'
 import { User, DollarSign, Shield, X, Edit, Save, Check } from 'lucide-react'
@@ -58,10 +53,17 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
         const baseSalary = employee.salary_info?.base_salary || 0
         return (
           <div className="flex items-center gap-4 text-morandi-muted">
-            <span className="flex items-center gap-1">底薪：<CurrencyCell amount={baseSalary} /></span>
-            <span className="flex items-center gap-1">津貼：<CurrencyCell amount={totalAllowances} /></span>
+            <span className="flex items-center gap-1">
+              底薪：
+              <CurrencyCell amount={baseSalary} />
+            </span>
+            <span className="flex items-center gap-1">
+              津貼：
+              <CurrencyCell amount={totalAllowances} />
+            </span>
             <span className="text-morandi-primary font-medium flex items-center gap-1">
-              總薪資：<CurrencyCell amount={baseSalary + totalAllowances} />
+              總薪資：
+              <CurrencyCell amount={baseSalary + totalAllowances} />
             </span>
           </div>
         )
@@ -71,12 +73,17 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
         const roleLabel = roleConfig?.label || COMP_HR_LABELS.未設定
         const permissionCount = roleConfig?.permissions.includes('*')
           ? SYSTEM_PERMISSIONS.length
-          : (employee.permissions?.length || 0)
+          : employee.permissions?.length || 0
 
         return (
           <div className="flex items-center gap-4 text-morandi-muted">
-            <span>角色：<span className="font-medium text-morandi-primary">{roleLabel}</span></span>
-            <span>{COMP_HR_LABELS.LABEL_4949}{permissionCount} / {SYSTEM_PERMISSIONS.length} 項功能</span>
+            <span>
+              角色：<span className="font-medium text-morandi-primary">{roleLabel}</span>
+            </span>
+            <span>
+              {COMP_HR_LABELS.LABEL_4949}
+              {permissionCount} / {SYSTEM_PERMISSIONS.length} 項功能
+            </span>
           </div>
         )
       default:
@@ -131,14 +138,15 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
   }
 
   return (
-    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={true} onOpenChange={open => !open && onClose()}>
       <DialogContent level={1} className="max-w-6xl h-[90vh] flex flex-col overflow-hidden p-0">
         {/* 標題列 */}
         <DialogHeader className="flex-shrink-0 p-6 pb-0">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-morandi-container/30 flex items-center justify-center">
               {employee.avatar ? (
-                <img src={employee.avatar}
+                <img
+                  src={employee.avatar}
                   alt={employee.display_name}
                   className="w-12 h-12 rounded-full object-cover"
                 />
@@ -190,13 +198,23 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
                     <Check size={14} />
                     {COMP_HR_LABELS.SAVE}
                   </Button>
-                  <Button size="sm" variant="outline" onClick={() => setIsEditing(false)} className="gap-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setIsEditing(false)}
+                    className="gap-1"
+                  >
                     <X size={14} />
                     {COMP_HR_LABELS.取消}
                   </Button>
                 </div>
               ) : (
-                <Button size="sm" variant="outline" onClick={() => setIsEditing(true)} className="gap-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setIsEditing(true)}
+                  className="gap-1"
+                >
                   <Edit size={14} />
                   {COMP_HR_LABELS.EDIT}
                 </Button>

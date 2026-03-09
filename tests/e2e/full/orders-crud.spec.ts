@@ -77,7 +77,7 @@ test.describe('訂單 CRUD 測試', () => {
 
     // 如果沒找到帶 placeholder 的，嘗試填第一個可見的 input
     const visibleInputs = dialog.locator('input:visible')
-    if (await visibleInputs.count() > 0) {
+    if ((await visibleInputs.count()) > 0) {
       const firstInput = visibleInputs.first()
       const currentValue = await firstInput.inputValue()
       if (!currentValue) {

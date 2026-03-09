@@ -19,7 +19,13 @@ import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Label } from '@/components/ui/label'
 import { useTravelInvoiceStore, TravelInvoiceItem, BuyerInfo } from '@/stores/travel-invoice-store'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 export default function CreateInvoicePage() {
   const router = useRouter()
@@ -153,13 +159,16 @@ export default function CreateInvoicePage() {
                   <Label htmlFor="invoice_date">{FinanceLabels.issueDate}</Label>
                   <DatePicker
                     value={invoice_date}
-                    onChange={(date) => setInvoiceDate(date)}
+                    onChange={date => setInvoiceDate(date)}
                     placeholder={FinanceLabels.selectDate}
                   />
                 </div>
                 <div>
                   <Label htmlFor="tax_type">{FinanceLabels.taxType}</Label>
-                  <Select value={tax_type} onValueChange={(value) => setTaxType(value as 'dutiable' | 'zero' | 'free')}>
+                  <Select
+                    value={tax_type}
+                    onValueChange={value => setTaxType(value as 'dutiable' | 'zero' | 'free')}
+                  >
                     <SelectTrigger className="h-10">
                       <SelectValue placeholder={FinanceLabels.selectTaxType} />
                     </SelectTrigger>
@@ -283,7 +292,9 @@ export default function CreateInvoicePage() {
                         type="number"
                         min="1"
                         value={item.item_count}
-                        onChange={e => updateItem(index, 'item_count', parseInt(e.target.value) || 1)}
+                        onChange={e =>
+                          updateItem(index, 'item_count', parseInt(e.target.value) || 1)
+                        }
                         className="h-9 text-center"
                       />
                     </div>
@@ -292,7 +303,9 @@ export default function CreateInvoicePage() {
                         type="number"
                         min="0"
                         value={item.item_price || ''}
-                        onChange={e => updateItem(index, 'item_price', parseFloat(e.target.value) || 0)}
+                        onChange={e =>
+                          updateItem(index, 'item_price', parseFloat(e.target.value) || 0)
+                        }
                         placeholder="0"
                         className="h-9 text-right"
                       />
@@ -354,9 +367,7 @@ export default function CreateInvoicePage() {
                       {FinanceLabels.remarksNote}
                     </p>
                   </div>
-                  <span className="text-sm text-muted-foreground pt-2">
-                    {remark.length}/50
-                  </span>
+                  <span className="text-sm text-muted-foreground pt-2">{remark.length}/50</span>
                 </div>
               </div>
 
@@ -383,12 +394,7 @@ export default function CreateInvoicePage() {
             >
               {FinanceLabels.cancel}
             </Button>
-            <Button
-              type="submit"
-              size="lg"
-              disabled={isLoading}
-              className="min-w-[120px]"
-            >
+            <Button type="submit" size="lg" disabled={isLoading} className="min-w-[120px]">
               {isLoading ? FinanceLabels.issuing : FinanceLabels.issueInvoice}
             </Button>
           </div>

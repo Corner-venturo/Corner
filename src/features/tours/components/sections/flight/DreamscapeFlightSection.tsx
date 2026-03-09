@@ -2,7 +2,7 @@
 
 /**
  * Dreamscape 風格航班區塊 - 時間軸式設計
- * 
+ *
  * 特色：
  * - 玻璃卡片效果
  * - 時間軸圓點動畫
@@ -36,7 +36,6 @@ interface DreamscapeFlightSectionProps {
   viewMode: 'desktop' | 'mobile'
 }
 
-
 // 單程航班節點
 function FlightNode({
   flight,
@@ -57,7 +56,9 @@ function FlightNode({
   const duration = flight.duration || ''
 
   return (
-    <div className={`flex justify-between items-center relative w-full ${isMobile ? 'flex-col gap-8' : ''}`}>
+    <div
+      className={`flex justify-between items-center relative w-full ${isMobile ? 'flex-col gap-8' : ''}`}
+    >
       {/* 起點 */}
       <motion.div
         className="text-center group"
@@ -181,7 +182,12 @@ function FlightNode({
   )
 }
 
-export function DreamscapeFlightSection({ outboundFlight, returnFlight, departureDate, viewMode }: DreamscapeFlightSectionProps) {
+export function DreamscapeFlightSection({
+  outboundFlight,
+  returnFlight,
+  departureDate,
+  viewMode,
+}: DreamscapeFlightSectionProps) {
   const isMobile = viewMode === 'mobile'
 
   if (!outboundFlight && !returnFlight) return null
@@ -195,7 +201,9 @@ export function DreamscapeFlightSection({ outboundFlight, returnFlight, departur
       {/* 頂部分隔線 */}
       <div
         className="absolute top-0 left-0 w-full h-px"
-        style={{ background: `linear-gradient(to right, transparent, ${DREAM.purple}4d, transparent)` }}
+        style={{
+          background: `linear-gradient(to right, transparent, ${DREAM.purple}4d, transparent)`,
+        }}
       />
 
       <div className="max-w-[1600px] mx-auto px-6 relative z-10">
@@ -215,16 +223,33 @@ export function DreamscapeFlightSection({ outboundFlight, returnFlight, departur
           {/* Hover 光效 */}
           <div
             className="absolute top-0 left-0 w-full h-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none"
-            style={{ background: 'linear-gradient(to right, rgba(255,255,255,0.4), transparent, rgba(255,255,255,0.4))' }}
+            style={{
+              background:
+                'linear-gradient(to right, rgba(255,255,255,0.4), transparent, rgba(255,255,255,0.4))',
+            }}
           />
 
-          <div className={`flex ${isMobile ? 'flex-col gap-12' : 'flex-col lg:flex-row justify-between items-center gap-12'} relative z-10`}>
+          <div
+            className={`flex ${isMobile ? 'flex-col gap-12' : 'flex-col lg:flex-row justify-between items-center gap-12'} relative z-10`}
+          >
             {/* 標題 */}
             <div className={isMobile ? 'text-center' : 'text-center lg:text-left'}>
-              <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: isMobile ? '1.5rem' : '2.25rem', color: `${DREAM.text}66` }}>
+              <h2
+                style={{
+                  fontFamily: "'Cinzel', serif",
+                  fontSize: isMobile ? '1.5rem' : '2.25rem',
+                  color: `${DREAM.text}66`,
+                }}
+              >
                 The Passage
               </h2>
-              <div style={{ fontFamily: "'La Belle Aurore', cursive", fontSize: isMobile ? '2rem' : '3.75rem', color: DREAM.purple }}>
+              <div
+                style={{
+                  fontFamily: "'La Belle Aurore', cursive",
+                  fontSize: isMobile ? '2rem' : '3.75rem',
+                  color: DREAM.purple,
+                }}
+              >
                 Flight Path
               </div>
             </div>
@@ -233,13 +258,21 @@ export function DreamscapeFlightSection({ outboundFlight, returnFlight, departur
             <div className="flex-1 w-full max-w-4xl relative">
               {outboundFlight && (
                 <div className={returnFlight ? 'mb-12' : ''}>
-                  <FlightNode flight={outboundFlight} type="outbound" departureDate={departureDate} isMobile={isMobile} />
+                  <FlightNode
+                    flight={outboundFlight}
+                    type="outbound"
+                    departureDate={departureDate}
+                    isMobile={isMobile}
+                  />
                 </div>
               )}
 
               {returnFlight && (
                 <div className="pt-8 border-t" style={{ borderColor: `${DREAM.text}1a` }}>
-                  <div className="text-xs uppercase tracking-widest mb-6 text-center" style={{ color: `${DREAM.text}66` }}>
+                  <div
+                    className="text-xs uppercase tracking-widest mb-6 text-center"
+                    style={{ color: `${DREAM.text}66` }}
+                  >
                     Return Journey
                   </div>
                   <FlightNode flight={returnFlight} type="return" isMobile={isMobile} />

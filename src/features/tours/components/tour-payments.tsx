@@ -105,7 +105,10 @@ export const TourPayments = React.memo(function TourPayments({
             <thead>
               {/* 區塊標題行 */}
               <tr className="bg-morandi-container/50 border-b border-border/60">
-                <th colSpan={8} className="text-left py-2 px-4 text-sm font-medium text-morandi-primary">
+                <th
+                  colSpan={8}
+                  className="text-left py-2 px-4 text-sm font-medium text-morandi-primary"
+                >
                   {COMP_TOURS_LABELS.LABEL_8600}
                 </th>
               </tr>

@@ -76,7 +76,7 @@ export function typedFrom<T extends SupabaseTableName>(tableName: T) {
  */
 export function dynamicFrom(tableName: string) {
   // 使用 any 是處理 Supabase 動態表名的標準做法
-   
+
   return supabase.from(tableName as SupabaseTableName) as any
 }
 
@@ -142,10 +142,7 @@ export type RpcReturns<T extends SupabaseRpcName> = Database['public']['Function
  *   p_passport_number: passportData.passport_number,
  * })
  */
-export function typedRpc<T extends SupabaseRpcName>(
-  fnName: T,
-  args: RpcArgs<T>
-) {
+export function typedRpc<T extends SupabaseRpcName>(fnName: T, args: RpcArgs<T>) {
   return supabase.rpc(fnName, args)
 }
 

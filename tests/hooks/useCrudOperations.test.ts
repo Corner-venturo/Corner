@@ -25,16 +25,14 @@ describe('useCrudOperations', () => {
       { id: 'item-1', name: 'First', value: 100 },
       { id: 'item-2', name: 'Second', value: 200 },
     ]
-    mockSetItems = vi.fn((newItems) => {
+    mockSetItems = vi.fn(newItems => {
       mockItems = typeof newItems === 'function' ? newItems(mockItems) : newItems
     })
   })
 
   describe('add', () => {
     it('should add a new item with generated id and timestamps', () => {
-      const { result } = renderHook(() =>
-        useCrudOperations(mockItems, mockSetItems)
-      )
+      const { result } = renderHook(() => useCrudOperations(mockItems, mockSetItems))
 
       let newItem: TestItem | undefined
       act(() => {
@@ -51,9 +49,7 @@ describe('useCrudOperations', () => {
     })
 
     it('should append new item to existing items', () => {
-      const { result } = renderHook(() =>
-        useCrudOperations(mockItems, mockSetItems)
-      )
+      const { result } = renderHook(() => useCrudOperations(mockItems, mockSetItems))
 
       act(() => {
         result.current.add({ name: 'Third', value: 300 })
@@ -67,9 +63,7 @@ describe('useCrudOperations', () => {
 
   describe('update', () => {
     it('should update an existing item by id', () => {
-      const { result } = renderHook(() =>
-        useCrudOperations(mockItems, mockSetItems)
-      )
+      const { result } = renderHook(() => useCrudOperations(mockItems, mockSetItems))
 
       act(() => {
         result.current.update('item-1', { name: 'Updated First', value: 150 })
@@ -82,9 +76,7 @@ describe('useCrudOperations', () => {
     })
 
     it('should only update the specified item', () => {
-      const { result } = renderHook(() =>
-        useCrudOperations(mockItems, mockSetItems)
-      )
+      const { result } = renderHook(() => useCrudOperations(mockItems, mockSetItems))
 
       act(() => {
         result.current.update('item-1', { name: 'Updated' })
@@ -95,9 +87,7 @@ describe('useCrudOperations', () => {
     })
 
     it('should not update if id not found', () => {
-      const { result } = renderHook(() =>
-        useCrudOperations(mockItems, mockSetItems)
-      )
+      const { result } = renderHook(() => useCrudOperations(mockItems, mockSetItems))
 
       act(() => {
         result.current.update('non-existent', { name: 'Updated' })
@@ -111,9 +101,7 @@ describe('useCrudOperations', () => {
 
   describe('remove', () => {
     it('should remove an item by id', () => {
-      const { result } = renderHook(() =>
-        useCrudOperations(mockItems, mockSetItems)
-      )
+      const { result } = renderHook(() => useCrudOperations(mockItems, mockSetItems))
 
       act(() => {
         result.current.remove('item-1')
@@ -125,9 +113,7 @@ describe('useCrudOperations', () => {
     })
 
     it('should not remove anything if id not found', () => {
-      const { result } = renderHook(() =>
-        useCrudOperations(mockItems, mockSetItems)
-      )
+      const { result } = renderHook(() => useCrudOperations(mockItems, mockSetItems))
 
       act(() => {
         result.current.remove('non-existent')

@@ -127,11 +127,14 @@ export function useVisaCreate(
       }
 
       // 批次建立簽證
-      const applicantMap = new Map<string, {
-        visaTypes: string[]
-        totalFee: number
-        totalCost: number
-      }>()
+      const applicantMap = new Map<
+        string,
+        {
+          visaTypes: string[]
+          totalFee: number
+          totalCost: number
+        }
+      >()
 
       for (const applicant of applicants) {
         if (!applicant.name) continue
@@ -182,15 +185,13 @@ export function useVisaCreate(
         const remarks = data.visaTypes.join('、')
 
         try {
-          const { error } = await supabase
-            .from('order_members')
-            .insert({
-              order_id: targetOrder.id,
-              chinese_name: name,
-              member_type: 'adult',
-              remarks,
-              workspace_id: user.workspace_id,
-            })
+          const { error } = await supabase.from('order_members').insert({
+            order_id: targetOrder.id,
+            chinese_name: name,
+            member_type: 'adult',
+            remarks,
+            workspace_id: user.workspace_id,
+          })
 
           if (error) throw error
           logger.log(`✅ 成員建立成功: ${name}`)

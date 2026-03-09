@@ -39,9 +39,7 @@ export const userStoreHelpers = {
     const users = state.items
 
     // 取得所有現有的員工編號
-    const allEmployeeNumbers = users
-      .map(user => user.employee_number)
-      .filter(Boolean) as string[]
+    const allEmployeeNumbers = users.map(user => user.employee_number).filter(Boolean) as string[]
 
     /**
      * 解析員工編號為序列號
@@ -86,9 +84,7 @@ export const userStoreHelpers = {
     }
 
     // 找出現有最大序號
-    const existingSequences = allEmployeeNumbers
-      .map(parseEmployeeNumber)
-      .filter(n => n >= 0)
+    const existingSequences = allEmployeeNumbers.map(parseEmployeeNumber).filter(n => n >= 0)
 
     const maxSequence = existingSequences.length > 0 ? Math.max(...existingSequences) : 0
     let nextSequence = maxSequence + 1

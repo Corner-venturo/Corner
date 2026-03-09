@@ -108,7 +108,7 @@ export function ShareAdvanceDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Dialog open={open} onOpenChange={isOpen => !isOpen && onClose()}>
       <DialogContent level={1} className="max-w-[800px] max-h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader className="pb-3 border-b border-morandi-gold/20">
           <DialogTitle>{COMP_WORKSPACE_LABELS.LABEL_9529}</DialogTitle>
@@ -206,15 +206,26 @@ export function ShareAdvanceDialog({
         {/* 底部：總計與操作按鈕 */}
         <DialogFooter className="pt-3 border-t border-morandi-gold/20 flex-col gap-3">
           <div className="flex items-center justify-between w-full">
-            <span className="text-sm text-morandi-secondary">{COMP_WORKSPACE_LABELS.TOTAL_7218}</span>
-            <CurrencyCell amount={totalAmount} className="text-lg font-semibold text-morandi-primary" />
+            <span className="text-sm text-morandi-secondary">
+              {COMP_WORKSPACE_LABELS.TOTAL_7218}
+            </span>
+            <CurrencyCell
+              amount={totalAmount}
+              className="text-lg font-semibold text-morandi-primary"
+            />
           </div>
           <div className="flex gap-2 justify-end w-full">
-            <button className="btn-morandi-secondary !py-2 !px-4 flex items-center gap-2" onClick={onClose}>
+            <button
+              className="btn-morandi-secondary !py-2 !px-4 flex items-center gap-2"
+              onClick={onClose}
+            >
               <X size={16} />
               {COMP_WORKSPACE_LABELS.CANCEL}
             </button>
-            <button className="btn-morandi-primary !py-2 !px-4 flex items-center gap-2" onClick={handleShare}>
+            <button
+              className="btn-morandi-primary !py-2 !px-4 flex items-center gap-2"
+              onClick={handleShare}
+            >
               <Check size={16} />
               {COMP_WORKSPACE_LABELS.LABEL_903}
             </button>

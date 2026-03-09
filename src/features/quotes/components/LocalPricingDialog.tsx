@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog'
 import { Plus, Trash2, MapPin, AlertTriangle, X, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { ACCOMMODATION_ITEM_ROW_LABELS, LOCAL_PRICING_DIALOG_LABELS } from '../constants/labels';
+import { ACCOMMODATION_ITEM_ROW_LABELS, LOCAL_PRICING_DIALOG_LABELS } from '../constants/labels'
 
 export interface LocalTier {
   id: string
@@ -86,7 +86,9 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
   // 點擊確認
   const handleConfirmClick = () => {
     // 檢查是否有填寫人數和單價
-    const hasEmptyData = tiers.some(t => !t.participants || t.participants <= 0 || !t.unitPrice || t.unitPrice <= 0)
+    const hasEmptyData = tiers.some(
+      t => !t.participants || t.participants <= 0 || !t.unitPrice || t.unitPrice <= 0
+    )
     if (hasEmptyData) {
       return
     }
@@ -141,8 +143,13 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
           <>
             {/* 目前總人數提示 */}
             <div className="bg-morandi-container/30 rounded-lg px-4 py-3 text-sm">
-              <span className="text-morandi-secondary">{LOCAL_PRICING_DIALOG_LABELS.目前總人數}</span>
-              <span className="font-semibold text-morandi-primary ml-1">{totalParticipants}{LOCAL_PRICING_DIALOG_LABELS.人}</span>
+              <span className="text-morandi-secondary">
+                {LOCAL_PRICING_DIALOG_LABELS.目前總人數}
+              </span>
+              <span className="font-semibold text-morandi-primary ml-1">
+                {totalParticipants}
+                {LOCAL_PRICING_DIALOG_LABELS.人}
+              </span>
             </div>
 
             {/* 檻次輸入區 */}
@@ -159,7 +166,9 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
                   key={tier.id}
                   className="grid grid-cols-[80px_1fr_1fr_40px] gap-2 items-center"
                 >
-                  <span className="text-sm text-morandi-secondary px-1">{LOCAL_PRICING_DIALOG_LABELS.檻次編號.replace('{index}', `${index + 1}`)}</span>
+                  <span className="text-sm text-morandi-secondary px-1">
+                    {LOCAL_PRICING_DIALOG_LABELS.檻次編號.replace('{index}', `${index + 1}`)}
+                  </span>
                   <Input
                     type="number"
                     value={tier.participants || ''}
@@ -189,12 +198,7 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
                 </div>
               ))}
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleAddTier}
-                className="w-full gap-2"
-              >
+              <Button variant="outline" size="sm" onClick={handleAddTier} className="w-full gap-2">
                 <Plus size={14} />
                 {LOCAL_PRICING_DIALOG_LABELS.新增檻次}
               </Button>
@@ -204,10 +208,15 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
             {matchedTier && matchedTier.unitPrice > 0 && (
               <div className="bg-morandi-gold/10 rounded-lg px-4 py-3 text-sm">
                 <span className="text-morandi-secondary">
-                  {LOCAL_PRICING_DIALOG_LABELS.人將使用檻次的報價.replace('{totalParticipants}', totalParticipants.toString()).replace('{matchedParticipants}', matchedTier.participants.toString())}
+                  {LOCAL_PRICING_DIALOG_LABELS.人將使用檻次的報價
+                    .replace('{totalParticipants}', totalParticipants.toString())
+                    .replace('{matchedParticipants}', matchedTier.participants.toString())}
                 </span>
                 <span className="font-semibold text-morandi-gold ml-1">
-                  {LOCAL_PRICING_DIALOG_LABELS.元每人.replace('{unitPrice}', matchedTier.unitPrice.toLocaleString())}
+                  {LOCAL_PRICING_DIALOG_LABELS.元每人.replace(
+                    '{unitPrice}',
+                    matchedTier.unitPrice.toLocaleString()
+                  )}
                 </span>
               </div>
             )}
@@ -220,7 +229,9 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
               <Button
                 onClick={handleConfirmClick}
                 className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-                disabled={tiers.some(t => !t.participants || t.participants <= 0 || !t.unitPrice || t.unitPrice <= 0)}
+                disabled={tiers.some(
+                  t => !t.participants || t.participants <= 0 || !t.unitPrice || t.unitPrice <= 0
+                )}
               >
                 <Check className="w-4 h-4 mr-2" />
                 {LOCAL_PRICING_DIALOG_LABELS.確認}
@@ -234,12 +245,21 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
               <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
                 <AlertTriangle size={20} className="text-amber-600 flex-shrink-0 mt-0.5" />
                 <div className="text-sm">
-                  <p className="font-medium text-amber-800">{LOCAL_PRICING_DIALOG_LABELS.人數變更提醒}</p>
-                  <p className="text-amber-700 mt-1">
-                    {LOCAL_PRICING_DIALOG_LABELS.人數變更提醒內容1.replace('{totalParticipants}', totalParticipants.toString()).replace('{matchedParticipants}', (matchedTier?.participants || 0).toString())}
+                  <p className="font-medium text-amber-800">
+                    {LOCAL_PRICING_DIALOG_LABELS.人數變更提醒}
                   </p>
                   <p className="text-amber-700 mt-1">
-                    {LOCAL_PRICING_DIALOG_LABELS.人數變更提醒內容2前}<strong>{totalParticipants} 人</strong>{LOCAL_PRICING_DIALOG_LABELS.人數變更提醒內容2後}
+                    {LOCAL_PRICING_DIALOG_LABELS.人數變更提醒內容1
+                      .replace('{totalParticipants}', totalParticipants.toString())
+                      .replace(
+                        '{matchedParticipants}',
+                        (matchedTier?.participants || 0).toString()
+                      )}
+                  </p>
+                  <p className="text-amber-700 mt-1">
+                    {LOCAL_PRICING_DIALOG_LABELS.人數變更提醒內容2前}
+                    <strong>{totalParticipants} 人</strong>
+                    {LOCAL_PRICING_DIALOG_LABELS.人數變更提醒內容2後}
                   </p>
                 </div>
               </div>

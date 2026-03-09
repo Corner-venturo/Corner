@@ -10,13 +10,13 @@
 
 本次審計發現系統存在多層面的不一致問題，主要集中在：
 
-| 問題類別 | 嚴重程度 | 數量 |
-|---------|---------|------|
-| Workspace 隔離缺失 | P0 Critical | 5+ |
-| 權限檢查缺失 | P0 Critical | 6 |
-| 命名不一致 | P1 High | 15+ |
-| 審計欄位缺失 | P1 High | 45% API |
-| 樂觀更新缺失 | P2 Medium | 多處 |
+| 問題類別           | 嚴重程度    | 數量    |
+| ------------------ | ----------- | ------- |
+| Workspace 隔離缺失 | P0 Critical | 5+      |
+| 權限檢查缺失       | P0 Critical | 6       |
+| 命名不一致         | P1 High     | 15+     |
+| 審計欄位缺失       | P1 High     | 45% API |
+| 樂觀更新缺失       | P2 Medium   | 多處    |
 
 ---
 
@@ -26,18 +26,18 @@
 
 系統存在兩種 Store 架構：
 
-| 架構 | 特點 | 使用位置 |
-|------|------|----------|
+| 架構                     | 特點               | 使用位置                    |
+| ------------------------ | ------------------ | --------------------------- |
 | **新架構** `createStore` | 工廠函數、統一模式 | customers, orders, tours 等 |
-| **舊架構** 手動 zustand | 各自實作、模式不一 | auth, ui, pnr 等 |
+| **舊架構** 手動 zustand  | 各自實作、模式不一 | auth, ui, pnr 等            |
 
 ### 1.2 命名不一致
 
-| 問題 | 新架構 | 舊架構 |
-|------|--------|--------|
-| 新增方法 | `create*` | `add*` |
-| 讀取方法 | `fetch*` | `load*`, `get*` |
-| 刪除方法 | `delete*` | `remove*` |
+| 問題     | 新架構    | 舊架構          |
+| -------- | --------- | --------------- |
+| 新增方法 | `create*` | `add*`          |
+| 讀取方法 | `fetch*`  | `load*`, `get*` |
+| 刪除方法 | `delete*` | `remove*`       |
 
 ### 1.3 缺少 workspaceScoped 的 Store
 
@@ -53,10 +53,10 @@
 
 ### 1.4 錯誤處理不一致
 
-| Store | 錯誤處理方式 |
-|-------|-------------|
-| auth-store | throw Error |
-| ui-store | console.error |
+| Store            | 錯誤處理方式            |
+| ---------------- | ----------------------- |
+| auth-store       | throw Error             |
+| ui-store         | console.error           |
 | createStore 系列 | return null / undefined |
 
 ---
@@ -66,24 +66,27 @@
 ### 2.1 回傳格式一致性
 
 **標準格式**（60% 採用）：
+
 ```typescript
 { success: true, data: T } | { success: false, error: string }
 ```
 
 **不一致的 API**：
+
 - `/api/supabase/*` - 直接回傳 data 或 error
 - `/api/pnr/*` - 混合多種格式
 - `/api/reports/*` - 部分回傳 `{ result: T }`
 
 ### 2.2 Workspace 權限檢查
 
-| 狀態 | 百分比 | 說明 |
-|------|--------|------|
-| ✅ 有檢查 | 50% | 正確使用 workspace_id |
-| ⚠️ 部分檢查 | 30% | 只檢查 auth，未驗證 workspace |
-| ❌ 無檢查 | 20% | 完全沒有權限驗證 |
+| 狀態        | 百分比 | 說明                          |
+| ----------- | ------ | ----------------------------- |
+| ✅ 有檢查   | 50%    | 正確使用 workspace_id         |
+| ⚠️ 部分檢查 | 30%    | 只檢查 auth，未驗證 workspace |
+| ❌ 無檢查   | 20%    | 完全沒有權限驗證              |
 
 **無權限檢查的 API** (P0 Critical)：
+
 ```
 1. /api/proposals/[id]/packages - 無 workspace 驗證
 2. /api/timebox/* - 無 workspace 驗證
@@ -95,12 +98,12 @@
 
 ### 2.3 審計欄位設定
 
-| 欄位 | 設定率 | 說明 |
-|------|--------|------|
-| `created_at` | 90% | 多數有設定 |
-| `updated_at` | 85% | 多數有設定 |
-| `created_by` | 45% | **嚴重不足** |
-| `updated_by` | 40% | **嚴重不足** |
+| 欄位         | 設定率 | 說明         |
+| ------------ | ------ | ------------ |
+| `created_at` | 90%    | 多數有設定   |
+| `updated_at` | 85%    | 多數有設定   |
+| `created_by` | 45%    | **嚴重不足** |
+| `updated_by` | 40%    | **嚴重不足** |
 
 ---
 
@@ -110,22 +113,22 @@
 
 資料庫中存在多種命名：
 
-| 表格 | 欄位名稱 | 應統一為 |
-|------|---------|----------|
-| todos | `created_by_legacy` | `created_by` |
-| messages | `created_by_legacy_author` | `created_by` |
-| advance_lists | `created_by_legacy_author` | `created_by` |
-| itineraries | `created_by_legacy_user_id` | `created_by` |
-| bulletins | `created_by` | ✅ 正確 |
-| quote_versions | `created_by` | ✅ 正確 |
+| 表格           | 欄位名稱                    | 應統一為     |
+| -------------- | --------------------------- | ------------ |
+| todos          | `created_by_legacy`         | `created_by` |
+| messages       | `created_by_legacy_author`  | `created_by` |
+| advance_lists  | `created_by_legacy_author`  | `created_by` |
+| itineraries    | `created_by_legacy_user_id` | `created_by` |
+| bulletins      | `created_by`                | ✅ 正確      |
+| quote_versions | `created_by`                | ✅ 正確      |
 
 ### 3.2 日期類型不一致
 
-| 問題 | 現況 | 建議 |
-|------|------|------|
-| 資料庫 | `timestamptz` → `string` | 統一 |
-| 前端 types | 混用 `Date` 和 `string` | 全用 `string` |
-| 運行時 | Date 物件 | JSON 序列化為 string |
+| 問題       | 現況                     | 建議                 |
+| ---------- | ------------------------ | -------------------- |
+| 資料庫     | `timestamptz` → `string` | 統一                 |
+| 前端 types | 混用 `Date` 和 `string`  | 全用 `string`        |
+| 運行時     | Date 物件                | JSON 序列化為 string |
 
 ### 3.3 workspace_id 必填狀態
 
@@ -141,11 +144,11 @@ workspace_id: string
 
 ### 3.4 Foreign Key 命名
 
-| 模式 | 範例 | 使用率 |
-|------|------|--------|
-| `{table}_id` | `tour_id`, `order_id` | 80% ✅ |
-| `{relation}_id` | `parent_id`, `owner_id` | 15% |
-| 其他 | `ref_id`, `source` | 5% ❌ |
+| 模式            | 範例                    | 使用率 |
+| --------------- | ----------------------- | ------ |
+| `{table}_id`    | `tour_id`, `order_id`   | 80% ✅ |
+| `{relation}_id` | `parent_id`, `owner_id` | 15%    |
+| 其他            | `ref_id`, `source`      | 5% ❌  |
 
 ---
 
@@ -170,7 +173,7 @@ export async function getTodos(workspaceId: string) {
   const { data } = await supabase
     .from('todos')
     .select('*')
-    .eq('workspace_id', workspaceId)  // 加上這行
+    .eq('workspace_id', workspaceId) // 加上這行
     .order('created_at', { ascending: false })
   return data
 }
@@ -194,17 +197,18 @@ usePnrScheduleChanges.ts
 ### 4.3 WORKSPACE_SCOPED_TABLES 可能缺漏
 
 需確認以下表格是否應加入：
+
 - `timebox_items`
 - `timebox_templates`
 - `timebox_sessions`
 
 ### 4.4 樂觀更新缺失
 
-| Hook 類型 | 有樂觀更新 | 無樂觀更新 |
-|-----------|-----------|-----------|
-| createCloudHook 系列 | ✅ | - |
-| 手動 SWR hooks | 部分 | 部分 |
-| DAL 直接呼叫 | - | ❌ 全部 |
+| Hook 類型            | 有樂觀更新 | 無樂觀更新 |
+| -------------------- | ---------- | ---------- |
+| createCloudHook 系列 | ✅         | -          |
+| 手動 SWR hooks       | 部分       | 部分       |
+| DAL 直接呼叫         | -          | ❌ 全部    |
 
 ---
 
@@ -212,27 +216,27 @@ usePnrScheduleChanges.ts
 
 ### P0 - Critical（立即修復）
 
-| # | 問題 | 位置 | 影響 |
-|---|------|------|------|
-| 1 | DAL todos.ts 無 workspace 過濾 | `src/lib/dal/todos.ts` | 資料洩漏 |
-| 2 | 6 個 API 無權限檢查 | `src/app/api/*` | 安全漏洞 |
-| 3 | Store 缺少 workspaceScoped | 5 個 Store | 資料混亂 |
+| #   | 問題                           | 位置                   | 影響     |
+| --- | ------------------------------ | ---------------------- | -------- |
+| 1   | DAL todos.ts 無 workspace 過濾 | `src/lib/dal/todos.ts` | 資料洩漏 |
+| 2   | 6 個 API 無權限檢查            | `src/app/api/*`        | 安全漏洞 |
+| 3   | Store 缺少 workspaceScoped     | 5 個 Store             | 資料混亂 |
 
 ### P1 - High（本週修復）
 
-| # | 問題 | 位置 | 影響 |
-|---|------|------|------|
-| 4 | created_by/updated_by 未設定 | 45% API | 審計追蹤失效 |
-| 5 | PNR hooks 重複程式碼 | `src/hooks/pnr/*` | 維護困難 |
-| 6 | Store 命名不一致 | 全系統 | 開發混亂 |
+| #   | 問題                         | 位置              | 影響         |
+| --- | ---------------------------- | ----------------- | ------------ |
+| 4   | created_by/updated_by 未設定 | 45% API           | 審計追蹤失效 |
+| 5   | PNR hooks 重複程式碼         | `src/hooks/pnr/*` | 維護困難     |
+| 6   | Store 命名不一致             | 全系統            | 開發混亂     |
 
 ### P2 - Medium（本月修復）
 
-| # | 問題 | 位置 | 影響 |
-|---|------|------|------|
-| 7 | API 回傳格式不一致 | `src/app/api/*` | 前端處理複雜 |
-| 8 | 類型定義日期不一致 | `src/types/*` | 類型安全降低 |
-| 9 | 樂觀更新缺失 | 部分 hooks | UX 較差 |
+| #   | 問題               | 位置            | 影響         |
+| --- | ------------------ | --------------- | ------------ |
+| 7   | API 回傳格式不一致 | `src/app/api/*` | 前端處理複雜 |
+| 8   | 類型定義日期不一致 | `src/types/*`   | 類型安全降低 |
+| 9   | 樂觀更新缺失       | 部分 hooks      | UX 較差      |
 
 ---
 
@@ -306,5 +310,5 @@ src/lib/utils/audit-fields.ts (新建)
 
 ---
 
-*報告生成日期：2026-01-12*
-*審計版本：1.0*
+_報告生成日期：2026-01-12_
+_審計版本：1.0_

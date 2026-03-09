@@ -185,11 +185,14 @@ export function useListPageState<T extends Record<string, any>>(
   }, [])
 
   // ========== 排序處理 ==========
-  const handleSort = useCallback((field: string, order: 'asc' | 'desc') => {
-    setSortBy(field)
-    setSortOrder(order)
-    pagination.setCurrentPage(1) // 重置到第一頁
-  }, [pagination])
+  const handleSort = useCallback(
+    (field: string, order: 'asc' | 'desc') => {
+      setSortBy(field)
+      setSortOrder(order)
+      pagination.setCurrentPage(1) // 重置到第一頁
+    },
+    [pagination]
+  )
 
   // ========== 重置所有狀態 ==========
   const reset = useCallback(() => {

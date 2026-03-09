@@ -4,7 +4,6 @@
  * 當輸入姓名或身分證號時，自動搜尋現有顧客
  */
 
-
 import React from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -28,7 +27,8 @@ export function CustomerMatchDialog({
   onClose,
   onSelect,
 }: CustomerMatchDialogProps) {
-  const matchTypeLabel = matchType === 'name' ? COMP_ORDERS_LABELS.姓名 : COMP_ORDERS_LABELS.身分證號
+  const matchTypeLabel =
+    matchType === 'name' ? COMP_ORDERS_LABELS.姓名 : COMP_ORDERS_LABELS.身分證號
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -42,7 +42,7 @@ export function CustomerMatchDialog({
 
         <div className="flex-1 overflow-y-auto py-4">
           <div className="space-y-2">
-            {customers.map((customer) => (
+            {customers.map(customer => (
               <div
                 key={customer.id}
                 className="border border-morandi-border rounded-lg p-4 hover:bg-morandi-container/20 transition-colors cursor-pointer"
@@ -57,9 +57,7 @@ export function CustomerMatchDialog({
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-morandi-primary">
-                        {customer.name}
-                      </span>
+                      <span className="font-medium text-morandi-primary">{customer.name}</span>
                       {customer.verification_status === 'verified' && (
                         <span className="text-xs px-2 py-0.5 bg-status-success-bg text-status-success rounded">
                           {COMP_ORDERS_LABELS.LABEL_499}
@@ -74,38 +72,54 @@ export function CustomerMatchDialog({
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-morandi-muted">
                       {customer.passport_name && (
                         <div>
-                          <span className="text-xs text-morandi-muted">{COMP_ORDERS_LABELS.LABEL_9672}</span>
+                          <span className="text-xs text-morandi-muted">
+                            {COMP_ORDERS_LABELS.LABEL_9672}
+                          </span>
                           {customer.passport_name}
                         </div>
                       )}
                       {customer.national_id && (
                         <div>
-                          <span className="text-xs text-morandi-muted">{COMP_ORDERS_LABELS.LABEL_2866}</span>
+                          <span className="text-xs text-morandi-muted">
+                            {COMP_ORDERS_LABELS.LABEL_2866}
+                          </span>
                           {customer.national_id}
                         </div>
                       )}
                       {customer.passport_number && (
                         <div>
-                          <span className="text-xs text-morandi-muted">{COMP_ORDERS_LABELS.LABEL_9593}</span>
+                          <span className="text-xs text-morandi-muted">
+                            {COMP_ORDERS_LABELS.LABEL_9593}
+                          </span>
                           {customer.passport_number}
                         </div>
                       )}
                       {customer.birth_date && (
                         <div>
-                          <span className="text-xs text-morandi-muted">{COMP_ORDERS_LABELS.LABEL_94}</span>
+                          <span className="text-xs text-morandi-muted">
+                            {COMP_ORDERS_LABELS.LABEL_94}
+                          </span>
                           {customer.birth_date}
                         </div>
                       )}
                       {customer.phone && (
                         <div>
-                          <span className="text-xs text-morandi-muted">{COMP_ORDERS_LABELS.LABEL_9704}</span>
+                          <span className="text-xs text-morandi-muted">
+                            {COMP_ORDERS_LABELS.LABEL_9704}
+                          </span>
                           {customer.phone}
                         </div>
                       )}
                       {customer.gender && (
                         <div>
-                          <span className="text-xs text-morandi-muted">{COMP_ORDERS_LABELS.LABEL_8424}</span>
-                          {customer.gender === 'M' ? COMP_ORDERS_LABELS.男 : customer.gender === 'F' ? COMP_ORDERS_LABELS.女 : customer.gender}
+                          <span className="text-xs text-morandi-muted">
+                            {COMP_ORDERS_LABELS.LABEL_8424}
+                          </span>
+                          {customer.gender === 'M'
+                            ? COMP_ORDERS_LABELS.男
+                            : customer.gender === 'F'
+                              ? COMP_ORDERS_LABELS.女
+                              : customer.gender}
                         </div>
                       )}
                     </div>

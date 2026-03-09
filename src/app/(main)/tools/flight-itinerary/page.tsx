@@ -4,7 +4,6 @@
  * 用於將 Trip.com 等訂票憑證轉換為 Corner 風格
  */
 
-
 import React, { useState } from 'react'
 import { CornerFlightItinerary } from '@/features/itinerary/components/CornerFlightItinerary'
 import { Button } from '@/components/ui/button'
@@ -110,8 +109,10 @@ export default function FlightItineraryPage() {
 
   const getCurrentData = () => {
     switch (currentItinerary) {
-      case 1: return SAMPLE_DATA_1
-      default: return SAMPLE_DATA_1
+      case 1:
+        return SAMPLE_DATA_1
+      default:
+        return SAMPLE_DATA_1
     }
   }
 
@@ -134,7 +135,11 @@ export default function FlightItineraryPage() {
     <>
       <style>{PRINT_STYLES}</style>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent level={1} className="max-w-[900px] max-h-[90vh] overflow-y-auto p-0 print:max-w-full print:rounded-none print:max-h-none print:overflow-visible print:shadow-none" id="flight-itinerary-printable">
+        <DialogContent
+          level={1}
+          className="max-w-[900px] max-h-[90vh] overflow-y-auto p-0 print:max-w-full print:rounded-none print:max-h-none print:overflow-visible print:shadow-none"
+          id="flight-itinerary-printable"
+        >
           {/* 控制面板 - 只在螢幕上顯示 */}
           <div className="print:hidden sticky top-0 bg-background border-b border-border px-6 py-4 flex items-center justify-between z-10 rounded-t-xl">
             <DialogHeader className="flex-row items-center gap-2">
@@ -166,7 +171,11 @@ export default function FlightItineraryPage() {
                   English
                 </Button>
               </div>
-              <Button size="sm" onClick={handlePrint} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+              <Button
+                size="sm"
+                onClick={handlePrint}
+                className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
+              >
                 <Printer size={16} />
                 {FLIGHT_ITINERARY_LABELS.SAVING_2172}
               </Button>
@@ -175,7 +184,11 @@ export default function FlightItineraryPage() {
 
           {/* 行程單內容 */}
           <div className="print:p-0">
-            <CornerFlightItinerary data={getCurrentData()} language={language} companyName={ws.name} />
+            <CornerFlightItinerary
+              data={getCurrentData()}
+              language={language}
+              companyName={ws.name}
+            />
           </div>
         </DialogContent>
       </Dialog>

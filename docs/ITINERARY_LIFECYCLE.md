@@ -10,11 +10,11 @@
 
 ## 📊 問題：同一行程做三次
 
-| 階段 | 產出 | 問題 |
-|------|------|------|
-| 提案 | 網頁行程 | 第 1 版 |
-| 開團 | 手冊 | 第 2 版（重做）|
-| 出團 | Online App | 第 3 版（又重做）|
+| 階段 | 產出       | 問題              |
+| ---- | ---------- | ----------------- |
+| 提案 | 網頁行程   | 第 1 版           |
+| 開團 | 手冊       | 第 2 版（重做）   |
+| 出團 | Online App | 第 3 版（又重做） |
 
 **浪費人力 + 版本錯亂**
 
@@ -66,23 +66,23 @@
 
 ### 三個產出，一份資料
 
-| 產出 | 來源 | 差異 |
-|------|------|------|
-| **網頁行程** | itineraries | 全部顯示 |
-| **手冊** | itineraries + brochure_settings | 可隱藏部分景點 |
-| **Online App** | trips (從 itineraries 複製) | 領隊可更新時間 |
+| 產出           | 來源                            | 差異           |
+| -------------- | ------------------------------- | -------------- |
+| **網頁行程**   | itineraries                     | 全部顯示       |
+| **手冊**       | itineraries + brochure_settings | 可隱藏部分景點 |
+| **Online App** | trips (從 itineraries 複製)     | 領隊可更新時間 |
 
 ---
 
 ## 🔐 關鍵規則
 
-| 規則 | 說明 |
-|------|------|
-| **開團前** | itinerary 可自由編輯、可有多版本 |
-| **開團後** | itinerary 鎖定，只能修改內容，不能新增版本 |
+| 規則         | 說明                                       |
+| ------------ | ------------------------------------------ |
+| **開團前**   | itinerary 可自由編輯、可有多版本           |
+| **開團後**   | itinerary 鎖定，只能修改內容，不能新增版本 |
 | **手冊隱藏** | 設定存在 brochure_settings，不影響原始資料 |
-| **複製時機** | 確認交接時（最終版本）|
-| **時間欄位** | 選填，領隊可在 Online 更新 |
+| **複製時機** | 確認交接時（最終版本）                     |
+| **時間欄位** | 選填，領隊可在 Online 更新                 |
 
 ---
 
@@ -119,18 +119,18 @@
 ```sql
 CREATE TABLE trips (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  
+
   -- 來源
   source TEXT NOT NULL CHECK (source IN ('erp', 'user')),
   erp_tour_id UUID REFERENCES erp_tours(id),  -- 如果來自 ERP
-  
+
   -- 基本資訊
   title TEXT NOT NULL,
   subtitle TEXT,
   cover_image TEXT,
   departure_date DATE,
   return_date DATE,
-  
+
   -- 行程資料 (JSONB)
   itinerary_data JSONB NOT NULL DEFAULT '{}',
   -- 結構：
@@ -155,14 +155,14 @@ CREATE TABLE trips (
   --   "returnFlight": {...},
   --   "hotels": [...]
   -- }
-  
+
   -- 狀態
   status TEXT NOT NULL DEFAULT 'upcoming' CHECK (status IN ('upcoming', 'ongoing', 'completed')),
-  
+
   -- 權限
   created_by UUID REFERENCES users(id),
   leader_id UUID REFERENCES users(id),  -- 領隊
-  
+
   -- 時間戳
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

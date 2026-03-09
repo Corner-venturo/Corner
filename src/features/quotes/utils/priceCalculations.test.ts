@@ -8,11 +8,7 @@ import {
   calculateTierParticipantCounts,
   generateUniqueId,
 } from './priceCalculations'
-import type {
-  SellingPrices,
-  IdentityCosts,
-  AccommodationSummaryItem,
-} from '../types'
+import type { SellingPrices, IdentityCosts, AccommodationSummaryItem } from '../types'
 
 describe('normalizeNumber', () => {
   it('converts full-width digits to half-width', () => {
@@ -48,17 +44,53 @@ describe('calculateProfit', () => {
 
 describe('calculateIdentityProfits', () => {
   it('calculates profits for all identities', () => {
-    const selling: SellingPrices = { adult: 1000, child_with_bed: 800, child_no_bed: 600, single_room: 1200, infant: 100 }
-    const costs: IdentityCosts = { adult: 700, child_with_bed: 500, child_no_bed: 400, single_room: 900, infant: 50 }
+    const selling: SellingPrices = {
+      adult: 1000,
+      child_with_bed: 800,
+      child_no_bed: 600,
+      single_room: 1200,
+      infant: 100,
+    }
+    const costs: IdentityCosts = {
+      adult: 700,
+      child_with_bed: 500,
+      child_no_bed: 400,
+      single_room: 900,
+      infant: 50,
+    }
     const result = calculateIdentityProfits(selling, costs)
-    expect(result).toEqual({ adult: 300, child_with_bed: 300, child_no_bed: 200, single_room: 300, infant: 50 })
+    expect(result).toEqual({
+      adult: 300,
+      child_with_bed: 300,
+      child_no_bed: 200,
+      single_room: 300,
+      infant: 50,
+    })
   })
 
   it('handles zero costs', () => {
-    const selling: SellingPrices = { adult: 1000, child_with_bed: 800, child_no_bed: 600, single_room: 1200, infant: 100 }
-    const costs: IdentityCosts = { adult: 0, child_with_bed: 0, child_no_bed: 0, single_room: 0, infant: 0 }
+    const selling: SellingPrices = {
+      adult: 1000,
+      child_with_bed: 800,
+      child_no_bed: 600,
+      single_room: 1200,
+      infant: 100,
+    }
+    const costs: IdentityCosts = {
+      adult: 0,
+      child_with_bed: 0,
+      child_no_bed: 0,
+      single_room: 0,
+      infant: 0,
+    }
     const result = calculateIdentityProfits(selling, costs)
-    expect(result).toEqual({ adult: 1000, child_with_bed: 800, child_no_bed: 600, single_room: 1200, infant: 100 })
+    expect(result).toEqual({
+      adult: 1000,
+      child_with_bed: 800,
+      child_no_bed: 600,
+      single_room: 1200,
+      infant: 100,
+    })
   })
 })
 
@@ -67,7 +99,13 @@ describe('getRoomTypeCost', () => {
     { name: '雙人房', total_cost: 5000, averageCost: 2500, days: 2, capacity: 2 },
     { name: '三人房', total_cost: 6000, averageCost: 2000, days: 2, capacity: 3 },
   ]
-  const identityCosts: IdentityCosts = { adult: 10000, child_with_bed: 8000, child_no_bed: 6000, single_room: 12000, infant: 500 }
+  const identityCosts: IdentityCosts = {
+    adult: 10000,
+    child_with_bed: 8000,
+    child_no_bed: 6000,
+    single_room: 12000,
+    infant: 500,
+  }
 
   it('returns base cost for first room type', () => {
     const cost = getRoomTypeCost('雙人房', 'adult', accommodationSummary, identityCosts)
@@ -98,20 +136,42 @@ describe('getRoomTypeProfit', () => {
   const accommodationSummary: AccommodationSummaryItem[] = [
     { name: '雙人房', total_cost: 5000, averageCost: 2500, days: 2, capacity: 2 },
   ]
-  const identityCosts: IdentityCosts = { adult: 10000, child_with_bed: 8000, child_no_bed: 6000, single_room: 12000, infant: 500 }
+  const identityCosts: IdentityCosts = {
+    adult: 10000,
+    child_with_bed: 8000,
+    child_no_bed: 6000,
+    single_room: 12000,
+    infant: 500,
+  }
   const sellingPrices: SellingPrices = {
-    adult: 15000, child_with_bed: 12000, child_no_bed: 9000, single_room: 18000, infant: 1000,
-    room_types: { '雙人房': { adult: 15000, child: 12000 } },
+    adult: 15000,
+    child_with_bed: 12000,
+    child_no_bed: 9000,
+    single_room: 18000,
+    infant: 1000,
+    room_types: { 雙人房: { adult: 15000, child: 12000 } },
   }
 
   it('calculates profit for room type', () => {
-    const profit = getRoomTypeProfit('雙人房', 'adult', sellingPrices, accommodationSummary, identityCosts)
+    const profit = getRoomTypeProfit(
+      '雙人房',
+      'adult',
+      sellingPrices,
+      accommodationSummary,
+      identityCosts
+    )
     // cost=10000, price=15000, profit=5000
     expect(profit).toBe(5000)
   })
 
   it('returns negative when no selling price set', () => {
-    const profit = getRoomTypeProfit('不存在', 'adult', sellingPrices, accommodationSummary, identityCosts)
+    const profit = getRoomTypeProfit(
+      '不存在',
+      'adult',
+      sellingPrices,
+      accommodationSummary,
+      identityCosts
+    )
     // cost=0, price=0, profit=0
     expect(profit).toBe(0)
   })

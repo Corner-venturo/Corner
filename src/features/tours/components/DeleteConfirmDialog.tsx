@@ -28,9 +28,7 @@ export function DeleteConfirmDialog({
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <p className="text-sm text-morandi-primary">
-            {TOUR_DELETE.confirm_text(tour?.name)}
-          </p>
+          <p className="text-sm text-morandi-primary">{TOUR_DELETE.confirm_text(tour?.name)}</p>
           <div className="bg-morandi-red/5 border border-morandi-red/20 rounded-lg p-3 space-y-2">
             <p className="text-sm font-medium text-morandi-red">{TOUR_DELETE.impact_title}</p>
             <ul className="text-sm text-morandi-secondary space-y-1 ml-4">
@@ -46,7 +44,10 @@ export function DeleteConfirmDialog({
             <X size={16} />
             {TOUR_DELETE.cancel}
           </Button>
-          <Button onClick={onConfirm} className="bg-morandi-red hover:bg-morandi-red/90 text-white gap-2">
+          <Button
+            onClick={onConfirm}
+            className="bg-morandi-red hover:bg-morandi-red/90 text-white gap-2"
+          >
             <Trash2 size={16} />
             {TOUR_DELETE.confirm}
           </Button>

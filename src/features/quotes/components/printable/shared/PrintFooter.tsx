@@ -3,7 +3,6 @@
  * PrintFooter - 列印頁尾組件（共用）
  */
 
-
 import React from 'react'
 import { COMPANY } from '@/lib/constants/company'
 import { MORANDI_COLORS } from './print-styles'
@@ -28,7 +27,9 @@ export const PrintFooter: React.FC = () => {
         </p>
       </div>
       <div className="text-center text-xs" style={{ color: MORANDI_COLORS.lightGray }}>
-        <span>{companyFullName} © {new Date().getFullYear()}</span>
+        <span>
+          {companyFullName} © {new Date().getFullYear()}
+        </span>
       </div>
     </div>
   )

@@ -24,14 +24,14 @@ test.describe.serial('客戶管理完整生命週期測試', () => {
   test('1. 創建客戶並驗證資料正確儲存', { timeout: 60000 }, async ({ authenticatedPage: page }) => {
     // 監聽控制台錯誤
     const consoleErrors: string[] = []
-    page.on('console', (msg) => {
+    page.on('console', msg => {
       if (msg.type() === 'error') {
         consoleErrors.push(msg.text())
       }
     })
 
     // 監聽頁面錯誤
-    page.on('pageerror', (error) => {
+    page.on('pageerror', error => {
       consoleErrors.push(`Page error: ${error.message}`)
     })
 
@@ -128,7 +128,10 @@ test.describe.serial('客戶管理完整生命週期測試', () => {
     }
 
     // 找到新增的客戶
-    const customerInTable = page.locator('table tbody tr').filter({ hasText: testCustomerName }).first()
+    const customerInTable = page
+      .locator('table tbody tr')
+      .filter({ hasText: testCustomerName })
+      .first()
     const customerVisible = await customerInTable.isVisible({ timeout: 5000 }).catch(() => false)
 
     if (customerVisible) {
@@ -162,7 +165,10 @@ test.describe.serial('客戶管理完整生命週期測試', () => {
     }
 
     // 確認客戶在列表中可見
-    const customerCell = page.locator('table tbody tr').filter({ hasText: createdCustomerName! }).first()
+    const customerCell = page
+      .locator('table tbody tr')
+      .filter({ hasText: createdCustomerName! })
+      .first()
     const isVisible = await customerCell.isVisible({ timeout: 5000 }).catch(() => false)
 
     if (!isVisible) {
@@ -188,7 +194,10 @@ test.describe.serial('客戶管理完整生命週期測試', () => {
       console.log('對話框內容:', dialogContent?.substring(0, 200))
 
       // 關閉對話框
-      const closeButton = detailDialog.locator('button').filter({ hasText: /關閉|取消|×/ }).first()
+      const closeButton = detailDialog
+        .locator('button')
+        .filter({ hasText: /關閉|取消|×/ })
+        .first()
       if (await closeButton.isVisible()) {
         await closeButton.click()
       } else {
@@ -220,7 +229,10 @@ test.describe.serial('客戶管理完整生命週期測試', () => {
     console.log(`搜尋結果數量: ${beforeDeleteCount}`)
 
     // 找到該客戶的行
-    const customerRow = page.locator('table tbody tr').filter({ hasText: createdCustomerName! }).first()
+    const customerRow = page
+      .locator('table tbody tr')
+      .filter({ hasText: createdCustomerName! })
+      .first()
     const isVisible = await customerRow.isVisible({ timeout: 5000 }).catch(() => false)
 
     if (!isVisible) {
@@ -232,7 +244,7 @@ test.describe.serial('客戶管理完整生命週期測試', () => {
     // 找到該行的刪除按鈕
     const deleteButton = customerRow.locator('button[title="刪除顧客"], button:has(svg)').last()
 
-    if (!await deleteButton.isVisible({ timeout: 3000 }).catch(() => false)) {
+    if (!(await deleteButton.isVisible({ timeout: 3000 }).catch(() => false))) {
       console.log('⚠️ 無法找到刪除按鈕，跳過測試')
       test.skip()
       return
@@ -243,7 +255,9 @@ test.describe.serial('客戶管理完整生命週期測試', () => {
     await page.waitForTimeout(500)
 
     // 確認對話框（客戶可能有關聯訂單的警告）
-    const confirmDialog = page.locator('[role="alertdialog"], [role="dialog"]').filter({ hasText: /確定|刪除|確認|無法刪除/ })
+    const confirmDialog = page
+      .locator('[role="alertdialog"], [role="dialog"]')
+      .filter({ hasText: /確定|刪除|確認|無法刪除/ })
     if (await confirmDialog.isVisible({ timeout: 3000 }).catch(() => false)) {
       console.log('確認對話框已出現')
 
@@ -251,7 +265,10 @@ test.describe.serial('客戶管理完整生命週期測試', () => {
       const dialogText = await confirmDialog.textContent()
       if (dialogText?.includes('無法刪除') || dialogText?.includes('已被使用')) {
         console.log('客戶有關聯訂單，無法刪除')
-        const cancelButton = confirmDialog.locator('button').filter({ hasText: /取消|關閉/ }).first()
+        const cancelButton = confirmDialog
+          .locator('button')
+          .filter({ hasText: /取消|關閉/ })
+          .first()
         if (await cancelButton.isVisible()) {
           await cancelButton.click()
         }
@@ -260,7 +277,10 @@ test.describe.serial('客戶管理完整生命週期測試', () => {
         return
       }
 
-      const confirmButton = confirmDialog.locator('button').filter({ hasText: /^確定$|^確認$|確認刪除|^刪除$/ }).first()
+      const confirmButton = confirmDialog
+        .locator('button')
+        .filter({ hasText: /^確定$|^確認$|確認刪除|^刪除$/ })
+        .first()
       if (await confirmButton.isVisible({ timeout: 2000 }).catch(() => false)) {
         console.log('點擊確認按鈕...')
         await confirmButton.click({ force: true })
@@ -287,8 +307,10 @@ test.describe.serial('客戶管理完整生命週期測試', () => {
     console.log(`刪除後搜尋結果數量: ${afterDeleteCount}`)
 
     // 確認搜尋結果為空或不包含該客戶
-    const deletedCustomerRow = page.locator('table tbody tr').filter({ hasText: createdCustomerName! })
-    const stillExists = await deletedCustomerRow.count() > 0
+    const deletedCustomerRow = page
+      .locator('table tbody tr')
+      .filter({ hasText: createdCustomerName! })
+    const stillExists = (await deletedCustomerRow.count()) > 0
 
     if (stillExists) {
       console.log('客戶仍可見，嘗試重新載入頁面...')
@@ -303,7 +325,8 @@ test.describe.serial('客戶管理完整生命週期測試', () => {
         await page.waitForTimeout(1000)
       }
 
-      const afterReloadExists = await page.locator('table tbody tr').filter({ hasText: createdCustomerName! }).count() > 0
+      const afterReloadExists =
+        (await page.locator('table tbody tr').filter({ hasText: createdCustomerName! }).count()) > 0
       expect(afterReloadExists).toBe(false)
       console.log(`✅ 重新載入後客戶 ${createdCustomerName} 確認已刪除`)
     } else {

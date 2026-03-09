@@ -73,15 +73,15 @@ export function useSupplierWorkspaces(options?: UseSupplierWorkspacesOptions) {
     return (data || []) as SupplierWorkspace[]
   }
 
-  const { data: workspaces = [], error, isLoading } = useSWR(
-    ['supplier-workspaces', targetTypes.join(','), excludeCurrentWorkspace],
-    fetcher,
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-      dedupingInterval: 60000, // 1 分鐘內不重複請求
-    }
-  )
+  const {
+    data: workspaces = [],
+    error,
+    isLoading,
+  } = useSWR(['supplier-workspaces', targetTypes.join(','), excludeCurrentWorkspace], fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    dedupingInterval: 60000, // 1 分鐘內不重複請求
+  })
 
   return {
     workspaces,

@@ -13,7 +13,7 @@ export const LABELS = {
   NEW_ITINERARY: '新建行程',
   NEW_ITINERARY_TABLE: '新增行程表',
   ITINERARY_EDITOR: '行程編輯器',
-  
+
   // 按钮文字
   SAVE: '儲存',
   CANCEL: '取消',
@@ -27,19 +27,19 @@ export const LABELS = {
   CREATE_ITINERARY: '建立行程',
   COPY_ITINERARY: '複製行程',
   CONFIRM_COPY: '確認複製',
-  
+
   // 状态和消息
   LOADING: '載入中...',
   SAVING: '儲存中...',
   CREATING: '建立中...',
   COPYING: '複製中...',
   COPYING_PREFIX: '正在複製：',
-  
+
   // 筛选和选择
   MY_ITINERARY: '我的行程',
   ALL_AUTHORS: '全部作者',
   ALL_COMPANIES: '全部分公司',
-  
+
   // 行程相关
   DAY: '第',
   DAY_SUFFIX: '天',
@@ -50,7 +50,7 @@ export const LABELS = {
   NOTES: '備註',
   DAILY_ITINERARY: '每日行程',
   DAILY_TITLE: '每日標題',
-  
+
   // 表单字段
   ITINERARY_NAME_REQUIRED: '行程名稱 *',
   ITINERARY_CODE_OPTIONAL: '行程編號（選填）',
@@ -58,7 +58,7 @@ export const LABELS = {
   COUNTRY: '國家',
   DEPARTURE_DATE_REQUIRED: '出發日期 *',
   DAYS_REQUIRED: '行程天數 *',
-  
+
   // 航班相关
   FLIGHT_INFO_OPTIONAL: '航班資訊（選填）',
   OUTBOUND: '去程',
@@ -70,7 +70,7 @@ export const LABELS = {
   TAKEOFF: '起飛',
   LANDING: '降落',
   MULTIPLE_SEGMENTS_SELECT: '此航班有多個航段，請選擇：',
-  
+
   // 餐食和住宿
   BREAKFAST: '早餐',
   LUNCH: '午餐',
@@ -78,11 +78,11 @@ export const LABELS = {
   ACCOMMODATION_HOTEL: '住宿飯店',
   SAME_ACCOMMODATION: '續住',
   WARM_HOME: '溫暖的家',
-  
+
   // 旅游相关
   ARRIVE_DESTINATION: '抵達目的地',
   RETURN_TAIWAN: '返回台灣',
-  
+
   // 占位符文字
   EXAMPLE_OKINAWA: '例：沖繩五日遊',
   EXAMPLE_TOUR_CODE: '例：25JOK21CIG',
@@ -92,12 +92,12 @@ export const LABELS = {
   ENTER_NEW_CODE: '請輸入新的行程編號',
   ENTER_NEW_NAME: '請輸入新的行程名稱',
   SELECT_DAYS_FIRST: '請先選擇行程天數',
-  
+
   // 密码和安全
   EDIT_ONGOING_ITINERARY: '編輯待出發行程',
   EDIT_PASSWORD_WARNING: '此行程已綁定旅遊團，為避免誤觸修改，請輸入公司密碼以解鎖編輯。',
   ENTER_COMPANY_PASSWORD: '請輸入公司密碼',
-  
+
   // 复制相关
   COPY_DESCRIPTION1: '封面、行程內容、圖片等將會完整複製。',
   COPY_DESCRIPTION2: '關聯的報價單也會一併複製（客戶資料會清空，價格保留）。',
@@ -166,10 +166,12 @@ export const ITINERARY_ACTIONS_LABELS = {
   FILL_CODE_AND_NAME: '請填寫行程編號和行程名稱',
   STATUS_PROPOSAL: '開團',
   TO_BE_FILLED: '（待填寫）',
-  COPY_WITH_QUOTES: (count: number) => `行程已複製成功！同時複製了 ${count} 個報價單（客戶資料已清空）`,
+  COPY_WITH_QUOTES: (count: number) =>
+    `行程已複製成功！同時複製了 ${count} 個報價單（客戶資料已清空）`,
   COPY_SUCCESS: '行程已複製成功！',
   COPY_FAILED: '複製失敗，請稍後再試',
-  ARCHIVE_WITH_QUOTES: (count: number) => `此行程有 ${count} 個關聯的報價單。\n\n請選擇封存方式：\n• 同步封存：報價單也一併封存\n• 僅封存行程：斷開關聯，報價單保留`,
+  ARCHIVE_WITH_QUOTES: (count: number) =>
+    `此行程有 ${count} 個關聯的報價單。\n\n請選擇封存方式：\n• 同步封存：報價單也一併封存\n• 僅封存行程：斷開關聯，報價單保留`,
   ARCHIVE_TITLE: '封存行程',
   ARCHIVE_SYNC: '同步封存',
   ARCHIVE_ONLY: '僅封存行程',
@@ -179,7 +181,8 @@ export const ITINERARY_ACTIONS_LABELS = {
   DELETE_FAILED: '刪除失敗',
   UNARCHIVE_SUCCESS: '行程已取消封存',
   UNARCHIVE_FAILED: '取消封存失敗',
-  DELETE_WITH_QUOTES: (count: number) => `此行程有 ${count} 個關聯的報價單。\n\n刪除行程會同時刪除這些報價單，確定要刪除嗎？`,
+  DELETE_WITH_QUOTES: (count: number) =>
+    `此行程有 ${count} 個關聯的報價單。\n\n刪除行程會同時刪除這些報價單，確定要刪除嗎？`,
   DELETE_SIMPLE: '確定要刪除此行程嗎？此操作無法復原。',
   DELETE_TITLE: '刪除行程',
   DELETE_SUCCESS: '行程已刪除',
@@ -214,7 +217,8 @@ export const ITINERARY_DATA_LOADER_LABELS = {
 export const ITINERARY_EDITOR_LABELS = {
   STATUS_PROPOSAL: '開團',
   STATUS_ACTIVE: '待出發',
-  SAVE_LEADER_CONFIRM: (name: string) => `要將「${name}」新增到領隊資料庫嗎？\n下次可以直接搜尋選用。`,
+  SAVE_LEADER_CONFIRM: (name: string) =>
+    `要將「${name}」新增到領隊資料庫嗎？\n下次可以直接搜尋選用。`,
   SAVE_LEADER_TITLE: '儲存領隊資料',
   AUTO_SAVE_FAILED: '自動存檔失敗，請手動儲存',
   UNSAVED_CHANGES: '您有未儲存的變更，確定要離開嗎？',

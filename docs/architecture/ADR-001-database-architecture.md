@@ -5,6 +5,7 @@
 ## 背景
 
 Venturo 有兩個產品面向：
+
 1. **ERP 系統**（內部管理）— 團管理、訂單、收款、請款、報價等
 2. **Online 系統**（客戶面向）— 行程瀏覽、線上報名、訂單查詢等
 
@@ -31,17 +32,20 @@ Venturo 有兩個產品面向：
 ## 後果
 
 ### 正面
+
 - 開發速度快，新功能可以同時影響 ERP 和 Online
 - 不需要寫 sync service 或 event-driven 同步
 - 單一帳單，成本透明
 
 ### 負面
+
 - ERP 和 Online 的負載互相影響（未來可能需要 read replica）
 - Schema 變更需要同時考慮兩個系統的影響
 - RLS 策略複雜度較高（需要區分 ERP 和 Online 的存取權限）
 - 如果未來需要拆分，migration 成本較高
 
 ### 風險緩解
+
 - 透過 RLS 嚴格隔離不同角色的存取範圍
 - 監控 DB 效能，當 QPS 超過閾值時考慮 read replica
 - 保持 schema 設計的模組化，方便未來拆分

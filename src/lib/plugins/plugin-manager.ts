@@ -21,7 +21,10 @@ type HookHandler = (data: unknown, context: PluginContext) => Promise<unknown> |
 
 export class PluginManager {
   private plugins: Map<string, LoadedPlugin> = new Map()
-  private hooks: Map<PluginHookType, { pluginId: string; handler: HookHandler; priority: number }[]> = new Map()
+  private hooks: Map<
+    PluginHookType,
+    { pluginId: string; handler: HookHandler; priority: number }[]
+  > = new Map()
   private workspaceId: string
 
   constructor(workspaceId: string) {
@@ -300,14 +303,13 @@ export class PluginManager {
 
   private async setPluginStorage<T>(pluginId: string, key: string, value: T): Promise<void> {
     // plugin_storage 表尚未加入 Supabase 型別定義（需先執行 migration）
-    await dynamicFrom('plugin_storage')
-      .upsert({
-        workspace_id: this.workspaceId,
-        plugin_id: pluginId,
-        key,
-        value,
-        updated_at: new Date().toISOString(),
-      })
+    await dynamicFrom('plugin_storage').upsert({
+      workspace_id: this.workspaceId,
+      plugin_id: pluginId,
+      key,
+      value,
+      updated_at: new Date().toISOString(),
+    })
   }
 
   private async deletePluginStorage(pluginId: string, key: string): Promise<void> {
@@ -321,13 +323,12 @@ export class PluginManager {
 
   private async savePluginConfig(pluginId: string, config: PluginConfig): Promise<void> {
     // plugin_configs 表尚未加入 Supabase 型別定義（需先執行 migration）
-    await dynamicFrom('plugin_configs')
-      .upsert({
-        workspace_id: this.workspaceId,
-        plugin_id: pluginId,
-        config,
-        updated_at: new Date().toISOString(),
-      })
+    await dynamicFrom('plugin_configs').upsert({
+      workspace_id: this.workspaceId,
+      plugin_id: pluginId,
+      config,
+      updated_at: new Date().toISOString(),
+    })
   }
 }
 

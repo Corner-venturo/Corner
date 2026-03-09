@@ -8,7 +8,14 @@ import Underline from '@tiptap/extension-underline'
 import Highlight from '@tiptap/extension-highlight'
 import { useEffect, useCallback, useState, useRef, useMemo } from 'react'
 import { cn } from '@/lib/utils'
-import { Bold, Italic, Underline as UnderlineIcon, Strikethrough, Palette, Highlighter } from 'lucide-react'
+import {
+  Bold,
+  Italic,
+  Underline as UnderlineIcon,
+  Strikethrough,
+  Palette,
+  Highlighter,
+} from 'lucide-react'
 import { UI_LABELS } from './constants/labels'
 import { sanitizeHtml } from '@/lib/utils/sanitize'
 
@@ -45,7 +52,13 @@ const HIGHLIGHTS = [
   { label: '橙色', value: '#FFE0B2' },
 ]
 
-export function RichTextInput({ value, onChange, placeholder, className, singleLine = true }: RichTextInputProps) {
+export function RichTextInput({
+  value,
+  onChange,
+  placeholder,
+  className,
+  singleLine = true,
+}: RichTextInputProps) {
   const [showToolbar, setShowToolbar] = useState(false)
   const [toolbarPos, setToolbarPos] = useState({ top: 0, left: 0 })
   const [showColorPicker, setShowColorPicker] = useState(false)
@@ -53,26 +66,29 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Memoize extensions to prevent recreating on each render
-  const extensions = useMemo(() => [
-    StarterKit.configure({
-      // 保留 paragraph（必須），但禁用其他區塊類型
-      heading: false,
-      bulletList: false,
-      orderedList: false,
-      blockquote: false,
-      codeBlock: false,
-      horizontalRule: false,
-      hardBreak: singleLine ? false : undefined,
-    }),
-    TextStyle,
-    Color,
-    Underline.configure({
-      HTMLAttributes: {
-        class: 'underline',
-      },
-    }),
-    Highlight.configure({ multicolor: true }),
-  ], [singleLine])
+  const extensions = useMemo(
+    () => [
+      StarterKit.configure({
+        // 保留 paragraph（必須），但禁用其他區塊類型
+        heading: false,
+        bulletList: false,
+        orderedList: false,
+        blockquote: false,
+        codeBlock: false,
+        horizontalRule: false,
+        hardBreak: singleLine ? false : undefined,
+      }),
+      TextStyle,
+      Color,
+      Underline.configure({
+        HTMLAttributes: {
+          class: 'underline',
+        },
+      }),
+      Highlight.configure({ multicolor: true }),
+    ],
+    [singleLine]
+  )
 
   const editor = useEditor({
     immediatelyRender: false, // 避免 SSR hydration 問題
@@ -85,13 +101,15 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
           singleLine && 'whitespace-nowrap overflow-x-auto'
         ),
       },
-      handleKeyDown: singleLine ? (view, event) => {
-        if (event.key === 'Enter') {
-          event.preventDefault()
-          return true
-        }
-        return false
-      } : undefined,
+      handleKeyDown: singleLine
+        ? (view, event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault()
+              return true
+            }
+            return false
+          }
+        : undefined,
     },
     onUpdate: ({ editor }) => {
       const html = editor.getHTML()
@@ -133,15 +151,21 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
     }
   }, [value, editor])
 
-  const setColor = useCallback((color: string) => {
-    editor?.chain().focus().setColor(color).run()
-    setShowColorPicker(false)
-  }, [editor])
+  const setColor = useCallback(
+    (color: string) => {
+      editor?.chain().focus().setColor(color).run()
+      setShowColorPicker(false)
+    },
+    [editor]
+  )
 
-  const setHighlight = useCallback((color: string) => {
-    editor?.chain().focus().toggleHighlight({ color }).run()
-    setShowHighlightPicker(false)
-  }, [editor])
+  const setHighlight = useCallback(
+    (color: string) => {
+      editor?.chain().focus().toggleHighlight({ color }).run()
+      setShowHighlightPicker(false)
+    },
+    [editor]
+  )
 
   const removeHighlight = useCallback(() => {
     editor?.chain().focus().unsetHighlight().run()
@@ -313,10 +337,5 @@ export function htmlToPlainText(html: string): string {
 // 輔助函數：安全渲染 HTML
 export function RichTextDisplay({ html, className }: { html: string; className?: string }) {
   if (!html) return null
-  return (
-    <span
-      className={className}
-      dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
-    />
-  )
+  return <span className={className} dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }} />
 }

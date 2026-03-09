@@ -115,10 +115,13 @@ export function CardGridTemplate({
       {/* 底部：餐食 + 住宿 */}
       <div className="px-6 py-4 bg-[#B8A99A]/5 border-t border-[#B8A99A]/20 flex gap-6">
         <div className="flex-1">
-          <div className="text-xs text-[#B8A99A] font-medium mb-1">{COMP_EDITOR_LABELS.LABEL_9126}</div>
+          <div className="text-xs text-[#B8A99A] font-medium mb-1">
+            {COMP_EDITOR_LABELS.LABEL_9126}
+          </div>
           <div className="flex gap-4 text-sm">
             <span>
-              早：<EditableText
+              早：
+              <EditableText
                 value={editingDay.meals?.breakfast || ''}
                 fieldKey="meals-breakfast"
                 editingField={editingField}
@@ -129,7 +132,8 @@ export function CardGridTemplate({
               />
             </span>
             <span>
-              午：<EditableText
+              午：
+              <EditableText
                 value={editingDay.meals?.lunch || ''}
                 fieldKey="meals-lunch"
                 editingField={editingField}
@@ -140,7 +144,8 @@ export function CardGridTemplate({
               />
             </span>
             <span>
-              晚：<EditableText
+              晚：
+              <EditableText
                 value={editingDay.meals?.dinner || ''}
                 fieldKey="meals-dinner"
                 editingField={editingField}

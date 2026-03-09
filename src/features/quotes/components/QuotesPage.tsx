@@ -4,7 +4,6 @@
  * 顯示旅遊團列表，點擊開啟報價單管理懸浮視窗
  */
 
-
 import React, { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
@@ -16,7 +15,11 @@ import type { Tour, Quote } from '@/stores/types'
 import { cn } from '@/lib/utils'
 import { formatDateTW } from '@/lib/utils/format-date'
 import { CurrencyCell } from '@/components/table-cells'
-import { LOCAL_PRICING_DIALOG_LABELS, QUOTES_PAGE_LABELS, QUOTE_CONFIRMATION_SECTION_LABELS } from '../constants/labels';
+import {
+  LOCAL_PRICING_DIALOG_LABELS,
+  QUOTES_PAGE_LABELS,
+  QUOTE_CONFIRMATION_SECTION_LABELS,
+} from '../constants/labels'
 
 // 狀態篩選
 const STATUS_TABS = [
@@ -51,10 +54,11 @@ export const QuotesPage: React.FC = () => {
     // 搜尋篩選
     if (searchTerm) {
       const term = searchTerm.toLowerCase()
-      result = result.filter(quote =>
-        quote.code?.toLowerCase().includes(term) ||
-        quote.name?.toLowerCase().includes(term) ||
-        quote.customer_name?.toLowerCase().includes(term)
+      result = result.filter(
+        quote =>
+          quote.code?.toLowerCase().includes(term) ||
+          quote.name?.toLowerCase().includes(term) ||
+          quote.customer_name?.toLowerCase().includes(term)
       )
     }
 
@@ -76,10 +80,11 @@ export const QuotesPage: React.FC = () => {
     // 搜尋篩選
     if (searchTerm) {
       const term = searchTerm.toLowerCase()
-      result = result.filter(tour =>
-        tour.code?.toLowerCase().includes(term) ||
-        tour.name?.toLowerCase().includes(term) ||
-        tour.location?.toLowerCase().includes(term)
+      result = result.filter(
+        tour =>
+          tour.code?.toLowerCase().includes(term) ||
+          tour.name?.toLowerCase().includes(term) ||
+          tour.location?.toLowerCase().includes(term)
       )
     }
 
@@ -100,9 +105,7 @@ export const QuotesPage: React.FC = () => {
       label: QUOTES_PAGE_LABELS.團號,
       width: '140px',
       render: (_: unknown, row: Tour) => (
-        <span className="font-mono text-sm text-morandi-gold font-medium">
-          {row.code}
-        </span>
+        <span className="font-mono text-sm text-morandi-gold font-medium">{row.code}</span>
       ),
     },
     {
@@ -110,9 +113,7 @@ export const QuotesPage: React.FC = () => {
       label: QUOTES_PAGE_LABELS.團名,
       render: (_: unknown, row: Tour) => (
         <div className="flex items-center gap-2">
-          <span className="text-sm text-morandi-primary truncate">
-            {row.name || '-'}
-          </span>
+          <span className="text-sm text-morandi-primary truncate">{row.name || '-'}</span>
         </div>
       ),
     },
@@ -156,12 +157,14 @@ export const QuotesPage: React.FC = () => {
       render: (_: unknown, row: Tour) => {
         const count = tourQuoteCounts[row.id] || 0
         return (
-          <div className={cn(
-            'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium',
-            count > 0
-              ? 'bg-morandi-gold/10 text-morandi-gold'
-              : 'bg-morandi-container/50 text-morandi-secondary'
-          )}>
+          <div
+            className={cn(
+              'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium',
+              count > 0
+                ? 'bg-morandi-gold/10 text-morandi-gold'
+                : 'bg-morandi-container/50 text-morandi-secondary'
+            )}
+          >
             <FileText size={12} />
             <span>{count} 份</span>
           </div>
@@ -177,18 +180,14 @@ export const QuotesPage: React.FC = () => {
       label: QUOTES_PAGE_LABELS.編號,
       width: '120px',
       render: (_: unknown, row: Quote) => (
-        <span className="font-mono text-sm text-morandi-gold font-medium">
-          {row.code || '-'}
-        </span>
+        <span className="font-mono text-sm text-morandi-gold font-medium">{row.code || '-'}</span>
       ),
     },
     {
       key: 'name',
       label: QUOTES_PAGE_LABELS.報價單名稱,
       render: (_: unknown, row: Quote) => (
-        <span className="text-sm text-morandi-primary">
-          {row.name || '-'}
-        </span>
+        <span className="text-sm text-morandi-primary">{row.name || '-'}</span>
       ),
     },
     {
@@ -196,9 +195,7 @@ export const QuotesPage: React.FC = () => {
       label: QUOTE_CONFIRMATION_SECTION_LABELS.客戶,
       width: '150px',
       render: (_: unknown, row: Quote) => (
-        <span className="text-sm text-morandi-secondary">
-          {row.customer_name || '-'}
-        </span>
+        <span className="text-sm text-morandi-secondary">{row.customer_name || '-'}</span>
       ),
     },
     {
@@ -217,7 +214,9 @@ export const QuotesPage: React.FC = () => {
       label: QUOTES_PAGE_LABELS.金額,
       width: '140px',
       render: (_: unknown, row: Quote) => (
-        <CurrencyCell amount={(row as Quote & { total_amount?: number }).total_amount || row.total_cost || 0} />
+        <CurrencyCell
+          amount={(row as Quote & { total_amount?: number }).total_amount || row.total_cost || 0}
+        />
       ),
     },
     {
@@ -252,33 +251,33 @@ export const QuotesPage: React.FC = () => {
       searchPlaceholder={QUOTES_PAGE_LABELS.搜尋團號_團名}
       contentClassName="flex-1 overflow-hidden"
     >
-        {statusFilter === 'standalone' ? (
-          <EnhancedTable
-            columns={standaloneColumns}
-            data={standaloneQuotes as Quote[]}
-            loading={loading}
-            emptyMessage={QUOTES_PAGE_LABELS.尚無獨立報價單}
-            onRowClick={(row) => {
-              const quote = row as Quote & { quote_type?: string }
-              // 根據報價單類型跳轉到不同頁面
-              if (quote.quote_type === 'quick') {
-                router.push(`/quotes/quick/${quote.id}`)
-              } else {
-                router.push(`/quotes/${quote.id}`)
-              }
-            }}
-            rowClassName={() => "cursor-pointer hover:bg-morandi-gold/5"}
-          />
-        ) : (
-          <EnhancedTable
-            columns={tourColumns}
-            data={filteredTours as Tour[]}
-            loading={loading}
-            emptyMessage={QUOTES_PAGE_LABELS.尚無報價單資料}
-            onRowClick={(row) => setSelectedTour(row as Tour)}
-            rowClassName={() => "cursor-pointer hover:bg-morandi-gold/5"}
-          />
-        )}
+      {statusFilter === 'standalone' ? (
+        <EnhancedTable
+          columns={standaloneColumns}
+          data={standaloneQuotes as Quote[]}
+          loading={loading}
+          emptyMessage={QUOTES_PAGE_LABELS.尚無獨立報價單}
+          onRowClick={row => {
+            const quote = row as Quote & { quote_type?: string }
+            // 根據報價單類型跳轉到不同頁面
+            if (quote.quote_type === 'quick') {
+              router.push(`/quotes/quick/${quote.id}`)
+            } else {
+              router.push(`/quotes/${quote.id}`)
+            }
+          }}
+          rowClassName={() => 'cursor-pointer hover:bg-morandi-gold/5'}
+        />
+      ) : (
+        <EnhancedTable
+          columns={tourColumns}
+          data={filteredTours as Tour[]}
+          loading={loading}
+          emptyMessage={QUOTES_PAGE_LABELS.尚無報價單資料}
+          onRowClick={row => setSelectedTour(row as Tour)}
+          rowClassName={() => 'cursor-pointer hover:bg-morandi-gold/5'}
+        />
+      )}
 
       {/* 報價單管理懸浮視窗（依團顯示） */}
       {selectedTour && (

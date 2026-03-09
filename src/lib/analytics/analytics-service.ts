@@ -239,7 +239,10 @@ export class AnalyticsService {
         {
           name: '旅遊團數量',
           data: [
-            metrics.totalTours - metrics.activeTours - metrics.completedTours - metrics.cancelledTours,
+            metrics.totalTours -
+              metrics.activeTours -
+              metrics.completedTours -
+              metrics.cancelledTours,
             metrics.activeTours,
             metrics.completedTours,
             metrics.cancelledTours,

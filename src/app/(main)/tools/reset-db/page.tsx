@@ -43,7 +43,7 @@ export default function ResetDBPage() {
       for (const dbName of dbNames) {
         try {
           const openRequest = indexedDB.open(dbName)
-          await new Promise<void>((resolve) => {
+          await new Promise<void>(resolve => {
             openRequest.onsuccess = () => {
               const db = openRequest.result
               logger.log(`🔌 關閉 ${dbName} 連線...`)
@@ -69,9 +69,7 @@ export default function ResetDBPage() {
       try {
         await Promise.race([
           deleteSingleDB('venturo-db'),
-          new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('timeout')), 5000)
-          )
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000)),
         ])
         logger.log('✅ 舊資料庫已刪除')
       } catch (e) {
@@ -83,14 +81,11 @@ export default function ResetDBPage() {
 
       await Promise.race([
         deleteSingleDB('VenturoOfflineDB'),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('timeout')), 10000)
-        )
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000)),
       ])
 
       setStatus('success')
       setMessage(RESET_DB_LABELS.SUCCESS)
-
     } catch (error) {
       setStatus('error')
       if (error instanceof Error && error.message === 'timeout') {
@@ -116,9 +111,7 @@ export default function ResetDBPage() {
             <Database className="w-6 h-6" />
             {RESET_DB_LABELS.TITLE}
           </CardTitle>
-          <CardDescription>
-            {RESET_DB_LABELS.LABEL_4817}
-          </CardDescription>
+          <CardDescription>{RESET_DB_LABELS.LABEL_4817}</CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">
@@ -153,20 +146,25 @@ export default function ResetDBPage() {
                 <span className="text-morandi-secondary ml-2">{RESET_DB_LABELS.OLD_DB}</span>
               </div>
               <div className="mt-2 text-morandi-secondary">
-                {RESET_DB_LABELS.REBUILD_VERSION}<code className="bg-card px-2 py-1 rounded border">{RESET_DB_LABELS.REBUILD_VERSION_VALUE}</code>
+                {RESET_DB_LABELS.REBUILD_VERSION}
+                <code className="bg-card px-2 py-1 rounded border">
+                  {RESET_DB_LABELS.REBUILD_VERSION_VALUE}
+                </code>
               </div>
             </div>
           </div>
 
           {/* 狀態訊息 */}
           {status !== 'idle' && (
-            <div className={`p-4 rounded-lg border ${
-              status === 'success'
-                ? 'bg-status-success-bg border-status-success/30 text-status-success'
-                : status === 'error'
-                ? 'bg-status-danger-bg border-status-danger/30 text-status-danger'
-                : 'bg-status-info-bg border-status-info/30 text-status-info'
-            }`}>
+            <div
+              className={`p-4 rounded-lg border ${
+                status === 'success'
+                  ? 'bg-status-success-bg border-status-success/30 text-status-success'
+                  : status === 'error'
+                    ? 'bg-status-danger-bg border-status-danger/30 text-status-danger'
+                    : 'bg-status-info-bg border-status-info/30 text-status-info'
+              }`}
+            >
               <div className="flex gap-2">
                 {status === 'success' ? (
                   <CheckCircle2 className="h-5 w-5 flex-shrink-0 mt-0.5" />
@@ -206,11 +204,13 @@ export default function ResetDBPage() {
             </summary>
             <div className="mt-2 space-y-2 pl-4">
               <p>
-                <strong>{RESET_DB_LABELS.LABEL_5751}</strong>{RESET_DB_LABELS.LABEL_8168}
+                <strong>{RESET_DB_LABELS.LABEL_5751}</strong>
+                {RESET_DB_LABELS.LABEL_8168}
                 {RESET_DB_LABELS.NOT_FOUND_9170}
               </p>
               <p>
-                <strong>{RESET_DB_LABELS.LABEL_7651}</strong>{RESET_DB_LABELS.ADD_2547}
+                <strong>{RESET_DB_LABELS.LABEL_7651}</strong>
+                {RESET_DB_LABELS.ADD_2547}
                 {RESET_DB_LABELS.LABEL_995}
               </p>
               <p>

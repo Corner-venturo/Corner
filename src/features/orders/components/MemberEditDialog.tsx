@@ -1,7 +1,7 @@
 'use client'
 /**
  * MemberEditDialog - 成員編輯/驗證對話框
- * 
+ *
  * 功能：
  * - 編輯成員資料
  * - 驗證護照資料（OCR 後確認）
@@ -10,7 +10,6 @@
  *
  * 2025-06-27: 改用統一的 ImageEditor 元件
  */
-
 
 import React, { useState, useCallback } from 'react'
 import { AlertTriangle, Pencil, X, RefreshCw } from 'lucide-react'
@@ -44,7 +43,7 @@ async function compressImage(file: File): Promise<File> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
-    reader.onload = (ev) => {
+    reader.onload = ev => {
       const img = new Image()
       img.src = ev.target?.result as string
       img.onload = () => {
@@ -69,7 +68,7 @@ async function compressImage(file: File): Promise<File> {
         }
         ctx.drawImage(img, 0, 0, width, height)
         canvas.toBlob(
-          (blob) => {
+          blob => {
             if (blob) {
               resolve(new File([blob], file.name, { type: 'image/jpeg' }))
             } else {
@@ -147,7 +146,10 @@ export function MemberEditDialog({
       })
 
       // 如果顧客有護照照片，也更新成員的護照照片
-      if (customer.passport_image_url && customer.passport_image_url !== editingMember.passport_image_url) {
+      if (
+        customer.passport_image_url &&
+        customer.passport_image_url !== editingMember.passport_image_url
+      ) {
         onMemberChange({
           ...editingMember,
           passport_image_url: customer.passport_image_url,
@@ -163,47 +165,50 @@ export function MemberEditDialog({
   }, [editingMember, editFormData, onFormDataChange, onMemberChange])
 
   // 上傳護照照片
-  const handleUploadPassport = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file || !editingMember) return
+  const handleUploadPassport = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0]
+      if (!file || !editingMember) return
 
-    try {
-      const compressedFile = await compressImage(file)
-      const random = Math.random().toString(36).substring(2, 8)
-      const fileName = `passport_${Date.now()}_${random}.jpg`
+      try {
+        const compressedFile = await compressImage(file)
+        const random = Math.random().toString(36).substring(2, 8)
+        const fileName = `passport_${Date.now()}_${random}.jpg`
 
-      const { error: uploadError } = await supabase.storage
-        .from('passport-images')
-        .upload(fileName, compressedFile, { upsert: true })
+        const { error: uploadError } = await supabase.storage
+          .from('passport-images')
+          .upload(fileName, compressedFile, { upsert: true })
 
-      if (uploadError) throw uploadError
+        if (uploadError) throw uploadError
 
-      const { data: urlData, error: urlError } = await supabase.storage
-        .from('passport-images')
-        .createSignedUrl(fileName, 3600 * 24 * 365) // 1 year signed URL
+        const { data: urlData, error: urlError } = await supabase.storage
+          .from('passport-images')
+          .createSignedUrl(fileName, 3600 * 24 * 365) // 1 year signed URL
 
-      if (urlError) throw urlError
+        if (urlError) throw urlError
 
-      onMemberChange({
-        ...editingMember,
-        passport_image_url: urlData.signedUrl,
-      })
+        onMemberChange({
+          ...editingMember,
+          passport_image_url: urlData.signedUrl,
+        })
 
-      toast.success(COMP_ORDERS_LABELS.護照照片已上傳)
+        toast.success(COMP_ORDERS_LABELS.護照照片已上傳)
 
-      // 自動進行 OCR
-      if (onRecognize) {
-        try {
-          await onRecognize(urlData.signedUrl)
-        } catch {
-          // OCR 失敗不影響上傳
+        // 自動進行 OCR
+        if (onRecognize) {
+          try {
+            await onRecognize(urlData.signedUrl)
+          } catch {
+            // OCR 失敗不影響上傳
+          }
         }
+      } catch (error) {
+        logger.error(COMP_ORDERS_LABELS.上傳護照照片失敗, error)
+        toast.error(COMP_ORDERS_LABELS.上傳失敗_請稍後再試)
       }
-    } catch (error) {
-      logger.error(COMP_ORDERS_LABELS.上傳護照照片失敗, error)
-      toast.error(COMP_ORDERS_LABELS.上傳失敗_請稍後再試)
-    }
-  }, [editingMember, onMemberChange, onRecognize])
+    },
+    [editingMember, onMemberChange, onRecognize]
+  )
 
   // 再次辨識
   const handleRecognize = useCallback(async () => {
@@ -213,7 +218,11 @@ export function MemberEditDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent nested level={2} className="max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+      <DialogContent
+        nested
+        level={2}
+        className="max-w-4xl max-h-[90vh] flex flex-col overflow-hidden"
+      >
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             {editMode === 'verify' ? (
@@ -242,10 +251,7 @@ export function MemberEditDialog({
           />
 
           {/* 右邊：表單 */}
-          <MemberInfoForm
-            formData={editFormData}
-            onChange={onFormDataChange}
-          />
+          <MemberInfoForm formData={editFormData} onChange={onFormDataChange} />
         </div>
 
         {/* 按鈕區域 - 固定在底部 */}
@@ -276,12 +282,17 @@ export function MemberEditDialog({
               onClick={onSave}
               disabled={isSaving}
               size="lg"
-              className={editMode === 'verify'
-                ? 'bg-status-success hover:bg-morandi-green text-white px-8 font-medium'
-                : 'bg-morandi-gold hover:bg-morandi-gold-hover text-white px-8 font-medium'
+              className={
+                editMode === 'verify'
+                  ? 'bg-status-success hover:bg-morandi-green text-white px-8 font-medium'
+                  : 'bg-morandi-gold hover:bg-morandi-gold-hover text-white px-8 font-medium'
               }
             >
-              {isSaving ? COMP_ORDERS_LABELS.儲存中 : editMode === 'verify' ? COMP_ORDERS_LABELS.確認驗證 : COMP_ORDERS_LABELS.儲存變更}
+              {isSaving
+                ? COMP_ORDERS_LABELS.儲存中
+                : editMode === 'verify'
+                  ? COMP_ORDERS_LABELS.確認驗證
+                  : COMP_ORDERS_LABELS.儲存變更}
             </Button>
           </div>
         </div>

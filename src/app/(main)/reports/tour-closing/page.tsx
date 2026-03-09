@@ -11,7 +11,13 @@ import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { TableColumn } from '@/components/ui/enhanced-table'
 import { DateCell, ActionCell, CurrencyCell } from '@/components/table-cells'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { TOUR_CLOSING_LABELS } from './constants/labels'
 
 interface TourClosingReport {
@@ -47,11 +53,7 @@ export default function TourClosingReportPage() {
       setLoading(true)
 
       // 取得當前 workspace
-      const { data: workspace } = await supabase
-        .from('workspaces')
-        .select('id')
-        .limit(1)
-        .single()
+      const { data: workspace } = await supabase.from('workspaces').select('id').limit(1).single()
 
       if (!workspace) {
         toast.error(TOUR_CLOSING_LABELS.WORKSPACE_NOT_FOUND)
@@ -83,7 +85,10 @@ export default function TourClosingReportPage() {
         .in('tour_id', tourIds)
 
       // 建立 tour -> orders 映射
-      const ordersByTour = new Map<string, Array<{ id: string; tour_id: string; paid_amount: number | null }>>()
+      const ordersByTour = new Map<
+        string,
+        Array<{ id: string; tour_id: string; paid_amount: number | null }>
+      >()
       const allOrderIds: string[] = []
 
       allOrders?.forEach(order => {
@@ -97,7 +102,10 @@ export default function TourClosingReportPage() {
       // 2. 平行批量查詢：成本、團員、獎金
       const paymentsByOrder = new Map<string, Array<{ amount: number | null }>>()
       const memberCountByOrder = new Map<string, number>()
-      const bonusByOrder = new Map<string, Array<{ supplier_name: string | null; amount: number | null; notes: string | null }>>()
+      const bonusByOrder = new Map<
+        string,
+        Array<{ supplier_name: string | null; amount: number | null; notes: string | null }>
+      >()
 
       if (allOrderIds.length > 0) {
         const [paymentsRes, membersRes, bonusRes] = await Promise.all([
@@ -109,10 +117,7 @@ export default function TourClosingReportPage() {
             .eq('status', 'paid')
             .neq('request_type', 'bonus'),
           // 團員
-          supabase
-            .from('order_members')
-            .select('order_id')
-            .in('order_id', allOrderIds),
+          supabase.from('order_members').select('order_id').in('order_id', allOrderIds),
           // 獎金
           supabase
             .from('payment_requests')
@@ -173,7 +178,8 @@ export default function TourClosingReportPage() {
         const netProfit = grossProfit - miscExpense - tax
 
         // 處理獎金
-        const salesBonuses: Array<{ employee_name: string; percentage: number; amount: number }> = []
+        const salesBonuses: Array<{ employee_name: string; percentage: number; amount: number }> =
+          []
         const opBonuses: Array<{ employee_name: string; percentage: number; amount: number }> = []
         let teamBonus = 0
 
@@ -187,13 +193,17 @@ export default function TourClosingReportPage() {
 
             if (bonus.supplier_name === TOUR_CLOSING_LABELS.BONUS_SALES) {
               salesBonuses.push({
-                employee_name: bonus.notes?.replace(/業務業績\s*\d+\.?\d*%/, '').trim() || TOUR_CLOSING_LABELS.UNKNOWN_EMPLOYEE,
+                employee_name:
+                  bonus.notes?.replace(/業務業績\s*\d+\.?\d*%/, '').trim() ||
+                  TOUR_CLOSING_LABELS.UNKNOWN_EMPLOYEE,
                 percentage,
                 amount: bonus.amount || 0,
               })
             } else if (bonus.supplier_name === TOUR_CLOSING_LABELS.BONUS_OP) {
               opBonuses.push({
-                employee_name: bonus.notes?.replace(/OP 獎金\s*\d+\.?\d*%/, '').trim() || TOUR_CLOSING_LABELS.UNKNOWN_EMPLOYEE,
+                employee_name:
+                  bonus.notes?.replace(/OP 獎金\s*\d+\.?\d*%/, '').trim() ||
+                  TOUR_CLOSING_LABELS.UNKNOWN_EMPLOYEE,
                 percentage,
                 amount: bonus.amount || 0,
               })
@@ -263,15 +273,23 @@ export default function TourClosingReportPage() {
       [TOUR_CLOSING_LABELS.EXCEL_DEPARTURE]: report.departure_date,
       [TOUR_CLOSING_LABELS.EXCEL_RETURN]: report.return_date,
       [TOUR_CLOSING_LABELS.EXCEL_CLOSING]: report.closing_date,
-      [TOUR_CLOSING_LABELS.EXCEL_SALES]: report.sales_bonuses.map(s => `${s.employee_name}(${s.percentage}%)`).join(', ') || '-',
-      [TOUR_CLOSING_LABELS.EXCEL_OP]: report.op_bonuses.map(o => `${o.employee_name}(${o.percentage}%)`).join(', ') || '-',
+      [TOUR_CLOSING_LABELS.EXCEL_SALES]:
+        report.sales_bonuses.map(s => `${s.employee_name}(${s.percentage}%)`).join(', ') || '-',
+      [TOUR_CLOSING_LABELS.EXCEL_OP]:
+        report.op_bonuses.map(o => `${o.employee_name}(${o.percentage}%)`).join(', ') || '-',
       [TOUR_CLOSING_LABELS.EXCEL_ORDER_AMOUNT]: report.total_revenue,
       [TOUR_CLOSING_LABELS.EXCEL_COST]: report.total_cost,
       [TOUR_CLOSING_LABELS.EXCEL_ADMIN_FEE]: report.misc_expense,
       [TOUR_CLOSING_LABELS.EXCEL_TAX]: report.tax,
       [TOUR_CLOSING_LABELS.EXCEL_TEAM_BONUS]: report.team_bonus,
-      [TOUR_CLOSING_LABELS.EXCEL_SALES_BONUS]: report.sales_bonuses.reduce((sum: number, s: { amount: number }) => sum + s.amount, 0),
-      [TOUR_CLOSING_LABELS.EXCEL_OP_BONUS]: report.op_bonuses.reduce((sum: number, o: { amount: number }) => sum + o.amount, 0),
+      [TOUR_CLOSING_LABELS.EXCEL_SALES_BONUS]: report.sales_bonuses.reduce(
+        (sum: number, s: { amount: number }) => sum + s.amount,
+        0
+      ),
+      [TOUR_CLOSING_LABELS.EXCEL_OP_BONUS]: report.op_bonuses.reduce(
+        (sum: number, o: { amount: number }) => sum + o.amount,
+        0
+      ),
       [TOUR_CLOSING_LABELS.EXCEL_GROSS_PROFIT]: report.gross_profit,
       [TOUR_CLOSING_LABELS.EXCEL_NET_PROFIT]: report.net_profit,
     }))
@@ -327,7 +345,7 @@ export default function TourClosingReportPage() {
       key: 'code',
       label: TOUR_CLOSING_LABELS.COL_TOUR_CODE,
       sortable: true,
-      render: (value) => <span className="font-mono">{String(value || "")}</span>,
+      render: value => <span className="font-mono">{String(value || '')}</span>,
     },
     {
       key: 'name',

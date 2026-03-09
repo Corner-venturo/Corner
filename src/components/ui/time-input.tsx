@@ -5,7 +5,10 @@ import { Input } from '@/components/ui/input'
 import { formatTimeInput, fullWidthToHalf } from '@/lib/utils/format-time-input'
 import { cn } from '@/lib/utils'
 
-interface TimeInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value'> {
+interface TimeInputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'onChange' | 'value'
+> {
   value: string
   onChange: (value: string) => void
 }
@@ -39,14 +42,17 @@ export function TimeInput({ value, onChange, className, ...props }: TimeInputPro
     onChange(formatted)
   }, [internalValue, onChange])
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Enter 時格式化
-    if (e.key === 'Enter') {
-      const formatted = formatTimeInput(internalValue)
-      setInternalValue(formatted)
-      onChange(formatted)
-    }
-  }, [internalValue, onChange])
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      // Enter 時格式化
+      if (e.key === 'Enter') {
+        const formatted = formatTimeInput(internalValue)
+        setInternalValue(formatted)
+        onChange(formatted)
+      }
+    },
+    [internalValue, onChange]
+  )
 
   return (
     <Input

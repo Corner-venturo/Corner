@@ -70,20 +70,28 @@ export function SettlementSection({
         {destinationCurrency && expectedForeign > 0 ? (
           <>
             <div className="space-y-1">
-              <p className="text-xs text-morandi-secondary">{TOUR_CONFIRMATION_LABELS.LABEL_949}{destinationCurrency})</p>
+              <p className="text-xs text-morandi-secondary">
+                {TOUR_CONFIRMATION_LABELS.LABEL_949}
+                {destinationCurrency})
+              </p>
               <p className="text-2xl font-mono font-medium text-morandi-gold">
                 {getCurrencySymbol(destinationCurrency)} {expectedForeign.toLocaleString()}
               </p>
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-morandi-secondary">{TOUR_CONFIRMATION_LABELS.LABEL_5818}{destinationCurrency})</p>
+              <p className="text-xs text-morandi-secondary">
+                {TOUR_CONFIRMATION_LABELS.LABEL_5818}
+                {destinationCurrency})
+              </p>
               <p className="text-2xl font-mono font-medium text-morandi-gold">
                 {getCurrencySymbol(destinationCurrency)} 0
               </p>
             </div>
           </>
         ) : (
-          <div className="text-sm text-morandi-secondary">{TOUR_CONFIRMATION_LABELS.EMPTY_7495}</div>
+          <div className="text-sm text-morandi-secondary">
+            {TOUR_CONFIRMATION_LABELS.EMPTY_7495}
+          </div>
         )}
       </div>
     </div>

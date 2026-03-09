@@ -129,11 +129,7 @@ export const PrintButton: React.FC<PrintButtonProps> = ({
       disabled={isPrinting}
       className={`gap-2 ${className || ''}`}
     >
-      {isPrinting ? (
-        <Loader2 size={16} className="animate-spin" />
-      ) : (
-        <Printer size={16} />
-      )}
+      {isPrinting ? <Loader2 size={16} className="animate-spin" /> : <Printer size={16} />}
       {label}
     </Button>
   )

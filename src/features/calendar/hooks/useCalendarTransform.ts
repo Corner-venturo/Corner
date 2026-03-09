@@ -124,7 +124,7 @@ export function useCalendarTransform(calendarEvents: CalendarEvent[]) {
 
         // 🔧 修正：全天事件只傳日期字串，避免 FullCalendar 時區轉換問題
         const startDate = event.all_day ? getDateInTaipei(event.start) : event.start
-        
+
         // FullCalendar 多日事件修正：全天事件的結束日期需要 +1 天
         let endDate: string | undefined = undefined
         if (event.end) {
@@ -175,20 +175,15 @@ export function useCalendarTransform(calendarEvents: CalendarEvent[]) {
         } else {
           const creator = employees?.find(emp => emp.id === event.created_by)
           creatorName =
-            creator?.display_name ||
-            creator?.chinese_name ||
-            creator?.english_name ||
-            '未知使用者'
+            creator?.display_name || creator?.chinese_name || creator?.english_name || '未知使用者'
         }
 
         const timeStr = getDisplayTime(event.start, event.all_day)
-        const displayTitle = timeStr
-          ? `${timeStr} 公司｜${event.title}`
-          : `公司｜${event.title}`
+        const displayTitle = timeStr ? `${timeStr} 公司｜${event.title}` : `公司｜${event.title}`
 
         // 🔧 修正：全天事件只傳日期字串，避免 FullCalendar 時區轉換問題
         const startDate = event.all_day ? getDateInTaipei(event.start) : event.start
-        
+
         // FullCalendar 多日事件修正：全天事件的結束日期需要 +1 天
         let endDate: string | undefined = undefined
         if (event.end) {

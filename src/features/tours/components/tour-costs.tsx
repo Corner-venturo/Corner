@@ -5,7 +5,13 @@ import { logger } from '@/lib/utils/logger'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Tour, Payment } from '@/stores/types'
 import {
   useOrdersSlim,
@@ -47,7 +53,12 @@ interface CostPayment extends Payment {
   receipt?: string
 }
 
-export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, showSummary = true, onChildDialogChange }: TourCostsProps) {
+export const TourCosts = React.memo(function TourCosts({
+  tour,
+  orderFilter,
+  showSummary = true,
+  onChildDialogChange,
+}: TourCostsProps) {
   const { items: orders } = useOrdersSlim()
   // 使用 @/data hooks（SWR 自動載入）
   const { items: paymentRequests } = usePaymentRequests()
@@ -110,7 +121,9 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
         updated_at: new Date().toISOString(),
       }
 
-      await createPaymentRequestApi(paymentRequestData as unknown as Parameters<typeof createPaymentRequestApi>[0])
+      await createPaymentRequestApi(
+        paymentRequestData as unknown as Parameters<typeof createPaymentRequestApi>[0]
+      )
       // SWR 快取失效，自動重新載入
       await invalidatePaymentRequests()
 
@@ -169,7 +182,9 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
   const costPayments = React.useMemo(() => {
     const tourOrderIds = new Set(tourOrders.map(o => o.id))
 
-    return (paymentRequests as unknown as (PaymentRequestWithItems & { deleted_at?: string | null })[])
+    return (
+      paymentRequests as unknown as (PaymentRequestWithItems & { deleted_at?: string | null })[]
+    )
       .filter(request => {
         // 排除已刪除的請款單
         if (request.deleted_at) return false
@@ -267,19 +282,31 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
           <div className="flex items-center gap-6 text-sm">
             <div className="flex items-center">
               <span className="text-morandi-secondary">{COMP_TOURS_LABELS.總成本}</span>
-              <CurrencyCell amount={totalCosts} className="ml-2 font-semibold text-morandi-primary" />
+              <CurrencyCell
+                amount={totalCosts}
+                className="ml-2 font-semibold text-morandi-primary"
+              />
             </div>
             <div className="flex items-center">
               <span className="text-morandi-secondary">{COMP_TOURS_LABELS.已確認}</span>
-              <CurrencyCell amount={confirmedCosts} className="ml-2 font-semibold text-morandi-green" />
+              <CurrencyCell
+                amount={confirmedCosts}
+                className="ml-2 font-semibold text-morandi-green"
+              />
             </div>
             <div className="flex items-center">
               <span className="text-morandi-secondary">{COMP_TOURS_LABELS.待確認}</span>
-              <CurrencyCell amount={pendingCosts} className="ml-2 font-semibold text-morandi-gold" />
+              <CurrencyCell
+                amount={pendingCosts}
+                className="ml-2 font-semibold text-morandi-gold"
+              />
             </div>
             <div className="flex items-center">
               <span className="text-morandi-secondary">{COMP_TOURS_LABELS.預估利潤}</span>
-              <CurrencyCell amount={Math.max(0, tour.total_revenue - totalCosts)} className="ml-2 font-semibold text-morandi-red" />
+              <CurrencyCell
+                amount={Math.max(0, tour.total_revenue - totalCosts)}
+                className="ml-2 font-semibold text-morandi-red"
+              />
             </div>
           </div>
           <Button
@@ -297,7 +324,9 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
       <div className="border border-border rounded-lg overflow-hidden">
         {/* 區塊標題行 */}
         <div className="bg-morandi-container/50 border-b border-border/60 px-4 py-2">
-          <span className="text-sm font-medium text-morandi-primary">{COMP_TOURS_LABELS.成本支出}</span>
+          <span className="text-sm font-medium text-morandi-primary">
+            {COMP_TOURS_LABELS.成本支出}
+          </span>
         </div>
         {/* 欄位標題行 */}
         <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-morandi-container/30 text-xs font-medium text-morandi-secondary">
@@ -323,7 +352,11 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
                 className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-morandi-container/20"
               >
                 <div className="col-span-2">
-                  <DateCell date={cost.created_at} showIcon className="text-sm text-morandi-primary" />
+                  <DateCell
+                    date={cost.created_at}
+                    showIcon
+                    className="text-sm text-morandi-primary"
+                  />
                 </div>
                 <div className="col-span-2">
                   <CurrencyCell amount={cost.amount} className="font-medium text-morandi-red" />
@@ -343,12 +376,16 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
                   </div>
                 </div>
                 <div className="col-span-1">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getReceiptBadge(COMP_TOURS_LABELS.待上傳)}`}>
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getReceiptBadge(COMP_TOURS_LABELS.待上傳)}`}
+                  >
                     {COMP_TOURS_LABELS.待上傳}
                   </span>
                 </div>
                 <div className="col-span-1">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusBadge(cost.status)}`}>
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusBadge(cost.status)}`}
+                  >
                     {getStatusLabel(cost.status)}
                   </span>
                 </div>
@@ -373,7 +410,9 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{COMP_TOURS_LABELS.支出金額}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {COMP_TOURS_LABELS.支出金額}
+              </label>
               <Input
                 type="number"
                 value={newCost.amount}
@@ -384,7 +423,9 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
             </div>
 
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{COMP_TOURS_LABELS.支出說明}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {COMP_TOURS_LABELS.支出說明}
+              </label>
               <Input
                 value={newCost.description}
                 onChange={e => setNewCost(prev => ({ ...prev, description: e.target.value }))}
@@ -394,7 +435,9 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
             </div>
 
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{COMP_TOURS_LABELS.類別}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {COMP_TOURS_LABELS.類別}
+              </label>
               <Select
                 value={newCost.category}
                 onValueChange={value => setNewCost(prev => ({ ...prev, category: value }))}
@@ -413,7 +456,9 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
             </div>
 
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{COMP_TOURS_LABELS.供應商}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {COMP_TOURS_LABELS.供應商}
+              </label>
               <Select
                 value={newCost.vendor}
                 onValueChange={value => setNewCost(prev => ({ ...prev, vendor: value }))}

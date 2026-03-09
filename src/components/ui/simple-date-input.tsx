@@ -39,27 +39,28 @@ export function SimpleDateInput({
   const day = parts[2] || ''
 
   // 轉換為 Date 物件（只有完整格式才解析）
-  const dateValue = value && value.match(/^\d{4}-\d{2}-\d{2}$/)
-    ? parse(value, 'yyyy-MM-dd', new Date())
-    : undefined
-  const minDate = min && min.match(/^\d{4}-\d{2}-\d{2}$/)
-    ? parse(min, 'yyyy-MM-dd', new Date())
-    : undefined
-  const defaultMonthDate = defaultMonth && defaultMonth.match(/^\d{4}-\d{2}-\d{2}$/)
-    ? parse(defaultMonth, 'yyyy-MM-dd', new Date())
-    : undefined
+  const dateValue =
+    value && value.match(/^\d{4}-\d{2}-\d{2}$/) ? parse(value, 'yyyy-MM-dd', new Date()) : undefined
+  const minDate =
+    min && min.match(/^\d{4}-\d{2}-\d{2}$/) ? parse(min, 'yyyy-MM-dd', new Date()) : undefined
+  const defaultMonthDate =
+    defaultMonth && defaultMonth.match(/^\d{4}-\d{2}-\d{2}$/)
+      ? parse(defaultMonth, 'yyyy-MM-dd', new Date())
+      : undefined
 
   // 計算日曆預設顯示的月份（優先級：當前值 > defaultMonth > min > 今天）
-  const calendarDefaultMonth = dateValue && isValid(dateValue)
-    ? dateValue
-    : defaultMonthDate && isValid(defaultMonthDate)
-      ? defaultMonthDate
-      : minDate && isValid(minDate)
-        ? minDate
-        : undefined
+  const calendarDefaultMonth =
+    dateValue && isValid(dateValue)
+      ? dateValue
+      : defaultMonthDate && isValid(defaultMonthDate)
+        ? defaultMonthDate
+        : minDate && isValid(minDate)
+          ? minDate
+          : undefined
 
   // 判斷是否為完整有效日期
-  const isCompleteDate = year.length === 4 && month.length === 2 && day.length === 2 && dateValue && isValid(dateValue)
+  const isCompleteDate =
+    year.length === 4 && month.length === 2 && day.length === 2 && dateValue && isValid(dateValue)
 
   // 格式化顯示文字（只有完整日期才顯示）
   const displayText = isCompleteDate ? format(dateValue!, 'yyyy/MM/dd') : ''
@@ -143,7 +144,14 @@ export function SimpleDateInput({
               className="text-morandi-secondary/60 hover:text-morandi-red transition-colors"
               title={UI_LABELS.LABEL_6342}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>

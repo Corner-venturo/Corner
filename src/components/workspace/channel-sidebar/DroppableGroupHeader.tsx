@@ -28,7 +28,9 @@ export function DroppableGroupHeader({
       >
         {isCollapsed ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
         <span>{groupName}</span>
-        {isOver && <span className="ml-auto text-morandi-gold">{COMP_WORKSPACE_LABELS.LABEL_2413}</span>}
+        {isOver && (
+          <span className="ml-auto text-morandi-gold">{COMP_WORKSPACE_LABELS.LABEL_2413}</span>
+        )}
       </button>
       {onDelete && (
         <button

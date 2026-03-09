@@ -26,7 +26,7 @@ interface DesktopActivityCarouselProps {
 export function DesktopActivityCarousel({
   activities,
   onActivityClick,
-  className = ''
+  className = '',
 }: DesktopActivityCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -45,7 +45,7 @@ export function DesktopActivityCarousel({
 
     container.scrollTo({
       left: scrollPosition,
-      behavior: 'smooth'
+      behavior: 'smooth',
     })
     setCurrentIndex(nextIndex)
   }
@@ -78,14 +78,14 @@ export function DesktopActivityCarousel({
         className="overflow-x-auto scrollbar-hide"
         style={{
           scrollBehavior: 'smooth',
-          scrollSnapType: 'x mandatory'
+          scrollSnapType: 'x mandatory',
         }}
       >
         <div
           className="flex gap-4"
           style={{
             paddingLeft: '20%',
-            paddingRight: '20%'
+            paddingRight: '20%',
           }}
         >
           {activities.map((activity, index) => (
@@ -97,7 +97,7 @@ export function DesktopActivityCarousel({
               )}
               style={{
                 width: '60%',
-                scrollSnapAlign: 'center'
+                scrollSnapAlign: 'center',
               }}
             >
               <AttractionCard
@@ -118,7 +118,7 @@ export function DesktopActivityCarousel({
         <>
           <button
             type="button"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation()
               scrollToIndex(currentIndex - 1)
             }}
@@ -129,7 +129,7 @@ export function DesktopActivityCarousel({
           </button>
           <button
             type="button"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation()
               scrollToIndex(currentIndex + 1)
             }}
@@ -148,7 +148,7 @@ export function DesktopActivityCarousel({
             <button
               key={index}
               type="button"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation()
                 scrollToIndex(index)
               }}

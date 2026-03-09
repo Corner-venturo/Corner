@@ -25,12 +25,14 @@
 ### 1. 單一來源原則 (Single Source of Truth)
 
 每個概念只在一處定義：
+
 - 權限定義 → `src/lib/permissions.ts`
 - 角色定義 → `src/lib/rbac-config.ts`
 - 型別定義 → `src/types/*.ts`
 - Store 工廠 → `src/stores/core/create-store.ts`
 
 **違規範例**：
+
 ```typescript
 // ❌ 錯誤：在多處定義相同的權限列表
 // file1.ts
@@ -48,6 +50,7 @@ const permissions = ['admin', 'user', ...] // 重複定義
 ### 3. 層級隔離原則 (Layer Isolation)
 
 每一層只與相鄰層溝通，禁止跨層調用：
+
 ```
 UI → Hooks → Store → API/DB
      ↑
@@ -93,12 +96,12 @@ UI → Hooks → Store → API/DB
 
 ### 層級職責詳解
 
-| 層級 | 可以做 | 不可以做 |
-|------|--------|----------|
-| UI | 調用 Hooks、渲染 UI、處理用戶事件 | 直接調用 Store、處理業務邏輯 |
-| Hook | 組合多個 Store、處理業務邏輯、資料轉換 | 直接調用 Supabase、寫入 DB |
-| Store | CRUD 操作、狀態管理、快取策略 | 處理業務規則、跨 Store 操作 |
-| API | 資料查詢、同步、錯誤處理 | 業務邏輯、UI 相關操作 |
+| 層級  | 可以做                                 | 不可以做                     |
+| ----- | -------------------------------------- | ---------------------------- |
+| UI    | 調用 Hooks、渲染 UI、處理用戶事件      | 直接調用 Store、處理業務邏輯 |
+| Hook  | 組合多個 Store、處理業務邏輯、資料轉換 | 直接調用 Supabase、寫入 DB   |
+| Store | CRUD 操作、狀態管理、快取策略          | 處理業務規則、跨 Store 操作  |
+| API   | 資料查詢、同步、錯誤處理               | 業務邏輯、UI 相關操作        |
 
 ---
 
@@ -130,11 +133,12 @@ UI → Hooks → Store → API/DB
 export const useTourStore = createStore<Tour>({
   tableName: 'tours',
   codePrefix: 'T',
-  workspaceScoped: true,  // 🔒 啟用隔離
+  workspaceScoped: true, // 🔒 啟用隔離
 })
 ```
 
 已啟用隔離的 Store：
+
 - `tours`, `itineraries`, `orders`, `customers`, `quotes`
 - `payment_requests`, `disbursement_orders`, `receipt_orders`
 - `members`, `quote_items`, `tour_addons`
@@ -148,6 +152,7 @@ export const useSupplierStore = createStore<Supplier>('suppliers', 'S')
 ```
 
 全局共享的 Store：
+
 - `suppliers`, `supplier_categories`
 - `regions`, `countries`, `cities`, `attractions`
 - `cost_templates`, `vendor_costs`
@@ -156,6 +161,7 @@ export const useSupplierStore = createStore<Supplier>('suppliers', 'S')
 ### 新增 Store 檢查清單
 
 建立新 Store 時，問自己：
+
 1. 這個資料是屬於特定公司/部門的嗎？ → 需要 `workspaceScoped: true`
 2. 這個資料是全系統共享的配置嗎？ → 不需要隔離
 3. Super Admin 需要跨 workspace 查看嗎？ → `canCrossWorkspace` 會自動處理
@@ -201,7 +207,7 @@ export const FEATURE_PERMISSIONS: PermissionConfig[] = [
 // ROLE_CONFIG 定義角色能力（不是權限列表）
 export const ROLE_CONFIG = {
   super_admin: {
-    canCrossWorkspace: true,  // 可跨 workspace
+    canCrossWorkspace: true, // 可跨 workspace
     canManageWorkspace: true, // 可管理 workspace
   },
   // ...
@@ -231,7 +237,7 @@ if (!hasPermissionForRoute(userPermissions, pathname)) {
 ```typescript
 // ❌ 錯誤：預設允許
 if (requiredPermissions.length === 0) {
-  return true  // 危險！未配置的路由會被允許訪問
+  return true // 危險！未配置的路由會被允許訪問
 }
 
 // ✅ 正確：預設拒絕
@@ -258,7 +264,7 @@ export const useTourStore = createStore<Tour>({
 })
 
 // ❌ 錯誤：自己寫 create
-export const useTourStore = create<TourState>((set) => ({
+export const useTourStore = create<TourState>(set => ({
   // 手動實作會遺漏快取、同步、隔離等功能
 }))
 ```
@@ -267,11 +273,11 @@ export const useTourStore = create<TourState>((set) => ({
 
 ```typescript
 interface StoreConfig {
-  tableName: TableName       // 必填：資料表名稱
-  codePrefix?: string        // 選填：編號前綴 (如 'T', 'O', 'Q')
-  workspaceScoped?: boolean  // 選填：是否啟用 workspace 隔離
-  enableSupabase?: boolean   // 選填：是否啟用 Supabase (預設 true)
-  fastInsert?: boolean       // 選填：是否使用快速寫入 (預設 true)
+  tableName: TableName // 必填：資料表名稱
+  codePrefix?: string // 選填：編號前綴 (如 'T', 'O', 'Q')
+  workspaceScoped?: boolean // 選填：是否啟用 workspace 隔離
+  enableSupabase?: boolean // 選填：是否啟用 Supabase (預設 true)
+  fastInsert?: boolean // 選填：是否使用快速寫入 (預設 true)
 }
 ```
 
@@ -352,15 +358,16 @@ const { data } = await supabase.from('orders').select()
 
 **統一格式**：`entity:{tableName}:{type}:{identifier?}`
 
-| 類型 | 格式 | 範例 |
-|------|------|------|
-| 列表 | `entity:{table}:list` | `entity:orders:list` |
-| 精簡列表 | `entity:{table}:slim` | `entity:orders:slim` |
-| 單筆詳情 | `entity:{table}:detail:{id}` | `entity:orders:detail:abc123` |
-| 分頁 | `entity:{table}:paginated:{params}` | `entity:orders:paginated:{...}` |
-| 字典 | `entity:{table}:dictionary` | `entity:orders:dictionary` |
+| 類型     | 格式                                | 範例                            |
+| -------- | ----------------------------------- | ------------------------------- |
+| 列表     | `entity:{table}:list`               | `entity:orders:list`            |
+| 精簡列表 | `entity:{table}:slim`               | `entity:orders:slim`            |
+| 單筆詳情 | `entity:{table}:detail:{id}`        | `entity:orders:detail:abc123`   |
+| 分頁     | `entity:{table}:paginated:{params}` | `entity:orders:paginated:{...}` |
+| 字典     | `entity:{table}:dictionary`         | `entity:orders:dictionary`      |
 
 **禁止使用的 Key 格式**：
+
 ```typescript
 // ❌ 禁止：簡短 key（會導致 mutate 無法同步）
 const SWR_KEY = 'orders'
@@ -373,20 +380,20 @@ const SWR_KEY = 'entity:order_members:list'
 
 #### 快取策略
 
-| 策略 | 適用場景 | 設定 |
-|------|---------|------|
-| **STATIC** | 國家、城市、景點等靜態資料 | 30 分鐘快取，不自動重新驗證 |
-| **DYNAMIC** | 訂單、成員等業務資料 | 1 分鐘快取，focus 時重新驗證 |
-| **REALTIME** | 訊息、待辦等即時資料 | 3 秒快取，搭配 Realtime 推送 |
+| 策略         | 適用場景                   | 設定                         |
+| ------------ | -------------------------- | ---------------------------- |
+| **STATIC**   | 國家、城市、景點等靜態資料 | 30 分鐘快取，不自動重新驗證  |
+| **DYNAMIC**  | 訂單、成員等業務資料       | 1 分鐘快取，focus 時重新驗證 |
+| **REALTIME** | 訊息、待辦等即時資料       | 3 秒快取，搭配 Realtime 推送 |
 
 ```typescript
 // 在 entity 定義時指定策略
 export const orderEntity = createEntityHook<Order>('orders', {
-  cache: CACHE_PRESETS.high,  // DYNAMIC 策略
+  cache: CACHE_PRESETS.high, // DYNAMIC 策略
 })
 
 export const countryEntity = createEntityHook<Country>('countries', {
-  cache: CACHE_PRESETS.static,  // STATIC 策略
+  cache: CACHE_PRESETS.static, // STATIC 策略
 })
 ```
 
@@ -397,11 +404,11 @@ SWR 自動去重：同一時間內相同 key 的請求只發一次。
 ```typescript
 // 這兩個組件同時渲染，只會發一次請求
 function ComponentA() {
-  const { items } = useOrders()  // key: entity:orders:list
+  const { items } = useOrders() // key: entity:orders:list
 }
 
 function ComponentB() {
-  const { items } = useOrders()  // key: entity:orders:list（共用）
+  const { items } = useOrders() // key: entity:orders:list（共用）
 }
 ```
 
@@ -439,23 +446,23 @@ function ComponentB() {
 
 #### 需要 Realtime 的表格
 
-| 表格 | 原因 | 優先級 |
-|------|------|--------|
-| `orders` | 多人同時操作，付款狀態變更 | P0 |
-| `tours` | 核心實體，狀態/人數變更 | P0 |
-| `receipt_orders` | 收款確認需即時同步 | P1 |
-| `visas` | 簽證狀態流程 | P1 |
-| `messages` | 聊天訊息（已實現）| ✅ 已完成 |
-| `todos` | 待辦事項（已實現）| ✅ 已完成 |
-| `calendar_events` | 行事曆（已實現）| ✅ 已完成 |
+| 表格              | 原因                       | 優先級    |
+| ----------------- | -------------------------- | --------- |
+| `orders`          | 多人同時操作，付款狀態變更 | P0        |
+| `tours`           | 核心實體，狀態/人數變更    | P0        |
+| `receipt_orders`  | 收款確認需即時同步         | P1        |
+| `visas`           | 簽證狀態流程               | P1        |
+| `messages`        | 聊天訊息（已實現）         | ✅ 已完成 |
+| `todos`           | 待辦事項（已實現）         | ✅ 已完成 |
+| `calendar_events` | 行事曆（已實現）           | ✅ 已完成 |
 
 #### 不需要 Realtime 的表格
 
-| 表格 | 原因 |
-|------|------|
-| `countries`, `cities`, `attractions` | 靜態資料，幾乎不變 |
-| `customers` | 低頻修改，多人同時編輯機率低 |
-| `suppliers` | 系統配置，變更少 |
+| 表格                                 | 原因                         |
+| ------------------------------------ | ---------------------------- |
+| `countries`, `cities`, `attractions` | 靜態資料，幾乎不變           |
+| `customers`                          | 低頻修改，多人同時編輯機率低 |
+| `suppliers`                          | 系統配置，變更少             |
 
 #### Realtime 訂閱管理
 
@@ -463,7 +470,7 @@ function ComponentB() {
 
 ```typescript
 // Supabase 會自動管理同名 channel
-const channel = supabase.channel('orders_realtime')  // 同名會複用
+const channel = supabase.channel('orders_realtime') // 同名會複用
 
 // 組件卸載時清理
 useEffect(() => {
@@ -479,7 +486,7 @@ useEffect(() => {
 // 未來：在 entity 配置中啟用 Realtime
 export const orderEntity = createEntityHook<Order>('orders', {
   cache: CACHE_PRESETS.high,
-  realtime: true,  // 啟用 Realtime 同步
+  realtime: true, // 啟用 Realtime 同步
 })
 ```
 
@@ -489,11 +496,11 @@ export const orderEntity = createEntityHook<Order>('orders', {
 
 #### 統一驗證組件
 
-| 組件 | 用途 | 位置 |
-|------|------|------|
-| `FieldError` | 顯示欄位錯誤訊息 | `@/components/ui/field-error` |
-| `FormField` | 表單欄位包裝器（含 label + error） | `@/components/ui/form-field` |
-| `Label` | 標籤（支援必填標記）| `@/components/ui/label` |
+| 組件         | 用途                               | 位置                          |
+| ------------ | ---------------------------------- | ----------------------------- |
+| `FieldError` | 顯示欄位錯誤訊息                   | `@/components/ui/field-error` |
+| `FormField`  | 表單欄位包裝器（含 label + error） | `@/components/ui/form-field`  |
+| `Label`      | 標籤（支援必填標記）               | `@/components/ui/label`       |
 
 ```typescript
 // ✅ 正確：使用統一組件
@@ -544,12 +551,12 @@ function OrderForm() {
 
 #### 錯誤訊息格式
 
-| 類型 | 格式 | 範例 |
-|------|------|------|
-| 必填 | `請輸入{欄位名}` | 請輸入聯絡人 |
-| 格式錯誤 | `{欄位名}格式不正確` | Email 格式不正確 |
+| 類型     | 格式                              | 範例                 |
+| -------- | --------------------------------- | -------------------- |
+| 必填     | `請輸入{欄位名}`                  | 請輸入聯絡人         |
+| 格式錯誤 | `{欄位名}格式不正確`              | Email 格式不正確     |
 | 範圍錯誤 | `{欄位名}必須在 {min}-{max} 之間` | 人數必須在 1-50 之間 |
-| 選擇 | `請選擇{欄位名}` | 請選擇旅遊團 |
+| 選擇     | `請選擇{欄位名}`                  | 請選擇旅遊團         |
 
 ---
 
@@ -589,13 +596,14 @@ router.push('/tours')
 router.push(`/orders/${orderId}`)
 
 // ❌ 錯誤：使用 window.location
-window.location.href = '/tours'      // 會造成完整頁面重載
-window.location.reload()             // 會丟失 React 狀態
+window.location.href = '/tours' // 會造成完整頁面重載
+window.location.reload() // 會丟失 React 狀態
 ```
 
 ### 例外情況
 
 只有以下情況才使用 `window.location`：
+
 1. 需要完全重置應用狀態（如登出後）
 2. 跳轉到外部網站
 
@@ -603,7 +611,7 @@ window.location.reload()             // 會丟失 React 狀態
 // 登出時可以使用 window.location
 const logout = () => {
   clearAuth()
-  window.location.href = '/login'  // 確保完全清除狀態
+  window.location.href = '/login' // 確保完全清除狀態
 }
 ```
 
@@ -628,7 +636,7 @@ window.location.reload()
 const syncTokenState = useCallback(() => {
   // 檢查 cookie 是否被 middleware 清除
   if (isAuthenticated && !hasAuthCookie()) {
-    logout()  // 前端同步登出
+    logout() // 前端同步登出
     return true
   }
   return false
@@ -651,7 +659,7 @@ try {
 
 // ❌ 錯誤：忽略錯誤
 const { data } = await supabase.from('tours').select()
-return data  // 如果有錯誤會是 null，但不會被處理
+return data // 如果有錯誤會是 null，但不會被處理
 ```
 
 ### 靜默降級
@@ -698,13 +706,13 @@ try {
 
 ### 獨立視角 vs 從屬視角
 
-| 類型 | 頁面 | 是否需要獨立路由 | 說明 |
-|------|------|-----------------|------|
-| **獨立視角** | 訂單 `/orders` | ✅ 需要 | 財務催收視角：「哪些訂單還沒付完」 |
-| **獨立視角** | 簽證 `/visas` | ✅ 需要 | 簽證流程視角：「哪些護照還沒送件」 |
-| **獨立視角** | 收款 `/finance/payments` | ✅ 需要 | 會計確認視角：「哪些收款單待確認」 |
-| **從屬視角** | 報價單 | ❌ 已隱藏 | 從團的操作去找（團內建立報價） |
-| **從屬視角** | 行程管理 | ❌ 已隱藏 | 從團的操作去找（團內編輯行程） |
+| 類型         | 頁面                     | 是否需要獨立路由 | 說明                               |
+| ------------ | ------------------------ | ---------------- | ---------------------------------- |
+| **獨立視角** | 訂單 `/orders`           | ✅ 需要          | 財務催收視角：「哪些訂單還沒付完」 |
+| **獨立視角** | 簽證 `/visas`            | ✅ 需要          | 簽證流程視角：「哪些護照還沒送件」 |
+| **獨立視角** | 收款 `/finance/payments` | ✅ 需要          | 會計確認視角：「哪些收款單待確認」 |
+| **從屬視角** | 報價單                   | ❌ 已隱藏        | 從團的操作去找（團內建立報價）     |
+| **從屬視角** | 行程管理                 | ❌ 已隱藏        | 從團的操作去找（團內編輯行程）     |
 
 ### 資料載入原則
 
@@ -713,19 +721,19 @@ try {
 useEffect(() => {
   fetchTours()
   fetchOrders()
-  fetchMembers()      // 這頁面不用
-  fetchCustomers()    // 這頁面也不用
-  fetchRegions()      // 有 denormalized 欄位
+  fetchMembers() // 這頁面不用
+  fetchCustomers() // 這頁面也不用
+  fetchRegions() // 有 denormalized 欄位
 }, [])
 
 // ✅ 正確：只載入眼睛現在要看的
 useEffect(() => {
-  fetchTours()  // 只要團列表
+  fetchTours() // 只要團列表
 }, [])
 
 // 需要時才載入
 const handleOpenDialog = () => {
-  regionsStore.fetchAll()  // Dialog 開啟時才需要
+  regionsStore.fetchAll() // Dialog 開啟時才需要
   setDialogOpen(true)
 }
 ```
@@ -763,12 +771,12 @@ Itineraries            →   行程展示
 
 ### 架構 TODO（待建立的制度）
 
-| 優先級 | 系統 | 說明 |
-|--------|------|------|
-| P0 | 資料流邊界系統 | 定義 ERP ↔ Online 的資料邊界 |
-| P1 | 供應商治理系統 | 供應商評分、分級、黑名單 |
-| P2 | 統一需求單系統 | 需求單模板、確認單追蹤 |
-| P3 | C 端回饋迴路 | 旅客行為回流到 ERP |
+| 優先級 | 系統           | 說明                         |
+| ------ | -------------- | ---------------------------- |
+| P0     | 資料流邊界系統 | 定義 ERP ↔ Online 的資料邊界 |
+| P1     | 供應商治理系統 | 供應商評分、分級、黑名單     |
+| P2     | 統一需求單系統 | 需求單模板、確認單追蹤       |
+| P3     | C 端回饋迴路   | 旅客行為回流到 ERP           |
 
 ---
 
@@ -821,7 +829,7 @@ Itineraries            →   行程展示
 
 ## 更新歷史
 
-| 日期 | 版本 | 變更內容 |
-|------|------|----------|
+| 日期       | 版本  | 變更內容                                                                      |
+| ---------- | ----- | ----------------------------------------------------------------------------- |
 | 2026-01-19 | 1.1.0 | 新增數據系統規範：快取層（SWR）、即時同步層（Realtime）、驗證層（Validation） |
-| 2025-12-09 | 1.0.0 | 初版建立：整合資料隔離、權限控制、Store 規範 |
+| 2025-12-09 | 1.0.0 | 初版建立：整合資料隔離、權限控制、Store 規範                                  |

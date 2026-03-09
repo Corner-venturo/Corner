@@ -135,8 +135,8 @@ function convertTimelineToMeals(days: TimelineDay[]): CostItem[] {
     // 從 attractions 中找餐食
     for (const attr of day.attractions) {
       if (attr.mealType && attr.mealType !== 'none' && attr.name) {
-        const mealLabel = attr.mealType === 'breakfast' ? '早餐' :
-                          attr.mealType === 'lunch' ? '午餐' : '晚餐'
+        const mealLabel =
+          attr.mealType === 'breakfast' ? '早餐' : attr.mealType === 'lunch' ? '午餐' : '晚餐'
         items.push({
           id: generateUUID(),
           name: `Day${dayNum} ${mealLabel}：${attr.name}`,
@@ -217,10 +217,7 @@ export async function syncItineraryToQuote(
     // 嘗試獲取 quote_id（優先順序：tour > proposal_package）
     // 1. 嘗試透過 tour_id 查找（旅遊團路徑）
     if (itinerary?.tour_id) {
-      const { data: tour } = await toursDb()
-        .select('quote_id')
-        .eq('id', itinerary.tour_id)
-        .single()
+      const { data: tour } = await toursDb().select('quote_id').eq('id', itinerary.tour_id).single()
 
       const tourData = tour as { quote_id: string | null } | null
       if (tourData?.quote_id) {
@@ -234,10 +231,7 @@ export async function syncItineraryToQuote(
       const pkgId = proposalPackageId || itinerary?.proposal_package_id
 
       if (pkgId) {
-        const { data: pkg } = await proposalPackagesDb()
-          .select('quote_id')
-          .eq('id', pkgId)
-          .single()
+        const { data: pkg } = await proposalPackagesDb().select('quote_id').eq('id', pkgId).single()
 
         const pkgData = pkg as { quote_id: string | null } | null
         if (pkgData?.quote_id) {
@@ -254,10 +248,7 @@ export async function syncItineraryToQuote(
     }
 
     // 2. 取得報價單現有的 categories
-    const { data: quote } = await quotesDb()
-      .select('categories')
-      .eq('id', quoteId)
-      .single()
+    const { data: quote } = await quotesDb().select('categories').eq('id', quoteId).single()
 
     if (!quote) {
       logger.warn('找不到報價單:', quoteId)
@@ -280,8 +271,8 @@ export async function syncItineraryToQuote(
           if (match) {
             const dayNum = match[1]
             const mealType = match[2]
-            const existingItem = cat.items.find(
-              old => old.name.startsWith(`Day${dayNum} ${mealType}`)
+            const existingItem = cat.items.find(old =>
+              old.name.startsWith(`Day${dayNum} ${mealType}`)
             )
             if (existingItem) {
               return {
@@ -332,7 +323,10 @@ export async function syncItineraryToQuote(
         total: 0,
       })
     }
-    if (!updatedCategories.find(c => c.id === 'accommodation') && newAccommodationItems.length > 0) {
+    if (
+      !updatedCategories.find(c => c.id === 'accommodation') &&
+      newAccommodationItems.length > 0
+    ) {
       updatedCategories.push({
         id: 'accommodation',
         name: '住宿',
@@ -380,10 +374,7 @@ export async function syncTimelineToQuote(
     }
 
     // 1. 取得報價單現有的 categories
-    const { data: quote } = await quotesDb()
-      .select('categories')
-      .eq('id', quoteId)
-      .single()
+    const { data: quote } = await quotesDb().select('categories').eq('id', quoteId).single()
 
     if (!quote) {
       logger.warn('找不到報價單:', quoteId)
@@ -406,8 +397,8 @@ export async function syncTimelineToQuote(
           if (match) {
             const dayNum = match[1]
             const mealType = match[2]
-            const existingItem = cat.items.find(
-              old => old.name.startsWith(`Day${dayNum} ${mealType}`)
+            const existingItem = cat.items.find(old =>
+              old.name.startsWith(`Day${dayNum} ${mealType}`)
             )
             if (existingItem) {
               return {
@@ -458,7 +449,10 @@ export async function syncTimelineToQuote(
         total: 0,
       })
     }
-    if (!updatedCategories.find(c => c.id === 'accommodation') && newAccommodationItems.length > 0) {
+    if (
+      !updatedCategories.find(c => c.id === 'accommodation') &&
+      newAccommodationItems.length > 0
+    ) {
       updatedCategories.push({
         id: 'accommodation',
         name: '住宿',

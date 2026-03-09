@@ -7,10 +7,15 @@ import { SimpleOrderTable } from '@/features/orders/components/simple-order-tabl
 import { AddReceiptDialog } from '@/features/finance/payments'
 import dynamic from 'next/dynamic'
 
-const AddRequestDialog = dynamic(() => import('@/features/finance/requests/components/AddRequestDialog').then(m => m.AddRequestDialog), { ssr: false })
+const AddRequestDialog = dynamic(
+  () =>
+    import('@/features/finance/requests/components/AddRequestDialog').then(m => m.AddRequestDialog),
+  { ssr: false }
+)
 
 // 訂單列表只需要的欄位（29 欄 → 15 欄）
-const ORDER_LIST_SELECT = 'id, order_number, code, contact_person, sales_person, assistant, tour_id, tour_name, paid_amount, remaining_amount, total_amount, status, member_count, created_at, workspace_id'
+const ORDER_LIST_SELECT =
+  'id, order_number, code, contact_person, sales_person, assistant, tour_id, tour_name, paid_amount, remaining_amount, total_amount, status, member_count, created_at, workspace_id'
 import { InvoiceDialog } from '@/features/finance/components/invoice-dialog'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -121,50 +126,53 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
   }, [])
 
   // 新增訂單
-  const handleAddOrder = useCallback(async (orderData: OrderFormData) => {
-    if (!currentWorkspace) return
+  const handleAddOrder = useCallback(
+    async (orderData: OrderFormData) => {
+      if (!currentWorkspace) return
 
-    try {
-      const nextOrderNumber = orders.length + 1
-      const orderNumber = `${tour.code}-O${nextOrderNumber.toString().padStart(2, '0')}`
+      try {
+        const nextOrderNumber = orders.length + 1
+        const orderNumber = `${tour.code}-O${nextOrderNumber.toString().padStart(2, '0')}`
 
-      await createOrder({
-        code: orderNumber,
-        order_number: orderNumber,
-        tour_id: tour.id,
-        tour_name: tour.name,
-        contact_person: orderData.contact_person,
-        sales_person: orderData.sales_person,
-        assistant: orderData.assistant,
-        member_count: 0,
-        total_amount: 0,
-        paid_amount: 0,
-        payment_status: 'unpaid',
-        remaining_amount: 0,
-        status: 'pending',
-        customer_id: null,
-      } as Omit<Order, 'id' | 'created_at' | 'updated_at'>)
+        await createOrder({
+          code: orderNumber,
+          order_number: orderNumber,
+          tour_id: tour.id,
+          tour_name: tour.name,
+          contact_person: orderData.contact_person,
+          sales_person: orderData.sales_person,
+          assistant: orderData.assistant,
+          member_count: 0,
+          total_amount: 0,
+          paid_amount: 0,
+          payment_status: 'unpaid',
+          remaining_amount: 0,
+          status: 'pending',
+          customer_id: null,
+        } as Omit<Order, 'id' | 'created_at' | 'updated_at'>)
 
-      setAddDialogOpen(false)
-      toast({ title: TOUR_ORDERS_LABELS.新增訂單成功 })
+        setAddDialogOpen(false)
+        toast({ title: TOUR_ORDERS_LABELS.新增訂單成功 })
 
-      // 重新載入訂單
-      const { data, error } = await supabase
-        .from('orders')
-        .select(ORDER_LIST_SELECT)
-        .eq('tour_id', tour.id)
-        .order('created_at', { ascending: false })
-      if (!error && data) setOrders(data as Order[])
+        // 重新載入訂單
+        const { data, error } = await supabase
+          .from('orders')
+          .select(ORDER_LIST_SELECT)
+          .eq('tour_id', tour.id)
+          .order('created_at', { ascending: false })
+        if (!error && data) setOrders(data as Order[])
 
-      // 重算團人數
-      recalculateParticipants(tour.id).catch(err => {
-        logger.error('重算團人數失敗:', err)
-      })
-    } catch (err) {
-      logger.error('新增訂單失敗:', err)
-      toast({ title: TOUR_ORDERS_LABELS.新增訂單失敗, variant: 'destructive' })
-    }
-  }, [currentWorkspace, orders.length, tour.code, tour.id, tour.name])
+        // 重算團人數
+        recalculateParticipants(tour.id).catch(err => {
+          logger.error('重算團人數失敗:', err)
+        })
+      } catch (err) {
+        logger.error('新增訂單失敗:', err)
+        toast({ title: TOUR_ORDERS_LABELS.新增訂單失敗, variant: 'destructive' })
+      }
+    },
+    [currentWorkspace, orders.length, tour.code, tour.id, tour.name]
+  )
 
   if (loading) {
     return (
@@ -210,7 +218,11 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
           <DialogHeader>
             <DialogTitle>{TOUR_ORDERS_LABELS.新增訂單}</DialogTitle>
           </DialogHeader>
-          <AddOrderForm tourId={tour.id} onSubmit={handleAddOrder} onCancel={() => setAddDialogOpen(false)} />
+          <AddOrderForm
+            tourId={tour.id}
+            onSubmit={handleAddOrder}
+            onCancel={() => setAddDialogOpen(false)}
+          />
         </DialogContent>
       </Dialog>
 
@@ -218,7 +230,7 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
       {selectedOrderForEdit && (
         <OrderEditDialog
           open={editDialogOpen}
-          onOpenChange={(open) => {
+          onOpenChange={open => {
             setEditDialogOpen(open)
             if (!open) {
               setSelectedOrderForEdit(null)

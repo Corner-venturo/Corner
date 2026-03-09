@@ -6,7 +6,6 @@
  * 可與原有 /itinerary/new 頁面並存
  */
 
-
 import { BLOCK_EDITOR_LABELS } from '../constants/labels'
 
 import { useState, useEffect, useCallback, useRef, Suspense } from 'react'
@@ -41,7 +40,9 @@ function BlockEditorPageContent() {
 
   // 自動存檔狀態
   const [isDirty, setIsDirty] = useState(false)
-  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>(
+    'idle'
+  )
 
   // 預覽模式
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop')
@@ -70,20 +71,34 @@ function BlockEditorPageContent() {
           city: itinerary.city || '',
           price: itinerary.price,
           priceNote: itinerary.price_note,
-          outboundFlight: (Array.isArray(itinerary.outbound_flight) ? itinerary.outbound_flight[0] : itinerary.outbound_flight) || {
-            airline: '', flightNumber: '', departureAirport: '',
-            departureTime: '', arrivalAirport: '', arrivalTime: '',
+          outboundFlight: (Array.isArray(itinerary.outbound_flight)
+            ? itinerary.outbound_flight[0]
+            : itinerary.outbound_flight) || {
+            airline: '',
+            flightNumber: '',
+            departureAirport: '',
+            departureTime: '',
+            arrivalAirport: '',
+            arrivalTime: '',
           },
-          returnFlight: (Array.isArray(itinerary.return_flight) ? itinerary.return_flight[0] : itinerary.return_flight) || {
-            airline: '', flightNumber: '', departureAirport: '',
-            departureTime: '', arrivalAirport: '', arrivalTime: '',
+          returnFlight: (Array.isArray(itinerary.return_flight)
+            ? itinerary.return_flight[0]
+            : itinerary.return_flight) || {
+            airline: '',
+            flightNumber: '',
+            departureAirport: '',
+            departureTime: '',
+            arrivalAirport: '',
+            arrivalTime: '',
           },
           flightStyle: itinerary.flight_style as TourFormData['flightStyle'],
           features: itinerary.features || [],
           featuresStyle: 'original',
           focusCards: itinerary.focus_cards || [],
           leader: itinerary.leader || { name: '', domesticPhone: '', overseasPhone: '' },
-          meetingPoints: itinerary.meeting_info ? [itinerary.meeting_info] : [{ time: '', location: '' }],
+          meetingPoints: itinerary.meeting_info
+            ? [itinerary.meeting_info]
+            : [{ time: '', location: '' }],
           hotels: itinerary.hotels || [],
           showFeatures: itinerary.show_features !== false,
           showLeaderMeeting: itinerary.show_leader_meeting !== false,
@@ -119,12 +134,20 @@ function BlockEditorPageContent() {
         country: '',
         city: '',
         outboundFlight: {
-          airline: '', flightNumber: '', departureAirport: '',
-          departureTime: '', arrivalAirport: '', arrivalTime: '',
+          airline: '',
+          flightNumber: '',
+          departureAirport: '',
+          departureTime: '',
+          arrivalAirport: '',
+          arrivalTime: '',
         },
         returnFlight: {
-          airline: '', flightNumber: '', departureAirport: '',
-          departureTime: '', arrivalAirport: '', arrivalTime: '',
+          airline: '',
+          flightNumber: '',
+          departureAirport: '',
+          departureTime: '',
+          arrivalAirport: '',
+          arrivalTime: '',
         },
         features: [],
         focusCards: [],
@@ -212,7 +235,11 @@ function BlockEditorPageContent() {
 
         if (newItinerary?.id) {
           setCurrentItineraryId(newItinerary.id)
-          window.history.replaceState(null, '', `/itinerary/block-editor?itinerary_id=${newItinerary.id}`)
+          window.history.replaceState(
+            null,
+            '',
+            `/itinerary/block-editor?itinerary_id=${newItinerary.id}`
+          )
         }
       }
 
@@ -260,7 +287,9 @@ function BlockEditorPageContent() {
             onClick={performAutoSave}
             disabled={!isDirty || autoSaveStatus === 'saving'}
           >
-            {autoSaveStatus === 'saving' ? BLOCK_EDITOR_LABELS.MANUAL_SAVING : BLOCK_EDITOR_LABELS.MANUAL_SAVE}
+            {autoSaveStatus === 'saving'
+              ? BLOCK_EDITOR_LABELS.MANUAL_SAVING
+              : BLOCK_EDITOR_LABELS.MANUAL_SAVE}
           </Button>
           <PublishButton
             data={{ ...tourData, id: currentItineraryId || undefined }}
@@ -271,95 +300,93 @@ function BlockEditorPageContent() {
       }
       contentClassName="flex-1 overflow-hidden"
     >
-        <div className="h-full flex">
-          {/* 左側：區塊編輯器 */}
-          <div className="w-1/2 bg-card border-r border-border flex flex-col">
-            <div className="h-12 bg-morandi-gold/90 text-white px-4 flex items-center justify-between border-b">
-              <div className="flex items-center gap-2">
-                <Sparkles size={16} />
-                <h2 className="text-sm font-semibold">{BLOCK_EDITOR_LABELS.BLOCK_EDITOR}</h2>
-              </div>
-              <div className="flex items-center gap-2 text-xs">
-                {autoSaveStatus === 'saving' && (
-                  <span className="flex items-center gap-1 text-white/80">
-                    <Cloud size={12} className="animate-pulse" />
-                    {BLOCK_EDITOR_LABELS.LABEL_2827}
-                  </span>
-                )}
-                {autoSaveStatus === 'saved' && (
-                  <span className="flex items-center gap-1 text-white/80">
-                    <Cloud size={12} />
-                    {BLOCK_EDITOR_LABELS.SAVING_4294}
-                  </span>
-                )}
-                {autoSaveStatus === 'error' && (
-                  <span className="flex items-center gap-1 text-morandi-red/80">
-                    <CloudOff size={12} />
-                    {BLOCK_EDITOR_LABELS.LABEL_6397}
-                  </span>
-                )}
-              </div>
+      <div className="h-full flex">
+        {/* 左側：區塊編輯器 */}
+        <div className="w-1/2 bg-card border-r border-border flex flex-col">
+          <div className="h-12 bg-morandi-gold/90 text-white px-4 flex items-center justify-between border-b">
+            <div className="flex items-center gap-2">
+              <Sparkles size={16} />
+              <h2 className="text-sm font-semibold">{BLOCK_EDITOR_LABELS.BLOCK_EDITOR}</h2>
             </div>
-            <div className="flex-1 overflow-y-auto p-4">
-              <BlockEditor
-                initialBlocks={blocks}
-                onBlocksChange={handleBlocksChange}
-                showToolbox
-              />
+            <div className="flex items-center gap-2 text-xs">
+              {autoSaveStatus === 'saving' && (
+                <span className="flex items-center gap-1 text-white/80">
+                  <Cloud size={12} className="animate-pulse" />
+                  {BLOCK_EDITOR_LABELS.LABEL_2827}
+                </span>
+              )}
+              {autoSaveStatus === 'saved' && (
+                <span className="flex items-center gap-1 text-white/80">
+                  <Cloud size={12} />
+                  {BLOCK_EDITOR_LABELS.SAVING_4294}
+                </span>
+              )}
+              {autoSaveStatus === 'error' && (
+                <span className="flex items-center gap-1 text-morandi-red/80">
+                  <CloudOff size={12} />
+                  {BLOCK_EDITOR_LABELS.LABEL_6397}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4">
+            <BlockEditor initialBlocks={blocks} onBlocksChange={handleBlocksChange} showToolbox />
+          </div>
+        </div>
+
+        {/* 右側：即時預覽 */}
+        <div className="w-1/2 bg-muted flex flex-col">
+          <div className="h-12 bg-card border-b px-4 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-morandi-primary">
+              {BLOCK_EDITOR_LABELS.LIVE_PREVIEW}
+            </h2>
+            <div className="flex gap-1 bg-morandi-container/30 rounded p-0.5">
+              <button
+                onClick={() => setViewMode('desktop')}
+                className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                  viewMode === 'desktop'
+                    ? 'bg-morandi-gold text-white'
+                    : 'text-morandi-secondary hover:text-morandi-primary'
+                }`}
+              >
+                {BLOCK_EDITOR_LABELS.DEVICE_DESKTOP}
+              </button>
+              <button
+                onClick={() => setViewMode('mobile')}
+                className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                  viewMode === 'mobile'
+                    ? 'bg-morandi-gold text-white'
+                    : 'text-morandi-secondary hover:text-morandi-primary'
+                }`}
+              >
+                {BLOCK_EDITOR_LABELS.DEVICE_MOBILE}
+              </button>
             </div>
           </div>
 
-          {/* 右側：即時預覽 */}
-          <div className="w-1/2 bg-muted flex flex-col">
-            <div className="h-12 bg-card border-b px-4 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-morandi-primary">{BLOCK_EDITOR_LABELS.LIVE_PREVIEW}</h2>
-              <div className="flex gap-1 bg-morandi-container/30 rounded p-0.5">
-                <button
-                  onClick={() => setViewMode('desktop')}
-                  className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
-                    viewMode === 'desktop'
-                      ? 'bg-morandi-gold text-white'
-                      : 'text-morandi-secondary hover:text-morandi-primary'
-                  }`}
-                >
-                  {BLOCK_EDITOR_LABELS.DEVICE_DESKTOP}
-                </button>
-                <button
-                  onClick={() => setViewMode('mobile')}
-                  className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
-                    viewMode === 'mobile'
-                      ? 'bg-morandi-gold text-white'
-                      : 'text-morandi-secondary hover:text-morandi-primary'
-                  }`}
-                >
-                  {BLOCK_EDITOR_LABELS.DEVICE_MOBILE}
-                </button>
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-auto p-4">
-              <div
-                className={`mx-auto bg-card shadow-lg rounded-lg overflow-hidden ${
-                  viewMode === 'mobile' ? 'max-w-[390px]' : 'max-w-[1200px]'
-                }`}
-                style={{ height: viewMode === 'mobile' ? '844px' : 'auto' }}
-              >
-                <div className="w-full h-full overflow-y-auto">
-                  <TourPreview
-                    data={{
-                      ...tourData,
-                      features: tourData.features.map(f => ({
-                        ...f,
-                        iconComponent: Sparkles,
-                      })),
-                    }}
-                    viewMode={viewMode}
-                  />
-                </div>
+          <div className="flex-1 overflow-auto p-4">
+            <div
+              className={`mx-auto bg-card shadow-lg rounded-lg overflow-hidden ${
+                viewMode === 'mobile' ? 'max-w-[390px]' : 'max-w-[1200px]'
+              }`}
+              style={{ height: viewMode === 'mobile' ? '844px' : 'auto' }}
+            >
+              <div className="w-full h-full overflow-y-auto">
+                <TourPreview
+                  data={{
+                    ...tourData,
+                    features: tourData.features.map(f => ({
+                      ...f,
+                      iconComponent: Sparkles,
+                    })),
+                  }}
+                  viewMode={viewMode}
+                />
               </div>
             </div>
           </div>
         </div>
+      </div>
     </ContentPageLayout>
   )
 }

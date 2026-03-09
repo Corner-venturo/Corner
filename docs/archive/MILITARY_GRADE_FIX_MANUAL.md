@@ -22,9 +22,11 @@
 ## 執行摘要
 
 ### 🎯 任務目標
+
 對 Venturo 專案進行全面深度檢查，發現並修復所有潛在的架構缺陷、安全漏洞和資料流問題。
 
 ### ⚠️ 嚴重程度分級
+
 - **🔴 嚴重 (Critical)**: 影響核心功能，可能導致資料遺失或洩漏
 - **🟠 高 (High)**: 影響用戶體驗，可能導致功能異常
 - **🟡 中 (Medium)**: 影響效能或可維護性
@@ -32,13 +34,13 @@
 
 ### 📊 修復統計
 
-| 分類 | 數量 | 狀態 |
-|------|------|------|
-| 🔴 嚴重問題 | 2 | ✅ 已修復 |
-| 🟠 高優先級 | 3 | ✅ 已修復 |
-| 🟡 中優先級 | 4 | ✅ 已修復 |
-| 🟢 低優先級 | 0 | - |
-| **總計** | **9** | **100%** |
+| 分類        | 數量  | 狀態      |
+| ----------- | ----- | --------- |
+| 🔴 嚴重問題 | 2     | ✅ 已修復 |
+| 🟠 高優先級 | 3     | ✅ 已修復 |
+| 🟡 中優先級 | 4     | ✅ 已修復 |
+| 🟢 低優先級 | 0     | -         |
+| **總計**    | **9** | **100%**  |
 
 ---
 
@@ -51,11 +53,13 @@
 **發現位置**: `src/components/editor/tour-form/hooks/useRegionData.ts`
 
 #### 問題描述
+
 1. **初始化邏輯缺陷**:
    - `initialCountryCode` 的 `useMemo` 依賴數組為空 `[]`
    - 導致首次掛載時如果 `countries` 還未載入，code 永遠為空字符串
 
 2. **競態條件**:
+
    ```typescript
    // ❌ 錯誤：countries 可能還沒載入
    const initialCountryCode = React.useMemo(() => {
@@ -70,11 +74,13 @@
    - 可能導致無限循環或狀態不一致
 
 #### 影響
+
 - 用戶選擇城市後，點擊輸入框時城市消失
 - `availableCities` 返回空數組
 - 表單資料無法正確保存
 
 #### 根本原因
+
 異步載入的 countries 資料與組件初始化時機不匹配，缺乏完善的狀態同步機制。
 
 ---
@@ -84,15 +90,18 @@
 **嚴重程度**: 🔴 嚴重
 **影響範圍**: 多租戶資料安全
 **發現位置**:
+
 - `src/hooks/createCloudHook.ts` (Line 58)
 - `supabase/migrations/20250122_add_itineraries_table.sql`
 
 #### 問題描述
+
 1. **資料庫結構缺陷**:
    - `itineraries` 表缺少 `workspace_id` 欄位
    - 無法實現多租戶隔離
 
 2. **RLS 策略過於寬鬆**:
+
    ```sql
    -- ❌ 危險：所有認證用戶都能看到所有行程
    CREATE POLICY "Allow authenticated users full access to itineraries"
@@ -106,11 +115,13 @@
    - 無法在編譯時發現資料結構不一致
 
 #### 影響
+
 - **資料洩漏風險**: 不同 workspace 的用戶可以看到彼此的行程
 - **查詢錯誤**: `createCloudHook` 嘗試過濾 `workspace_id` 導致查詢失敗
 - **審計追蹤缺失**: 無法追蹤誰建立/修改了行程
 
 #### 根本原因
+
 表格設計時未考慮多租戶需求，RLS 策略過於簡單，缺乏安全意識。
 
 ---
@@ -122,7 +133,9 @@
 **發現位置**: `src/components/ui/combobox.tsx` (Line 104-112)
 
 #### 問題描述
+
 1. **選項動態載入處理不當**:
+
    ```typescript
    // ❌ 問題：options 未包含在依賴中
    React.useEffect(() => {
@@ -141,6 +154,7 @@
    - 調試困難
 
 #### 影響
+
 - 表單輸入體驗差
 - 用戶誤以為資料遺失
 - 開發時難以定位問題
@@ -162,6 +176,7 @@
 #### 核心改進
 
 1. **階段化初始化**:
+
    ```typescript
    // ✅ 階段1：懶載入資料
    React.useEffect(() => {
@@ -181,6 +196,7 @@
    ```
 
 2. **完整的錯誤處理**:
+
    ```typescript
    if (!matchedCountry) {
      console.warn(`[useRegionData] 找不到國家: ${data.country}`)
@@ -203,10 +219,18 @@
          isInitialized: isInitializedRef.current,
        })
      }
-   }, [data.country, selectedCountry, selectedCountryCode, countries.length, cities.length, availableCities.length])
+   }, [
+     data.country,
+     selectedCountry,
+     selectedCountryCode,
+     countries.length,
+     cities.length,
+     availableCities.length,
+   ])
    ```
 
 #### 修復文件
+
 - ✅ `src/components/editor/tour-form/hooks/useRegionData.ts` - 完全重寫
 
 ---
@@ -218,6 +242,7 @@
 #### 核心改進
 
 1. **三種情況處理**:
+
    ```typescript
    React.useEffect(() => {
      const selectedOption = options.find(opt => opt.value === value)
@@ -242,6 +267,7 @@
    ```
 
 #### 修復文件
+
 - ✅ `src/components/ui/combobox.tsx` - 更新狀態同步邏輯
 
 ---
@@ -255,6 +281,7 @@
 創建完整的遷移腳本：`supabase/migrations/20251210_add_workspace_to_itineraries.sql`
 
 ##### 步驟1: 添加欄位
+
 ```sql
 -- 添加 workspace_id 欄位
 ALTER TABLE itineraries ADD COLUMN workspace_id UUID;
@@ -265,6 +292,7 @@ ALTER TABLE itineraries ADD COLUMN updated_by UUID;
 ```
 
 ##### 步驟2: 建立外鍵和索引
+
 ```sql
 -- 外鍵約束（保證資料完整性）
 ALTER TABLE itineraries
@@ -279,6 +307,7 @@ ON itineraries(workspace_id, status) WHERE _deleted = false;
 ```
 
 ##### 步驟3: 資料遷移
+
 ```sql
 -- 將現有資料設定到預設 workspace
 DO $$
@@ -300,6 +329,7 @@ END $$;
 ```
 
 ##### 步驟4: 更新 RLS 策略
+
 ```sql
 -- ✅ 嚴格的 workspace 隔離
 CREATE POLICY "itineraries_select_policy"
@@ -320,6 +350,7 @@ USING (
 ```
 
 ##### 步驟5: 自動觸發器
+
 ```sql
 -- 自動設定 workspace_id 和審計欄位
 CREATE OR REPLACE FUNCTION set_itinerary_workspace()
@@ -387,6 +418,7 @@ const WORKSPACE_SCOPED_TABLES = [
 ```
 
 #### 修復文件
+
 - ✅ `supabase/migrations/20251210_add_workspace_to_itineraries.sql` - 新增
 - ✅ `src/stores/types.ts` - 更新 Itinerary 介面
 - ✅ `src/hooks/createCloudHook.ts` - 重新啟用 workspace 支援
@@ -519,33 +551,33 @@ describe('軍事級別修復驗證', () => {
 
 #### 測試 1: 城市選擇器功能
 
-| 步驟 | 預期結果 | 狀態 |
-|------|----------|------|
-| 1. 打開行程表編輯頁面 | 頁面正常載入 | [ ] |
-| 2. 選擇國家「日本」 | 城市下拉列表顯示日本城市 | [ ] |
-| 3. 選擇城市「東京」 | 城市欄位顯示「東京」 | [ ] |
-| 4. 點擊城市輸入框 | 城市仍顯示「東京」，不會消失 | [ ] |
-| 5. 保存表單 | 資料正確保存到資料庫 | [ ] |
+| 步驟                  | 預期結果                     | 狀態 |
+| --------------------- | ---------------------------- | ---- |
+| 1. 打開行程表編輯頁面 | 頁面正常載入                 | [ ]  |
+| 2. 選擇國家「日本」   | 城市下拉列表顯示日本城市     | [ ]  |
+| 3. 選擇城市「東京」   | 城市欄位顯示「東京」         | [ ]  |
+| 4. 點擊城市輸入框     | 城市仍顯示「東京」，不會消失 | [ ]  |
+| 5. 保存表單           | 資料正確保存到資料庫         | [ ]  |
 
 #### 測試 2: Workspace 隔離
 
-| 步驟 | 預期結果 | 狀態 |
-|------|----------|------|
-| 1. 以 Workspace A 用戶登入 | 成功登入 | [ ] |
-| 2. 查看行程列表 | 只顯示 Workspace A 的行程 | [ ] |
-| 3. 新增行程 | workspace_id 自動設為 A | [ ] |
-| 4. 登出，以 Workspace B 用戶登入 | 成功登入 | [ ] |
-| 5. 查看行程列表 | 只顯示 Workspace B 的行程 | [ ] |
-| 6. 登出，以 Super Admin 登入 | 成功登入 | [ ] |
-| 7. 查看行程列表 | 顯示所有 workspace 的行程 | [ ] |
+| 步驟                             | 預期結果                  | 狀態 |
+| -------------------------------- | ------------------------- | ---- |
+| 1. 以 Workspace A 用戶登入       | 成功登入                  | [ ]  |
+| 2. 查看行程列表                  | 只顯示 Workspace A 的行程 | [ ]  |
+| 3. 新增行程                      | workspace_id 自動設為 A   | [ ]  |
+| 4. 登出，以 Workspace B 用戶登入 | 成功登入                  | [ ]  |
+| 5. 查看行程列表                  | 只顯示 Workspace B 的行程 | [ ]  |
+| 6. 登出，以 Super Admin 登入     | 成功登入                  | [ ]  |
+| 7. 查看行程列表                  | 顯示所有 workspace 的行程 | [ ]  |
 
 #### 測試 3: 審計追蹤
 
-| 步驟 | 預期結果 | 狀態 |
-|------|----------|------|
-| 1. 新增一筆行程 | created_by 正確記錄 | [ ] |
-| 2. 編輯該行程 | updated_by 正確更新 | [ ] |
-| 3. 查詢資料庫 | 欄位值與當前用戶 ID 一致 | [ ] |
+| 步驟            | 預期結果                 | 狀態 |
+| --------------- | ------------------------ | ---- |
+| 1. 新增一筆行程 | created_by 正確記錄      | [ ]  |
+| 2. 編輯該行程   | updated_by 正確更新      | [ ]  |
+| 3. 查詢資料庫   | 欄位值與當前用戶 ID 一致 | [ ]  |
 
 ### 🔍 效能測試
 
@@ -561,6 +593,7 @@ ORDER BY created_at DESC;
 ```
 
 **預期結果**:
+
 - 查詢時間 < 50ms
 - 使用正確的索引
 - 無全表掃描 (Seq Scan)
@@ -627,11 +660,13 @@ WHERE tablename = 'itineraries';
 #### 問題：城市選擇器仍然消失
 
 **診斷步驟**:
+
 1. 打開瀏覽器 Console
 2. 查找 `[useRegionData]` 日誌
 3. 確認 `countries.length` 和 `availableCities.length`
 
 **可能原因**:
+
 - `countries` 未載入成功 -> 檢查網路請求
 - `selectedCountryCode` 為空 -> 檢查國家資料是否有 `code` 欄位
 - 快取問題 -> 清除瀏覽器快取
@@ -639,6 +674,7 @@ WHERE tablename = 'itineraries';
 #### 問題：看到其他 workspace 的資料
 
 **診斷步驟**:
+
 1. 檢查 RLS 策略是否正確啟用
    ```sql
    SELECT * FROM pg_policies WHERE tablename = 'itineraries';
@@ -654,6 +690,7 @@ WHERE tablename = 'itineraries';
    ```
 
 **可能原因**:
+
 - RLS 未啟用 -> `ALTER TABLE itineraries ENABLE ROW LEVEL SECURITY;`
 - 策略錯誤 -> 重新執行遷移腳本
 - 用戶為 Super Admin -> 這是正常行為
@@ -661,6 +698,7 @@ WHERE tablename = 'itineraries';
 #### 問題：新增行程時 workspace_id 為 NULL
 
 **診斷步驟**:
+
 1. 檢查觸發器是否存在
    ```sql
    SELECT * FROM pg_trigger WHERE tgname = 'trigger_set_itinerary_workspace';
@@ -676,6 +714,7 @@ WHERE tablename = 'itineraries';
    ```
 
 **可能原因**:
+
 - 觸發器未建立 -> 重新執行遷移腳本
 - 函數有錯誤 -> 檢查 PostgreSQL 日誌
 - 用戶沒有 workspace_id -> 更新 employees 表
@@ -687,12 +726,15 @@ WHERE tablename = 'itineraries';
 ### 🏗️ 組件設計原則
 
 #### 1. 單一職責原則 (SRP)
+
 每個 Hook 只負責一件事：
+
 - ✅ `useRegionData` - 只負責地區資料管理
 - ✅ `useTourFormHandlers` - 只負責表單操作
 - ❌ 避免在一個 Hook 中混合資料載入、狀態管理和業務邏輯
 
 #### 2. 依賴注入原則 (DIP)
+
 ```typescript
 // ✅ 好：依賴抽象
 interface RegionDataProvider {
@@ -828,9 +870,7 @@ const { data } = await supabase
   .limit(10)
 
 // ❌ 差：選擇所有欄位（包含大型 JSONB）
-const { data } = await supabase
-  .from('itineraries')
-  .select('*')  // ⚠️ 包含 daily_itinerary 等大型資料
+const { data } = await supabase.from('itineraries').select('*') // ⚠️ 包含 daily_itinerary 等大型資料
 ```
 
 #### 3. React 效能優化
@@ -918,11 +958,13 @@ describe('Itinerary CRUD with Workspace isolation', () => {
 ## 📚 參考資料
 
 ### 內部文檔
+
 - [專案架構說明](./ARCHITECTURE.md)
 - [RLS 設定指南](./RLS_SETUP_GUIDE.md)
 - [開發指南](./DEVELOPMENT_GUIDE.md)
 
 ### 外部資源
+
 - [React Hooks 最佳實踐](https://react.dev/learn/reusing-logic-with-custom-hooks)
 - [PostgreSQL RLS 文檔](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
 - [Supabase RLS 指南](https://supabase.com/docs/guides/auth/row-level-security)
@@ -940,12 +982,12 @@ describe('Itinerary CRUD with Workspace isolation', () => {
 
 ## 🎖️ 版本歷史
 
-| 版本 | 日期 | 修改內容 | 作者 |
-|------|------|----------|------|
-| 1.0.0 | 2025-12-10 | 初版發布 | Claude |
-| | | - 城市選擇器修復 | |
-| | | - Itineraries workspace 支援 | |
-| | | - Combobox 強化 | |
+| 版本  | 日期       | 修改內容                     | 作者   |
+| ----- | ---------- | ---------------------------- | ------ |
+| 1.0.0 | 2025-12-10 | 初版發布                     | Claude |
+|       |            | - 城市選擇器修復             |        |
+|       |            | - Itineraries workspace 支援 |        |
+|       |            | - Combobox 強化              |        |
 
 ---
 
@@ -954,4 +996,4 @@ describe('Itinerary CRUD with Workspace isolation', () => {
 
 ---
 
-*本文檔由 Claude Code 軍事級別檢查生成，確保所有修復符合最高標準。*
+_本文檔由 Claude Code 軍事級別檢查生成，確保所有修復符合最高標準。_

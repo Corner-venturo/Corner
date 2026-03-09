@@ -6,12 +6,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
   Home,
   Calendar,
@@ -60,7 +55,13 @@ export const DEFAULT_NAV_ITEMS: NavItem[] = [
     href: '/calendar',
     requiredPermission: 'calendar',
   },
-  { id: 'tours', icon: 'MapPin', label: COMP_LAYOUT_LABELS.旅遊團, href: '/tours', requiredPermission: 'tours' },
+  {
+    id: 'tours',
+    icon: 'MapPin',
+    label: COMP_LAYOUT_LABELS.旅遊團,
+    href: '/tours',
+    requiredPermission: 'tours',
+  },
   {
     id: 'orders',
     icon: 'ShoppingCart',
@@ -152,9 +153,7 @@ export function MobileBottomNav() {
     if (!_hasHydrated) return
 
     const storedIds = getStoredNavItems()
-    const validStoredIds = storedIds.filter(id =>
-      availableNavItems.some(item => item.id === id)
-    )
+    const validStoredIds = storedIds.filter(id => availableNavItems.some(item => item.id === id))
 
     if (validStoredIds.length > 0) {
       setSelectedItemIds(validStoredIds)
@@ -267,7 +266,12 @@ interface MobileNavSettingsProps {
   onClose: () => void
 }
 
-function MobileNavSettings({ availableItems, selectedItemIds, onSave, onClose }: MobileNavSettingsProps) {
+function MobileNavSettings({
+  availableItems,
+  selectedItemIds,
+  onSave,
+  onClose,
+}: MobileNavSettingsProps) {
   const [tempSelected, setTempSelected] = useState<string[]>(selectedItemIds)
 
   useEffect(() => {
@@ -290,11 +294,16 @@ function MobileNavSettings({ availableItems, selectedItemIds, onSave, onClose }:
   }
 
   return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent level={1} className="fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 w-full max-w-full md:max-w-md md:left-[50%] md:top-[50%] md:translate-x-[-50%] md:translate-y-[-50%] md:bottom-auto rounded-t-xl md:rounded-xl p-0 gap-0">
+    <Dialog open onOpenChange={open => !open && onClose()}>
+      <DialogContent
+        level={1}
+        className="fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 w-full max-w-full md:max-w-md md:left-[50%] md:top-[50%] md:translate-x-[-50%] md:translate-y-[-50%] md:bottom-auto rounded-t-xl md:rounded-xl p-0 gap-0"
+      >
         {/* 標題列 */}
         <DialogHeader className="p-4 border-b border-border">
-          <DialogTitle className="text-lg font-bold text-morandi-primary">{COMP_LAYOUT_LABELS.LABEL_2572}</DialogTitle>
+          <DialogTitle className="text-lg font-bold text-morandi-primary">
+            {COMP_LAYOUT_LABELS.LABEL_2572}
+          </DialogTitle>
         </DialogHeader>
 
         {/* 提示 */}
@@ -328,9 +337,7 @@ function MobileNavSettings({ availableItems, selectedItemIds, onSave, onClose }:
                 >
                   <Icon size={20} />
                   <span className="font-medium">{item.label}</span>
-                  {isSelected && (
-                    <Check className="w-5 h-5 ml-auto" />
-                  )}
+                  {isSelected && <Check className="w-5 h-5 ml-auto" />}
                 </button>
               )
             })}

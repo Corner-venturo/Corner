@@ -2,7 +2,13 @@
 
 import React from 'react'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Search, Star } from 'lucide-react'
 import { COMP_EDITOR_LABELS } from '../constants/labels'
 
@@ -149,10 +155,7 @@ export function RestaurantSearchInput({
 
       {/* 搜尋框 */}
       <div className="flex-1 relative min-w-[160px]">
-        <Search
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-muted"
-          size={18}
-        />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-muted" size={18} />
         <Input
           value={searchQuery}
           onChange={e => onSearchChange(e.target.value)}

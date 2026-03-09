@@ -6,7 +6,8 @@
 const { createClient } = require('@supabase/supabase-js')
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabaseKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 if (!supabaseUrl || !supabaseKey) {
   console.error('❌ 缺少 Supabase 環境變數')
@@ -76,17 +77,22 @@ async function debugChannelAPI() {
       console.log('  - Employee ID:', member.employee_id)
       console.log('  - Role:', member.role)
       console.log('  - Status:', member.status)
-      console.log('  - Profile:', member.employees ? {
-        名稱: member.employees.display_name,
-        英文名: member.employees.english_name,
-        Email: member.employees.personal_info?.email,
-        狀態: member.employees.status,
-      } : '❌ 沒有 employees 資料')
+      console.log(
+        '  - Profile:',
+        member.employees
+          ? {
+              名稱: member.employees.display_name,
+              英文名: member.employees.english_name,
+              Email: member.employees.personal_info?.email,
+              狀態: member.employees.status,
+            }
+          : '❌ 沒有 employees 資料'
+      )
       console.log('')
     })
 
     // 4. 模擬 API response 格式
-    const apiResponse = members.map((member) => ({
+    const apiResponse = members.map(member => ({
       id: member.id,
       workspaceId: member.workspace_id,
       channelId: member.channel_id,
@@ -110,7 +116,6 @@ async function debugChannelAPI() {
 
     console.log('📤 API Response 格式:')
     console.log(JSON.stringify({ members: apiResponse }, null, 2))
-
   } catch (error) {
     console.error('❌ 測試失敗:', error)
     process.exit(1)

@@ -3,7 +3,6 @@
  * SuppliersList - 供應商列表（含類別顯示）
  */
 
-
 import React from 'react'
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'
 import { Badge } from '@/components/ui/badge'
@@ -37,26 +36,30 @@ export const SuppliersList: React.FC<SuppliersListProps> = ({
   suppliers,
   loading = false,
   onEdit,
-  onDelete
+  onDelete,
 }) => {
   const columns: TableColumn[] = [
     {
       key: 'code',
       label: LABELS.supplierCode,
       sortable: true,
-      render: (value) => <span className="font-mono text-sm text-morandi-secondary">{String(value || '-')}</span>,
+      render: value => (
+        <span className="font-mono text-sm text-morandi-secondary">{String(value || '-')}</span>
+      ),
     },
     {
       key: 'name',
       label: LABELS.supplierName,
       sortable: true,
-      render: (value) => <span className="font-medium text-morandi-primary">{String(value || '')}</span>,
+      render: value => (
+        <span className="font-medium text-morandi-primary">{String(value || '')}</span>
+      ),
     },
     {
       key: 'type',
       label: LABELS.type,
       sortable: true,
-      render: (value) => {
+      render: value => {
         const label = TYPE_LABELS[String(value)] || String(value)
         return (
           <Badge variant="secondary" className="text-xs">
@@ -69,19 +72,19 @@ export const SuppliersList: React.FC<SuppliersListProps> = ({
       key: 'bank_name',
       label: LABELS.bankName,
       sortable: true,
-      render: (value) => <span className="text-morandi-primary">{String(value || '-')}</span>,
+      render: value => <span className="text-morandi-primary">{String(value || '-')}</span>,
     },
     {
       key: 'bank_account',
       label: LABELS.bankAccount,
       sortable: true,
-      render: (value) => <span className="text-morandi-secondary">{String(value || '-')}</span>,
+      render: value => <span className="text-morandi-secondary">{String(value || '-')}</span>,
     },
     {
       key: 'notes',
       label: LABELS.notes,
       sortable: false,
-      render: (value) => <span className="text-sm text-morandi-muted">{String(value || '-')}</span>,
+      render: value => <span className="text-sm text-morandi-muted">{String(value || '-')}</span>,
     },
   ]
 
@@ -91,7 +94,7 @@ export const SuppliersList: React.FC<SuppliersListProps> = ({
       columns={columns}
       data={suppliers}
       loading={loading}
-      actions={(row) => {
+      actions={row => {
         const supplier = row as Supplier
         return (
           <div className="flex items-center gap-1">
@@ -99,7 +102,7 @@ export const SuppliersList: React.FC<SuppliersListProps> = ({
               <Button
                 variant="ghost"
                 size="iconSm"
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation()
                   onEdit(supplier)
                 }}
@@ -113,7 +116,7 @@ export const SuppliersList: React.FC<SuppliersListProps> = ({
               <Button
                 variant="ghost"
                 size="iconSm"
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation()
                   onDelete(supplier)
                 }}

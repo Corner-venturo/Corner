@@ -61,7 +61,12 @@ export function useToursPaginated(params: UseToursPaginatedParams): UseToursPagi
   // RLS 已在資料庫層保護資料，前端不需要重複驗證
   const swrKey = buildSwrKey(params)
 
-  const { data, error, isLoading, mutate: mutateSelf } = useSWR(
+  const {
+    data,
+    error,
+    isLoading,
+    mutate: mutateSelf,
+  } = useSWR(
     swrKey,
     async () => {
       const from = (page - 1) * pageSize
@@ -70,7 +75,10 @@ export function useToursPaginated(params: UseToursPaginatedParams): UseToursPagi
       // Start building query
       let query = supabase
         .from('tours')
-        .select('id, code, name, location, status, departure_date, return_date, price, selling_price_per_person, max_participants, current_participants, total_revenue, total_cost, profit, archived, is_active, quote_id, itinerary_id, controller_id, closing_status, workspace_id, created_at', { count: 'exact' })
+        .select(
+          'id, code, name, location, status, departure_date, return_date, price, selling_price_per_person, max_participants, current_participants, total_revenue, total_cost, profit, archived, is_active, quote_id, itinerary_id, controller_id, closing_status, workspace_id, created_at',
+          { count: 'exact' }
+        )
         .range(from, to) // ✅ Server-side pagination
         .order(sortBy, { ascending: sortOrder === 'asc' })
 
@@ -137,7 +145,9 @@ export function useToursPaginated(params: UseToursPaginatedParams): UseToursPagi
   }
 
   // Create tour
-  const createTour = async (tourData: Omit<Tour, 'id' | 'created_at' | 'updated_at'>): Promise<Tour> => {
+  const createTour = async (
+    tourData: Omit<Tour, 'id' | 'created_at' | 'updated_at'>
+  ): Promise<Tour> => {
     const now = new Date().toISOString()
     const newTour = {
       ...tourData,
@@ -255,7 +265,12 @@ export function useToursPaginated(params: UseToursPaginatedParams): UseToursPagi
  * Only fetches when tourId is provided
  */
 export function useTourDetailsPaginated(tourId: string | null) {
-  const { data: tour, error, isLoading, mutate: mutateTour } = useSWR<Tour | null>(
+  const {
+    data: tour,
+    error,
+    isLoading,
+    mutate: mutateTour,
+  } = useSWR<Tour | null>(
     tourId ? `tour-detail-${tourId}` : null, // ✅ Skip pattern: null key = no fetch
     async () => {
       if (!tourId) return null
@@ -280,13 +295,13 @@ export function useTourDetailsPaginated(tourId: string | null) {
 
     // 狀態轉換驗證
     const VALID_TOUR_TRANSITIONS: Record<string, string[]> = {
-      '開團': ['待出發', '取消'],
-      '待出發': ['已出發', '取消', '開團'],
-      '已出發': ['待結團'],
-      '待結團': ['已結團'],
-      '已結團': [],
-      '取消': ['開團'],
-      '特殊團': [],
+      開團: ['待出發', '取消'],
+      待出發: ['已出發', '取消', '開團'],
+      已出發: ['待結團'],
+      待結團: ['已結團'],
+      已結團: [],
+      取消: ['開團'],
+      特殊團: [],
     }
 
     const { data: current, error: fetchError } = await supabase
@@ -299,7 +314,9 @@ export function useTourDetailsPaginated(tourId: string | null) {
 
     const currentStatus = current.status ?? ''
     if (!currentStatus || !VALID_TOUR_TRANSITIONS[currentStatus]?.includes(newStatus)) {
-      throw new Error(TOURS_ADVANCED_LABELS.INVALID_STATUS_TRANSITION(currentStatus || '', newStatus))
+      throw new Error(
+        TOURS_ADVANCED_LABELS.INVALID_STATUS_TRANSITION(currentStatus || '', newStatus)
+      )
     }
 
     const { data, error: updateError } = await supabase

@@ -3,9 +3,11 @@
 ## 🔧 Build 規則
 
 **Push 前必須 Build 通過**
+
 ```bash
 npx next build
 ```
+
 - 不要 push 有 build error 的程式碼
 - CI 會擋，但本地先確認更省時間
 
@@ -24,19 +26,22 @@ npx next build
 核心表 `tour_itinerary_items` 是行程資料的單一真相來源。
 
 ### 使用方式
+
 ```typescript
 // ✅ 正確：用專用 hook
-const { items, updateItem } = useTourItineraryItemsByTour(tourId);
+const { items, updateItem } = useTourItineraryItemsByTour(tourId)
 
 // ❌ 錯誤：直接 query 或用其他方式
 ```
 
 ### 相關文件
+
 - `docs/CROSS_SYSTEM_MAP.md` — ERP ↔ Online 欄位對應
 
 ## 🗺️ 開工前必讀
 
 每次開始開發前，先讀：
+
 - `docs/CROSS_SYSTEM_MAP.md` — 系統間欄位對應
 - `docs/VENTURO_BLUEPRINT.md` — 架構藍圖
 
@@ -51,4 +56,4 @@ const { items, updateItem } = useTourItineraryItemsByTour(tourId);
 
 ---
 
-*統一規範，不管誰開發都走同一套。*
+_統一規範，不管誰開發都走同一套。_

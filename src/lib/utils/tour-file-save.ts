@@ -1,6 +1,6 @@
 /**
  * Tour File Save Utility
- * 
+ *
  * 自動將產生的文件存到團的對應資料夾
  */
 
@@ -43,7 +43,7 @@ export async function saveTourFile({
   try {
     // 1. 取得或建立資料夾
     const folderId = await getOrCreateTourFolder(tourId, workspaceId, tourCode, category, createdBy)
-    
+
     if (!folderId) {
       logger.error('無法取得資料夾', { tourId, category })
       return { success: false, error: '無法取得資料夾' }
@@ -93,7 +93,22 @@ export async function saveTourFile({
         extension: ext,
         storage_path: storagePath,
         storage_bucket: 'workspace-files',
-        category: category as 'quote' | 'contract' | 'passport' | 'itinerary' | 'ticket' | 'voucher' | 'insurance' | 'photo' | 'other' | 'visa' | 'invoice' | 'email_attachment' | 'request' | 'cancellation' | 'confirmation',
+        category: category as
+          | 'quote'
+          | 'contract'
+          | 'passport'
+          | 'itinerary'
+          | 'ticket'
+          | 'voucher'
+          | 'insurance'
+          | 'photo'
+          | 'other'
+          | 'visa'
+          | 'invoice'
+          | 'email_attachment'
+          | 'request'
+          | 'cancellation'
+          | 'confirmation',
         tour_id: tourId,
         source: 'auto_generated',
         created_by: createdBy || null,

@@ -45,12 +45,17 @@ export function CardGridLayout({
         {/* 左側大圖 */}
         <div className="relative h-[400px] w-full">
           {hasImage ? (
-            <img src={mainImage}
+            <img
+              src={mainImage}
               alt={day.title || ''}
               className="absolute inset-0 w-full h-full object-cover shadow-lg cursor-pointer"
               style={{ filter: 'contrast(125%) sepia(30%)' }}
-              onMouseEnter={(e) => { e.currentTarget.style.filter = 'contrast(125%) sepia(0%)' }}
-              onMouseLeave={(e) => { e.currentTarget.style.filter = 'contrast(125%) sepia(30%)' }}
+              onMouseEnter={e => {
+                e.currentTarget.style.filter = 'contrast(125%) sepia(0%)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.filter = 'contrast(125%) sepia(30%)'
+              }}
               onClick={() => onImageClick(allImages, 0, day.title)}
             />
           ) : (
@@ -77,14 +82,12 @@ export function CardGridLayout({
           <div className="flex items-center gap-4 mb-4">
             <span className="w-12 h-px" style={{ backgroundColor: ART.clay }} />
             <span className="text-xs uppercase tracking-[0.3em] text-white/60">
-              {dateInfo ? `${dateInfo.monthShort} ${dateInfo.day}` : ''} · {day.locationLabel || 'Destination'}
+              {dateInfo ? `${dateInfo.monthShort} ${dateInfo.day}` : ''} ·{' '}
+              {day.locationLabel || 'Destination'}
             </span>
           </div>
 
-          <h3
-            className="text-5xl mb-6 text-white"
-            style={{ fontFamily: "'Noto Serif TC', serif" }}
-          >
+          <h3 className="text-5xl mb-6 text-white" style={{ fontFamily: "'Noto Serif TC', serif" }}>
             {day.title?.split('→').slice(-1)[0]?.trim() || `第 ${index + 1} 天`}
           </h3>
 

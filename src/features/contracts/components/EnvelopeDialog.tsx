@@ -294,7 +294,9 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
         <div className="space-y-6 py-4">
           {/* 旅遊團資訊 */}
           <div className="bg-morandi-container/20 rounded-lg p-4">
-            <h3 className="text-sm font-semibold text-morandi-primary mb-2">{ENVELOPE_LABELS.TOUR_INFO}</h3>
+            <h3 className="text-sm font-semibold text-morandi-primary mb-2">
+              {ENVELOPE_LABELS.TOUR_INFO}
+            </h3>
             <div className="text-sm text-morandi-primary">
               {tour.code} - {tour.name}
             </div>
@@ -302,10 +304,14 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
 
           {/* 收件人資訊 */}
           <div>
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">{ENVELOPE_LABELS.RECIPIENT_INFO}</h3>
+            <h3 className="text-sm font-semibold text-morandi-primary mb-3">
+              {ENVELOPE_LABELS.RECIPIENT_INFO}
+            </h3>
             <div className="space-y-3">
               <div>
-                <label className="text-xs text-morandi-primary block mb-1">{ENVELOPE_LABELS.RECIPIENT_NAME}</label>
+                <label className="text-xs text-morandi-primary block mb-1">
+                  {ENVELOPE_LABELS.RECIPIENT_NAME}
+                </label>
                 <Input
                   type="text"
                   value={recipient}
@@ -314,7 +320,9 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                 />
               </div>
               <div>
-                <label className="text-xs text-morandi-primary block mb-1">{ENVELOPE_LABELS.LABEL_2394}</label>
+                <label className="text-xs text-morandi-primary block mb-1">
+                  {ENVELOPE_LABELS.LABEL_2394}
+                </label>
                 <Input
                   type="text"
                   value={recipientAddress}
@@ -323,7 +331,9 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                 />
               </div>
               <div>
-                <label className="text-xs text-morandi-primary block mb-1">{ENVELOPE_LABELS.LABEL_8172}</label>
+                <label className="text-xs text-morandi-primary block mb-1">
+                  {ENVELOPE_LABELS.LABEL_8172}
+                </label>
                 <Input
                   type="text"
                   value={recipientPhone}
@@ -336,11 +346,15 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
 
           {/* 寄件人資訊 */}
           <div>
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">{ENVELOPE_LABELS.LABEL_9195}</h3>
+            <h3 className="text-sm font-semibold text-morandi-primary mb-3">
+              {ENVELOPE_LABELS.LABEL_9195}
+            </h3>
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-morandi-primary block mb-1">{ENVELOPE_LABELS.LABEL_20}</label>
+                  <label className="text-xs text-morandi-primary block mb-1">
+                    {ENVELOPE_LABELS.LABEL_20}
+                  </label>
                   <Input
                     type="text"
                     value={senderCompany}
@@ -361,7 +375,9 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                 </div>
               </div>
               <div>
-                <label className="text-xs text-morandi-primary block mb-1">{ENVELOPE_LABELS.LABEL_5007}</label>
+                <label className="text-xs text-morandi-primary block mb-1">
+                  {ENVELOPE_LABELS.LABEL_5007}
+                </label>
                 <Input
                   type="text"
                   value={senderAddress}

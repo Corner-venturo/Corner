@@ -68,10 +68,7 @@ export interface CompanyContact {
 }
 
 // 建立/更新資料的輸入型別
-export type CreateCompanyData = Omit<
-  Company,
-  'id' | 'created_at' | 'updated_at' | 'created_by'
-> & {
+export type CreateCompanyData = Omit<Company, 'id' | 'created_at' | 'updated_at' | 'created_by'> & {
   payment_terms?: number
   payment_method?: 'transfer' | 'cash' | 'check' | 'credit_card'
   credit_limit?: number

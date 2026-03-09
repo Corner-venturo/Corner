@@ -60,7 +60,9 @@ export function useRequiredWorkspaceId(): string {
  * 為 create 操作注入 workspace_id
  * 用於確保所有 RLS 操作都有正確的 workspace_id
  */
-export function withWorkspaceId<T extends Record<string, unknown>>(data: T): T & { workspace_id: string } {
+export function withWorkspaceId<T extends Record<string, unknown>>(
+  data: T
+): T & { workspace_id: string } {
   const workspaceId = getRequiredWorkspaceId()
   return {
     ...data,

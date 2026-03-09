@@ -183,9 +183,7 @@ export function ContentPageLayout({
       </ResponsiveHeader>
 
       {/* 內容區域 */}
-      <div className={contentClassName || 'flex-1 overflow-auto'}>
-        {children}
-      </div>
+      <div className={contentClassName || 'flex-1 overflow-auto'}>{children}</div>
     </div>
   )
 }

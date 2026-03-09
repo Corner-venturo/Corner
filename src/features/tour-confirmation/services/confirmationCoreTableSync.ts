@@ -31,9 +31,10 @@ export async function syncConfirmationCreateToCore(params: {
   logger.log(SYNC_LABELS.SYNC_START, { confirmation_item_id, itinerary_item_id })
 
   try {
-    const confirmation_status = booking_status === 'confirmed'
-      ? ITEM_CONFIRMATION_STATUS.CONFIRMED
-      : ITEM_CONFIRMATION_STATUS.PENDING
+    const confirmation_status =
+      booking_status === 'confirmed'
+        ? ITEM_CONFIRMATION_STATUS.CONFIRMED
+        : ITEM_CONFIRMATION_STATUS.PENDING
 
     const update_data: Record<string, unknown> = {
       confirmation_item_id,
@@ -68,7 +69,13 @@ export async function syncConfirmationUpdateToCore(params: {
   booking_reference?: string | null
   confirmation_note?: string | null
 }): Promise<{ success: boolean; message?: string }> {
-  const { itinerary_item_id, booking_status, confirmed_cost, booking_reference, confirmation_note } = params
+  const {
+    itinerary_item_id,
+    booking_status,
+    confirmed_cost,
+    booking_reference,
+    confirmation_note,
+  } = params
 
   logger.log(SYNC_LABELS.SYNC_START, { itinerary_item_id, booking_status })
 

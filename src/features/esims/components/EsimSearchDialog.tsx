@@ -114,14 +114,20 @@ export function EsimSearchDialog({ open, onOpenChange, onSearch }: EsimSearchDia
             <Label htmlFor="status">{LABELS.status}</Label>
             <Select
               value={filters.status?.toString()}
-              onValueChange={value => setFilters({ ...filters, status: Number(value) as EsimStatus })}
+              onValueChange={value =>
+                setFilters({ ...filters, status: Number(value) as EsimStatus })
+              }
             >
               <SelectTrigger id="status">
                 <SelectValue placeholder={LABELS.statusPlaceholder} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={ESIM_STATUSES.UNCONFIRMED.toString()}>{LABELS.CONFIRM_7150}</SelectItem>
-                <SelectItem value={ESIM_STATUSES.CONFIRMED.toString()}>{LABELS.CONFIRM_469}</SelectItem>
+                <SelectItem value={ESIM_STATUSES.UNCONFIRMED.toString()}>
+                  {LABELS.CONFIRM_7150}
+                </SelectItem>
+                <SelectItem value={ESIM_STATUSES.CONFIRMED.toString()}>
+                  {LABELS.CONFIRM_469}
+                </SelectItem>
                 <SelectItem value={ESIM_STATUSES.ERROR.toString()}>{LABELS.LABEL_8594}</SelectItem>
               </SelectContent>
             </Select>

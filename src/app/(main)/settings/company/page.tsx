@@ -87,56 +87,61 @@ function ImageUploadField({
   const [uploading, setUploading] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const handleFileSelect = useCallback(async (file: File) => {
-    if (!ACCEPTED_TYPES.includes(file.type)) {
-      toast.error(COMPANY_LABELS.UNSUPPORTED_FORMAT)
-      return
-    }
-    if (file.size > MAX_FILE_SIZE) {
-      toast.error(COMPANY_LABELS.FILE_TOO_LARGE)
-      return
-    }
+  const handleFileSelect = useCallback(
+    async (file: File) => {
+      if (!ACCEPTED_TYPES.includes(file.type)) {
+        toast.error(COMPANY_LABELS.UNSUPPORTED_FORMAT)
+        return
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(COMPANY_LABELS.FILE_TOO_LARGE)
+        return
+      }
 
-    setUploading(true)
-    try {
-      const ext = file.name.split('.').pop()
-      const fileName = `${workspaceId}/${fieldName}-${Date.now()}.${ext}`
+      setUploading(true)
+      try {
+        const ext = file.name.split('.').pop()
+        const fileName = `${workspaceId}/${fieldName}-${Date.now()}.${ext}`
 
-      const { error: uploadError } = await supabase.storage
-        .from(STORAGE_BUCKET)
-        .upload(fileName, file, { upsert: true })
+        const { error: uploadError } = await supabase.storage
+          .from(STORAGE_BUCKET)
+          .upload(fileName, file, { upsert: true })
 
-      if (uploadError) throw uploadError
+        if (uploadError) throw uploadError
 
-      const { data: urlData } = supabase.storage
-        .from(STORAGE_BUCKET)
-        .getPublicUrl(fileName)
+        const { data: urlData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(fileName)
 
-      onChange(urlData.publicUrl)
-    } catch (error) {
-      logger.error(`${COMPANY_LABELS.UPLOAD_FAILED}:`, error)
-      toast.error(COMPANY_LABELS.UPLOAD_FAILED)
-    } finally {
-      setUploading(false)
-    }
-  }, [workspaceId, fieldName, onChange])
+        onChange(urlData.publicUrl)
+      } catch (error) {
+        logger.error(`${COMPANY_LABELS.UPLOAD_FAILED}:`, error)
+        toast.error(COMPANY_LABELS.UPLOAD_FAILED)
+      } finally {
+        setUploading(false)
+      }
+    },
+    [workspaceId, fieldName, onChange]
+  )
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    const file = e.dataTransfer.files[0]
-    if (file) handleFileSelect(file)
-  }, [handleFileSelect])
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      const file = e.dataTransfer.files[0]
+      if (file) handleFileSelect(file)
+    },
+    [handleFileSelect]
+  )
 
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) handleFileSelect(file)
-  }, [handleFileSelect])
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0]
+      if (file) handleFileSelect(file)
+    },
+    [handleFileSelect]
+  )
 
   return (
     <div>
-      <Label className="text-sm font-medium text-morandi-primary mb-2 block">
-        {label}
-      </Label>
+      <Label className="text-sm font-medium text-morandi-primary mb-2 block">{label}</Label>
       <p className="text-xs text-morandi-secondary mb-3">{hint}</p>
 
       {value ? (
@@ -157,7 +162,7 @@ function ImageUploadField({
       ) : (
         <div
           onDrop={handleDrop}
-          onDragOver={(e) => e.preventDefault()}
+          onDragOver={e => e.preventDefault()}
           onClick={() => inputRef.current?.click()}
           className={cn(
             'border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer',
@@ -171,7 +176,9 @@ function ImageUploadField({
             <>
               <Upload className="h-8 w-8 mx-auto text-morandi-secondary mb-2" />
               <p className="text-sm text-morandi-secondary">{COMPANY_LABELS.CLICK_TO_UPLOAD}</p>
-              <p className="text-xs text-morandi-secondary/60 mt-1">{COMPANY_LABELS.SUPPORTED_FORMATS}</p>
+              <p className="text-xs text-morandi-secondary/60 mt-1">
+                {COMPANY_LABELS.SUPPORTED_FORMATS}
+              </p>
             </>
           )}
         </div>
@@ -200,7 +207,9 @@ export default function CompanySettingsPage() {
     try {
       const { data, error } = await supabase
         .from('workspaces')
-        .select('name, description, logo_url, address, phone, fax, email, website, tax_id, bank_name, bank_branch, bank_account, bank_account_name, seal_image_url, invoice_seal_image_url')
+        .select(
+          'name, description, logo_url, address, phone, fax, email, website, tax_id, bank_name, bank_branch, bank_account, bank_account_name, seal_image_url, invoice_seal_image_url'
+        )
         .eq('id', workspaceId)
         .single()
 
@@ -241,10 +250,7 @@ export default function CompanySettingsPage() {
     setSaving(true)
     try {
       const { name: _name, ...updateData } = form
-      const { error } = await supabase
-        .from('workspaces')
-        .update(updateData)
-        .eq('id', workspaceId)
+      const { error } = await supabase.from('workspaces').update(updateData).eq('id', workspaceId)
 
       if (error) throw error
       toast.success(COMPANY_LABELS.SAVE_SUCCESS)
@@ -339,18 +345,14 @@ export default function CompanySettingsPage() {
               <Label className="text-sm font-medium text-morandi-primary">
                 {COMPANY_LABELS.COMPANY_NAME}
               </Label>
-              <Input
-                value={form.name}
-                disabled
-                className="mt-1.5 bg-morandi-container/30"
-              />
+              <Input value={form.name} disabled className="mt-1.5 bg-morandi-container/30" />
             </div>
 
             <ImageUploadField
               label={COMPANY_LABELS.LOGO}
               hint={COMPANY_LABELS.LOGO_HINT}
               value={form.logo_url}
-              onChange={(url) => updateField('logo_url', url)}
+              onChange={url => updateField('logo_url', url)}
               fieldName="logo"
               workspaceId={workspaceId}
             />
@@ -361,7 +363,7 @@ export default function CompanySettingsPage() {
               </Label>
               <Textarea
                 value={form.description}
-                onChange={(e) => updateField('description', e.target.value)}
+                onChange={e => updateField('description', e.target.value)}
                 placeholder={COMPANY_LABELS.DESCRIPTION_PLACEHOLDER}
                 className="mt-1.5"
                 rows={3}
@@ -383,7 +385,7 @@ export default function CompanySettingsPage() {
               </Label>
               <Input
                 value={form.address}
-                onChange={(e) => updateField('address', e.target.value)}
+                onChange={e => updateField('address', e.target.value)}
                 placeholder={COMPANY_LABELS.ADDRESS_PLACEHOLDER}
                 className="mt-1.5"
               />
@@ -394,7 +396,7 @@ export default function CompanySettingsPage() {
               </Label>
               <Input
                 value={form.phone}
-                onChange={(e) => updateField('phone', e.target.value)}
+                onChange={e => updateField('phone', e.target.value)}
                 placeholder={COMPANY_LABELS.PHONE_PLACEHOLDER}
                 className="mt-1.5"
               />
@@ -405,7 +407,7 @@ export default function CompanySettingsPage() {
               </Label>
               <Input
                 value={form.fax}
-                onChange={(e) => updateField('fax', e.target.value)}
+                onChange={e => updateField('fax', e.target.value)}
                 placeholder={COMPANY_LABELS.FAX_PLACEHOLDER}
                 className="mt-1.5"
               />
@@ -417,7 +419,7 @@ export default function CompanySettingsPage() {
               <Input
                 type="email"
                 value={form.email}
-                onChange={(e) => updateField('email', e.target.value)}
+                onChange={e => updateField('email', e.target.value)}
                 placeholder={COMPANY_LABELS.EMAIL_PLACEHOLDER}
                 className="mt-1.5"
               />
@@ -428,7 +430,7 @@ export default function CompanySettingsPage() {
               </Label>
               <Input
                 value={form.website}
-                onChange={(e) => updateField('website', e.target.value)}
+                onChange={e => updateField('website', e.target.value)}
                 placeholder={COMPANY_LABELS.WEBSITE_PLACEHOLDER}
                 className="mt-1.5"
               />
@@ -448,7 +450,7 @@ export default function CompanySettingsPage() {
             </Label>
             <Input
               value={form.tax_id}
-              onChange={(e) => updateField('tax_id', e.target.value)}
+              onChange={e => updateField('tax_id', e.target.value)}
               placeholder={COMPANY_LABELS.TAX_ID_PLACEHOLDER}
               className="mt-1.5 max-w-xs"
               maxLength={8}
@@ -469,7 +471,7 @@ export default function CompanySettingsPage() {
               </Label>
               <Input
                 value={form.bank_name}
-                onChange={(e) => updateField('bank_name', e.target.value)}
+                onChange={e => updateField('bank_name', e.target.value)}
                 placeholder={COMPANY_LABELS.BANK_NAME_PLACEHOLDER}
                 className="mt-1.5"
               />
@@ -480,7 +482,7 @@ export default function CompanySettingsPage() {
               </Label>
               <Input
                 value={form.bank_branch}
-                onChange={(e) => updateField('bank_branch', e.target.value)}
+                onChange={e => updateField('bank_branch', e.target.value)}
                 placeholder={COMPANY_LABELS.BANK_BRANCH_PLACEHOLDER}
                 className="mt-1.5"
               />
@@ -491,7 +493,7 @@ export default function CompanySettingsPage() {
               </Label>
               <Input
                 value={form.bank_account}
-                onChange={(e) => updateField('bank_account', e.target.value)}
+                onChange={e => updateField('bank_account', e.target.value)}
                 placeholder={COMPANY_LABELS.BANK_ACCOUNT_PLACEHOLDER}
                 className="mt-1.5"
               />
@@ -502,7 +504,7 @@ export default function CompanySettingsPage() {
               </Label>
               <Input
                 value={form.bank_account_name}
-                onChange={(e) => updateField('bank_account_name', e.target.value)}
+                onChange={e => updateField('bank_account_name', e.target.value)}
                 placeholder={COMPANY_LABELS.BANK_ACCOUNT_NAME_PLACEHOLDER}
                 className="mt-1.5"
               />
@@ -521,7 +523,7 @@ export default function CompanySettingsPage() {
               label={COMPANY_LABELS.SEAL_IMAGE}
               hint={COMPANY_LABELS.SEAL_IMAGE_HINT}
               value={form.seal_image_url}
-              onChange={(url) => updateField('seal_image_url', url)}
+              onChange={url => updateField('seal_image_url', url)}
               fieldName="seal"
               workspaceId={workspaceId}
             />
@@ -529,7 +531,7 @@ export default function CompanySettingsPage() {
               label={COMPANY_LABELS.INVOICE_SEAL_IMAGE}
               hint={COMPANY_LABELS.INVOICE_SEAL_IMAGE_HINT}
               value={form.invoice_seal_image_url}
-              onChange={(url) => updateField('invoice_seal_image_url', url)}
+              onChange={url => updateField('invoice_seal_image_url', url)}
               fieldName="invoice-seal"
               workspaceId={workspaceId}
             />

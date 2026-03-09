@@ -36,55 +36,116 @@ interface StatusDisplay {
 function getQuoteStatusDisplay(status: string): StatusDisplay {
   switch (status) {
     case 'confirmed':
-      return { label: TOUR_TRACKING_LABELS.QUOTE_CONFIRMED, color: 'text-emerald-600 bg-emerald-50', icon: '✅' }
+      return {
+        label: TOUR_TRACKING_LABELS.QUOTE_CONFIRMED,
+        color: 'text-emerald-600 bg-emerald-50',
+        icon: '✅',
+      }
     case 'drafted':
-      return { label: TOUR_TRACKING_LABELS.QUOTE_DRAFTED, color: 'text-amber-600 bg-amber-50', icon: '⏳' }
+      return {
+        label: TOUR_TRACKING_LABELS.QUOTE_DRAFTED,
+        color: 'text-amber-600 bg-amber-50',
+        icon: '⏳',
+      }
     default:
-      return { label: TOUR_TRACKING_LABELS.QUOTE_NONE, color: 'text-gray-400 bg-gray-50', icon: '⬜' }
+      return {
+        label: TOUR_TRACKING_LABELS.QUOTE_NONE,
+        color: 'text-gray-400 bg-gray-50',
+        icon: '⬜',
+      }
   }
 }
 
 function getRequestStatusDisplay(status: string): StatusDisplay {
   switch (status) {
     case 'confirmed':
-      return { label: TOUR_TRACKING_LABELS.REQUEST_CONFIRMED, color: 'text-emerald-600 bg-emerald-50', icon: '✅' }
+      return {
+        label: TOUR_TRACKING_LABELS.REQUEST_CONFIRMED,
+        color: 'text-emerald-600 bg-emerald-50',
+        icon: '✅',
+      }
     case 'replied':
-      return { label: TOUR_TRACKING_LABELS.REQUEST_REPLIED, color: 'text-blue-600 bg-blue-50', icon: '💬' }
+      return {
+        label: TOUR_TRACKING_LABELS.REQUEST_REPLIED,
+        color: 'text-blue-600 bg-blue-50',
+        icon: '💬',
+      }
     case 'sent':
-      return { label: TOUR_TRACKING_LABELS.REQUEST_SENT, color: 'text-amber-600 bg-amber-50', icon: '⏳' }
+      return {
+        label: TOUR_TRACKING_LABELS.REQUEST_SENT,
+        color: 'text-amber-600 bg-amber-50',
+        icon: '⏳',
+      }
     case 'cancelled':
-      return { label: TOUR_TRACKING_LABELS.REQUEST_CANCELLED, color: 'text-red-600 bg-red-50', icon: '❌' }
+      return {
+        label: TOUR_TRACKING_LABELS.REQUEST_CANCELLED,
+        color: 'text-red-600 bg-red-50',
+        icon: '❌',
+      }
     default:
-      return { label: TOUR_TRACKING_LABELS.REQUEST_NONE, color: 'text-gray-400 bg-gray-50', icon: '⬜' }
+      return {
+        label: TOUR_TRACKING_LABELS.REQUEST_NONE,
+        color: 'text-gray-400 bg-gray-50',
+        icon: '⬜',
+      }
   }
 }
 
 function getConfirmationStatusDisplay(status: string): StatusDisplay {
   switch (status) {
     case 'confirmed':
-      return { label: TOUR_TRACKING_LABELS.CONFIRM_CONFIRMED, color: 'text-emerald-600 bg-emerald-50', icon: '✅' }
+      return {
+        label: TOUR_TRACKING_LABELS.CONFIRM_CONFIRMED,
+        color: 'text-emerald-600 bg-emerald-50',
+        icon: '✅',
+      }
     case 'pending':
-      return { label: TOUR_TRACKING_LABELS.CONFIRM_PENDING, color: 'text-amber-600 bg-amber-50', icon: '⏳' }
+      return {
+        label: TOUR_TRACKING_LABELS.CONFIRM_PENDING,
+        color: 'text-amber-600 bg-amber-50',
+        icon: '⏳',
+      }
     default:
-      return { label: TOUR_TRACKING_LABELS.CONFIRM_NONE, color: 'text-gray-400 bg-gray-50', icon: '⬜' }
+      return {
+        label: TOUR_TRACKING_LABELS.CONFIRM_NONE,
+        color: 'text-gray-400 bg-gray-50',
+        icon: '⬜',
+      }
   }
 }
 
 function getLeaderStatusDisplay(status: string): StatusDisplay {
   switch (status) {
     case 'reviewed':
-      return { label: TOUR_TRACKING_LABELS.LEADER_REVIEWED, color: 'text-emerald-600 bg-emerald-50', icon: '✅' }
+      return {
+        label: TOUR_TRACKING_LABELS.LEADER_REVIEWED,
+        color: 'text-emerald-600 bg-emerald-50',
+        icon: '✅',
+      }
     case 'filled':
-      return { label: TOUR_TRACKING_LABELS.LEADER_FILLED, color: 'text-blue-600 bg-blue-50', icon: '📝' }
+      return {
+        label: TOUR_TRACKING_LABELS.LEADER_FILLED,
+        color: 'text-blue-600 bg-blue-50',
+        icon: '📝',
+      }
     default:
-      return { label: TOUR_TRACKING_LABELS.LEADER_NONE, color: 'text-gray-400 bg-gray-50', icon: '⬜' }
+      return {
+        label: TOUR_TRACKING_LABELS.LEADER_NONE,
+        color: 'text-gray-400 bg-gray-50',
+        icon: '⬜',
+      }
   }
 }
 
 // === Status Badge Component ===
 function StatusBadge({ display }: { display: StatusDisplay }) {
   return (
-    <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium', display.color)}>
+    <span
+      className={cn(
+        'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium',
+        display.color
+      )}
+    >
       <span>{display.icon}</span>
       <span>{display.label}</span>
     </span>
@@ -134,9 +195,7 @@ export function TourTrackingPanel({ tour }: TourTrackingPanelProps) {
 
   if (items.length === 0) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
-        {TOUR_TRACKING_LABELS.NO_ITEMS}
-      </div>
+      <div className="text-center py-12 text-muted-foreground">{TOUR_TRACKING_LABELS.NO_ITEMS}</div>
     )
   }
 
@@ -159,18 +218,34 @@ export function TourTrackingPanel({ tour }: TourTrackingPanelProps) {
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-muted/50 border-b">
-                <th className="text-left px-3 py-2 font-medium whitespace-nowrap">{TOUR_TRACKING_LABELS.COL_DATE}</th>
-                <th className="text-left px-3 py-2 font-medium whitespace-nowrap">{TOUR_TRACKING_LABELS.COL_TITLE}</th>
-                <th className="text-left px-3 py-2 font-medium whitespace-nowrap">{TOUR_TRACKING_LABELS.COL_CATEGORY}</th>
-                <th className="text-right px-3 py-2 font-medium whitespace-nowrap">{TOUR_TRACKING_LABELS.COL_QUOTE_AMOUNT}</th>
-                <th className="text-center px-3 py-2 font-medium whitespace-nowrap">{TOUR_TRACKING_LABELS.COL_REQUEST_STATUS}</th>
-                <th className="text-center px-3 py-2 font-medium whitespace-nowrap">{TOUR_TRACKING_LABELS.COL_CONFIRMATION_STATUS}</th>
-                <th className="text-right px-3 py-2 font-medium whitespace-nowrap">{TOUR_TRACKING_LABELS.COL_ACTUAL_AMOUNT}</th>
-                <th className="text-center px-3 py-2 font-medium whitespace-nowrap">{TOUR_TRACKING_LABELS.COL_LEADER_STATUS}</th>
+                <th className="text-left px-3 py-2 font-medium whitespace-nowrap">
+                  {TOUR_TRACKING_LABELS.COL_DATE}
+                </th>
+                <th className="text-left px-3 py-2 font-medium whitespace-nowrap">
+                  {TOUR_TRACKING_LABELS.COL_TITLE}
+                </th>
+                <th className="text-left px-3 py-2 font-medium whitespace-nowrap">
+                  {TOUR_TRACKING_LABELS.COL_CATEGORY}
+                </th>
+                <th className="text-right px-3 py-2 font-medium whitespace-nowrap">
+                  {TOUR_TRACKING_LABELS.COL_QUOTE_AMOUNT}
+                </th>
+                <th className="text-center px-3 py-2 font-medium whitespace-nowrap">
+                  {TOUR_TRACKING_LABELS.COL_REQUEST_STATUS}
+                </th>
+                <th className="text-center px-3 py-2 font-medium whitespace-nowrap">
+                  {TOUR_TRACKING_LABELS.COL_CONFIRMATION_STATUS}
+                </th>
+                <th className="text-right px-3 py-2 font-medium whitespace-nowrap">
+                  {TOUR_TRACKING_LABELS.COL_ACTUAL_AMOUNT}
+                </th>
+                <th className="text-center px-3 py-2 font-medium whitespace-nowrap">
+                  {TOUR_TRACKING_LABELS.COL_LEADER_STATUS}
+                </th>
               </tr>
             </thead>
             <tbody>
-              {grouped_items.map(([day_number, day_items]) => (
+              {grouped_items.map(([day_number, day_items]) =>
                 day_items.map((item, idx) => (
                   <tr
                     key={item.id}
@@ -189,7 +264,9 @@ export function TourTrackingPanel({ tour }: TourTrackingPanelProps) {
                     <td className="px-3 py-2">
                       <span className="font-medium">{item.title || '-'}</span>
                       {item.sub_category && (
-                        <span className="ml-1 text-xs text-muted-foreground">({item.sub_category})</span>
+                        <span className="ml-1 text-xs text-muted-foreground">
+                          ({item.sub_category})
+                        </span>
                       )}
                     </td>
                     <td className="px-3 py-2 whitespace-nowrap">
@@ -204,7 +281,9 @@ export function TourTrackingPanel({ tour }: TourTrackingPanelProps) {
                       <StatusBadge display={getRequestStatusDisplay(item.request_status)} />
                     </td>
                     <td className="px-3 py-2 text-center">
-                      <StatusBadge display={getConfirmationStatusDisplay(item.confirmation_status)} />
+                      <StatusBadge
+                        display={getConfirmationStatusDisplay(item.confirmation_status)}
+                      />
                     </td>
                     <td className="px-3 py-2 text-right">
                       <AmountCell amount={item.actual_expense} currency={item.currency} />
@@ -214,7 +293,7 @@ export function TourTrackingPanel({ tour }: TourTrackingPanelProps) {
                     </td>
                   </tr>
                 ))
-              ))}
+              )}
             </tbody>
           </table>
         </div>

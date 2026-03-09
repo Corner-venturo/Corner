@@ -11,6 +11,7 @@
 ## 🚨 第一鐵律：永遠讀文件，不要猜
 
 ### 開發前必讀
+
 1. **`/ai/maps/SYSTEM_MAP.md`** — 系統結構、29 domains
 2. **`/ai/maps/ROUTES_MAP.md`** — 70+ 頁面路由
 3. **`/ai/maps/DB_SCHEMA.md`** — 259 張資料表
@@ -18,6 +19,7 @@
 5. **`DESIGN_SYSTEM.md`** — 設計系統規範（莫蘭迪色系）
 
 ### 為什麼？
+
 - ❌ 猜測會導致重複開發、業務邏輯錯誤、UI 不一致
 - ✅ 讀文件會讓你了解現有架構、避免衝突、符合規範
 
@@ -28,6 +30,7 @@
 ### Rule 1：禁止硬編碼顏色
 
 #### ❌ 禁止使用
+
 ```tsx
 // 禁止 Tailwind 預設顏色
 className="border-black"
@@ -43,17 +46,19 @@ style={{ borderColor: '#ccc' }}
 ```
 
 #### ✅ 正確使用
+
 ```tsx
 // 使用設計系統 CSS 變數
-className="border-[var(--border)]"          // 奶茶邊框 #d4c4b0
-className="text-[var(--morandi-primary)]"   // 主要文字 #3a3633
-className="text-[var(--morandi-secondary)]" // 次要文字 #8b8680
-className="text-[var(--morandi-muted)]"     // 淡化文字 #b8b2aa
-className="bg-[var(--background)]"          // 頁面背景 #f6f4f1
-className="bg-[var(--card)]"                // 卡片背景 #ffffff
+className = 'border-[var(--border)]' // 奶茶邊框 #d4c4b0
+className = 'text-[var(--morandi-primary)]' // 主要文字 #3a3633
+className = 'text-[var(--morandi-secondary)]' // 次要文字 #8b8680
+className = 'text-[var(--morandi-muted)]' // 淡化文字 #b8b2aa
+className = 'bg-[var(--background)]' // 頁面背景 #f6f4f1
+className = 'bg-[var(--card)]' // 卡片背景 #ffffff
 ```
 
 #### 為什麼？
+
 1. **深色模式自動適配** — CSS 變數會隨主題切換
 2. **視覺一致性** — 所有元件都用同一套配色
 3. **品牌識別度** — 莫蘭迪色系是 Venturo 的視覺特色
@@ -62,6 +67,7 @@ className="bg-[var(--card)]"                // 卡片背景 #ffffff
 ### Rule 2：禁止使用 Emoji
 
 #### ❌ 禁止使用
+
 ```tsx
 <button>✅ 確認</button>
 <div>🔥 熱門行程</div>
@@ -69,6 +75,7 @@ className="bg-[var(--card)]"                // 卡片背景 #ffffff
 ```
 
 #### ✅ 正確使用
+
 ```tsx
 // 使用 Lucide React icons
 import { Check, Flame, MapPin } from 'lucide-react'
@@ -79,6 +86,7 @@ import { Check, Flame, MapPin } from 'lucide-react'
 ```
 
 #### 為什麼？
+
 1. **跨平台一致性** — Emoji 在不同系統顯示不同
 2. **專業感** — 企業系統不該用 Emoji
 3. **可控性** — Icon 可以調大小、顏色、對齊
@@ -86,6 +94,7 @@ import { Check, Flame, MapPin } from 'lucide-react'
 ### Rule 3：統一使用設計系統元件
 
 #### 按鈕
+
 ```tsx
 // ❌ 自己寫樣式
 <button className="px-4 py-2 bg-blue-500 text-white rounded">
@@ -95,6 +104,7 @@ import { Check, Flame, MapPin } from 'lucide-react'
 ```
 
 #### 卡片
+
 ```tsx
 // ❌ 自己寫樣式
 <div className="p-4 bg-white border border-gray-200 rounded-lg shadow">
@@ -104,6 +114,7 @@ import { Check, Flame, MapPin } from 'lucide-react'
 ```
 
 #### 輸入框
+
 ```tsx
 // ❌ 硬編碼樣式
 <input className="border-gray-300 focus:border-blue-500" />
@@ -115,27 +126,30 @@ import { Check, Flame, MapPin } from 'lucide-react'
 ### Rule 4：邊框樣式規範
 
 #### 實線邊框
+
 ```tsx
 // ✅ 正確
-className="border border-[var(--border)]"        // 1px 實線
-className="border-2 border-[var(--border)]"      // 2px 實線
-className="border-[var(--morandi-gold)]"         // 強調色邊框
+className = 'border border-[var(--border)]' // 1px 實線
+className = 'border-2 border-[var(--border)]' // 2px 實線
+className = 'border-[var(--morandi-gold)]' // 強調色邊框
 ```
 
 #### 虛線邊框
+
 ```tsx
 // ✅ 正確
-className="border-dashed border-[var(--border)]"       // 虛線
-className="border-dashed border-[var(--border)]/50"    // 半透明虛線
+className = 'border-dashed border-[var(--border)]' // 虛線
+className = 'border-dashed border-[var(--border)]/50' // 半透明虛線
 ```
 
 #### 陰影
+
 ```tsx
 // ❌ 不要用 Tailwind 預設陰影
-className="shadow-md"
+className = 'shadow-md'
 
 // ✅ 使用設計系統陰影（在 CSS 定義好的）
-className="morandi-card"  // 自帶陰影
+className = 'morandi-card' // 自帶陰影
 ```
 
 ---
@@ -145,18 +159,21 @@ className="morandi-card"  // 自帶陰影
 ### Rule 5：改之前先查 Schema
 
 #### ❌ 錯誤做法
+
 ```ts
 // 直接假設欄位存在
 const { name, email, phone } = customer
 ```
 
 #### ✅ 正確做法
+
 ```bash
 # 先查 DB_SCHEMA.md 或實際資料庫
 grep -A 20 "CREATE TABLE customers" /ai/maps/DB_SCHEMA.md
 ```
 
 #### 為什麼？
+
 - 欄位名稱可能不是你想的（例如 `first_name` 不是 `name`）
 - 可能有必填欄位（`NOT NULL`）
 - 可能有外鍵約束（`REFERENCES`）
@@ -166,18 +183,15 @@ grep -A 20 "CREATE TABLE customers" /ai/maps/DB_SCHEMA.md
 Venturo ERP 是**多租戶系統**，每個公司的資料隔離。
 
 #### ✅ 正確查詢
+
 ```ts
-const tours = await supabase
-  .from('tours')
-  .select('*')
-  .eq('workspace_id', workspaceId)  // 必須過濾
+const tours = await supabase.from('tours').select('*').eq('workspace_id', workspaceId) // 必須過濾
 ```
 
 #### ❌ 錯誤查詢
+
 ```ts
-const tours = await supabase
-  .from('tours')
-  .select('*')  // 會拿到所有公司的資料！
+const tours = await supabase.from('tours').select('*') // 會拿到所有公司的資料！
 ```
 
 ### Rule 7：Soft Delete
@@ -185,19 +199,15 @@ const tours = await supabase
 不要真的刪除資料，用 `deleted_at` 標記。
 
 #### ✅ 正確
+
 ```ts
-await supabase
-  .from('tours')
-  .update({ deleted_at: new Date().toISOString() })
-  .eq('id', tourId)
+await supabase.from('tours').update({ deleted_at: new Date().toISOString() }).eq('id', tourId)
 ```
 
 #### ❌ 錯誤
+
 ```ts
-await supabase
-  .from('tours')
-  .delete()
-  .eq('id', tourId)
+await supabase.from('tours').delete().eq('id', tourId)
 ```
 
 ---
@@ -209,6 +219,7 @@ await supabase
 TypeScript 錯誤**不是警告**，是**絕對錯誤**。
 
 #### ✅ 開發流程
+
 1. 寫完程式碼
 2. 等 dev server 編譯
 3. 確認**零 TypeScript 錯誤**
@@ -216,6 +227,7 @@ TypeScript 錯誤**不是警告**，是**絕對錯誤**。
 5. Commit
 
 #### ❌ 不可接受
+
 - 「先 commit，晚點再修 TypeScript 錯誤」
 - 「只是 type 錯誤，不影響功能」
 - 用 `@ts-ignore` 略過錯誤
@@ -227,7 +239,8 @@ TypeScript 錯誤**不是警告**，是**絕對錯誤**。
 import { Tour } from '@/types/tour'
 
 // ❌ 錯誤
-interface Tour {  // 在檔案裡自己定義
+interface Tour {
+  // 在檔案裡自己定義
   id: string
   name: string
 }
@@ -238,7 +251,7 @@ interface Tour {  // 在檔案裡自己定義
 ```ts
 // ❌ 錯誤
 const data = await fetch('/api/tours').then(r => r.json())
-console.log(data.name)  // 假設一定有 name
+console.log(data.name) // 假設一定有 name
 
 // ✅ 正確
 const response = await fetch('/api/tours')
@@ -327,6 +340,7 @@ console.error('Failed to fetch tour:', error)
 Venturo ERP 的業務邏輯**不是常識**，必須讀文件。
 
 #### 範例：訂單是唯一源頭
+
 ```ts
 // ✅ 正確：先建訂單，才能建客戶
 1. 建立 order
@@ -339,6 +353,7 @@ Venturo ERP 的業務邏輯**不是常識**，必須讀文件。
 ```
 
 #### 範例：代收轉付
+
 ```ts
 // ✅ 正確：收款和付款分開記
 收款：客戶付 50000 → 記錄 payment_received
@@ -371,13 +386,11 @@ const tourCode = `TOUR-${String(id).padStart(3, '0')}`
 // ❌ 錯誤（每個 tour 查一次客戶）
 const tours = await getTours()
 for (const tour of tours) {
-  const customer = await getCustomer(tour.customer_id)  // N+1!
+  const customer = await getCustomer(tour.customer_id) // N+1!
 }
 
 // ✅ 正確（一次拿全部）
-const tours = await supabase
-  .from('tours')
-  .select('*, customer:customers(*)')
+const tours = await supabase.from('tours').select('*, customer:customers(*)')
 ```
 
 ### Rule 19：分頁查詢
@@ -387,10 +400,7 @@ const tours = await supabase
 const allTours = await supabase.from('tours').select('*')
 
 // ✅ 正確（分頁）
-const { data: tours } = await supabase
-  .from('tours')
-  .select('*')
-  .range(0, 49)  // 只拿 50 筆
+const { data: tours } = await supabase.from('tours').select('*').range(0, 49) // 只拿 50 筆
 ```
 
 ---
@@ -430,12 +440,9 @@ export async function GET(req: Request) {
 export async function GET(req: Request) {
   const session = await getSession(req)
   if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  
-  const tours = await supabase
-    .from('tours')
-    .select('*')
-    .eq('workspace_id', session.workspace_id)  // 只能看自己公司的
-  
+
+  const tours = await supabase.from('tours').select('*').eq('workspace_id', session.workspace_id) // 只能看自己公司的
+
   return Response.json(tours)
 }
 ```
@@ -461,6 +468,7 @@ git commit -m "refactor: 統一使用設計系統的按鈕樣式"
 ### Rule 23：Pre-commit Hook 會檢查
 
 Venturo ERP 有 pre-commit hook，會自動檢查：
+
 - TypeScript 錯誤
 - ESLint 錯誤
 - Prettier 格式
@@ -504,6 +512,7 @@ git commit --no-verify
 ---
 
 **版本記錄**：
+
 - 2026-03-08：v1.0 初版（馬修建立）
 
 _最後更新：2026-03-08_  

@@ -71,9 +71,7 @@ export function DesignList({ onEdit, onDelete, onDuplicate, categoryFilter }: De
       render: (_, row) => {
         const config = DESIGN_TYPE_CONFIG[row.design_type as DesignType]
         return (
-          <span className="text-sm text-morandi-primary">
-            {config?.label || row.design_type}
-          </span>
+          <span className="text-sm text-morandi-primary">{config?.label || row.design_type}</span>
         )
       },
     },
@@ -111,7 +109,7 @@ export function DesignList({ onEdit, onDelete, onDuplicate, categoryFilter }: De
               variant="ghost"
               size="sm"
               className="h-8 w-8 p-0"
-              onClick={(e) => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
             >
               <MoreHorizontal size={16} />
             </Button>
@@ -127,10 +125,7 @@ export function DesignList({ onEdit, onDelete, onDuplicate, categoryFilter }: De
                 {LABELS.COPY}
               </DropdownMenuItem>
             )}
-            <DropdownMenuItem
-              onClick={() => onDelete?.(row)}
-              className="text-morandi-red"
-            >
+            <DropdownMenuItem onClick={() => onDelete?.(row)} className="text-morandi-red">
               <Trash2 size={14} className="mr-2" />
               {LABELS.delete}
             </DropdownMenuItem>
@@ -162,16 +157,12 @@ export function DesignList({ onEdit, onDelete, onDuplicate, categoryFilter }: De
       <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
         <FileText size={48} className="mb-4 opacity-30" />
         <p>{LABELS.noDesigns}</p>
-        <p className="text-sm">{LABELS.noDesignsHint1}「{LABELS.noDesignsHint2}」{LABELS.noDesignsHint3}</p>
+        <p className="text-sm">
+          {LABELS.noDesignsHint1}「{LABELS.noDesignsHint2}」{LABELS.noDesignsHint3}
+        </p>
       </div>
     )
   }
 
-  return (
-    <EnhancedTable
-      columns={columns}
-      data={filteredDesigns}
-      className="min-h-full"
-    />
-  )
+  return <EnhancedTable columns={columns} data={filteredDesigns} className="min-h-full" />
 }

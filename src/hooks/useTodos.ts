@@ -5,7 +5,11 @@
 import { useEffect } from 'react'
 import useSWR, { mutate } from 'swr'
 import { supabase } from '@/lib/supabase/client'
-import { createTodo as createTodoEntity, updateTodo as updateTodoEntity, deleteTodo as deleteTodoEntity } from '@/data/entities/todos'
+import {
+  createTodo as createTodoEntity,
+  updateTodo as updateTodoEntity,
+  deleteTodo as deleteTodoEntity,
+} from '@/data/entities/todos'
 import { getAllTodos } from '@/lib/data/todos'
 import { CACHE_STRATEGY } from '@/lib/swr'
 import type { Todo } from '@/stores/types'
@@ -34,12 +38,12 @@ function generateUUID(): string {
   }
   if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
     return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, c =>
-      (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
+      (+c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))).toString(16)
     )
   }
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-    const r = Math.random() * 16 | 0
-    const v = c === 'x' ? r : (r & 0x3 | 0x8)
+    const r = (Math.random() * 16) | 0
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
     return v.toString(16)
   })
 }
@@ -65,7 +69,12 @@ export function useTodos() {
 
   // 使用 DAL 的 getAllTodos 作為 SWR fetcher
   // Todos 使用 REALTIME 策略（即時更新）
-  const { data: todos = [], error, isLoading, isValidating } = useSWR<Todo[]>(
+  const {
+    data: todos = [],
+    error,
+    isLoading,
+    isValidating,
+  } = useSWR<Todo[]>(
     swrKey,
     // SWR fetcher 接收 key，我們需要從 key 中提取 workspaceId
     async () => {
@@ -81,15 +90,11 @@ export function useTodos() {
 
     const channel = supabase
       .channel('todos_realtime')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'todos' },
-        (payload) => {
-          logger.log('[Todos] Realtime 收到更新:', payload.eventType)
-          // 重新抓取資料
-          mutate(swrKey)
-        }
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'todos' }, payload => {
+        logger.log('[Todos] Realtime 收到更新:', payload.eventType)
+        // 重新抓取資料
+        mutate(swrKey)
+      })
       .subscribe()
 
     return () => {
@@ -152,14 +157,15 @@ export function useTodos() {
     } catch (err) {
       // 失敗時回滾
       // 顯示完整的 Supabase 錯誤訊息
-      const errorDetails = err && typeof err === 'object'
-        ? {
-            message: (err as { message?: string }).message,
-            code: (err as { code?: string }).code,
-            details: (err as { details?: string }).details,
-            hint: (err as { hint?: string }).hint,
-          }
-        : err
+      const errorDetails =
+        err && typeof err === 'object'
+          ? {
+              message: (err as { message?: string }).message,
+              code: (err as { code?: string }).code,
+              details: (err as { details?: string }).details,
+              hint: (err as { hint?: string }).hint,
+            }
+          : err
       logger.error('[useTodos] 新增失敗:', errorDetails)
       mutate(swrKey)
       throw err
@@ -176,7 +182,8 @@ export function useTodos() {
     // 樂觀更新：使用 functional update 避免 stale closure 問題
     mutate(
       swrKey,
-      (currentTodos: Todo[] | undefined) => (currentTodos || []).map(t => (t.id === id ? { ...t, ...updatedTodo } : t)),
+      (currentTodos: Todo[] | undefined) =>
+        (currentTodos || []).map(t => (t.id === id ? { ...t, ...updatedTodo } : t)),
       false
     )
 

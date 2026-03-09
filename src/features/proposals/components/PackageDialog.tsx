@@ -31,8 +31,8 @@ interface PackageDialogProps {
 
 interface FormData {
   version_name: string
-  country: string        // 國家名稱
-  airport_code: string   // 機場代碼
+  country: string // 國家名稱
+  airport_code: string // 機場代碼
   start_date: string
   end_date: string
   days: number | null
@@ -79,8 +79,8 @@ export function PackageDialog({
       if (mode === 'edit' && pkg) {
         setFormData({
           version_name: pkg.version_name || '',
-          country: pkg.country_id || '',    // 存放國家名稱
-          airport_code: pkg.main_city_id || '',  // 存放機場代碼
+          country: pkg.country_id || '', // 存放國家名稱
+          airport_code: pkg.main_city_id || '', // 存放機場代碼
           start_date: pkg.start_date || '',
           end_date: pkg.end_date || '',
           days: pkg.days || null,
@@ -92,13 +92,13 @@ export function PackageDialog({
         // 新增模式：使用 basePackage 或 proposal 的資料
         setFormData({
           version_name: '',
-          country: (basePackage?.country_id || proposal.country_id) || '',
-          airport_code: (basePackage?.main_city_id || proposal.main_city_id) || '',
-          start_date: (basePackage?.start_date || proposal.expected_start_date) || '',
-          end_date: (basePackage?.end_date || proposal.expected_end_date) || '',
+          country: basePackage?.country_id || proposal.country_id || '',
+          airport_code: basePackage?.main_city_id || proposal.main_city_id || '',
+          start_date: basePackage?.start_date || proposal.expected_start_date || '',
+          end_date: basePackage?.end_date || proposal.expected_end_date || '',
           days: basePackage?.days || null,
           nights: basePackage?.nights || null,
-          group_size: (basePackage?.group_size || proposal.group_size) || null,
+          group_size: basePackage?.group_size || proposal.group_size || null,
           notes: '',
         })
       }
@@ -132,7 +132,7 @@ export function PackageDialog({
       const data: CreatePackageData | Partial<CreatePackageData> = {
         proposal_id: proposalId,
         version_name: formData.version_name.trim(),
-        country_id: formData.country || undefined,     // 存放國家名稱
+        country_id: formData.country || undefined, // 存放國家名稱
         main_city_id: formData.airport_code || undefined, // 存放機場代碼
         start_date: formData.start_date || undefined,
         end_date: formData.end_date || undefined,
@@ -151,22 +151,29 @@ export function PackageDialog({
     <FormDialog
       open={open}
       onOpenChange={onOpenChange}
-      title={mode === 'create' ? PROPOSAL_LABELS.packageDialog.createTitle : PROPOSAL_LABELS.packageDialog.editTitle}
+      title={
+        mode === 'create'
+          ? PROPOSAL_LABELS.packageDialog.createTitle
+          : PROPOSAL_LABELS.packageDialog.editTitle
+      }
       onSubmit={handleSubmit}
-      submitLabel={mode === 'create' ? PROPOSAL_LABELS.packageDialog.createSubmit : PROPOSAL_LABELS.packageDialog.editSubmit}
+      submitLabel={
+        mode === 'create'
+          ? PROPOSAL_LABELS.packageDialog.createSubmit
+          : PROPOSAL_LABELS.packageDialog.editSubmit
+      }
       loading={submitting}
       maxWidth="md"
     >
       <div className="space-y-4">
         <div>
           <label className="text-sm font-medium text-morandi-primary mb-2 block">
-            {PROPOSAL_LABELS.packageDialog.versionNameLabel} <span className="text-morandi-red">{PROPOSAL_LABELS.required}</span>
+            {PROPOSAL_LABELS.packageDialog.versionNameLabel}{' '}
+            <span className="text-morandi-red">{PROPOSAL_LABELS.required}</span>
           </label>
           <Input
             value={formData.version_name}
-            onChange={e =>
-              setFormData(prev => ({ ...prev, version_name: e.target.value }))
-            }
+            onChange={e => setFormData(prev => ({ ...prev, version_name: e.target.value }))}
             placeholder={PROPOSAL_LABELS.packageDialog.versionNamePlaceholder}
           />
         </div>

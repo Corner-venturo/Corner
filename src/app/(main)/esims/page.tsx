@@ -91,22 +91,30 @@ export default function EsimsPage() {
       key: 'quantity',
       label: ESIMS_LABELS.COL_QUANTITY,
       render: (_: unknown, row: Esim) => (
-        <span className="text-morandi-text-primary">{row.quantity} {ESIMS_LABELS.QUANTITY_UNIT}</span>
+        <span className="text-morandi-text-primary">
+          {row.quantity} {ESIMS_LABELS.QUANTITY_UNIT}
+        </span>
       ),
     },
     {
       key: 'price',
       label: ESIMS_LABELS.COL_UNIT_PRICE,
-      render: (_: unknown, row: Esim) => (
-        row.price ? <CurrencyCell amount={row.price} /> : <span className="text-morandi-text-secondary">-</span>
-      ),
+      render: (_: unknown, row: Esim) =>
+        row.price ? (
+          <CurrencyCell amount={row.price} />
+        ) : (
+          <span className="text-morandi-text-secondary">-</span>
+        ),
     },
     {
       key: 'total_amount',
       label: ESIMS_LABELS.COL_TOTAL,
-      render: (_: unknown, row: Esim) => (
-        row.price ? <CurrencyCell amount={row.price * row.quantity} /> : <span className="text-morandi-text-secondary">-</span>
-      ),
+      render: (_: unknown, row: Esim) =>
+        row.price ? (
+          <CurrencyCell amount={row.price * row.quantity} />
+        ) : (
+          <span className="text-morandi-text-secondary">-</span>
+        ),
     },
     {
       key: 'supplier_order_number',
@@ -130,8 +138,17 @@ export default function EsimsPage() {
       render: (_: unknown, row: Esim) => (
         <ActionCell
           actions={[
-            { icon: Edit2, label: ESIMS_LABELS.ACTION_EDIT, onClick: () => router.push(`/esims/${row.esim_number}`) },
-            { icon: Trash2, label: ESIMS_LABELS.ACTION_DELETE, onClick: () => handleDelete(row.id), variant: 'danger' },
+            {
+              icon: Edit2,
+              label: ESIMS_LABELS.ACTION_EDIT,
+              onClick: () => router.push(`/esims/${row.esim_number}`),
+            },
+            {
+              icon: Trash2,
+              label: ESIMS_LABELS.ACTION_DELETE,
+              onClick: () => handleDelete(row.id),
+              variant: 'danger',
+            },
           ]}
         />
       ),

@@ -55,7 +55,6 @@ export type {
   Message,
   Attachment,
 
-
   // 同步
   SyncStatus,
   PendingChange,

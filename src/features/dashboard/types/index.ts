@@ -1,5 +1,14 @@
 // 可用的小工具類型
-export type WidgetType = 'calculator' | 'currency' | 'timer' | 'notes' | 'stats' | 'pnr' | 'flight' | 'weather' | 'weather-weekly'
+export type WidgetType =
+  | 'calculator'
+  | 'currency'
+  | 'timer'
+  | 'notes'
+  | 'stats'
+  | 'pnr'
+  | 'flight'
+  | 'weather'
+  | 'weather-weekly'
 
 export interface WidgetConfig {
   id: WidgetType

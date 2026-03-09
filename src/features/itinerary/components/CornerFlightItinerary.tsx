@@ -4,14 +4,13 @@
  * 用於生成機票行程單 PDF
  */
 
-
 import React from 'react'
 
 // Corner 品牌色系
 const CORNER_COLORS = {
   orange: '#F89A1E', // Corner 橘色
-  gold: '#B8A99A',   // 金色（次要）
-  brown: '#3a3633',  // 深棕色
+  gold: '#B8A99A', // 金色（次要）
+  brown: '#3a3633', // 深棕色
   lightBrown: '#FAF7F2', // 淺棕背景
   gray: '#4B5563',
   lightGray: '#9CA3AF',
@@ -110,28 +109,36 @@ export const CornerFlightItinerary: React.FC<CornerFlightItineraryProps> = ({
   const t = labels[language]
 
   return (
-    <div style={{
-      padding: '0',
-      backgroundColor: 'white',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif',
-      fontSize: '11pt',
-      color: CORNER_COLORS.gray,
-      lineHeight: 1.6,
-    }}>
+    <div
+      style={{
+        padding: '0',
+        backgroundColor: 'white',
+        fontFamily:
+          '-apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif',
+        fontSize: '11pt',
+        color: CORNER_COLORS.gray,
+        lineHeight: 1.6,
+      }}
+    >
       {/* 頁首 - Corner Logo + 標題 */}
-      <div style={{
-        borderBottom: `2px solid ${CORNER_COLORS.orange}`,
-        paddingBottom: '12px',
-        marginBottom: '20px',
-        position: 'relative',
-      }}>
+      <div
+        style={{
+          borderBottom: `2px solid ${CORNER_COLORS.orange}`,
+          paddingBottom: '12px',
+          marginBottom: '20px',
+          position: 'relative',
+        }}
+      >
         {/* Logo - 左上角 */}
-        <div style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-        }}>
-          <img src="/corner-logo.png"
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+          }}
+        >
+          <img
+            src="/corner-logo.png"
             alt="Corner Travel"
             style={{
               height: '35px',
@@ -142,32 +149,38 @@ export const CornerFlightItinerary: React.FC<CornerFlightItineraryProps> = ({
 
         {/* 標題 - 右側 */}
         <div style={{ textAlign: 'right' }}>
-          <div style={{
-            fontSize: '18pt',
-            fontWeight: 'bold',
-            color: CORNER_COLORS.brown,
-            marginBottom: '4px',
-          }}>
+          <div
+            style={{
+              fontSize: '18pt',
+              fontWeight: 'bold',
+              color: CORNER_COLORS.brown,
+              marginBottom: '4px',
+            }}
+          >
             {t.title}
           </div>
-          <div style={{
-            fontSize: '9pt',
-            color: CORNER_COLORS.lightGray,
-            letterSpacing: '2px',
-          }}>
+          <div
+            style={{
+              fontSize: '9pt',
+              color: CORNER_COLORS.lightGray,
+              letterSpacing: '2px',
+            }}
+          >
             {t.subtitle}
           </div>
         </div>
       </div>
 
       {/* 基本資訊 */}
-      <div style={{
-        backgroundColor: CORNER_COLORS.lightBrown,
-        padding: '12px 16px',
-        borderRadius: '8px',
-        marginBottom: '20px',
-        borderLeft: `4px solid ${CORNER_COLORS.orange}`,
-      }}>
+      <div
+        style={{
+          backgroundColor: CORNER_COLORS.lightBrown,
+          padding: '12px 16px',
+          borderRadius: '8px',
+          marginBottom: '20px',
+          borderLeft: `4px solid ${CORNER_COLORS.orange}`,
+        }}
+      >
         <div style={{ marginBottom: '6px' }}>
           <span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>{t.orderNumber}</span>
           <span style={{ color: CORNER_COLORS.orange, fontWeight: 'bold', fontSize: '11pt' }}>
@@ -181,38 +194,48 @@ export const CornerFlightItinerary: React.FC<CornerFlightItineraryProps> = ({
       </div>
 
       {/* 去程航班 */}
-      <div style={{
-        marginBottom: '24px',
-      }}>
-        <h3 style={{
-          margin: '0 0 12px 0',
-          fontSize: '13pt',
-          fontWeight: 'bold',
-          color: CORNER_COLORS.brown,
-          borderBottom: `2px solid ${CORNER_COLORS.orange}`,
-          paddingBottom: '8px',
-        }}>
+      <div
+        style={{
+          marginBottom: '24px',
+        }}
+      >
+        <h3
+          style={{
+            margin: '0 0 12px 0',
+            fontSize: '13pt',
+            fontWeight: 'bold',
+            color: CORNER_COLORS.brown,
+            borderBottom: `2px solid ${CORNER_COLORS.orange}`,
+            paddingBottom: '8px',
+          }}
+        >
           ✈️ {t.outbound}
         </h3>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '16px',
-          marginBottom: '12px',
-        }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '16px',
+            marginBottom: '12px',
+          }}
+        >
           {/* 出發 */}
-          <div style={{
-            padding: '12px',
-            backgroundColor: CORNER_COLORS.lightBrown,
-            borderRadius: '8px',
-          }}>
-            <div style={{
-              fontSize: '9pt',
-              color: CORNER_COLORS.lightGray,
-              marginBottom: '4px',
-              fontWeight: '600',
-            }}>
+          <div
+            style={{
+              padding: '12px',
+              backgroundColor: CORNER_COLORS.lightBrown,
+              borderRadius: '8px',
+            }}
+          >
+            <div
+              style={{
+                fontSize: '9pt',
+                color: CORNER_COLORS.lightGray,
+                marginBottom: '4px',
+                fontWeight: '600',
+              }}
+            >
               {t.departure}
             </div>
             <div style={{ fontSize: '12pt', fontWeight: 'bold', color: CORNER_COLORS.orange }}>
@@ -220,22 +243,27 @@ export const CornerFlightItinerary: React.FC<CornerFlightItineraryProps> = ({
             </div>
             <div style={{ fontSize: '10pt', color: CORNER_COLORS.gray, marginTop: '4px' }}>
               {data.outbound_flight.departure_airport}
-              {data.outbound_flight.departure_terminal && ` ${data.outbound_flight.departure_terminal}`}
+              {data.outbound_flight.departure_terminal &&
+                ` ${data.outbound_flight.departure_terminal}`}
             </div>
           </div>
 
           {/* 抵達 */}
-          <div style={{
-            padding: '12px',
-            backgroundColor: CORNER_COLORS.lightBrown,
-            borderRadius: '8px',
-          }}>
-            <div style={{
-              fontSize: '9pt',
-              color: CORNER_COLORS.lightGray,
-              marginBottom: '4px',
-              fontWeight: '600',
-            }}>
+          <div
+            style={{
+              padding: '12px',
+              backgroundColor: CORNER_COLORS.lightBrown,
+              borderRadius: '8px',
+            }}
+          >
+            <div
+              style={{
+                fontSize: '9pt',
+                color: CORNER_COLORS.lightGray,
+                marginBottom: '4px',
+                fontWeight: '600',
+              }}
+            >
               {t.arrival}
             </div>
             <div style={{ fontSize: '12pt', fontWeight: 'bold', color: CORNER_COLORS.orange }}>
@@ -249,30 +277,47 @@ export const CornerFlightItinerary: React.FC<CornerFlightItineraryProps> = ({
         </div>
 
         {/* 去程行李 */}
-        <div style={{
-          padding: '10px 16px',
-          backgroundColor: CORNER_COLORS.lightBrown,
-          borderRadius: '8px',
-          display: 'flex',
-          gap: '24px',
-          flexWrap: 'wrap',
-          fontSize: '9pt',
-        }}>
+        <div
+          style={{
+            padding: '10px 16px',
+            backgroundColor: CORNER_COLORS.lightBrown,
+            borderRadius: '8px',
+            display: 'flex',
+            gap: '24px',
+            flexWrap: 'wrap',
+            fontSize: '9pt',
+          }}
+        >
           <span style={{ color: CORNER_COLORS.orange, fontWeight: '700' }}>🧳 {t.baggageInfo}</span>
-          <span><span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>{t.personalItem}：</span>{data.outbound_baggage.personal_item}</span>
-          <span><span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>{t.carryOn}：</span>{data.outbound_baggage.carry_on}</span>
-          <span><span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>{t.checked}：</span>{data.outbound_baggage.checked}</span>
+          <span>
+            <span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>
+              {t.personalItem}：
+            </span>
+            {data.outbound_baggage.personal_item}
+          </span>
+          <span>
+            <span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>{t.carryOn}：</span>
+            {data.outbound_baggage.carry_on}
+          </span>
+          <span>
+            <span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>{t.checked}：</span>
+            {data.outbound_baggage.checked}
+          </span>
         </div>
 
         {/* 航班詳情 */}
-        <div style={{
-          padding: '12px 16px',
-          border: `1px solid ${CORNER_COLORS.border}`,
-          borderRadius: '8px',
-        }}>
+        <div
+          style={{
+            padding: '12px 16px',
+            border: `1px solid ${CORNER_COLORS.border}`,
+            borderRadius: '8px',
+          }}
+        >
           <div style={{ marginBottom: '6px' }}>
             <span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>{t.airline}：</span>
-            <span>{data.outbound_flight.airline} {data.outbound_flight.flight_number}</span>
+            <span>
+              {data.outbound_flight.airline} {data.outbound_flight.flight_number}
+            </span>
           </div>
           <div style={{ marginBottom: '6px' }}>
             <span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>{t.cabinClass}：</span>
@@ -292,38 +337,48 @@ export const CornerFlightItinerary: React.FC<CornerFlightItineraryProps> = ({
       </div>
 
       {/* 回程航班 */}
-      <div style={{
-        marginBottom: '24px',
-      }}>
-        <h3 style={{
-          margin: '0 0 12px 0',
-          fontSize: '13pt',
-          fontWeight: 'bold',
-          color: CORNER_COLORS.brown,
-          borderBottom: `2px solid ${CORNER_COLORS.orange}`,
-          paddingBottom: '8px',
-        }}>
+      <div
+        style={{
+          marginBottom: '24px',
+        }}
+      >
+        <h3
+          style={{
+            margin: '0 0 12px 0',
+            fontSize: '13pt',
+            fontWeight: 'bold',
+            color: CORNER_COLORS.brown,
+            borderBottom: `2px solid ${CORNER_COLORS.orange}`,
+            paddingBottom: '8px',
+          }}
+        >
           ✈️ {t.return}
         </h3>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '16px',
-          marginBottom: '12px',
-        }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '16px',
+            marginBottom: '12px',
+          }}
+        >
           {/* 出發 */}
-          <div style={{
-            padding: '12px',
-            backgroundColor: CORNER_COLORS.lightBrown,
-            borderRadius: '8px',
-          }}>
-            <div style={{
-              fontSize: '9pt',
-              color: CORNER_COLORS.lightGray,
-              marginBottom: '4px',
-              fontWeight: '600',
-            }}>
+          <div
+            style={{
+              padding: '12px',
+              backgroundColor: CORNER_COLORS.lightBrown,
+              borderRadius: '8px',
+            }}
+          >
+            <div
+              style={{
+                fontSize: '9pt',
+                color: CORNER_COLORS.lightGray,
+                marginBottom: '4px',
+                fontWeight: '600',
+              }}
+            >
               {t.departure}
             </div>
             <div style={{ fontSize: '12pt', fontWeight: 'bold', color: CORNER_COLORS.orange }}>
@@ -336,17 +391,21 @@ export const CornerFlightItinerary: React.FC<CornerFlightItineraryProps> = ({
           </div>
 
           {/* 抵達 */}
-          <div style={{
-            padding: '12px',
-            backgroundColor: CORNER_COLORS.lightBrown,
-            borderRadius: '8px',
-          }}>
-            <div style={{
-              fontSize: '9pt',
-              color: CORNER_COLORS.lightGray,
-              marginBottom: '4px',
-              fontWeight: '600',
-            }}>
+          <div
+            style={{
+              padding: '12px',
+              backgroundColor: CORNER_COLORS.lightBrown,
+              borderRadius: '8px',
+            }}
+          >
+            <div
+              style={{
+                fontSize: '9pt',
+                color: CORNER_COLORS.lightGray,
+                marginBottom: '4px',
+                fontWeight: '600',
+              }}
+            >
               {t.arrival}
             </div>
             <div style={{ fontSize: '12pt', fontWeight: 'bold', color: CORNER_COLORS.orange }}>
@@ -360,30 +419,47 @@ export const CornerFlightItinerary: React.FC<CornerFlightItineraryProps> = ({
         </div>
 
         {/* 回程行李 */}
-        <div style={{
-          padding: '10px 16px',
-          backgroundColor: CORNER_COLORS.lightBrown,
-          borderRadius: '8px',
-          display: 'flex',
-          gap: '24px',
-          flexWrap: 'wrap',
-          fontSize: '9pt',
-        }}>
+        <div
+          style={{
+            padding: '10px 16px',
+            backgroundColor: CORNER_COLORS.lightBrown,
+            borderRadius: '8px',
+            display: 'flex',
+            gap: '24px',
+            flexWrap: 'wrap',
+            fontSize: '9pt',
+          }}
+        >
           <span style={{ color: CORNER_COLORS.orange, fontWeight: '700' }}>🧳 {t.baggageInfo}</span>
-          <span><span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>{t.personalItem}：</span>{data.return_baggage.personal_item}</span>
-          <span><span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>{t.carryOn}：</span>{data.return_baggage.carry_on}</span>
-          <span><span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>{t.checked}：</span>{data.return_baggage.checked}</span>
+          <span>
+            <span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>
+              {t.personalItem}：
+            </span>
+            {data.return_baggage.personal_item}
+          </span>
+          <span>
+            <span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>{t.carryOn}：</span>
+            {data.return_baggage.carry_on}
+          </span>
+          <span>
+            <span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>{t.checked}：</span>
+            {data.return_baggage.checked}
+          </span>
         </div>
 
         {/* 航班詳情 */}
-        <div style={{
-          padding: '12px 16px',
-          border: `1px solid ${CORNER_COLORS.border}`,
-          borderRadius: '8px',
-        }}>
+        <div
+          style={{
+            padding: '12px 16px',
+            border: `1px solid ${CORNER_COLORS.border}`,
+            borderRadius: '8px',
+          }}
+        >
           <div style={{ marginBottom: '6px' }}>
             <span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>{t.airline}：</span>
-            <span>{data.return_flight.airline} {data.return_flight.flight_number}</span>
+            <span>
+              {data.return_flight.airline} {data.return_flight.flight_number}
+            </span>
           </div>
           <div style={{ marginBottom: '6px' }}>
             <span style={{ color: CORNER_COLORS.brown, fontWeight: '600' }}>{t.cabinClass}：</span>
@@ -400,28 +476,33 @@ export const CornerFlightItinerary: React.FC<CornerFlightItineraryProps> = ({
             </div>
           )}
         </div>
-
       </div>
 
       {/* 頁尾 - Corner 資訊 */}
-      <div style={{
-        marginTop: '40px',
-        paddingTop: '16px',
-        borderTop: `1px solid ${CORNER_COLORS.border}`,
-        textAlign: 'center',
-      }}>
-        <div style={{
-          fontSize: '9pt',
-          color: CORNER_COLORS.gray,
-          fontStyle: 'italic',
-          marginBottom: '12px',
-        }}>
+      <div
+        style={{
+          marginTop: '40px',
+          paddingTop: '16px',
+          borderTop: `1px solid ${CORNER_COLORS.border}`,
+          textAlign: 'center',
+        }}
+      >
+        <div
+          style={{
+            fontSize: '9pt',
+            color: CORNER_COLORS.gray,
+            fontStyle: 'italic',
+            marginBottom: '12px',
+          }}
+        >
           {t.slogan}
         </div>
-        <div style={{
-          fontSize: '8pt',
-          color: CORNER_COLORS.lightGray,
-        }}>
+        <div
+          style={{
+            fontSize: '8pt',
+            color: CORNER_COLORS.lightGray,
+          }}
+        >
           {displayCompany} © {new Date().getFullYear()}
         </div>
       </div>

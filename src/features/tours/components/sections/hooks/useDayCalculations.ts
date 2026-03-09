@@ -42,8 +42,34 @@ export function calculateDayDate(
     const month = date.getMonth()
     const year = date.getFullYear()
     if (isNaN(day) || isNaN(month)) return null
-    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
-    const monthsFull = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    const months = [
+      'JAN',
+      'FEB',
+      'MAR',
+      'APR',
+      'MAY',
+      'JUN',
+      'JUL',
+      'AUG',
+      'SEP',
+      'OCT',
+      'NOV',
+      'DEC',
+    ]
+    const monthsFull = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ]
     return { day, month: monthsFull[month], monthShort: months[month], year }
   } catch {
     return null
@@ -74,12 +100,11 @@ export function isLastMainDay(
 }
 
 // 處理圖片邏輯
-export function getDayImages(
-  day: TourFormData['dailyItinerary'][0]
-): string[] {
-  const dayImages = day.showDailyImages === true && day.images && day.images.length > 0 ? day.images : []
+export function getDayImages(day: TourFormData['dailyItinerary'][0]): string[] {
+  const dayImages =
+    day.showDailyImages === true && day.images && day.images.length > 0 ? day.images : []
   const activityImages = day.activities?.filter(a => a.image).map(a => a.image!) || []
-  const normalizedDayImages = dayImages.map(img => typeof img === 'string' ? img : img.url)
+  const normalizedDayImages = dayImages.map(img => (typeof img === 'string' ? img : img.url))
   const allImages: string[] = normalizedDayImages.length > 0 ? normalizedDayImages : activityImages
   return allImages
 }

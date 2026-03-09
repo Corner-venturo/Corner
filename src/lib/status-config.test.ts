@@ -12,7 +12,20 @@ import {
 
 describe('STATUS_CONFIGS', () => {
   it('should have all expected status types', () => {
-    const types = ['payment', 'disbursement', 'todo', 'invoice', 'tour', 'order', 'visa', 'esim', 'voucher', 'receipt', 'quote', 'tour_request']
+    const types = [
+      'payment',
+      'disbursement',
+      'todo',
+      'invoice',
+      'tour',
+      'order',
+      'visa',
+      'esim',
+      'voucher',
+      'receipt',
+      'quote',
+      'tour_request',
+    ]
     for (const type of types) {
       expect(STATUS_CONFIGS[type as keyof typeof STATUS_CONFIGS]).toBeDefined()
     }

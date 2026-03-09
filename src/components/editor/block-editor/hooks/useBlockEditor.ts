@@ -29,10 +29,7 @@ const initialState: BlockEditorState = {
 // Reducer
 // ============================================================
 
-function blockEditorReducer(
-  state: BlockEditorState,
-  action: BlockEditorAction
-): BlockEditorState {
+function blockEditorReducer(state: BlockEditorState, action: BlockEditorAction): BlockEditorState {
   switch (action.type) {
     case 'SET_BLOCKS': {
       return {
@@ -125,7 +122,10 @@ function blockEditorReducer(
       if (newIndex < 0 || newIndex >= state.blocks.length) return state
 
       const newBlocks = [...state.blocks]
-      ;[newBlocks[currentIndex], newBlocks[newIndex]] = [newBlocks[newIndex], newBlocks[currentIndex]]
+      ;[newBlocks[currentIndex], newBlocks[newIndex]] = [
+        newBlocks[newIndex],
+        newBlocks[currentIndex],
+      ]
 
       return {
         ...state,
@@ -219,13 +219,13 @@ export function useBlockEditor(options: UseBlockEditorOptions = {}) {
     dispatch({ type: 'REMOVE_BLOCK', payload: { blockId } })
   }, [])
 
-  const updateBlock = useCallback(<T extends BlockType>(
-    blockId: string,
-    data: Partial<BlockDataMap[T]>
-  ) => {
-    dispatch({ type: 'UPDATE_BLOCK', payload: { blockId, data } })
-    onBlocksChange?.(state.blocks)
-  }, [onBlocksChange, state.blocks])
+  const updateBlock = useCallback(
+    <T extends BlockType>(blockId: string, data: Partial<BlockDataMap[T]>) => {
+      dispatch({ type: 'UPDATE_BLOCK', payload: { blockId, data } })
+      onBlocksChange?.(state.blocks)
+    },
+    [onBlocksChange, state.blocks]
+  )
 
   const moveBlock = useCallback((blockId: string, direction: 'up' | 'down') => {
     dispatch({ type: 'MOVE_BLOCK', payload: { blockId, direction } })
@@ -255,13 +255,19 @@ export function useBlockEditor(options: UseBlockEditorOptions = {}) {
   // 輔助方法
   // ============================================================
 
-  const getBlockById = useCallback((blockId: string) => {
-    return state.blocks.find(b => b.meta.id === blockId)
-  }, [state.blocks])
+  const getBlockById = useCallback(
+    (blockId: string) => {
+      return state.blocks.find(b => b.meta.id === blockId)
+    },
+    [state.blocks]
+  )
 
-  const getBlockByType = useCallback(<T extends BlockType>(type: T) => {
-    return state.blocks.find(b => b.meta.type === type) as AnyBlock | undefined
-  }, [state.blocks])
+  const getBlockByType = useCallback(
+    <T extends BlockType>(type: T) => {
+      return state.blocks.find(b => b.meta.type === type) as AnyBlock | undefined
+    },
+    [state.blocks]
+  )
 
   const getVisibleBlocks = useMemo(() => {
     return state.blocks.filter(b => b.meta.visible)

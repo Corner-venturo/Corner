@@ -3,8 +3,19 @@
 import React from 'react'
 import { Button } from '@/components/ui/button'
 import {
-  Plane, Calendar, AlertCircle, Clock,
-  Utensils, Crown, Phone, Heart, Shield, Info, AlertTriangle, Baby, Users
+  Plane,
+  Calendar,
+  AlertCircle,
+  Clock,
+  Utensils,
+  Crown,
+  Phone,
+  Heart,
+  Shield,
+  Info,
+  AlertTriangle,
+  Baby,
+  Users,
 } from 'lucide-react'
 import { formatDateChineseWithWeekday } from '@/lib/utils/format-date'
 import {
@@ -57,23 +68,28 @@ export function PnrPreview({
         {hasWarnings && (
           <div className="space-y-2">
             {/* 年齡警告 */}
-            {parsedData.ageValidations?.filter(v => !v.isValid).map((v, idx) => (
-              <div key={`age-${idx}`} className="bg-amber-50 border border-amber-200 p-2 rounded-lg">
-                <div className="flex items-start gap-2">
-                  <Baby size={14} className="text-amber-600 mt-0.5 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-amber-900 text-xs">{v.passengerName}</div>
-                    <div className="text-amber-700 text-xs mt-0.5">{v.warning}</div>
-                    {v.suggestion && (
-                      <div className="text-amber-600 text-xs mt-1 flex items-start gap-1">
-                        <Info size={12} className="mt-0.5 flex-shrink-0" />
-                        <span>{v.suggestion}</span>
-                      </div>
-                    )}
+            {parsedData.ageValidations
+              ?.filter(v => !v.isValid)
+              .map((v, idx) => (
+                <div
+                  key={`age-${idx}`}
+                  className="bg-amber-50 border border-amber-200 p-2 rounded-lg"
+                >
+                  <div className="flex items-start gap-2">
+                    <Baby size={14} className="text-amber-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-amber-900 text-xs">{v.passengerName}</div>
+                      <div className="text-amber-700 text-xs mt-0.5">{v.warning}</div>
+                      {v.suggestion && (
+                        <div className="text-amber-600 text-xs mt-1 flex items-start gap-1">
+                          <Info size={12} className="mt-0.5 flex-shrink-0" />
+                          <span>{v.suggestion}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
 
             {/* 嬰兒/成人比例警告 */}
             {parsedData.infantRatioCheck && !parsedData.infantRatioCheck.isValid && (
@@ -81,62 +97,90 @@ export function PnrPreview({
                 <div className="flex items-start gap-2">
                   <Users size={14} className="text-red-600 mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-red-900 text-xs">{PNR_LABELS.LABEL_2033}</div>
-                    <div className="text-red-700 text-xs mt-0.5">{parsedData.infantRatioCheck.error}</div>
+                    <div className="font-semibold text-red-900 text-xs">
+                      {PNR_LABELS.LABEL_2033}
+                    </div>
+                    <div className="text-red-700 text-xs mt-0.5">
+                      {parsedData.infantRatioCheck.error}
+                    </div>
                   </div>
                 </div>
               </div>
             )}
 
             {/* 轉機警告 */}
-            {parsedData.connections?.filter(c => !c.isSufficient).map((c, idx) => (
-              <div key={`conn-${idx}`} className="bg-red-50 border border-red-200 p-2 rounded-lg">
-                <div className="flex items-start gap-2">
-                  <AlertTriangle size={14} className="text-red-600 mt-0.5 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-red-900 text-xs">{PNR_LABELS.LABEL_7874}{c.airportName}</div>
-                    <div className="text-red-700 text-xs mt-0.5">{c.warning}</div>
-                    {c.suggestion && (
-                      <div className="text-red-600 text-xs mt-1 flex items-start gap-1">
-                        <Info size={12} className="mt-0.5 flex-shrink-0" />
-                        <span>{c.suggestion}</span>
+            {parsedData.connections
+              ?.filter(c => !c.isSufficient)
+              .map((c, idx) => (
+                <div key={`conn-${idx}`} className="bg-red-50 border border-red-200 p-2 rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle size={14} className="text-red-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-red-900 text-xs">
+                        {PNR_LABELS.LABEL_7874}
+                        {c.airportName}
                       </div>
-                    )}
+                      <div className="text-red-700 text-xs mt-0.5">{c.warning}</div>
+                      {c.suggestion && (
+                        <div className="text-red-600 text-xs mt-1 flex items-start gap-1">
+                          <Info size={12} className="mt-0.5 flex-shrink-0" />
+                          <span>{c.suggestion}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
 
             {/* 轉機時間緊迫警告 */}
-            {parsedData.connections?.filter(c => c.isSufficient && c.warning).map((c, idx) => (
-              <div key={`conn-warn-${idx}`} className="bg-amber-50 border border-amber-200 p-2 rounded-lg">
-                <div className="flex items-start gap-2">
-                  <Clock size={14} className="text-amber-600 mt-0.5 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-amber-900 text-xs">{PNR_LABELS.LABEL_7874}{c.airportName}</div>
-                    <div className="text-amber-700 text-xs mt-0.5">{c.warning}</div>
+            {parsedData.connections
+              ?.filter(c => c.isSufficient && c.warning)
+              .map((c, idx) => (
+                <div
+                  key={`conn-warn-${idx}`}
+                  className="bg-amber-50 border border-amber-200 p-2 rounded-lg"
+                >
+                  <div className="flex items-start gap-2">
+                    <Clock size={14} className="text-amber-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-amber-900 text-xs">
+                        {PNR_LABELS.LABEL_7874}
+                        {c.airportName}
+                      </div>
+                      <div className="text-amber-700 text-xs mt-0.5">{c.warning}</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
 
             {/* 票號警告 */}
-            {parsedData.ticketValidations?.filter(tv => !tv.isValid || tv.warnings.length > 0).map((tv, idx) => (
-              <div key={`ticket-${idx}`} className="bg-amber-50 border border-amber-200 p-2 rounded-lg">
-                <div className="flex items-start gap-2">
-                  <AlertCircle size={14} className="text-amber-600 mt-0.5 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-amber-900 text-xs font-mono">{tv.ticketNumber}</div>
-                    {tv.errors.map((err, errIdx) => (
-                      <div key={errIdx} className="text-red-700 text-xs mt-0.5">{err}</div>
-                    ))}
-                    {tv.warnings.map((warn, warnIdx) => (
-                      <div key={warnIdx} className="text-amber-700 text-xs mt-0.5">{warn}</div>
-                    ))}
+            {parsedData.ticketValidations
+              ?.filter(tv => !tv.isValid || tv.warnings.length > 0)
+              .map((tv, idx) => (
+                <div
+                  key={`ticket-${idx}`}
+                  className="bg-amber-50 border border-amber-200 p-2 rounded-lg"
+                >
+                  <div className="flex items-start gap-2">
+                    <AlertCircle size={14} className="text-amber-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-amber-900 text-xs font-mono">
+                        {tv.ticketNumber}
+                      </div>
+                      {tv.errors.map((err, errIdx) => (
+                        <div key={errIdx} className="text-red-700 text-xs mt-0.5">
+                          {err}
+                        </div>
+                      ))}
+                      {tv.warnings.map((warn, warnIdx) => (
+                        <div key={warnIdx} className="text-amber-700 text-xs mt-0.5">
+                          {warn}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         )}
 
@@ -150,9 +194,7 @@ export function PnrPreview({
           </div>
           <div>
             <span className="font-medium text-morandi-primary">{PNR_LABELS.LABEL_392}</span>
-            <p className="text-morandi-secondary mt-0.5">
-              {parsedData.passengerNames.length} 人
-            </p>
+            <p className="text-morandi-secondary mt-0.5">{parsedData.passengerNames.length} 人</p>
           </div>
         </div>
 
@@ -160,7 +202,10 @@ export function PnrPreview({
           <span className="font-medium text-morandi-primary">{PNR_LABELS.LABEL_8113}</span>
           <div className="mt-1 space-y-1">
             {parsedData.passengerNames.map((name, idx) => (
-              <div key={idx} className="text-morandi-secondary font-mono bg-morandi-container/10 px-2 py-1 rounded">
+              <div
+                key={idx}
+                className="text-morandi-secondary font-mono bg-morandi-container/10 px-2 py-1 rounded"
+              >
                 {idx + 1}. {name}
               </div>
             ))}
@@ -177,14 +222,18 @@ export function PnrPreview({
               <Clock size={14} className="text-morandi-primary" />
               <span className="font-medium text-morandi-primary">{PNR_LABELS.LABEL_9939}</span>
             </div>
-            <p className={
-              isUrgent(parsedData.ticketingDeadline)
-                ? 'text-morandi-alert font-semibold'
-                : 'text-morandi-secondary'
-            }>
+            <p
+              className={
+                isUrgent(parsedData.ticketingDeadline)
+                  ? 'text-morandi-alert font-semibold'
+                  : 'text-morandi-secondary'
+              }
+            >
               {formatDateChineseWithWeekday(parsedData.ticketingDeadline)}
               {isUrgent(parsedData.ticketingDeadline) && (
-                <span className="ml-2 text-xs bg-morandi-alert/10 text-morandi-alert px-1 py-0.5 rounded">{PNR_LABELS.LABEL_3458}</span>
+                <span className="ml-2 text-xs bg-morandi-alert/10 text-morandi-alert px-1 py-0.5 rounded">
+                  {PNR_LABELS.LABEL_3458}
+                </span>
               )}
             </p>
           </div>
@@ -195,7 +244,9 @@ export function PnrPreview({
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="font-medium text-morandi-primary">{PNR_LABELS.LABEL_1343}</span>
-              <span className="text-xs text-morandi-secondary">{parsedData.segments.length} 個航段</span>
+              <span className="text-xs text-morandi-secondary">
+                {parsedData.segments.length} 個航段
+              </span>
             </div>
             <div className="space-y-2">
               {parsedData.segments.slice(0, showAdvanced ? undefined : 3).map((seg, idx) => (
@@ -224,14 +275,23 @@ export function PnrPreview({
         {/* SSR 特殊服務 */}
         {parsedData.specialRequests.length > 0 && showAdvanced && (
           <div>
-            <span className="font-medium text-morandi-primary block mb-2">{PNR_LABELS.LABEL_7702}</span>
+            <span className="font-medium text-morandi-primary block mb-2">
+              {PNR_LABELS.LABEL_7702}
+            </span>
             <div className="space-y-1">
               {parsedData.specialRequests.map((ssr, idx) => (
-                <div key={idx} className="flex items-center gap-2 text-morandi-secondary bg-morandi-container/5 p-2 rounded">
+                <div
+                  key={idx}
+                  className="flex items-center gap-2 text-morandi-secondary bg-morandi-container/5 p-2 rounded"
+                >
                   {getSSRIcon(ssr)}
                   <span className="font-mono text-xs">{ssr.code}</span>
                   {ssr.description && <span>- {ssr.description}</span>}
-                  {ssr.segments && <span className="text-xs text-morandi-gold">{PNR_LABELS.LABEL_3194} {ssr.segments.join(',')}</span>}
+                  {ssr.segments && (
+                    <span className="text-xs text-morandi-gold">
+                      {PNR_LABELS.LABEL_3194} {ssr.segments.join(',')}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
@@ -241,10 +301,15 @@ export function PnrPreview({
         {/* OSI 其他資訊 */}
         {parsedData.otherInfo.length > 0 && showAdvanced && (
           <div>
-            <span className="font-medium text-morandi-primary block mb-2">{PNR_LABELS.LABEL_5164}</span>
+            <span className="font-medium text-morandi-primary block mb-2">
+              {PNR_LABELS.LABEL_5164}
+            </span>
             <div className="space-y-1">
               {parsedData.otherInfo.map((osi, idx) => (
-                <div key={idx} className="text-morandi-secondary bg-morandi-container/5 p-2 rounded text-xs">
+                <div
+                  key={idx}
+                  className="text-morandi-secondary bg-morandi-container/5 p-2 rounded text-xs"
+                >
                   <div className="flex items-center gap-2 mb-1">
                     {getOSIIcon(osi)}
                     <span className="font-mono">{osi.airline}</span>
@@ -262,7 +327,9 @@ export function PnrPreview({
             onClick={onToggleAdvanced}
             className="text-xs text-morandi-sky hover:text-morandi-sky/80"
           >
-            {showAdvanced ? '隱藏進階資訊' : `顯示SSR/OSI (${parsedData.specialRequests.length + parsedData.otherInfo.length}項)`}
+            {showAdvanced
+              ? '隱藏進階資訊'
+              : `顯示SSR/OSI (${parsedData.specialRequests.length + parsedData.otherInfo.length}項)`}
           </button>
         )}
       </div>

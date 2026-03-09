@@ -6,12 +6,7 @@
  */
 
 import { useState, useCallback, useEffect, useMemo } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -30,10 +25,7 @@ import {
 import { cn } from '@/lib/utils'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { formatDateTW } from '@/lib/utils/format-date'
-import {
-  parseAmadeusPNR,
-  type ParsedPNR,
-} from '@/lib/pnr-parser'
+import { parseAmadeusPNR, type ParsedPNR } from '@/lib/pnr-parser'
 import { useReferenceData } from '@/lib/pnr/use-reference-data'
 import { createPNR } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
@@ -43,10 +35,7 @@ import type { OrderMember } from '@/features/orders/types/order-member.types'
 import type { PNR, PNRSegment } from '@/types/pnr.types'
 import type { Json } from '@/lib/supabase/types'
 import { COMP_TOURS_LABELS, TOUR_PNR_TOOL_DIALOG_LABELS as LABELS } from '../../constants/labels'
-import {
-  type PassengerMatch,
-  buildPassengerMatches,
-} from './pnr-matching'
+import { type PassengerMatch, buildPassengerMatches } from './pnr-matching'
 
 // 客戶庫建議型別
 interface CustomerSuggestion {
@@ -80,7 +69,9 @@ export function TourPnrToolDialog({
   const [error, setError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [passengerMatches, setPassengerMatches] = useState<PassengerMatch[]>([])
-  const [customerSuggestions, setCustomerSuggestions] = useState<Record<number, CustomerSuggestion>>({})
+  const [customerSuggestions, setCustomerSuggestions] = useState<
+    Record<number, CustomerSuggestion>
+  >({})
   const [addingMember, setAddingMember] = useState<number | null>(null)
 
   const { user } = useAuthStore()
@@ -161,7 +152,10 @@ export function TourPnrToolDialog({
         setError(result.validation.errors[0])
       }
     } catch (err) {
-      setError(COMP_TOURS_LABELS.解析失敗 + (err instanceof Error ? err.message : COMP_TOURS_LABELS.未知錯誤))
+      setError(
+        COMP_TOURS_LABELS.解析失敗 +
+          (err instanceof Error ? err.message : COMP_TOURS_LABELS.未知錯誤)
+      )
       setParsedPNR(null)
       setPassengerMatches([])
     }
@@ -193,158 +187,173 @@ export function TourPnrToolDialog({
   }, [storageKey])
 
   // 手動選擇比對的團員
-  const handleMemberSelect = useCallback((pnrIndex: number, memberId: string | null) => {
-    setPassengerMatches(prev => prev.map((match, i) => {
-      if (i !== pnrIndex) return match
-      const member = memberId ? members.find(m => m.id === memberId) : null
-      return {
-        ...match,
-        memberId,
-        memberName: member?.chinese_name || null,
-        memberPassportName: member?.passport_name || null,
-        ticketPrice: member?.flight_cost || match.ticketPrice,
-        existingPnr: member?.pnr || null,
-      }
-    }))
-  }, [members])
+  const handleMemberSelect = useCallback(
+    (pnrIndex: number, memberId: string | null) => {
+      setPassengerMatches(prev =>
+        prev.map((match, i) => {
+          if (i !== pnrIndex) return match
+          const member = memberId ? members.find(m => m.id === memberId) : null
+          return {
+            ...match,
+            memberId,
+            memberName: member?.chinese_name || null,
+            memberPassportName: member?.passport_name || null,
+            ticketPrice: member?.flight_cost || match.ticketPrice,
+            existingPnr: member?.pnr || null,
+          }
+        })
+      )
+    },
+    [members]
+  )
 
   // 加入訂單（從客戶庫）
-  const handleAddFromCustomer = useCallback(async (pnrIndex: number, suggestion: CustomerSuggestion) => {
-    if (!user?.workspace_id) return
-    setAddingMember(pnrIndex)
+  const handleAddFromCustomer = useCallback(
+    async (pnrIndex: number, suggestion: CustomerSuggestion) => {
+      if (!user?.workspace_id) return
+      setAddingMember(pnrIndex)
 
-    try {
-      const { supabase } = await import('@/lib/supabase/client')
+      try {
+        const { supabase } = await import('@/lib/supabase/client')
 
-      // 找到這個團的第一個 order_id（優先從 members，沒有的話從 tour 查）
-      let orderId: string | undefined = members[0]?.order_id
-      
-      if (!orderId) {
-        // 從 tour 查詢第一個訂單
-        const { data: orders } = await supabase
-          .from('orders')
-          .select('id')
-          .eq('tour_id', tourId)
-          .limit(1)
-        
-        orderId = orders?.[0]?.id
-        
+        // 找到這個團的第一個 order_id（優先從 members，沒有的話從 tour 查）
+        let orderId: string | undefined = members[0]?.order_id
+
         if (!orderId) {
-          toast.error(LABELS.找不到訂單)
-          return
+          // 從 tour 查詢第一個訂單
+          const { data: orders } = await supabase
+            .from('orders')
+            .select('id')
+            .eq('tour_id', tourId)
+            .limit(1)
+
+          orderId = orders?.[0]?.id
+
+          if (!orderId) {
+            toast.error(LABELS.找不到訂單)
+            return
+          }
         }
+
+        const { data, error: insertError } = await supabase
+          .from('order_members')
+          .insert({
+            order_id: orderId!,
+            customer_id: suggestion.customer_id,
+            chinese_name: suggestion.name,
+            passport_name: suggestion.passport_name,
+            member_type: 'adult',
+            workspace_id: user.workspace_id,
+          })
+          .select()
+          .single()
+
+        if (insertError) throw insertError
+
+        // 更新配對
+        setPassengerMatches(prev =>
+          prev.map((match, i) => {
+            if (i !== pnrIndex) return match
+            return {
+              ...match,
+              memberId: data.id,
+              memberName: suggestion.name,
+              memberPassportName: suggestion.passport_name,
+            }
+          })
+        )
+
+        toast.success(LABELS.已加入訂單(suggestion.name || suggestion.passport_name || ''))
+
+        // 通知上層重新載入團員資料
+        onSuccess?.()
+      } catch (err) {
+        logger.error('[PNR] 加入訂單失敗:', err)
+        toast.error(LABELS.加入訂單失敗)
+      } finally {
+        setAddingMember(null)
       }
-
-      const { data, error: insertError } = await supabase
-        .from('order_members')
-        .insert({
-          order_id: orderId!,
-          customer_id: suggestion.customer_id,
-          chinese_name: suggestion.name,
-          passport_name: suggestion.passport_name,
-          member_type: 'adult',
-          workspace_id: user.workspace_id,
-        })
-        .select()
-        .single()
-
-      if (insertError) throw insertError
-
-      // 更新配對
-      setPassengerMatches(prev => prev.map((match, i) => {
-        if (i !== pnrIndex) return match
-        return {
-          ...match,
-          memberId: data.id,
-          memberName: suggestion.name,
-          memberPassportName: suggestion.passport_name,
-        }
-      }))
-
-      toast.success(LABELS.已加入訂單(suggestion.name || suggestion.passport_name || ''))
-      
-      // 通知上層重新載入團員資料
-      onSuccess?.()
-    } catch (err) {
-      logger.error('[PNR] 加入訂單失敗:', err)
-      toast.error(LABELS.加入訂單失敗)
-    } finally {
-      setAddingMember(null)
-    }
-  }, [user, members, onSuccess])
+    },
+    [user, members, onSuccess]
+  )
 
   // 新增團員（從 PNR 姓名）
-  const handleAddNewMember = useCallback(async (pnrIndex: number, pnrName: string) => {
-    if (!user?.workspace_id) return
-    setAddingMember(pnrIndex)
+  const handleAddNewMember = useCallback(
+    async (pnrIndex: number, pnrName: string) => {
+      if (!user?.workspace_id) return
+      setAddingMember(pnrIndex)
 
-    try {
-      const { supabase } = await import('@/lib/supabase/client')
+      try {
+        const { supabase } = await import('@/lib/supabase/client')
 
-      // 找到這個團的第一個 order_id（優先從 members，沒有的話從 tour 查）
-      let orderId: string | undefined = members[0]?.order_id
-      
-      if (!orderId) {
-        // 從 tour 查詢第一個訂單
-        const { data: orders } = await supabase
-          .from('orders')
-          .select('id')
-          .eq('tour_id', tourId)
-          .limit(1)
-        
-        orderId = orders?.[0]?.id
-        
+        // 找到這個團的第一個 order_id（優先從 members，沒有的話從 tour 查）
+        let orderId: string | undefined = members[0]?.order_id
+
         if (!orderId) {
-          toast.error(LABELS.找不到訂單)
-          return
+          // 從 tour 查詢第一個訂單
+          const { data: orders } = await supabase
+            .from('orders')
+            .select('id')
+            .eq('tour_id', tourId)
+            .limit(1)
+
+          orderId = orders?.[0]?.id
+
+          if (!orderId) {
+            toast.error(LABELS.找不到訂單)
+            return
+          }
         }
+
+        const { data, error: insertError } = await supabase
+          .from('order_members')
+          .insert({
+            order_id: orderId!,
+            passport_name: pnrName,
+            member_type: 'adult',
+            workspace_id: user.workspace_id,
+          })
+          .select()
+          .single()
+
+        if (insertError) throw insertError
+
+        setPassengerMatches(prev =>
+          prev.map((match, i) => {
+            if (i !== pnrIndex) return match
+            return {
+              ...match,
+              memberId: data.id,
+              memberName: null,
+              memberPassportName: pnrName,
+            }
+          })
+        )
+
+        toast.success(LABELS.已新增團員(pnrName))
+      } catch (err) {
+        logger.error('[PNR] 新增團員失敗:', err)
+        toast.error(LABELS.新增團員失敗)
+      } finally {
+        setAddingMember(null)
       }
-
-      const { data, error: insertError } = await supabase
-        .from('order_members')
-        .insert({
-          order_id: orderId!,
-          passport_name: pnrName,
-          member_type: 'adult',
-          workspace_id: user.workspace_id,
-        })
-        .select()
-        .single()
-
-      if (insertError) throw insertError
-
-      setPassengerMatches(prev => prev.map((match, i) => {
-        if (i !== pnrIndex) return match
-        return {
-          ...match,
-          memberId: data.id,
-          memberName: null,
-          memberPassportName: pnrName,
-        }
-      }))
-
-      toast.success(LABELS.已新增團員(pnrName))
-    } catch (err) {
-      logger.error('[PNR] 新增團員失敗:', err)
-      toast.error(LABELS.新增團員失敗)
-    } finally {
-      setAddingMember(null)
-    }
-  }, [user, members])
+    },
+    [user, members]
+  )
 
   // 儲存
   const handleSave = useCallback(async () => {
     if (!parsedPNR || !user?.workspace_id) return
 
-    const conflicts = passengerMatches.filter(m =>
-      m.memberId && m.existingPnr && m.existingPnr !== parsedPNR.recordLocator
+    const conflicts = passengerMatches.filter(
+      m => m.memberId && m.existingPnr && m.existingPnr !== parsedPNR.recordLocator
     )
     if (conflicts.length > 0) {
       const names = conflicts.map(m => m.memberName || m.pnrName).join('、')
-      const confirmed = await confirm(
-        `${LABELS.以下團員已有不同的_PNR_儲存後將覆蓋}\n${names}`,
-        { title: COMP_TOURS_LABELS.PNR_覆蓋確認, type: 'warning' }
-      )
+      const confirmed = await confirm(`${LABELS.以下團員已有不同的_PNR_儲存後將覆蓋}\n${names}`, {
+        title: COMP_TOURS_LABELS.PNR_覆蓋確認,
+        type: 'warning',
+      })
       if (!confirmed) return
     }
 
@@ -433,7 +442,10 @@ export function TourPnrToolDialog({
       onSuccess?.()
       onClose()
     } catch (err) {
-      toast.error(COMP_TOURS_LABELS.儲存失敗_3 + (err instanceof Error ? err.message : COMP_TOURS_LABELS.未知錯誤))
+      toast.error(
+        COMP_TOURS_LABELS.儲存失敗_3 +
+          (err instanceof Error ? err.message : COMP_TOURS_LABELS.未知錯誤)
+      )
     } finally {
       setIsSaving(false)
     }
@@ -486,7 +498,7 @@ export function TourPnrToolDialog({
   }, [passengerMatches])
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent level={2} className="max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-sm">
@@ -503,11 +515,13 @@ export function TourPnrToolDialog({
           <div className="relative">
             <Textarea
               value={rawPNR}
-              onChange={(e) => setRawPNR(e.target.value)}
+              onChange={e => setRawPNR(e.target.value)}
               placeholder={COMP_TOURS_LABELS.貼上_Amadeus_PNR_電報}
               className={cn(
-                "font-mono text-xs transition-all",
-                parsedPNR ? "min-h-[50px] max-h-[50px] overflow-hidden text-morandi-secondary" : "min-h-[100px]"
+                'font-mono text-xs transition-all',
+                parsedPNR
+                  ? 'min-h-[50px] max-h-[50px] overflow-hidden text-morandi-secondary'
+                  : 'min-h-[100px]'
               )}
             />
             {parsedPNR && (
@@ -554,18 +568,22 @@ export function TourPnrToolDialog({
                   {parsedPNR.recordLocator}
                 </span>
                 <span className="text-xs text-morandi-secondary">
-                  {parsedPNR.passengers.length} {LABELS.位旅客} · {parsedPNR.segments.length} {LABELS.段航班}
+                  {parsedPNR.passengers.length} {LABELS.位旅客} · {parsedPNR.segments.length}{' '}
+                  {LABELS.段航班}
                 </span>
                 {deadlineStatus && (
-                  <span className={cn(
-                    "ml-auto text-xs px-2 py-0.5 rounded-full flex items-center gap-1",
-                    deadlineStatus.urgent
-                      ? "bg-[#fae8e5] text-[#c17b6e]"
-                      : "bg-[#e8f0e8] text-[#7a9e7e]"
-                  )}>
+                  <span
+                    className={cn(
+                      'ml-auto text-xs px-2 py-0.5 rounded-full flex items-center gap-1',
+                      deadlineStatus.urgent
+                        ? 'bg-[#fae8e5] text-[#c17b6e]'
+                        : 'bg-[#e8f0e8] text-[#7a9e7e]'
+                    )}
+                  >
                     <Clock size={11} />
-                    {LABELS.出票期限}{parsedPNR.ticketingDeadline ? formatDateTW(parsedPNR.ticketingDeadline) : ''}
-                    （{deadlineStatus.text}）
+                    {LABELS.出票期限}
+                    {parsedPNR.ticketingDeadline ? formatDateTW(parsedPNR.ticketingDeadline) : ''}（
+                    {deadlineStatus.text}）
                   </span>
                 )}
               </div>
@@ -580,7 +598,9 @@ export function TourPnrToolDialog({
                         {matchStats.matched}/{matchStats.total} {LABELS.全部配對完成} ✓
                       </span>
                     ) : (
-                      <>{matchStats.matched}/{matchStats.total} {LABELS.已配對}</>
+                      <>
+                        {matchStats.matched}/{matchStats.total} {LABELS.已配對}
+                      </>
                     )}
                   </span>
                 </div>
@@ -596,21 +616,25 @@ export function TourPnrToolDialog({
                       <div
                         key={i}
                         className={cn(
-                          "flex items-center gap-3 px-3 py-2 rounded-lg border text-sm transition-colors",
+                          'flex items-center gap-3 px-3 py-2 rounded-lg border text-sm transition-colors',
                           hasMatch
-                            ? "border-l-[3px] border-l-[#7a9e7e] border-r-morandi-border border-y-morandi-border bg-white"
+                            ? 'border-l-[3px] border-l-[#7a9e7e] border-r-morandi-border border-y-morandi-border bg-white'
                             : hasSuggestion
-                              ? "border-l-[3px] border-l-[#7b95b0] border-r-morandi-border border-y-morandi-border bg-[#f7fafd]"
-                              : "border-l-[3px] border-l-morandi-gold border-r-morandi-border border-y-morandi-border bg-[#fdfaf6]"
+                              ? 'border-l-[3px] border-l-[#7b95b0] border-r-morandi-border border-y-morandi-border bg-[#f7fafd]'
+                              : 'border-l-[3px] border-l-morandi-gold border-r-morandi-border border-y-morandi-border bg-[#fdfaf6]'
                         )}
                       >
                         {/* 編號 */}
-                        <span className={cn(
-                          "w-5 h-5 rounded-full text-[10px] font-semibold flex items-center justify-center flex-shrink-0",
-                          hasMatch ? "bg-[#e8f0e8] text-[#7a9e7e]" :
-                          hasSuggestion ? "bg-[#e5edf5] text-[#7b95b0]" :
-                          "bg-morandi-gold/15 text-morandi-gold"
-                        )}>
+                        <span
+                          className={cn(
+                            'w-5 h-5 rounded-full text-[10px] font-semibold flex items-center justify-center flex-shrink-0',
+                            hasMatch
+                              ? 'bg-[#e8f0e8] text-[#7a9e7e]'
+                              : hasSuggestion
+                                ? 'bg-[#e5edf5] text-[#7b95b0]'
+                                : 'bg-morandi-gold/15 text-morandi-gold'
+                          )}
+                        >
                           {i + 1}
                         </span>
 
@@ -633,10 +657,13 @@ export function TourPnrToolDialog({
                         </div>
 
                         {/* 箭頭 */}
-                        <ArrowRight size={13} className={cn(
-                          "flex-shrink-0",
-                          hasMatch ? "text-[#7a9e7e]" : "text-morandi-muted"
-                        )} />
+                        <ArrowRight
+                          size={13}
+                          className={cn(
+                            'flex-shrink-0',
+                            hasMatch ? 'text-[#7a9e7e]' : 'text-morandi-muted'
+                          )}
+                        />
 
                         {/* 配對結果 */}
                         <div className="flex-1 min-w-0">
@@ -647,7 +674,8 @@ export function TourPnrToolDialog({
                           ) : hasSuggestion ? (
                             <div>
                               <div className="text-xs font-medium text-[#7b95b0]">
-                                💡 {LABELS.客戶庫找到}：{suggestion.name || suggestion.passport_name}
+                                💡 {LABELS.客戶庫找到}：
+                                {suggestion.name || suggestion.passport_name}
                               </div>
                             </div>
                           ) : (
@@ -656,7 +684,7 @@ export function TourPnrToolDialog({
                               <select
                                 className="mt-1 text-xs border border-morandi-border rounded px-1.5 py-0.5 bg-white"
                                 value=""
-                                onChange={(e) => handleMemberSelect(i, e.target.value || null)}
+                                onChange={e => handleMemberSelect(i, e.target.value || null)}
                               >
                                 <option value="">{LABELS.選擇團員}</option>
                                 {members.map(m => (
@@ -683,7 +711,11 @@ export function TourPnrToolDialog({
                               onClick={() => handleAddFromCustomer(i, suggestion)}
                               className="h-6 text-[11px] px-2 border-[#7b95b0] text-[#7b95b0] hover:bg-[#e5edf5]"
                             >
-                              {isAdding ? <Loader2 size={12} className="animate-spin" /> : LABELS.加入訂單btn}
+                              {isAdding ? (
+                                <Loader2 size={12} className="animate-spin" />
+                              ) : (
+                                LABELS.加入訂單btn
+                              )}
                             </Button>
                           ) : (
                             <Button
@@ -692,8 +724,13 @@ export function TourPnrToolDialog({
                               onClick={() => handleAddNewMember(i, match.pnrName)}
                               className="h-6 text-[11px] px-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
                             >
-                              {isAdding ? <Loader2 size={12} className="animate-spin" /> : (
-                                <><UserPlus size={11} className="mr-0.5" />{LABELS.新增btn}</>
+                              {isAdding ? (
+                                <Loader2 size={12} className="animate-spin" />
+                              ) : (
+                                <>
+                                  <UserPlus size={11} className="mr-0.5" />
+                                  {LABELS.新增btn}
+                                </>
                               )}
                             </Button>
                           )}
@@ -711,31 +748,39 @@ export function TourPnrToolDialog({
                     ✈️ {LABELS.航班資訊} {parsedPNR.segments.length} {LABELS.段}
                   </span>
                   {parsedPNR.segments.map((seg, i) => {
-                    const statusLabel = {
-                      HK: COMP_TOURS_LABELS.已確認,
-                      TK: COMP_TOURS_LABELS.已開票,
-                      RR: COMP_TOURS_LABELS.已確認,
-                      HX: COMP_TOURS_LABELS.已取消,
-                      XX: COMP_TOURS_LABELS.已取消,
-                    }[seg.status] || seg.status
+                    const statusLabel =
+                      {
+                        HK: COMP_TOURS_LABELS.已確認,
+                        TK: COMP_TOURS_LABELS.已開票,
+                        RR: COMP_TOURS_LABELS.已確認,
+                        HX: COMP_TOURS_LABELS.已取消,
+                        XX: COMP_TOURS_LABELS.已取消,
+                      }[seg.status] || seg.status
                     const isOk = ['HK', 'RR', 'TK'].includes(seg.status)
 
                     return (
-                      <div key={i} className="flex items-center gap-3 px-3 py-1.5 bg-morandi-container/40 rounded-lg text-xs">
+                      <div
+                        key={i}
+                        className="flex items-center gap-3 px-3 py-1.5 bg-morandi-container/40 rounded-lg text-xs"
+                      >
                         <span className="font-mono font-semibold text-morandi-gold min-w-[52px]">
                           {seg.airline} {seg.flightNumber}
                         </span>
                         <span className="text-morandi-primary">
-                          {getAirportName(seg.origin) || seg.origin} → {getAirportName(seg.destination) || seg.destination}
+                          {getAirportName(seg.origin) || seg.origin} →{' '}
+                          {getAirportName(seg.destination) || seg.destination}
                         </span>
                         <span className="text-morandi-secondary">
                           {seg.departureDate}
-                          {seg.departureTime && ` ${seg.departureTime.slice(0, 2)}:${seg.departureTime.slice(2)}`}
+                          {seg.departureTime &&
+                            ` ${seg.departureTime.slice(0, 2)}:${seg.departureTime.slice(2)}`}
                         </span>
-                        <span className={cn(
-                          "ml-auto px-1.5 py-0.5 rounded text-[10px]",
-                          isOk ? "bg-[#e8f0e8] text-[#7a9e7e]" : "bg-[#fae8e5] text-[#c17b6e]"
-                        )}>
+                        <span
+                          className={cn(
+                            'ml-auto px-1.5 py-0.5 rounded text-[10px]',
+                            isOk ? 'bg-[#e8f0e8] text-[#7a9e7e]' : 'bg-[#fae8e5] text-[#c17b6e]'
+                          )}
+                        >
                           {statusLabel}
                         </span>
                       </div>
@@ -751,9 +796,11 @@ export function TourPnrToolDialog({
         <div className="flex items-center justify-between pt-3 border-t border-morandi-border">
           <span className="text-xs text-morandi-secondary">
             {parsedPNR ? (
-              matchStats.allMatched
-                ? <span className="text-[#7a9e7e]">✅ {LABELS.全部配對完成}</span>
-                : `✅ ${matchStats.matched} ${LABELS.已配對} · ➕ ${matchStats.total - matchStats.matched} ${LABELS.待處理}`
+              matchStats.allMatched ? (
+                <span className="text-[#7a9e7e]">✅ {LABELS.全部配對完成}</span>
+              ) : (
+                `✅ ${matchStats.matched} ${LABELS.已配對} · ➕ ${matchStats.total - matchStats.matched} ${LABELS.待處理}`
+              )
             ) : (
               `${LABELS.團員label} ${members.length} ${LABELS.人label}`
             )}

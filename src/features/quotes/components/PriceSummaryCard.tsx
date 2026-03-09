@@ -5,7 +5,11 @@ import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
 import { PriceInputRow } from './PriceInputRow'
 import { TierPricing } from '../types'
-import { CATEGORY_SECTION_LABELS, COST_ITEM_ROW_LABELS, PRICE_SUMMARY_CARD_LABELS } from '../constants/labels';
+import {
+  CATEGORY_SECTION_LABELS,
+  COST_ITEM_ROW_LABELS,
+  PRICE_SUMMARY_CARD_LABELS,
+} from '../constants/labels'
 
 interface PriceSummaryCardProps {
   tier: TierPricing
@@ -63,7 +67,9 @@ export const PriceSummaryCard: React.FC<PriceSummaryCardProps> = ({
             <th className="text-center py-2 px-4 text-xs font-medium text-morandi-primary border-r border-border">
               {PRICE_SUMMARY_CARD_LABELS.LABEL_561}
             </th>
-            <th className="text-center py-2 px-4 text-xs font-medium text-morandi-primary">{PRICE_SUMMARY_CARD_LABELS.LABEL_7705}</th>
+            <th className="text-center py-2 px-4 text-xs font-medium text-morandi-primary">
+              {PRICE_SUMMARY_CARD_LABELS.LABEL_7705}
+            </th>
           </tr>
         </thead>
         <tbody>

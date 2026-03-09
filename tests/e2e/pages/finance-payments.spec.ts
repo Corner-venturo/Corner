@@ -73,7 +73,10 @@ test.describe('收款管理 - 新增收款對話框', () => {
     await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 5000 })
 
     // 點擊取消
-    const cancelButton = page.locator('[role="dialog"]').locator('button').filter({ hasText: '取消' })
+    const cancelButton = page
+      .locator('[role="dialog"]')
+      .locator('button')
+      .filter({ hasText: '取消' })
     await cancelButton.click()
 
     // 對話框應該關閉

@@ -70,11 +70,11 @@ export function TourFeaturesSectionLuxury({ data, viewMode }: TourFeaturesSectio
   }
 
   const goToPrev = () => {
-    setLightboxIndex((prev) => (prev > 0 ? prev - 1 : lightboxImages.length - 1))
+    setLightboxIndex(prev => (prev > 0 ? prev - 1 : lightboxImages.length - 1))
   }
 
   const goToNext = () => {
-    setLightboxIndex((prev) => (prev < lightboxImages.length - 1 ? prev + 1 : 0))
+    setLightboxIndex(prev => (prev < lightboxImages.length - 1 ? prev + 1 : 0))
   }
 
   // 取得標籤文字：優先使用自訂 tag，其次用 icon 對應，最後用預設
@@ -119,7 +119,7 @@ export function TourFeaturesSectionLuxury({ data, viewMode }: TourFeaturesSectio
             style={{
               color: LUXURY.secondary,
               fontFamily: "'Noto Serif TC', serif",
-              fontSize: isMobile ? '1rem' : '1.125rem'
+              fontSize: isMobile ? '1rem' : '1.125rem',
             }}
           >
             Exclusive Experiences
@@ -128,7 +128,7 @@ export function TourFeaturesSectionLuxury({ data, viewMode }: TourFeaturesSectio
             className={`font-bold ${isMobile ? 'text-2xl' : 'text-3xl'}`}
             style={{
               color: LUXURY.text,
-              fontFamily: "'Noto Serif TC', serif"
+              fontFamily: "'Noto Serif TC', serif",
             }}
           >
             {TOURS_LABELS.LABEL_6890}
@@ -136,15 +136,17 @@ export function TourFeaturesSectionLuxury({ data, viewMode }: TourFeaturesSectio
         </motion.div>
 
         {/* 特色網格 */}
-        <div className={`grid ${
-          isMobile
-            ? 'grid-cols-1 gap-8'
-            : features.length === 1
-              ? 'grid-cols-1 max-w-2xl mx-auto gap-8'
-              : features.length === 2
-                ? 'md:grid-cols-2 gap-8'
-                : 'md:grid-cols-2 lg:grid-cols-3 gap-8'
-        }`}>
+        <div
+          className={`grid ${
+            isMobile
+              ? 'grid-cols-1 gap-8'
+              : features.length === 1
+                ? 'grid-cols-1 max-w-2xl mx-auto gap-8'
+                : features.length === 2
+                  ? 'md:grid-cols-2 gap-8'
+                  : 'md:grid-cols-2 lg:grid-cols-3 gap-8'
+          }`}
+        >
           {features.map((feature, index) => (
             <FeatureCard
               key={index}
@@ -162,7 +164,7 @@ export function TourFeaturesSectionLuxury({ data, viewMode }: TourFeaturesSectio
       </div>
 
       {/* Lightbox */}
-      <Dialog open={lightboxImages.length > 0} onOpenChange={(open) => !open && closeLightbox()}>
+      <Dialog open={lightboxImages.length > 0} onOpenChange={open => !open && closeLightbox()}>
         <DialogContent level={1} className="max-w-5xl bg-black/90 border-none p-0">
           <div className="relative flex items-center justify-center min-h-[60vh]">
             {/* 左箭頭 */}
@@ -184,7 +186,8 @@ export function TourFeaturesSectionLuxury({ data, viewMode }: TourFeaturesSectio
                 exit={{ opacity: 0, scale: 0.9 }}
                 className="flex items-center justify-center px-16"
               >
-                <img src={lightboxImages[lightboxIndex]}
+                <img
+                  src={lightboxImages[lightboxIndex]}
                   alt={`圖片 ${lightboxIndex + 1}`}
                   className="max-w-full max-h-[85vh] object-contain rounded-lg"
                 />
@@ -223,7 +226,7 @@ function FeatureCard({
   tagColor,
   isExpanded,
   onToggleExpand,
-  onImageClick
+  onImageClick,
 }: {
   feature: Feature
   index: number
@@ -241,12 +244,12 @@ function FeatureCard({
 
   const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation()
-    setCurrentImageIndex((prev) => (prev < validImages.length - 1 ? prev + 1 : 0))
+    setCurrentImageIndex(prev => (prev < validImages.length - 1 ? prev + 1 : 0))
   }
 
   const prevImage = (e: React.MouseEvent) => {
     e.stopPropagation()
-    setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : validImages.length - 1))
+    setCurrentImageIndex(prev => (prev > 0 ? prev - 1 : validImages.length - 1))
   }
 
   return (
@@ -263,7 +266,8 @@ function FeatureCard({
         onClick={() => hasImages && onImageClick(validImages, currentImageIndex)}
       >
         {hasImages ? (
-          <img src={validImages[isExpanded ? currentImageIndex : 0]}
+          <img
+            src={validImages[isExpanded ? currentImageIndex : 0]}
             alt={feature.title}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
@@ -317,7 +321,7 @@ function FeatureCard({
           className={`font-bold mb-3 ${isMobile ? 'text-lg' : 'text-xl'}`}
           style={{
             color: LUXURY.text,
-            fontFamily: "'Noto Serif TC', serif"
+            fontFamily: "'Noto Serif TC', serif",
           }}
         >
           {feature.title}
@@ -337,13 +341,17 @@ function FeatureCard({
           className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-widest pb-0.5 transition-colors hover:opacity-80"
           style={{
             color: LUXURY.secondary,
-            borderBottom: `1px solid ${LUXURY.secondary}`
+            borderBottom: `1px solid ${LUXURY.secondary}`,
           }}
         >
           {isExpanded ? (
-            <>{TOURS_LABELS.COLLAPSE} <ChevronDown size={14} className="rotate-180" /></>
+            <>
+              {TOURS_LABELS.COLLAPSE} <ChevronDown size={14} className="rotate-180" />
+            </>
           ) : (
-            <>Read More <ArrowRight size={14} /></>
+            <>
+              Read More <ArrowRight size={14} />
+            </>
           )}
         </button>
 
@@ -362,9 +370,13 @@ function FeatureCard({
                     key={idx}
                     onClick={() => setCurrentImageIndex(idx)}
                     className={`relative flex-shrink-0 w-16 h-16 rounded overflow-hidden border-2 transition-all ${
-                      idx === currentImageIndex ? 'border-secondary opacity-100' : 'border-transparent opacity-60 hover:opacity-100'
+                      idx === currentImageIndex
+                        ? 'border-secondary opacity-100'
+                        : 'border-transparent opacity-60 hover:opacity-100'
                     }`}
-                    style={{ borderColor: idx === currentImageIndex ? LUXURY.secondary : 'transparent' }}
+                    style={{
+                      borderColor: idx === currentImageIndex ? LUXURY.secondary : 'transparent',
+                    }}
                   >
                     <Image src={img} alt={`縮圖 ${idx + 1}`} fill className="object-cover" />
                   </button>

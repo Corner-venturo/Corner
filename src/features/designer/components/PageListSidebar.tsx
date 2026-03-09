@@ -25,7 +25,12 @@ import { useDragSort } from '@/hooks/useDragSort'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { CanvasPage } from './types'
 import type { StyleSeries } from '../templates/engine'
-import type { MemoSettings, MemoItem, SeasonInfo, MemoInfoItem } from '../templates/definitions/types'
+import type {
+  MemoSettings,
+  MemoItem,
+  SeasonInfo,
+  MemoInfoItem,
+} from '../templates/definitions/types'
 import { DESIGNER_LABELS } from './constants/labels'
 
 // 頁面類型定義
@@ -104,12 +109,12 @@ export function PageListSidebar({
   // 拖曳排序（封面不可拖曳/放置）
   const { dragState, dragHandlers } = useDragSort({
     onReorder: onReorderPages,
-    canDrag: (index) => index > 0, // 封面不可拖曳
-    canDrop: (index) => index > 0, // 不能拖到封面位置
+    canDrag: index => index > 0, // 封面不可拖曳
+    canDrop: index => index > 0, // 不能拖到封面位置
   })
 
   // 可用的頁面類型（根據選擇的風格）
-  const availablePageTypes = PAGE_TYPES.filter((pt) => {
+  const availablePageTypes = PAGE_TYPES.filter(pt => {
     if (!selectedStyle) return false
     // 空白頁永遠可用
     if (pt.templateKey === 'blank') return true
@@ -130,28 +135,22 @@ export function PageListSidebar({
 
   // 處理備忘錄項目勾選
   const handleToggleMemoItem = useCallback((itemId: string) => {
-    setSelectedMemoItemIds((prev) =>
-      prev.includes(itemId)
-        ? prev.filter((id) => id !== itemId)
-        : [...prev, itemId]
+    setSelectedMemoItemIds(prev =>
+      prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]
     )
   }, [])
 
   // 處理季節勾選
   const handleToggleSeason = useCallback((season: string) => {
-    setSelectedSeasonIds((prev) =>
-      prev.includes(season)
-        ? prev.filter((s) => s !== season)
-        : [...prev, season]
+    setSelectedSeasonIds(prev =>
+      prev.includes(season) ? prev.filter(s => s !== season) : [...prev, season]
     )
   }, [])
 
   // 處理資訊項目勾選
   const handleToggleInfoItem = useCallback((itemId: string) => {
-    setSelectedInfoItemIds((prev) =>
-      prev.includes(itemId)
-        ? prev.filter((id) => id !== itemId)
-        : [...prev, itemId]
+    setSelectedInfoItemIds(prev =>
+      prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]
     )
   }, [])
 
@@ -161,9 +160,8 @@ export function PageListSidebar({
 
     if (memoPageType === 'items') {
       // 項目頁
-      const selectedItems = memoSettings.items?.filter(
-        (item) => selectedMemoItemIds.includes(item.id)
-      ) || []
+      const selectedItems =
+        memoSettings.items?.filter(item => selectedMemoItemIds.includes(item.id)) || []
       if (selectedItems.length === 0) return
 
       onAddMemoPage({
@@ -172,12 +170,10 @@ export function PageListSidebar({
       })
     } else {
       // 天氣/資訊頁
-      const selectedSeasons = memoSettings.seasons?.filter(
-        (s) => selectedSeasonIds.includes(s.season)
-      ) || []
-      const selectedInfos = memoSettings.infoItems?.filter(
-        (i) => selectedInfoItemIds.includes(i.id)
-      ) || []
+      const selectedSeasons =
+        memoSettings.seasons?.filter(s => selectedSeasonIds.includes(s.season)) || []
+      const selectedInfos =
+        memoSettings.infoItems?.filter(i => selectedInfoItemIds.includes(i.id)) || []
       if (selectedSeasons.length === 0 && selectedInfos.length === 0) return
 
       onAddMemoPage({
@@ -192,7 +188,14 @@ export function PageListSidebar({
     setSelectedMemoItemIds([])
     setSelectedSeasonIds([])
     setSelectedInfoItemIds([])
-  }, [onAddMemoPage, memoSettings, memoPageType, selectedMemoItemIds, selectedSeasonIds, selectedInfoItemIds])
+  }, [
+    onAddMemoPage,
+    memoSettings,
+    memoPageType,
+    selectedMemoItemIds,
+    selectedSeasonIds,
+    selectedInfoItemIds,
+  ])
 
   // 打開備忘錄選擇對話框
   const handleOpenMemoDialog = useCallback(() => {
@@ -209,7 +212,9 @@ export function PageListSidebar({
     <div className="w-48 bg-card border-r border-border flex flex-col shrink-0">
       {/* 標題 - 高度與元素庫一致 */}
       <div className="p-3 border-b border-border flex items-center justify-between h-[42px]">
-        <span className="text-sm font-medium text-morandi-primary">{DESIGNER_LABELS.LABEL_2099}</span>
+        <span className="text-sm font-medium text-morandi-primary">
+          {DESIGNER_LABELS.LABEL_2099}
+        </span>
         <Button
           variant="ghost"
           size="sm"
@@ -227,10 +232,10 @@ export function PageListSidebar({
           <div
             key={page.id}
             draggable={dragState.canDrag(index)}
-            onDragStart={(e) => dragHandlers.onDragStart(e, index)}
-            onDragOver={(e) => dragHandlers.onDragOver(e, index)}
+            onDragStart={e => dragHandlers.onDragStart(e, index)}
+            onDragOver={e => dragHandlers.onDragOver(e, index)}
             onDragLeave={dragHandlers.onDragLeave}
-            onDrop={(e) => dragHandlers.onDrop(e, index)}
+            onDrop={e => dragHandlers.onDrop(e, index)}
             onDragEnd={dragHandlers.onDragEnd}
             className={cn(
               'group relative rounded-lg border-2 transition-all cursor-pointer',
@@ -245,17 +250,11 @@ export function PageListSidebar({
             onClick={() => onSelectPage(index)}
           >
             {/* 縮圖預覽區 */}
-            <div
-              className="aspect-[559/794] bg-white rounded-t flex items-center justify-center text-xs text-morandi-secondary overflow-hidden"
-            >
+            <div className="aspect-[559/794] bg-white rounded-t flex items-center justify-center text-xs text-morandi-secondary overflow-hidden">
               {/* 簡易預覽：顯示頁面名稱 */}
               <div className="text-center p-2">
-                <div className="text-morandi-primary font-medium truncate">
-                  {page.name}
-                </div>
-                <div className="text-[10px] text-morandi-secondary">
-                  第 {index + 1} 頁
-                </div>
+                <div className="text-morandi-primary font-medium truncate">{page.name}</div>
+                <div className="text-[10px] text-morandi-secondary">第 {index + 1} 頁</div>
               </div>
             </div>
 
@@ -270,7 +269,7 @@ export function PageListSidebar({
                 {onDuplicatePage && (
                   <button
                     type="button"
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation()
                       onDuplicatePage(index)
                     }}
@@ -283,7 +282,7 @@ export function PageListSidebar({
                 {index > 0 && (
                   <button
                     type="button"
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation()
                       onDeletePage(index)
                     }}
@@ -307,7 +306,7 @@ export function PageListSidebar({
           </DialogHeader>
 
           <div className="space-y-2">
-            {availablePageTypes.map((pageType) => (
+            {availablePageTypes.map(pageType => (
               <button
                 key={pageType.id}
                 type="button"
@@ -336,9 +335,7 @@ export function PageListSidebar({
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-morandi-secondary">
-                    {pageType.description}
-                  </div>
+                  <div className="text-xs text-morandi-secondary">{pageType.description}</div>
                 </div>
               </button>
             ))}
@@ -392,7 +389,7 @@ export function PageListSidebar({
                       {CATEGORY_LABELS[category] || category}
                     </div>
                     <div className="space-y-1">
-                      {items.map((item) => {
+                      {items.map(item => {
                         const isUsed = usedMemoItemIds.includes(item.id)
                         const isSelected = selectedMemoItemIds.includes(item.id)
                         return (
@@ -446,7 +443,7 @@ export function PageListSidebar({
                       {DESIGNER_LABELS.LABEL_805}
                     </div>
                     <div className="grid grid-cols-2 gap-2">
-                      {memoSettings.seasons.map((season) => {
+                      {memoSettings.seasons.map(season => {
                         const isSelected = selectedSeasonIds.includes(season.season)
                         return (
                           <label
@@ -469,9 +466,7 @@ export function PageListSidebar({
                                 {season.season === 'autumn' && '秋季'}
                                 {season.season === 'winter' && '冬季'}
                               </div>
-                              <div className="text-xs text-morandi-secondary">
-                                {season.months}
-                              </div>
+                              <div className="text-xs text-morandi-secondary">{season.months}</div>
                             </div>
                           </label>
                         )
@@ -487,7 +482,7 @@ export function PageListSidebar({
                       {DESIGNER_LABELS.LABEL_7094}
                     </div>
                     <div className="space-y-1">
-                      {memoSettings.infoItems.map((item) => {
+                      {memoSettings.infoItems.map(item => {
                         const isSelected = selectedInfoItemIds.includes(item.id)
                         return (
                           <label
@@ -521,10 +516,10 @@ export function PageListSidebar({
 
                 {(!memoSettings?.seasons || memoSettings.seasons.length === 0) &&
                   (!memoSettings?.infoItems || memoSettings.infoItems.length === 0) && (
-                  <div className="text-center text-morandi-secondary py-8">
-                    {DESIGNER_LABELS.NOT_FOUND_2488}
-                  </div>
-                )}
+                    <div className="text-center text-morandi-secondary py-8">
+                      {DESIGNER_LABELS.NOT_FOUND_2488}
+                    </div>
+                  )}
               </>
             )}
           </div>
@@ -536,10 +531,7 @@ export function PageListSidebar({
                 ? `已選擇 ${selectedMemoItemIds.length} 個項目`
                 : `已選擇 ${selectedSeasonIds.length} 個季節, ${selectedInfoItemIds.length} 個資訊`}
             </div>
-            <Button
-              variant="outline"
-              onClick={() => setShowMemoDialog(false)}
-            >
+            <Button variant="outline" onClick={() => setShowMemoDialog(false)}>
               {DESIGNER_LABELS.CANCEL}
             </Button>
             <Button

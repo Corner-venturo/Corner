@@ -216,42 +216,42 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
 
   // 團體狀態
   tour: {
-    '開團': {
+    開團: {
       color: 'text-morandi-gold',
       label: '開團',
       icon: FileText,
       bgColor: 'bg-morandi-gold/10',
       borderColor: 'border-morandi-gold/30',
     },
-    '待出發': {
+    待出發: {
       color: 'text-morandi-green',
       label: '待出發',
       icon: Truck,
       bgColor: 'bg-morandi-green/10',
       borderColor: 'border-morandi-green/30',
     },
-    '已出發': {
+    已出發: {
       color: 'text-emerald-700',
       label: '已出發',
       icon: Truck,
       bgColor: 'bg-emerald-50',
       borderColor: 'border-emerald-200',
     },
-    '待結團': {
+    待結團: {
       color: 'text-morandi-red',
       label: '待結團',
       icon: Clock,
       bgColor: 'bg-morandi-red/10',
       borderColor: 'border-morandi-red/30',
     },
-    '已結團': {
+    已結團: {
       color: 'text-morandi-secondary',
       label: '已結團',
       icon: FileCheck,
       bgColor: 'bg-morandi-container',
       borderColor: 'border-morandi-muted/30',
     },
-    '取消': {
+    取消: {
       color: 'text-morandi-muted',
       label: '已取消',
       icon: XCircle,
@@ -470,7 +470,7 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
       icon: FileText,
       bgColor: 'bg-status-info/10',
     },
-    '待出發': {
+    待出發: {
       color: 'text-status-info',
       label: '待出發',
       icon: Truck,

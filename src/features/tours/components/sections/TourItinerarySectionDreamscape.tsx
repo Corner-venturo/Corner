@@ -5,7 +5,10 @@ import { MutableRefObject, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { formatDateMonthDayEN } from '@/lib/utils/format-date'
-import type { DailyItinerary as DailyItineraryType, TourPageData } from '@/features/tours/types/tour-display.types'
+import type {
+  DailyItinerary as DailyItineraryType,
+  TourPageData,
+} from '@/features/tours/types/tour-display.types'
 
 // Dreamscape 每日行程佈局風格
 type DreamscapeDayLayout = 'blobLeft' | 'blobRight' | 'fullHero' | 'glassCard'
@@ -82,7 +85,9 @@ function BlobLeftLayout({
       className={`flex flex-col lg:flex-row w-full min-h-[70vh] relative overflow-hidden group ${isMobile ? 'py-8' : 'py-0'}`}
     >
       {/* 左側文字 */}
-      <div className={`lg:w-[40%] ${isMobile ? 'px-4' : 'p-12 lg:p-24'} flex flex-col justify-center bg-card/20 backdrop-blur-sm relative z-10 order-2 lg:order-1`}>
+      <div
+        className={`lg:w-[40%] ${isMobile ? 'px-4' : 'p-12 lg:p-24'} flex flex-col justify-center bg-card/20 backdrop-blur-sm relative z-10 order-2 lg:order-1`}
+      >
         <div
           className="absolute top-10 left-10 text-xs font-bold tracking-[0.5em] uppercase"
           style={{ color: DREAM.purple, fontFamily: "'Cormorant Garamond', serif" }}
@@ -148,7 +153,8 @@ function BlobLeftLayout({
       >
         {imageUrl ? (
           <>
-            <img className="absolute inset-0 w-full h-full object-cover transition-transform duration-[3s] group-hover:scale-110"
+            <img
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-[3s] group-hover:scale-110"
               src={imageUrl}
               alt={day.title || ''}
             />
@@ -187,7 +193,11 @@ function BlobRightLayout({
   dayRef: (el: HTMLDivElement | null) => void
 }) {
   const dayNum = extractDayNumber(dayLabel)
-  const images = day.activities?.map(a => a.image).filter(Boolean).slice(0, 2) || []
+  const images =
+    day.activities
+      ?.map(a => a.image)
+      .filter(Boolean)
+      .slice(0, 2) || []
   const dateFormatted = day.date ? formatDateMonthDayEN(day.date) : ''
 
   return (
@@ -196,16 +206,23 @@ function BlobRightLayout({
       className={`w-full ${isMobile ? 'py-12 px-4' : 'py-32 px-6 lg:px-12'} relative`}
       style={{ backgroundColor: `${DREAM.lavender}1a` }}
     >
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl -z-10" style={{ backgroundColor: `${DREAM.accent}0d` }} />
+      <div
+        className="absolute right-0 top-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl -z-10"
+        style={{ backgroundColor: `${DREAM.accent}0d` }}
+      />
 
       <div className="max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         {/* 中間文字 */}
-        <div className={`lg:col-span-4 ${isMobile ? '' : 'lg:col-start-5'} text-center relative z-20 py-12`}>
+        <div
+          className={`lg:col-span-4 ${isMobile ? '' : 'lg:col-start-5'} text-center relative z-20 py-12`}
+        >
           <div
             className="inline-block border rounded-full px-6 py-2 mb-6 bg-card/40 backdrop-blur"
             style={{ borderColor: `${DREAM.text}33`, fontFamily: "'Space Mono', monospace" }}
           >
-            <span className="text-xs tracking-[0.3em] uppercase">Day {String(dayNum).padStart(2, '0')} • {dateFormatted}</span>
+            <span className="text-xs tracking-[0.3em] uppercase">
+              Day {String(dayNum).padStart(2, '0')} • {dateFormatted}
+            </span>
           </div>
 
           <h2
@@ -231,7 +248,11 @@ function BlobRightLayout({
           {day.meals?.dinner && day.meals.dinner !== '敬請自理' && (
             <button
               className="px-8 py-3 rounded-full text-white transition-colors duration-300"
-              style={{ backgroundColor: DREAM.text, fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic' }}
+              style={{
+                backgroundColor: DREAM.text,
+                fontFamily: "'Cormorant Garamond', serif",
+                fontStyle: 'italic',
+              }}
             >
               View Dining: {day.meals.dinner}
             </button>
@@ -245,10 +266,10 @@ function BlobRightLayout({
               <Image className="object-cover" src={images[0]} alt="" fill />
             </div>
             {day.activities?.[0]?.title && (
-              <div
-                className="absolute -bottom-6 -right-6 p-4 rounded-xl z-10 rotate-3 bg-card/30 backdrop-blur-md border border-white/40 shadow-lg"
-              >
-                <span style={{ fontFamily: "'Cinzel', serif", fontSize: '1.5rem', color: DREAM.accent }}>
+              <div className="absolute -bottom-6 -right-6 p-4 rounded-xl z-10 rotate-3 bg-card/30 backdrop-blur-md border border-white/40 shadow-lg">
+                <span
+                  style={{ fontFamily: "'Cinzel', serif", fontSize: '1.5rem', color: DREAM.accent }}
+                >
                   {day.activities[0].title}
                 </span>
               </div>
@@ -263,10 +284,15 @@ function BlobRightLayout({
               <Image className="object-cover" src={images[1]} alt="" fill />
             </div>
             {day.activities?.[1]?.title && (
-              <div
-                className="absolute top-12 -left-12 p-6 rounded-full w-32 h-32 flex items-center justify-center z-10 animate-pulse bg-card/30 backdrop-blur-md border border-white/40 shadow-lg"
-              >
-                <span style={{ fontFamily: "'La Belle Aurore', cursive", fontSize: '1.25rem', textAlign: 'center', lineHeight: 1.2 }}>
+              <div className="absolute top-12 -left-12 p-6 rounded-full w-32 h-32 flex items-center justify-center z-10 animate-pulse bg-card/30 backdrop-blur-md border border-white/40 shadow-lg">
+                <span
+                  style={{
+                    fontFamily: "'La Belle Aurore', cursive",
+                    fontSize: '1.25rem',
+                    textAlign: 'center',
+                    lineHeight: 1.2,
+                  }}
+                >
                   {day.activities[1].title}
                 </span>
               </div>
@@ -278,7 +304,10 @@ function BlobRightLayout({
         {isMobile && images.length > 0 && (
           <div className="flex gap-4 overflow-x-auto pb-4">
             {images.map((img, i) => (
-              <div key={i} className="relative flex-shrink-0 w-64 h-48 rounded-2xl overflow-hidden shadow-lg">
+              <div
+                key={i}
+                className="relative flex-shrink-0 w-64 h-48 rounded-2xl overflow-hidden shadow-lg"
+              >
                 {img && <Image className="object-cover" src={img} alt="" fill />}
               </div>
             ))}
@@ -346,7 +375,8 @@ function FullHeroLayout({
           className={`${isMobile ? 'text-5xl' : 'text-[5rem] lg:text-[10rem]'} leading-none mb-2 mix-blend-overlay drop-shadow-lg`}
           style={{
             fontFamily: "'Cinzel', serif",
-            textShadow: '2px 2px 0px white, -2px -2px 0px white, 2px -2px 0px white, -2px 2px 0px white',
+            textShadow:
+              '2px 2px 0px white, -2px -2px 0px white, 2px -2px 0px white, -2px 2px 0px white',
             color: 'transparent',
           }}
         >
@@ -376,7 +406,10 @@ function FullHeroLayout({
                 </h4>
                 <p
                   className={`${isMobile ? 'text-sm' : 'text-lg'}`}
-                  style={{ fontFamily: "'Cormorant Garamond', serif", color: 'rgba(255,255,255,0.8)' }}
+                  style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    color: 'rgba(255,255,255,0.8)',
+                  }}
                 >
                   {activity.description}
                 </p>
@@ -413,7 +446,9 @@ function GlassCardLayout({
       style={{ backgroundColor: DREAM.base }}
     >
       {/* 標題 */}
-      <div className={`${isMobile ? 'px-4' : 'px-8 lg:px-24'} mb-16 flex items-end justify-between`}>
+      <div
+        className={`${isMobile ? 'px-4' : 'px-8 lg:px-24'} mb-16 flex items-end justify-between`}
+      >
         <div>
           <span
             className="text-3xl block mb-2"
@@ -431,7 +466,10 @@ function GlassCardLayout({
       </div>
 
       {/* 卡片滾動區 */}
-      <div className={`w-full overflow-x-auto ${isMobile ? 'pl-4' : 'pl-8 lg:pl-24'} pb-20`} style={{ scrollbarWidth: 'none' }}>
+      <div
+        className={`w-full overflow-x-auto ${isMobile ? 'pl-4' : 'pl-8 lg:pl-24'} pb-20`}
+        style={{ scrollbarWidth: 'none' }}
+      >
         <div className="flex gap-8 lg:gap-16 w-max items-center">
           {days.map((day, i) => {
             const actualIndex = startIndex + i
@@ -446,7 +484,9 @@ function GlassCardLayout({
               return (
                 <div
                   key={actualIndex}
-                  ref={el => { dayRefs.current[actualIndex] = el }}
+                  ref={el => {
+                    dayRefs.current[actualIndex] = el
+                  }}
                   className={`${isMobile ? 'w-[200px] h-[200px]' : 'w-[300px] h-[300px]'} rounded-full flex flex-col items-center justify-center text-center text-white p-8 relative hover:scale-105 transition-transform duration-300 shadow-lg`}
                   style={{
                     background: `linear-gradient(to bottom right, ${DREAM.purple}, #4f46e5)`,
@@ -462,7 +502,10 @@ function GlassCardLayout({
                   >
                     The End
                   </h4>
-                  <div className="text-sm opacity-80 mb-4" style={{ fontFamily: "'Space Mono', monospace" }}>
+                  <div
+                    className="text-sm opacity-80 mb-4"
+                    style={{ fontFamily: "'Space Mono', monospace" }}
+                  >
                     Day {String(dayNum).padStart(2, '0')}
                   </div>
                   <p
@@ -478,7 +521,9 @@ function GlassCardLayout({
             return (
               <div
                 key={actualIndex}
-                ref={el => { dayRefs.current[actualIndex] = el }}
+                ref={el => {
+                  dayRefs.current[actualIndex] = el
+                }}
                 className={`${isMobile ? 'w-[280px]' : 'w-[350px] lg:w-[450px]'} aspect-[3/4] rounded-[3rem] p-8 flex flex-col relative group hover:-translate-y-4 transition-transform duration-500 bg-card/60 backdrop-blur-lg shadow-lg border border-white/60`}
               >
                 {/* Day 標籤 */}
@@ -492,7 +537,8 @@ function GlassCardLayout({
                 {/* 圖片區 */}
                 <div className="h-1/2 w-full rounded-2xl overflow-hidden mb-6 relative">
                   {imageUrl ? (
-                    <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    <img
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                       src={imageUrl}
                       alt={day.title || ''}
                     />
@@ -568,7 +614,9 @@ export function TourItinerarySectionDreamscape({
     while (i < dailyItinerary.length) {
       const day = dailyItinerary[i]
       // 使用 dreamscapeLayout 欄位，預設根據索引自動分配
-      const layout = (day as { dreamscapeLayout?: DreamscapeDayLayout }).dreamscapeLayout || getDefaultLayout(i, dailyItinerary.length)
+      const layout =
+        (day as { dreamscapeLayout?: DreamscapeDayLayout }).dreamscapeLayout ||
+        getDefaultLayout(i, dailyItinerary.length)
 
       if (layout === 'glassCard') {
         // 收集連續的 glassCard 天數
@@ -577,7 +625,9 @@ export function TourItinerarySectionDreamscape({
 
         while (i < dailyItinerary.length) {
           const currentDay = dailyItinerary[i]
-          const currentLayout = (currentDay as { dreamscapeLayout?: DreamscapeDayLayout }).dreamscapeLayout || getDefaultLayout(i, dailyItinerary.length)
+          const currentLayout =
+            (currentDay as { dreamscapeLayout?: DreamscapeDayLayout }).dreamscapeLayout ||
+            getDefaultLayout(i, dailyItinerary.length)
           if (currentLayout === 'glassCard') {
             glassCardDays.push(currentDay)
             i++
@@ -598,11 +648,12 @@ export function TourItinerarySectionDreamscape({
         )
       } else {
         // 單獨渲染其他佈局
-        const LayoutComponent = {
-          blobLeft: BlobLeftLayout,
-          blobRight: BlobRightLayout,
-          fullHero: FullHeroLayout,
-        }[layout] || BlobLeftLayout
+        const LayoutComponent =
+          {
+            blobLeft: BlobLeftLayout,
+            blobRight: BlobRightLayout,
+            fullHero: FullHeroLayout,
+          }[layout] || BlobLeftLayout
 
         elements.push(
           <LayoutComponent
@@ -611,7 +662,9 @@ export function TourItinerarySectionDreamscape({
             dayLabel={dayLabels[i]}
             index={i}
             isMobile={isMobile}
-            dayRef={(el) => { dayRefs.current[i] = el }}
+            dayRef={el => {
+              dayRefs.current[i] = el
+            }}
           />
         )
         i++
@@ -637,7 +690,9 @@ export function TourItinerarySectionDreamscape({
       }}
     >
       {/* 標題 */}
-      <div className={`flex flex-col items-center ${isMobile ? 'pt-12 pb-8' : 'pt-32 pb-16'} relative`}>
+      <div
+        className={`flex flex-col items-center ${isMobile ? 'pt-12 pb-8' : 'pt-32 pb-16'} relative`}
+      >
         <div
           className="h-32 w-px mb-8"
           style={{
@@ -659,7 +714,9 @@ export function TourItinerarySectionDreamscape({
           className={`${isMobile ? 'text-4xl' : 'text-6xl lg:text-8xl'} text-center`}
           style={{ fontFamily: "'Cinzel', serif", color: DREAM.text }}
         >
-          Unfolding<br />Chapters
+          Unfolding
+          <br />
+          Chapters
         </h2>
       </div>
 

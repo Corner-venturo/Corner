@@ -45,10 +45,14 @@ const FILTERS: { value: FilterType; label: string }[] = [
 // 轉換 priority 數字為字串
 function priorityNumberToString(priority: number): 'low' | 'medium' | 'high' | 'urgent' {
   switch (priority) {
-    case 4: return 'urgent'
-    case 3: return 'high'
-    case 2: return 'medium'
-    default: return 'low'
+    case 4:
+      return 'urgent'
+    case 3:
+      return 'high'
+    case 2:
+      return 'medium'
+    default:
+      return 'low'
   }
 }
 
@@ -88,9 +92,7 @@ export default function MobileTodosPage() {
       // 根據篩選條件調整查詢
       switch (filter) {
         case 'today':
-          query = query
-            .in('status', ['pending', 'in_progress'])
-            .eq('deadline', formatDate(today))
+          query = query.in('status', ['pending', 'in_progress']).eq('deadline', formatDate(today))
           break
         case 'week':
           query = query
@@ -99,9 +101,7 @@ export default function MobileTodosPage() {
             .lte('deadline', formatDate(weekEnd))
           break
         case 'overdue':
-          query = query
-            .in('status', ['pending', 'in_progress'])
-            .lt('deadline', formatDate(today))
+          query = query.in('status', ['pending', 'in_progress']).lt('deadline', formatDate(today))
           break
         case 'completed':
           query = query.eq('status', 'completed')
@@ -115,7 +115,7 @@ export default function MobileTodosPage() {
       if (error) {
         logger.error('Failed to load todos:', error)
       } else {
-        setTodos((data as DbTodo[] || []).map(formatTodo))
+        setTodos(((data as DbTodo[]) || []).map(formatTodo))
       }
       setIsLoading(false)
     }
@@ -136,20 +136,20 @@ export default function MobileTodosPage() {
       const { toast } = await import('sonner')
       toast.error('更新失敗，請稍後再試')
     } else {
-      setTodos((prev) =>
-        prev.map((t) => (t.id === todoId ? { ...t, status: newStatus as DisplayTodo['status'] } : t))
+      setTodos(prev =>
+        prev.map(t => (t.id === todoId ? { ...t, status: newStatus as DisplayTodo['status'] } : t))
       )
     }
   }
 
   // 分組待辦
   const groupedTodos = {
-    urgent: todos.filter((t) => t.priority === 'urgent' && t.status !== 'completed'),
-    high: todos.filter((t) => t.priority === 'high' && t.status !== 'completed'),
+    urgent: todos.filter(t => t.priority === 'urgent' && t.status !== 'completed'),
+    high: todos.filter(t => t.priority === 'high' && t.status !== 'completed'),
     normal: todos.filter(
-      (t) => (t.priority === 'medium' || t.priority === 'low') && t.status !== 'completed'
+      t => (t.priority === 'medium' || t.priority === 'low') && t.status !== 'completed'
     ),
-    completed: todos.filter((t) => t.status === 'completed'),
+    completed: todos.filter(t => t.status === 'completed'),
   }
 
   return (
@@ -173,7 +173,7 @@ export default function MobileTodosPage() {
 
         {/* 篩選標籤 */}
         <div className="px-4 pb-3 flex gap-2 overflow-x-auto scrollbar-hide">
-          {FILTERS.map((f) => (
+          {FILTERS.map(f => (
             <button
               key={f.value}
               onClick={() => setFilter(f.value)}
@@ -209,7 +209,7 @@ export default function MobileTodosPage() {
                   🔴 緊急 ({groupedTodos.urgent.length})
                 </h3>
                 <div className="space-y-2">
-                  {groupedTodos.urgent.map((todo) => (
+                  {groupedTodos.urgent.map(todo => (
                     <TodoCard
                       key={todo.id}
                       todo={todo}
@@ -227,7 +227,7 @@ export default function MobileTodosPage() {
                   🟠 高優先 ({groupedTodos.high.length})
                 </h3>
                 <div className="space-y-2">
-                  {groupedTodos.high.map((todo) => (
+                  {groupedTodos.high.map(todo => (
                     <TodoCard
                       key={todo.id}
                       todo={todo}
@@ -245,7 +245,7 @@ export default function MobileTodosPage() {
                   一般 ({groupedTodos.normal.length})
                 </h3>
                 <div className="space-y-2">
-                  {groupedTodos.normal.map((todo) => (
+                  {groupedTodos.normal.map(todo => (
                     <TodoCard
                       key={todo.id}
                       todo={todo}
@@ -263,7 +263,7 @@ export default function MobileTodosPage() {
                   已完成 ({groupedTodos.completed.length})
                 </h3>
                 <div className="space-y-2">
-                  {groupedTodos.completed.map((todo) => (
+                  {groupedTodos.completed.map(todo => (
                     <TodoCard
                       key={todo.id}
                       todo={todo}

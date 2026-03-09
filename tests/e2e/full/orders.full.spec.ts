@@ -174,7 +174,10 @@ test.describe('訂單管理 - 完整功能測試', () => {
       await expect(contactInput).toHaveValue('測試聯絡人')
 
       // 點擊旅遊團選擇器
-      const tourCombobox = dialog.locator('button, input').filter({ hasText: /搜尋或選擇旅遊團|選擇旅遊團/ }).first()
+      const tourCombobox = dialog
+        .locator('button, input')
+        .filter({ hasText: /搜尋或選擇旅遊團|選擇旅遊團/ })
+        .first()
       if (await tourCombobox.isVisible()) {
         await tourCombobox.click()
         await page.waitForTimeout(500)

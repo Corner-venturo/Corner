@@ -9,7 +9,7 @@ export const ACCOMMODATION_ITEM_ROW_LABELS = {
   刪除: '刪除',
 
   LABEL_1440: '同上 (',
-};
+}
 
 export const CATEGORY_SECTION_LABELS = {
   車資: '車資',
@@ -30,7 +30,7 @@ export const CATEGORY_SECTION_LABELS = {
   SELECT_8015: '選擇國家',
   LOADING_6912: '載入中...',
   EMPTY_4962: '車資管理中尚無任何國家資料',
-};
+}
 
 export const COST_ITEM_ROW_LABELS = {
   兒童: '兒童',
@@ -43,7 +43,7 @@ export const COST_ITEM_ROW_LABELS = {
   設為自理: '設為自理',
 
   LABEL_2796: '自理',
-};
+}
 
 export const IMPORT_ACTIVITIES_DIALOG_LABELS = {
   取消全選: '取消全選',
@@ -54,7 +54,7 @@ export const IMPORT_ACTIVITIES_DIALOG_LABELS = {
   NOT_FOUND_2956: '行程表中沒有景點資料',
   ADD: '新增',
   CANCEL: '取消',
-};
+}
 
 export const IMPORT_MEALS_DIALOG_LABELS = {
   早餐: '早餐',
@@ -67,7 +67,7 @@ export const IMPORT_MEALS_DIALOG_LABELS = {
   NOT_FOUND_1124: '行程表中沒有餐飲資料',
   ADD: '新增',
   CANCEL: '取消',
-};
+}
 
 export const LINK_TOUR_DIALOG_LABELS = {
   取消: '取消',
@@ -84,7 +84,7 @@ export const LINK_TOUR_DIALOG_LABELS = {
   LOADING_6912: '載入中...',
   NOT_FOUND_3707: '目前沒有可關聯的旅遊團',
   PLEASE_SELECT_8035: '請選擇「新建旅遊團」',
-};
+}
 
 export const LOCAL_PRICING_DIALOG_LABELS = {
   人數: '人數',
@@ -99,21 +99,22 @@ export const LOCAL_PRICING_DIALOG_LABELS = {
   取消: '取消',
   確認: '確認',
   人數變更提醒: '人數變更提醒',
-  人數變更提醒內容1: '目前總人數（{totalParticipants} 人）將使用「{matchedParticipants} 人」檻次的報價。',
+  人數變更提醒內容1:
+    '目前總人數（{totalParticipants} 人）將使用「{matchedParticipants} 人」檻次的報價。',
   人數變更提醒內容2前: '確認後，報價單檻次表將以 ',
   人數變更提醒內容2後: ' 作為第一個檻次。',
   返回修改: '返回修改',
   確認更新: '確認更新',
   人將使用檻次的報價: '{totalParticipants} 人將使用「{matchedParticipants} 人」檻次的報價：',
   元每人: '${unitPrice}/人',
-};
+}
 
 export const PARTICIPANT_COUNT_EDITOR_LABELS = {
   請輸入有效的人數: '請輸入有效的人數',
   輸入人數_如_20_30_40: '輸入人數（如：20、30、40）',
 
   ADD_4134: '新增檻次表',
-};
+}
 
 export const PRICE_SUMMARY_CARD_LABELS = {
   單人房: '單人房',
@@ -125,16 +126,16 @@ export const PRICE_SUMMARY_CARD_LABELS = {
   LABEL_7178: '成本',
   LABEL_561: '售價',
   LABEL_7705: '利潤',
-};
+}
 
 export const PRINTABLE_QUICK_QUOTE_LABELS = {
   公司_Logo_Alt: 'Company Logo',
   報價請款單: '報價請款單',
-};
+}
 
 export const PRINTABLE_QUOTATION_LABELS = {
   旅遊報價單: '旅遊報價單',
-};
+}
 
 export const QUICK_QUOTE_DETAIL_LABELS = {
   至少需要保留一個版本: '至少需要保留一個版本',
@@ -146,7 +147,7 @@ export const QUICK_QUOTE_DETAIL_LABELS = {
   EDIT: '編輯',
   CANCEL: '取消',
   LABEL_6621: '另存新版本',
-};
+}
 
 export const QUICK_QUOTE_DIALOG_LABELS = {
   輸入客戶姓名: '輸入客戶姓名',
@@ -164,7 +165,7 @@ export const QUICK_QUOTE_DIALOG_LABELS = {
   LABEL_4209: '團體編號',
   LABEL_4702: '承辦業務',
   LABEL_8538: '開單日期',
-};
+}
 
 export const QUICK_QUOTE_SECTION_LABELS = {
   客戶名稱: '客戶名稱',
@@ -182,7 +183,7 @@ export const QUICK_QUOTE_SECTION_LABELS = {
   TOTAL_8800: '總利潤',
   LABEL_8143: '已收金額',
   LABEL_2302: '應收餘額',
-};
+}
 
 export const QUOTE_CONFIRMATION_SECTION_LABELS = {
   未確認: '未確認',
@@ -227,7 +228,7 @@ export const QUOTE_CONFIRMATION_SECTION_LABELS = {
   CONFIRMED_BY_CUSTOMER: '客戶',
   CONFIRMED_BY_STAFF: '業務',
   CONFIRMED_BY_SUFFIX: '：',
-};
+}
 
 export const QUOTE_DETAIL_EMBED_LABELS = {
   特殊團: '特殊團',
@@ -245,7 +246,7 @@ export const QUOTE_DETAIL_EMBED_LABELS = {
   LABEL_9413: '單價',
   LABEL_832: '小計',
   ACTIONS: '操作',
-};
+}
 
 export const QUOTE_DIALOG_LABELS = {
   獨立報價單_無旅遊團: '獨立報價單（無旅遊團）',
@@ -267,7 +268,7 @@ export const QUOTE_DIALOG_LABELS = {
   GENERATING_4057: '不填寫則自動生成 Q 開頭的編號',
   ADD: '新增',
   CANCEL: '取消',
-};
+}
 
 export const QUOTE_HEADER_LABELS = {
   返回旅遊團: '返回旅遊團',
@@ -290,7 +291,7 @@ export const QUOTE_HEADER_LABELS = {
   SAVE: '儲存',
   IMPORT_FROM_ITINERARY: '從行程帶入',
   IMPORTING: '帶入中...',
-};
+}
 
 export const QUOTES_LIST_LABELS = {
   團體名稱: '團體名稱',
@@ -305,7 +306,7 @@ export const QUOTES_LIST_LABELS = {
   複製報價單: '複製報價單',
   作廢報價單: '作廢報價單',
   刪除報價單: '刪除報價單',
-};
+}
 
 export const QUOTES_PAGE_LABELS = {
   依團顯示: '依團顯示',
@@ -325,13 +326,13 @@ export const QUOTES_PAGE_LABELS = {
   尚無獨立報價單: '尚無獨立報價單',
   尚無報價單資料: '尚無報價單資料',
   人數: '人數',
-};
+}
 
 export const RESOURCE_SELECT_BUTTON_LABELS = {
   選擇餐廳: '選擇餐廳',
   選擇飯店: '選擇飯店',
   選擇景點: '選擇景點',
-};
+}
 
 export const SAVE_VERSION_DIALOG_LABELS = {
   保存版本: '保存版本',
@@ -340,7 +341,7 @@ export const SAVE_VERSION_DIALOG_LABELS = {
   保存: '保存',
   保存快捷鍵: '保存 <span className="ml-1 text-xs opacity-70">(Enter)</span>',
   版本名稱: '版本名稱',
-};
+}
 
 export const SELLING_PRICE_SECTION_LABELS = {
   已儲存: '已儲存',
@@ -355,7 +356,7 @@ export const SELLING_PRICE_SECTION_LABELS = {
   LABEL_7705: '利潤',
   TIER_QUOTE_PREFIX: '檻次報價 - ',
   TIER_QUOTE_SUFFIX: ' 人',
-};
+}
 
 export const SYNC_TO_ITINERARY_DIALOG_LABELS = {
   同步餐飲到行程表: '同步餐飲到行程表',
@@ -370,7 +371,7 @@ export const SYNC_TO_ITINERARY_DIALOG_LABELS = {
   原本: '原本',
   更新後: '更新後',
   空: '（空）',
-};
+}
 
 export const QUICK_QUOTE_ITEMS_TABLE_LABELS = {
   可輸入算式: '可輸入算式',
@@ -386,7 +387,7 @@ export const QUICK_QUOTE_ITEMS_TABLE_LABELS = {
   LABEL_7705: '利潤',
   REMARKS: '備註',
   EMPTY_1514: '尚無項目',
-};
+}
 
 export const QUOTATION_INFO_LABELS = {
   精選旅遊行程: '精選旅遊行程',
@@ -394,7 +395,7 @@ export const QUOTATION_INFO_LABELS = {
   LABEL_6072: '行程名稱：',
   TOTAL_812: '總人數：',
   LABEL_4345: '有效期限：',
-};
+}
 
 export const QUOTATION_PRICING_TABLE_LABELS = {
   小孩佔床: '小孩佔床',
@@ -403,7 +404,7 @@ export const QUOTATION_PRICING_TABLE_LABELS = {
 
   LABEL_8725: '身份',
   LABEL_2056: '基本報價',
-};
+}
 
 export const QUICK_QUOTE_VERSION_PANEL_LABELS = {
   刪除版本: '刪除版本',
@@ -416,9 +417,7 @@ export const QUICK_QUOTE_VERSION_PANEL_LABELS = {
   PLEASE_ENTER_793: '請輸入版本名稱，例如：「初稿」「修訂版」「最終版」',
   ADD: '新增',
   CANCEL: '取消',
-};
-
-
+}
 
 export const QUICK_QUOTE_LABELS = {
   TITLE: '快速報價單',

@@ -21,7 +21,7 @@ function getImageUrl(image: string | DailyImage): string {
 
 // 工具函數：取得圖片 position
 function getImagePosition(image: string | DailyImage): string {
-  return typeof image === 'string' ? 'center' : (image.position || 'center')
+  return typeof image === 'string' ? 'center' : image.position || 'center'
 }
 
 // 圖片預覽 Modal
@@ -72,7 +72,8 @@ export function ImagePreviewModal({
 
           {/* 圖片 */}
           <div className="flex items-center justify-center min-h-[60vh] p-4">
-            <img src={imageUrl}
+            <img
+              src={imageUrl}
               alt={`圖片 ${currentIndex + 1}`}
               className="max-w-full max-h-[80vh] object-contain rounded-lg"
             />
@@ -87,7 +88,14 @@ export function ImagePreviewModal({
                   onClick={() => onNavigate(currentIndex - 1)}
                   className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
                 >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
                     <polyline points="15,18 9,12 15,6" />
                   </svg>
                 </button>
@@ -98,7 +106,14 @@ export function ImagePreviewModal({
                   onClick={() => onNavigate(currentIndex + 1)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
                 >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
                     <polyline points="9,6 15,12 9,18" />
                   </svg>
                 </button>
@@ -123,11 +138,7 @@ interface ImagePositionEditorProps {
   onClose: () => void
 }
 
-export function ImagePositionEditor({
-  image,
-  onSave,
-  onClose,
-}: ImagePositionEditorProps) {
+export function ImagePositionEditor({ image, onSave, onClose }: ImagePositionEditorProps) {
   const imageUrl = getImageUrl(image)
   const initialPosition = getImagePosition(image)
 
@@ -139,11 +150,11 @@ export function ImagePositionEditor({
   const parsePosition = (pos: string): { x: number; y: number } => {
     // 處理預設關鍵字
     const keywords: Record<string, { x: number; y: number }> = {
-      'center': { x: 50, y: 50 },
-      'top': { x: 50, y: 0 },
-      'bottom': { x: 50, y: 100 },
-      'left': { x: 0, y: 50 },
-      'right': { x: 100, y: 50 },
+      center: { x: 50, y: 50 },
+      top: { x: 50, y: 0 },
+      bottom: { x: 50, y: 100 },
+      left: { x: 0, y: 50 },
+      right: { x: 100, y: 50 },
       'center top': { x: 50, y: 0 },
       'center bottom': { x: 50, y: 100 },
       'left top': { x: 0, y: 0 },
@@ -199,9 +210,7 @@ export function ImagePositionEditor({
     <div className="space-y-4">
       {/* 預覽區域 */}
       <div className="relative">
-        <p className="text-sm text-morandi-secondary mb-2">
-          {COMP_EDITOR_LABELS.LABEL_7288}
-        </p>
+        <p className="text-sm text-morandi-secondary mb-2">{COMP_EDITOR_LABELS.LABEL_7288}</p>
         {/* 模擬橫向裁切框 */}
         <div
           ref={containerRef}
@@ -211,7 +220,8 @@ export function ImagePositionEditor({
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
         >
-          <img src={imageUrl}
+          <img
+            src={imageUrl}
             alt={COMP_EDITOR_LABELS.調整位置}
             className="w-full h-full object-cover"
             style={{ objectPosition: position }}
@@ -234,7 +244,7 @@ export function ImagePositionEditor({
 
       {/* 快速預設按鈕 */}
       <div className="flex flex-wrap gap-2">
-        {presetPositions.map((preset) => (
+        {presetPositions.map(preset => (
           <button
             key={preset.value}
             type="button"

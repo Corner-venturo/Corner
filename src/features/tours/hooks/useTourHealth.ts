@@ -48,7 +48,7 @@ export function useTourHealth(tourId: string): TourHealthData {
     passports: { status: 'good', message: TOUR_HEALTH_LABELS.全部完成 },
     tickets: { status: 'good', message: TOUR_HEALTH_LABELS.全部完成 },
     hotels: { status: 'good', message: TOUR_HEALTH_LABELS.全部完成 },
-    participants: { status: 'good', message: TOUR_HEALTH_LABELS.全部完成 }
+    participants: { status: 'good', message: TOUR_HEALTH_LABELS.全部完成 },
   })
 
   useEffect(() => {
@@ -64,19 +64,19 @@ export function useTourHealth(tourId: string): TourHealthData {
           .from('tour_requests')
           .select('id')
           .eq('tour_id', tourId)
-        
+
         const requestIds = tourRequests?.map(req => req.id) || []
-        
+
         // 再查詢這些 request 的 items（如果有 request 的話）
         let requestItems: Array<{ reply_status: string | null; request_id: string }> = []
         let requestError = null
-        
+
         if (requestIds.length > 0) {
           const result = await supabase
             .from('tour_request_items')
             .select('reply_status, request_id')
             .in('request_id', requestIds)
-          
+
           requestItems = result.data || []
           requestError = result.error
         }
@@ -86,8 +86,8 @@ export function useTourHealth(tourId: string): TourHealthData {
         }
 
         // 統計待回覆的需求單
-        const pendingRequests = requestItems.filter(item => 
-          !item.reply_status || item.reply_status === 'pending'
+        const pendingRequests = requestItems.filter(
+          item => !item.reply_status || item.reply_status === 'pending'
         )
 
         // 2. 查詢該團所有成員的護照和機票狀態
@@ -96,19 +96,23 @@ export function useTourHealth(tourId: string): TourHealthData {
           .from('orders')
           .select('id')
           .eq('tour_id', tourId)
-        
+
         const orderIds = tourOrders?.map(order => order.id) || []
-        
+
         // 再查詢這些訂單的成員（如果有訂單的話）
-        let members: Array<{ passport_number: string | null; ticket_number: string | null; order_id: string }> = []
+        let members: Array<{
+          passport_number: string | null
+          ticket_number: string | null
+          order_id: string
+        }> = []
         let membersError = null
-        
+
         if (orderIds.length > 0) {
           const result = await supabase
             .from('order_members')
             .select('passport_number, ticket_number, order_id')
             .in('order_id', orderIds)
-          
+
           members = result.data || []
           membersError = result.error
         }
@@ -118,12 +122,12 @@ export function useTourHealth(tourId: string): TourHealthData {
         }
 
         // 統計缺護照和沒機票的人數
-        const missingPassports = members.filter(member => 
-          !member.passport_number || member.passport_number.trim() === ''
+        const missingPassports = members.filter(
+          member => !member.passport_number || member.passport_number.trim() === ''
         )
-        
-        const missingTickets = members.filter(member => 
-          !member.ticket_number || member.ticket_number.trim() === ''
+
+        const missingTickets = members.filter(
+          member => !member.ticket_number || member.ticket_number.trim() === ''
         )
 
         // 3. 查詢飯店確認狀態
@@ -138,9 +142,10 @@ export function useTourHealth(tourId: string): TourHealthData {
         }
 
         // 統計未確認的飯店
-        const unconfirmedHotels = accommodations?.filter(hotel => 
-          !hotel.confirmation_status || hotel.confirmation_status !== 'confirmed'
-        ) || []
+        const unconfirmedHotels =
+          accommodations?.filter(
+            hotel => !hotel.confirmation_status || hotel.confirmation_status !== 'confirmed'
+          ) || []
 
         // 4. 查詢團員人數
         const { data: tour, error: tourError } = await supabase
@@ -158,29 +163,29 @@ export function useTourHealth(tourId: string): TourHealthData {
           isLoading: false,
           error: null,
           requirements: buildHealthStatus(
-            pendingRequests.length, 
-            requestItems.length, 
+            pendingRequests.length,
+            requestItems.length,
             TOUR_HEALTH_LABELS.項需回覆
           ),
           passports: buildHealthStatus(
-            missingPassports.length, 
-            members.length, 
+            missingPassports.length,
+            members.length,
             TOUR_HEALTH_LABELS.人缺護照
           ),
           tickets: buildHealthStatus(
-            missingTickets.length, 
-            members.length, 
+            missingTickets.length,
+            members.length,
             TOUR_HEALTH_LABELS.人沒有機票
           ),
           hotels: buildHealthStatus(
-            unconfirmedHotels.length, 
-            accommodations?.length || 0, 
+            unconfirmedHotels.length,
+            accommodations?.length || 0,
             TOUR_HEALTH_LABELS.間飯店未確認
           ),
           participants: buildParticipantsStatus(
             tour?.current_participants || 0,
             tour?.max_participants || 0
-          )
+          ),
         }
 
         setData(healthData)
@@ -189,7 +194,7 @@ export function useTourHealth(tourId: string): TourHealthData {
         setData(prev => ({
           ...prev,
           isLoading: false,
-          error: TOUR_HEALTH_LABELS.載入失敗
+          error: TOUR_HEALTH_LABELS.載入失敗,
         }))
       }
     }
@@ -202,16 +207,16 @@ export function useTourHealth(tourId: string): TourHealthData {
 
 // 建立一般健康度狀態
 function buildHealthStatus(
-  problemCount: number, 
-  total: number, 
+  problemCount: number,
+  total: number,
   problemLabel: string
-): { status: 'good' | 'warning' | 'error', message: string, count?: number, total?: number } {
+): { status: 'good' | 'warning' | 'error'; message: string; count?: number; total?: number } {
   if (total === 0) {
     return {
       status: 'warning',
       message: TOUR_HEALTH_LABELS.尚未開團,
       count: 0,
-      total: 0
+      total: 0,
     }
   }
 
@@ -220,7 +225,7 @@ function buildHealthStatus(
       status: 'good',
       message: TOUR_HEALTH_LABELS.全部完成,
       count: 0,
-      total
+      total,
     }
   }
 
@@ -229,7 +234,7 @@ function buildHealthStatus(
       status: 'error',
       message: `全部${problemLabel}`,
       count: problemCount,
-      total
+      total,
     }
   }
 
@@ -237,21 +242,21 @@ function buildHealthStatus(
     status: 'warning',
     message: `${problemCount}${problemLabel}`,
     count: problemCount,
-    total
+    total,
   }
 }
 
 // 建立團員人數狀態
 function buildParticipantsStatus(
-  current: number, 
+  current: number,
   max: number
-): { status: 'good' | 'warning' | 'error', message: string, current?: number, max?: number } {
+): { status: 'good' | 'warning' | 'error'; message: string; current?: number; max?: number } {
   if (max === 0) {
     return {
       status: 'warning',
       message: TOUR_HEALTH_LABELS.尚未開團,
       current,
-      max
+      max,
     }
   }
 
@@ -260,7 +265,7 @@ function buildParticipantsStatus(
       status: 'good',
       message: `${current}${TOUR_HEALTH_LABELS.人滿團}`,
       current,
-      max
+      max,
     }
   }
 
@@ -269,7 +274,7 @@ function buildParticipantsStatus(
       status: 'error',
       message: TOUR_HEALTH_LABELS.尚未開團,
       current,
-      max
+      max,
     }
   }
 
@@ -277,6 +282,6 @@ function buildParticipantsStatus(
     status: 'warning',
     message: `${current}/${max} 人`,
     current,
-    max
+    max,
   }
 }

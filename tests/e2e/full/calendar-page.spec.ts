@@ -33,28 +33,39 @@ test.describe('行事曆頁面測試', () => {
     await page.waitForTimeout(2000)
 
     // 找到導航按鈕（上/下月）
-    const nextButton = page.locator('button').filter({ hasText: /下一|next|>/ }).first()
-    const prevButton = page.locator('button').filter({ hasText: /上一|prev|</ }).first()
+    const nextButton = page
+      .locator('button')
+      .filter({ hasText: /下一|next|>/ })
+      .first()
+    const prevButton = page
+      .locator('button')
+      .filter({ hasText: /上一|prev|</ })
+      .first()
 
     // 或者使用 FullCalendar 的標準按鈕
-    const fcNext = page.locator('.fc-next-button, button[title*="next"], button[aria-label*="next"]').first()
-    const fcPrev = page.locator('.fc-prev-button, button[title*="prev"], button[aria-label*="prev"]').first()
+    const fcNext = page
+      .locator('.fc-next-button, button[title*="next"], button[aria-label*="next"]')
+      .first()
+    const fcPrev = page
+      .locator('.fc-prev-button, button[title*="prev"], button[aria-label*="prev"]')
+      .first()
 
-    const hasNavigation = await nextButton.isVisible({ timeout: 3000 }).catch(() => false) ||
-                          await fcNext.isVisible({ timeout: 3000 }).catch(() => false)
+    const hasNavigation =
+      (await nextButton.isVisible({ timeout: 3000 }).catch(() => false)) ||
+      (await fcNext.isVisible({ timeout: 3000 }).catch(() => false))
 
     if (hasNavigation) {
       console.log('✅ 找到導航按鈕')
 
       // 嘗試點擊下一月
-      const navBtn = await nextButton.isVisible() ? nextButton : fcNext
+      const navBtn = (await nextButton.isVisible()) ? nextButton : fcNext
       if (await navBtn.isVisible()) {
         await navBtn.click()
         await page.waitForTimeout(500)
         console.log('✅ 已切換到下個月')
 
         // 切回上個月
-        const backBtn = await prevButton.isVisible() ? prevButton : fcPrev
+        const backBtn = (await prevButton.isVisible()) ? prevButton : fcPrev
         if (await backBtn.isVisible()) {
           await backBtn.click()
           await page.waitForTimeout(500)

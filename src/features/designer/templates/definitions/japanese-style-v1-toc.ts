@@ -9,7 +9,13 @@
  * - 自動計算頁碼
  */
 import type { PageTemplate, TemplateData, TocContentItem } from './types'
-import type { CanvasElement, ShapeElement, TextElement, ImageElement, TextStyle } from '@/features/designer/components/types'
+import type {
+  CanvasElement,
+  ShapeElement,
+  TextElement,
+  ImageElement,
+  TextStyle,
+} from '@/features/designer/components/types'
 
 // A5 尺寸（像素，96 DPI）
 const A5_WIDTH = 559

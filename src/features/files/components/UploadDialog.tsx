@@ -4,12 +4,7 @@ import { useState, useCallback } from 'react'
 import { Upload, X, File, Check, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useFileSystemStore } from '@/stores/file-system-store'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import {
@@ -21,11 +16,7 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import {
-  formatFileSize,
-  FILE_CATEGORY_INFO,
-  type FileCategory,
-} from '@/types/file-system.types'
+import { formatFileSize, FILE_CATEGORY_INFO, type FileCategory } from '@/types/file-system.types'
 import { LABELS } from '../constants/labels'
 
 interface UploadDialogProps {
@@ -72,14 +63,14 @@ export function UploadDialog({ open, onClose }: UploadDialogProps) {
   }
 
   const addFiles = (files: File[]) => {
-    const newPendingFiles: PendingFile[] = files.map((file) => ({
+    const newPendingFiles: PendingFile[] = files.map(file => ({
       file,
       category: guessCategory(file.name),
       description: '',
       status: 'pending',
       progress: 0,
     }))
-    setPendingFiles((prev) => [...prev, ...newPendingFiles])
+    setPendingFiles(prev => [...prev, ...newPendingFiles])
   }
 
   // 根據檔名猜測分類
@@ -91,21 +82,21 @@ export function UploadDialog({ open, onClose }: UploadDialogProps) {
     if (lower.includes('quote') || lower.includes('報價')) return 'quote'
     if (lower.includes('itinerary') || lower.includes('行程')) return 'itinerary'
     if (lower.includes('ticket') || lower.includes('機票')) return 'ticket'
-    if (lower.includes('voucher') || lower.includes('住宿') || lower.includes('訂房')) return 'voucher'
-    if (lower.includes('invoice') || lower.includes('發票') || lower.includes('收據')) return 'invoice'
+    if (lower.includes('voucher') || lower.includes('住宿') || lower.includes('訂房'))
+      return 'voucher'
+    if (lower.includes('invoice') || lower.includes('發票') || lower.includes('收據'))
+      return 'invoice'
     if (lower.includes('insurance') || lower.includes('保險')) return 'insurance'
     if (/\.(jpg|jpeg|png|gif|webp|heic)$/i.test(lower)) return 'photo'
     return 'other'
   }
 
   const removeFile = (index: number) => {
-    setPendingFiles((prev) => prev.filter((_, i) => i !== index))
+    setPendingFiles(prev => prev.filter((_, i) => i !== index))
   }
 
   const updateFileCategory = (index: number, category: FileCategory) => {
-    setPendingFiles((prev) =>
-      prev.map((f, i) => (i === index ? { ...f, category } : f))
-    )
+    setPendingFiles(prev => prev.map((f, i) => (i === index ? { ...f, category } : f)))
   }
 
   const handleUpload = async () => {
@@ -114,10 +105,8 @@ export function UploadDialog({ open, onClose }: UploadDialogProps) {
       if (pending.status !== 'pending') continue
 
       // 更新狀態為上傳中
-      setPendingFiles((prev) =>
-        prev.map((f, idx) =>
-          idx === i ? { ...f, status: 'uploading', progress: 0 } : f
-        )
+      setPendingFiles(prev =>
+        prev.map((f, idx) => (idx === i ? { ...f, status: 'uploading', progress: 0 } : f))
       )
 
       try {
@@ -128,14 +117,12 @@ export function UploadDialog({ open, onClose }: UploadDialogProps) {
         })
 
         // 更新狀態為成功
-        setPendingFiles((prev) =>
-          prev.map((f, idx) =>
-            idx === i ? { ...f, status: 'success', progress: 100 } : f
-          )
+        setPendingFiles(prev =>
+          prev.map((f, idx) => (idx === i ? { ...f, status: 'success', progress: 100 } : f))
         )
       } catch (error) {
         // 更新狀態為失敗
-        setPendingFiles((prev) =>
+        setPendingFiles(prev =>
           prev.map((f, idx) =>
             idx === i
               ? {
@@ -157,9 +144,9 @@ export function UploadDialog({ open, onClose }: UploadDialogProps) {
     }
   }
 
-  const allDone = pendingFiles.length > 0 && pendingFiles.every(
-    (f) => f.status === 'success' || f.status === 'error'
-  )
+  const allDone =
+    pendingFiles.length > 0 &&
+    pendingFiles.every(f => f.status === 'success' || f.status === 'error')
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -183,9 +170,7 @@ export function UploadDialog({ open, onClose }: UploadDialogProps) {
           >
             <Upload className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
             <p className="text-sm font-medium">{LABELS.dragDropHere}</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              {LABELS.orClickToSelect}
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">{LABELS.orClickToSelect}</p>
             <input
               id="file-input"
               type="file"
@@ -198,7 +183,8 @@ export function UploadDialog({ open, onClose }: UploadDialogProps) {
           {/* 目標資料夾 */}
           {currentFolder && (
             <div className="text-sm text-muted-foreground">
-              {LABELS.uploadTo}<span className="text-foreground">{currentFolder.name}</span>
+              {LABELS.uploadTo}
+              <span className="text-foreground">{currentFolder.name}</span>
             </div>
           )}
 
@@ -206,10 +192,7 @@ export function UploadDialog({ open, onClose }: UploadDialogProps) {
           {pendingFiles.length > 0 && (
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {pendingFiles.map((pending, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg"
-                >
+                <div key={index} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                   {/* 狀態圖示 */}
                   {pending.status === 'success' ? (
                     <Check className="w-5 h-5 text-green-500 shrink-0" />
@@ -237,7 +220,7 @@ export function UploadDialog({ open, onClose }: UploadDialogProps) {
                   {pending.status === 'pending' && (
                     <Select
                       value={pending.category}
-                      onValueChange={(v) => updateFileCategory(index, v as FileCategory)}
+                      onValueChange={v => updateFileCategory(index, v as FileCategory)}
                     >
                       <SelectTrigger className="w-24 h-8 text-xs">
                         <SelectValue />
@@ -256,7 +239,8 @@ export function UploadDialog({ open, onClose }: UploadDialogProps) {
                   {pending.status === 'pending' && (
                     <Button
                       variant="ghost"
-                      size="icon" aria-label="Close"
+                      size="icon"
+                      aria-label="Close"
                       className="h-7 w-7 shrink-0"
                       onClick={() => removeFile(index)}
                     >
@@ -275,7 +259,9 @@ export function UploadDialog({ open, onClose }: UploadDialogProps) {
             </Button>
             {!allDone && pendingFiles.length > 0 && (
               <Button onClick={handleUpload} disabled={uploading}>
-                {uploading ? LABELS.uploading : LABELS.uploadCount(pendingFiles.filter((f) => f.status === 'pending').length)}
+                {uploading
+                  ? LABELS.uploading
+                  : LABELS.uploadCount(pendingFiles.filter(f => f.status === 'pending').length)}
               </Button>
             )}
           </div>

@@ -57,33 +57,33 @@ export function useStoreSyncSetup(): void {
 
     // Tour 更新時，重新載入相關 Orders
     subscriptions.push(
-      storeEvents.on('TOUR_UPDATED', async ({ tourId, source }) => {
-        // 避免由 order store 觸發的事件再次觸發 order 重載
-        if (source === 'order') return
+      storeEvents.on(
+        'TOUR_UPDATED',
+        async ({ tourId, source }) => {
+          // 避免由 order store 觸發的事件再次觸發 order 重載
+          if (source === 'order') return
 
-        logger.log(`[StoreSync] Tour ${tourId} 更新，重新載入相關 Orders`)
+          logger.log(`[StoreSync] Tour ${tourId} 更新，重新載入相關 Orders`)
 
-        try {
-          // 動態載入 store 避免循環依賴
-          const { useOrderStore } = await import('../index')
-          const orderState = useOrderStore.getState()
+          try {
+            // 動態載入 store 避免循環依賴
+            const { useOrderStore } = await import('../index')
+            const orderState = useOrderStore.getState()
 
-          // 只更新該 Tour 的訂單（精準更新）
-          const affectedOrders = orderState.items.filter(
-            order => order.tour_id === tourId
-          )
+            // 只更新該 Tour 的訂單（精準更新）
+            const affectedOrders = orderState.items.filter(order => order.tour_id === tourId)
 
-          if (affectedOrders.length > 0) {
-            // 重新取得這些訂單的最新資料
-            await Promise.all(
-              affectedOrders.map(order => orderState.fetchById(order.id))
-            )
-            logger.log(`[StoreSync] 已重新載入 ${affectedOrders.length} 筆 Orders`)
+            if (affectedOrders.length > 0) {
+              // 重新取得這些訂單的最新資料
+              await Promise.all(affectedOrders.map(order => orderState.fetchById(order.id)))
+              logger.log(`[StoreSync] 已重新載入 ${affectedOrders.length} 筆 Orders`)
+            }
+          } catch (error) {
+            logger.error('[StoreSync] 重新載入 Orders 失敗:', error)
           }
-        } catch (error) {
-          logger.error('[StoreSync] 重新載入 Orders 失敗:', error)
-        }
-      }, { ignoreSources: ['order'] })
+        },
+        { ignoreSources: ['order'] }
+      )
     )
 
     // Tour 刪除時，從 UI 移除相關 Orders（實際資料由 DB cascade 處理）
@@ -97,9 +97,7 @@ export function useStoreSyncSetup(): void {
           const memberState = useMemberStore.getState()
 
           // 找出被影響的訂單
-          const affectedOrders = orderState.items.filter(
-            order => order.tour_id === tourId
-          )
+          const affectedOrders = orderState.items.filter(order => order.tour_id === tourId)
           const affectedOrderIds = affectedOrders.map(o => o.id)
 
           // 從 UI 狀態中移除（資料庫已由 cascade 處理）
@@ -110,7 +108,9 @@ export function useStoreSyncSetup(): void {
             // 同時更新 members
             await memberState.fetchAll()
 
-            logger.log(`[StoreSync] 已同步 ${affectedOrders.length} 筆受影響的 Orders 和相關 Members`)
+            logger.log(
+              `[StoreSync] 已同步 ${affectedOrders.length} 筆受影響的 Orders 和相關 Members`
+            )
           }
         } catch (error) {
           logger.error('[StoreSync] 清理相關資料失敗:', error)
@@ -124,32 +124,32 @@ export function useStoreSyncSetup(): void {
 
     // Order 更新時，重新載入相關 Members
     subscriptions.push(
-      storeEvents.on('ORDER_UPDATED', async ({ orderId, source }) => {
-        // 避免由 member store 觸發的事件再次觸發 member 重載
-        if (source === 'member') return
+      storeEvents.on(
+        'ORDER_UPDATED',
+        async ({ orderId, source }) => {
+          // 避免由 member store 觸發的事件再次觸發 member 重載
+          if (source === 'member') return
 
-        logger.log(`[StoreSync] Order ${orderId} 更新，重新載入相關 Members`)
+          logger.log(`[StoreSync] Order ${orderId} 更新，重新載入相關 Members`)
 
-        try {
-          const { useMemberStore } = await import('../index')
-          const memberState = useMemberStore.getState()
+          try {
+            const { useMemberStore } = await import('../index')
+            const memberState = useMemberStore.getState()
 
-          // 只更新該 Order 的成員（精準更新）
-          const affectedMembers = memberState.items.filter(
-            member => member.order_id === orderId
-          )
+            // 只更新該 Order 的成員（精準更新）
+            const affectedMembers = memberState.items.filter(member => member.order_id === orderId)
 
-          if (affectedMembers.length > 0) {
-            // 重新取得這些成員的最新資料
-            await Promise.all(
-              affectedMembers.map(member => memberState.fetchById(member.id))
-            )
-            logger.log(`[StoreSync] 已重新載入 ${affectedMembers.length} 筆 Members`)
+            if (affectedMembers.length > 0) {
+              // 重新取得這些成員的最新資料
+              await Promise.all(affectedMembers.map(member => memberState.fetchById(member.id)))
+              logger.log(`[StoreSync] 已重新載入 ${affectedMembers.length} 筆 Members`)
+            }
+          } catch (error) {
+            logger.error('[StoreSync] 重新載入 Members 失敗:', error)
           }
-        } catch (error) {
-          logger.error('[StoreSync] 重新載入 Members 失敗:', error)
-        }
-      }, { ignoreSources: ['member'] })
+        },
+        { ignoreSources: ['member'] }
+      )
     )
 
     // Order 刪除時，清理相關 Members

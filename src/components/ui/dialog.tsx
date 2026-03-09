@@ -19,12 +19,12 @@ import { cn } from '@/lib/utils'
  * - full: 編輯器類型、全螢幕操作（max-w-[95vw]）
  */
 export const DIALOG_SIZES = {
-  sm: 'max-w-sm',       // 小型確認框
-  md: 'max-w-md',       // 標準表單
-  lg: 'max-w-lg',       // 大型表單
-  xl: 'max-w-xl',       // 複雜表單
-  '2xl': 'max-w-2xl',   // 多欄表單
-  '4xl': 'max-w-4xl',   // 全螢幕表單
+  sm: 'max-w-sm', // 小型確認框
+  md: 'max-w-md', // 標準表單
+  lg: 'max-w-lg', // 大型表單
+  xl: 'max-w-xl', // 複雜表單
+  '2xl': 'max-w-2xl', // 多欄表單
+  '4xl': 'max-w-4xl', // 全螢幕表單
   full: 'max-w-[95vw]', // 幾乎全螢幕
 } as const
 
@@ -75,8 +75,8 @@ const DialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
-    onDragOver={(e) => e.preventDefault()}
-    onDrop={(e) => e.preventDefault()}
+    onDragOver={e => e.preventDefault()}
+    onDrop={e => e.preventDefault()}
     className={cn(
       'fixed inset-0 z-[9000] bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
       className
@@ -86,8 +86,9 @@ const DialogOverlay = React.forwardRef<
 ))
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
-interface DialogContentProps
-  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
+interface DialogContentProps extends React.ComponentPropsWithoutRef<
+  typeof DialogPrimitive.Content
+> {
   /**
    * Dialog 寬度大小
    * @default 'lg'
@@ -137,8 +138,8 @@ const DialogContent = React.forwardRef<
         - Level 2+: 透明遮罩（避免多重黑色疊加）
       */}
       <DialogPrimitive.Overlay
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => e.preventDefault()}
+        onDragOver={e => e.preventDefault()}
+        onDrop={e => e.preventDefault()}
         className={cn(
           'fixed inset-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
           showOverlay ? 'bg-black/60 backdrop-blur-sm' : 'bg-black/30 backdrop-blur-sm'
@@ -148,9 +149,9 @@ const DialogContent = React.forwardRef<
       <DialogPrimitive.Content
         ref={ref}
         aria-describedby={undefined}
-        onOpenAutoFocus={(e) => e.preventDefault()}
-        onInteractOutside={(e) => e.preventDefault()}
-        onPointerDownOutside={(e) => e.preventDefault()}
+        onOpenAutoFocus={e => e.preventDefault()}
+        onInteractOutside={e => e.preventDefault()}
+        onPointerDownOutside={e => e.preventDefault()}
         aria-labelledby={undefined}
         className={cn(
           'fixed left-[50%] top-[50%] grid w-full translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-background p-8 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] rounded-xl',

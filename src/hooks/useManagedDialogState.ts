@@ -120,12 +120,7 @@ export interface UseManagedDialogStateReturn<T> {
 export function useManagedDialogState<T = unknown>(
   options: UseManagedDialogStateOptions<T> = {}
 ): UseManagedDialogStateReturn<T> {
-  const {
-    onClose,
-    onConfirmClose,
-    resetOnClose = true,
-    initialData = null,
-  } = options
+  const { onClose, onConfirmClose, resetOnClose = true, initialData = null } = options
 
   const [isOpen, setIsOpen] = useState(false)
   const [data, setDataState] = useState<T | null>(initialData)
@@ -180,7 +175,7 @@ export function useManagedDialogState<T = unknown>(
   }, [])
 
   const updateData = useCallback((partial: Partial<T>) => {
-    setDataState((prev) => {
+    setDataState(prev => {
       if (prev === null) {
         return partial as T
       }

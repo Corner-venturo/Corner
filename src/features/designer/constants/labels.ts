@@ -15,7 +15,7 @@ export const DESIGNER_LABELS = {
   光線: '光線',
   色彩: '色彩',
   效果: '效果',
-  
+
   // PropertiesPanel
   屬性: '屬性',
   選取元素以編輯屬性: '選取元素以編輯屬性',
@@ -52,14 +52,14 @@ export const DESIGNER_LABELS = {
   上傳圖片後會裁切成此形狀: '上傳圖片後會裁切成此形狀',
   顏色漸層: '顏色/漸層',
   圖片遮罩: '圖片遮罩',
-  
+
   // DualPagePreview
   封底空白頁: '封底/空白頁',
   點擊編輯: '點擊編輯: ',
   第: '第 ',
   頁: ' 頁',
   編輯中: '編輯中',
-  
+
   // FontPicker - 字體分類
   中文黑體: '中文黑體',
   中文宋體: '中文宋體',
@@ -69,7 +69,7 @@ export const DESIGNER_LABELS = {
   英文無襯線: '英文無襯線',
   英文襯線: '英文襯線',
   英文手寫: '英文手寫',
-  
+
   // FontPicker - 字體標籤
   思源黑體: '思源黑體',
   台北黑體: '台北黑體',
@@ -87,7 +87,7 @@ export const DESIGNER_LABELS = {
   禪角黑體: '禪角黑體',
   汐風明朝: '汐風明朝',
   小杉丸: '小杉丸',
-  
+
   // FontPicker - 字重
   正常: '正常',
   粗體: '粗體',
@@ -96,13 +96,13 @@ export const DESIGNER_LABELS = {
   中等: '中等',
   粗: '粗',
   極粗: '極粗',
-  
+
   // FontPicker - 對齊方式
   靠左: '靠左',
   置中: '置中',
   靠右: '靠右',
   兩端: '兩端',
-  
+
   // ElementLibrary
   元素庫: '元素庫',
   基本: '基本',
@@ -122,7 +122,7 @@ export const DESIGNER_LABELS = {
   虛線: '虛線',
   點線: '點線',
   箭頭: '箭頭',
-};
+}
 
 // PropertiesPanel 函數
 export function getObjectType(type: string): string {

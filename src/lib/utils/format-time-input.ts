@@ -9,16 +9,30 @@
 
 // 全形轉半形對照表
 const fullWidthToHalfWidth: Record<string, string> = {
-  '０': '0', '１': '1', '２': '2', '３': '3', '４': '4',
-  '５': '5', '６': '6', '７': '7', '８': '8', '９': '9',
-  '：': ':', '．': '.', '－': '-', '／': '/',
+  '０': '0',
+  '１': '1',
+  '２': '2',
+  '３': '3',
+  '４': '4',
+  '５': '5',
+  '６': '6',
+  '７': '7',
+  '８': '8',
+  '９': '9',
+  '：': ':',
+  '．': '.',
+  '－': '-',
+  '／': '/',
 }
 
 /**
  * 將全形字符轉換為半形
  */
 export function fullWidthToHalf(str: string): string {
-  return str.split('').map(char => fullWidthToHalfWidth[char] || char).join('')
+  return str
+    .split('')
+    .map(char => fullWidthToHalfWidth[char] || char)
+    .join('')
 }
 
 /**

@@ -42,7 +42,12 @@ export function captureException(error: unknown, context?: ErrorContext): void {
  * Capture a plain message.
  */
 export function captureMessage(message: string, level: ErrorLevel = 'info'): void {
-  const logFn = level === 'error' || level === 'fatal' ? console.error : level === 'warning' ? console.warn : console.log
+  const logFn =
+    level === 'error' || level === 'fatal'
+      ? console.error
+      : level === 'warning'
+        ? console.warn
+        : console.log
   logFn(`[error-tracking][${level}]`, message, { userId: _currentUserId })
 
   // TODO: Sentry.captureMessage(message, level)
@@ -63,7 +68,7 @@ export function setUser(userId: string | null): void {
 export async function withErrorTracking<T>(
   module: string,
   fn: () => Promise<T>,
-  extra?: Record<string, unknown>,
+  extra?: Record<string, unknown>
 ): Promise<T> {
   try {
     return await fn()

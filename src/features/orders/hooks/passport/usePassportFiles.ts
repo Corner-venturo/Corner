@@ -61,8 +61,8 @@ export function usePassportFiles(): UsePassportFilesReturn {
         viewport: viewport,
       }).promise
 
-      const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((b) => resolve(b!), 'image/jpeg', 0.85)
+      const blob = await new Promise<Blob>(resolve => {
+        canvas.toBlob(b => resolve(b!), 'image/jpeg', 0.85)
       })
 
       const fileName = `${pdfFile.name.replace('.pdf', '')}_page${i}.jpg`
@@ -74,51 +74,57 @@ export function usePassportFiles(): UsePassportFilesReturn {
   }, [])
 
   // 處理檔案（PDF 或圖片）
-  const processFiles = useCallback(async (files: FileList): Promise<ProcessedFile[]> => {
-    const newProcessedFiles: ProcessedFile[] = []
+  const processFiles = useCallback(
+    async (files: FileList): Promise<ProcessedFile[]> => {
+      const newProcessedFiles: ProcessedFile[] = []
 
-    for (const file of Array.from(files)) {
-      if (file.type === 'application/pdf') {
-        const images = await convertPdfToImages(file)
-        for (const img of images) {
-          const preview = URL.createObjectURL(img)
+      for (const file of Array.from(files)) {
+        if (file.type === 'application/pdf') {
+          const images = await convertPdfToImages(file)
+          for (const img of images) {
+            const preview = URL.createObjectURL(img)
+            newProcessedFiles.push({
+              file: img,
+              preview,
+              originalName: file.name,
+              isPdf: true,
+            })
+          }
+        } else if (file.type.startsWith('image/')) {
+          const preview = URL.createObjectURL(file)
           newProcessedFiles.push({
-            file: img,
+            file,
             preview,
             originalName: file.name,
-            isPdf: true,
+            isPdf: false,
           })
         }
-      } else if (file.type.startsWith('image/')) {
-        const preview = URL.createObjectURL(file)
-        newProcessedFiles.push({
-          file,
-          preview,
-          originalName: file.name,
-          isPdf: false,
-        })
       }
-    }
 
-    return newProcessedFiles
-  }, [convertPdfToImages])
+      return newProcessedFiles
+    },
+    [convertPdfToImages]
+  )
 
   // 檔案選擇處理
-  const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (!files || files.length === 0) return
+  const handleFileChange = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files
+      if (!files || files.length === 0) return
 
-    setIsProcessing(true)
-    try {
-      const newFiles = await processFiles(files)
-      setProcessedFiles(prev => [...prev, ...newFiles])
-    } catch (error) {
-      logger.error(COMP_ORDERS_LABELS.處理檔案失敗, error)
-      void alert(COMP_ORDERS_LABELS.檔案處理失敗_請重試, 'error')
-    } finally {
-      setIsProcessing(false)
-    }
-  }, [processFiles])
+      setIsProcessing(true)
+      try {
+        const newFiles = await processFiles(files)
+        setProcessedFiles(prev => [...prev, ...newFiles])
+      } catch (error) {
+        logger.error(COMP_ORDERS_LABELS.處理檔案失敗, error)
+        void alert(COMP_ORDERS_LABELS.檔案處理失敗_請重試, 'error')
+      } finally {
+        setIsProcessing(false)
+      }
+    },
+    [processFiles]
+  )
 
   // 拖放處理
   const handleDragOver = useCallback((e: React.DragEvent<HTMLLabelElement>) => {
@@ -133,25 +139,28 @@ export function usePassportFiles(): UsePassportFilesReturn {
     setIsDragging(false)
   }, [])
 
-  const handleDrop = useCallback(async (e: React.DragEvent<HTMLLabelElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(false)
+  const handleDrop = useCallback(
+    async (e: React.DragEvent<HTMLLabelElement>) => {
+      e.preventDefault()
+      e.stopPropagation()
+      setIsDragging(false)
 
-    const files = e.dataTransfer.files
-    if (!files || files.length === 0) return
+      const files = e.dataTransfer.files
+      if (!files || files.length === 0) return
 
-    setIsProcessing(true)
-    try {
-      const newFiles = await processFiles(files)
-      setProcessedFiles(prev => [...prev, ...newFiles])
-    } catch (error) {
-      logger.error(COMP_ORDERS_LABELS.處理檔案失敗, error)
-      void alert(COMP_ORDERS_LABELS.檔案處理失敗_請重試, 'error')
-    } finally {
-      setIsProcessing(false)
-    }
-  }, [processFiles])
+      setIsProcessing(true)
+      try {
+        const newFiles = await processFiles(files)
+        setProcessedFiles(prev => [...prev, ...newFiles])
+      } catch (error) {
+        logger.error(COMP_ORDERS_LABELS.處理檔案失敗, error)
+        void alert(COMP_ORDERS_LABELS.檔案處理失敗_請重試, 'error')
+      } finally {
+        setIsProcessing(false)
+      }
+    },
+    [processFiles]
+  )
 
   // 移除檔案
   const handleRemoveFile = useCallback((index: number) => {
@@ -202,7 +211,7 @@ export function usePassportFiles(): UsePassportFilesReturn {
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
       reader.readAsDataURL(file)
-      reader.onload = (e) => {
+      reader.onload = e => {
         const img = new Image()
         img.src = e.target?.result as string
         img.onload = () => {
@@ -228,7 +237,7 @@ export function usePassportFiles(): UsePassportFilesReturn {
           ctx?.drawImage(img, 0, 0, width, height)
 
           canvas.toBlob(
-            async (blob) => {
+            async blob => {
               if (blob) {
                 const compressedFile = new File([blob], file.name, {
                   type: 'image/jpeg',

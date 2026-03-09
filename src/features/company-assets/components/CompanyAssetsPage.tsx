@@ -1,21 +1,15 @@
 'use client'
 /**
  * CompanyAssetsPage - 公司資源管理頁面
- * 
+ *
  * 列表模式 — 簡潔的檔案清單
  */
-
 
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useCallback, useEffect } from 'react'
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { FolderArchive } from 'lucide-react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { CompanyAssetsList } from './CompanyAssetsList'
 import { CompanyAssetsDialog } from './CompanyAssetsDialog'
 import { supabase } from '@/lib/supabase/client'
@@ -79,9 +73,7 @@ export const CompanyAssetsPage: React.FC = () => {
 
   // 過濾資源
   const filteredAssets = assets.filter(asset =>
-    searchQuery
-      ? asset.name?.toLowerCase().includes(searchQuery.toLowerCase())
-      : true
+    searchQuery ? asset.name?.toLowerCase().includes(searchQuery.toLowerCase()) : true
   )
 
   const handleOpenAddDialog = useCallback(() => {
@@ -103,33 +95,36 @@ export const CompanyAssetsPage: React.FC = () => {
     setIsDialogOpen(true)
   }, [])
 
-  const handleDelete = useCallback(async (asset: CompanyAsset) => {
-    const confirmed = await confirm(`確定要刪除「${asset.name}」嗎？`, {
-      title: COMPANY_ASSETS_LABELS.刪除資源,
-      type: 'warning',
-    })
-    if (!confirmed) return
+  const handleDelete = useCallback(
+    async (asset: CompanyAsset) => {
+      const confirmed = await confirm(`確定要刪除「${asset.name}」嗎？`, {
+        title: COMPANY_ASSETS_LABELS.刪除資源,
+        type: 'warning',
+      })
+      if (!confirmed) return
 
-    try {
-      const response = await fetch(
-        `/api/storage/upload?bucket=company-assets&path=${encodeURIComponent(asset.file_path)}`,
-        { method: 'DELETE' }
-      )
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || COMPANY_ASSETS_LABELS.刪除失敗)
+      try {
+        const response = await fetch(
+          `/api/storage/upload?bucket=company-assets&path=${encodeURIComponent(asset.file_path)}`,
+          { method: 'DELETE' }
+        )
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || COMPANY_ASSETS_LABELS.刪除失敗)
+        }
+
+        const { error } = await supabase.from('company_assets').delete().eq('id', asset.id)
+        if (error) throw error
+
+        await alert(COMPANY_ASSETS_LABELS.刪除成功, 'success')
+        fetchAssets()
+      } catch (error) {
+        logger.error(COMPANY_ASSETS_LABELS.刪除失敗, error)
+        await alert(COMPANY_ASSETS_LABELS.刪除失敗, 'error')
       }
-
-      const { error } = await supabase.from('company_assets').delete().eq('id', asset.id)
-      if (error) throw error
-
-      await alert(COMPANY_ASSETS_LABELS.刪除成功, 'success')
-      fetchAssets()
-    } catch (error) {
-      logger.error(COMPANY_ASSETS_LABELS.刪除失敗, error)
-      await alert(COMPANY_ASSETS_LABELS.刪除失敗, 'error')
-    }
-  }, [fetchAssets])
+    },
+    [fetchAssets]
+  )
 
   const handlePreview = useCallback((asset: CompanyAsset) => {
     setPreviewAsset(asset)
@@ -261,7 +256,10 @@ export const CompanyAssetsPage: React.FC = () => {
       fetchAssets()
     } catch (error) {
       logger.error(COMPANY_ASSETS_LABELS.儲存失敗, error)
-      await alert(`儲存失敗: ${error instanceof Error ? error.message : COMPANY_ASSETS_LABELS.未知錯誤}`, 'error')
+      await alert(
+        `儲存失敗: ${error instanceof Error ? error.message : COMPANY_ASSETS_LABELS.未知錯誤}`,
+        'error'
+      )
     } finally {
       setIsLoading(false)
     }
@@ -305,7 +303,7 @@ export const CompanyAssetsPage: React.FC = () => {
       />
 
       {/* 預覽彈窗 */}
-      <Dialog open={!!previewAsset} onOpenChange={(open) => !open && setPreviewAsset(null)}>
+      <Dialog open={!!previewAsset} onOpenChange={open => !open && setPreviewAsset(null)}>
         <DialogContent level={1} className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-morandi-primary truncate">
@@ -316,19 +314,28 @@ export const CompanyAssetsPage: React.FC = () => {
           <div className="flex items-center justify-center bg-morandi-container/20 min-h-[300px] max-h-[60vh] rounded-lg">
             {previewAsset?.asset_type === 'image' ? (
               <img
-                src={supabase.storage.from('company-assets').getPublicUrl(previewAsset.file_path).data.publicUrl}
+                src={
+                  supabase.storage.from('company-assets').getPublicUrl(previewAsset.file_path).data
+                    .publicUrl
+                }
                 alt={previewAsset.name}
                 className="max-w-full max-h-[55vh] object-contain"
               />
             ) : previewAsset?.asset_type === 'video' ? (
               <video
-                src={supabase.storage.from('company-assets').getPublicUrl(previewAsset.file_path).data.publicUrl}
+                src={
+                  supabase.storage.from('company-assets').getPublicUrl(previewAsset.file_path).data
+                    .publicUrl
+                }
                 controls
                 className="max-w-full max-h-[55vh]"
               />
             ) : previewAsset ? (
               <iframe
-                src={supabase.storage.from('company-assets').getPublicUrl(previewAsset.file_path).data.publicUrl}
+                src={
+                  supabase.storage.from('company-assets').getPublicUrl(previewAsset.file_path).data
+                    .publicUrl
+                }
                 className="w-full h-[55vh] bg-card"
               />
             ) : null}

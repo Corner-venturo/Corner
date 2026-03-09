@@ -1,7 +1,8 @@
 # 日曆排程模組審計報告
 
 **審計日期**: 2025-01-27  
-**審計範圍**: 
+**審計範圍**:
+
 - `/src/app/(main)/calendar/`
 - `/src/app/(main)/scheduling/`
 - `/src/features/calendar/`
@@ -11,12 +12,12 @@
 
 ## 📊 整體評估
 
-| 項目 | 評分 | 說明 |
-|------|------|------|
-| 功能完整性 | ⭐⭐⭐⭐ | 日曆與排程功能齊全 |
+| 項目       | 評分     | 說明                            |
+| ---------- | -------- | ------------------------------- |
+| 功能完整性 | ⭐⭐⭐⭐ | 日曆與排程功能齊全              |
 | 程式碼品質 | ⭐⭐⭐⭐ | 架構清晰，Custom Hooks 分離良好 |
-| 效能優化 | ⭐⭐⭐ | 有分頁載入，但有優化空間 |
-| 使用者體驗 | ⭐⭐⭐⭐ | 拖放、視圖切換流暢 |
+| 效能優化   | ⭐⭐⭐   | 有分頁載入，但有優化空間        |
+| 使用者體驗 | ⭐⭐⭐⭐ | 拖放、視圖切換流暢              |
 
 ---
 
@@ -37,12 +38,14 @@
    - 客戶生日（獨立彈窗顯示）
 
 3. **時區處理**
+
    ```typescript
    // CalendarGrid.tsx - 明確指定台灣時區
-   timeZone="Asia/Taipei"
+   timeZone = 'Asia/Taipei'
    ```
 
 4. **Realtime 同步**
+
    ```typescript
    // useCalendarEvents.ts - 自動同步其他用戶的變更
    supabase.channel('calendar_events_realtime')
@@ -61,6 +64,7 @@
 ### ⚠️ 問題與建議
 
 #### 1. 【中等】事件點擊導航不一致
+
 ```typescript
 // useEventOperations.ts
 handleEventClick = (info: EventClickArg) => {
@@ -73,11 +77,13 @@ handleEventClick = (info: EventClickArg) => {
   }
 }
 ```
+
 **問題**: 旅遊團和生日事件跳轉頁面，但使用的是 `tourId` 和 `memberId`，而 extendedProps 中是 `tour_id` 和 `member_id`。
 
 **建議**: 統一 extendedProps 的命名規範（camelCase 或 snake_case）
 
 #### 2. 【低】AddEventDialog 表單驗證不足
+
 ```typescript
 // AddEventDialog.tsx
 <form onSubmit={e => {
@@ -87,27 +93,33 @@ handleEventClick = (info: EventClickArg) => {
   }
 }}>
 ```
+
 **問題**: 只驗證標題，未驗證時間格式、日期順序（結束日期應大於開始日期）
 
-**建議**: 
+**建議**:
+
 - 加入日期順序驗證
 - 時間格式驗證應在 submit 時再次確認
 - 考慮使用 react-hook-form + zod 統一驗證
 
 #### 3. 【低】生日事件只考慮當年
+
 ```typescript
 // useCalendarEvents.ts
 const birthdayThisYear = `${currentYear}-${customer.birth_date.slice(5)}`
 ```
+
 **問題**: 如果在年末查看下一年的日曆，生日會顯示錯誤年份
 
 **建議**: 根據視圖日期範圍動態計算生日年份
 
 #### 4. 【低】CalendarSettings 未持久化
+
 ```typescript
 // calendar-settings-dialog.tsx
 const { settings, updateSettings } = useCalendarStore()
 ```
+
 **建議**: 確認 store 有使用 persist middleware 持久化設定
 
 ---
@@ -122,6 +134,7 @@ const { settings, updateSettings } = useCalendarStore()
    - 共用相同的 UI 架構
 
 2. **衝突檢查機制**
+
    ```typescript
    // useScheduleConflict.ts
    const hasConflict = await checkVehicleConflict(...)
@@ -147,6 +160,7 @@ const { settings, updateSettings } = useCalendarStore()
 ### ⚠️ 問題與建議
 
 #### 1. 【高】RequirementGanttChart 效能問題
+
 ```typescript
 // RequirementGanttChart.tsx
 const rows = useMemo((): RequirementRow[] => {
@@ -160,21 +174,26 @@ const rows = useMemo((): RequirementRow[] => {
   return result
 }, [requests])
 ```
+
 **問題**: 如果需求數量很大（如 quantity=20），會產生大量 DOM 元素
 
-**建議**: 
+**建議**:
+
 - 考慮虛擬滾動 (react-window 或 @tanstack/virtual)
 - 或限制單次展開數量
 
 #### 2. 【中等】ScheduleCalendar 未使用
+
 ```typescript
 // SchedulingPage.tsx
 // ScheduleCalendar 保留用於未來可能的資源視圖
 // import { ScheduleCalendar } from './ScheduleCalendar'
 ```
+
 **建議**: 如果確定不使用，應移除以減少維護負擔
 
 #### 3. 【中等】需求單直接查詢資料庫
+
 ```typescript
 // SchedulingPage.tsx
 const fetchRequests = useCallback(async () => {
@@ -186,11 +205,13 @@ const fetchRequests = useCallback(async () => {
   ...
 }, [])
 ```
+
 **問題**: 未使用 SWR/React Query，缺少快取和 revalidation
 
 **建議**: 建立 `/data/tour-requests.ts` hook 統一管理
 
 #### 4. 【低】日期格式化重複
+
 ```typescript
 // 多處都有類似的安全格式化函式
 function safeFormat(date: Date | null | undefined, formatStr: string): string {
@@ -198,16 +219,19 @@ function safeFormat(date: Date | null | undefined, formatStr: string): string {
   ...
 }
 ```
+
 **建議**: 統一抽取到 `/lib/utils/format-date.ts`
 
 #### 5. 【低】handleAssignResource 參數未使用
+
 ```typescript
 const handleAssignResource = useCallback(async (
-  requestId: string, 
-  resourceId: string, 
+  requestId: string,
+  resourceId: string,
   _index: number  // 未使用
 ) => {
 ```
+
 **建議**: 移除未使用的參數，或實作分配特定 quantity index 的邏輯
 
 ---
@@ -215,25 +239,31 @@ const handleAssignResource = useCallback(async (
 ## 📊 資料來源審計
 
 ### 旅遊團行程
+
 ```typescript
 // useCalendarEvents.ts
 const { items: tours } = useToursForCalendar(dateRange)
 ```
+
 ✅ 使用專門的 hook，支援日期範圍過濾
 
 ### 領隊排班
+
 ```typescript
 // SchedulingPage.tsx
 const { items: leaderSchedules } = useLeaderSchedules()
 const { items: leaderAvailability } = useLeaderAvailability()
 ```
+
 ✅ 分離排班和可用檔期，架構清晰
 
 ### 車輛調度
+
 ```typescript
 const { items: vehicles } = useFleetVehicles()
 const { items: vehicleSchedules } = useFleetSchedules()
 ```
+
 ✅ 使用統一的 data hooks
 
 ---
@@ -272,6 +302,7 @@ const { items: vehicleSchedules } = useFleetSchedules()
 ### 建議優化
 
 1. **虛擬滾動**
+
    ```typescript
    // 對於長列表考慮使用
    import { FixedSizeList } from 'react-window'
@@ -325,5 +356,5 @@ const { items: vehicleSchedules } = useFleetSchedules()
 
 ---
 
-*審計人員: Claude (AI)*  
-*最後更新: 2025-01-27*
+_審計人員: Claude (AI)_  
+_最後更新: 2025-01-27_

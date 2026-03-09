@@ -6,7 +6,7 @@ import type { PageHistory, UseCanvasHistoryOptions, UseCanvasHistoryReturn } fro
 
 /**
  * useCanvasHistory - 歷史記錄管理 Hook
- * 
+ *
  * 功能：
  * - Undo/Redo 支援
  * - 多頁獨立歷史記錄
@@ -101,81 +101,87 @@ export function useCanvasHistory(
     }
   }, [])
 
-  const loadPageHistory = useCallback((pageId: string) => {
-    currentPageIdRef.current = pageId
-    const savedHistory = pageHistoriesRef.current.get(pageId)
-    if (savedHistory) {
-      historyRef.current = {
-        stack: [...savedHistory.stack],
-        index: savedHistory.index,
+  const loadPageHistory = useCallback(
+    (pageId: string) => {
+      currentPageIdRef.current = pageId
+      const savedHistory = pageHistoriesRef.current.get(pageId)
+      if (savedHistory) {
+        historyRef.current = {
+          stack: [...savedHistory.stack],
+          index: savedHistory.index,
+        }
+      } else {
+        // 新頁面，初始化空歷史
+        historyRef.current = { stack: [], index: -1 }
       }
-    } else {
-      // 新頁面，初始化空歷史
-      historyRef.current = { stack: [], index: -1 }
-    }
-    updateHistoryState()
-  }, [updateHistoryState])
+      updateHistoryState()
+    },
+    [updateHistoryState]
+  )
 
-  const initPageHistory = useCallback((pageId: string) => {
-    currentPageIdRef.current = pageId
-    historyRef.current = { stack: [], index: -1 }
-    // 延遲保存初始狀態，確保 canvas 內容已載入
-    setTimeout(() => {
-      saveToHistoryImmediate()
-    }, 100)
-  }, [saveToHistoryImmediate])
+  const initPageHistory = useCallback(
+    (pageId: string) => {
+      currentPageIdRef.current = pageId
+      historyRef.current = { stack: [], index: -1 }
+      // 延遲保存初始狀態，確保 canvas 內容已載入
+      setTimeout(() => {
+        saveToHistoryImmediate()
+      }, 100)
+    },
+    [saveToHistoryImmediate]
+  )
 
   // ============================================
   // Undo
   // ============================================
-  const undo = useCallback(async (
-    canvas: fabric.Canvas | null,
-    applyControlStyles: (canvas: fabric.Canvas) => void
-  ) => {
-    const history = historyRef.current
-    if (!canvas || history.index <= 0) return
+  const undo = useCallback(
+    async (canvas: fabric.Canvas | null, applyControlStyles: (canvas: fabric.Canvas) => void) => {
+      const history = historyRef.current
+      if (!canvas || history.index <= 0) return
 
-    // 確保沒有待處理的防抖保存
-    if (saveHistoryTimeoutRef.current) {
-      clearTimeout(saveHistoryTimeoutRef.current)
-      saveHistoryTimeoutRef.current = null
-    }
+      // 確保沒有待處理的防抖保存
+      if (saveHistoryTimeoutRef.current) {
+        clearTimeout(saveHistoryTimeoutRef.current)
+        saveHistoryTimeoutRef.current = null
+      }
 
-    isUndoRedoRef.current = true
-    history.index--
+      isUndoRedoRef.current = true
+      history.index--
 
-    try {
-      await canvas.loadFromJSON(JSON.parse(history.stack[history.index]))
-      applyControlStyles(canvas)
-      canvas.renderAll()
-      updateHistoryState()
-    } finally {
-      isUndoRedoRef.current = false
-    }
-  }, [updateHistoryState])
+      try {
+        await canvas.loadFromJSON(JSON.parse(history.stack[history.index]))
+        applyControlStyles(canvas)
+        canvas.renderAll()
+        updateHistoryState()
+      } finally {
+        isUndoRedoRef.current = false
+      }
+    },
+    [updateHistoryState]
+  )
 
   // ============================================
   // Redo
   // ============================================
-  const redo = useCallback(async (
-    canvas: fabric.Canvas | null,
-    applyControlStyles: (canvas: fabric.Canvas) => void
-  ) => {
-    const history = historyRef.current
-    if (!canvas || history.index >= history.stack.length - 1) return
+  const redo = useCallback(
+    async (canvas: fabric.Canvas | null, applyControlStyles: (canvas: fabric.Canvas) => void) => {
+      const history = historyRef.current
+      if (!canvas || history.index >= history.stack.length - 1) return
 
-    isUndoRedoRef.current = true
-    history.index++
+      isUndoRedoRef.current = true
+      history.index++
 
-    try {
-      await canvas.loadFromJSON(JSON.parse(history.stack[history.index]))
-      applyControlStyles(canvas)
-      canvas.renderAll()
-      updateHistoryState()
-    } finally {
-      isUndoRedoRef.current = false
-    }
-  }, [updateHistoryState])
+      try {
+        await canvas.loadFromJSON(JSON.parse(history.stack[history.index]))
+        applyControlStyles(canvas)
+        canvas.renderAll()
+        updateHistoryState()
+      } finally {
+        isUndoRedoRef.current = false
+      }
+    },
+    [updateHistoryState]
+  )
 
   // ============================================
   // Clear Pending Timeout

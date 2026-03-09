@@ -8,11 +8,7 @@ import {
   Plugin,
   UniverInstanceType,
 } from '@univerjs/core'
-import {
-  IMenuManagerService,
-  MenuItemType,
-  RibbonStartGroup,
-} from '@univerjs/ui'
+import { IMenuManagerService, MenuItemType, RibbonStartGroup } from '@univerjs/ui'
 import type { IMenuButtonItem } from '@univerjs/ui'
 import { OFFICE_LABELS } from '../constants/labels'
 
@@ -86,7 +82,7 @@ export class UniverBackToListDocPlugin extends Plugin {
     setTimeout(() => {
       try {
         const deps: Dependency[] = [[BackToListDocController]]
-        deps.forEach((dep) => this._injector.add(dep))
+        deps.forEach(dep => this._injector.add(dep))
         // 取得 controller 觸發初始化
         this._injector.get(BackToListDocController)
       } catch (error) {

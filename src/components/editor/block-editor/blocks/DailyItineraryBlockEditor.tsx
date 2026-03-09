@@ -5,11 +5,16 @@
  * 編輯每日行程列表（簡化版）
  */
 
-
 import { useCallback, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   Plus,
   Trash2,
@@ -61,24 +66,33 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
     setExpandedDays(prev => new Set([...prev, days.length]))
   }, [days, onChange])
 
-  const updateDay = useCallback((index: number, field: keyof DailyItinerary, value: unknown) => {
-    const newDays = [...days]
-    newDays[index] = { ...newDays[index], [field]: value }
-    onChange({ dailyItinerary: newDays })
-  }, [days, onChange])
+  const updateDay = useCallback(
+    (index: number, field: keyof DailyItinerary, value: unknown) => {
+      const newDays = [...days]
+      newDays[index] = { ...newDays[index], [field]: value }
+      onChange({ dailyItinerary: newDays })
+    },
+    [days, onChange]
+  )
 
-  const removeDay = useCallback((index: number) => {
-    const newDays = days.filter((_, i) => i !== index)
-      .map((day, i) => ({ ...day, dayLabel: `Day ${i + 1}` }))
-    onChange({ dailyItinerary: newDays })
-  }, [days, onChange])
+  const removeDay = useCallback(
+    (index: number) => {
+      const newDays = days
+        .filter((_, i) => i !== index)
+        .map((day, i) => ({ ...day, dayLabel: `Day ${i + 1}` }))
+      onChange({ dailyItinerary: newDays })
+    },
+    [days, onChange]
+  )
 
   return (
     <div className="space-y-3">
       {/* 標題和風格 */}
       <div className="flex items-center gap-3">
         <div className="flex-1">
-          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5760}</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">
+            {COMP_EDITOR_LABELS.LABEL_5760}
+          </label>
           <Input
             value={data.itinerarySubtitle || ''}
             onChange={e => onChange({ itinerarySubtitle: e.target.value })}
@@ -88,10 +102,12 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
         </div>
 
         <div className="w-36">
-          <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_4287}</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">
+            {COMP_EDITOR_LABELS.LABEL_4287}
+          </label>
           <Select
             value={data.itineraryStyle || 'original'}
-            onValueChange={(value) => onChange({ itineraryStyle: value as ItineraryStyleType })}
+            onValueChange={value => onChange({ itineraryStyle: value as ItineraryStyleType })}
           >
             <SelectTrigger className="h-8 text-sm">
               <SelectValue placeholder={COMP_EDITOR_LABELS.選擇} />
@@ -111,10 +127,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
         {days.map((day, index) => {
           const isExpanded = expandedDays.has(index)
           return (
-            <div
-              key={index}
-              className="border border-border/50 rounded-lg overflow-hidden"
-            >
+            <div key={index} className="border border-border/50 rounded-lg overflow-hidden">
               {/* 日期標題列 */}
               <button
                 type="button"
@@ -136,9 +149,10 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                 </span>
                 <Button
                   variant="ghost"
-                  size="icon" aria-label="Delete"
+                  size="icon"
+                  aria-label="Delete"
                   className="h-6 w-6 text-status-danger hover:text-status-danger hover:bg-status-danger-bg"
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation()
                     removeDay(index)
                   }}
@@ -152,7 +166,9 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                 <div className="p-3 space-y-3">
                   <div className="grid grid-cols-3 gap-2">
                     <div>
-                      <label className="block text-xs text-morandi-primary mb-1">{COMP_EDITOR_LABELS.DAY_LABEL}</label>
+                      <label className="block text-xs text-morandi-primary mb-1">
+                        {COMP_EDITOR_LABELS.DAY_LABEL}
+                      </label>
                       <Input
                         value={day.dayLabel || ''}
                         onChange={e => updateDay(index, 'dayLabel', e.target.value)}
@@ -161,7 +177,9 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-morandi-primary mb-1">{COMP_EDITOR_LABELS.DATE}</label>
+                      <label className="block text-xs text-morandi-primary mb-1">
+                        {COMP_EDITOR_LABELS.DATE}
+                      </label>
                       <Input
                         value={day.date || ''}
                         onChange={e => updateDay(index, 'date', e.target.value)}
@@ -170,7 +188,9 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-morandi-primary mb-1">{COMP_EDITOR_LABELS.TITLE}</label>
+                      <label className="block text-xs text-morandi-primary mb-1">
+                        {COMP_EDITOR_LABELS.TITLE}
+                      </label>
                       <Input
                         value={day.title || ''}
                         onChange={e => updateDay(index, 'title', e.target.value)}
@@ -201,25 +221,35 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                       </label>
                       <Input
                         value={day.meals?.breakfast || ''}
-                        onChange={e => updateDay(index, 'meals', { ...day.meals, breakfast: e.target.value })}
+                        onChange={e =>
+                          updateDay(index, 'meals', { ...day.meals, breakfast: e.target.value })
+                        }
                         placeholder={COMP_EDITOR_LABELS.飯店早餐}
                         className="h-8 text-sm"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-morandi-primary mb-1">{COMP_EDITOR_LABELS.午餐}</label>
+                      <label className="block text-xs text-morandi-primary mb-1">
+                        {COMP_EDITOR_LABELS.午餐}
+                      </label>
                       <Input
                         value={day.meals?.lunch || ''}
-                        onChange={e => updateDay(index, 'meals', { ...day.meals, lunch: e.target.value })}
+                        onChange={e =>
+                          updateDay(index, 'meals', { ...day.meals, lunch: e.target.value })
+                        }
                         placeholder={COMP_EDITOR_LABELS.自理}
                         className="h-8 text-sm"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-morandi-primary mb-1">{COMP_EDITOR_LABELS.晚餐}</label>
+                      <label className="block text-xs text-morandi-primary mb-1">
+                        {COMP_EDITOR_LABELS.晚餐}
+                      </label>
                       <Input
                         value={day.meals?.dinner || ''}
-                        onChange={e => updateDay(index, 'meals', { ...day.meals, dinner: e.target.value })}
+                        onChange={e =>
+                          updateDay(index, 'meals', { ...day.meals, dinner: e.target.value })
+                        }
                         placeholder={COMP_EDITOR_LABELS.自理}
                         className="h-8 text-sm"
                       />
@@ -243,7 +273,12 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                     活動數量：{day.activities?.length || 0} 個
                     {day.activities && day.activities.length > 0 && (
                       <span className="ml-2">
-                        ({day.activities.map(a => a.title).filter(Boolean).join('、') || COMP_EDITOR_LABELS.無標題})
+                        (
+                        {day.activities
+                          .map(a => a.title)
+                          .filter(Boolean)
+                          .join('、') || COMP_EDITOR_LABELS.無標題}
+                        )
                       </span>
                     )}
                   </div>
@@ -255,12 +290,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
       </div>
 
       {/* 新增按鈕 */}
-      <Button
-        variant="outline"
-        size="sm"
-        className="w-full gap-2"
-        onClick={addDay}
-      >
+      <Button variant="outline" size="sm" className="w-full gap-2" onClick={addDay}>
         <Plus size={14} />
         {COMP_EDITOR_LABELS.ADD_3205}
       </Button>

@@ -3,7 +3,6 @@
  * QuickQuoteDialog - 快速報價單表單（簡單收款用）
  */
 
-
 import { QUICK_QUOTE_LABELS } from '../constants/labels'
 
 import React, { useState, useEffect } from 'react'
@@ -14,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Plus, X } from 'lucide-react'
 import { CurrencyCell } from '@/components/table-cells'
-import { ACCOMMODATION_ITEM_ROW_LABELS, QUICK_QUOTE_DIALOG_LABELS } from '../constants/labels';
+import { ACCOMMODATION_ITEM_ROW_LABELS, QUICK_QUOTE_DIALOG_LABELS } from '../constants/labels'
 
 interface QuickQuoteItem {
   id: string
@@ -40,7 +39,14 @@ interface QuickQuoteDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   formData: QuickQuoteFormData
-  setFormField: (field: string, value: string | number | QuickQuoteItem[] | ((prev: QuickQuoteFormData) => string | number | QuickQuoteItem[])) => void
+  setFormField: (
+    field: string,
+    value:
+      | string
+      | number
+      | QuickQuoteItem[]
+      | ((prev: QuickQuoteFormData) => string | number | QuickQuoteItem[])
+  ) => void
   onSubmit: () => Promise<boolean>
   onClose: () => void
 }
@@ -133,7 +139,9 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
           {/* 客戶資訊 */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.CUSTOMER_NAME_REQUIRED}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {QUICK_QUOTE_LABELS.CUSTOMER_NAME_REQUIRED}
+              </label>
               <Input
                 value={formData.customer_name}
                 onChange={e => setFormField('customer_name', e.target.value)}
@@ -143,7 +151,9 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.PHONE}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {QUICK_QUOTE_LABELS.PHONE}
+              </label>
               <Input
                 value={formData.contact_phone}
                 onChange={e => setFormField('contact_phone', e.target.value)}
@@ -152,7 +162,9 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.ADDRESS}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {QUICK_QUOTE_LABELS.ADDRESS}
+              </label>
               <Input
                 value={formData.contact_address}
                 onChange={e => setFormField('contact_address', e.target.value)}
@@ -161,7 +173,9 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.GROUP_NUMBER}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {QUICK_QUOTE_LABELS.GROUP_NUMBER}
+              </label>
               <Input
                 value={formData.tour_code}
                 onChange={e => setFormField('tour_code', e.target.value)}
@@ -170,7 +184,9 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.HANDLER}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {QUICK_QUOTE_LABELS.HANDLER}
+              </label>
               <Input
                 value={formData.handler_name}
                 onChange={e => setFormField('handler_name', e.target.value)}
@@ -179,10 +195,12 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.ISSUE_DATE}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {QUICK_QUOTE_LABELS.ISSUE_DATE}
+              </label>
               <DatePicker
                 value={formData.issue_date}
-                onChange={(date) => setFormField('issue_date', date || '')}
+                onChange={date => setFormField('issue_date', date || '')}
                 placeholder={QUICK_QUOTE_DIALOG_LABELS.選擇日期}
                 className="mt-1"
               />
@@ -192,7 +210,9 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
           {/* 收費明細表 */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.FEE_DETAILS_TABLE}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {QUICK_QUOTE_LABELS.FEE_DETAILS_TABLE}
+              </label>
               <Button type="button" size="sm" onClick={addItem} variant="outline" className="gap-1">
                 <Plus size={16} />
                 {QUICK_QUOTE_LABELS.ADD_2089}
@@ -225,7 +245,8 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
                       </td>
                       <td className="px-3 py-2">
                         <Input
-                          type="text" inputMode="decimal"
+                          type="text"
+                          inputMode="decimal"
                           value={item.quantity === 0 ? '' : item.quantity}
                           onChange={e => {
                             const val = e.target.value
@@ -246,7 +267,8 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
                       </td>
                       <td className="px-3 py-2">
                         <Input
-                          type="text" inputMode="decimal"
+                          type="text"
+                          inputMode="decimal"
                           value={item.unit_price === 0 ? '' : item.unit_price}
                           onChange={e => {
                             const val = e.target.value
@@ -304,13 +326,18 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
           {/* 金額統計 */}
           <div className="grid grid-cols-3 gap-4 bg-morandi-container/10 p-4 rounded-md">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.RECEIVABLE}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {QUICK_QUOTE_LABELS.RECEIVABLE}
+              </label>
               <CurrencyCell amount={totalAmount} className="mt-1 text-lg font-bold" />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.RECEIVED}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {QUICK_QUOTE_LABELS.RECEIVED}
+              </label>
               <Input
-                type="text" inputMode="decimal"
+                type="text"
+                inputMode="decimal"
                 value={formData.received_amount}
                 onChange={e => {
                   const value = e.target.value
@@ -322,7 +349,9 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{QUICK_QUOTE_LABELS.LABEL_2302}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {QUICK_QUOTE_LABELS.LABEL_2302}
+              </label>
               <CurrencyCell
                 amount={balanceAmount}
                 variant={balanceAmount > 0 ? 'expense' : 'income'}

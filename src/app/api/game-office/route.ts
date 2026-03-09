@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = getSupabase()
-  
+
   // Check if shared room exists
   const { data: existing } = await supabase
     .from('game_office_rooms')

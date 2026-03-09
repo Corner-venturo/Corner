@@ -21,11 +21,34 @@ interface PaymentCardProps {
 
 import { PAYMENT_CARD_LABELS } from './labels'
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: typeof Clock }> = {
-  pending: { label: PAYMENT_CARD_LABELS.STATUS_PENDING, color: 'text-amber-700', bg: 'bg-amber-100', icon: Clock },
-  confirmed: { label: PAYMENT_CARD_LABELS.STATUS_CONFIRMED, color: 'text-blue-700', bg: 'bg-blue-100', icon: CheckCircle },
-  billed: { label: PAYMENT_CARD_LABELS.STATUS_BILLED, color: 'text-green-700', bg: 'bg-green-100', icon: CheckCircle },
-  rejected: { label: PAYMENT_CARD_LABELS.STATUS_REJECTED, color: 'text-red-700', bg: 'bg-red-100', icon: AlertCircle },
+const STATUS_CONFIG: Record<
+  string,
+  { label: string; color: string; bg: string; icon: typeof Clock }
+> = {
+  pending: {
+    label: PAYMENT_CARD_LABELS.STATUS_PENDING,
+    color: 'text-amber-700',
+    bg: 'bg-amber-100',
+    icon: Clock,
+  },
+  confirmed: {
+    label: PAYMENT_CARD_LABELS.STATUS_CONFIRMED,
+    color: 'text-blue-700',
+    bg: 'bg-blue-100',
+    icon: CheckCircle,
+  },
+  billed: {
+    label: PAYMENT_CARD_LABELS.STATUS_BILLED,
+    color: 'text-green-700',
+    bg: 'bg-green-100',
+    icon: CheckCircle,
+  },
+  rejected: {
+    label: PAYMENT_CARD_LABELS.STATUS_REJECTED,
+    color: 'text-red-700',
+    bg: 'bg-red-100',
+    icon: AlertCircle,
+  },
 }
 
 export function PaymentCard({ payment, onClick, className }: PaymentCardProps) {
@@ -69,7 +92,9 @@ export function PaymentCard({ payment, onClick, className }: PaymentCardProps) {
             <span className="font-medium text-morandi-primary line-clamp-1">
               {payment.description}
             </span>
-            <span className={cn('text-xs px-2 py-0.5 rounded-full shrink-0', status.bg, status.color)}>
+            <span
+              className={cn('text-xs px-2 py-0.5 rounded-full shrink-0', status.bg, status.color)}
+            >
               {status.label}
             </span>
           </div>
@@ -87,9 +112,7 @@ export function PaymentCard({ payment, onClick, className }: PaymentCardProps) {
 
           {/* 金額 + 日期 */}
           <div className="flex items-center justify-between">
-            <span className="font-bold text-morandi-primary">
-              {formatAmount(payment.amount)}
-            </span>
+            <span className="font-bold text-morandi-primary">{formatAmount(payment.amount)}</span>
             <span className="text-xs text-morandi-secondary">
               {formatDate(payment.paid_at || payment.created_at)}
             </span>

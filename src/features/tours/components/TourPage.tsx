@@ -2,7 +2,7 @@
 
 /**
  * TourPage - 行程展示頁面
- * 
+ *
  * 🎨 風格統一原則：
  * 所有區塊跟隨 coverStyle，不再有獨立的 flightStyle、itineraryStyle 等
  * 選一個主題 → 全站統一風格
@@ -138,7 +138,12 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
             {isLuxury ? (
               <TourFeaturesSectionLuxury data={data} viewMode={viewMode} />
             ) : (
-              <TourFeaturesSection data={data} viewMode={viewMode} coverStyle={style} featuresStyle={isCollage ? 'collage' : 'original'} />
+              <TourFeaturesSection
+                data={data}
+                viewMode={viewMode}
+                coverStyle={style}
+                featuresStyle={isCollage ? 'collage' : 'original'}
+              />
             )}
           </div>
 
@@ -181,27 +186,29 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
       </div>
 
       {/* Leader Section */}
-      {data.showLeaderMeeting !== false && (
-        data.leader?.name ||
-        data.leader?.domesticPhone ||
-        data.leader?.overseasPhone ||
-        data.meetingInfo?.time ||
-        data.meetingInfo?.location ||
-        (data.meetingPoints && data.meetingPoints.some((p: { time?: string; location?: string }) => p.time || p.location))
-      ) && (
-        <>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="border-t border-border"></div>
-          </div>
-          <div id="leader">
-            {isLuxury ? (
-              <TourLeaderSectionLuxury data={data} viewMode={viewMode} />
-            ) : (
-              <TourLeaderSection data={data} viewMode={viewMode} coverStyle={style} />
-            )}
-          </div>
-        </>
-      )}
+      {data.showLeaderMeeting !== false &&
+        (data.leader?.name ||
+          data.leader?.domesticPhone ||
+          data.leader?.overseasPhone ||
+          data.meetingInfo?.time ||
+          data.meetingInfo?.location ||
+          (data.meetingPoints &&
+            data.meetingPoints.some(
+              (p: { time?: string; location?: string }) => p.time || p.location
+            ))) && (
+          <>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="border-t border-border"></div>
+            </div>
+            <div id="leader">
+              {isLuxury ? (
+                <TourLeaderSectionLuxury data={data} viewMode={viewMode} />
+              ) : (
+                <TourLeaderSection data={data} viewMode={viewMode} coverStyle={style} />
+              )}
+            </div>
+          </>
+        )}
 
       {/* Hotels Section */}
       {data.showHotels !== false && data.hotels && data.hotels.length > 0 && (
@@ -259,7 +266,9 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
 
       {/* Notices Section */}
       {((data.showNotices && data.notices && data.notices.length > 0) ||
-        (data.showCancellationPolicy && data.cancellationPolicy && data.cancellationPolicy.length > 0)) && (
+        (data.showCancellationPolicy &&
+          data.cancellationPolicy &&
+          data.cancellationPolicy.length > 0)) && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="border-t border-border"></div>
         </div>
@@ -274,18 +283,23 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
           <div className="text-center">
             <div className="flex justify-center mb-3">
               {companyLogoUrl ? (
-                <img src={companyLogoUrl}
+                <img
+                  src={companyLogoUrl}
                   alt="Company Logo"
                   className={`w-auto object-contain ${viewMode === 'mobile' ? 'h-6' : 'h-8'}`}
                 />
               ) : (
-                <h3 className={`font-bold text-morandi-gold ${viewMode === 'mobile' ? 'text-lg' : 'text-2xl'}`}>
+                <h3
+                  className={`font-bold text-morandi-gold ${viewMode === 'mobile' ? 'text-lg' : 'text-2xl'}`}
+                >
                   {COMPANY.name}
                 </h3>
               )}
             </div>
             <p className="text-morandi-secondary mb-6 text-sm">{COMPANY.subtitle}</p>
-            <p className="text-morandi-secondary text-xs">© {new Date().getFullYear()} {COMPANY.name}. All rights reserved.</p>
+            <p className="text-morandi-secondary text-xs">
+              © {new Date().getFullYear()} {COMPANY.name}. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>

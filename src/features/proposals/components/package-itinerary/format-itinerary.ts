@@ -154,11 +154,14 @@ export function generatePrintHtml({
   returnFlight,
   dailyData,
 }: PrintOptions): string {
-  const flightHtml = !isDomestic && (outboundFlight || returnFlight) ? `
+  const flightHtml =
+    !isDomestic && (outboundFlight || returnFlight)
+      ? `
     <div class="info-grid" style="margin-top: 8px;">
       ${outboundFlight ? `<div><span class="info-label">去程航班：</span>${outboundFlight.airline} ${outboundFlight.flightNumber} (${outboundFlight.departureAirport} ${outboundFlight.departureTime} → ${outboundFlight.arrivalAirport} ${outboundFlight.arrivalTime})</div>` : ''}
       ${returnFlight ? `<div><span class="info-label">回程航班：</span>${returnFlight.airline} ${returnFlight.flightNumber} (${returnFlight.departureAirport} ${returnFlight.departureTime} → ${returnFlight.arrivalAirport} ${returnFlight.arrivalTime})</div>` : ''}
-    </div>` : ''
+    </div>`
+      : ''
 
   return `
     <!DOCTYPE html>
@@ -207,7 +210,9 @@ export function generatePrintHtml({
           </tr>
         </thead>
         <tbody>
-          ${dailyData.map((day) => `
+          ${dailyData
+            .map(
+              day => `
             <tr>
               <td>
                 <div class="day-label">${day.dayLabel}</div>
@@ -219,7 +224,9 @@ export function generatePrintHtml({
               <td style="text-align: center; font-size: 12px;">${day.meals.dinner || '-'}</td>
               <td style="font-size: 12px;">${day.accommodation || '-'}</td>
             </tr>
-          `).join('')}
+          `
+            )
+            .join('')}
         </tbody>
       </table>
       <div class="footer">

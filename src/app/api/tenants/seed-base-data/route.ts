@@ -14,10 +14,7 @@ export async function POST(request: NextRequest) {
   try {
     const auth = await getServerAuth()
     if (!auth.success) {
-      return NextResponse.json(
-        { success: false, error: '請先登入' },
-        { status: 401 }
-      )
+      return NextResponse.json({ success: false, error: '請先登入' }, { status: 401 })
     }
 
     // 查員工角色
@@ -29,36 +26,27 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (!employee?.roles?.includes('super_admin')) {
-      return NextResponse.json(
-        { success: false, error: '權限不足' },
-        { status: 403 }
-      )
+      return NextResponse.json({ success: false, error: '權限不足' }, { status: 403 })
     }
 
     const body = (await request.json()) as { targetWorkspaceId?: string }
     const { targetWorkspaceId } = body
 
     if (!targetWorkspaceId) {
-      return NextResponse.json(
-        { success: false, error: '缺少 targetWorkspaceId' },
-        { status: 400 }
-      )
+      return NextResponse.json({ success: false, error: '缺少 targetWorkspaceId' }, { status: 400 })
     }
 
     // 呼叫 DB function 複製基礎資料
     const supabase = supabaseAdmin
     // @ts-expect-error - seed_tenant_base_data 是手動建立的 DB function，不在 generated types 裡
-    const { error } = await supabase.rpc('seed_tenant_base_data', {
+    const { error } = (await supabase.rpc('seed_tenant_base_data', {
       source_workspace_id: CORNER_WORKSPACE_ID,
       target_workspace_id: targetWorkspaceId,
-    }) as { error: { message: string } | null }
+    })) as { error: { message: string } | null }
 
     if (error) {
       logger.error('Seed base data failed:', error)
-      return NextResponse.json(
-        { success: false, error: '基礎資料建立失敗' },
-        { status: 500 }
-      )
+      return NextResponse.json({ success: false, error: '基礎資料建立失敗' }, { status: 500 })
     }
 
     logger.log(`Seeded base data for workspace: ${targetWorkspaceId}`)
@@ -66,9 +54,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (error) {
     logger.error('Seed base data error:', error)
-    return NextResponse.json(
-      { success: false, error: '伺服器錯誤' },
-      { status: 500 }
-    )
+    return NextResponse.json({ success: false, error: '伺服器錯誤' }, { status: 500 })
   }
 }

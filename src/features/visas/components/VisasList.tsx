@@ -38,32 +38,37 @@ export function VisasList({
       label: L.col_applicant,
       width: '100',
       sortable: true,
-      render: (value) => <TextCell text={String(value || '')} />,
+      render: value => <TextCell text={String(value || '')} />,
     },
     {
       key: 'contact_person',
       label: L.col_contact,
       width: '100',
-      render: (value) => <TextCell text={String(value || '')} />,
+      render: value => <TextCell text={String(value || '')} />,
     },
     {
       key: 'contact_phone',
       label: L.col_phone,
       width: '110',
-      render: (value) => <TextCell text={String(value || '')} />,
+      render: value => <TextCell text={String(value || '')} />,
     },
     {
       key: 'country',
       label: L.col_visa,
       width: '80',
-      render: (value) => <TextCell text={String(value || '')} />,
+      render: value => <TextCell text={String(value || '')} />,
     },
     {
       key: 'is_urgent',
       label: L.col_urgent,
       width: '50',
-      render: (value) => (
-        <span className={cn('text-sm', value ? 'text-morandi-red font-medium' : 'text-morandi-secondary')}>
+      render: value => (
+        <span
+          className={cn(
+            'text-sm',
+            value ? 'text-morandi-red font-medium' : 'text-morandi-secondary'
+          )}
+        >
           {value ? L.urgent_yes : L.urgent_no}
         </span>
       ),
@@ -82,7 +87,12 @@ export function VisasList({
           returned: 'text-morandi-secondary',
         }
         return (
-          <span className={cn('text-sm font-medium', statusColors[visa.status] || 'text-morandi-secondary')}>
+          <span
+            className={cn(
+              'text-sm font-medium',
+              statusColors[visa.status] || 'text-morandi-secondary'
+            )}
+          >
             {getVisaStatusLabel(visa.status)}
           </span>
         )
@@ -103,37 +113,37 @@ export function VisasList({
       key: 'actual_submission_date',
       label: L.col_submitted,
       width: '100',
-      render: (value) => <DateCell date={value as string | null} />,
+      render: value => <DateCell date={value as string | null} />,
     },
     {
       key: 'expected_issue_date',
       label: L.col_expected,
       width: '100',
-      render: (value) => <DateCell date={value as string | null} />,
+      render: value => <DateCell date={value as string | null} />,
     },
     {
       key: 'vendor',
       label: L.col_vendor,
       width: '100',
-      render: (value) => <TextCell text={typeof value === 'string' ? value : ''} />,
+      render: value => <TextCell text={typeof value === 'string' ? value : ''} />,
     },
     {
       key: 'documents_returned_date',
       label: L.col_returned,
       width: '100',
-      render: (value) => <DateCell date={value as string | null} />,
+      render: value => <DateCell date={value as string | null} />,
     },
     {
       key: 'fee',
       label: L.col_fee,
       width: '90',
-      render: (value) => <CurrencyCell amount={Number(value || 0)} />,
+      render: value => <CurrencyCell amount={Number(value || 0)} />,
     },
     {
       key: 'cost',
       label: L.col_cost,
       width: '90',
-      render: (value) => <CurrencyCell amount={Number(value || 0)} variant="default" />,
+      render: value => <CurrencyCell amount={Number(value || 0)} variant="default" />,
     },
   ]
 

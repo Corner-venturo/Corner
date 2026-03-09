@@ -67,7 +67,10 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string; size?: 
 }
 
 // 分類圖示映射
-const CATEGORY_ICONS: Record<ComponentCategory, React.ComponentType<{ className?: string; size?: number }>> = {
+const CATEGORY_ICONS: Record<
+  ComponentCategory,
+  React.ComponentType<{ className?: string; size?: number }>
+> = {
   cover: BookOpen,
   itinerary: Calendar,
   info: Info,
@@ -124,13 +127,17 @@ export function ComponentLibrary({ onInsertComponent, templateData }: ComponentL
         onClick={() => handleInsert(comp)}
         title={comp.description}
       >
-        <div className={cn(
-          'w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 transition-colors',
-          'bg-stone-50 group-hover:bg-stone-100'
-        )}>
-          {IconComp
-            ? <IconComp size={16} className="text-stone-600" />
-            : <LayoutTemplate size={16} className="text-stone-600" />}
+        <div
+          className={cn(
+            'w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 transition-colors',
+            'bg-stone-50 group-hover:bg-stone-100'
+          )}
+        >
+          {IconComp ? (
+            <IconComp size={16} className="text-stone-600" />
+          ) : (
+            <LayoutTemplate size={16} className="text-stone-600" />
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-sm font-medium text-morandi-primary truncate">{comp.name}</div>
@@ -167,7 +174,9 @@ export function ComponentLibrary({ onInsertComponent, templateData }: ComponentL
             // 搜尋結果
             <div className="px-2">
               {filteredComponents.length === 0 ? (
-                <p className="text-xs text-morandi-secondary text-center py-6">{DESIGNER_LABELS.NOT_FOUND_3128}</p>
+                <p className="text-xs text-morandi-secondary text-center py-6">
+                  {DESIGNER_LABELS.NOT_FOUND_3128}
+                </p>
               ) : (
                 filteredComponents.map(renderComponentItem)
               )}
@@ -185,15 +194,19 @@ export function ComponentLibrary({ onInsertComponent, templateData }: ComponentL
                     className="w-full flex items-center gap-2 px-3 py-2 hover:bg-morandi-container/30 transition-colors"
                     onClick={() => toggleCategory(cat.id)}
                   >
-                    {isExpanded ? <ChevronDown size={14} className="text-morandi-secondary" /> : <ChevronRight size={14} className="text-morandi-secondary" />}
+                    {isExpanded ? (
+                      <ChevronDown size={14} className="text-morandi-secondary" />
+                    ) : (
+                      <ChevronRight size={14} className="text-morandi-secondary" />
+                    )}
                     <CatIcon size={14} className="text-morandi-gold" />
                     <span className="text-xs font-semibold text-morandi-primary">{cat.name}</span>
-                    <span className="text-[10px] text-morandi-secondary ml-auto">{components.length}</span>
+                    <span className="text-[10px] text-morandi-secondary ml-auto">
+                      {components.length}
+                    </span>
                   </button>
                   {isExpanded && (
-                    <div className="px-2 pb-1">
-                      {components.map(renderComponentItem)}
-                    </div>
+                    <div className="px-2 pb-1">{components.map(renderComponentItem)}</div>
                   )}
                 </div>
               )

@@ -121,7 +121,16 @@ export function useEmployeeForm(onSubmit: () => void) {
         pinyin: formData.pinyin || null,
         workspace_id: targetWorkspaceId,
         supabase_user_id: authUserId, // 設定 supabase_user_id（向後相容）
-        roles: formData.roles as ('admin' | 'employee' | 'user' | 'tour_leader' | 'sales' | 'accountant' | 'assistant' | 'super_admin')[],
+        roles: formData.roles as (
+          | 'admin'
+          | 'employee'
+          | 'user'
+          | 'tour_leader'
+          | 'sales'
+          | 'accountant'
+          | 'assistant'
+          | 'super_admin'
+        )[],
         personal_info: {
           national_id: formData.personal_info.national_id,
           birth_date: formData.personal_info.birth_date,
@@ -173,15 +182,17 @@ export function useEmployeeForm(onSubmit: () => void) {
           // 將新員工加入公開頻道
           if (channels && channels.length > 0) {
             const { createChannelMember } = await import('@/data/entities/channel-members')
-            await Promise.all(channels.map(channel =>
-              createChannelMember({
-                workspace_id: targetWorkspaceId,
-                channel_id: channel.id,
-                employee_id: newEmployee.id,
-                role: 'member',
-                status: 'active',
-              })
-            ))
+            await Promise.all(
+              channels.map(channel =>
+                createChannelMember({
+                  workspace_id: targetWorkspaceId,
+                  channel_id: channel.id,
+                  employee_id: newEmployee.id,
+                  role: 'member',
+                  status: 'active',
+                })
+              )
+            )
             logger.log(`✅ 已將新員工加入 ${channels.length} 個公開頻道`)
           }
         } catch (channelError) {

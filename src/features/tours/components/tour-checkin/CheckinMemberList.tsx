@@ -13,17 +13,7 @@ export interface CheckinMember {
   checked_in_at: string | null
 }
 import { Input } from '@/components/ui/input'
-import {
-  Search,
-  RefreshCw,
-  Check,
-  X,
-  UserCheck,
-  UserX,
-  Users,
-  Loader2,
-  Clock,
-} from 'lucide-react'
+import { Search, RefreshCw, Check, X, UserCheck, UserX, Users, Loader2, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { COMP_TOURS_LABELS, CHECKIN_MEMBER_LIST_LABELS } from '../../constants/labels'
 
@@ -108,13 +98,7 @@ export function CheckinMemberList({
           <Users size={16} />
           {CHECKIN_MEMBER_LIST_LABELS.報到名單}
         </h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onRefresh}
-          disabled={loading}
-          className="gap-1"
-        >
+        <Button variant="ghost" size="sm" onClick={onRefresh} disabled={loading} className="gap-1">
           <RefreshCw size={14} className={cn(loading && 'animate-spin')} />
           {CHECKIN_MEMBER_LIST_LABELS.重新整理}
         </Button>
@@ -163,7 +147,10 @@ export function CheckinMemberList({
 
         {/* 搜尋 */}
         <div className="relative flex-1 max-w-xs">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-muted" />
+          <Search
+            size={14}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-muted"
+          />
           <Input
             placeholder={COMP_TOURS_LABELS.搜尋團員}
             value={searchQuery}

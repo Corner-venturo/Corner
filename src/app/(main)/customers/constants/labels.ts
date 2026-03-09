@@ -261,7 +261,8 @@ export const CUSTOMER_PASSPORT_UPLOAD_LABELS = {
   CONFIRMED_UPDATE: (count: number) => `\n更新 ${count} 位客戶護照資料`,
   SKIPPED: (count: number) => `\n跳過 ${count} 位客戶（使用者取消）`,
   SKIPPED_DUPLICATE: (count: number) => `\n跳過 ${count} 筆重複護照`,
-  VERIFY_REMINDER: '\n\n重要提醒：\n• 所有 OCR 辨識的資料已標記為「待驗證」\n• 請務必人工檢查護照資訊',
+  VERIFY_REMINDER:
+    '\n\n重要提醒：\n• 所有 OCR 辨識的資料已標記為「待驗證」\n• 請務必人工檢查護照資訊',
   FAILED_ITEMS: (items: string) => `\n\n失敗項目：\n${items}`,
   BATCH_FAILED_PREFIX: '批次上傳失敗：',
   UNKNOWN_ERROR: '未知錯誤',
@@ -330,8 +331,7 @@ export const CUSTOMER_IMPORT_LABELS = {
   error_no_data_to_import: '沒有可匯入的資料',
   // Messages
   msg_import_success: (count: number) => `成功匯入 ${count} 位顧客`,
-  msg_import_partial: (success: number, total: number) =>
-    `匯入完成：${success}/${total} 筆成功`,
+  msg_import_partial: (success: number, total: number) => `匯入完成：${success}/${total} 筆成功`,
   msg_import_failed: '匯入失敗，請稍後再試',
   msg_duplicate_passport: (passport: string) => `護照號碼 ${passport} 已存在`,
   msg_duplicate_phone: (phone: string) => `電話 ${phone} 已存在`,
@@ -346,4 +346,4 @@ export const CUSTOMER_IMPORT_LABELS = {
 export const CUSTOMER_LOGGER = {
   IMPORT_PARSE_FAILED: 'Customer import parsing failed',
   IMPORT_BATCH_FAILED: 'Customer batch import failed',
-};
+}

@@ -14,7 +14,8 @@ import type {
 } from './types'
 
 // Gemini API 設定
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent'
+const GEMINI_API_URL =
+  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent'
 
 // 多 API Key 輪替
 const GEMINI_API_KEYS = [
@@ -55,12 +56,12 @@ const STYLE_DESCRIPTIONS: Record<ItineraryStyle, string> = {
 }
 
 interface GeminiItineraryRequest {
-  destination: string        // 目的地名稱
-  countryName?: string       // 國家名稱
+  destination: string // 目的地名稱
+  countryName?: string // 國家名稱
   numDays: number
   departureDate: string
-  arrivalTime: string        // 抵達時間 HH:mm
-  departureTime: string      // 離開時間 HH:mm
+  arrivalTime: string // 抵達時間 HH:mm
+  departureTime: string // 離開時間 HH:mm
   style?: ItineraryStyle
   accommodations?: AccommodationPlan[]
 }
@@ -181,17 +182,18 @@ function parseGeminiResponse(text: string): DailyItineraryDay[] | null {
           }))
         : []
 
-      const meals: DailyMeals = day.meals && typeof day.meals === 'object'
-        ? {
-            breakfast: String((day.meals as Record<string, unknown>).breakfast || '飯店內享用'),
-            lunch: String((day.meals as Record<string, unknown>).lunch || '當地特色餐廳'),
-            dinner: String((day.meals as Record<string, unknown>).dinner || '當地特色餐廳'),
-          }
-        : {
-            breakfast: '飯店內享用',
-            lunch: '當地特色餐廳',
-            dinner: '當地特色餐廳',
-          }
+      const meals: DailyMeals =
+        day.meals && typeof day.meals === 'object'
+          ? {
+              breakfast: String((day.meals as Record<string, unknown>).breakfast || '飯店內享用'),
+              lunch: String((day.meals as Record<string, unknown>).lunch || '當地特色餐廳'),
+              dinner: String((day.meals as Record<string, unknown>).dinner || '當地特色餐廳'),
+            }
+          : {
+              breakfast: '飯店內享用',
+              lunch: '當地特色餐廳',
+              dinner: '當地特色餐廳',
+            }
 
       return {
         dayLabel: String(day.dayLabel || `Day ${parsed.dailyItinerary.indexOf(day) + 1}`),
@@ -243,7 +245,9 @@ export async function generateItineraryWithGemini(
     }
 
     triedKeys++
-    logger.log(`[Gemini Itinerary] 嘗試 key ${apiKey.slice(-6)}... (${triedKeys}/${GEMINI_API_KEYS.length})`)
+    logger.log(
+      `[Gemini Itinerary] 嘗試 key ${apiKey.slice(-6)}... (${triedKeys}/${GEMINI_API_KEYS.length})`
+    )
 
     try {
       const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
@@ -261,10 +265,15 @@ export async function generateItineraryWithGemini(
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        const errorMessage = (errorData as { error?: { message?: string } }).error?.message || 'Unknown error'
+        const errorMessage =
+          (errorData as { error?: { message?: string } }).error?.message || 'Unknown error'
 
         // 配額錯誤，換下一個 key
-        if (response.status === 429 || errorMessage.includes('quota') || errorMessage.includes('RESOURCE_EXHAUSTED')) {
+        if (
+          response.status === 429 ||
+          errorMessage.includes('quota') ||
+          errorMessage.includes('RESOURCE_EXHAUSTED')
+        ) {
           markKeyAsBlocked(apiKey, 60)
           lastError = errorMessage
           continue
@@ -303,7 +312,6 @@ export async function generateItineraryWithGemini(
         success: true,
         dailyItinerary,
       }
-
     } catch (error) {
       lastError = error instanceof Error ? error.message : 'Request failed'
       logger.error('[Gemini Itinerary] 請求失敗:', error)

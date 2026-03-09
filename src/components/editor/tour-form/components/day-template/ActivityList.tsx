@@ -95,8 +95,14 @@ export function ActivityList({
     return (
       <div className="space-y-2">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_2716}</span>
-          <button type="button" onClick={addActivity} className="text-xs text-[#c76d54] hover:underline flex items-center gap-1">
+          <span className="text-sm font-medium text-morandi-secondary">
+            {COMP_EDITOR_LABELS.LABEL_2716}
+          </span>
+          <button
+            type="button"
+            onClick={addActivity}
+            className="text-xs text-[#c76d54] hover:underline flex items-center gap-1"
+          >
             <Plus size={12} /> {COMP_EDITOR_LABELS.新增}
           </button>
         </div>

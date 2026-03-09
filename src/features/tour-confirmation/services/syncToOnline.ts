@@ -1,8 +1,8 @@
 /**
  * 同步行程到 Online App
- * 
+ *
  * 當確認單交接時呼叫，將行程資料同步到 online_trips 表
- * 
+ *
  * online_trips 表已建立，types 已更新
  */
 
@@ -77,7 +77,9 @@ export async function syncTripToOnline(tourId: string): Promise<SyncResult> {
     // 1. 取得旅遊團資料
     const { data: tour, error: tourError } = await supabase
       .from('tours')
-      .select('workspace_id, code, name, departure_date, return_date, location, outbound_flight, return_flight')
+      .select(
+        'workspace_id, code, name, departure_date, return_date, location, outbound_flight, return_flight'
+      )
       .eq('id', tourId)
       .single()
 
@@ -206,22 +208,16 @@ export async function syncTripToOnline(tourId: string): Promise<SyncResult> {
  * 同步團員到 Online（含分車分房資料）
  */
 async function syncTripMembers(
-  tourId: string, 
+  tourId: string,
   onlineTripId: string,
   leaderInfo: LeaderInfo | null
 ): Promise<void> {
   try {
     // 1. 先清除舊的成員資料（避免重複）
-    await untypedSupabase
-      .from('online_trip_members')
-      .delete()
-      .eq('trip_id', onlineTripId)
+    await untypedSupabase.from('online_trip_members').delete().eq('trip_id', onlineTripId)
 
     // 2. 取得該團的所有訂單
-    const { data: orders } = await supabase
-      .from('orders')
-      .select('id')
-      .eq('tour_id', tourId)
+    const { data: orders } = await supabase.from('orders').select('id').eq('tour_id', tourId)
 
     if (!orders || orders.length === 0) {
       // 只同步領隊
@@ -242,7 +238,9 @@ async function syncTripMembers(
     // 3. 取得所有訂單成員
     const { data: orderMembers } = await supabase
       .from('order_members')
-      .select('id, chinese_name, passport_name, member_type, special_meal, remarks, checked_in, checked_in_at')
+      .select(
+        'id, chinese_name, passport_name, member_type, special_meal, remarks, checked_in, checked_in_at'
+      )
       .in('order_id', orderIds)
 
     if (!orderMembers || orderMembers.length === 0) {
@@ -277,7 +275,10 @@ async function syncTripMembers(
       }
     }
 
-    const roomMap = new Map<string, { room_number: string; room_type?: string; roommates: string[] }>()
+    const roomMap = new Map<
+      string,
+      { room_number: string; room_type?: string; roommates: string[] }
+    >()
     if (roomAssignments) {
       // 先按房間分組，找出同房人
       const roomGroups = new Map<string, string[]>()

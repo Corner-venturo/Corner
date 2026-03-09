@@ -129,7 +129,7 @@ export function ShareOrdersDialog({ channelId, open, onClose, onSuccess }: Share
   }
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Dialog open={open} onOpenChange={isOpen => !isOpen && onClose()}>
       <DialogContent level={1} className="max-w-[900px] max-h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader className="pb-3 border-b border-morandi-gold/20">
           <DialogTitle className="flex items-center gap-2">
@@ -159,7 +159,9 @@ export function ShareOrdersDialog({ channelId, open, onClose, onSuccess }: Share
         <div className="flex-1 overflow-y-auto">
           {filteredOrders.length === 0 ? (
             <div className="text-center py-8 text-morandi-secondary">
-              {searchQuery ? COMP_WORKSPACE_LABELS.沒有符合搜尋條件的訂單 : COMP_WORKSPACE_LABELS.目前沒有待收款訂單}
+              {searchQuery
+                ? COMP_WORKSPACE_LABELS.沒有符合搜尋條件的訂單
+                : COMP_WORKSPACE_LABELS.目前沒有待收款訂單}
             </div>
           ) : (
             <table className="w-full">
@@ -189,7 +191,8 @@ export function ShareOrdersDialog({ channelId, open, onClose, onSuccess }: Share
               <tbody>
                 {filteredOrders.map(order => {
                   const isSelected = selectedOrders.has(order.id)
-                  const isFullyUnpaid = (order.total_amount || 0) > 0 && (order.paid_amount || 0) === 0
+                  const isFullyUnpaid =
+                    (order.total_amount || 0) > 0 && (order.paid_amount || 0) === 0
                   const isLowRate = order.collectionRate < 30
 
                   return (
@@ -222,7 +225,11 @@ export function ShareOrdersDialog({ channelId, open, onClose, onSuccess }: Share
                         <CurrencyCell amount={order.paid_amount || 0} className="justify-end" />
                       </td>
                       <td className="py-2 px-2 text-sm text-right">
-                        <CurrencyCell amount={order.gap} variant="expense" className="justify-end font-semibold" />
+                        <CurrencyCell
+                          amount={order.gap}
+                          variant="expense"
+                          className="justify-end font-semibold"
+                        />
                       </td>
                       <td className="py-2 px-2 text-center">
                         {isFullyUnpaid ? (
@@ -256,12 +263,21 @@ export function ShareOrdersDialog({ channelId, open, onClose, onSuccess }: Share
               {COMP_WORKSPACE_LABELS.LABEL_3592}
             </div>
             <div className="text-right">
-              <div className="text-xs text-morandi-secondary">{COMP_WORKSPACE_LABELS.TOTAL_4384}</div>
-              <CurrencyCell amount={selectedStats.totalGap} variant="expense" className="text-lg font-semibold" />
+              <div className="text-xs text-morandi-secondary">
+                {COMP_WORKSPACE_LABELS.TOTAL_4384}
+              </div>
+              <CurrencyCell
+                amount={selectedStats.totalGap}
+                variant="expense"
+                className="text-lg font-semibold"
+              />
             </div>
           </div>
           <div className="flex gap-2 justify-end w-full">
-            <button className="btn-morandi-secondary !py-2 !px-4 flex items-center gap-2" onClick={onClose}>
+            <button
+              className="btn-morandi-secondary !py-2 !px-4 flex items-center gap-2"
+              onClick={onClose}
+            >
               <X size={16} />
               {COMP_WORKSPACE_LABELS.CANCEL}
             </button>

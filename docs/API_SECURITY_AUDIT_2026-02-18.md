@@ -11,11 +11,13 @@
 ## 修復的 Bug
 
 ### 1. `cron/ticket-status` → `bot/ticket-status` Header 不匹配 🔴
+
 - **問題：** `cron/ticket-status` 發送 `authorization` header，但 `bot/ticket-status` 檢查的是 `x-bot-secret`
 - **影響：** Cron 呼叫 bot API 時認證永遠失敗
 - **修復：** 改為發送 `x-bot-secret` header
 
 ### 2. `auth/get-employee-data` 缺少 try-catch 🟡
+
 - **問題：** 整個 POST handler 沒有 try-catch，且引入了未使用的 `withAuth`
 - **修復：** 加上 try-catch + 移除未使用的 import
 
@@ -25,62 +27,62 @@
 
 ### ✅ 需要認證（getServerAuth / withAuth）的路由
 
-| 路由 | 方法 | 認證方式 | Rate Limit | Zod 驗證 |
-|------|------|----------|------------|----------|
-| `/api/ai/edit-image` | POST | getServerAuth | API usage limit | ✅ |
-| `/api/ai/suggest-attraction` | POST | getServerAuth | API usage limit | ✅ |
-| `/api/auth/admin-reset-password` | POST | getServerAuth + admin check | ✅ 5/min | ✅ |
-| `/api/auth/create-employee-auth` | POST | getServerAuth | ❌ | ✅ |
-| `/api/auth/reset-employee-password` | POST | getServerAuth | ❌ | ✅ |
-| `/api/fetch-image` | POST | getServerAuth | ❌ | ✅ |
-| `/api/gemini/generate-image` | POST | getServerAuth | ❌ | ✅ |
-| `/api/health/detailed` | GET | session check | ❌ | N/A |
-| `/api/itineraries/generate` | POST | getServerAuth | ❌ | ✅ |
-| `/api/linkpay` | POST | getServerAuth | ✅ | ✅ |
-| `/api/log-error` | POST | getServerAuth | ❌ | ✅ |
-| `/api/logan/chat` | POST | getServerAuth | ❌ | ✅ |
-| `/api/ocr/passport` | POST | getServerAuth | ❌ | N/A (FormData) |
-| `/api/ocr/passport/batch-reprocess` | GET/POST | getServerAuth | ❌ | ✅ (POST) |
-| `/api/proposals/convert-to-tour` | POST | getServerAuth | ❌ | ✅ |
-| `/api/quotes/confirmation/logs` | GET | getServerAuth | ❌ | N/A |
-| `/api/quotes/confirmation/revoke` | POST | getServerAuth | ❌ | ✅ |
-| `/api/quotes/confirmation/send` | POST | getServerAuth | ❌ | ✅ |
-| `/api/quotes/confirmation/staff` | POST | getServerAuth | ❌ | ✅ |
-| `/api/settings/env` | GET | getServerAuth | ❌ | N/A |
-| `/api/storage/upload` | POST/DELETE | getServerAuth | ❌ | N/A (FormData) |
-| `/api/travel-invoice/allowance` | POST | getServerAuth | ❌ | ✅ |
-| `/api/travel-invoice/batch-issue` | POST | getServerAuth | ❌ | ✅ |
-| `/api/travel-invoice/issue` | POST | getServerAuth | ❌ | ✅ |
-| `/api/travel-invoice/orders` | GET | getServerAuth | ❌ | N/A |
-| `/api/travel-invoice/query` | GET | getServerAuth | ❌ | N/A |
-| `/api/travel-invoice/void` | POST | getServerAuth | ❌ | ✅ |
-| `/api/traveler-chat` | GET/POST | getServerAuth | ❌ | ✅ (POST) |
-| `/api/traveler-chat/[id]` | GET | getServerAuth | ❌ | N/A |
-| `/api/workspaces/.../members` | GET/POST/DELETE | getServerAuth + workspace check | ❌ | ✅ (POST/DELETE) |
+| 路由                                | 方法            | 認證方式                        | Rate Limit      | Zod 驗證         |
+| ----------------------------------- | --------------- | ------------------------------- | --------------- | ---------------- |
+| `/api/ai/edit-image`                | POST            | getServerAuth                   | API usage limit | ✅               |
+| `/api/ai/suggest-attraction`        | POST            | getServerAuth                   | API usage limit | ✅               |
+| `/api/auth/admin-reset-password`    | POST            | getServerAuth + admin check     | ✅ 5/min        | ✅               |
+| `/api/auth/create-employee-auth`    | POST            | getServerAuth                   | ❌              | ✅               |
+| `/api/auth/reset-employee-password` | POST            | getServerAuth                   | ❌              | ✅               |
+| `/api/fetch-image`                  | POST            | getServerAuth                   | ❌              | ✅               |
+| `/api/gemini/generate-image`        | POST            | getServerAuth                   | ❌              | ✅               |
+| `/api/health/detailed`              | GET             | session check                   | ❌              | N/A              |
+| `/api/itineraries/generate`         | POST            | getServerAuth                   | ❌              | ✅               |
+| `/api/linkpay`                      | POST            | getServerAuth                   | ✅              | ✅               |
+| `/api/log-error`                    | POST            | getServerAuth                   | ❌              | ✅               |
+| `/api/logan/chat`                   | POST            | getServerAuth                   | ❌              | ✅               |
+| `/api/ocr/passport`                 | POST            | getServerAuth                   | ❌              | N/A (FormData)   |
+| `/api/ocr/passport/batch-reprocess` | GET/POST        | getServerAuth                   | ❌              | ✅ (POST)        |
+| `/api/proposals/convert-to-tour`    | POST            | getServerAuth                   | ❌              | ✅               |
+| `/api/quotes/confirmation/logs`     | GET             | getServerAuth                   | ❌              | N/A              |
+| `/api/quotes/confirmation/revoke`   | POST            | getServerAuth                   | ❌              | ✅               |
+| `/api/quotes/confirmation/send`     | POST            | getServerAuth                   | ❌              | ✅               |
+| `/api/quotes/confirmation/staff`    | POST            | getServerAuth                   | ❌              | ✅               |
+| `/api/settings/env`                 | GET             | getServerAuth                   | ❌              | N/A              |
+| `/api/storage/upload`               | POST/DELETE     | getServerAuth                   | ❌              | N/A (FormData)   |
+| `/api/travel-invoice/allowance`     | POST            | getServerAuth                   | ❌              | ✅               |
+| `/api/travel-invoice/batch-issue`   | POST            | getServerAuth                   | ❌              | ✅               |
+| `/api/travel-invoice/issue`         | POST            | getServerAuth                   | ❌              | ✅               |
+| `/api/travel-invoice/orders`        | GET             | getServerAuth                   | ❌              | N/A              |
+| `/api/travel-invoice/query`         | GET             | getServerAuth                   | ❌              | N/A              |
+| `/api/travel-invoice/void`          | POST            | getServerAuth                   | ❌              | ✅               |
+| `/api/traveler-chat`                | GET/POST        | getServerAuth                   | ❌              | ✅ (POST)        |
+| `/api/traveler-chat/[id]`           | GET             | getServerAuth                   | ❌              | N/A              |
+| `/api/workspaces/.../members`       | GET/POST/DELETE | getServerAuth + workspace check | ❌              | ✅ (POST/DELETE) |
 
 ### 🔑 特殊認證（Secret / Token）
 
-| 路由 | 方法 | 認證方式 | 備註 |
-|------|------|----------|------|
-| `/api/auth/sync-employee` | POST | access_token 或 session | 驗證 user ID 匹配 |
-| `/api/bot-notification` | POST | BOT_API_SECRET (x-bot-secret) | dev 環境可跳過 |
-| `/api/bot/ticket-status` | GET/POST/PATCH | BOT_API_SECRET (x-bot-secret) | dev 環境可跳過 |
-| `/api/cron/process-tasks` | GET/POST | CRON_SECRET (Bearer) | 未設定時可跳過 |
-| `/api/cron/sync-logan-knowledge` | GET | CRON_SECRET (Bearer) | 未設定時可跳過 |
-| `/api/cron/ticket-status` | GET | CRON_SECRET (Bearer) | 未設定時可跳過 |
-| `/api/linkpay/webhook` | POST | MAC 簽名驗證 | 台新銀行 webhook |
+| 路由                             | 方法           | 認證方式                      | 備註              |
+| -------------------------------- | -------------- | ----------------------------- | ----------------- |
+| `/api/auth/sync-employee`        | POST           | access_token 或 session       | 驗證 user ID 匹配 |
+| `/api/bot-notification`          | POST           | BOT_API_SECRET (x-bot-secret) | dev 環境可跳過    |
+| `/api/bot/ticket-status`         | GET/POST/PATCH | BOT_API_SECRET (x-bot-secret) | dev 環境可跳過    |
+| `/api/cron/process-tasks`        | GET/POST       | CRON_SECRET (Bearer)          | 未設定時可跳過    |
+| `/api/cron/sync-logan-knowledge` | GET            | CRON_SECRET (Bearer)          | 未設定時可跳過    |
+| `/api/cron/ticket-status`        | GET            | CRON_SECRET (Bearer)          | 未設定時可跳過    |
+| `/api/linkpay/webhook`           | POST           | MAC 簽名驗證                  | 台新銀行 webhook  |
 
 ### 🌐 公開端點（不需認證）
 
-| 路由 | 方法 | 理由 | Rate Limit |
-|------|------|------|------------|
-| `/api/health` | GET | 公開健康檢查，僅回傳 healthy/unhealthy | ❌ |
-| `/api/auth/validate-login` | POST | 登入驗證 | ✅ 10/min |
-| `/api/auth/change-password` | POST | 需當前密碼驗證 | ✅ 5/min |
-| `/api/auth/get-employee-data` | POST | 登入後取資料（需 username+code） | ❌ |
-| `/api/quotes/confirmation/customer` | GET/POST | 客戶確認報價（需 token） | ❌ |
-| `/api/itineraries/[id]` | GET | 公開行程分享頁 | ❌ |
-| `/api/logan/chat` | GET | 僅回傳 AI 可用狀態 | ❌ |
+| 路由                                | 方法     | 理由                                   | Rate Limit |
+| ----------------------------------- | -------- | -------------------------------------- | ---------- |
+| `/api/health`                       | GET      | 公開健康檢查，僅回傳 healthy/unhealthy | ❌         |
+| `/api/auth/validate-login`          | POST     | 登入驗證                               | ✅ 10/min  |
+| `/api/auth/change-password`         | POST     | 需當前密碼驗證                         | ✅ 5/min   |
+| `/api/auth/get-employee-data`       | POST     | 登入後取資料（需 username+code）       | ❌         |
+| `/api/quotes/confirmation/customer` | GET/POST | 客戶確認報價（需 token）               | ❌         |
+| `/api/itineraries/[id]`             | GET      | 公開行程分享頁                         | ❌         |
+| `/api/logan/chat`                   | GET      | 僅回傳 AI 可用狀態                     | ❌         |
 
 ---
 

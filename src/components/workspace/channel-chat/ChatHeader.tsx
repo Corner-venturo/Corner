@@ -5,7 +5,14 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Badge } from '@/components/ui/badge'
-import { Users, MapPin, CircleDollarSign, ExternalLink, MessageCircle, Megaphone } from 'lucide-react'
+import {
+  Users,
+  MapPin,
+  CircleDollarSign,
+  ExternalLink,
+  MessageCircle,
+  Megaphone,
+} from 'lucide-react'
 import { useQuotes } from '@/data'
 import { cn } from '@/lib/utils'
 import type { ChatMode, TravelerConversationType } from './useTravelerMode'
@@ -126,7 +133,8 @@ export function ChatHeader({
       {tourId && (
         <Button
           variant="ghost"
-          size="icon" aria-label="Button"
+          size="icon"
+          aria-label="Button"
           className="w-8 h-8 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10"
           onClick={() => router.push(`/tours?highlight=${tourId}`)}
           title={COMP_WORKSPACE_LABELS.前往旅遊團詳情}
@@ -141,7 +149,8 @@ export function ChatHeader({
           <PopoverTrigger asChild>
             <Button
               variant="ghost"
-              size="icon" aria-label="Button"
+              size="icon"
+              aria-label="Button"
               className="w-8 h-8 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10 relative"
               title={COMP_WORKSPACE_LABELS.關聯報價單}
             >
@@ -154,7 +163,9 @@ export function ChatHeader({
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-64 p-2" align="end">
-            <div className="text-sm font-medium text-morandi-primary mb-2">{COMP_WORKSPACE_LABELS.關聯報價單}</div>
+            <div className="text-sm font-medium text-morandi-primary mb-2">
+              {COMP_WORKSPACE_LABELS.關聯報價單}
+            </div>
             {linkedQuotes.length > 0 ? (
               <div className="space-y-1">
                 {linkedQuotes.map(quote => (
@@ -174,7 +185,9 @@ export function ChatHeader({
                       <div className="flex items-center gap-2">
                         <span className="font-mono text-xs text-morandi-gold">{quote.code}</span>
                         <span className="text-sm text-morandi-text truncate">
-                          {stripHtml(quote.name) || stripHtml(quote.destination) || COMP_WORKSPACE_LABELS.未命名}
+                          {stripHtml(quote.name) ||
+                            stripHtml(quote.destination) ||
+                            COMP_WORKSPACE_LABELS.未命名}
                         </span>
                       </div>
                       {quote.total_cost && (
@@ -196,7 +209,13 @@ export function ChatHeader({
         </Popover>
       )}
 
-      <Button variant="ghost" size="icon" aria-label="Toggle menu" className="w-8 h-8" onClick={onToggleMemberSidebar}>
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label="Toggle menu"
+        className="w-8 h-8"
+        onClick={onToggleMemberSidebar}
+      >
         <Users size={16} />
       </Button>
     </div>

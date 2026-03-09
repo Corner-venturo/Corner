@@ -14,9 +14,8 @@ const localStorageMock = {
   removeItem: vi.fn(),
   clear: vi.fn(),
 }
- 
+
 ;(global as any).localStorage = localStorageMock
 
 // Mock IndexedDB
- 
 ;(global as any).indexedDB = {}

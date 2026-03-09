@@ -4,7 +4,6 @@
  * 可選擇：新建旅遊團 / 關聯現有旅遊團
  */
 
-
 import React, { useState, useMemo, useEffect } from 'react'
 import {
   Dialog,
@@ -14,17 +13,10 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import {
-  Plus,
-  Link,
-  Loader2,
-  MapPin,
-  Calendar,
-  Plane,
-} from 'lucide-react'
+import { Plus, Link, Loader2, MapPin, Calendar, Plane } from 'lucide-react'
 import { useToursSlim, invalidateTours } from '@/data'
 import type { Tour } from '@/stores/types'
-import { LINK_TOUR_DIALOG_LABELS } from '../constants/labels';
+import { LINK_TOUR_DIALOG_LABELS } from '../constants/labels'
 
 interface LinkTourDialogProps {
   isOpen: boolean
@@ -82,9 +74,7 @@ export function LinkTourDialog({
           <>
             <DialogHeader>
               <DialogTitle>{LINK_TOUR_DIALOG_LABELS.LABEL_2010}</DialogTitle>
-              <DialogDescription>
-                {LINK_TOUR_DIALOG_LABELS.PLEASE_SELECT_1147}
-              </DialogDescription>
+              <DialogDescription>{LINK_TOUR_DIALOG_LABELS.PLEASE_SELECT_1147}</DialogDescription>
             </DialogHeader>
 
             <div className="space-y-3 mt-4">
@@ -97,8 +87,12 @@ export function LinkTourDialog({
                   <Plus className="w-5 h-5 text-[var(--morandi-gold)]" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-[var(--morandi-primary)]">{LINK_TOUR_DIALOG_LABELS.LABEL_8984}</div>
-                  <div className="text-sm text-[var(--morandi-secondary)]">{LINK_TOUR_DIALOG_LABELS.LABEL_6874}</div>
+                  <div className="font-medium text-[var(--morandi-primary)]">
+                    {LINK_TOUR_DIALOG_LABELS.LABEL_8984}
+                  </div>
+                  <div className="text-sm text-[var(--morandi-secondary)]">
+                    {LINK_TOUR_DIALOG_LABELS.LABEL_6874}
+                  </div>
                 </div>
               </button>
 
@@ -119,7 +113,9 @@ export function LinkTourDialog({
                       </span>
                     )}
                   </div>
-                  <div className="text-sm text-[var(--morandi-secondary)]">{LINK_TOUR_DIALOG_LABELS.SELECT_2369}</div>
+                  <div className="text-sm text-[var(--morandi-secondary)]">
+                    {LINK_TOUR_DIALOG_LABELS.SELECT_2369}
+                  </div>
                 </div>
               </button>
             </div>
@@ -136,16 +132,16 @@ export function LinkTourDialog({
                 </button>
                 {LINK_TOUR_DIALOG_LABELS.SELECT_448}
               </DialogTitle>
-              <DialogDescription>
-                {LINK_TOUR_DIALOG_LABELS.SELECT_4490}
-              </DialogDescription>
+              <DialogDescription>{LINK_TOUR_DIALOG_LABELS.SELECT_4490}</DialogDescription>
             </DialogHeader>
 
             <div className="mt-4">
               {loadingTours ? (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="w-5 h-5 animate-spin text-[var(--morandi-secondary)]" />
-                  <span className="ml-2 text-sm text-[var(--morandi-secondary)]">{LINK_TOUR_DIALOG_LABELS.LOADING_6912}</span>
+                  <span className="ml-2 text-sm text-[var(--morandi-secondary)]">
+                    {LINK_TOUR_DIALOG_LABELS.LOADING_6912}
+                  </span>
                 </div>
               ) : availableTours.length > 0 ? (
                 <div className="max-h-[300px] overflow-y-auto space-y-2">
@@ -160,7 +156,9 @@ export function LinkTourDialog({
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-sm text-[var(--morandi-gold)]">{tour.code}</span>
+                          <span className="font-mono text-sm text-[var(--morandi-gold)]">
+                            {tour.code}
+                          </span>
                           <span className="font-medium text-[var(--morandi-text)] truncate">
                             {tour.name || LINK_TOUR_DIALOG_LABELS.未命名旅遊團}
                           </span>
@@ -191,8 +189,12 @@ export function LinkTourDialog({
               ) : (
                 <div className="text-center py-8">
                   <Plane className="w-10 h-10 text-[var(--morandi-secondary)]/30 mx-auto mb-3" />
-                  <p className="text-sm text-[var(--morandi-secondary)]">{LINK_TOUR_DIALOG_LABELS.NOT_FOUND_3707}</p>
-                  <p className="text-xs text-[var(--morandi-secondary)]/70 mt-1">{LINK_TOUR_DIALOG_LABELS.PLEASE_SELECT_8035}</p>
+                  <p className="text-sm text-[var(--morandi-secondary)]">
+                    {LINK_TOUR_DIALOG_LABELS.NOT_FOUND_3707}
+                  </p>
+                  <p className="text-xs text-[var(--morandi-secondary)]/70 mt-1">
+                    {LINK_TOUR_DIALOG_LABELS.PLEASE_SELECT_8035}
+                  </p>
                 </div>
               )}
             </div>

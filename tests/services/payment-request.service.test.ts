@@ -123,9 +123,7 @@ describe('PaymentRequestService', () => {
         { id: 'item-2', request_id: 'request-1', description: '住宿' },
       ]
 
-      mockFromImplementation.mockReturnValue(
-        createMockChain({ data: mockItems, error: null })
-      )
+      mockFromImplementation.mockReturnValue(createMockChain({ data: mockItems, error: null }))
 
       const result = await paymentRequestService.getItemsByRequestIdAsync('request-1')
 
@@ -138,8 +136,7 @@ describe('PaymentRequestService', () => {
         createMockChain({ data: null, error: { message: '資料庫錯誤' } })
       )
 
-      await expect(paymentRequestService.getItemsByRequestIdAsync('request-1'))
-        .rejects.toThrow()
+      await expect(paymentRequestService.getItemsByRequestIdAsync('request-1')).rejects.toThrow()
     })
   })
 
@@ -150,9 +147,7 @@ describe('PaymentRequestService', () => {
         createMockRequest({ id: 'request-2', status: 'pending' }),
       ]
 
-      mockFromImplementation.mockReturnValue(
-        createMockChain({ data: mockRequests, error: null })
-      )
+      mockFromImplementation.mockReturnValue(createMockChain({ data: mockRequests, error: null }))
 
       const result = await paymentRequestService.getPendingRequests()
 
@@ -163,13 +158,9 @@ describe('PaymentRequestService', () => {
 
   describe('getRequestsByTour', () => {
     it('should return requests for a specific tour', async () => {
-      const mockRequests = [
-        createMockRequest({ id: 'request-1', tour_id: 'tour-1' }),
-      ]
+      const mockRequests = [createMockRequest({ id: 'request-1', tour_id: 'tour-1' })]
 
-      mockFromImplementation.mockReturnValue(
-        createMockChain({ data: mockRequests, error: null })
-      )
+      mockFromImplementation.mockReturnValue(createMockChain({ data: mockRequests, error: null }))
 
       const result = await paymentRequestService.getRequestsByTour('tour-1')
 
@@ -178,9 +169,7 @@ describe('PaymentRequestService', () => {
     })
 
     it('should return empty array when no requests found', async () => {
-      mockFromImplementation.mockReturnValue(
-        createMockChain({ data: [], error: null })
-      )
+      mockFromImplementation.mockReturnValue(createMockChain({ data: [], error: null }))
 
       const result = await paymentRequestService.getRequestsByTour('non-existent')
 
@@ -190,13 +179,9 @@ describe('PaymentRequestService', () => {
 
   describe('getRequestsByOrder', () => {
     it('should return requests for a specific order', async () => {
-      const mockRequests = [
-        createMockRequest({ id: 'request-1', order_id: 'order-1' }),
-      ]
+      const mockRequests = [createMockRequest({ id: 'request-1', order_id: 'order-1' })]
 
-      mockFromImplementation.mockReturnValue(
-        createMockChain({ data: mockRequests, error: null })
-      )
+      mockFromImplementation.mockReturnValue(createMockChain({ data: mockRequests, error: null }))
 
       const result = await paymentRequestService.getRequestsByOrder('order-1')
 
@@ -206,13 +191,9 @@ describe('PaymentRequestService', () => {
 
   describe('getItemsByCategory', () => {
     it('should return items filtered by category', async () => {
-      const mockItems = [
-        { id: 'item-1', request_id: 'request-1', category: 'transportation' },
-      ]
+      const mockItems = [{ id: 'item-1', request_id: 'request-1', category: 'transportation' }]
 
-      mockFromImplementation.mockReturnValue(
-        createMockChain({ data: mockItems, error: null })
-      )
+      mockFromImplementation.mockReturnValue(createMockChain({ data: mockItems, error: null }))
 
       const result = await paymentRequestService.getItemsByCategory('request-1', 'transportation')
 

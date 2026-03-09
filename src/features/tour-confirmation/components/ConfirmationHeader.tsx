@@ -12,23 +12,14 @@ import { CONFIRM_HEADER_LABELS } from '../constants/labels'
  */
 
 import { useState } from 'react'
-import {
-  Calendar,
-  Users,
-  Plane,
-  User,
-  Briefcase,
-  Edit2,
-  Save,
-  X,
-} from 'lucide-react'
+import { Calendar, Users, Plane, User, Briefcase, Edit2, Save, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import type { Tour } from '@/stores/types'
 import type { TourConfirmationSheet } from '@/types/tour-confirmation-sheet.types'
-import { CONFIRMATION_HEADER_LABELS } from '../constants/labels';
+import { CONFIRMATION_HEADER_LABELS } from '../constants/labels'
 import { formatDateTW } from '@/lib/utils/format-date'
 
 interface ConfirmationHeaderProps {
@@ -38,12 +29,7 @@ interface ConfirmationHeaderProps {
   saving: boolean
 }
 
-export function ConfirmationHeader({
-  sheet,
-  tour,
-  onUpdate,
-  saving,
-}: ConfirmationHeaderProps) {
+export function ConfirmationHeader({ sheet, tour, onUpdate, saving }: ConfirmationHeaderProps) {
   const [editing, setEditing] = useState(false)
   const [formData, setFormData] = useState({
     tour_leader_name: sheet?.tour_leader_name || '',
@@ -74,7 +60,10 @@ export function ConfirmationHeader({
   }
 
   const getStatusLabel = (status: string) => {
-    const statusMap: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
+    const statusMap: Record<
+      string,
+      { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }
+    > = {
       draft: { label: CONFIRMATION_HEADER_LABELS.草稿, variant: 'secondary' },
       confirmed: { label: CONFIRMATION_HEADER_LABELS.已確認, variant: 'default' },
       in_progress: { label: CONFIRMATION_HEADER_LABELS.執行中, variant: 'outline' },
@@ -119,12 +108,7 @@ export function ConfirmationHeader({
               </Button>
             </>
           ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setEditing(true)}
-              className="gap-1"
-            >
+            <Button variant="outline" size="sm" onClick={() => setEditing(true)} className="gap-1">
               <Edit2 size={14} />
               {CONFIRM_HEADER_LABELS.EDIT}
             </Button>
@@ -137,19 +121,21 @@ export function ConfirmationHeader({
         {/* 第一列：團號、團名、日期 */}
         <div className="grid grid-cols-4 gap-6 mb-6">
           <div>
-            <Label className="text-xs text-morandi-primary">{CONFIRM_HEADER_LABELS.TOUR_CODE}</Label>
-            <p className="text-base font-medium text-morandi-primary mt-1">
-              {tour.code}
-            </p>
+            <Label className="text-xs text-morandi-primary">
+              {CONFIRM_HEADER_LABELS.TOUR_CODE}
+            </Label>
+            <p className="text-base font-medium text-morandi-primary mt-1">{tour.code}</p>
           </div>
           <div className="col-span-2">
-            <Label className="text-xs text-morandi-primary">{CONFIRM_HEADER_LABELS.TOUR_NAME}</Label>
-            <p className="text-base font-medium text-morandi-primary mt-1">
-              {tour.name}
-            </p>
+            <Label className="text-xs text-morandi-primary">
+              {CONFIRM_HEADER_LABELS.TOUR_NAME}
+            </Label>
+            <p className="text-base font-medium text-morandi-primary mt-1">{tour.name}</p>
           </div>
           <div>
-            <Label className="text-xs text-morandi-primary">{CONFIRM_HEADER_LABELS.DEPARTURE_RETURN}</Label>
+            <Label className="text-xs text-morandi-primary">
+              {CONFIRM_HEADER_LABELS.DEPARTURE_RETURN}
+            </Label>
             <div className="flex items-center gap-2 mt-1">
               <Calendar size={14} className="text-morandi-secondary" />
               <span className="text-sm text-morandi-primary">
@@ -164,56 +150,56 @@ export function ConfirmationHeader({
           {editing ? (
             <>
               <div>
-                <Label className="text-xs text-morandi-primary">{CONFIRM_HEADER_LABELS.LEADER}</Label>
+                <Label className="text-xs text-morandi-primary">
+                  {CONFIRM_HEADER_LABELS.LEADER}
+                </Label>
                 <Input
                   value={formData.tour_leader_name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, tour_leader_name: e.target.value })
-                  }
+                  onChange={e => setFormData({ ...formData, tour_leader_name: e.target.value })}
                   placeholder={CONFIRMATION_HEADER_LABELS.領隊姓名}
                   className="mt-1 h-8"
                 />
               </div>
               <div>
-                <Label className="text-xs text-morandi-primary">{CONFIRM_HEADER_LABELS.SALES}</Label>
+                <Label className="text-xs text-morandi-primary">
+                  {CONFIRM_HEADER_LABELS.SALES}
+                </Label>
                 <Input
                   value={formData.sales_person}
-                  onChange={(e) =>
-                    setFormData({ ...formData, sales_person: e.target.value })
-                  }
+                  onChange={e => setFormData({ ...formData, sales_person: e.target.value })}
                   placeholder={CONFIRMATION_HEADER_LABELS.業務姓名}
                   className="mt-1 h-8"
                 />
               </div>
               <div>
-                <Label className="text-xs text-morandi-primary">{CONFIRM_HEADER_LABELS.ASSISTANT}</Label>
+                <Label className="text-xs text-morandi-primary">
+                  {CONFIRM_HEADER_LABELS.ASSISTANT}
+                </Label>
                 <Input
                   value={formData.assistant}
-                  onChange={(e) =>
-                    setFormData({ ...formData, assistant: e.target.value })
-                  }
+                  onChange={e => setFormData({ ...formData, assistant: e.target.value })}
                   placeholder={CONFIRMATION_HEADER_LABELS.助理姓名}
                   className="mt-1 h-8"
                 />
               </div>
               <div>
-                <Label className="text-xs text-morandi-primary">{CONFIRM_HEADER_LABELS.HEADCOUNT}</Label>
+                <Label className="text-xs text-morandi-primary">
+                  {CONFIRM_HEADER_LABELS.HEADCOUNT}
+                </Label>
                 <Input
                   type="number"
                   value={formData.pax}
-                  onChange={(e) =>
-                    setFormData({ ...formData, pax: parseInt(e.target.value) || 0 })
-                  }
+                  onChange={e => setFormData({ ...formData, pax: parseInt(e.target.value) || 0 })}
                   className="mt-1 h-8"
                 />
               </div>
               <div>
-                <Label className="text-xs text-morandi-primary">{CONFIRM_HEADER_LABELS.FLIGHT}</Label>
+                <Label className="text-xs text-morandi-primary">
+                  {CONFIRM_HEADER_LABELS.FLIGHT}
+                </Label>
                 <Input
                   value={formData.flight_info}
-                  onChange={(e) =>
-                    setFormData({ ...formData, flight_info: e.target.value })
-                  }
+                  onChange={e => setFormData({ ...formData, flight_info: e.target.value })}
                   placeholder={CONFIRMATION_HEADER_LABELS.航班資訊}
                   className="mt-1 h-8"
                 />
@@ -222,7 +208,9 @@ export function ConfirmationHeader({
           ) : (
             <>
               <div>
-                <Label className="text-xs text-morandi-primary">{CONFIRM_HEADER_LABELS.LEADER}</Label>
+                <Label className="text-xs text-morandi-primary">
+                  {CONFIRM_HEADER_LABELS.LEADER}
+                </Label>
                 <div className="flex items-center gap-2 mt-1">
                   <User size={14} className="text-morandi-secondary" />
                   <span className="text-sm text-morandi-primary">
@@ -231,25 +219,27 @@ export function ConfirmationHeader({
                 </div>
               </div>
               <div>
-                <Label className="text-xs text-morandi-primary">{CONFIRM_HEADER_LABELS.SALES}</Label>
+                <Label className="text-xs text-morandi-primary">
+                  {CONFIRM_HEADER_LABELS.SALES}
+                </Label>
                 <div className="flex items-center gap-2 mt-1">
                   <Briefcase size={14} className="text-morandi-secondary" />
-                  <span className="text-sm text-morandi-primary">
-                    {sheet?.sales_person || '-'}
-                  </span>
+                  <span className="text-sm text-morandi-primary">{sheet?.sales_person || '-'}</span>
                 </div>
               </div>
               <div>
-                <Label className="text-xs text-morandi-primary">{CONFIRM_HEADER_LABELS.ASSISTANT}</Label>
+                <Label className="text-xs text-morandi-primary">
+                  {CONFIRM_HEADER_LABELS.ASSISTANT}
+                </Label>
                 <div className="flex items-center gap-2 mt-1">
                   <User size={14} className="text-morandi-secondary" />
-                  <span className="text-sm text-morandi-primary">
-                    {sheet?.assistant || '-'}
-                  </span>
+                  <span className="text-sm text-morandi-primary">{sheet?.assistant || '-'}</span>
                 </div>
               </div>
               <div>
-                <Label className="text-xs text-morandi-primary">{CONFIRM_HEADER_LABELS.HEADCOUNT}</Label>
+                <Label className="text-xs text-morandi-primary">
+                  {CONFIRM_HEADER_LABELS.HEADCOUNT}
+                </Label>
                 <div className="flex items-center gap-2 mt-1">
                   <Users size={14} className="text-morandi-secondary" />
                   <span className="text-sm text-morandi-primary">
@@ -258,12 +248,12 @@ export function ConfirmationHeader({
                 </div>
               </div>
               <div>
-                <Label className="text-xs text-morandi-primary">{CONFIRM_HEADER_LABELS.FLIGHT}</Label>
+                <Label className="text-xs text-morandi-primary">
+                  {CONFIRM_HEADER_LABELS.FLIGHT}
+                </Label>
                 <div className="flex items-center gap-2 mt-1">
                   <Plane size={14} className="text-morandi-secondary" />
-                  <span className="text-sm text-morandi-primary">
-                    {sheet?.flight_info || '-'}
-                  </span>
+                  <span className="text-sm text-morandi-primary">{sheet?.flight_info || '-'}</span>
                 </div>
               </div>
             </>

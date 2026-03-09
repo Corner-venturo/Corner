@@ -9,14 +9,8 @@
  * - Tour 模式：開團後使用
  */
 
-
 import { useState, useEffect, useCallback } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { ClipboardList, X } from 'lucide-react'
 import { TourRequestFormDialog } from './TourRequestFormDialog'
@@ -65,7 +59,7 @@ export function RequirementSyncDialog({
 
   // 取得 quoteId
   const quoteId = tour
-    ? (tour.quote_id || (tour as { locked_quote_id?: string | null }).locked_quote_id)
+    ? tour.quote_id || (tour as { locked_quote_id?: string | null }).locked_quote_id
     : pkg?.quote_id
 
   // Realtime 訂閱報價單變更
@@ -84,7 +78,10 @@ export function RequirementSyncDialog({
         },
         () => {
           logger.log('報價單已更新')
-          toast({ title: PROPOSAL_LABELS.requirementSync.quoteUpdated, description: PROPOSAL_LABELS.requirementSync.quoteUpdatedDesc })
+          toast({
+            title: PROPOSAL_LABELS.requirementSync.quoteUpdated,
+            description: PROPOSAL_LABELS.requirementSync.quoteUpdatedDesc,
+          })
         }
       )
       .subscribe()
@@ -95,17 +92,20 @@ export function RequirementSyncDialog({
   }, [isOpen, quoteId, toast])
 
   // 開啟需求單 Dialog 的回調
-  const handleOpenRequestDialog = useCallback((data: {
-    category: string
-    supplierName: string
-    items: { serviceDate: string | null; title: string; quantity: number; note?: string }[]
-    tour?: Tour
-    pkg?: ProposalPackage
-    startDate: string | null
-  }) => {
-    setSelectedRequestData(data)
-    setRequestDialogOpen(true)
-  }, [])
+  const handleOpenRequestDialog = useCallback(
+    (data: {
+      category: string
+      supplierName: string
+      items: { serviceDate: string | null; title: string; quantity: number; note?: string }[]
+      tour?: Tour
+      pkg?: ProposalPackage
+      startDate: string | null
+    }) => {
+      setSelectedRequestData(data)
+      setRequestDialogOpen(true)
+    },
+    []
+  )
 
   // 注意：已移除 hasChildDialogOpen 模式，改用 Dialog level 系統處理多重遮罩
 
@@ -133,38 +133,38 @@ export function RequirementSyncDialog({
   return (
     <>
       {/* 主 Dialog：使用 level={2} */}
-        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()} modal={true}>
-          <DialogContent level={2} className="max-w-5xl max-h-[85vh] overflow-hidden flex flex-col">
-            <DialogHeader className="flex flex-row items-center justify-between">
-              <DialogTitle className="flex items-center gap-2">
-                <ClipboardList size={18} className="text-morandi-gold" />
-                {PROPOSAL_LABELS.requirementSync.title}
-                {mode === 'tour' && (
-                  <span className="text-xs font-normal text-morandi-secondary ml-1">
-                    ({source.code})
-                  </span>
-                )}
-              </DialogTitle>
-            </DialogHeader>
+      <Dialog open={isOpen} onOpenChange={open => !open && onClose()} modal={true}>
+        <DialogContent level={2} className="max-w-5xl max-h-[85vh] overflow-hidden flex flex-col">
+          <DialogHeader className="flex flex-row items-center justify-between">
+            <DialogTitle className="flex items-center gap-2">
+              <ClipboardList size={18} className="text-morandi-gold" />
+              {PROPOSAL_LABELS.requirementSync.title}
+              {mode === 'tour' && (
+                <span className="text-xs font-normal text-morandi-secondary ml-1">
+                  ({source.code})
+                </span>
+              )}
+            </DialogTitle>
+          </DialogHeader>
 
-            <div className="flex-1 overflow-y-auto -mx-6 px-6">
-              <RequirementsList
-                tourId={tour?.id}
-                proposalPackageId={pkg?.id}
-                quoteId={quoteId}
-                onOpenRequestDialog={handleOpenRequestDialog}
-              />
-            </div>
+          <div className="flex-1 overflow-y-auto -mx-6 px-6">
+            <RequirementsList
+              tourId={tour?.id}
+              proposalPackageId={pkg?.id}
+              quoteId={quoteId}
+              onOpenRequestDialog={handleOpenRequestDialog}
+            />
+          </div>
 
-            {/* 底部按鈕 */}
-            <div className="flex justify-end pt-4 border-t border-border">
-              <Button variant="outline" onClick={onClose} className="gap-2">
-                <X size={16} />
-                {PROPOSAL_LABELS.requirementSync.close}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+          {/* 底部按鈕 */}
+          <div className="flex justify-end pt-4 border-t border-border">
+            <Button variant="outline" onClick={onClose} className="gap-2">
+              <X size={16} />
+              {PROPOSAL_LABELS.requirementSync.close}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* 需求單 Dialog（level={3}） */}
       {selectedRequestData && (

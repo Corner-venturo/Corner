@@ -23,9 +23,7 @@ export function PermissionManagementSettings() {
                 <Building2 className="h-5 w-5 text-morandi-blue" />
                 <h3 className="font-medium">{PERMISSION_LABELS.BRANCH_MANAGEMENT}</h3>
               </div>
-              <p className="text-sm text-morandi-secondary mb-3">
-                {PERMISSION_LABELS.MANAGE_2715}
-              </p>
+              <p className="text-sm text-morandi-secondary mb-3">{PERMISSION_LABELS.MANAGE_2715}</p>
             </div>
 
             <Button
@@ -47,9 +45,7 @@ export function PermissionManagementSettings() {
                 <Shield className="h-5 w-5 text-morandi-gold" />
                 <h3 className="font-medium">{PERMISSION_LABELS.CROSS_BRANCH_PERMISSION}</h3>
               </div>
-              <p className="text-sm text-morandi-secondary mb-3">
-                {PERMISSION_LABELS.MANAGE_9542}
-              </p>
+              <p className="text-sm text-morandi-secondary mb-3">{PERMISSION_LABELS.MANAGE_9542}</p>
 
               {/* 功能說明 */}
               <div className="mt-3 p-3 bg-morandi-container/20 rounded-lg text-xs text-morandi-muted space-y-1">

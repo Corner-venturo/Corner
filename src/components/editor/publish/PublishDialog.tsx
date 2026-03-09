@@ -54,13 +54,16 @@ export function PublishDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
-          <Label htmlFor={isVersion ? 'version-note' : 'new-file-name'} className="text-sm font-medium">
+          <Label
+            htmlFor={isVersion ? 'version-note' : 'new-file-name'}
+            className="text-sm font-medium"
+          >
             {isVersion ? COMP_EDITOR_LABELS.版本名稱 : COMP_EDITOR_LABELS.新檔案名稱}
           </Label>
           <Input
             id={isVersion ? 'version-note' : 'new-file-name'}
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={e => onChange(e.target.value)}
             placeholder={placeholder}
             className="mt-2"
           />

@@ -21,12 +21,17 @@ interface RoomAssignmentCellProps {
   hotelId: string
   hotelName: string
   currentRoomId: string
-  currentRoomLabel: string  // 目前顯示的房間標籤（如 COMP_ORDERS_LABELS.雙床1）
+  currentRoomLabel: string // 目前顯示的房間標籤（如 COMP_ORDERS_LABELS.雙床1）
   roomOptions: RoomOption[]
-  roomMembers: RoomMemberInfo[]  // 同房成員列表
+  roomMembers: RoomMemberInfo[] // 同房成員列表
   rowSpan?: number
-  onAssign: (memberId: string, hotelName: string, roomId: string | null, memberBirthDate?: string | null) => void
-  onRemoveMember?: (memberId: string, hotelName: string) => void  // 移除單一成員
+  onAssign: (
+    memberId: string,
+    hotelName: string,
+    roomId: string | null,
+    memberBirthDate?: string | null
+  ) => void
+  onRemoveMember?: (memberId: string, hotelName: string) => void // 移除單一成員
   departureDate?: string | null
 }
 
@@ -90,7 +95,8 @@ export function RoomAssignmentCell({
             const isFull = opt.assignedCount >= opt.capacity
             return (
               <option key={opt.id} value={opt.id}>
-                {opt.label}{isFull ? COMP_ORDERS_LABELS._6歲_可加 : ''}
+                {opt.label}
+                {isFull ? COMP_ORDERS_LABELS._6歲_可加 : ''}
               </option>
             )
           })}
@@ -110,18 +116,14 @@ export function RoomAssignmentCell({
           <button
             type="button"
             className={cn(
-              "w-full h-6 text-left px-1 rounded hover:bg-emerald-100 transition-colors",
-              "text-morandi-primary cursor-pointer"
+              'w-full h-6 text-left px-1 rounded hover:bg-emerald-100 transition-colors',
+              'text-morandi-primary cursor-pointer'
             )}
           >
             {currentRoomLabel}
           </button>
         </PopoverTrigger>
-        <PopoverContent
-          className="w-64 p-0"
-          align="start"
-          side="bottom"
-        >
+        <PopoverContent className="w-64 p-0" align="start" side="bottom">
           {/* 房間標題 */}
           <div className="flex items-center gap-2 px-3 py-2 border-b border-border bg-muted/50">
             <Bed className="h-4 w-4 text-morandi-gold" />
@@ -140,14 +142,14 @@ export function RoomAssignmentCell({
                 key={member.id}
                 className="flex items-center justify-between px-3 py-1.5 hover:bg-muted/50"
               >
-                <span className={cn(
-                  "text-sm",
-                  member.isChild ? "text-morandi-muted" : "text-morandi-primary"
-                )}>
-                  {member.name}
-                  {member.isChild && (
-                    <span className="ml-1 text-xs text-orange-500">(不佔床)</span>
+                <span
+                  className={cn(
+                    'text-sm',
+                    member.isChild ? 'text-morandi-muted' : 'text-morandi-primary'
                   )}
+                >
+                  {member.name}
+                  {member.isChild && <span className="ml-1 text-xs text-orange-500">(不佔床)</span>}
                 </span>
                 <button
                   type="button"
@@ -207,7 +209,8 @@ export function RoomAssignmentCell({
                 const isFull = opt.assignedCount >= opt.capacity && opt.id !== currentRoomId
                 return (
                   <option key={opt.id} value={opt.id}>
-                    {opt.label}{isFull ? COMP_ORDERS_LABELS._6歲_可加 : ''}
+                    {opt.label}
+                    {isFull ? COMP_ORDERS_LABELS._6歲_可加 : ''}
                   </option>
                 )
               })}

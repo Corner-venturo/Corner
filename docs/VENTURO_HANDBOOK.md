@@ -32,20 +32,20 @@
 
 ### 兩個產品
 
-| 產品 | 用戶 | 路徑 | 端口 | 命名規範 |
-|------|------|------|------|---------|
-| **Venturo ERP** | 旅行社員工 | `~/Projects/venturo-erp` | 3000 | snake_case |
-| **Venturo Online** | 旅客（PWA） | `~/Projects/venturo-online` | 3001 | camelCase |
+| 產品               | 用戶        | 路徑                        | 端口 | 命名規範   |
+| ------------------ | ----------- | --------------------------- | ---- | ---------- |
+| **Venturo ERP**    | 旅行社員工  | `~/Projects/venturo-erp`    | 3000 | snake_case |
+| **Venturo Online** | 旅客（PWA） | `~/Projects/venturo-online` | 3001 | camelCase  |
 
 **共享同一個 Supabase 資料庫**。ERP 產生資料，Online 呈現資料。
 
 ### 角色模型
 
-| 角色 | 說明 |
-|------|------|
-| **S¹ (Travel Supplier)** | 旅遊供應商（DMC、飯店、導遊、車公司） |
-| **S² (Service Supplier)** | 產業服務商（金流、SaaS） |
-| **B (Partner)** | 旅行社 |
+| 角色                      | 說明                                  |
+| ------------------------- | ------------------------------------- |
+| **S¹ (Travel Supplier)**  | 旅遊供應商（DMC、飯店、導遊、車公司） |
+| **S² (Service Supplier)** | 產業服務商（金流、SaaS）              |
+| **B (Partner)**           | 旅行社                                |
 
 **關鍵決策：不對 S¹ 抽成。** 供應商無壓力，使用動機回到秩序。
 
@@ -69,25 +69,25 @@
 
 ### Tech Stack
 
-| 層級 | 技術 |
-|------|------|
-| 框架 | Next.js 16 + React 19 |
-| 語言 | TypeScript（strict） |
-| 狀態管理 | Zustand 5 |
-| 資料庫 | Supabase（PostgreSQL） |
-| 認證 | JWT（jose SignJWT HS256）+ Supabase Auth |
-| 部署 | Vercel |
+| 層級     | 技術                                     |
+| -------- | ---------------------------------------- |
+| 框架     | Next.js 16 + React 19                    |
+| 語言     | TypeScript（strict）                     |
+| 狀態管理 | Zustand 5                                |
+| 資料庫   | Supabase（PostgreSQL）                   |
+| 認證     | JWT（jose SignJWT HS256）+ Supabase Auth |
+| 部署     | Vercel                                   |
 
 ### 專案規模（2026-02-27）
 
-| 指標 | 數值 |
-|------|------|
-| ERP 程式碼 | ~33 萬行 |
-| Online 程式碼 | ~1.5 萬行 |
-| DB 表 | 268 張 |
-| DB 查詢 | 694 個 |
-| 測試 | 1592 個（82 files） |
-| Commits | 1600+ |
+| 指標          | 數值                |
+| ------------- | ------------------- |
+| ERP 程式碼    | ~33 萬行            |
+| Online 程式碼 | ~1.5 萬行           |
+| DB 表         | 268 張              |
+| DB 查詢       | 694 個              |
+| 測試          | 1592 個（82 files） |
+| Commits       | 1600+               |
 
 ### 多租戶架構
 
@@ -102,6 +102,7 @@
 路徑：`src/data/core/createEntityHook.ts`
 
 改一個地方，全系統生效：
+
 - 自動注入 `workspace_id`
 - 自動記錄 `created_by` / `updated_by`
 - 自動處理權限檢查
@@ -112,12 +113,12 @@
 
 ### 必要環境變數（Production）
 
-| 變數 | 用途 | 說明 |
-|------|------|------|
-| `JWT_SECRET` | JWT 簽名 | 必填，不設會 throw error |
-| `TAISHIN_MAC_KEY` | LinkPay webhook 驗證 | 空值 = 拒絕所有 webhook |
-| `SUPABASE_URL` | Supabase 連線 | |
-| `SUPABASE_ANON_KEY` | Supabase 匿名金鑰 | |
+| 變數                | 用途                 | 說明                     |
+| ------------------- | -------------------- | ------------------------ |
+| `JWT_SECRET`        | JWT 簽名             | 必填，不設會 throw error |
+| `TAISHIN_MAC_KEY`   | LinkPay webhook 驗證 | 空值 = 拒絕所有 webhook  |
+| `SUPABASE_URL`      | Supabase 連線        |                          |
+| `SUPABASE_ANON_KEY` | Supabase 匿名金鑰    |                          |
 
 ### Dev Server
 
@@ -151,14 +152,14 @@ python3 scripts/validate-queries.py
 
 違反任何一條 = 不准 push。
 
-| # | 禁令 | 說明 |
-|---|------|------|
-| 1 | **禁止 any** | 不准 `: any`、`as any`、`<any>` |
-| 2 | **禁止 console.log** | 必須用 `import { logger } from '@/lib/utils/logger'` |
-| 3 | **禁止 JSX 硬編碼中文** | 放到 `constants/labels.ts` |
-| 4 | **拆分依邏輯性** | 不設行數門檻，根據邏輯清晰度決定 |
-| 5 | **禁止自訂版面佈局** | 列表頁用 `ListPageLayout` / `EnhancedTable` |
-| 6 | **禁止跳過 Dialog level** | 所有 Dialog 必須設定 `level={1|2|3}` |
+| #   | 禁令                      | 說明                                                 |
+| --- | ------------------------- | ---------------------------------------------------- | --- | --- |
+| 1   | **禁止 any**              | 不准 `: any`、`as any`、`<any>`                      |
+| 2   | **禁止 console.log**      | 必須用 `import { logger } from '@/lib/utils/logger'` |
+| 3   | **禁止 JSX 硬編碼中文**   | 放到 `constants/labels.ts`                           |
+| 4   | **拆分依邏輯性**          | 不設行數門檻，根據邏輯清晰度決定                     |
+| 5   | **禁止自訂版面佈局**      | 列表頁用 `ListPageLayout` / `EnhancedTable`          |
+| 6   | **禁止跳過 Dialog level** | 所有 Dialog 必須設定 `level={1                       | 2   | 3}` |
 
 ### ERP 額外禁令
 
@@ -178,30 +179,30 @@ python3 scripts/validate-queries.py
 
 ### 變數命名
 
-| 層級 | ERP | Online |
-|------|-----|--------|
-| 資料庫欄位 | snake_case | snake_case |
-| TypeScript 變數 | snake_case | camelCase |
-| Component | PascalCase | PascalCase |
+| 層級            | ERP        | Online     |
+| --------------- | ---------- | ---------- |
+| 資料庫欄位      | snake_case | snake_case |
+| TypeScript 變數 | snake_case | camelCase  |
+| Component       | PascalCase | PascalCase |
 
 ### 編號格式
 
-| 項目 | 格式 | 範例 |
-|------|------|------|
-| 團號 | `{城市代碼}{YYMMDD}{A-Z}` | `CNX250128A` |
-| 訂單 | `{團號}-O{2位數}` | `CNX250128A-O01` |
-| 需求單 | `{團號}-RQ{2位數}` | `CNX250128A-RQ01` |
-| 請款單 | `{團號}-I{2位數}` | `CNX250128A-I01` |
-| 收款單 | `{團號}-R{2位數}` | `CNX250128A-R01` |
+| 項目   | 格式                      | 範例              |
+| ------ | ------------------------- | ----------------- |
+| 團號   | `{城市代碼}{YYMMDD}{A-Z}` | `CNX250128A`      |
+| 訂單   | `{團號}-O{2位數}`         | `CNX250128A-O01`  |
+| 需求單 | `{團號}-RQ{2位數}`        | `CNX250128A-RQ01` |
+| 請款單 | `{團號}-I{2位數}`         | `CNX250128A-I01`  |
+| 收款單 | `{團號}-R{2位數}`         | `CNX250128A-R01`  |
 
 ### 資料庫欄位陷阱
 
-| ❌ 不要用 | ✅ 正確的 | 說明 |
-|-----------|----------|------|
-| `birthday` | `birth_date` | ERP 統一用 birth_date |
-| `name_en` | `english_name` | hotels 表用 english_name |
-| `chinese_name`（customers） | `name` | customers 表用 name |
-| `customer_name`（orders） | 不存在 | orders 沒有這個欄位 |
+| ❌ 不要用                   | ✅ 正確的      | 說明                     |
+| --------------------------- | -------------- | ------------------------ |
+| `birthday`                  | `birth_date`   | ERP 統一用 birth_date    |
+| `name_en`                   | `english_name` | hotels 表用 english_name |
+| `chinese_name`（customers） | `name`         | customers 表用 name      |
+| `customer_name`（orders）   | 不存在         | orders 沒有這個欄位      |
 
 ---
 
@@ -209,7 +210,7 @@ python3 scripts/validate-queries.py
 
 > 完整說明見 `docs/PERFORMANCE_GUIDE.md`
 
-### 鐵律一：列表查詢禁止 select('*')
+### 鐵律一：列表查詢禁止 select('\*')
 
 ```typescript
 // ❌
@@ -220,16 +221,16 @@ const TOUR_LIST_SELECT = 'id, code, name, status, departure_date, return_date'
 const { data } = await supabase.from('tours').select(TOUR_LIST_SELECT)
 ```
 
-**允許 select('*')：** `.single()`、表單編輯、insert 後回傳
+**允許 select('\*')：** `.single()`、表單編輯、insert 後回傳
 
 ### 鐵律二：所有查詢必須有 limit
 
-| 場景 | 建議 limit |
-|------|-----------|
-| 列表頁 | 500 |
-| 下拉選單 | 200 |
-| 參考表 | 2000 |
-| 歷史紀錄 | 100 |
+| 場景     | 建議 limit |
+| -------- | ---------- |
+| 列表頁   | 500        |
+| 下拉選單 | 200        |
+| 參考表   | 2000       |
+| 歷史紀錄 | 100        |
 
 ### 鐵律三：寫 query 前必須查 DB schema
 
@@ -249,15 +250,15 @@ curl -s -X POST "https://api.supabase.com/v1/projects/pfqvdacxowpgfamuvnsn/datab
 
 ### 已完成的安全措施（2026-02-27）
 
-| 項目 | 狀態 | 說明 |
-|------|------|------|
-| JWT 簽名 | ✅ | jose SignJWT HS256，取代 base64 |
-| RLS 隔離 | ✅ | 162 張表 workspace 隔離 |
-| 護照 Bucket | ✅ | private + createSignedUrl |
-| 藍新金鑰 | ✅ | 依 workspace_id 取得 |
-| LinkPay 驗證 | ✅ | MAC_KEY 空值拒絕 |
-| Quick-Login | ✅ | server-only（無 NEXT_PUBLIC_） |
-| API Zod 驗證 | ✅ | 所有 POST/PUT/PATCH |
+| 項目         | 狀態 | 說明                            |
+| ------------ | ---- | ------------------------------- |
+| JWT 簽名     | ✅   | jose SignJWT HS256，取代 base64 |
+| RLS 隔離     | ✅   | 162 張表 workspace 隔離         |
+| 護照 Bucket  | ✅   | private + createSignedUrl       |
+| 藍新金鑰     | ✅   | 依 workspace_id 取得            |
+| LinkPay 驗證 | ✅   | MAC_KEY 空值拒絕                |
+| Quick-Login  | ✅   | server-only（無 NEXT*PUBLIC*）  |
+| API Zod 驗證 | ✅   | 所有 POST/PUT/PATCH             |
 
 ### RBAC 角色
 
@@ -278,15 +279,15 @@ super_admin > admin > controller > sales/accountant/assistant > tour_leader > st
 
 ### 色系：Morandi
 
-| 用途 | 色碼 | 名稱 |
-|------|------|------|
-| 金色（主色） | `morandi-gold` | 按鈕、強調 |
-| 綠色（成功） | `#7a9e7e` | 已完成、已確認 |
-| 藍色（建議） | `#7b95b0` | 提示、建議 |
-| 紅色（警告） | `#c17b6e` | 錯誤、緊急 |
-| 容器背景 | `morandi-container` | 卡片、區塊背景 |
-| 文字主色 | `morandi-primary` | |
-| 文字次色 | `morandi-secondary` | |
+| 用途         | 色碼                | 名稱           |
+| ------------ | ------------------- | -------------- |
+| 金色（主色） | `morandi-gold`      | 按鈕、強調     |
+| 綠色（成功） | `#7a9e7e`           | 已完成、已確認 |
+| 藍色（建議） | `#7b95b0`           | 提示、建議     |
+| 紅色（警告） | `#c17b6e`           | 錯誤、緊急     |
+| 容器背景     | `morandi-container` | 卡片、區塊背景 |
+| 文字主色     | `morandi-primary`   |                |
+| 文字次色     | `morandi-secondary` |                |
 
 **禁止用：** red-50, orange-50, yellow-50, blue-100, pink-100 等原生 Tailwind 彩色
 
@@ -378,6 +379,7 @@ Build 失敗 = 不准 push。沒有例外。
 ### 子任務規則
 
 派子任務時，指令裡必須寫明：
+
 1. **架構決定** — 核心表一 row 走到底、不需要交接機制
 2. **已確認的設計結論** — 子任務不會自己去讀 MEMORY.md
 3. **禁止做的事** — 不只是 coding style，還有「不要走舊架構的路」
@@ -417,9 +419,9 @@ Build 失敗 = 不准 push。沒有例外。
 
 **規則：指令裡寫明「Online 直接讀 tour_itinerary_items，不需要交接」。**
 
-### 6. select(*) 會殺死效能
+### 6. select(\*) 會殺死效能
 
-> 2026-02-27：發現 291 處 select('*')，tours 表 63 欄但列表只用 10 欄。analytics 查 3 張全表只為了算 count。
+> 2026-02-27：發現 291 處 select('\*')，tours 表 63 欄但列表只用 10 欄。analytics 查 3 張全表只為了算 count。
 
 **規則：三鐵律（見第 6 節）。**
 
@@ -429,51 +431,51 @@ Build 失敗 = 不准 push。沒有例外。
 
 ### 核心規範
 
-| 文件 | 說明 |
-|------|------|
-| `docs/VENTURO_HANDBOOK.md` | **本文件** — 總索引 |
-| `.claude/VENTURO_VISION.md` | 雙平台願景、價值飛輪 |
-| `~/Projects/VENTURO_THESIS.md` | 創立理念（為什麼做） |
-| `docs/ARCHITECTURE_STANDARDS.md` | 五層架構、資料隔離 |
-| `docs/CODE_STANDARDS.md` | 程式碼規範 |
-| `docs/PERFORMANCE_GUIDE.md` | 效能規範（含三鐵律） |
+| 文件                             | 說明                 |
+| -------------------------------- | -------------------- |
+| `docs/VENTURO_HANDBOOK.md`       | **本文件** — 總索引  |
+| `.claude/VENTURO_VISION.md`      | 雙平台願景、價值飛輪 |
+| `~/Projects/VENTURO_THESIS.md`   | 創立理念（為什麼做） |
+| `docs/ARCHITECTURE_STANDARDS.md` | 五層架構、資料隔離   |
+| `docs/CODE_STANDARDS.md`         | 程式碼規範           |
+| `docs/PERFORMANCE_GUIDE.md`      | 效能規範（含三鐵律） |
 
 ### 資料庫
 
-| 文件 | 說明 |
-|------|------|
-| `docs/DATABASE_DESIGN_STANDARDS.md` | 表格分類、設計原則 |
-| `docs/FIELD_NAMING_STANDARDS.md` | 欄位命名標準 |
-| `docs/SUPABASE_RLS_POLICY.md` | RLS 規範 |
-| `docs/DB_SCHEMA.md` | Schema 概覽 |
-| `docs/INDEX_RECOMMENDATIONS_2026-02-18.md` | 索引建議 |
+| 文件                                       | 說明               |
+| ------------------------------------------ | ------------------ |
+| `docs/DATABASE_DESIGN_STANDARDS.md`        | 表格分類、設計原則 |
+| `docs/FIELD_NAMING_STANDARDS.md`           | 欄位命名標準       |
+| `docs/SUPABASE_RLS_POLICY.md`              | RLS 規範           |
+| `docs/DB_SCHEMA.md`                        | Schema 概覽        |
+| `docs/INDEX_RECOMMENDATIONS_2026-02-18.md` | 索引建議           |
 
 ### UI / 設計
 
-| 文件 | 說明 |
-|------|------|
-| `docs/COMPONENT_GUIDE.md` | 元件使用指南 |
+| 文件                              | 說明                   |
+| --------------------------------- | ---------------------- |
+| `docs/COMPONENT_GUIDE.md`         | 元件使用指南           |
 | `docs/VENTURO_UI_DESIGN_STYLE.md` | Morandi 色系、設計風格 |
-| `docs/BROCHURE_COMPONENTS.md` | 手冊設計元件 |
+| `docs/BROCHURE_COMPONENTS.md`     | 手冊設計元件           |
 
 ### 安全 / 部署
 
-| 文件 | 說明 |
-|------|------|
-| `docs/API_SECURITY_AUDIT_2026-02-18.md` | API 安全審計 |
-| `docs/WORKSPACE_ISOLATION_AUDIT.md` | 多租戶隔離審計 |
-| `docs/DEPLOYMENT_INFO.md` | 部署資訊 |
+| 文件                                    | 說明           |
+| --------------------------------------- | -------------- |
+| `docs/API_SECURITY_AUDIT_2026-02-18.md` | API 安全審計   |
+| `docs/WORKSPACE_ISOLATION_AUDIT.md`     | 多租戶隔離審計 |
+| `docs/DEPLOYMENT_INFO.md`               | 部署資訊       |
 
 ### 審計報告
 
-| 文件 | 說明 |
-|------|------|
-| `docs/AUDIT_INDEX_2026-02-18.md` | 2/18 全模組審計索引 |
-| `docs/AUDIT_SUMMARY_2026-02-18.md` | 審計總結 |
-| `docs/V1_LAUNCH_CHECKLIST.md` | V1 上線清單 |
+| 文件                               | 說明                |
+| ---------------------------------- | ------------------- |
+| `docs/AUDIT_INDEX_2026-02-18.md`   | 2/18 全模組審計索引 |
+| `docs/AUDIT_SUMMARY_2026-02-18.md` | 審計總結            |
+| `docs/V1_LAUNCH_CHECKLIST.md`      | V1 上線清單         |
 
 ---
 
 > **這份手冊是活的。** 每次學到新教訓、建立新規範，就更新這裡。
-> 
+>
 > 如果你是新加入的開發者（AI 或人類），讀完這份就能開始工作。

@@ -55,7 +55,9 @@ test.describe.serial('旅遊團完整生命週期測試', () => {
     console.log('填寫旅遊團名稱...')
     // 找到「旅遊團名稱」欄位
     const nameLabel = dialog.locator('label').filter({ hasText: '旅遊團名稱' })
-    const nameInput = nameLabel.locator('xpath=following-sibling::input | ../following::input[1]').first()
+    const nameInput = nameLabel
+      .locator('xpath=following-sibling::input | ../following::input[1]')
+      .first()
 
     // 如果找不到，嘗試用其他方式
     let tourNameInput = nameInput
@@ -128,14 +130,18 @@ test.describe.serial('旅遊團完整生命週期測試', () => {
 
     // 等待日曆 popover 出現
     // Calendar 使用 Radix Popover，有一個「今天」按鈕可以識別
-    const calendarPopover = page.locator('[data-radix-popper-content-wrapper]').filter({ hasText: '今天' })
+    const calendarPopover = page
+      .locator('[data-radix-popper-content-wrapper]')
+      .filter({ hasText: '今天' })
     await expect(calendarPopover).toBeVisible({ timeout: 3000 })
     console.log('日曆 popover 已出現')
 
     // 點擊下個月按鈕多次（跳到未來幾個月以避免團號衝突）
     // 使用時間戳的最後一位數決定月份偏移（0-9 → 2-11 個月後）
     const monthOffset = 2 + parseInt(testTimestamp.slice(-1))
-    const nextMonthBtn = calendarPopover.locator('button').filter({ has: page.locator('.sr-only:has-text("下個月")') })
+    const nextMonthBtn = calendarPopover
+      .locator('button')
+      .filter({ has: page.locator('.sr-only:has-text("下個月")') })
     for (let i = 0; i < monthOffset; i++) {
       if (await nextMonthBtn.isVisible({ timeout: 500 }).catch(() => false)) {
         await nextMonthBtn.click()
@@ -147,14 +153,20 @@ test.describe.serial('旅遊團完整生命週期測試', () => {
     // 選擇基於時間戳的日期（避免選到相同日期）
     // 定義為高層變數讓返回日期也能使用
     let selectedDepartureDay = 10 + (parseInt(testTimestamp.slice(-2)) % 15) // 10-24 號
-    const availableDay = calendarPopover.locator('button:not([disabled]) time').filter({ hasText: new RegExp(`^${selectedDepartureDay}$`) }).first()
+    const availableDay = calendarPopover
+      .locator('button:not([disabled]) time')
+      .filter({ hasText: new RegExp(`^${selectedDepartureDay}$`) })
+      .first()
     if (await availableDay.isVisible({ timeout: 1000 }).catch(() => false)) {
       await availableDay.click()
       console.log(`出發日期: 選擇 ${selectedDepartureDay} 號`)
     } else {
       // 如果該日期不可用，選擇 15 號
       selectedDepartureDay = 15
-      const altDay = calendarPopover.locator('button:not([disabled]) time').filter({ hasText: /^15$/ }).first()
+      const altDay = calendarPopover
+        .locator('button:not([disabled]) time')
+        .filter({ hasText: /^15$/ })
+        .first()
       if (await altDay.isVisible({ timeout: 1000 }).catch(() => false)) {
         await altDay.click()
         console.log('出發日期: 選擇 15 號')
@@ -171,19 +183,27 @@ test.describe.serial('旅遊團完整生命週期測試', () => {
     await page.waitForTimeout(500)
 
     // 等待日曆 popover
-    const returnCalendarPopover = page.locator('[data-radix-popper-content-wrapper]').filter({ hasText: '今天' })
+    const returnCalendarPopover = page
+      .locator('[data-radix-popper-content-wrapper]')
+      .filter({ hasText: '今天' })
     await expect(returnCalendarPopover).toBeVisible({ timeout: 3000 })
     console.log('返回日期日曆 popover 已出現')
 
     // 選擇比出發日期晚 5 天的日期
     const returnDayToSelect = Math.min(28, selectedDepartureDay + 5)
-    const returnDay = returnCalendarPopover.locator('button:not([disabled]) time').filter({ hasText: new RegExp(`^${returnDayToSelect}$`) }).first()
+    const returnDay = returnCalendarPopover
+      .locator('button:not([disabled]) time')
+      .filter({ hasText: new RegExp(`^${returnDayToSelect}$`) })
+      .first()
     if (await returnDay.isVisible({ timeout: 1000 }).catch(() => false)) {
       await returnDay.click()
       console.log(`返回日期: 選擇 ${returnDayToSelect} 號`)
     } else {
       // 選擇 28 號
-      const altReturnDay = returnCalendarPopover.locator('button:not([disabled]) time').filter({ hasText: /^28$/ }).first()
+      const altReturnDay = returnCalendarPopover
+        .locator('button:not([disabled]) time')
+        .filter({ hasText: /^28$/ })
+        .first()
       if (await altReturnDay.isVisible({ timeout: 1000 }).catch(() => false)) {
         await altReturnDay.click()
         console.log('返回日期: 選擇 28 號')
@@ -195,7 +215,10 @@ test.describe.serial('旅遊團完整生命週期測試', () => {
     await page.waitForTimeout(500)
 
     // 找到提交按鈕
-    const submitButton = dialog.locator('button').filter({ hasText: /新增旅遊團|建立|開團|儲存/ }).last()
+    const submitButton = dialog
+      .locator('button')
+      .filter({ hasText: /新增旅遊團|建立|開團|儲存/ })
+      .last()
     await expect(submitButton).toBeVisible({ timeout: 3000 })
 
     const isEnabled = await submitButton.isEnabled()
@@ -246,7 +269,10 @@ test.describe.serial('旅遊團完整生命週期測試', () => {
     } catch {
       console.log('對話框未關閉')
       // 檢查錯誤訊息
-      const errorText = await dialog.locator('.text-status-danger, .text-red-500, [data-type="error"]').textContent().catch(() => '')
+      const errorText = await dialog
+        .locator('.text-status-danger, .text-red-500, [data-type="error"]')
+        .textContent()
+        .catch(() => '')
       if (errorText) {
         console.log('錯誤訊息:', errorText)
       }
@@ -331,7 +357,10 @@ test.describe.serial('旅遊團完整生命週期測試', () => {
       console.log('對話框內容:', dialogContent?.substring(0, 200))
 
       // 關閉對話框
-      const closeButton = detailDialog.locator('button').filter({ hasText: /關閉|取消|×/ }).first()
+      const closeButton = detailDialog
+        .locator('button')
+        .filter({ hasText: /關閉|取消|×/ })
+        .first()
       if (await closeButton.isVisible()) {
         await closeButton.click()
       } else {
@@ -384,7 +413,9 @@ test.describe.serial('旅遊團完整生命週期測試', () => {
     for (let i = 0; i < deleteButtonCount; i++) {
       const deleteBtn = allDeleteButtons.nth(i)
       // 向上找到最近的 tr 或 包含行資訊的 div
-      const parentRow = deleteBtn.locator('xpath=ancestor::tr[1] | ancestor::div[contains(@class, "group")][1]')
+      const parentRow = deleteBtn.locator(
+        'xpath=ancestor::tr[1] | ancestor::div[contains(@class, "group")][1]'
+      )
       const rowText = await parentRow.textContent().catch(() => '')
 
       if (rowText && rowText.includes(createdTourCode!)) {
@@ -407,7 +438,10 @@ test.describe.serial('旅遊團完整生命週期測試', () => {
       }
     }
 
-    if (!targetDeleteButton || !(await targetDeleteButton.isVisible({ timeout: 2000 }).catch(() => false))) {
+    if (
+      !targetDeleteButton ||
+      !(await targetDeleteButton.isVisible({ timeout: 2000 }).catch(() => false))
+    ) {
       console.log('⚠️ 無法找到刪除按鈕，跳過測試')
       test.skip()
       return
@@ -420,18 +454,25 @@ test.describe.serial('旅遊團完整生命週期測試', () => {
     await page.waitForTimeout(500)
 
     // 確認對話框
-    const confirmDialog = page.locator('[role="alertdialog"], [role="dialog"]').filter({ hasText: /確定|刪除|確認/ })
+    const confirmDialog = page
+      .locator('[role="alertdialog"], [role="dialog"]')
+      .filter({ hasText: /確定|刪除|確認/ })
     if (await confirmDialog.isVisible({ timeout: 3000 }).catch(() => false)) {
       console.log('確認對話框已出現')
 
       // 找到確認按鈕
-      const confirmButton = confirmDialog.locator('button').filter({ hasText: /^確定$|^確認$|^刪除$/ }).first()
+      const confirmButton = confirmDialog
+        .locator('button')
+        .filter({ hasText: /^確定$|^確認$|^刪除$/ })
+        .first()
       if (await confirmButton.isVisible({ timeout: 2000 }).catch(() => false)) {
         console.log('點擊確認按鈕...')
         await confirmButton.click({ force: true })
       } else {
         // 嘗試其他按鈕選擇器
-        const altConfirmButton = confirmDialog.locator('button.bg-red, button.text-red, button:not(:has-text("取消"))').first()
+        const altConfirmButton = confirmDialog
+          .locator('button.bg-red, button.text-red, button:not(:has-text("取消"))')
+          .first()
         if (await altConfirmButton.isVisible({ timeout: 1000 }).catch(() => false)) {
           console.log('使用備用按鈕點擊確認...')
           await altConfirmButton.click({ force: true })
@@ -457,7 +498,7 @@ test.describe.serial('旅遊團完整生命週期測試', () => {
     // 確認該旅遊團不在列表中
     await page.waitForTimeout(500)
     const deletedTour = page.locator(`text="${createdTourCode}"`)
-    const stillExists = await deletedTour.count() > 0
+    const stillExists = (await deletedTour.count()) > 0
 
     if (stillExists) {
       // 可能是頁面還沒更新，嘗試重新載入
@@ -466,7 +507,7 @@ test.describe.serial('旅遊團完整生命週期測試', () => {
       await page.waitForLoadState('networkidle')
       await page.waitForTimeout(1000)
 
-      const afterReloadExists = await page.locator(`text="${createdTourCode}"`).count() > 0
+      const afterReloadExists = (await page.locator(`text="${createdTourCode}"`).count()) > 0
       expect(afterReloadExists).toBe(false)
       console.log(`✅ 重新載入後旅遊團 ${createdTourCode} 確認已刪除`)
     } else {

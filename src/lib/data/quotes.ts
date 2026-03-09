@@ -20,7 +20,7 @@ export interface GetPaginatedQuotesParams {
   page?: number
   limit?: number
   status?: string
-  workspaceId?: string  // 可選，若未提供則從 session 取得
+  workspaceId?: string // 可選，若未提供則從 session 取得
 }
 
 export interface PaginatedQuotesResult {
@@ -64,7 +64,7 @@ export async function getPaginatedQuotes({
   let query = supabase
     .from('quotes')
     .select('*', { count: 'exact' })
-    .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
+    .eq('workspace_id', wsId) // 🔒 Workspace 過濾
     .order('created_at', { ascending: false })
 
   // 狀態篩選
@@ -118,7 +118,7 @@ export async function getQuotesPageData({
       let query = supabase
         .from('quotes')
         .select('*', { count: 'exact' })
-        .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
+        .eq('workspace_id', wsId) // 🔒 Workspace 過濾
         .order('created_at', { ascending: false })
 
       if (status && status !== 'all') {
@@ -134,7 +134,7 @@ export async function getQuotesPageData({
     supabase
       .from('tours')
       .select('id, code, name, departure_date, return_date, status, closing_status, workspace_id')
-      .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
+      .eq('workspace_id', wsId) // 🔒 Workspace 過濾
       .neq('closing_status', 'closed')
       .order('departure_date', { ascending: false })
       .limit(100),
@@ -177,7 +177,7 @@ export async function getQuoteById(id: string, workspaceId?: string): Promise<Qu
     .from('quotes')
     .select('*')
     .eq('id', id)
-    .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
+    .eq('workspace_id', wsId) // 🔒 Workspace 過濾
     .single()
 
   if (error) {

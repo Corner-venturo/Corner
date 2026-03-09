@@ -15,7 +15,10 @@ interface LeaderMeetingSectionProps {
 }
 
 // 計算起飛前三小時的集合時間
-function calculateMeetingTime(departureDate: string | undefined, departureTime: string | undefined): string {
+function calculateMeetingTime(
+  departureDate: string | undefined,
+  departureTime: string | undefined
+): string {
   if (!departureDate || !departureTime) return ''
 
   try {
@@ -176,13 +179,22 @@ export function LeaderMeetingSection({
 
     // 只在有領隊、沒有集合點、有航班資訊、且尚未自動填入過時執行
     if (hasLeaderName && !hasMeetingPoints && hasFlightInfo && !hasAutoFilledRef.current) {
-      const meetingTime = calculateMeetingTime(data.departureDate, data.outboundFlight.departureTime)
+      const meetingTime = calculateMeetingTime(
+        data.departureDate,
+        data.outboundFlight.departureTime
+      )
       if (meetingTime) {
         hasAutoFilledRef.current = true
         updateField('meetingPoints', [{ time: meetingTime, location: '' }])
       }
     }
-  }, [data.leader?.name, data.outboundFlight?.departureTime, data.departureDate, meetingPoints.length, updateField])
+  }, [
+    data.leader?.name,
+    data.outboundFlight?.departureTime,
+    data.departureDate,
+    meetingPoints.length,
+    updateField,
+  ])
 
   const addMeetingPoint = () => {
     // 新增集合點時，自動帶入起飛前三小時
@@ -221,7 +233,8 @@ export function LeaderMeetingSection({
             <div className="relative group">
               {data.leader?.photo ? (
                 <div className="relative">
-                  <img src={data.leader.photo}
+                  <img
+                    src={data.leader.photo}
                     alt={COMP_EDITOR_LABELS.領隊頭像}
                     className="w-20 h-20 rounded-full object-cover border-2 border-morandi-container"
                   />
@@ -269,7 +282,9 @@ export function LeaderMeetingSection({
           <div className="flex-1 space-y-3">
             {/* 中文名稱 - 帶搜尋 */}
             <div className="relative" ref={dropdownRef}>
-              <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_6347}</label>
+              <label className="block text-sm font-medium text-morandi-primary mb-1">
+                {COMP_EDITOR_LABELS.LABEL_6347}
+              </label>
               <div className="relative">
                 <input
                   type="text"
@@ -290,7 +305,7 @@ export function LeaderMeetingSection({
               {/* 搜尋結果下拉 */}
               {showDropdown && searchResults.length > 0 && (
                 <div className="absolute z-50 w-full mt-1 bg-card border border-morandi-container rounded-lg shadow-lg max-h-60 overflow-auto">
-                  {searchResults.map((leader) => (
+                  {searchResults.map(leader => (
                     <button
                       key={leader.id}
                       type="button"
@@ -298,7 +313,13 @@ export function LeaderMeetingSection({
                       className="w-full px-3 py-2 text-left hover:bg-morandi-container/30 transition-colors flex items-center gap-3"
                     >
                       {leader.photo ? (
-                        <Image src={leader.photo} alt={leader.name || ''} width={32} height={32} className="w-8 h-8 rounded-full object-cover" />
+                        <Image
+                          src={leader.photo}
+                          alt={leader.name || ''}
+                          width={32}
+                          height={32}
+                          className="w-8 h-8 rounded-full object-cover"
+                        />
                       ) : (
                         <div className="w-8 h-8 rounded-full bg-morandi-container/50 flex items-center justify-center">
                           <User size={14} className="text-morandi-secondary" />
@@ -317,7 +338,9 @@ export function LeaderMeetingSection({
             </div>
             {/* 英文暱稱 */}
             <div>
-              <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_2765}</label>
+              <label className="block text-sm font-medium text-morandi-primary mb-1">
+                {COMP_EDITOR_LABELS.LABEL_2765}
+              </label>
               <input
                 type="text"
                 value={data.leader?.englishName || ''}
@@ -330,7 +353,9 @@ export function LeaderMeetingSection({
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.國內電話}</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              {COMP_EDITOR_LABELS.國內電話}
+            </label>
             <input
               type="text"
               value={data.leader?.domesticPhone || ''}
@@ -340,7 +365,9 @@ export function LeaderMeetingSection({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_2358}</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              {COMP_EDITOR_LABELS.LABEL_2358}
+            </label>
             <input
               type="text"
               value={data.leader?.overseasPhone || ''}

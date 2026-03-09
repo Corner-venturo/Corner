@@ -121,61 +121,64 @@ export function useVisasDialog(tours: Tour[]) {
   }, [])
 
   // 追加同一人的其他簽證（插入在該申請人下方）
-  const addApplicantForSame = useCallback((parentId: string, parentName: string) => {
-    setApplicants(prev => {
-      const parentIndex = prev.findIndex(a => a.id === parentId)
-      if (parentIndex === -1) return prev
-
-      const parent = prev[parentIndex]
-      const defaultCountry = '護照 成人'
-      // 追加列的收件日期 = 父列的預計下件日期（等前一件下來才能送）
-      const newReceivedDate = parent.expected_issue_date || ''
-      // 根據新的收件日期和簽證類型計算預計下件日期
-      const expectedDate = newReceivedDate
-        ? calculateReceivedDate(newReceivedDate, defaultCountry)
-        : ''
-
-      const newApplicant: VisaApplicant = {
-        id: Date.now().toString(),
-        name: parentName, // 帶入同一人名字
-        country: defaultCountry, // 預設另一種類型
-        is_urgent: false,
-        received_date: newReceivedDate, // 收件日期 = 父列的下件日期
-        expected_issue_date: expectedDate, // 自動計算預計下件日期
-        cost: 0,
-        isAdditional: true, // 標記為追加列
-        parentId: parentId,
-      }
-
-      // 插入在該申請人的下一個位置
-      const newList = [...prev]
-      newList.splice(parentIndex + 1, 0, newApplicant)
-      return newList
-    })
-  }, [calculateReceivedDate])
-
-  // 移除辦理人
-  const removeApplicant = useCallback(
-    (id: string) => {
+  const addApplicantForSame = useCallback(
+    (parentId: string, parentName: string) => {
       setApplicants(prev => {
-        // 找到要刪除的項目
-        const target = prev.find(a => a.id === id)
-        if (!target) return prev
+        const parentIndex = prev.findIndex(a => a.id === parentId)
+        if (parentIndex === -1) return prev
 
-        let filteredList: VisaApplicant[]
+        const parent = prev[parentIndex]
+        const defaultCountry = '護照 成人'
+        // 追加列的收件日期 = 父列的預計下件日期（等前一件下來才能送）
+        const newReceivedDate = parent.expected_issue_date || ''
+        // 根據新的收件日期和簽證類型計算預計下件日期
+        const expectedDate = newReceivedDate
+          ? calculateReceivedDate(newReceivedDate, defaultCountry)
+          : ''
 
-        if (target.isAdditional) {
-          // 如果是追加列，直接刪除
-          filteredList = prev.filter(a => a.id !== id)
-        } else {
-          // 如果是主列，一起刪除它的追加列
-          filteredList = prev.filter(a => a.id !== id && a.parentId !== id)
+        const newApplicant: VisaApplicant = {
+          id: Date.now().toString(),
+          name: parentName, // 帶入同一人名字
+          country: defaultCountry, // 預設另一種類型
+          is_urgent: false,
+          received_date: newReceivedDate, // 收件日期 = 父列的下件日期
+          expected_issue_date: expectedDate, // 自動計算預計下件日期
+          cost: 0,
+          isAdditional: true, // 標記為追加列
+          parentId: parentId,
         }
 
-        // 確保至少有一個項目
-        if (filteredList.length === 0) {
-          // 如果刪除後沒有任何項目，保留一個空的主列
-          return [{
+        // 插入在該申請人的下一個位置
+        const newList = [...prev]
+        newList.splice(parentIndex + 1, 0, newApplicant)
+        return newList
+      })
+    },
+    [calculateReceivedDate]
+  )
+
+  // 移除辦理人
+  const removeApplicant = useCallback((id: string) => {
+    setApplicants(prev => {
+      // 找到要刪除的項目
+      const target = prev.find(a => a.id === id)
+      if (!target) return prev
+
+      let filteredList: VisaApplicant[]
+
+      if (target.isAdditional) {
+        // 如果是追加列，直接刪除
+        filteredList = prev.filter(a => a.id !== id)
+      } else {
+        // 如果是主列，一起刪除它的追加列
+        filteredList = prev.filter(a => a.id !== id && a.parentId !== id)
+      }
+
+      // 確保至少有一個項目
+      if (filteredList.length === 0) {
+        // 如果刪除後沒有任何項目，保留一個空的主列
+        return [
+          {
             id: Date.now().toString(),
             name: '',
             country: '護照 成人',
@@ -183,29 +186,28 @@ export function useVisasDialog(tours: Tour[]) {
             received_date: '',
             expected_issue_date: '',
             cost: 0,
-          }]
-        }
+          },
+        ]
+      }
 
-        // 檢查是否還有主列
-        const hasMainApplicant = filteredList.some(a => !a.isAdditional)
-        if (!hasMainApplicant) {
-          // 如果只剩追加列（沒有主列），將第一個追加列轉為主列
-          const firstAdditional = filteredList[0]
-          return filteredList.map((a, index) => {
-            if (index === 0) {
-              // 第一個轉為主列
-              return { ...a, isAdditional: false, parentId: undefined }
-            }
-            // 其他追加列的 parentId 指向新的主列
-            return { ...a, parentId: firstAdditional.id }
-          })
-        }
+      // 檢查是否還有主列
+      const hasMainApplicant = filteredList.some(a => !a.isAdditional)
+      if (!hasMainApplicant) {
+        // 如果只剩追加列（沒有主列），將第一個追加列轉為主列
+        const firstAdditional = filteredList[0]
+        return filteredList.map((a, index) => {
+          if (index === 0) {
+            // 第一個轉為主列
+            return { ...a, isAdditional: false, parentId: undefined }
+          }
+          // 其他追加列的 parentId 指向新的主列
+          return { ...a, parentId: firstAdditional.id }
+        })
+      }
 
-        return filteredList
-      })
-    },
-    []
-  )
+      return filteredList
+    })
+  }, [])
 
   // 更新辦理人資料
   const updateApplicant = useCallback(
@@ -243,7 +245,12 @@ export function useVisasDialog(tours: Tour[]) {
         // 如果修改的是主列，同步更新所有追加列
         if (!target.isAdditional) {
           // 修改日期或急件時，同步更新追加列的日期
-          if (field === 'received_date' || field === 'expected_issue_date' || field === 'is_urgent' || field === 'country') {
+          if (
+            field === 'received_date' ||
+            field === 'expected_issue_date' ||
+            field === 'is_urgent' ||
+            field === 'country'
+          ) {
             newList = newList.map(a => {
               if (a.parentId !== mainId) return a
               // 追加列的收件日期 = 主列的預計下件日期

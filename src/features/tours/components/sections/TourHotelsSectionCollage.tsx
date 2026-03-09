@@ -56,15 +56,17 @@ export function TourHotelsSectionCollage({ data, viewMode }: TourHotelsSectionCo
         </motion.div>
 
         {/* 飯店卡片網格 */}
-        <div className={`grid ${
-          isMobile
-            ? 'grid-cols-1 gap-8'
-            : hotels.length === 1
-              ? 'grid-cols-1 max-w-md mx-auto gap-8'
-              : hotels.length === 2
-                ? 'md:grid-cols-2 max-w-3xl mx-auto gap-8'
-                : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'
-        }`}>
+        <div
+          className={`grid ${
+            isMobile
+              ? 'grid-cols-1 gap-8'
+              : hotels.length === 1
+                ? 'grid-cols-1 max-w-md mx-auto gap-8'
+                : hotels.length === 2
+                  ? 'md:grid-cols-2 max-w-3xl mx-auto gap-8'
+                  : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'
+          }`}
+        >
           {hotels.map((hotel, index) => {
             const image = getHotelImage(hotel)
             const pushpinColor = pushpinColors[index % pushpinColors.length]
@@ -81,7 +83,8 @@ export function TourHotelsSectionCollage({ data, viewMode }: TourHotelsSectionCo
                 transition={{ delay: index * 0.1 }}
                 className={`bg-card p-3 pb-8 relative group ${hasOffset ? 'mt-8 lg:mt-0' : ''}`}
                 style={{
-                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                  boxShadow:
+                    '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
                 }}
               >
                 {/* 圖釘 */}
@@ -92,7 +95,8 @@ export function TourHotelsSectionCollage({ data, viewMode }: TourHotelsSectionCo
                 {/* 圖片區 */}
                 <div className="overflow-hidden h-48 mb-4 border border-border">
                   {image ? (
-                    <img src={image}
+                    <img
+                      src={image}
                       alt={hotel.name || '飯店'}
                       className={`w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 transform ${rotation} group-hover:${hoverRotation}`}
                     />
@@ -120,13 +124,15 @@ export function TourHotelsSectionCollage({ data, viewMode }: TourHotelsSectionCo
                     className="absolute bottom-4 right-4 transform -rotate-[15deg] text-lg font-bold text-[#FF0080]"
                     style={{ fontFamily: "'Gloria Hallelujah', cursive" }}
                   >
-                    {hotel.description.length > 20 ? hotel.description.substring(0, 20) + '...' : hotel.description}
+                    {hotel.description.length > 20
+                      ? hotel.description.substring(0, 20) + '...'
+                      : hotel.description}
                   </div>
                 )}
 
                 {/* 星星評分裝飾 */}
                 <div className="mt-4 flex gap-1">
-                  {[1, 2, 3, 4].map((star) => (
+                  {[1, 2, 3, 4].map(star => (
                     <svg
                       key={star}
                       className="w-4 h-4 text-[#FFEB3B]"

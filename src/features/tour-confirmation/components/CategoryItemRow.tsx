@@ -1,10 +1,6 @@
 import React from 'react'
 import { CalcInput } from '@/components/ui/calc-input'
-import {
-  getCurrencySymbol,
-  formatCurrency,
-  formatDate,
-} from '../constants/currency'
+import { getCurrencySymbol, formatCurrency, formatDate } from '../constants/currency'
 import { TOUR_CONFIRMATION_SHEET_PAGE_LABELS } from '../constants/labels'
 import type { TourConfirmationItem } from '@/types/tour-confirmation-sheet.types'
 import type { MutableRefObject } from 'react'
@@ -40,9 +36,11 @@ export function CategoryItemRow({
   onNotesBlur,
   onCurrencyConvert,
 }: CategoryItemRowProps) {
-  const subtotal =
-    item.subtotal ?? (item.unit_price || 0) * (item.quantity || 0)
-  const typeData = item.type_data as { subtotal_currency?: string; expected_cost_formula?: string } | null
+  const subtotal = item.subtotal ?? (item.unit_price || 0) * (item.quantity || 0)
+  const typeData = item.type_data as {
+    subtotal_currency?: string
+    expected_cost_formula?: string
+  } | null
 
   return (
     <tr
@@ -56,9 +54,7 @@ export function CategoryItemRow({
       <td className="px-1 py-2 text-xs border-r border-border/30">
         {formatDate(item.service_date)}
       </td>
-      <td className="px-2 py-2 text-sm border-r border-border/30">
-        {item.supplier_name}
-      </td>
+      <td className="px-2 py-2 text-sm border-r border-border/30">{item.supplier_name}</td>
       <td className="px-2 py-2 text-sm border-r border-border/30">{item.title}</td>
       <td className="px-2 py-2 text-right font-mono text-sm border-r border-border/30">
         {item.unit_price ? formatCurrency(item.unit_price) : '-'}
@@ -88,14 +84,13 @@ export function CategoryItemRow({
                 ? localExpectedCostsRef.current[item.id].value
                 : item.expected_cost
             }
-            onChange={(val) => onExpectedCostChange(item.id, val)}
+            onChange={val => onExpectedCostChange(item.id, val)}
             formula={
-              localExpectedCostsRef.current[item.id]?.formula ??
-              typeData?.expected_cost_formula
+              localExpectedCostsRef.current[item.id]?.formula ?? typeData?.expected_cost_formula
             }
-            onFormulaChange={(f) => onExpectedCostFormulaChange(item.id, f)}
+            onFormulaChange={f => onExpectedCostFormulaChange(item.id, f)}
             onBlur={() => onExpectedCostBlur(item.id, item.type_data)}
-            onKeyDown={(e) => {
+            onKeyDown={e => {
               if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
                 e.preventDefault()
                 const inputs = document.querySelectorAll<HTMLInputElement>(
@@ -103,7 +98,7 @@ export function CategoryItemRow({
                 )
                 const inputsArray = Array.from(inputs)
                 const currentIndex = inputsArray.findIndex(
-                  (input) => input.dataset.expectedCostInput === item.id
+                  input => input.dataset.expectedCostInput === item.id
                 )
                 if (currentIndex === -1) return
                 const nextIndex =
@@ -139,13 +134,12 @@ export function CategoryItemRow({
                 ? localNotesRef.current[item.id].value
                 : item.notes || ''
             }
-            onChange={(e) => onNotesChange(item.id, e.target.value)}
+            onChange={e => onNotesChange(item.id, e.target.value)}
             onBlur={() => onNotesBlur(item.id)}
             className="flex-1 h-7 px-2 py-1 text-xs bg-transparent border border-transparent hover:border-border focus:border-morandi-gold focus:ring-1 focus:ring-morandi-gold/30 rounded outline-none"
             placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.備註}
           />
-          {destinationCurrency &&
-          (item.subtotal || (item.unit_price && item.quantity)) ? (
+          {destinationCurrency && (item.subtotal || (item.unit_price && item.quantity)) ? (
             <button
               type="button"
               className="h-6 px-1.5 text-xs text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10 rounded shrink-0 print:hidden"

@@ -69,11 +69,7 @@ export function UniverSlides({ className }: UniverSlidesProps) {
           theme: defaultTheme,
           locale: LocaleType.ZH_TW,
           locales: {
-            [LocaleType.ZH_TW]: merge(
-              {},
-              DesignZhTW,
-              UIZhTW
-            ),
+            [LocaleType.ZH_TW]: merge({}, DesignZhTW, UIZhTW),
           },
         })
 
@@ -109,11 +105,5 @@ export function UniverSlides({ className }: UniverSlidesProps) {
     }
   }, [])
 
-  return (
-    <div
-      ref={containerRef}
-      className={className}
-      style={{ width: '100%', height: '100%' }}
-    />
-  )
+  return <div ref={containerRef} className={className} style={{ width: '100%', height: '100%' }} />
 }

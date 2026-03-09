@@ -40,8 +40,10 @@ function computeSpans(
       continue
     }
     let count = 1
-    while (i + count < sortedMembers.length &&
-           assignments[sortedMembers[i + count].id] === current) {
+    while (
+      i + count < sortedMembers.length &&
+      assignments[sortedMembers[i + count].id] === current
+    ) {
       count++
     }
     spans[sortedMembers[i].id] = count

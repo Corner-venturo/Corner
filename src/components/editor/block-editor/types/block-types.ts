@@ -37,28 +37,28 @@ import { COMP_EDITOR_LABELS } from '../../constants/labels'
  * 區塊類型枚舉
  */
 export type BlockType =
-  | 'COVER'           // 封面區塊
-  | 'FLIGHT'          // 航班資訊
-  | 'FEATURES'        // 行程特色
-  | 'FOCUS_CARDS'     // 精選景點
-  | 'LEADER_MEETING'  // 領隊與集合
-  | 'HOTELS'          // 飯店資訊
+  | 'COVER' // 封面區塊
+  | 'FLIGHT' // 航班資訊
+  | 'FEATURES' // 行程特色
+  | 'FOCUS_CARDS' // 精選景點
+  | 'LEADER_MEETING' // 領隊與集合
+  | 'HOTELS' // 飯店資訊
   | 'DAILY_ITINERARY' // 每日行程
-  | 'PRICING'         // 團費明細
-  | 'PRICE_TIERS'     // 價格方案
-  | 'FAQS'            // 常見問題
-  | 'NOTICES'         // 提醒事項
-  | 'CANCELLATION'    // 取消政策
+  | 'PRICING' // 團費明細
+  | 'PRICE_TIERS' // 價格方案
+  | 'FAQS' // 常見問題
+  | 'NOTICES' // 提醒事項
+  | 'CANCELLATION' // 取消政策
 
 /**
  * 區塊中繼資料
  */
 export interface BlockMeta {
-  id: string           // 區塊唯一 ID
-  type: BlockType      // 區塊類型
-  order: number        // 排序順序
-  visible: boolean     // 是否顯示
-  collapsed?: boolean  // 編輯器中是否收合
+  id: string // 區塊唯一 ID
+  type: BlockType // 區塊類型
+  order: number // 排序順序
+  visible: boolean // 是否顯示
+  collapsed?: boolean // 編輯器中是否收合
 }
 
 // ============================================================
@@ -259,10 +259,10 @@ export interface BlockConfig {
   icon: string
   description: string
   defaultData: BlockDataMap[BlockType]
-  canAdd: boolean      // 是否可以新增（某些區塊只能有一個）
-  canRemove: boolean   // 是否可以刪除
-  canReorder: boolean  // 是否可以重新排序
-  maxCount?: number    // 最大數量限制
+  canAdd: boolean // 是否可以新增（某些區塊只能有一個）
+  canRemove: boolean // 是否可以刪除
+  canReorder: boolean // 是否可以重新排序
+  maxCount?: number // 最大數量限制
 }
 
 /**

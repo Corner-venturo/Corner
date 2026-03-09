@@ -43,7 +43,7 @@ export function JapaneseAccommodationCard({
             transparent 4px
           )
         `,
-        backgroundColor: '#f7f5ef'
+        backgroundColor: '#f7f5ef',
       }}
     >
       {/* 格子紋理裝飾 */}
@@ -54,7 +54,7 @@ export function JapaneseAccommodationCard({
             linear-gradient(90deg, transparent 49%, ${primaryColor} 50%, transparent 51%),
             linear-gradient(0deg, transparent 49%, ${primaryColor} 50%, transparent 51%)
           `,
-          backgroundSize: '60px 40px'
+          backgroundSize: '60px 40px',
         }}
       />
 
@@ -63,7 +63,7 @@ export function JapaneseAccommodationCard({
         className="relative z-10 flex items-center justify-between px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 md:py-4 rounded-lg backdrop-blur-sm border border-white/40"
         style={{
           backgroundColor: 'rgba(255, 255, 255, 0.7)',
-          boxShadow: 'inset 0 0 20px rgba(93, 64, 55, 0.05)'
+          boxShadow: 'inset 0 0 20px rgba(93, 64, 55, 0.05)',
         }}
       >
         {/* 左側圖標 */}
@@ -86,7 +86,7 @@ export function JapaneseAccommodationCard({
               className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold tracking-wider sm:tracking-widest line-clamp-2 hover:underline transition-all"
               style={{
                 color: '#5D4037',
-                fontFamily: '"Zen Old Mincho", serif'
+                fontFamily: '"Zen Old Mincho", serif',
               }}
             >
               {name}
@@ -96,7 +96,7 @@ export function JapaneseAccommodationCard({
               className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold tracking-wider sm:tracking-widest line-clamp-2"
               style={{
                 color: '#5D4037',
-                fontFamily: '"Zen Old Mincho", serif'
+                fontFamily: '"Zen Old Mincho", serif',
               }}
             >
               {name}
@@ -108,10 +108,7 @@ export function JapaneseAccommodationCard({
         <div className="flex flex-col items-center justify-center min-w-[40px] sm:min-w-[50px] md:min-w-[60px] opacity-70">
           {rating === 0 ? (
             // 特色旅宿
-            <span
-              className="text-[8px] sm:text-[10px] font-serif"
-              style={{ color: matchaColor }}
-            >
+            <span className="text-[8px] sm:text-[10px] font-serif" style={{ color: matchaColor }}>
               {TOUR_PREVIEW_LABELS.LABEL_6456}
             </span>
           ) : (

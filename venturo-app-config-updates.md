@@ -9,7 +9,7 @@ Please update the following files in your `/Users/williamchien/Projects/venturo-
 請將您的 `tailwind.config.ts` 檔案內容更新為以下內容：
 
 ```tsx
-import type { Config } from 'tailwindcss';
+import type { Config } from 'tailwindcss'
 
 const config: Config = {
   content: [
@@ -59,8 +59,8 @@ const config: Config = {
     },
   },
   plugins: [],
-};
-export default config;
+}
+export default config
 ```
 
 ---
@@ -76,7 +76,6 @@ export default config;
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
 /* 引入 Google Fonts - Inter (用於英文) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
-
 
 /* 莫蘭迪主題（預設） */
 :root,
@@ -94,10 +93,10 @@ export default config;
   --morandi-muted: #b8b2aa;
 
   /* C 端增加的暖色調 */
-  --warm-accent: #F59E0B; /* 琥珀色 */
-  --nature-green: #10B981; /* 自然綠 */
-  --ocean-blue: #0EA5E9; /* 海洋藍 */
-  --bg-warm: #FFFBF5; /* 更柔和的背景 */
+  --warm-accent: #f59e0b; /* 琥珀色 */
+  --nature-green: #10b981; /* 自然綠 */
+  --ocean-blue: #0ea5e9; /* 海洋藍 */
+  --bg-warm: #fffbf5; /* 更柔和的背景 */
 
   /* 背景色 */
   --background: #f6f4f1;
@@ -335,8 +334,8 @@ export default config;
   --color-ocean-blue: var(--ocean-blue);
   --color-bg-warm: var(--bg-warm);
 
-  --font-sans: "Noto Sans TC", "Inter", sans-serif;
-  --font-mono: "Inter", monospace;
+  --font-sans: 'Noto Sans TC', 'Inter', sans-serif;
+  --font-mono: 'Inter', monospace;
 }
 
 body {
@@ -1004,7 +1003,8 @@ table input[type='number']:focus {
   }
 
   /* 重置基本樣式 */
-  html, body {
+  html,
+  body {
     margin: 0 !important;
     padding: 0 !important;
     background: white !important;
@@ -1029,7 +1029,7 @@ table input[type='number']:focus {
     print-color-adjust: exact !important;
     box-sizing: border-box !important;
     z-index: 999999 !important;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   }
 
   #disbursement-print-container * {
@@ -1082,5 +1082,4 @@ table input[type='number']:focus {
     color: #666 !important;
   }
 }
-
 ```

@@ -108,7 +108,7 @@ export function ImageFilters({ adjustments, onChange }: ImageFiltersProps) {
         </Button>
       </div>
 
-      {filters.map((filter) => (
+      {filters.map(filter => (
         <div key={filter.key} className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs text-morandi-secondary">{filter.label}</span>
@@ -177,7 +177,7 @@ export function FilterPresets({ onSelect }: FilterPresetsProps) {
     <div className="space-y-2">
       <span className="text-sm font-medium">{DESIGNER_LABELS.LABEL_945}</span>
       <div className="grid grid-cols-3 gap-2">
-        {FILTER_PRESETS.map((preset) => (
+        {FILTER_PRESETS.map(preset => (
           <button
             key={preset.name}
             className="p-2 text-xs text-center border rounded-lg hover:bg-morandi-container/50 transition-colors"

@@ -24,18 +24,24 @@ export function AccommodationPreview({ formData }: AccommodationPreviewProps) {
           <div className="w-12 h-12 bg-morandi-gold rounded-md flex items-center justify-center text-white text-2xl font-bold">
             V
           </div>
-          <h1 className="text-3xl font-bold text-morandi-primary">{ACCOMMODATION_PREVIEW_LABELS.HOTEL_VOUCHER_TITLE}</h1>
+          <h1 className="text-3xl font-bold text-morandi-primary">
+            {ACCOMMODATION_PREVIEW_LABELS.HOTEL_VOUCHER_TITLE}
+          </h1>
         </div>
         <div className="text-right text-sm text-morandi-secondary">
           {formData.booking_number && (
             <div className="mb-1">
-              <strong className="text-morandi-primary">{ACCOMMODATION_PREVIEW_LABELS.BOOKING_NUMBER}</strong>{' '}
+              <strong className="text-morandi-primary">
+                {ACCOMMODATION_PREVIEW_LABELS.BOOKING_NUMBER}
+              </strong>{' '}
               <span className="font-mono text-morandi-gold">{formData.booking_number}</span>
             </div>
           )}
           {formData.confirmation_number && (
             <div>
-              <strong className="text-morandi-primary">{ACCOMMODATION_PREVIEW_LABELS.HOTEL_CONFIRMATION_NUMBER}</strong>{' '}
+              <strong className="text-morandi-primary">
+                {ACCOMMODATION_PREVIEW_LABELS.HOTEL_CONFIRMATION_NUMBER}
+              </strong>{' '}
               <span className="font-mono text-morandi-gold">{formData.confirmation_number}</span>
             </div>
           )}
@@ -48,13 +54,17 @@ export function AccommodationPreview({ formData }: AccommodationPreviewProps) {
           <div className="text-xl font-semibold text-morandi-primary mb-4">{data.hotelName}</div>
           {data.hotelAddress && (
             <div className="grid grid-cols-[80px_1fr] gap-2 mb-2 text-sm">
-              <div className="font-semibold text-morandi-secondary">{ACCOMMODATION_PREVIEW_LABELS.ADDRESS}</div>
+              <div className="font-semibold text-morandi-secondary">
+                {ACCOMMODATION_PREVIEW_LABELS.ADDRESS}
+              </div>
               <div className="text-morandi-primary">{data.hotelAddress}</div>
             </div>
           )}
           {data.hotelPhone && data.hotelPhone.length > 0 && (
             <div className="grid grid-cols-[80px_1fr] gap-2 text-sm">
-              <div className="font-semibold text-morandi-secondary">{ACCOMMODATION_PREVIEW_LABELS.PHONE}</div>
+              <div className="font-semibold text-morandi-secondary">
+                {ACCOMMODATION_PREVIEW_LABELS.PHONE}
+              </div>
               <div className="text-morandi-gold">
                 {data.hotelPhone.map((phone, i) => (
                   <div key={i}>☏ {phone}</div>
@@ -69,7 +79,9 @@ export function AccommodationPreview({ formData }: AccommodationPreviewProps) {
       {(data.checkInDate || data.checkOutDate) && (
         <div className="grid grid-cols-4 gap-4 mb-6 bg-card border border-morandi-cream-dark rounded-md overflow-hidden">
           <div className="p-5 text-center border-r border-morandi-cream">
-            <div className="text-xs text-morandi-secondary font-semibold mb-2">{ACCOMMODATION_PREVIEW_LABELS.CHECK_IN}</div>
+            <div className="text-xs text-morandi-secondary font-semibold mb-2">
+              {ACCOMMODATION_PREVIEW_LABELS.CHECK_IN}
+            </div>
             <div className="text-lg font-semibold text-morandi-primary mb-1">
               {formatDate(data.checkInDate || '')}
             </div>
@@ -80,7 +92,9 @@ export function AccommodationPreview({ formData }: AccommodationPreviewProps) {
             </div>
           </div>
           <div className="p-5 text-center border-r border-morandi-cream">
-            <div className="text-xs text-morandi-secondary font-semibold mb-2">{ACCOMMODATION_PREVIEW_LABELS.CHECK_OUT}</div>
+            <div className="text-xs text-morandi-secondary font-semibold mb-2">
+              {ACCOMMODATION_PREVIEW_LABELS.CHECK_OUT}
+            </div>
             <div className="text-lg font-semibold text-morandi-primary mb-1">
               {formatDate(data.checkOutDate || '')}
             </div>
@@ -91,11 +105,15 @@ export function AccommodationPreview({ formData }: AccommodationPreviewProps) {
             </div>
           </div>
           <div className="p-5 text-center border-r border-morandi-cream">
-            <div className="text-xs text-morandi-secondary font-semibold mb-2">{ACCOMMODATION_PREVIEW_LABELS.ROOM}</div>
+            <div className="text-xs text-morandi-secondary font-semibold mb-2">
+              {ACCOMMODATION_PREVIEW_LABELS.ROOM}
+            </div>
             <div className="text-lg font-semibold text-morandi-primary">{data.roomCount || 0}</div>
           </div>
           <div className="p-5 text-center">
-            <div className="text-xs text-morandi-secondary font-semibold mb-2">{ACCOMMODATION_PREVIEW_LABELS.NIGHT}</div>
+            <div className="text-xs text-morandi-secondary font-semibold mb-2">
+              {ACCOMMODATION_PREVIEW_LABELS.NIGHT}
+            </div>
             <div className="text-lg font-semibold text-morandi-primary">{data.nightCount || 0}</div>
           </div>
         </div>
@@ -113,21 +131,30 @@ export function AccommodationPreview({ formData }: AccommodationPreviewProps) {
             </div>
             {data.guestName && (
               <div className="grid grid-cols-[120px_1fr] gap-3 mb-3 text-sm">
-                <div className="font-semibold text-morandi-secondary">{ACCOMMODATION_PREVIEW_LABELS.GUEST_NAME}</div>
+                <div className="font-semibold text-morandi-secondary">
+                  {ACCOMMODATION_PREVIEW_LABELS.GUEST_NAME}
+                </div>
                 <div className="font-medium text-morandi-gold">{data.guestName}</div>
               </div>
             )}
             {data.roomCount && data.nightCount && (
               <div className="grid grid-cols-[120px_1fr] gap-3 mb-3 text-sm">
-                <div className="font-semibold text-morandi-secondary">{ACCOMMODATION_PREVIEW_LABELS.YOUR_BOOKING}</div>
+                <div className="font-semibold text-morandi-secondary">
+                  {ACCOMMODATION_PREVIEW_LABELS.YOUR_BOOKING}
+                </div>
                 <div className="text-morandi-primary">
-                  {data.roomCount}{ACCOMMODATION_PREVIEW_LABELS.ROOMS_UNIT}{data.nightCount}{ACCOMMODATION_PREVIEW_LABELS.NIGHTS_UNIT}
+                  {data.roomCount}
+                  {ACCOMMODATION_PREVIEW_LABELS.ROOMS_UNIT}
+                  {data.nightCount}
+                  {ACCOMMODATION_PREVIEW_LABELS.NIGHTS_UNIT}
                 </div>
               </div>
             )}
             {data.guestCapacity && (
               <div className="grid grid-cols-[120px_1fr] gap-3 text-sm">
-                <div className="font-semibold text-morandi-secondary">{ACCOMMODATION_PREVIEW_LABELS.GUEST_CAPACITY}</div>
+                <div className="font-semibold text-morandi-secondary">
+                  {ACCOMMODATION_PREVIEW_LABELS.GUEST_CAPACITY}
+                </div>
                 <div className="text-morandi-primary">{data.guestCapacity}</div>
               </div>
             )}

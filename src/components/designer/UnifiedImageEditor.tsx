@@ -5,20 +5,15 @@ import Cropper, { Area } from 'react-easy-crop'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
-import {
-  ZoomIn,
-  ZoomOut,
-  RotateCcw,
-  Move,
-  Crop,
-  Sliders,
-  Check,
-} from 'lucide-react'
+import { ZoomIn, ZoomOut, RotateCcw, Move, Crop, Sliders, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ImageAdjustmentsPanel } from '@/features/designer/components/ImageAdjustmentsPanel'
 import { useImageAdjustments } from '@/features/designer/hooks/useImageAdjustments'
 import type { ImageAdjustments, ImagePositionSettings } from '@/features/designer/components/types'
-import { DEFAULT_IMAGE_ADJUSTMENTS, DEFAULT_IMAGE_POSITION } from '@/features/designer/components/types'
+import {
+  DEFAULT_IMAGE_ADJUSTMENTS,
+  DEFAULT_IMAGE_POSITION,
+} from '@/features/designer/components/types'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { DESIGNER_LABELS } from './constants/labels'
@@ -138,7 +133,7 @@ export function UnifiedImageEditor({
 
       const moveMultiplier = position.scale
 
-      setPosition((prev) => ({
+      setPosition(prev => ({
         ...prev,
         x: Math.max(0, Math.min(100, dragStartRef.current.posX - percentX * moveMultiplier)),
         y: Math.max(0, Math.min(100, dragStartRef.current.posY - percentY * moveMultiplier)),
@@ -212,10 +207,10 @@ export function UnifiedImageEditor({
     { key: 'position', label: '位置', icon: Move },
     { key: 'adjust', label: '調整', icon: Sliders },
   ]
-  const modes = allModes.filter((m) => !hideModes.includes(m.key))
+  const modes = allModes.filter(m => !hideModes.includes(m.key))
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Dialog open={open} onOpenChange={isOpen => !isOpen && onClose()}>
       <DialogContent level={1} className="max-w-3xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>{DESIGNER_LABELS.EDIT_5128}</DialogTitle>
@@ -269,7 +264,8 @@ export function UnifiedImageEditor({
                 style={{ aspectRatio }}
                 onMouseDown={handlePositionMouseDown}
               >
-                <img src={imageSrc}
+                <img
+                  src={imageSrc}
                   alt={DESIGNER_LABELS.PREVIEW}
                   className="w-full h-full object-cover pointer-events-none"
                   style={{
@@ -295,11 +291,9 @@ export function UnifiedImageEditor({
 
             {/* 調整模式 */}
             {mode === 'adjust' && (
-              <div
-                className="relative bg-black rounded-lg overflow-hidden"
-                style={{ aspectRatio }}
-              >
-                <img src={previewImageSrc}
+              <div className="relative bg-black rounded-lg overflow-hidden" style={{ aspectRatio }}>
+                <img
+                  src={previewImageSrc}
                   alt={DESIGNER_LABELS.PREVIEW}
                   className="w-full h-full object-cover"
                 />
@@ -310,10 +304,7 @@ export function UnifiedImageEditor({
           {/* 控制區（調整模式時顯示在右側） */}
           {mode === 'adjust' && (
             <div className="w-64 flex-shrink-0 overflow-y-auto">
-              <ImageAdjustmentsPanel
-                adjustments={adjustments}
-                onChange={setAdjustments}
-              />
+              <ImageAdjustmentsPanel adjustments={adjustments} onChange={setAdjustments} />
             </div>
           )}
         </div>
@@ -329,11 +320,11 @@ export function UnifiedImageEditor({
                 min={1}
                 max={3}
                 step={0.1}
-                onValueChange={(values) => {
+                onValueChange={values => {
                   if (mode === 'crop') {
                     setCropZoom(values[0])
                   } else {
-                    setPosition((prev) => ({ ...prev, scale: values[0] }))
+                    setPosition(prev => ({ ...prev, scale: values[0] }))
                   }
                 }}
                 className="flex-1"
@@ -358,11 +349,11 @@ export function UnifiedImageEditor({
                 { label: '左下', x: 0, y: 100 },
                 { label: '下', x: 50, y: 100 },
                 { label: '右下', x: 100, y: 100 },
-              ].map((preset) => (
+              ].map(preset => (
                 <button
                   key={preset.label}
                   type="button"
-                  onClick={() => setPosition((prev) => ({ ...prev, x: preset.x, y: preset.y }))}
+                  onClick={() => setPosition(prev => ({ ...prev, x: preset.x, y: preset.y }))}
                   className={cn(
                     'px-2 py-1 text-xs rounded transition-colors',
                     position.x === preset.x && position.y === preset.y
@@ -439,7 +430,7 @@ async function getCroppedImg(imageSrc: string, pixelCrop: Area): Promise<Blob> {
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(
-      (blob) => {
+      blob => {
         if (blob) {
           resolve(blob)
         } else {
@@ -456,7 +447,7 @@ function createImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image()
     image.addEventListener('load', () => resolve(image))
-    image.addEventListener('error', (error) => reject(error))
+    image.addEventListener('error', error => reject(error))
     image.crossOrigin = 'anonymous'
     image.src = url
   })

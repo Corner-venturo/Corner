@@ -44,7 +44,9 @@ export function MultiImageLayout({
             <span key={i}>
               {i > 0 && <br />}
               {i === arr.length - 1 ? (
-                <span style={{ color: ART.accent }} className="italic">{part.trim()}</span>
+                <span style={{ color: ART.accent }} className="italic">
+                  {part.trim()}
+                </span>
               ) : (
                 part.trim()
               )}
@@ -88,24 +90,34 @@ export function MultiImageLayout({
                 className="overflow-hidden aspect-square cursor-pointer"
                 onClick={() => onImageClick(allImages, 0, day.title)}
               >
-                <img src={allImages[0]}
+                <img
+                  src={allImages[0]}
                   alt=""
                   className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                   style={{ filter: 'grayscale(100%)' }}
-                  onMouseEnter={(e) => { e.currentTarget.style.filter = 'grayscale(0%)' }}
-                  onMouseLeave={(e) => { e.currentTarget.style.filter = 'grayscale(100%)' }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.filter = 'grayscale(0%)'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.filter = 'grayscale(100%)'
+                  }}
                 />
               </div>
               <div
                 className="overflow-hidden aspect-square translate-y-8 cursor-pointer"
                 onClick={() => onImageClick(allImages, allImages.length > 1 ? 1 : 0, day.title)}
               >
-                <img src={allImages[1] || allImages[0]}
+                <img
+                  src={allImages[1] || allImages[0]}
                   alt=""
                   className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                   style={{ filter: 'grayscale(100%)' }}
-                  onMouseEnter={(e) => { e.currentTarget.style.filter = 'grayscale(0%)' }}
-                  onMouseLeave={(e) => { e.currentTarget.style.filter = 'grayscale(100%)' }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.filter = 'grayscale(0%)'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.filter = 'grayscale(100%)'
+                  }}
                 />
               </div>
             </>

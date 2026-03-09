@@ -9,74 +9,83 @@
 ## 1. individual_international.html（國外個別旅遊契約）
 
 ### 基本資訊
-| 變數名稱 | 說明 | 範例值 |
-|---------|------|--------|
-| `{{reviewYear}}` | 契約審閱年份（民國） | `113` |
-| `{{reviewMonth}}` | 契約審閱月份 | `11` |
-| `{{reviewDay}}` | 契約審閱日 | `12` |
+
+| 變數名稱          | 說明                 | 範例值 |
+| ----------------- | -------------------- | ------ |
+| `{{reviewYear}}`  | 契約審閱年份（民國） | `113`  |
+| `{{reviewMonth}}` | 契約審閱月份         | `11`   |
+| `{{reviewDay}}`   | 契約審閱日           | `12`   |
 
 ### 旅客資訊（甲方）
-| 變數名稱 | 說明 | 範例值 |
-|---------|------|--------|
-| `{{travelerName}}` | 旅客姓名 | `王小明` |
-| `{{travelerAddress}}` | 旅客住址 | `台北市大安區...` |
-| `{{travelerIdNumber}}` | 旅客身分證字號 | `A123456789` |
-| `{{travelerPhone}}` | 旅客電話 | `0912-345-678` |
+
+| 變數名稱               | 說明           | 範例值            |
+| ---------------------- | -------------- | ----------------- |
+| `{{travelerName}}`     | 旅客姓名       | `王小明`          |
+| `{{travelerAddress}}`  | 旅客住址       | `台北市大安區...` |
+| `{{travelerIdNumber}}` | 旅客身分證字號 | `A123456789`      |
+| `{{travelerPhone}}`    | 旅客電話       | `0912-345-678`    |
 
 ### 集合資訊
-| 變數名稱 | 說明 | 範例值 |
-|---------|------|--------|
-| `{{gatherYear}}` | 集合年份（民國） | `113` |
-| `{{gatherMonth}}` | 集合月份 | `12` |
-| `{{gatherDay}}` | 集合日 | `15` |
-| `{{gatherHour}}` | 集合時 | `08` |
-| `{{gatherMinute}}` | 集合分 | `30` |
+
+| 變數名稱           | 說明             | 範例值 |
+| ------------------ | ---------------- | ------ |
+| `{{gatherYear}}`   | 集合年份（民國） | `113`  |
+| `{{gatherMonth}}`  | 集合月份         | `12`   |
+| `{{gatherDay}}`    | 集合日           | `15`   |
+| `{{gatherHour}}`   | 集合時           | `08`   |
+| `{{gatherMinute}}` | 集合分           | `30`   |
 
 ### 費用資訊
-| 變數名稱 | 說明 | 範例值 |
-|---------|------|--------|
-| `{{totalAmount}}` | 旅遊費用總額（新台幣） | `50,000` |
-| `{{depositAmount}}` | 定金金額（新台幣） | `10,000` |
+
+| 變數名稱            | 說明                   | 範例值   |
+| ------------------- | ---------------------- | -------- |
+| `{{totalAmount}}`   | 旅遊費用總額（新台幣） | `50,000` |
+| `{{depositAmount}}` | 定金金額（新台幣）     | `10,000` |
 
 ---
 
 ## 2. domestic.html（國內旅遊契約）
 
 ### 基本資訊
-| 變數名稱 | 說明 | 範例值 |
-|---------|------|--------|
-| `{{reviewYear}}` | 契約審閱年份（民國） | `113` |
-| `{{reviewMonth}}` | 契約審閱月份 | `11` |
-| `{{reviewDay}}` | 契約審閱日 | `12` |
+
+| 變數名稱          | 說明                 | 範例值 |
+| ----------------- | -------------------- | ------ |
+| `{{reviewYear}}`  | 契約審閱年份（民國） | `113`  |
+| `{{reviewMonth}}` | 契約審閱月份         | `11`   |
+| `{{reviewDay}}`   | 契約審閱日           | `12`   |
 
 ### 旅客資訊（甲方）
-| 變數名稱 | 說明 | 範例值 |
-|---------|------|--------|
-| `{{travelerName}}` | 旅客姓名 | `王小明` |
-| `{{travelerPhone}}` | 旅客電話 | `0912-345-678` |
+
+| 變數名稱              | 說明       | 範例值            |
+| --------------------- | ---------- | ----------------- |
+| `{{travelerName}}`    | 旅客姓名   | `王小明`          |
+| `{{travelerPhone}}`   | 旅客電話   | `0912-345-678`    |
 | `{{travelerAddress}}` | 旅客居住所 | `台北市大安區...` |
 
 ### 緊急聯絡人
-| 變數名稱 | 說明 | 範例值 |
-|---------|------|--------|
-| `{{emergencyContactName}}` | 緊急聯絡人姓名 | `王大明` |
+
+| 變數名稱                    | 說明           | 範例值         |
+| --------------------------- | -------------- | -------------- |
+| `{{emergencyContactName}}`  | 緊急聯絡人姓名 | `王大明`       |
 | `{{emergencyContactPhone}}` | 緊急聯絡人電話 | `0922-111-222` |
 
 ### 旅遊資訊
-| 變數名稱 | 說明 | 範例值 |
-|---------|------|--------|
-| `{{tourName}}` | 旅遊團名稱 | `阿里山日月潭三日遊` |
-| `{{tourDestination}}` | 旅遊地區 | `阿里山、日月潭` |
+
+| 變數名稱              | 說明       | 範例值               |
+| --------------------- | ---------- | -------------------- |
+| `{{tourName}}`        | 旅遊團名稱 | `阿里山日月潭三日遊` |
+| `{{tourDestination}}` | 旅遊地區   | `阿里山、日月潭`     |
 
 ### 集合資訊
-| 變數名稱 | 說明 | 範例值 |
-|---------|------|--------|
-| `{{gatherYear}}` | 集合年份（民國） | `113` |
-| `{{gatherMonth}}` | 集合月份 | `12` |
-| `{{gatherDay}}` | 集合日 | `15` |
-| `{{gatherHour}}` | 集合時 | `08` |
-| `{{gatherMinute}}` | 集合分 | `30` |
-| `{{gatherLocation}}` | 集合地點 | `台北火車站東三門` |
+
+| 變數名稱             | 說明             | 範例值             |
+| -------------------- | ---------------- | ------------------ |
+| `{{gatherYear}}`     | 集合年份（民國） | `113`              |
+| `{{gatherMonth}}`    | 集合月份         | `12`               |
+| `{{gatherDay}}`      | 集合日           | `15`               |
+| `{{gatherHour}}`     | 集合時           | `08`               |
+| `{{gatherMinute}}`   | 集合分           | `30`               |
+| `{{gatherLocation}}` | 集合地點         | `台北火車站東三門` |
 
 ---
 
@@ -91,11 +100,11 @@
 ### JavaScript 範例（使用 Mustache.js）
 
 ```javascript
-import Mustache from 'mustache';
-import fs from 'fs';
+import Mustache from 'mustache'
+import fs from 'fs'
 
 // 讀取範本
-const template = fs.readFileSync('public/contract-templates/domestic.html', 'utf-8');
+const template = fs.readFileSync('public/contract-templates/domestic.html', 'utf-8')
 
 // 準備資料
 const data = {
@@ -114,32 +123,35 @@ const data = {
   gatherDay: '15',
   gatherHour: '08',
   gatherMinute: '30',
-  gatherLocation: '台北火車站東三門'
-};
+  gatherLocation: '台北火車站東三門',
+}
 
 // 渲染
-const html = Mustache.render(template, data);
+const html = Mustache.render(template, data)
 
 // 儲存或輸出
-fs.writeFileSync('output/contract.html', html);
+fs.writeFileSync('output/contract.html', html)
 ```
 
 ### TypeScript 範例（使用簡單替換）
 
 ```typescript
 function renderContract(template: string, data: Record<string, string>): string {
-  let result = template;
+  let result = template
 
   for (const [key, value] of Object.entries(data)) {
-    const pattern = new RegExp(`{{${key}}}`, 'g');
-    result = result.replace(pattern, value);
+    const pattern = new RegExp(`{{${key}}}`, 'g')
+    result = result.replace(pattern, value)
   }
 
-  return result;
+  return result
 }
 
 // 使用
-const template = await fs.readFile('public/contract-templates/individual_international.html', 'utf-8');
+const template = await fs.readFile(
+  'public/contract-templates/individual_international.html',
+  'utf-8'
+)
 const rendered = renderContract(template, {
   reviewYear: '113',
   reviewMonth: '11',
@@ -154,8 +166,8 @@ const rendered = renderContract(template, {
   gatherHour: '10',
   gatherMinute: '00',
   totalAmount: '85,000',
-  depositAmount: '20,000'
-});
+  depositAmount: '20,000',
+})
 ```
 
 ---

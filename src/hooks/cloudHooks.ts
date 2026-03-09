@@ -137,9 +137,12 @@ export const useCustomerGroups = createCloudHook<CustomerGroup>('customer_groups
 })
 
 // 客戶群組成員
-export const useCustomerGroupMembers = createCloudHook<CustomerGroupMember>('customer_group_members', {
-  orderBy: { column: 'created_at', ascending: false },
-})
+export const useCustomerGroupMembers = createCloudHook<CustomerGroupMember>(
+  'customer_group_members',
+  {
+    orderBy: { column: 'created_at', ascending: false },
+  }
+)
 
 // ===== 提案系統 =====
 

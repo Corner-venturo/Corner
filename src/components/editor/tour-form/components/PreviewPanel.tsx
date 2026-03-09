@@ -33,7 +33,9 @@ export function PreviewPanel({
       {/* 標題列（和主編輯器一致） */}
       <div className="h-14 bg-card border-b px-6 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
-          <h2 className="text-lg font-semibold text-morandi-primary">{TOUR_FORM_LABELS.PREVIEW_2405}</h2>
+          <h2 className="text-lg font-semibold text-morandi-primary">
+            {TOUR_FORM_LABELS.PREVIEW_2405}
+          </h2>
           <div className="flex gap-2 bg-morandi-container/30 rounded-lg p-1">
             <button
               type="button"
@@ -102,9 +104,7 @@ export function PreviewPanel({
                     }}
                   >
                     {/* 內容區域 */}
-                    <div className="w-full h-full overflow-y-auto">
-                      {children(viewMode)}
-                    </div>
+                    <div className="w-full h-full overflow-y-auto">{children(viewMode)}</div>
 
                     {/* 底部指示條 */}
                     <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10">
@@ -122,9 +122,7 @@ export function PreviewPanel({
                   height: '800px',
                 }}
               >
-                <div className="w-full h-full overflow-y-auto">
-                  {children(viewMode)}
-                </div>
+                <div className="w-full h-full overflow-y-auto">{children(viewMode)}</div>
               </div>
             )}
           </div>

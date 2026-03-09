@@ -2,7 +2,7 @@
 
 /**
  * Collage 風格航班區塊 - 登機證造型
- * 
+ *
  * 特色：
  * - 登機證卡片設計
  * - 膠帶裝飾
@@ -172,7 +172,12 @@ function BoardingPassCard({
   )
 }
 
-export function CollageFlightSection({ outboundFlight, returnFlight, departureDate, viewMode }: CollageFlightSectionProps) {
+export function CollageFlightSection({
+  outboundFlight,
+  returnFlight,
+  departureDate,
+  viewMode,
+}: CollageFlightSectionProps) {
   const isMobile = viewMode === 'mobile'
 
   if (!outboundFlight && !returnFlight) return null
@@ -186,7 +191,10 @@ export function CollageFlightSection({ outboundFlight, returnFlight, departureDa
       {/* 網點背景 */}
       <div
         className="absolute inset-0 opacity-40 pointer-events-none"
-        style={{ backgroundImage: 'radial-gradient(#ddd 1px, transparent 1px)', backgroundSize: '20px 20px' }}
+        style={{
+          backgroundImage: 'radial-gradient(#ddd 1px, transparent 1px)',
+          backgroundSize: '20px 20px',
+        }}
       />
 
       {/* 裝飾色塊 */}
@@ -233,7 +241,10 @@ export function CollageFlightSection({ outboundFlight, returnFlight, departureDa
           >
             <span className="text-sm font-bold uppercase tracking-widest">Flight Info</span>
           </div>
-          <h2 className={isMobile ? 'text-3xl' : 'text-5xl'} style={{ fontFamily: "'Permanent Marker', cursive" }}>
+          <h2
+            className={isMobile ? 'text-3xl' : 'text-5xl'}
+            style={{ fontFamily: "'Permanent Marker', cursive" }}
+          >
             YOUR TICKETS
           </h2>
         </motion.div>
@@ -241,7 +252,12 @@ export function CollageFlightSection({ outboundFlight, returnFlight, departureDa
         {/* 航班卡片 */}
         <div className={`grid ${isMobile ? 'grid-cols-1 gap-8' : 'grid-cols-2 gap-8'}`}>
           {outboundFlight && (
-            <BoardingPassCard flight={outboundFlight} type="outbound" departureDate={departureDate} isMobile={isMobile} />
+            <BoardingPassCard
+              flight={outboundFlight}
+              type="outbound"
+              departureDate={departureDate}
+              isMobile={isMobile}
+            />
           )}
           {returnFlight && (
             <BoardingPassCard flight={returnFlight} type="return" isMobile={isMobile} />

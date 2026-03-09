@@ -74,17 +74,18 @@ export function NewebPaySettings() {
 
     try {
       if (!workspaceId) return
-      const { error } = await supabase
-        .from('system_settings')
-        .upsert({
+      const { error } = await supabase.from('system_settings').upsert(
+        {
           category: 'newebpay',
           workspace_id: workspaceId,
           settings: config as unknown as Json,
           description: NEWEBPAY_LABELS.TITLE,
           updated_at: new Date().toISOString(),
-        }, {
+        },
+        {
           onConflict: 'category,workspace_id',
-        })
+        }
+      )
 
       if (error) throw error
 
@@ -196,9 +197,7 @@ export function NewebPaySettings() {
               {NEWEBPAY_LABELS.LABEL_2112}
             </Label>
             <p className="text-xs text-morandi-secondary mt-1">
-              {config.isProduction
-                ? NEWEBPAY_LABELS.ENV_PRODUCTION
-                : NEWEBPAY_LABELS.ENV_TEST}
+              {config.isProduction ? NEWEBPAY_LABELS.ENV_PRODUCTION : NEWEBPAY_LABELS.ENV_TEST}
             </p>
           </div>
           <Switch
@@ -216,11 +215,7 @@ export function NewebPaySettings() {
                 message.type === 'success' ? 'text-status-success' : 'text-status-danger'
               }`}
             >
-              {message.type === 'success' ? (
-                <CheckCircle2 size={16} />
-              ) : (
-                <AlertCircle size={16} />
-              )}
+              {message.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
               {message.text}
             </div>
           )}
@@ -234,7 +229,9 @@ export function NewebPaySettings() {
 
       {/* 說明 */}
       <div className="mt-6 p-4 bg-status-info-bg rounded-lg border border-status-info/30">
-        <h4 className="text-sm font-medium text-morandi-primary mb-2">{NEWEBPAY_LABELS.SETUP_GUIDE}</h4>
+        <h4 className="text-sm font-medium text-morandi-primary mb-2">
+          {NEWEBPAY_LABELS.SETUP_GUIDE}
+        </h4>
         <ul className="text-xs text-morandi-secondary space-y-1 list-disc list-inside">
           <li>{NEWEBPAY_LABELS.GUIDE_1}</li>
           <li>{NEWEBPAY_LABELS.GUIDE_2}</li>

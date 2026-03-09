@@ -7,11 +7,11 @@
 
 ## ✅ 修復摘要
 
-| 項目 | 檔案數 | 狀態 |
-|------|--------|------|
-| **userId 獲取** | 3 個檔案 | ✅ 已完成 |
-| **健身資料清除** | 1 個檔案 | ✅ 已完成 |
-| **總計** | **4 個檔案** | **5 個 TODO** |
+| 項目             | 檔案數       | 狀態          |
+| ---------------- | ------------ | ------------- |
+| **userId 獲取**  | 3 個檔案     | ✅ 已完成     |
+| **健身資料清除** | 1 個檔案     | ✅ 已完成     |
+| **總計**         | **4 個檔案** | **5 個 TODO** |
 
 **TODO 數量變化**: 27 → 22 個 (↓ 18.5%)
 
@@ -22,11 +22,13 @@
 ### 1. Timebox 組件 - userId 獲取 (4個)
 
 #### 修復檔案:
+
 - `src/app/timebox/components/day-view.tsx:29`
 - `src/app/timebox/components/week-view.tsx:21`
 - `src/app/timebox/page.tsx:35`
 
 #### 修復前:
+
 ```typescript
 // TODO: Get userId from auth context
 const userId = 'temp-user-id' // Placeholder
@@ -34,6 +36,7 @@ initializeCurrentWeek(selectedDay, userId)
 ```
 
 #### 修復後:
+
 ```typescript
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -43,6 +46,7 @@ initializeCurrentWeek(selectedDay, userId)
 ```
 
 **修復說明**:
+
 - 使用 `useAuthStore` 從認證狀態獲取真實 userId
 - 保留 fallback 'temp-user-id' 以防止 user 為 null
 - 新增 user 作為 useEffect 依賴項
@@ -52,9 +56,11 @@ initializeCurrentWeek(selectedDay, userId)
 ### 2. 健身設定 - 資料清除功能 (1個)
 
 #### 修復檔案:
+
 - `src/app/fitness/settings/page.tsx:25`
 
 #### 修復前:
+
 ```typescript
 const handleClearData = () => {
   if (confirm('...')) {
@@ -66,6 +72,7 @@ const handleClearData = () => {
 ```
 
 #### 修復後:
+
 ```typescript
 import { localDB } from '@/lib/db'
 
@@ -92,6 +99,7 @@ const handleClearData = async () => {
 ```
 
 **修復說明**:
+
 - 呼叫 `localDB.clear('fitness_records')` 清除 IndexedDB 資料
 - 新增錯誤處理機制
 - 使用 async/await 處理非同步操作
@@ -125,6 +133,7 @@ $ grep -c "TODO" src/app/fitness/settings/page.tsx
 根據 `TODO_ANALYSIS_REPORT.md` 的分類:
 
 ### 中優先級 (13 個)
+
 1. **會計系統** - Store 方法 (2個)
    - `updateCategory` in accounting-store
    - `deleteCategory` in accounting-store
@@ -153,6 +162,7 @@ $ grep -c "TODO" src/app/fitness/settings/page.tsx
    - AddReceiptDialog 儲存邏輯
 
 ### 低優先級 (9 個)
+
 1. **eSIM 系統** - FastMove API (5個)
    - 等待 API Key 配置
 
@@ -168,6 +178,7 @@ $ grep -c "TODO" src/app/fitness/settings/page.tsx
 ## 🎯 下一步建議
 
 ### Week 2: 核心功能 TODO (8 個)
+
 優先處理影響業務的功能性 TODO:
 
 1. **會計 Store 方法** (2個) - 高價值
@@ -175,6 +186,7 @@ $ grep -c "TODO" src/app/fitness/settings/page.tsx
 3. **報價編號衝突** (1個) - 資料正確性
 
 ### Week 3: 功能增強 TODO (5 個)
+
 1. 供應商城市選擇
 2. Timebox 複製
 3. 文件管理
@@ -182,6 +194,7 @@ $ grep -c "TODO" src/app/fitness/settings/page.tsx
 5. 工作區員工數
 
 ### 未來: 外部依賴 TODO (6 個)
+
 - eSIM API 整合 (等待 API Key)
 - 健身模組完善 (等待功能規劃)
 

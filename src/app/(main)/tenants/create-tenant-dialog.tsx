@@ -4,7 +4,13 @@ import React, { useState, useCallback } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Card } from '@/components/ui/card'
 import { Copy, Check } from 'lucide-react'
 import { toast } from 'sonner'
@@ -48,7 +54,12 @@ interface LoginInfo {
   password: string
 }
 
-export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCodes }: CreateTenantDialogProps) {
+export function CreateTenantDialog({
+  open,
+  onOpenChange,
+  onComplete,
+  existingCodes,
+}: CreateTenantDialogProps) {
   const { createWorkspace, createChannel } = useWorkspaceChannels()
   const user = useAuthStore(state => state.user)
 
@@ -58,7 +69,12 @@ export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCod
   const [codeError, setCodeError] = useState('')
 
   const [step1, setStep1] = useState<Step1Data>({ name: '', code: '', type: '' })
-  const [step2, setStep2] = useState<Step2Data>({ employeeNumber: 'E001', name: '', email: '', password: '12345678' })
+  const [step2, setStep2] = useState<Step2Data>({
+    employeeNumber: 'E001',
+    name: '',
+    email: '',
+    password: '12345678',
+  })
   const [loginInfo, setLoginInfo] = useState<LoginInfo | null>(null)
 
   const resetForm = useCallback(() => {
@@ -111,7 +127,11 @@ export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCod
     [validateCode]
   )
 
-  const isStep1Valid = step1.name.trim() !== '' && step1.code.trim() !== '' && !codeError && /^[A-Z]+$/.test(step1.code)
+  const isStep1Valid =
+    step1.name.trim() !== '' &&
+    step1.code.trim() !== '' &&
+    !codeError &&
+    /^[A-Z]+$/.test(step1.code)
   const isStep2Valid = step2.name.trim() !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(step2.email)
 
   const handleCreate = async () => {
@@ -234,15 +254,13 @@ export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCod
         .eq('id', employee.id)
 
       // 5. Insert profile
-      await supabase
-        .from('profiles')
-        .insert({
-          id: authUserId,
-          workspace_id: createdWs.id,
-          employee_id: employee.id,
-          display_name: step2.name,
-          is_employee: true,
-        })
+      await supabase.from('profiles').insert({
+        id: authUserId,
+        workspace_id: createdWs.id,
+        employee_id: employee.id,
+        display_name: step2.name,
+        is_employee: true,
+      })
 
       toast.success(LABELS.TOAST_ADMIN_CREATED)
 
@@ -312,7 +330,8 @@ export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCod
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                  {LABELS.FIELD_NAME} <span className="text-morandi-red">{LABELS.FIELD_NAME_REQUIRED}</span>
+                  {LABELS.FIELD_NAME}{' '}
+                  <span className="text-morandi-red">{LABELS.FIELD_NAME_REQUIRED}</span>
                 </label>
                 <Input
                   value={step1.name}
@@ -324,7 +343,8 @@ export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCod
 
               <div>
                 <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                  {LABELS.FIELD_CODE} <span className="text-morandi-red">{LABELS.FIELD_CODE_REQUIRED}</span>
+                  {LABELS.FIELD_CODE}{' '}
+                  <span className="text-morandi-red">{LABELS.FIELD_CODE_REQUIRED}</span>
                 </label>
                 <Input
                   value={step1.code}
@@ -362,11 +382,7 @@ export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCod
             </div>
 
             <div className="flex gap-2 mt-6">
-              <Button
-                variant="outline"
-                onClick={() => handleOpenChange(false)}
-                className="flex-1"
-              >
+              <Button variant="outline" onClick={() => handleOpenChange(false)} className="flex-1">
                 {LABELS.BTN_CANCEL}
               </Button>
               <Button
@@ -398,7 +414,8 @@ export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCod
 
               <div>
                 <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                  {LABELS.FIELD_ADMIN_NAME} <span className="text-morandi-red">{LABELS.FIELD_ADMIN_NAME_REQUIRED}</span>
+                  {LABELS.FIELD_ADMIN_NAME}{' '}
+                  <span className="text-morandi-red">{LABELS.FIELD_ADMIN_NAME_REQUIRED}</span>
                 </label>
                 <Input
                   value={step2.name}
@@ -436,11 +453,7 @@ export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCod
             </div>
 
             <div className="flex gap-2 mt-6">
-              <Button
-                variant="outline"
-                onClick={() => setStep(1)}
-                className="flex-1"
-              >
+              <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
                 {LABELS.BTN_PREV}
               </Button>
               <Button
@@ -462,28 +475,34 @@ export function CreateTenantDialog({ open, onOpenChange, onComplete, existingCod
             <Card className="bg-morandi-container/10 border-morandi-container/30 p-4 space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-morandi-secondary">{LABELS.LOGIN_INFO_CODE}</span>
-                <span className="font-mono font-semibold text-morandi-primary">{loginInfo.workspaceCode}</span>
+                <span className="font-mono font-semibold text-morandi-primary">
+                  {loginInfo.workspaceCode}
+                </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-morandi-secondary">{LABELS.LOGIN_INFO_EMPLOYEE_NUMBER}</span>
-                <span className="font-mono font-semibold text-morandi-primary">{loginInfo.employeeNumber}</span>
+                <span className="text-sm text-morandi-secondary">
+                  {LABELS.LOGIN_INFO_EMPLOYEE_NUMBER}
+                </span>
+                <span className="font-mono font-semibold text-morandi-primary">
+                  {loginInfo.employeeNumber}
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-morandi-secondary">{LABELS.LOGIN_INFO_EMAIL}</span>
-                <span className="font-mono font-semibold text-morandi-primary text-sm">{loginInfo.email}</span>
+                <span className="font-mono font-semibold text-morandi-primary text-sm">
+                  {loginInfo.email}
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-morandi-secondary">{LABELS.LOGIN_INFO_PASSWORD}</span>
-                <span className="font-mono font-semibold text-morandi-primary">{loginInfo.password}</span>
+                <span className="font-mono font-semibold text-morandi-primary">
+                  {loginInfo.password}
+                </span>
               </div>
             </Card>
 
             <div className="flex gap-2 mt-4">
-              <Button
-                variant="outline"
-                onClick={handleClose}
-                className="flex-1"
-              >
+              <Button variant="outline" onClick={handleClose} className="flex-1">
                 {LABELS.BTN_CLOSE}
               </Button>
               <Button

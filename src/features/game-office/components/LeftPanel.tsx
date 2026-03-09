@@ -14,7 +14,7 @@ const TABS = [
   { id: 'alerts', label: '通知', icon: Bell },
 ] as const
 
-type TabId = typeof TABS[number]['id']
+type TabId = (typeof TABS)[number]['id']
 
 interface DashboardStats {
   activeTours: number
@@ -99,29 +99,40 @@ function StatsPanel() {
         const { count: activeTours } = await supabase
           .from('tours')
           .select('*', { count: 'exact', head: true })
-          .in('status', ['confirmed', 'in_progress']).eq('workspace_id', useAuthStore.getState().user?.workspace_id || '')
+          .in('status', ['confirmed', 'in_progress'])
+          .eq('workspace_id', useAuthStore.getState().user?.workspace_id || '')
 
         // Pending orders
         const { count: pendingOrders } = await supabase
           .from('orders')
           .select('*', { count: 'exact', head: true })
-          .eq('status', 'pending_deposit').eq('workspace_id', useAuthStore.getState().user?.workspace_id || '')
+          .eq('status', 'pending_deposit')
+          .eq('workspace_id', useAuthStore.getState().user?.workspace_id || '')
 
         // Recent tours
-        const { data: recentToursData } = await supabase
+        const { data: recentToursData } = (await supabase
           .from('tours')
           .select('tour_code, destination, current_participants')
-          .in('status', ['confirmed', 'in_progress']).eq('workspace_id', useAuthStore.getState().user?.workspace_id || '')
+          .in('status', ['confirmed', 'in_progress'])
+          .eq('workspace_id', useAuthStore.getState().user?.workspace_id || '')
           .order('departure_date', { ascending: true })
-          .limit(5) as unknown as { data: { tour_code: string | null; destination: string | null; current_participants: number | null }[] | null }
+          .limit(5)) as unknown as {
+          data:
+            | {
+                tour_code: string | null
+                destination: string | null
+                current_participants: number | null
+              }[]
+            | null
+        }
 
         setStats({
           activeTours: activeTours || 0,
           pendingOrders: pendingOrders || 0,
           todayRevenue: '-',
           pendingRequests: 0,
-          recentTours: (recentToursData || []).map(t =>
-            `${t.tour_code} ${t.destination || ''} (${t.current_participants || 0}人)`
+          recentTours: (recentToursData || []).map(
+            t => `${t.tour_code} ${t.destination || ''} (${t.current_participants || 0}人)`
           ),
         })
       } catch {
@@ -133,7 +144,10 @@ function StatsPanel() {
     fetchStats()
   }, [])
 
-  if (loading) return <div className="text-xs text-gray-500 animate-pulse">{GAME_OFFICE_LABELS.LOADING_6991}</div>
+  if (loading)
+    return (
+      <div className="text-xs text-gray-500 animate-pulse">{GAME_OFFICE_LABELS.LOADING_6991}</div>
+    )
 
   return (
     <div className="space-y-4">
@@ -141,9 +155,17 @@ function StatsPanel() {
       <div className="grid grid-cols-2 gap-2">
         {[
           { label: '進行中的團', value: String(stats?.activeTours || 0), color: 'text-blue-400' },
-          { label: '待處理訂單', value: String(stats?.pendingOrders || 0), color: 'text-yellow-400' },
+          {
+            label: '待處理訂單',
+            value: String(stats?.pendingOrders || 0),
+            color: 'text-yellow-400',
+          },
           { label: '今日收款', value: stats?.todayRevenue || '-', color: 'text-emerald-400' },
-          { label: '待確認需求', value: String(stats?.pendingRequests || 0), color: 'text-orange-400' },
+          {
+            label: '待確認需求',
+            value: String(stats?.pendingRequests || 0),
+            color: 'text-orange-400',
+          },
         ].map(s => (
           <div key={s.label} className="bg-gray-900/50 rounded-lg p-2">
             <div className={`text-lg font-bold ${s.color}`}>{s.value}</div>
@@ -153,10 +175,14 @@ function StatsPanel() {
       </div>
       {stats?.recentTours && stats.recentTours.length > 0 && (
         <>
-          <h3 className="text-xs font-bold text-gray-500 uppercase mt-4">{GAME_OFFICE_LABELS.LABEL_8724}</h3>
+          <h3 className="text-xs font-bold text-gray-500 uppercase mt-4">
+            {GAME_OFFICE_LABELS.LABEL_8724}
+          </h3>
           <div className="space-y-2">
             {stats.recentTours.map(t => (
-              <div key={t} className="bg-gray-900/50 rounded px-2 py-1.5 text-xs">{t}</div>
+              <div key={t} className="bg-gray-900/50 rounded px-2 py-1.5 text-xs">
+                {t}
+              </div>
             ))}
           </div>
         </>
@@ -182,7 +208,8 @@ function TodosPanel() {
       const { data } = await supabase
         .from('todos')
         .select('id, title, completed')
-        .eq('completed', false).eq('workspace_id', useAuthStore.getState().user?.workspace_id || '')
+        .eq('completed', false)
+        .eq('workspace_id', useAuthStore.getState().user?.workspace_id || '')
         .order('created_at', { ascending: false })
         .limit(10)
       if (data) {
@@ -200,7 +227,10 @@ function TodosPanel() {
     <div className="space-y-3">
       <h3 className="text-xs font-bold text-gray-500 uppercase">{GAME_OFFICE_LABELS.LABEL_4477}</h3>
       {todos.map(t => (
-        <label key={t.id} className="flex items-center gap-2 text-xs cursor-pointer hover:text-white">
+        <label
+          key={t.id}
+          className="flex items-center gap-2 text-xs cursor-pointer hover:text-white"
+        >
           <input type="checkbox" className="rounded border-[var(--border)]" />
           {t.title}
         </label>

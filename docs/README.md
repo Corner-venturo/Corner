@@ -8,49 +8,49 @@
 
 ## 📖 核心文檔（必讀）
 
-| 文檔 | 說明 | 優先級 |
-|------|------|--------|
-| [**SYSTEM_STATUS.md**](SYSTEM_STATUS.md) | 系統當前狀態、技術棧、編號規範 | ⭐⭐⭐ |
-| [**DEVELOPMENT_GUIDE.md**](DEVELOPMENT_GUIDE.md) | 開發指南、專案架構、常用指令 | ⭐⭐⭐ |
-| [**ARCHITECTURE_STANDARDS.md**](ARCHITECTURE_STANDARDS.md) | 五層架構、資料隔離、權限控制 | ⭐⭐⭐ |
+| 文檔                                                       | 說明                           | 優先級 |
+| ---------------------------------------------------------- | ------------------------------ | ------ |
+| [**SYSTEM_STATUS.md**](SYSTEM_STATUS.md)                   | 系統當前狀態、技術棧、編號規範 | ⭐⭐⭐ |
+| [**DEVELOPMENT_GUIDE.md**](DEVELOPMENT_GUIDE.md)           | 開發指南、專案架構、常用指令   | ⭐⭐⭐ |
+| [**ARCHITECTURE_STANDARDS.md**](ARCHITECTURE_STANDARDS.md) | 五層架構、資料隔離、權限控制   | ⭐⭐⭐ |
 
 ---
 
 ## 🗄️ 資料庫與 Supabase
 
-| 文檔 | 說明 |
-|------|------|
+| 文檔                                                             | 說明                               |
+| ---------------------------------------------------------------- | ---------------------------------- |
 | [**DATABASE_DESIGN_STANDARDS.md**](DATABASE_DESIGN_STANDARDS.md) | 資料庫設計規範、表格分類、命名規則 |
-| [**SUPABASE_GUIDE.md**](SUPABASE_GUIDE.md) | Supabase 操作指南、Migration 流程 |
-| [**SUPABASE_RLS_POLICY.md**](SUPABASE_RLS_POLICY.md) | RLS 政策、Workspace 隔離 |
+| [**SUPABASE_GUIDE.md**](SUPABASE_GUIDE.md)                       | Supabase 操作指南、Migration 流程  |
+| [**SUPABASE_RLS_POLICY.md**](SUPABASE_RLS_POLICY.md)             | RLS 政策、Workspace 隔離           |
 
 ---
 
 ## 🎨 設計與規範
 
-| 文檔 | 說明 |
-|------|------|
-| [**VENTURO_UI_DESIGN_STYLE.md**](VENTURO_UI_DESIGN_STYLE.md) | UI 設計風格、莫蘭迪色系、組件樣式 |
-| [**NAMING_CONVENTION_STANDARD.md**](NAMING_CONVENTION_STANDARD.md) | 命名規範（組件、Hook、檔案） |
-| [**CODE_STANDARDS.md**](CODE_STANDARDS.md) | 程式碼規範 |
-| [**CODE_REVIEW_CHECKLIST.md**](CODE_REVIEW_CHECKLIST.md) | Code Review 檢查清單 |
+| 文檔                                                               | 說明                              |
+| ------------------------------------------------------------------ | --------------------------------- |
+| [**VENTURO_UI_DESIGN_STYLE.md**](VENTURO_UI_DESIGN_STYLE.md)       | UI 設計風格、莫蘭迪色系、組件樣式 |
+| [**NAMING_CONVENTION_STANDARD.md**](NAMING_CONVENTION_STANDARD.md) | 命名規範（組件、Hook、檔案）      |
+| [**CODE_STANDARDS.md**](CODE_STANDARDS.md)                         | 程式碼規範                        |
+| [**CODE_REVIEW_CHECKLIST.md**](CODE_REVIEW_CHECKLIST.md)           | Code Review 檢查清單              |
 
 ---
 
 ## 🤖 AI 功能
 
-| 文檔 | 說明 |
-|------|------|
+| 文檔                                       | 說明                  |
+| ------------------------------------------ | --------------------- |
 | [**LOGAN_AI_GUIDE.md**](LOGAN_AI_GUIDE.md) | Logan AI 助理使用指南 |
 
 ---
 
 ## 📋 其他文檔
 
-| 文檔 | 說明 |
-|------|------|
+| 文檔                                               | 說明         |
+| -------------------------------------------------- | ------------ |
 | [**PROJECT_PRINCIPLES.md**](PROJECT_PRINCIPLES.md) | 專案開發原則 |
-| [**DEPLOYMENT_INFO.md**](DEPLOYMENT_INFO.md) | 部署資訊 |
+| [**DEPLOYMENT_INFO.md**](DEPLOYMENT_INFO.md)       | 部署資訊     |
 
 ---
 
@@ -104,11 +104,11 @@ docs/
 
 ### 常見任務
 
-| 我想要... | 查看文檔 |
-|----------|---------|
-| 修改資料庫 | [SUPABASE_GUIDE.md](SUPABASE_GUIDE.md) |
-| 了解 RLS | [SUPABASE_RLS_POLICY.md](SUPABASE_RLS_POLICY.md) |
-| 查看 UI 規範 | [VENTURO_UI_DESIGN_STYLE.md](VENTURO_UI_DESIGN_STYLE.md) |
+| 我想要...    | 查看文檔                                                       |
+| ------------ | -------------------------------------------------------------- |
+| 修改資料庫   | [SUPABASE_GUIDE.md](SUPABASE_GUIDE.md)                         |
+| 了解 RLS     | [SUPABASE_RLS_POLICY.md](SUPABASE_RLS_POLICY.md)               |
+| 查看 UI 規範 | [VENTURO_UI_DESIGN_STYLE.md](VENTURO_UI_DESIGN_STYLE.md)       |
 | 了解命名規則 | [NAMING_CONVENTION_STANDARD.md](NAMING_CONVENTION_STANDARD.md) |
 
 ---

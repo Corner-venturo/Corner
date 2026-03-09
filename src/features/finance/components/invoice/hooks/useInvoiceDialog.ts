@@ -63,7 +63,9 @@ export function useInvoiceDialog({
     if (open) {
       setDataLoaded(false)
       Promise.all([invalidateTours(), invalidateOrders(), fetchInvoices()])
-        .then(() => { setDataLoaded(true) })
+        .then(() => {
+          setDataLoaded(true)
+        })
         .catch(err => logger.error('[useInvoiceDialog] loadData', err))
     }
   }, [open, fetchInvoices])
@@ -100,7 +102,9 @@ export function useInvoiceDialog({
       setInvoiceDate(getTodayString())
       setReportStatus('unreported')
       setRemark('')
-      setItems([{ item_name: '', item_count: 1, item_unit: INVOICE_LABELS.UNIT, item_price: 0, itemAmt: 0 }])
+      setItems([
+        { item_name: '', item_count: 1, item_unit: INVOICE_LABELS.UNIT, item_price: 0, itemAmt: 0 },
+      ])
 
       if (fixedOrder) {
         setBuyerInfo({
@@ -148,7 +152,10 @@ export function useInvoiceDialog({
 
   // 商品明細操作
   const addItem = () => {
-    setItems([...items, { item_name: '', item_count: 1, item_unit: INVOICE_LABELS.UNIT, item_price: 0, itemAmt: 0 }])
+    setItems([
+      ...items,
+      { item_name: '', item_count: 1, item_unit: INVOICE_LABELS.UNIT, item_price: 0, itemAmt: 0 },
+    ])
   }
 
   const removeItem = (index: number) => {
@@ -173,11 +180,19 @@ export function useInvoiceDialog({
   // 開立發票
   const handleSubmit = async () => {
     if (!buyerInfo.buyerName) {
-      toast({ title: INVOICE_LABELS.ERROR, description: INVOICE_LABELS.ENTER_BUYER_NAME, variant: 'destructive' })
+      toast({
+        title: INVOICE_LABELS.ERROR,
+        description: INVOICE_LABELS.ENTER_BUYER_NAME,
+        variant: 'destructive',
+      })
       return
     }
     if (items.some(item => !item.item_name || item.item_price <= 0)) {
-      toast({ title: INVOICE_LABELS.ERROR, description: INVOICE_LABELS.FILL_PRODUCT_INFO, variant: 'destructive' })
+      toast({
+        title: INVOICE_LABELS.ERROR,
+        description: INVOICE_LABELS.FILL_PRODUCT_INFO,
+        variant: 'destructive',
+      })
       return
     }
 
@@ -187,7 +202,10 @@ export function useInvoiceDialog({
     // 檢查超開提醒
     if (currentOrder && totalAmount > (currentOrder.paid_amount ?? 0)) {
       const confirmed = await confirm(
-        INVOICE_LABELS.AMOUNT_EXCEED_CONFIRM(totalAmount.toLocaleString(), (currentOrder.paid_amount ?? 0).toLocaleString()),
+        INVOICE_LABELS.AMOUNT_EXCEED_CONFIRM(
+          totalAmount.toLocaleString(),
+          (currentOrder.paid_amount ?? 0).toLocaleString()
+        ),
         { title: INVOICE_LABELS.AMOUNT_EXCEED_TITLE, type: 'warning' }
       )
       if (!confirmed) return
@@ -207,7 +225,9 @@ export function useInvoiceDialog({
 
       // 根據是否預約顯示不同訊息
       const isScheduled = result?.isScheduled
-      const message = result?.message || (isScheduled ? INVOICE_LABELS.SCHEDULED_MESSAGE(invoiceDate) : INVOICE_LABELS.ISSUE_SUCCESS)
+      const message =
+        result?.message ||
+        (isScheduled ? INVOICE_LABELS.SCHEDULED_MESSAGE(invoiceDate) : INVOICE_LABELS.ISSUE_SUCCESS)
       toast({
         title: isScheduled ? INVOICE_LABELS.SCHEDULE_SUCCESS : INVOICE_LABELS.ISSUE_SUCCESS,
         description: INVOICE_LABELS.PROXY_INVOICE(customNo, message),

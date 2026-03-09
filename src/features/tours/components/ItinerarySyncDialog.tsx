@@ -22,12 +22,7 @@ interface ItinerarySyncDialogProps {
   onClose: () => void
 }
 
-export function ItinerarySyncDialog({
-  open,
-  syncInfo,
-  onSync,
-  onClose,
-}: ItinerarySyncDialogProps) {
+export function ItinerarySyncDialog({ open, syncInfo, onSync, onClose }: ItinerarySyncDialogProps) {
   // State for tracking which days to remove (when decreasing)
   const [selectedDays, setSelectedDays] = useState<number[]>([])
 
@@ -46,9 +41,7 @@ export function ItinerarySyncDialog({
   // Initialize selected days (default: last N days)
   React.useEffect(() => {
     if (syncInfo?.action === 'decrease' && dailyItinerary.length > 0) {
-      const defaultSelected = dailyItinerary
-        .map((_, idx) => idx)
-        .slice(-daysToRemoveCount)
+      const defaultSelected = dailyItinerary.map((_, idx) => idx).slice(-daysToRemoveCount)
       setSelectedDays(defaultSelected)
     } else {
       setSelectedDays([])
@@ -92,7 +85,7 @@ export function ItinerarySyncDialog({
   if (!syncInfo) return null
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Dialog open={open} onOpenChange={isOpen => !isOpen && onClose()}>
       <DialogContent level={2} className="max-w-lg" aria-describedby="sync-dialog-description">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -109,30 +102,42 @@ export function ItinerarySyncDialog({
           <div className="bg-muted/50 rounded-lg p-4 space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">{COMP_TOURS_LABELS.LABEL_4788}</span>
-              <span className="font-medium">{syncInfo.itinerary.title || syncInfo.itinerary.name || COMP_TOURS_LABELS.未命名行程}</span>
+              <span className="font-medium">
+                {syncInfo.itinerary.title ||
+                  syncInfo.itinerary.name ||
+                  COMP_TOURS_LABELS.未命名行程}
+              </span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">{COMP_TOURS_LABELS.LABEL_6069}</span>
-              <span className="font-medium">{syncInfo.currentDays} {COMP_TOURS_LABELS.UNIT_DAY}</span>
+              <span className="font-medium">
+                {syncInfo.currentDays} {COMP_TOURS_LABELS.UNIT_DAY}
+              </span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">{COMP_TOURS_LABELS.LABEL_357}</span>
-              <span className="font-medium text-primary">{syncInfo.newDays} {COMP_TOURS_LABELS.UNIT_DAY}</span>
+              <span className="font-medium text-primary">
+                {syncInfo.newDays} {COMP_TOURS_LABELS.UNIT_DAY}
+              </span>
             </div>
             <div className="flex items-center justify-between text-sm pt-2 border-t">
               <span className="text-muted-foreground">{COMP_TOURS_LABELS.LABEL_493}</span>
-              <span className={`font-medium flex items-center gap-1 ${
-                syncInfo.action === 'increase' ? 'text-green-600' : 'text-amber-600'
-              }`}>
+              <span
+                className={`font-medium flex items-center gap-1 ${
+                  syncInfo.action === 'increase' ? 'text-green-600' : 'text-amber-600'
+                }`}
+              >
                 {syncInfo.action === 'increase' ? (
                   <>
                     <Plus className="h-4 w-4" />
-                    {COMP_TOURS_LABELS.INCREASE_PREFIX} {syncInfo.newDays - syncInfo.currentDays} {COMP_TOURS_LABELS.UNIT_DAY}
+                    {COMP_TOURS_LABELS.INCREASE_PREFIX} {syncInfo.newDays - syncInfo.currentDays}{' '}
+                    {COMP_TOURS_LABELS.UNIT_DAY}
                   </>
                 ) : (
                   <>
                     <Minus className="h-4 w-4" />
-                    {COMP_TOURS_LABELS.DECREASE_PREFIX} {syncInfo.currentDays - syncInfo.newDays} {COMP_TOURS_LABELS.UNIT_DAY}
+                    {COMP_TOURS_LABELS.DECREASE_PREFIX} {syncInfo.currentDays - syncInfo.newDays}{' '}
+                    {COMP_TOURS_LABELS.UNIT_DAY}
                   </>
                 )}
               </span>
@@ -143,7 +148,9 @@ export function ItinerarySyncDialog({
           {syncInfo.action === 'decrease' && (
             <div className="space-y-3">
               <p className="text-sm text-muted-foreground">
-                {COMP_TOURS_LABELS.SELECT_DAYS_TO_REMOVE} <span className="font-medium text-foreground">{daysToRemoveCount}</span> {COMP_TOURS_LABELS.LABEL_7016}
+                {COMP_TOURS_LABELS.SELECT_DAYS_TO_REMOVE}{' '}
+                <span className="font-medium text-foreground">{daysToRemoveCount}</span>{' '}
+                {COMP_TOURS_LABELS.LABEL_7016}
               </p>
               <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
                 {dailyItinerary.map((day, idx) => (
@@ -185,11 +192,13 @@ export function ItinerarySyncDialog({
           {syncInfo.action === 'increase' && (
             <div className="space-y-3">
               <p className="text-sm text-muted-foreground">
-                {COMP_TOURS_LABELS.APPEND_BLANK_DAYS} <span className="font-medium text-foreground">{syncInfo.newDays - syncInfo.currentDays}</span> {COMP_TOURS_LABELS.LABEL_5498}
+                {COMP_TOURS_LABELS.APPEND_BLANK_DAYS}{' '}
+                <span className="font-medium text-foreground">
+                  {syncInfo.newDays - syncInfo.currentDays}
+                </span>{' '}
+                {COMP_TOURS_LABELS.LABEL_5498}
               </p>
-              <p className="text-sm text-muted-foreground">
-                {COMP_TOURS_LABELS.ADD_1897}
-              </p>
+              <p className="text-sm text-muted-foreground">{COMP_TOURS_LABELS.ADD_1897}</p>
             </div>
           )}
         </div>
@@ -204,7 +213,9 @@ export function ItinerarySyncDialog({
             disabled={!isSelectionValid}
             className={syncInfo.action === 'decrease' ? 'bg-amber-600 hover:bg-amber-700' : ''}
           >
-            {syncInfo.action === 'decrease' ? COMP_TOURS_LABELS.確認移除 : COMP_TOURS_LABELS.確認新增}
+            {syncInfo.action === 'decrease'
+              ? COMP_TOURS_LABELS.確認移除
+              : COMP_TOURS_LABELS.確認新增}
           </Button>
         </div>
       </DialogContent>

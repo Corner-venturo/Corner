@@ -3,7 +3,13 @@
 import { useState } from 'react'
 import { Banknote, Search, Loader2, AlertCircle, TrendingDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { DASHBOARD_LABELS } from './constants/labels'
 
 interface RemittanceOption {
@@ -270,20 +276,26 @@ export function RemittanceWidget() {
 
                   <div className="grid grid-cols-3 gap-2 text-center">
                     <div className="bg-card/50 rounded-lg p-2">
-                      <p className="text-xs text-morandi-secondary mb-1">{DASHBOARD_LABELS.LABEL_4924}</p>
+                      <p className="text-xs text-morandi-secondary mb-1">
+                        {DASHBOARD_LABELS.LABEL_4924}
+                      </p>
                       <p className="font-semibold text-xs text-status-danger">
                         -{fromCountry?.symbol}
                         {option.fee.toFixed(0)}
                       </p>
                     </div>
                     <div className="bg-card/50 rounded-lg p-2">
-                      <p className="text-xs text-morandi-secondary mb-1">{DASHBOARD_LABELS.LABEL_3165}</p>
+                      <p className="text-xs text-morandi-secondary mb-1">
+                        {DASHBOARD_LABELS.LABEL_3165}
+                      </p>
                       <p className="font-semibold text-xs text-morandi-primary">
                         {option.exchangeRate.toFixed(2)}
                       </p>
                     </div>
                     <div className="bg-card/50 rounded-lg p-2">
-                      <p className="text-xs text-morandi-secondary mb-1">{DASHBOARD_LABELS.LABEL_433}</p>
+                      <p className="text-xs text-morandi-secondary mb-1">
+                        {DASHBOARD_LABELS.LABEL_433}
+                      </p>
                       <p className="font-bold text-sm text-status-success">
                         {toCountry?.symbol}
                         {option.total.toFixed(0)}

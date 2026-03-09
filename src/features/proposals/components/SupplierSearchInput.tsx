@@ -8,7 +8,6 @@
  * 3. 沒有時可新建供應商
  */
 
-
 import React, { useState, useEffect, useRef } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -33,7 +32,7 @@ interface SupplierSearchInputProps {
   value: string
   onChange: (value: string) => void
   onSupplierSelect?: (supplier: Supplier) => void
-  category?: string  // 優先顯示同類別供應商
+  category?: string // 優先顯示同類別供應商
   placeholder?: string
   className?: string
 }
@@ -67,7 +66,7 @@ export function SupplierSearchInput({
         const supplierType = category === 'activity' ? 'attraction' : category
 
         // 查詢供應商（包含完整欄位）
-         
+
         let query = dynamicFrom('suppliers')
           .select('id, code, name, contact_person, phone, type')
           .ilike('name', `%${searchTerm}%`)
@@ -142,7 +141,10 @@ export function SupplierSearchInput({
   return (
     <div className={`relative ${className}`}>
       <div className="relative">
-        <Search size={14} className="absolute left-2 top-1/2 -translate-y-1/2 text-morandi-secondary" />
+        <Search
+          size={14}
+          className="absolute left-2 top-1/2 -translate-y-1/2 text-morandi-secondary"
+        />
         <Input
           ref={inputRef}
           value={searchTerm}
@@ -152,12 +154,15 @@ export function SupplierSearchInput({
           className="h-7 text-sm pl-7"
         />
         {loading && (
-          <Loader2 size={14} className="absolute right-2 top-1/2 -translate-y-1/2 animate-spin text-morandi-secondary" />
+          <Loader2
+            size={14}
+            className="absolute right-2 top-1/2 -translate-y-1/2 animate-spin text-morandi-secondary"
+          />
         )}
       </div>
 
       {/* 下拉選單 */}
-      {isOpen && (searchTerm.length >= 2) && (
+      {isOpen && searchTerm.length >= 2 && (
         <div
           ref={dropdownRef}
           className="absolute z-50 top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-lg max-h-60 overflow-auto"
@@ -182,7 +187,7 @@ export function SupplierSearchInput({
               </Button>
             </div>
           ) : (
-            suppliers.map((supplier) => (
+            suppliers.map(supplier => (
               <button
                 key={supplier.id}
                 onClick={() => handleSelect(supplier)}
@@ -191,11 +196,14 @@ export function SupplierSearchInput({
                 <div className="flex items-center gap-2">
                   <Building2 size={14} className="text-morandi-secondary shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium text-sm truncate">
-                      {supplier.name}
-                    </div>
+                    <div className="font-medium text-sm truncate">{supplier.name}</div>
                     <div className="text-xs text-morandi-secondary flex gap-2">
-                      {supplier.contact_person && <span>{PROPOSAL_LABELS.supplierSearch.contactLabel}{supplier.contact_person}</span>}
+                      {supplier.contact_person && (
+                        <span>
+                          {PROPOSAL_LABELS.supplierSearch.contactLabel}
+                          {supplier.contact_person}
+                        </span>
+                      )}
                       {supplier.phone && <span>{supplier.phone}</span>}
                     </div>
                   </div>

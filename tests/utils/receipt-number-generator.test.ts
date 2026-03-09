@@ -13,18 +13,12 @@ describe('receipt-number-generator', () => {
     })
 
     it('should increment from existing', () => {
-      const existing = [
-        { receipt_number: 'CNX250128A-R01' },
-        { receipt_number: 'CNX250128A-R02' },
-      ]
+      const existing = [{ receipt_number: 'CNX250128A-R01' }, { receipt_number: 'CNX250128A-R02' }]
       expect(generateReceiptNumber('CNX250128A', existing)).toBe('CNX250128A-R03')
     })
 
     it('should find max number even if unordered', () => {
-      const existing = [
-        { receipt_number: 'CNX250128A-R05' },
-        { receipt_number: 'CNX250128A-R02' },
-      ]
+      const existing = [{ receipt_number: 'CNX250128A-R05' }, { receipt_number: 'CNX250128A-R02' }]
       expect(generateReceiptNumber('CNX250128A', existing)).toBe('CNX250128A-R06')
     })
 

@@ -4,7 +4,6 @@
  * 可勾選要匯入的景點
  */
 
-
 import React, { useState, useMemo, useEffect } from 'react'
 import {
   Dialog,
@@ -17,7 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Loader2, MapPin, X, Download } from 'lucide-react'
 import { CostItem } from '../types'
-import { IMPORT_ACTIVITIES_DIALOG_LABELS } from '../constants/labels';
+import { IMPORT_ACTIVITIES_DIALOG_LABELS } from '../constants/labels'
 
 interface ActivityItem {
   day: number
@@ -110,9 +109,7 @@ export function ImportActivitiesDialog({
             <MapPin className="w-5 h-5 text-[var(--morandi-gold)]" />
             {IMPORT_ACTIVITIES_DIALOG_LABELS.LABEL_1519}
           </DialogTitle>
-          <DialogDescription>
-            {IMPORT_ACTIVITIES_DIALOG_LABELS.SELECT_9050}
-          </DialogDescription>
+          <DialogDescription>{IMPORT_ACTIVITIES_DIALOG_LABELS.SELECT_9050}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 mt-2">
@@ -122,7 +119,9 @@ export function ImportActivitiesDialog({
               onClick={handleSelectAll}
               className="text-xs text-[var(--morandi-gold)] hover:underline"
             >
-              {selectedActivities.size === activities.length ? IMPORT_ACTIVITIES_DIALOG_LABELS.取消全選 : IMPORT_ACTIVITIES_DIALOG_LABELS.全選}
+              {selectedActivities.size === activities.length
+                ? IMPORT_ACTIVITIES_DIALOG_LABELS.取消全選
+                : IMPORT_ACTIVITIES_DIALOG_LABELS.全選}
             </button>
           </div>
 
@@ -187,11 +186,7 @@ export function ImportActivitiesDialog({
               disabled={selectedActivities.size === 0 || isLoading}
               className="flex-1 bg-[var(--morandi-gold)] hover:bg-[var(--morandi-gold-hover)] text-white gap-1"
             >
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Download size={16} />
-              )}
+              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download size={16} />}
               匯入 {selectedActivities.size > 0 ? `(${selectedActivities.size})` : ''}
             </Button>
           </div>

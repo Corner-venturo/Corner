@@ -4,10 +4,7 @@ import { ValidationError } from '@/core/errors/app-errors'
 import { logger } from '@/lib/utils/logger'
 import { getRequiredWorkspaceId } from '@/lib/workspace-context'
 import { supabase } from '@/lib/supabase/client'
-import {
-  invalidatePaymentRequests,
-  invalidatePaymentRequestItems,
-} from '@/data'
+import { invalidatePaymentRequests, invalidatePaymentRequestItems } from '@/data'
 import { PAYMENTS_LABELS } from '../constants/labels'
 import { recalculateExpenseStats } from '@/features/finance/payments/services/expense-core.service'
 
@@ -24,7 +21,12 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       getById: (id: string) => this._items.find(r => r.id === id),
       add: async (request: PaymentRequest) => {
         const { id, created_at, updated_at, ...createData } = request
-        const insertData = { id: request.id, ...createData, created_at: request.created_at, updated_at: request.updated_at }
+        const insertData = {
+          id: request.id,
+          ...createData,
+          created_at: request.created_at,
+          updated_at: request.updated_at,
+        }
         logger.log('Creating payment_request with data:', insertData)
         const { data, error } = await supabase
           .from('payment_requests')
@@ -42,18 +44,12 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
         return newRequest
       },
       update: async (id: string, data: Partial<PaymentRequest>) => {
-        const { error } = await supabase
-          .from('payment_requests')
-          .update(data)
-          .eq('id', id)
+        const { error } = await supabase.from('payment_requests').update(data).eq('id', id)
         if (error) throw error
         await invalidatePaymentRequests()
       },
       delete: async (id: string) => {
-        const { error } = await supabase
-          .from('payment_requests')
-          .delete()
-          .eq('id', id)
+        const { error } = await supabase.from('payment_requests').delete().eq('id', id)
         if (error) throw error
         await invalidatePaymentRequests()
       },
@@ -198,10 +194,12 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
    */
   async addItems(
     requestId: string,
-    itemsData: Array<Omit<
-      PaymentRequestItem,
-      'id' | 'request_id' | 'item_number' | 'subtotal' | 'created_at' | 'updated_at'
-    >>
+    itemsData: Array<
+      Omit<
+        PaymentRequestItem,
+        'id' | 'request_id' | 'item_number' | 'subtotal' | 'created_at' | 'updated_at'
+      >
+    >
   ): Promise<PaymentRequestItem[]> {
     if (itemsData.length === 0) return []
 
@@ -244,10 +242,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
     await invalidatePaymentRequestItems()
 
     // 更新 request 的總金額
-    const allItems = [
-      ...existingItems,
-      ...(createdItems as unknown as PaymentRequestItem[]),
-    ]
+    const allItems = [...existingItems, ...(createdItems as unknown as PaymentRequestItem[])]
     const totalAmount = allItems.reduce((sum, i) => sum + (i.subtotal || 0), 0)
 
     await this.update(requestId, {
@@ -288,7 +283,9 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
     if (fetchError) throw fetchError
 
     // 計算新的 subtotal（資料庫欄位是 unitprice）
-    const unitPrice = Number(itemData.unit_price ?? (existingItem as Record<string, unknown>)?.unitprice ?? 0)
+    const unitPrice = Number(
+      itemData.unit_price ?? (existingItem as Record<string, unknown>)?.unitprice ?? 0
+    )
     const quantity = Number(itemData.quantity ?? existingItem?.quantity ?? 0)
     const subtotal = unitPrice * quantity
 
@@ -348,10 +345,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
     const now = this.now()
 
     // 直接使用 Supabase 刪除項目
-    const { error } = await supabase
-      .from('payment_request_items')
-      .delete()
-      .eq('id', itemId)
+    const { error } = await supabase.from('payment_request_items').delete().eq('id', itemId)
 
     if (error) throw error
     await invalidatePaymentRequestItems()

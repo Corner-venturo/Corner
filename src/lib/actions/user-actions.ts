@@ -30,13 +30,15 @@ export async function getWorkspaceMembers(): Promise<WorkspaceMember[]> {
   // Query for all employees in the workspace
   const { data: members, error: queryError } = await supabase
     .from('employees')
-    .select(`
+    .select(
+      `
       id,
       display_name,
       chinese_name,
       english_name,
       avatar_url
-    `)
+    `
+    )
     .eq('workspace_id', workspaceId)
     .eq('is_active', true)
     .neq('id', user.id) // Exclude the current user

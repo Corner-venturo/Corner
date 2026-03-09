@@ -51,7 +51,7 @@ export function TravelerMessageInput({
         <div className="flex-1 relative">
           <Textarea
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={e => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
             disabled={disabled || isSending}
@@ -73,16 +73,15 @@ export function TravelerMessageInput({
             'bg-violet-500 hover:bg-violet-600 text-white',
             'disabled:bg-violet-500/30 disabled:text-violet-300/50'
           )}
-          size="icon" aria-label="Send"
+          size="icon"
+          aria-label="Send"
         >
           <Send size={18} />
         </Button>
       </div>
 
       {/* 提示文字 */}
-      <p className="text-xs text-violet-400 mt-1.5 ml-1">
-        {COMP_WORKSPACE_LABELS.SENDING_1544}
-      </p>
+      <p className="text-xs text-violet-400 mt-1.5 ml-1">{COMP_WORKSPACE_LABELS.SENDING_1544}</p>
     </div>
   )
 }

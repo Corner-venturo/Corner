@@ -55,17 +55,12 @@ export function ThreadPanel({
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <div className="flex items-center gap-2">
           <MessageSquare size={16} className="text-morandi-secondary" />
-          <span className="font-medium text-morandi-primary">{COMP_WORKSPACE_LABELS.LABEL_9507}</span>
-          <span className="text-xs text-morandi-secondary">
-            {replies.length} 則回覆
+          <span className="font-medium text-morandi-primary">
+            {COMP_WORKSPACE_LABELS.LABEL_9507}
           </span>
+          <span className="text-xs text-morandi-secondary">{replies.length} 則回覆</span>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-7 w-7 p-0"
-          onClick={onClose}
-        >
+        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={onClose}>
           <X size={16} />
         </Button>
       </div>
@@ -73,30 +68,20 @@ export function ThreadPanel({
       {/* 訊息列表 */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {/* 父訊息 */}
-        <MessageItem
-          message={parentMessage}
-          isParent
-          currentUserId={currentUserId}
-        />
+        <MessageItem message={parentMessage} isParent currentUserId={currentUserId} />
 
         {/* 分隔線 */}
         {replies.length > 0 && (
           <div className="flex items-center gap-2 py-2">
             <div className="flex-1 h-px bg-border" />
-            <span className="text-xs text-morandi-secondary">
-              {replies.length} 則回覆
-            </span>
+            <span className="text-xs text-morandi-secondary">{replies.length} 則回覆</span>
             <div className="flex-1 h-px bg-border" />
           </div>
         )}
 
         {/* 回覆列表 */}
-        {replies.map((reply) => (
-          <MessageItem
-            key={reply.id}
-            message={reply}
-            currentUserId={currentUserId}
-          />
+        {replies.map(reply => (
+          <MessageItem key={reply.id} message={reply} currentUserId={currentUserId} />
         ))}
 
         <div ref={messagesEndRef} />
@@ -108,7 +93,7 @@ export function ThreadPanel({
           <Textarea
             ref={textareaRef}
             value={messageText}
-            onChange={(e) => onMessageChange(e.target.value)}
+            onChange={e => onMessageChange(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={COMP_WORKSPACE_LABELS.回覆討論串_2}
             className="min-h-[60px] max-h-[120px] pr-10 resize-none"
@@ -162,22 +147,19 @@ function MessageItem({ message, isParent, currentUserId }: MessageItemProps) {
   const isOwn = message.author_id === currentUserId
 
   return (
-    <div
-      className={cn(
-        'group flex gap-2',
-        isParent && 'pb-2'
-      )}
-    >
+    <div className={cn('group flex gap-2', isParent && 'pb-2')}>
       {/* 用戶頭像 */}
       <div className="w-8 h-8 bg-gradient-to-br from-morandi-gold/30 to-morandi-gold/10 rounded-md flex items-center justify-center text-xs font-semibold text-morandi-gold shrink-0">
         {message.author?.display_name?.charAt(0) || '?'}
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2">
-          <span className={cn(
-            'font-medium text-sm',
-            isOwn ? 'text-morandi-gold' : 'text-morandi-primary'
-          )}>
+          <span
+            className={cn(
+              'font-medium text-sm',
+              isOwn ? 'text-morandi-gold' : 'text-morandi-primary'
+            )}
+          >
             {message.author?.display_name || COMP_WORKSPACE_LABELS.未知用戶}
           </span>
           <span className="text-xs text-morandi-secondary">
@@ -187,10 +169,12 @@ function MessageItem({ message, isParent, currentUserId }: MessageItemProps) {
             })}
           </span>
         </div>
-        <div className={cn(
-          'mt-1 text-sm text-morandi-primary break-words whitespace-pre-wrap',
-          isParent && 'font-medium'
-        )}>
+        <div
+          className={cn(
+            'mt-1 text-sm text-morandi-primary break-words whitespace-pre-wrap',
+            isParent && 'font-medium'
+          )}
+        >
           {renderMessageContent(message.content)}
         </div>
       </div>

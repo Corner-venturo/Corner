@@ -54,7 +54,10 @@ test.describe('簽證 CRUD 測試', () => {
 
     // 檢查提交按鈕
     const submitButton = dialog.locator('button').filter({ hasText: /批次新增簽證|新增|儲存/ })
-    const isEnabled = await submitButton.first().isEnabled({ timeout: 3000 }).catch(() => false)
+    const isEnabled = await submitButton
+      .first()
+      .isEnabled({ timeout: 3000 })
+      .catch(() => false)
     console.log(`新增按鈕狀態: ${isEnabled ? '可點擊' : '禁用'}`)
 
     // 如果可以點擊就嘗試提交
@@ -107,7 +110,11 @@ test.describe('簽證 CRUD 測試', () => {
       console.log('✅ 簽證詳情對話框已開啟')
 
       // 檢查詳情內容
-      const hasEditButton = await dialog.locator('button').filter({ hasText: /編輯|儲存/ }).isVisible().catch(() => false)
+      const hasEditButton = await dialog
+        .locator('button')
+        .filter({ hasText: /編輯|儲存/ })
+        .isVisible()
+        .catch(() => false)
       console.log(`可編輯: ${hasEditButton}`)
 
       await page.keyboard.press('Escape')
@@ -138,8 +145,15 @@ test.describe('簽證 CRUD 測試', () => {
     const dialog = page.locator('[role="dialog"]')
     if (await dialog.isVisible({ timeout: 5000 }).catch(() => false)) {
       // 找狀態選擇欄位
-      const statusSelect = dialog.locator('select, [data-state]').filter({ hasText: /待送件|已送件|已取件/ })
-      if (await statusSelect.first().isVisible({ timeout: 3000 }).catch(() => false)) {
+      const statusSelect = dialog
+        .locator('select, [data-state]')
+        .filter({ hasText: /待送件|已送件|已取件/ })
+      if (
+        await statusSelect
+          .first()
+          .isVisible({ timeout: 3000 })
+          .catch(() => false)
+      ) {
         console.log('✅ 找到簽證狀態欄位')
       }
 

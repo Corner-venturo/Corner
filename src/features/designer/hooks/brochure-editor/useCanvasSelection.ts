@@ -6,7 +6,7 @@ import type { FabricObjectWithId, FabricObjectWithName } from './types'
 
 /**
  * useCanvasSelection - 選取操作 Hook
- * 
+ *
  * 功能：
  * - deleteSelected, copySelected, pasteClipboard, cutSelected
  * - moveSelected
@@ -47,7 +47,7 @@ export function useCanvasSelection(options: UseCanvasSelectionOptions): UseCanva
     const activeObjects = canvas.getActiveObjects()
     if (activeObjects.length === 0) return
 
-    activeObjects.forEach((obj) => canvas.remove(obj))
+    activeObjects.forEach(obj => canvas.remove(obj))
     canvas.discardActiveObject()
     canvas.renderAll()
   }, [getCanvas])
@@ -101,23 +101,26 @@ export function useCanvasSelection(options: UseCanvasSelectionOptions): UseCanva
   // ============================================
   // Move Selected
   // ============================================
-  const moveSelected = useCallback((dx: number, dy: number) => {
-    const canvas = getCanvas()
-    if (!canvas) return
+  const moveSelected = useCallback(
+    (dx: number, dy: number) => {
+      const canvas = getCanvas()
+      if (!canvas) return
 
-    const activeObject = canvas.getActiveObject()
-    if (!activeObject) return
+      const activeObject = canvas.getActiveObject()
+      if (!activeObject) return
 
-    activeObject.set({
-      left: (activeObject.left || 0) + dx,
-      top: (activeObject.top || 0) + dy,
-    })
-    activeObject.setCoords()
-    canvas.renderAll()
+      activeObject.set({
+        left: (activeObject.left || 0) + dx,
+        top: (activeObject.top || 0) + dy,
+      })
+      activeObject.setCoords()
+      canvas.renderAll()
 
-    markDirty()
-    saveToHistory()
-  }, [getCanvas, markDirty, saveToHistory])
+      markDirty()
+      saveToHistory()
+    },
+    [getCanvas, markDirty, saveToHistory]
+  )
 
   // ============================================
   // Select All
@@ -126,7 +129,11 @@ export function useCanvasSelection(options: UseCanvasSelectionOptions): UseCanva
     const canvas = getCanvas()
     if (!canvas) return
 
-    const objects = canvas.getObjects().filter(obj => !obj.isType('line') || !((obj as unknown as { isGuideLine?: boolean }).isGuideLine))
+    const objects = canvas
+      .getObjects()
+      .filter(
+        obj => !obj.isType('line') || !(obj as unknown as { isGuideLine?: boolean }).isGuideLine
+      )
     if (objects.length === 0) return
 
     canvas.discardActiveObject()
@@ -142,87 +149,96 @@ export function useCanvasSelection(options: UseCanvasSelectionOptions): UseCanva
   // ============================================
   // Update Element by Name
   // ============================================
-  const updateElementByName = useCallback((elementName: string, updates: { text?: string }) => {
-    const canvas = getCanvas()
-    if (!canvas) return false
+  const updateElementByName = useCallback(
+    (elementName: string, updates: { text?: string }) => {
+      const canvas = getCanvas()
+      if (!canvas) return false
 
-    const objects = canvas.getObjects()
+      const objects = canvas.getObjects()
 
-    // 先在頂層尋找
-    let targetObj = objects.find(obj => {
-      const fabricObj = obj as FabricObjectWithName
-      return fabricObj.name === elementName
-    })
+      // 先在頂層尋找
+      let targetObj = objects.find(obj => {
+        const fabricObj = obj as FabricObjectWithName
+        return fabricObj.name === elementName
+      })
 
-    // 如果頂層找不到，搜尋群組內的元素
-    if (!targetObj) {
-      for (const obj of objects) {
-        if (obj.type === 'group') {
-          const group = obj as fabric.Group
-          const groupObjects = group.getObjects()
-          const found = groupObjects.find(item => {
-            const fabricItem = item as FabricObjectWithName
-            return fabricItem.name === elementName
-          })
-          if (found) {
-            targetObj = found
-            break
+      // 如果頂層找不到，搜尋群組內的元素
+      if (!targetObj) {
+        for (const obj of objects) {
+          if (obj.type === 'group') {
+            const group = obj as fabric.Group
+            const groupObjects = group.getObjects()
+            const found = groupObjects.find(item => {
+              const fabricItem = item as FabricObjectWithName
+              return fabricItem.name === elementName
+            })
+            if (found) {
+              targetObj = found
+              break
+            }
           }
         }
       }
-    }
 
-    if (targetObj && updates.text !== undefined) {
-      const textObj = targetObj as fabric.Textbox
-      if (textObj.set && typeof textObj.text !== 'undefined') {
-        textObj.set('text', updates.text)
-        canvas.renderAll()
-        markDirty()
-        return true
+      if (targetObj && updates.text !== undefined) {
+        const textObj = targetObj as fabric.Textbox
+        if (textObj.set && typeof textObj.text !== 'undefined') {
+          textObj.set('text', updates.text)
+          canvas.renderAll()
+          markDirty()
+          return true
+        }
       }
-    }
 
-    return false
-  }, [getCanvas, markDirty])
+      return false
+    },
+    [getCanvas, markDirty]
+  )
 
   // ============================================
   // Remove Object by Name
   // ============================================
-  const removeObjectByName = useCallback((elementName: string) => {
-    const canvas = getCanvas()
-    if (!canvas) return false
+  const removeObjectByName = useCallback(
+    (elementName: string) => {
+      const canvas = getCanvas()
+      if (!canvas) return false
 
-    const objects = canvas.getObjects()
-    const targetObj = objects.find(obj => {
-      const fabricObj = obj as FabricObjectWithName
-      return fabricObj.name === elementName
-    })
+      const objects = canvas.getObjects()
+      const targetObj = objects.find(obj => {
+        const fabricObj = obj as FabricObjectWithName
+        return fabricObj.name === elementName
+      })
 
-    if (targetObj) {
-      canvas.remove(targetObj)
-      canvas.renderAll()
-      markDirty()
-      return true
-    }
+      if (targetObj) {
+        canvas.remove(targetObj)
+        canvas.renderAll()
+        markDirty()
+        return true
+      }
 
-    return false
-  }, [getCanvas, markDirty])
+      return false
+    },
+    [getCanvas, markDirty]
+  )
 
   // ============================================
   // Get Object by Name
   // ============================================
-  const getObjectByName = useCallback((elementName: string) => {
-    const canvas = getCanvas()
-    if (!canvas) return null
+  const getObjectByName = useCallback(
+    (elementName: string) => {
+      const canvas = getCanvas()
+      if (!canvas) return null
 
-    const objects = canvas.getObjects()
-    const targetObj = objects.find(obj => {
-      const fabricObj = obj as FabricObjectWithName
-      return fabricObj.name === elementName
-    })
+      const objects = canvas.getObjects()
+      const targetObj = objects.find(obj => {
+        const fabricObj = obj as FabricObjectWithName
+        return fabricObj.name === elementName
+      })
 
-    return targetObj || null
-  }, [getCanvas])
+      return targetObj || null
+    },
+    [getCanvas]
+  )
 
   return {
     deleteSelected,

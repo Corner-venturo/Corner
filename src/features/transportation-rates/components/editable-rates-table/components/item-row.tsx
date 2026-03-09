@@ -20,10 +20,23 @@ interface ItemRowProps {
   editValue: string
   setEditValue: (value: string) => void
   inputRef: React.RefObject<HTMLInputElement>
-  startEdit: (rowId: string, field: keyof TransportationRate, currentValue: string | number | boolean | null | undefined) => void
+  startEdit: (
+    rowId: string,
+    field: keyof TransportationRate,
+    currentValue: string | number | boolean | null | undefined
+  ) => void
   saveEdit: () => Promise<void>
-  handleKeyDown: (e: React.KeyboardEvent, rowId: string, field: keyof TransportationRate) => Promise<void>
-  renderEditableCell: (rate: TransportationRate, field: keyof TransportationRate, value: string | number | boolean | null | undefined, type?: 'text' | 'number') => React.ReactNode
+  handleKeyDown: (
+    e: React.KeyboardEvent,
+    rowId: string,
+    field: keyof TransportationRate
+  ) => Promise<void>
+  renderEditableCell: (
+    rate: TransportationRate,
+    field: keyof TransportationRate,
+    value: string | number | boolean | null | undefined,
+    type?: 'text' | 'number'
+  ) => React.ReactNode
   onUpdate: (id: string, updates: Partial<TransportationRate>) => Promise<void>
   onDelete: (id: string) => Promise<void>
   onInsert?: (rate: TransportationRate) => void
@@ -67,7 +80,9 @@ export function ItemRow({
   categoryDragAttributes,
   categoryDragListeners,
 }: ItemRowProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: rate.id })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: rate.id,
+  })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -199,17 +214,30 @@ export function ItemRow({
         <>
           {/* KKDAY售價 */}
           <td className="px-4 py-2.5 text-right bg-status-warning-bg border-r border-morandi-gold/30">
-            {renderEditableCell(rate, 'kkday_selling_price', rate.kkday_selling_price?.toLocaleString() || '0', 'number')}
+            {renderEditableCell(
+              rate,
+              'kkday_selling_price',
+              rate.kkday_selling_price?.toLocaleString() || '0',
+              'number'
+            )}
           </td>
 
           {/* KKDAY成本 */}
           <td className="px-4 py-2.5 text-right bg-status-warning-bg border-r border-morandi-gold/30">
-            {renderEditableCell(rate, 'kkday_cost', rate.kkday_cost?.toLocaleString() || '0', 'number')}
+            {renderEditableCell(
+              rate,
+              'kkday_cost',
+              rate.kkday_cost?.toLocaleString() || '0',
+              'number'
+            )}
           </td>
 
           {/* 利潤（自動計算，不可編輯） */}
           <td className="px-4 py-2.5 text-right bg-status-warning-bg border-r border-border/40">
-            <span className="font-mono text-sm text-morandi-gold font-medium" title={EDITABLE_RATES_TABLE_LABELS.CALCULATING_7714}>
+            <span
+              className="font-mono text-sm text-morandi-gold font-medium"
+              title={EDITABLE_RATES_TABLE_LABELS.CALCULATING_7714}
+            >
               {rate.kkday_profit?.toLocaleString() || '0'}
             </span>
           </td>

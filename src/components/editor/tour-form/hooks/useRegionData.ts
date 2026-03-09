@@ -92,7 +92,7 @@ export function useRegionData(data: { country?: string }) {
       .map(c => ({
         id: c.id,
         code: c.code || '',
-        name: c.name
+        name: c.name,
       }))
     logger.log(`[useRegionData] allDestinations 計算完成: ${result.length} 個國家`)
     return result
@@ -132,10 +132,12 @@ export function useRegionData(data: { country?: string }) {
       .map(c => ({
         id: c.id,
         code: c.airport_code!,
-        name: c.name
+        name: c.name,
       }))
 
-    logger.log(`[useRegionData] availableCities 計算完成: ${result.length} 個城市 for ${country.name}`)
+    logger.log(
+      `[useRegionData] availableCities 計算完成: ${result.length} 個城市 for ${country.name}`
+    )
     return result
   }, [selectedCountryCode, countries, cities])
 
@@ -152,7 +154,14 @@ export function useRegionData(data: { country?: string }) {
         isInitialized: isInitializedRef.current,
       })
     }
-  }, [data.country, selectedCountry, selectedCountryCode, countries.length, cities.length, availableCities.length])
+  }, [
+    data.country,
+    selectedCountry,
+    selectedCountryCode,
+    countries.length,
+    cities.length,
+    availableCities.length,
+  ])
 
   return {
     selectedCountry,

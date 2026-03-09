@@ -19,7 +19,7 @@ const ORDERS_LIST_FIELDS = [
   'assistant',
   'payment_status',
   'total_amount',
-  'paid_amount',      // TourOverviewTab 用於計算收款率
+  'paid_amount', // TourOverviewTab 用於計算收款率
   'remaining_amount',
   'member_count',
   'code',
@@ -61,13 +61,7 @@ export const useToursListSlim = createCloudHook<Tour>('tours', {
 // Quotes 列表瘦身版（用於 /tours 連結報價）
 // ============================================
 
-const QUOTES_LIST_FIELDS = [
-  'id',
-  'tour_id',
-  'name',
-  'total_cost',
-  'group_size',
-].join(',')
+const QUOTES_LIST_FIELDS = ['id', 'tour_id', 'name', 'total_cost', 'group_size'].join(',')
 
 /**
  * 瘦身版 Quotes hook - 只抓連結功能需要的欄位
@@ -81,10 +75,7 @@ export const useQuotesListSlim = createCloudHook<Quote>('quotes', {
 // Itineraries 列表瘦身版（用於 /tours 連結行程）
 // ============================================
 
-const ITINERARIES_LIST_FIELDS = [
-  'id',
-  'tour_id',
-].join(',')
+const ITINERARIES_LIST_FIELDS = ['id', 'tour_id'].join(',')
 
 /**
  * 瘦身版 Itineraries hook - 只抓連結功能需要的欄位
@@ -98,10 +89,7 @@ export const useItinerariesListSlim = createCloudHook<Itinerary>('itineraries', 
 // Members 列表瘦身版（用於計算人數）
 // ============================================
 
-const MEMBERS_COUNT_FIELDS = [
-  'id',
-  'order_id',
-].join(',')
+const MEMBERS_COUNT_FIELDS = ['id', 'order_id'].join(',')
 
 /**
  * 瘦身版 Members hook - 只抓計算人數需要的欄位

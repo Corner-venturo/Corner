@@ -4,14 +4,18 @@
  * 包含封面圖片、每日封面圖片、遮罩填充、區塊元件庫等對話框
  */
 
-
 import * as fabric from 'fabric'
 import { ImagePickerDialog } from '@/components/ui/image-uploader'
 import { ImageEditor, type ImageEditorSettings } from '@/components/ui/image-editor'
 import { ImageMaskFillDialog } from '@/features/designer/components/ImageMaskFill'
 import { BlockLibrary } from '@/features/designer/components/BlockLibrary'
 import { toast } from 'sonner'
-import type { CanvasElement, TextElement, ShapeElement, ImageElement } from '@/features/designer/components/types'
+import type {
+  CanvasElement,
+  TextElement,
+  ShapeElement,
+  ImageElement,
+} from '@/features/designer/components/types'
 import { DESIGNER_LABELS } from '../constants/labels'
 
 interface DesignerDialogsProps {

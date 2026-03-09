@@ -22,7 +22,10 @@ export type UpdateLeaderAvailability = Database['public']['Tables']['leader_avai
 export type LeaderAvailabilityStatus = 'available' | 'tentative' | 'blocked'
 
 // Status display configuration
-export const LEADER_AVAILABILITY_STATUS_CONFIG: Record<LeaderAvailabilityStatus, { label: string; color: string }> = {
+export const LEADER_AVAILABILITY_STATUS_CONFIG: Record<
+  LeaderAvailabilityStatus,
+  { label: string; color: string }
+> = {
   available: { label: '可用', color: 'bg-morandi-green/70 text-white' },
   tentative: { label: '暫定', color: 'bg-morandi-gold/70 text-white' },
   blocked: { label: '不可用', color: 'bg-morandi-red/70 text-white' },

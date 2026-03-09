@@ -24,7 +24,6 @@ export function WorkspaceSwitcher() {
     // 從 localStorage 讀取當前選擇的 workspace
     const saved = localStorage.getItem('current_workspace_filter')
     setCurrentWorkspace(saved)
-   
   }, [isSuperAdmin])
 
   // 如果不是 super_admin，不顯示切換器
@@ -52,9 +51,7 @@ export function WorkspaceSwitcher() {
         <h2 className="text-xl font-semibold">{WORKSPACE_SWITCHER_LABELS.TITLE}</h2>
       </div>
 
-      <p className="text-sm text-morandi-secondary mb-6">
-        {WORKSPACE_SWITCHER_LABELS.LABEL_795}
-      </p>
+      <p className="text-sm text-morandi-secondary mb-6">{WORKSPACE_SWITCHER_LABELS.LABEL_795}</p>
 
       <div className="space-y-3">
         {/* 查看全部 */}

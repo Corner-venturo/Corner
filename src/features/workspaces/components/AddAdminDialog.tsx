@@ -4,7 +4,6 @@
  * 為現有公司新增管理員帳號
  */
 
-
 import { useState, useCallback, useEffect } from 'react'
 import {
   Dialog,
@@ -51,7 +50,7 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
   }, [open, workspace])
 
   const handleFieldChange = useCallback((field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    setFormData(prev => ({ ...prev, [field]: value }))
   }, [])
 
   const handleSubmit = useCallback(async () => {
@@ -75,16 +74,14 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
     try {
       const passwordHash = await bcrypt.hash(formData.password, 10)
 
-      const { error } = await supabase
-        .from('employees')
-        .insert({
-          workspace_id: workspace.id,
-          display_name: formData.name.trim(),
-          employee_number: formData.employee_number.trim().toUpperCase(),
-          password_hash: passwordHash,
-          role: 'admin',
-          status: 'active',
-        })
+      const { error } = await supabase.from('employees').insert({
+        workspace_id: workspace.id,
+        display_name: formData.name.trim(),
+        employee_number: formData.employee_number.trim().toUpperCase(),
+        password_hash: passwordHash,
+        role: 'admin',
+        status: 'active',
+      })
 
       if (error) {
         if (error.code === '23505') {
@@ -127,7 +124,7 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
             <Label required>{WORKSPACES_LABELS.LABEL_658}</Label>
             <Input
               value={formData.name}
-              onChange={(e) => handleFieldChange('name', e.target.value)}
+              onChange={e => handleFieldChange('name', e.target.value)}
               placeholder={WORKSPACES_LABELS.例_王大明}
             />
           </div>
@@ -136,7 +133,7 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
             <Label required>{WORKSPACES_LABELS.LABEL_2161}</Label>
             <Input
               value={formData.employee_number}
-              onChange={(e) => handleFieldChange('employee_number', e.target.value)}
+              onChange={e => handleFieldChange('employee_number', e.target.value)}
               placeholder={WORKSPACES_LABELS.例_E002}
               className="uppercase"
             />
@@ -147,7 +144,7 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
             <Input
               type="password"
               value={formData.password}
-              onChange={(e) => handleFieldChange('password', e.target.value)}
+              onChange={e => handleFieldChange('password', e.target.value)}
               placeholder={WORKSPACES_LABELS.請設定密碼}
             />
           </div>
@@ -164,11 +161,7 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
             disabled={isSubmitting}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
-            {isSubmitting ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <Save size={16} />
-            )}
+            {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
             新增管理員
           </Button>
         </div>

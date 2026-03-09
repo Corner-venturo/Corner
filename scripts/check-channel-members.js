@@ -83,15 +83,15 @@ async function checkChannelMembers() {
       const employeeMembers = members.filter(m => m.employee_id === employee.id)
       const workspaceChannels = channels.filter(c => c.workspace_id === employee.workspace_id)
 
-      console.log(
-        `\n   ${employee.display_name} (${employee.employee_number}):`
-      )
+      console.log(`\n   ${employee.display_name} (${employee.employee_number}):`)
       console.log(`   - 所屬 workspace: ${employee.workspace_id?.substring(0, 8)}...`)
       console.log(`   - 該 workspace 的頻道數: ${workspaceChannels.length}`)
       console.log(`   - 已加入的頻道數: ${employeeMembers.length}`)
 
       if (employeeMembers.length < workspaceChannels.length) {
-        console.log(`   ⚠️  缺少 ${workspaceChannels.length - employeeMembers.length} 個頻道成員記錄`)
+        console.log(
+          `   ⚠️  缺少 ${workspaceChannels.length - employeeMembers.length} 個頻道成員記錄`
+        )
       } else if (workspaceChannels.length === 0) {
         console.log(`   ⚠️  該 workspace 沒有任何頻道`)
       } else {

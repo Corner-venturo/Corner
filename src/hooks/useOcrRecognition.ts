@@ -51,72 +51,72 @@ export function useOcrRecognition() {
    * @param imageSource - 可以是 URL 或 File 物件
    * @param onSuccess - 辨識成功時的回調函數，回傳解析後的資料
    */
-  const recognizePassport = useCallback(async (
-    imageSource: string | File,
-    onSuccess: (data: OcrParsedData) => void
-  ) => {
-    setIsRecognizing(true)
-    try {
-      let file: File
+  const recognizePassport = useCallback(
+    async (imageSource: string | File, onSuccess: (data: OcrParsedData) => void) => {
+      setIsRecognizing(true)
+      try {
+        let file: File
 
-      // 如果是 base64 URL，轉換為 File
-      if (typeof imageSource === 'string') {
-        const response = await fetch(imageSource)
-        const blob = await response.blob()
-        file = new File([blob], 'passport.jpg', { type: 'image/jpeg' })
-      } else {
-        file = imageSource
-      }
-
-      // 呼叫 OCR API
-      const formData = new FormData()
-      formData.append('files', file)
-
-      const ocrResponse = await fetch('/api/ocr/passport', {
-        method: 'POST',
-        body: formData,
-      })
-
-      if (!ocrResponse.ok) {
-        throw new Error('OCR 辨識失敗')
-      }
-
-      const result: OcrApiResponse = await ocrResponse.json()
-
-      if (result.results?.[0]?.success && result.results[0].customer) {
-        const ocrData = result.results[0].customer
-
-        // 性別判斷：優先用 OCR 結果，再用身分證字號第二碼備援
-        let gender = ocrData.sex || ocrData.gender
-        if (!gender && ocrData.national_id) {
-          const secondChar = ocrData.national_id.charAt(1)
-          if (secondChar === '1') gender = '男'
-          else if (secondChar === '2') gender = '女'
+        // 如果是 base64 URL，轉換為 File
+        if (typeof imageSource === 'string') {
+          const response = await fetch(imageSource)
+          const blob = await response.blob()
+          file = new File([blob], 'passport.jpg', { type: 'image/jpeg' })
+        } else {
+          file = imageSource
         }
 
-        // 組合辨識結果
-        const recognizedData: OcrParsedData = {
-          name: ocrData.name,
-          passport_romanization: ocrData.passport_romanization,
-          birth_date: ocrData.birth_date,
-          gender,
-          passport_number: ocrData.passport_number,
-          passport_expiry: ocrData.passport_expiry,
-          national_id: ocrData.national_id,
+        // 呼叫 OCR API
+        const formData = new FormData()
+        formData.append('files', file)
+
+        const ocrResponse = await fetch('/api/ocr/passport', {
+          method: 'POST',
+          body: formData,
+        })
+
+        if (!ocrResponse.ok) {
+          throw new Error('OCR 辨識失敗')
         }
 
-        onSuccess(recognizedData)
-        toast.success('辨識成功！請檢查資料')
-      } else {
-        toast.error('無法辨識護照資訊，請手動輸入')
+        const result: OcrApiResponse = await ocrResponse.json()
+
+        if (result.results?.[0]?.success && result.results[0].customer) {
+          const ocrData = result.results[0].customer
+
+          // 性別判斷：優先用 OCR 結果，再用身分證字號第二碼備援
+          let gender = ocrData.sex || ocrData.gender
+          if (!gender && ocrData.national_id) {
+            const secondChar = ocrData.national_id.charAt(1)
+            if (secondChar === '1') gender = '男'
+            else if (secondChar === '2') gender = '女'
+          }
+
+          // 組合辨識結果
+          const recognizedData: OcrParsedData = {
+            name: ocrData.name,
+            passport_romanization: ocrData.passport_romanization,
+            birth_date: ocrData.birth_date,
+            gender,
+            passport_number: ocrData.passport_number,
+            passport_expiry: ocrData.passport_expiry,
+            national_id: ocrData.national_id,
+          }
+
+          onSuccess(recognizedData)
+          toast.success('辨識成功！請檢查資料')
+        } else {
+          toast.error('無法辨識護照資訊，請手動輸入')
+        }
+      } catch (error) {
+        logger.error('OCR 辨識失敗:', error)
+        toast.error('辨識失敗，請重試')
+      } finally {
+        setIsRecognizing(false)
       }
-    } catch (error) {
-      logger.error('OCR 辨識失敗:', error)
-      toast.error('辨識失敗，請重試')
-    } finally {
-      setIsRecognizing(false)
-    }
-  }, [])
+    },
+    []
+  )
 
   return {
     isRecognizing,

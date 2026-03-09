@@ -144,7 +144,9 @@ async function fetchAllReferenceData(): Promise<ReferenceData> {
       }
     }
 
-    logger.log(`✅ 參考資料載入完成: ${airlines.size} 航空公司, ${airports.size} 機場, ${ssrCodes.size} SSR 代碼`)
+    logger.log(
+      `✅ 參考資料載入完成: ${airlines.size} 航空公司, ${airports.size} 機場, ${ssrCodes.size} SSR 代碼`
+    )
 
     cachedData = {
       airlines,

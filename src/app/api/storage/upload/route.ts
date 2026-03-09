@@ -43,21 +43,17 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(arrayBuffer)
 
     const supabaseAdmin = getSupabaseAdminClient()
-    const { data, error } = await supabaseAdmin.storage
-      .from(bucket)
-      .upload(path, buffer, {
-        contentType: file.type,
-        upsert: false,
-      })
+    const { data, error } = await supabaseAdmin.storage.from(bucket).upload(path, buffer, {
+      contentType: file.type,
+      upsert: false,
+    })
 
     if (error) {
       logger.error('Storage upload error:', error)
       return errorResponse(error.message, 500, ErrorCode.INTERNAL_ERROR)
     }
 
-    const { data: publicUrlData } = supabaseAdmin.storage
-      .from(bucket)
-      .getPublicUrl(path)
+    const { data: publicUrlData } = supabaseAdmin.storage.from(bucket).getPublicUrl(path)
 
     return successResponse({
       path: data.path,
@@ -94,11 +90,7 @@ export async function DELETE(request: NextRequest) {
     const path = searchParams.get('path')
 
     if (!bucket || !path) {
-      return errorResponse(
-        'Missing required params: bucket, path',
-        400,
-        ErrorCode.MISSING_FIELD
-      )
+      return errorResponse('Missing required params: bucket, path', 400, ErrorCode.MISSING_FIELD)
     }
 
     const allowedBuckets = ['company-assets', 'passport-images', 'member-documents', 'user-avatars']
@@ -107,9 +99,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const supabaseAdmin = getSupabaseAdminClient()
-    const { error } = await supabaseAdmin.storage
-      .from(bucket)
-      .remove([path])
+    const { error } = await supabaseAdmin.storage.from(bucket).remove([path])
 
     if (error) {
       logger.error('Storage delete error:', error)

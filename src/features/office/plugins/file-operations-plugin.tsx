@@ -9,13 +9,12 @@ import {
   Plugin,
   UniverInstanceType,
 } from '@univerjs/core'
-import { SetRangeValuesCommand, getSheetCommandTarget, SheetsSelectionsService } from '@univerjs/sheets'
 import {
-  ComponentManager,
-  IMenuManagerService,
-  MenuItemType,
-  RibbonStartGroup,
-} from '@univerjs/ui'
+  SetRangeValuesCommand,
+  getSheetCommandTarget,
+  SheetsSelectionsService,
+} from '@univerjs/sheets'
+import { ComponentManager, IMenuManagerService, MenuItemType, RibbonStartGroup } from '@univerjs/ui'
 import type { IMenuButtonItem } from '@univerjs/ui'
 import { OFFICE_LABELS } from '../constants/labels'
 
@@ -60,45 +59,84 @@ export function clearFileOperationCallbacks() {
 // ============================================
 function SaveIcon() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-      <polyline points="17 21 17 13 7 13 7 21"/>
-      <polyline points="7 3 7 8 15 8"/>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+      <polyline points="17 21 17 13 7 13 7 21" />
+      <polyline points="7 3 7 8 15 8" />
     </svg>
   )
 }
 
 function SaveAsIcon() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-      <polyline points="17 21 17 13 7 13 7 21"/>
-      <polyline points="7 3 7 8 15 8"/>
-      <circle cx="19" cy="19" r="4" fill="currentColor" stroke="none"/>
-      <path d="M19 17v4M17 19h4" stroke="white" strokeWidth="1.5"/>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M17 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+      <polyline points="17 21 17 13 7 13 7 21" />
+      <polyline points="7 3 7 8 15 8" />
+      <circle cx="19" cy="19" r="4" fill="currentColor" stroke="none" />
+      <path d="M19 17v4M17 19h4" stroke="white" strokeWidth="1.5" />
     </svg>
   )
 }
 
 function ExportExcelIcon() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-      <polyline points="14 2 14 8 20 8"/>
-      <path d="M12 18v-6"/>
-      <path d="M9 15l3 3 3-3"/>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <path d="M12 18v-6" />
+      <path d="M9 15l3 3 3-3" />
     </svg>
   )
 }
 
 function AutoSumIcon() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 4H6l6 6-6 6h12"/>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M18 4H6l6 6-6 6h12" />
     </svg>
   )
 }
-
 
 // ============================================
 // Commands
@@ -248,7 +286,6 @@ function AutoSumMenuItemFactory(): IMenuButtonItem<string> {
   }
 }
 
-
 // ============================================
 // Controller
 // ============================================
@@ -318,7 +355,7 @@ export class UniverFileOperationsPlugin extends Plugin {
 
   override onStarting(): void {
     const deps: Dependency[] = [[FileOperationsController]]
-    deps.forEach((dep) => this._injector.add(dep))
+    deps.forEach(dep => this._injector.add(dep))
     this._injector.get(FileOperationsController)
   }
 }
@@ -337,7 +374,7 @@ export class UniverFileOperationsDocPlugin extends Plugin {
 
   override onStarting(): void {
     const deps: Dependency[] = [[FileOperationsController]]
-    deps.forEach((dep) => this._injector.add(dep))
+    deps.forEach(dep => this._injector.add(dep))
     this._injector.get(FileOperationsController)
   }
 }

@@ -25,17 +25,30 @@ export function ItineraryHeader({
 }: ItineraryHeaderProps) {
   return (
     <ResponsiveHeader
-      title={tourData.tourCode ? NEW_LABELS.EDIT_ITINERARY_TITLE(tourData.tourCode) : NEW_LABELS.NEW_WEB_ITINERARY}
+      title={
+        tourData.tourCode
+          ? NEW_LABELS.EDIT_ITINERARY_TITLE(tourData.tourCode)
+          : NEW_LABELS.NEW_WEB_ITINERARY
+      }
       breadcrumb={[
         { label: NEW_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
         { label: NEW_LABELS.BREADCRUMB_ITINERARY_MGMT, href: '/itinerary' },
-        { label: tourData.tourCode ? NEW_LABELS.EDIT_BREADCRUMB(tourData.tourCode) : NEW_LABELS.NEW_WEB_ITINERARY, href: '#' },
+        {
+          label: tourData.tourCode
+            ? NEW_LABELS.EDIT_BREADCRUMB(tourData.tourCode)
+            : NEW_LABELS.NEW_WEB_ITINERARY,
+          href: '#',
+        },
       ]}
       showBackButton={true}
       onBack={onBack}
       actions={
         <PublishButton
-          data={{ ...tourData, id: itineraryId || undefined, version_records: tourData.version_records }}
+          data={{
+            ...tourData,
+            id: itineraryId || undefined,
+            version_records: tourData.version_records,
+          }}
           currentVersionIndex={currentVersionIndex}
           onVersionChange={onVersionChange}
           onVersionRecordsChange={onVersionRecordsChange}

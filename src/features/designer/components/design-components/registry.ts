@@ -69,8 +69,7 @@ export function getComponentById(id: string): DesignComponent | undefined {
 /** 搜尋元件（名稱或說明） */
 export function searchComponents(query: string): DesignComponent[] {
   const q = query.toLowerCase()
-  return ALL_COMPONENTS.filter(c =>
-    c.name.toLowerCase().includes(q) ||
-    c.description.toLowerCase().includes(q)
+  return ALL_COMPONENTS.filter(
+    c => c.name.toLowerCase().includes(q) || c.description.toLowerCase().includes(q)
   )
 }

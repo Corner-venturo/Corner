@@ -107,7 +107,12 @@ export default function ContractsPage() {
       {
         key: 'participants',
         label: CONTRACTS_LABELS.COL_PARTICIPANTS,
-        render: (_, tour) => <NumberCell value={tour.current_participants || 0} suffix={CONTRACTS_LABELS.PARTICIPANTS_UNIT} />,
+        render: (_, tour) => (
+          <NumberCell
+            value={tour.current_participants || 0}
+            suffix={CONTRACTS_LABELS.PARTICIPANTS_UNIT}
+          />
+        ),
       },
       {
         key: 'contract_status',

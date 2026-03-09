@@ -50,15 +50,35 @@ interface MenuItem {
 // 主選單項目
 const menuItems: MenuItem[] = [
   { href: '/dashboard', label: COMP_LAYOUT_LABELS.首頁, icon: Home },
-  { href: '/calendar', label: COMP_LAYOUT_LABELS.行事曆, icon: Calendar, requiredPermission: 'calendar' },
-  { href: '/workspace', label: COMP_LAYOUT_LABELS.工作空間, icon: Building2, requiredPermission: 'workspace' },
+  {
+    href: '/calendar',
+    label: COMP_LAYOUT_LABELS.行事曆,
+    icon: Calendar,
+    requiredPermission: 'calendar',
+  },
+  {
+    href: '/workspace',
+    label: COMP_LAYOUT_LABELS.工作空間,
+    icon: Building2,
+    requiredPermission: 'workspace',
+  },
   // 旅伴通訊已整合到工作頻道中，此路由暫時隱藏
   // { href: '/traveler-chat', label: '旅伴通訊', icon: MessageCircle, requiredPermission: 'workspace' },
-  { href: '/todos', label: COMP_LAYOUT_LABELS.待辦事項, icon: CheckSquare, requiredPermission: 'todos' },
+  {
+    href: '/todos',
+    label: COMP_LAYOUT_LABELS.待辦事項,
+    icon: CheckSquare,
+    requiredPermission: 'todos',
+  },
   // 行程管理已整合到旅遊團中，從團的視角操作
   // { href: '/itinerary', label: '行程管理', icon: Flag, requiredPermission: 'itinerary' },
   { href: '/tours', label: COMP_LAYOUT_LABELS.旅遊團, icon: MapPin, requiredPermission: 'tours' },
-  { href: '/orders', label: COMP_LAYOUT_LABELS.訂單, icon: ShoppingCart, requiredPermission: 'orders' },
+  {
+    href: '/orders',
+    label: COMP_LAYOUT_LABELS.訂單,
+    icon: ShoppingCart,
+    requiredPermission: 'orders',
+  },
   // 報價單已整合到旅遊團中，從團的視角操作
   // { href: '/quotes', label: '報價單', icon: Calculator, requiredPermission: 'quotes' },
   {
@@ -66,30 +86,96 @@ const menuItems: MenuItem[] = [
     label: COMP_LAYOUT_LABELS.財務系統,
     icon: CreditCard,
     children: [
-      { href: '/finance/payments', label: COMP_LAYOUT_LABELS.收款管理, icon: CreditCard, requiredPermission: 'payments' },
-      { href: '/finance/requests', label: COMP_LAYOUT_LABELS.請款管理, icon: TrendingDown, requiredPermission: 'requests' },
-      { href: '/finance/treasury', label: COMP_LAYOUT_LABELS.出納管理, icon: Wallet, requiredPermission: 'disbursement' },
+      {
+        href: '/finance/payments',
+        label: COMP_LAYOUT_LABELS.收款管理,
+        icon: CreditCard,
+        requiredPermission: 'payments',
+      },
+      {
+        href: '/finance/requests',
+        label: COMP_LAYOUT_LABELS.請款管理,
+        icon: TrendingDown,
+        requiredPermission: 'requests',
+      },
+      {
+        href: '/finance/treasury',
+        label: COMP_LAYOUT_LABELS.出納管理,
+        icon: Wallet,
+        requiredPermission: 'disbursement',
+      },
       // { href: '/erp-accounting/vouchers', label: COMP_LAYOUT_LABELS.會計傳票, icon: FileText, requiredPermission: 'vouchers' },
-      { href: '/finance/travel-invoice', label: COMP_LAYOUT_LABELS.代轉發票, icon: FileText, requiredPermission: 'travel_invoice', restrictedFeature: 'travel_invoices' },
-      { href: '/finance/reports', label: COMP_LAYOUT_LABELS.報表管理, icon: BarChart3, requiredPermission: 'reports' },
+      {
+        href: '/finance/travel-invoice',
+        label: COMP_LAYOUT_LABELS.代轉發票,
+        icon: FileText,
+        requiredPermission: 'travel_invoice',
+        restrictedFeature: 'travel_invoices',
+      },
+      {
+        href: '/finance/reports',
+        label: COMP_LAYOUT_LABELS.報表管理,
+        icon: BarChart3,
+        requiredPermission: 'reports',
+      },
     ],
   },
   // V1: 簽證管理暫時隱藏
   // { href: '/visas', label: COMP_LAYOUT_LABELS.簽證管理, icon: FileCheck, requiredPermission: 'visas' },
-  { href: '/contracts', label: COMP_LAYOUT_LABELS.合約管理, icon: FileSignature, requiredPermission: 'contracts' },
-  { href: '/confirmations', label: COMP_LAYOUT_LABELS.確認單管理, icon: CircleDot, requiredPermission: 'confirmations' },
+  {
+    href: '/contracts',
+    label: COMP_LAYOUT_LABELS.合約管理,
+    icon: FileSignature,
+    requiredPermission: 'contracts',
+  },
+  {
+    href: '/confirmations',
+    label: COMP_LAYOUT_LABELS.確認單管理,
+    icon: CircleDot,
+    requiredPermission: 'confirmations',
+  },
   {
     href: '/database',
     label: COMP_LAYOUT_LABELS.資料管理,
     icon: Database,
     requiredPermission: 'database',
     children: [
-      { href: '/customers', label: COMP_LAYOUT_LABELS.顧客管理, icon: Users, requiredPermission: 'customers' },
-      { href: '/database/attractions', label: COMP_LAYOUT_LABELS.旅遊資料庫, icon: MapPin, requiredPermission: 'database' },
-      { href: '/database/transportation-rates', label: COMP_LAYOUT_LABELS.車資管理, icon: Bus, requiredPermission: 'database' },
-      { href: '/database/suppliers', label: COMP_LAYOUT_LABELS.供應商管理, icon: Building2, requiredPermission: 'database' },
-      { href: '/database/tour-leaders', label: COMP_LAYOUT_LABELS.領隊資料, icon: Users, requiredPermission: 'database' },
-      { href: '/database/company-assets', label: COMP_LAYOUT_LABELS.公司資源管理, icon: ImageIcon, requiredPermission: 'database' },
+      {
+        href: '/customers',
+        label: COMP_LAYOUT_LABELS.顧客管理,
+        icon: Users,
+        requiredPermission: 'customers',
+      },
+      {
+        href: '/database/attractions',
+        label: COMP_LAYOUT_LABELS.旅遊資料庫,
+        icon: MapPin,
+        requiredPermission: 'database',
+      },
+      {
+        href: '/database/transportation-rates',
+        label: COMP_LAYOUT_LABELS.車資管理,
+        icon: Bus,
+        requiredPermission: 'database',
+      },
+      {
+        href: '/database/suppliers',
+        label: COMP_LAYOUT_LABELS.供應商管理,
+        icon: Building2,
+        requiredPermission: 'database',
+      },
+      {
+        href: '/database/tour-leaders',
+        label: COMP_LAYOUT_LABELS.領隊資料,
+        icon: Users,
+        requiredPermission: 'database',
+      },
+      {
+        href: '/database/company-assets',
+        label: COMP_LAYOUT_LABELS.公司資源管理,
+        icon: ImageIcon,
+        requiredPermission: 'database',
+      },
     ],
   },
   { href: '/hr', label: COMP_LAYOUT_LABELS.人資管理, icon: UserCog, requiredPermission: 'hr' },
@@ -99,7 +185,12 @@ const menuItems: MenuItem[] = [
 
 // 個人工具
 const personalToolItems: MenuItem[] = [
-  { href: '/accounting', label: COMP_LAYOUT_LABELS.記帳管理, icon: Wallet, requiredPermission: 'accounting' },
+  {
+    href: '/accounting',
+    label: COMP_LAYOUT_LABELS.記帳管理,
+    icon: Wallet,
+    requiredPermission: 'accounting',
+  },
   // timebox removed
 ]
 
@@ -139,9 +230,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
 
   // 切換子選單展開
   const toggleExpand = (href: string) => {
-    setExpandedItems(prev =>
-      prev.includes(href) ? prev.filter(h => h !== href) : [...prev, href]
-    )
+    setExpandedItems(prev => (prev.includes(href) ? prev.filter(h => h !== href) : [...prev, href]))
   }
 
   // 過濾選單（與桌面版一致的權限邏輯）
@@ -190,7 +279,9 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             onClick={() => toggleExpand(item.href)}
             className={cn(
               'w-full flex items-center justify-between px-4 py-3 text-left transition-colors',
-              isActive ? 'bg-morandi-gold/10 text-morandi-gold' : 'text-morandi-primary hover:bg-muted'
+              isActive
+                ? 'bg-morandi-gold/10 text-morandi-gold'
+                : 'text-morandi-primary hover:bg-muted'
             )}
           >
             <span className="flex items-center gap-3">
@@ -230,7 +321,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent
         level={1}
         className="lg:hidden fixed top-0 left-0 bottom-0 right-auto w-72 max-w-[80vw] translate-x-0 translate-y-0 bg-background shadow-lg rounded-none rounded-r-xl p-0 gap-0 data-[state=open]:slide-in-from-left data-[state=closed]:slide-out-to-left"

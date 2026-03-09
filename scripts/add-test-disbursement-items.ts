@@ -7,10 +7,7 @@ const supabase = createClient(
 
 async function addTestData() {
   // 先查詢現有的 payment_request_items 看看有什麼欄位
-  const { data: existingItems } = await supabase
-    .from('payment_request_items')
-    .select('*')
-    .limit(1)
+  const { data: existingItems } = await supabase.from('payment_request_items').select('*').limit(1)
 
   console.log('現有項目欄位:', existingItems?.[0] ? Object.keys(existingItems[0]) : '無資料')
 
@@ -98,10 +95,7 @@ async function addTestData() {
 
   console.log(`準備新增 ${testItems.length} 筆測試項目...`)
 
-  const { data, error } = await supabase
-    .from('payment_request_items')
-    .insert(testItems)
-    .select()
+  const { data, error } = await supabase.from('payment_request_items').insert(testItems).select()
 
   if (error) {
     console.error('新增失敗:', error)

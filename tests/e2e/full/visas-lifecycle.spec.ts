@@ -94,13 +94,18 @@ test.describe.serial('簽證管理完整生命週期測試', () => {
     // ========== 第六步：選擇簽證類型 ==========
     console.log('選擇簽證類型...')
     // 簽證類型是一個 Radix Select 下拉選單
-    const visaTypeSelect = dialog.locator('table [role="combobox"], table button[aria-haspopup="listbox"]').first()
+    const visaTypeSelect = dialog
+      .locator('table [role="combobox"], table button[aria-haspopup="listbox"]')
+      .first()
     if (await visaTypeSelect.isVisible({ timeout: 2000 }).catch(() => false)) {
       await visaTypeSelect.click()
       await page.waitForTimeout(500)
 
       // 選擇「護照 成人」- 使用 [role="option"] 選擇器
-      const passportOption = page.locator('[role="option"]').filter({ hasText: '護照 成人' }).first()
+      const passportOption = page
+        .locator('[role="option"]')
+        .filter({ hasText: '護照 成人' })
+        .first()
       if (await passportOption.isVisible({ timeout: 2000 }).catch(() => false)) {
         await passportOption.click()
         console.log('簽證類型: 護照 成人')
@@ -123,7 +128,7 @@ test.describe.serial('簽證管理完整生命週期測試', () => {
     const receivedDateInput = dateInputs.first()
     if (await receivedDateInput.isVisible({ timeout: 2000 }).catch(() => false)) {
       // 如果是日期選擇按鈕，點擊並選擇今天
-      if (await receivedDateInput.getAttribute('title') === '選擇日期') {
+      if ((await receivedDateInput.getAttribute('title')) === '選擇日期') {
         await receivedDateInput.click()
         await page.waitForTimeout(300)
         // 點擊「今天」按鈕
@@ -137,7 +142,10 @@ test.describe.serial('簽證管理完整生命週期測試', () => {
     await page.waitForTimeout(500)
 
     // ========== 第八步：提交表單 ==========
-    const submitButton = dialog.locator('button').filter({ hasText: /批次新增簽證|新增|儲存/ }).last()
+    const submitButton = dialog
+      .locator('button')
+      .filter({ hasText: /批次新增簽證|新增|儲存/ })
+      .last()
     await expect(submitButton).toBeVisible({ timeout: 3000 })
 
     const isEnabled = await submitButton.isEnabled()
@@ -166,7 +174,10 @@ test.describe.serial('簽證管理完整生命週期測試', () => {
       const matchDialog = page.locator('[role="dialog"]').filter({ hasText: '旅客比對' })
       if (await matchDialog.isVisible({ timeout: 3000 }).catch(() => false)) {
         console.log('旅客比對對話框出現，關閉它')
-        const closeButton = matchDialog.locator('button').filter({ hasText: /關閉|取消|完成/ }).first()
+        const closeButton = matchDialog
+          .locator('button')
+          .filter({ hasText: /關閉|取消|完成/ })
+          .first()
         if (await closeButton.isVisible()) {
           await closeButton.click()
         } else {
@@ -248,7 +259,10 @@ test.describe.serial('簽證管理完整生命週期測試', () => {
           console.log('對話框內容:', dialogContent?.substring(0, 200))
 
           // 關閉對話框
-          const closeButton = detailDialog.locator('button').filter({ hasText: /關閉|取消/ }).first()
+          const closeButton = detailDialog
+            .locator('button')
+            .filter({ hasText: /關閉|取消/ })
+            .first()
           if (await closeButton.isVisible()) {
             await closeButton.click()
           } else {
@@ -312,11 +326,16 @@ test.describe.serial('簽證管理完整生命週期測試', () => {
     await page.waitForTimeout(500)
 
     // 確認對話框
-    const confirmDialog = page.locator('[role="alertdialog"], [role="dialog"]').filter({ hasText: /確定|刪除|確認/ })
+    const confirmDialog = page
+      .locator('[role="alertdialog"], [role="dialog"]')
+      .filter({ hasText: /確定|刪除|確認/ })
     if (await confirmDialog.isVisible({ timeout: 3000 }).catch(() => false)) {
       console.log('確認對話框已出現')
 
-      const confirmButton = confirmDialog.locator('button').filter({ hasText: /^確定$|^確認$|確認刪除|^刪除$/ }).first()
+      const confirmButton = confirmDialog
+        .locator('button')
+        .filter({ hasText: /^確定$|^確認$|確認刪除|^刪除$/ })
+        .first()
       if (await confirmButton.isVisible({ timeout: 2000 }).catch(() => false)) {
         console.log('點擊確認按鈕...')
         await confirmButton.click({ force: true })
@@ -337,7 +356,7 @@ test.describe.serial('簽證管理完整生命週期測試', () => {
 
     // 確認該簽證不在列表中
     const deletedApplicant = page.locator(`text="${createdApplicantName}"`)
-    const stillExists = await deletedApplicant.count() > 0
+    const stillExists = (await deletedApplicant.count()) > 0
 
     if (stillExists) {
       console.log('簽證仍可見，嘗試重新載入頁面...')
@@ -345,7 +364,7 @@ test.describe.serial('簽證管理完整生命週期測試', () => {
       await page.waitForLoadState('networkidle')
       await page.waitForTimeout(1000)
 
-      const afterReloadExists = await page.locator(`text="${createdApplicantName}"`).count() > 0
+      const afterReloadExists = (await page.locator(`text="${createdApplicantName}"`).count()) > 0
       expect(afterReloadExists).toBe(false)
       console.log(`✅ 重新載入後簽證 ${createdApplicantName} 確認已刪除`)
     } else {

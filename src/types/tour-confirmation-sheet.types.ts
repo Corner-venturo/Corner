@@ -125,24 +125,24 @@ export interface TourConfirmationItem extends BaseEntity {
 }
 
 export type ConfirmationItemCategory =
-  | 'transport'     // 交通
-  | 'meal'          // 餐食
+  | 'transport' // 交通
+  | 'meal' // 餐食
   | 'accommodation' // 住宿
-  | 'activity'      // 活動
-  | 'other'         // 其他
+  | 'activity' // 活動
+  | 'other' // 其他
 
 // 資源類型
 export type ResourceType =
-  | 'restaurant'    // 餐廳
-  | 'hotel'         // 飯店
-  | 'attraction'    // 景點
-  | 'supplier'      // 供應商
+  | 'restaurant' // 餐廳
+  | 'hotel' // 飯店
+  | 'attraction' // 景點
+  | 'supplier' // 供應商
 
 export type BookingStatus =
-  | 'pending'       // 待處理
-  | 'requested'     // 已發需求
-  | 'confirmed'     // 已確認
-  | 'cancelled'     // 已取消
+  | 'pending' // 待處理
+  | 'requested' // 已發需求
+  | 'confirmed' // 已確認
+  | 'cancelled' // 已取消
   | 'pending_change' // 待變更（版本切換時）
 
 // ============================================

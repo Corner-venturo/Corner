@@ -13,7 +13,11 @@ import { generateUUID } from '@/lib/utils/uuid'
 import type { Database } from '@/lib/supabase/types'
 import { logger } from '@/lib/utils/logger'
 import { createTour as createTourData, deleteTour as deleteTourData } from '@/data'
-import { TOURS_ADVANCED_LABELS, TOUR_SERVICE_LABELS, TOUR_OPERATIONS_LABELS } from '../constants/labels'
+import {
+  TOURS_ADVANCED_LABELS,
+  TOUR_SERVICE_LABELS,
+  TOUR_OPERATIONS_LABELS,
+} from '../constants/labels'
 
 const TOURS_KEY = 'tours'
 
@@ -22,7 +26,8 @@ const TOURS_KEY = 'tours'
 // 不要在這裡調用 getSession()，它會導致掛起
 // 列表頁只需要的欄位（63 欄 → ~20 欄）
 // 列表頁只需要的欄位（63 欄 → 22 欄）
-const TOUR_LIST_SELECT = 'id, code, name, location, status, departure_date, return_date, price, selling_price_per_person, max_participants, current_participants, total_revenue, total_cost, profit, archived, is_active, quote_id, itinerary_id, controller_id, closing_status, workspace_id, created_at'
+const TOUR_LIST_SELECT =
+  'id, code, name, location, status, departure_date, return_date, price, selling_price_per_person, max_participants, current_participants, total_revenue, total_cost, profit, archived, is_active, quote_id, itinerary_id, controller_id, closing_status, workspace_id, created_at'
 
 async function fetchTours(): Promise<Tour[]> {
   const { data, error } = await supabase
@@ -43,15 +48,15 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
   // ✅ 優化：讀取不等 auth hydration，讓 SWR 立即從快取顯示
   const swrKey = TOURS_KEY
 
-  const { data: allTours = [], error, isLoading } = useSWR<Tour[]>(
-    swrKey,
-    fetchTours,
-    {
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
-      dedupingInterval: 5000,
-    }
-  )
+  const {
+    data: allTours = [],
+    error,
+    isLoading,
+  } = useSWR<Tour[]>(swrKey, fetchTours, {
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
+    dedupingInterval: 5000,
+  })
 
   // 根據 params 進行過濾、排序、分頁
   const processedTours = (() => {
@@ -60,10 +65,11 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
     // 搜尋過濾
     if (params?.search) {
       const searchLower = params.search.toLowerCase()
-      result = result.filter(tour =>
-        tour.name.toLowerCase().includes(searchLower) ||
-        tour.code.toLowerCase().includes(searchLower) ||
-        (tour.location || '').toLowerCase().includes(searchLower)
+      result = result.filter(
+        tour =>
+          tour.name.toLowerCase().includes(searchLower) ||
+          tour.code.toLowerCase().includes(searchLower) ||
+          (tour.location || '').toLowerCase().includes(searchLower)
       )
     }
 
@@ -100,7 +106,11 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
     } as Tour
 
     // 樂觀更新：使用 functional update 避免 stale closure 問題
-    mutate(TOURS_KEY, (currentTours: Tour[] | undefined) => [newTour, ...(currentTours || [])], false)
+    mutate(
+      TOURS_KEY,
+      (currentTours: Tour[] | undefined) => [newTour, ...(currentTours || [])],
+      false
+    )
 
     try {
       // Type assertion needed due to Tour type vs Database Insert type mismatch
@@ -122,8 +132,10 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
     }
 
     // 樂觀更新：使用 functional update 避免 stale closure 問題
-    mutate(TOURS_KEY, (currentTours: Tour[] | undefined) =>
-      (currentTours || []).map(tour => tour.id === id ? { ...tour, ...updatedData } : tour),
+    mutate(
+      TOURS_KEY,
+      (currentTours: Tour[] | undefined) =>
+        (currentTours || []).map(tour => (tour.id === id ? { ...tour, ...updatedData } : tour)),
       false
     )
 
@@ -200,15 +212,16 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
 
 // 專門用於單個旅遊團詳情的 hook
 export function useTourDetails(tour_id: string) {
-  const { data: tour, error, isLoading: loading, mutate: mutateTour } = useSWR<Tour | null>(
+  const {
+    data: tour,
+    error,
+    isLoading: loading,
+    mutate: mutateTour,
+  } = useSWR<Tour | null>(
     tour_id ? `tour-${tour_id}` : null,
     async () => {
       if (!tour_id) return null
-      const { data, error } = await supabase
-        .from('tours')
-        .select('*')
-        .eq('id', tour_id)
-        .single()
+      const { data, error } = await supabase.from('tours').select('*').eq('id', tour_id).single()
 
       if (error) throw error
       return data as Tour
@@ -220,25 +233,27 @@ export function useTourDetails(tour_id: string) {
   )
 
   // 計算財務摘要
-  const financials = tour ? {
-    total_revenue: (tour.price || 0) * (tour.current_participants || 0),
-    total_cost: (tour.price || 0) * (tour.current_participants || 0) * 0.7,
-    profit: (tour.price || 0) * (tour.current_participants || 0) * 0.3,
-    profitMargin: 30,
-  } : null
+  const financials = tour
+    ? {
+        total_revenue: (tour.price || 0) * (tour.current_participants || 0),
+        total_cost: (tour.price || 0) * (tour.current_participants || 0) * 0.7,
+        profit: (tour.price || 0) * (tour.current_participants || 0) * 0.3,
+        profitMargin: 30,
+      }
+    : null
 
   const updateTourStatus = async (newStatus: NonNullable<Tour['status']>) => {
     if (!tour_id) return null
 
     // 狀態轉換驗證
     const VALID_TOUR_TRANSITIONS: Record<string, string[]> = {
-      '開團': ['待出發', '取消'],
-      '待出發': ['已出發', '取消', '開團'],
-      '已出發': ['待結團'],
-      '待結團': ['已結團'],
-      '已結團': [],
-      '取消': ['開團'],
-      '特殊團': [],
+      開團: ['待出發', '取消'],
+      待出發: ['已出發', '取消', '開團'],
+      已出發: ['待結團'],
+      待結團: ['已結團'],
+      已結團: [],
+      取消: ['開團'],
+      特殊團: [],
     }
 
     const { data: current, error: fetchError } = await supabase
@@ -251,7 +266,9 @@ export function useTourDetails(tour_id: string) {
 
     const currentStatus = current.status ?? ''
     if (!currentStatus || !VALID_TOUR_TRANSITIONS[currentStatus]?.includes(newStatus)) {
-      throw new Error(TOURS_ADVANCED_LABELS.INVALID_STATUS_TRANSITION(currentStatus || '', newStatus))
+      throw new Error(
+        TOURS_ADVANCED_LABELS.INVALID_STATUS_TRANSITION(currentStatus || '', newStatus)
+      )
     }
 
     const now = new Date().toISOString()
@@ -276,9 +293,7 @@ export function useTourDetails(tour_id: string) {
     }
 
     // 獲取現有 tours 來避免重複
-    const { data: existingTours } = await supabase
-      .from('tours')
-      .select('code')
+    const { data: existingTours } = await supabase.from('tours').select('code')
 
     const code = generateTourCodeUtil(
       workspaceCode,

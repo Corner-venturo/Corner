@@ -9,8 +9,12 @@ import { DAILY_ITINERARY_LABELS } from './constants/labels'
 interface DayListProps {
   data: TourFormData
   dayLabels: string[]
-  isAccommodationLockedByQuote?: boolean  // 有關聯報價單時鎖定住宿編輯
-  updateDailyItinerary: (index: number, field: string | Record<string, unknown>, value?: unknown) => void
+  isAccommodationLockedByQuote?: boolean // 有關聯報價單時鎖定住宿編輯
+  updateDailyItinerary: (
+    index: number,
+    field: string | Record<string, unknown>,
+    value?: unknown
+  ) => void
   removeDailyItinerary: (index: number) => void
   swapDailyItinerary?: (fromIndex: number, toIndex: number) => void
   addActivity: (dayIndex: number) => void
@@ -25,7 +29,11 @@ interface DayListProps {
   onOpenHotelSelector: (dayIndex: number) => void
   onOpenRestaurantSelector: (dayIndex: number, mealType: 'breakfast' | 'lunch' | 'dinner') => void
   handleActivityImageUpload: (dayIndex: number, actIndex: number, file: File) => Promise<void>
-  handleExternalImageUpload?: (dayIndex: number, actIndex: number, imageUrl: string) => Promise<void>
+  handleExternalImageUpload?: (
+    dayIndex: number,
+    actIndex: number,
+    imageUrl: string
+  ) => Promise<void>
   onOpenPositionEditor: (dayIndex: number, actIndex: number) => void
 }
 

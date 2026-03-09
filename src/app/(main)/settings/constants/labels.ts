@@ -5,7 +5,7 @@ export const LABELS = {
   SETTINGS: '設定',
   USER: '使用者',
   LOGOUT: '登出',
-  
+
   // Setup Mode
   WELCOME_TITLE: '歡迎！請完成帳號設定',
   FIRST_LOGIN_DESC: '這是您首次登入系統，請完成以下設定以確保帳號安全：',
@@ -14,7 +14,7 @@ export const LABELS = {
   UPLOAD_AVATAR_TITLE: '2. 上傳頭像',
   UPLOAD_AVATAR_DESC: '上傳您的照片，方便同事辨認',
   SKIP_LATER: '稍後再說',
-  
+
   // Workspaces Page
   WORKSPACE_MANAGEMENT: '工作空間管理',
   WORKSPACE_MANAGEMENT_DESC: '管理多分公司設定，實現資料隔離（台北公司 vs 台中分公司）',
@@ -31,7 +31,7 @@ export const LABELS = {
   EMPLOYEE_COUNT: '員工數：{count} 人',
   EDIT: '編輯',
   EDIT_FEATURE_COMING: '編輯功能開發中',
-  
+
   // Workspace Creation Dialog
   ADD_WORKSPACE_TITLE: '新增工作空間',
   WORKSPACE_NAME_LABEL: '名稱',
@@ -41,7 +41,7 @@ export const LABELS = {
   WORKSPACE_DESCRIPTION_PLACEHOLDER: '簡短說明此工作空間',
   CANCEL: '取消',
   CREATE: '建立',
-  
+
   // Workspace Creation - Code & Type
   WORKSPACE_CODE_LABEL: '公司代碼',
   WORKSPACE_CODE_REQUIRED: '*',
@@ -87,11 +87,11 @@ export const LABELS = {
   BOT_CREATION_FAILED: '建立機器人失敗（不影響 workspace 建立）',
   WORKSPACE_CREATED_SUCCESS: '工作空間、公告頻道和機器人已建立',
   CREATION_FAILED: '建立失敗',
-  
+
   // Empty State
   NO_WORKSPACE_TITLE: '尚未建立工作空間',
   NO_WORKSPACE_DESC: '開始建立第一個工作空間以啟用多分公司管理',
-  
+
   // Account Settings
   ACCOUNT_SECURITY: '帳號安全',
   AVATAR: '頭像',
@@ -115,14 +115,14 @@ export const LABELS = {
   PASSWORD_REQ_LENGTH: '至少8個字元',
   PASSWORD_REQ_FORMAT: '建議包含數字和字母',
   PASSWORD_REQ_CURRENT: '需要先輸入目前密碼進行驗證',
-  
+
   // Avatar Upload Messages
   UNSUPPORTED_IMAGE_FORMAT: '只支援 JPG、PNG、GIF、WebP 格式的圖片',
   FILE_SIZE_TOO_LARGE: '檔案大小不能超過 10MB',
   UPLOAD_FAILED: '上傳失敗',
   AVATAR_UPLOAD_SUCCESS: '頭像上傳成功',
   AVATAR_UPLOAD_FAILED: '頭像上傳失敗：',
-  
+
   // Password Change Messages
   PLEASE_LOGIN_FIRST: '請先登入',
   CURRENT_PASSWORD_REQUIRED: '請輸入目前密碼！',
@@ -134,7 +134,7 @@ export const LABELS = {
   PASSWORD_UPDATE_SUCCESS: '密碼更新成功！',
   UPDATE_SUCCESS: '更新成功',
   PASSWORD_UPDATE_ERROR: '密碼更新失敗，請稍後再試',
-  
+
   // Menu Settings
   MENU_SETTINGS: '選單設定',
   MENU_SETTINGS_DESC: '自訂側邊欄顯示的功能選單。隱藏不常用的功能，讓工作區更整潔。',
@@ -149,7 +149,7 @@ export const LABELS = {
   RESET_CONFIRM_MESSAGE: '確定要重設為預設值嗎？所有選單都會顯示。',
   RESET_MENU_TITLE: '重設選單',
   HIDDEN_ITEMS_COUNT: '目前隱藏 {count} 個選單項目',
-  
+
   // Permissions Page
   CROSS_WORKSPACE_PERMISSIONS: '跨分公司權限管理',
   PERMISSIONS_MANAGEMENT_DESC: '管理員工的跨分公司資料存取權限',
@@ -168,11 +168,12 @@ export const LABELS = {
   ROLE_LABELS: '角色標籤（admin, tour_leader 等）',
   REFERENCE_DOC: '參考文檔：',
   RLS_SPEC_DOC: 'CLAUDE.md - RLS 規範',
-  
+
   // System Settings
   SYSTEM_MAINTENANCE: '系統維護',
   CLEAR_LOCAL_CACHE: '清除本地快取',
-  CLEAR_CACHE_DESC: '清除所有本地儲存的資料，包括 IndexedDB、localStorage 和 sessionStorage。 清除後會從 Supabase 重新載入最新資料。',
+  CLEAR_CACHE_DESC:
+    '清除所有本地儲存的資料，包括 IndexedDB、localStorage 和 sessionStorage。 清除後會從 Supabase 重新載入最新資料。',
   DB_STATUS: '資料庫狀態',
   DB_CREATED: '已建立',
   DB_NOT_CREATED: '未建立',
@@ -180,8 +181,10 @@ export const LABELS = {
   LOCAL_TABLES_UNIT: '個',
   CLEARING: '清除中...',
   CLEAR_CACHE_BTN: '清除快取',
-  CLEAR_CACHE_WARNING: '清除快取會刪除所有本地儲存的資料，但不會影響 Supabase 雲端資料庫。如果遇到資料同步問題或顯示異常時，可以使用此功能重置本地快取。',
-  CLEAR_CACHE_CONFIRM_MSG: '確定要清除所有本地快取嗎？\n\n這會刪除：\n• IndexedDB 本地資料庫\n• localStorage 儲存的狀態\n• sessionStorage 暫存資料\n\n清除後系統會重新整理，從 Supabase 載入最新資料。',
+  CLEAR_CACHE_WARNING:
+    '清除快取會刪除所有本地儲存的資料，但不會影響 Supabase 雲端資料庫。如果遇到資料同步問題或顯示異常時，可以使用此功能重置本地快取。',
+  CLEAR_CACHE_CONFIRM_MSG:
+    '確定要清除所有本地快取嗎？\n\n這會刪除：\n• IndexedDB 本地資料庫\n• localStorage 儲存的狀態\n• sessionStorage 暫存資料\n\n清除後系統會重新整理，從 Supabase 載入最新資料。',
   CLEAR_CACHE_CONFIRM_TITLE: '清除快取確認',
   CLEAR_CACHE_SUCCESS: '快取已成功清除！\n頁面即將重新載入...',
   CLEAR_CACHE_SUCCESS_TITLE: '清除成功',
@@ -192,7 +195,6 @@ export const LABELS = {
   CLEAR_CACHE_TIMING_2: '系統更新後需要重新初始化',
   CLEAR_CACHE_TIMING_3: '遇到資料同步問題',
   CLEAR_CACHE_TIMING_4: '本地快取損壞或過期',
-
 }
 export const COMPANY_LABELS = {
   // Page
@@ -472,7 +474,14 @@ export const MODULES_PAGE_LABELS = {
   // Module info
   ACCOUNTING_NAME: '會計模組',
   ACCOUNTING_DESC: '完整的會計傳票系統，支援自動拋轉與財務報表',
-  ACCOUNTING_FEATURES: ['自動產生會計傳票', '收款/付款自動拋轉', '結團自動產生收入與成本傳票', '手工傳票輸入', '傳票過帳與作廢', '借貸平衡檢查'] as const,
+  ACCOUNTING_FEATURES: [
+    '自動產生會計傳票',
+    '收款/付款自動拋轉',
+    '結團自動產生收入與成本傳票',
+    '手工傳票輸入',
+    '傳票過帳與作廢',
+    '借貸平衡檢查',
+  ] as const,
   INVENTORY_NAME: '庫存模組',
   INVENTORY_DESC: '庫存管理系統（開發中）',
   INVENTORY_FEATURES: ['庫存追蹤', '進銷存管理', '盤點功能', '庫存警報'] as const,

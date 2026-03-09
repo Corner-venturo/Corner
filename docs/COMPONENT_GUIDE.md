@@ -14,30 +14,30 @@
 
 ```css
 /* 主色系 */
---morandi-primary: #3a3633;     /* 主文字、深色 */
---morandi-secondary: #8b8680;   /* 次要文字 */
---morandi-gold: #c9aa7c;        /* 強調色、按鈕、連結 ⭐ */
---morandi-gold-hover: #b8996b;  /* 金色懸停 */
---morandi-green: #9fa68f;       /* 成功 */
---morandi-red: #c08374;         /* 錯誤 */
---morandi-container: #e8e5e0;   /* 背景淡色 */
---morandi-muted: #b8b2aa;       /* 禁用 */
+--morandi-primary: #3a3633; /* 主文字、深色 */
+--morandi-secondary: #8b8680; /* 次要文字 */
+--morandi-gold: #c9aa7c; /* 強調色、按鈕、連結 ⭐ */
+--morandi-gold-hover: #b8996b; /* 金色懸停 */
+--morandi-green: #9fa68f; /* 成功 */
+--morandi-red: #c08374; /* 錯誤 */
+--morandi-container: #e8e5e0; /* 背景淡色 */
+--morandi-muted: #b8b2aa; /* 禁用 */
 
 /* 背景 */
---background: #f6f4f1;          /* 頁面背景 */
---card: #ffffff;                /* 卡片背景 */
---border: #d4c4b0;              /* 邊框 */
+--background: #f6f4f1; /* 頁面背景 */
+--card: #ffffff; /* 卡片背景 */
+--border: #d4c4b0; /* 邊框 */
 ```
 
 ### 設計 Token
 
-| 元素 | Class | 說明 |
-|------|-------|------|
-| **主要卡片** | `rounded-xl shadow-lg border border-border p-8` | 登入頁標準 |
-| **次要卡片** | `rounded-lg shadow-sm border border-border p-6` | 列表項目 |
-| **主要按鈕** | `bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-lg` | CTA |
-| **輸入框** | `rounded-lg border border-border focus:ring-2 focus:ring-morandi-gold` | 表單 |
-| **表格頭** | `bg-morandi-container/40 border-b border-border/60` | 表格 |
+| 元素         | Class                                                                  | 說明       |
+| ------------ | ---------------------------------------------------------------------- | ---------- |
+| **主要卡片** | `rounded-xl shadow-lg border border-border p-8`                        | 登入頁標準 |
+| **次要卡片** | `rounded-lg shadow-sm border border-border p-6`                        | 列表項目   |
+| **主要按鈕** | `bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-lg`    | CTA        |
+| **輸入框**   | `rounded-lg border border-border focus:ring-2 focus:ring-morandi-gold` | 表單       |
+| **表格頭**   | `bg-morandi-container/40 border-b border-border/60`                    | 表格       |
 
 ### ❌ 禁止的設計做法
 
@@ -53,12 +53,12 @@
 
 ## 📋 標準組件使用規則
 
-| 場景 | 必須使用的組件 | 位置 |
-|------|---------------|------|
-| **列表頁面** | `ListPageLayout` | `@/components/layout/list-page-layout` |
-| **頁面標題** | `ResponsiveHeader` | `@/components/layout/responsive-header` |
-| **表格** | `EnhancedTable` | `@/components/ui/enhanced-table` |
-| **表格單元格** | `DateCell`, `StatusCell`, `CurrencyCell` 等 | `@/components/table-cells` |
+| 場景           | 必須使用的組件                              | 位置                                    |
+| -------------- | ------------------------------------------- | --------------------------------------- |
+| **列表頁面**   | `ListPageLayout`                            | `@/components/layout/list-page-layout`  |
+| **頁面標題**   | `ResponsiveHeader`                          | `@/components/layout/responsive-header` |
+| **表格**       | `EnhancedTable`                             | `@/components/ui/enhanced-table`        |
+| **表格單元格** | `DateCell`, `StatusCell`, `CurrencyCell` 等 | `@/components/table-cells`              |
 
 ---
 
@@ -124,7 +124,7 @@ export default function MyPage() {
           { label: '上層頁面', href: '/parent' },
           { label: '目前頁面', href: '/parent/current' },
         ]}
-        onAdd={handleAdd}      // 主要動作按鈕
+        onAdd={handleAdd} // 主要動作按鈕
         addLabel="新增 XXX"
       />
 
@@ -140,8 +140,10 @@ export default function MyPage() {
 ### 工具列規範（如需要）
 
 ```tsx
-{/* 工具列樣式 */}
-<div className="flex items-center gap-2 px-4 py-3 bg-morandi-bg border-b border-morandi-border">
+{
+  /* 工具列樣式 */
+}
+;<div className="flex items-center gap-2 px-4 py-3 bg-morandi-bg border-b border-morandi-border">
   <Button variant="outline" size="sm">
     <Icon className="w-4 h-4 mr-1" />
     按鈕文字
@@ -223,29 +225,29 @@ const columns = [
 
 ### 可用組件列表
 
-| 組件 | 用途 | 範例 |
-|------|------|------|
-| `DateCell` | 日期顯示 | `<DateCell date={date} format="short" showIcon />` |
-| `StatusCell` | 狀態徽章 | `<StatusCell type="tour" status="confirmed" />` |
-| `CurrencyCell` | 金額顯示 | `<CurrencyCell amount={1000} variant="income" />` |
-| `DateRangeCell` | 日期區間 | `<DateRangeCell start={start} end={end} showDuration />` |
-| `ActionCell` | 操作按鈕 | `<ActionCell actions={[...]} />` |
-| `AvatarCell` | 頭像+名稱 | `<AvatarCell name="張三" subtitle="業務部" />` |
-| `TextCell` | 截斷文字 | `<TextCell text={desc} maxLength={50} />` |
-| `NumberCell` | 數字 | `<NumberCell value={10} suffix="人" />` |
-| `BadgeCell` | 簡單徽章 | `<BadgeCell text="熱門" variant="warning" />` |
+| 組件            | 用途      | 範例                                                     |
+| --------------- | --------- | -------------------------------------------------------- |
+| `DateCell`      | 日期顯示  | `<DateCell date={date} format="short" showIcon />`       |
+| `StatusCell`    | 狀態徽章  | `<StatusCell type="tour" status="confirmed" />`          |
+| `CurrencyCell`  | 金額顯示  | `<CurrencyCell amount={1000} variant="income" />`        |
+| `DateRangeCell` | 日期區間  | `<DateRangeCell start={start} end={end} showDuration />` |
+| `ActionCell`    | 操作按鈕  | `<ActionCell actions={[...]} />`                         |
+| `AvatarCell`    | 頭像+名稱 | `<AvatarCell name="張三" subtitle="業務部" />`           |
+| `TextCell`      | 截斷文字  | `<TextCell text={desc} maxLength={50} />`                |
+| `NumberCell`    | 數字      | `<NumberCell value={10} suffix="人" />`                  |
+| `BadgeCell`     | 簡單徽章  | `<BadgeCell text="熱門" variant="warning" />`            |
 
 ### StatusCell 狀態類型
 
-| type | 用途 | 可用狀態 |
-|------|------|----------|
-| `tour` | 旅遊團 | planning, confirmed, in_progress, completed, cancelled |
-| `order` | 訂單 | draft, pending, confirmed, processing, completed, cancelled |
-| `payment` | 付款 | pending, confirmed, completed, cancelled |
-| `invoice` | 發票 | draft, pending, approved, paid, rejected |
-| `visa` | 簽證 | pending, submitted, issued, collected, rejected |
-| `todo` | 待辦 | pending, in_progress, completed, cancelled |
-| `voucher` | 傳票 | draft, pending, approved, posted |
+| type      | 用途   | 可用狀態                                                    |
+| --------- | ------ | ----------------------------------------------------------- |
+| `tour`    | 旅遊團 | planning, confirmed, in_progress, completed, cancelled      |
+| `order`   | 訂單   | draft, pending, confirmed, processing, completed, cancelled |
+| `payment` | 付款   | pending, confirmed, completed, cancelled                    |
+| `invoice` | 發票   | draft, pending, approved, paid, rejected                    |
+| `visa`    | 簽證   | pending, submitted, issued, collected, rejected             |
+| `todo`    | 待辦   | pending, in_progress, completed, cancelled                  |
+| `voucher` | 傳票   | draft, pending, approved, posted                            |
 
 ### ❌ 禁止的做法
 
@@ -301,14 +303,14 @@ import { Plus, Save, Check, X, Trash2, Edit2, Printer } from 'lucide-react'
 
 ### 常用按鈕圖標對應
 
-| 操作 | 圖標 | 操作 | 圖標 |
-|------|------|------|------|
-| 新增 | `Plus` | 刪除 | `Trash2` |
-| 儲存 | `Save` | 編輯 | `Edit2` |
-| 確認 | `Check` | 列印 | `Printer` |
+| 操作 | 圖標        | 操作 | 圖標       |
+| ---- | ----------- | ---- | ---------- |
+| 新增 | `Plus`      | 刪除 | `Trash2`   |
+| 儲存 | `Save`      | 編輯 | `Edit2`    |
+| 確認 | `Check`     | 列印 | `Printer`  |
 | 更新 | `RefreshCw` | 下載 | `Download` |
-| 取消 | `X` | 上傳 | `Upload` |
-| 關閉 | `X` | 搜尋 | `Search` |
+| 取消 | `X`         | 上傳 | `Upload`   |
+| 關閉 | `X`         | 搜尋 | `Search`   |
 
 ---
 
@@ -338,7 +340,7 @@ import { FormField } from '@/components/ui/form-field'
 ```tsx
 import { Label } from '@/components/ui/label'
 
-<Label required>姓名</Label>  // 顯示紅色星號
+;<Label required>姓名</Label> // 顯示紅色星號
 ```
 
 ---
@@ -351,9 +353,7 @@ import { Label } from '@/components/ui/label'
 import { DIALOG_SIZES } from '@/components/ui/dialog'
 
 // 可用尺寸: sm, md, lg, xl, 2xl, 4xl, full
-<DialogContent className={DIALOG_SIZES.lg}>
-  ...
-</DialogContent>
+;<DialogContent className={DIALOG_SIZES.lg}>...</DialogContent>
 ```
 
 ### ManagedDialog - 有狀態管理的 Dialog
@@ -380,12 +380,12 @@ const { isDirty, markDirty, reset } = useManagedDialogState()
 
 #### 層級定義
 
-| Level | Z-Index | 遮罩 | 使用場景 |
-|-------|---------|------|----------|
-| **Level 1** | 9000-9010 | `bg-black/60` + blur | 從頁面直接打開的主 Dialog |
-| **Level 2** | 9100-9110 | `bg-black/30` + blur | 從 Level 1 Dialog 內打開的子 Dialog |
-| **Level 3** | 9200-9210 | `bg-black/30` + blur | 從 Level 2 Dialog 內打開的孫 Dialog |
-| **Level 4-5** | 9300+ | `bg-black/30` + blur | 極少用的更深層嵌套 |
+| Level         | Z-Index   | 遮罩                 | 使用場景                            |
+| ------------- | --------- | -------------------- | ----------------------------------- |
+| **Level 1**   | 9000-9010 | `bg-black/60` + blur | 從頁面直接打開的主 Dialog           |
+| **Level 2**   | 9100-9110 | `bg-black/30` + blur | 從 Level 1 Dialog 內打開的子 Dialog |
+| **Level 3**   | 9200-9210 | `bg-black/30` + blur | 從 Level 2 Dialog 內打開的孫 Dialog |
+| **Level 4-5** | 9300+     | `bg-black/30` + blur | 極少用的更深層嵌套                  |
 
 #### 使用方式
 
@@ -425,21 +425,21 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 
 #### 常見 Dialog 層級對照表
 
-| Dialog | Level | 說明 |
-|--------|-------|------|
-| `TourDetailDialog` | 1 | 從旅遊團列表打開 |
-| `ProposalDetailDialog` | 1 | 從提案列表打開 |
-| `CustomerDetailDialog` | 1 | 從客戶列表打開 |
-| `ReceiptDetailDialog` | 1 | 從收款單列表打開 |
-| `TourEditDialog` | 2 | 從 TourDetailDialog 打開 |
-| `AddRequestDialog` | 2 | 從 TourDetailDialog 打開 |
-| `AddReceiptDialog` | 2 | 從 TourDetailDialog 打開 |
-| `TourPnrToolDialog` | 2 | 從 TourDetailDialog 打開 |
-| `TourRoomManager` | 2 | 從 TourDetailDialog 打開 |
-| `TourVehicleManager` | 2 | 從 TourDetailDialog 打開 |
-| `ContractDialog` | 2 | 從 TourDetailDialog 打開 |
-| 新增車輛 Dialog | 3 | 從 TourVehicleManager 打開 |
-| AI 對話 Dialog | 3 | 從 PackageItineraryDialog 打開 |
+| Dialog                 | Level | 說明                           |
+| ---------------------- | ----- | ------------------------------ |
+| `TourDetailDialog`     | 1     | 從旅遊團列表打開               |
+| `ProposalDetailDialog` | 1     | 從提案列表打開                 |
+| `CustomerDetailDialog` | 1     | 從客戶列表打開                 |
+| `ReceiptDetailDialog`  | 1     | 從收款單列表打開               |
+| `TourEditDialog`       | 2     | 從 TourDetailDialog 打開       |
+| `AddRequestDialog`     | 2     | 從 TourDetailDialog 打開       |
+| `AddReceiptDialog`     | 2     | 從 TourDetailDialog 打開       |
+| `TourPnrToolDialog`    | 2     | 從 TourDetailDialog 打開       |
+| `TourRoomManager`      | 2     | 從 TourDetailDialog 打開       |
+| `TourVehicleManager`   | 2     | 從 TourDetailDialog 打開       |
+| `ContractDialog`       | 2     | 從 TourDetailDialog 打開       |
+| 新增車輛 Dialog        | 3     | 從 TourVehicleManager 打開     |
+| AI 對話 Dialog         | 3     | 從 PackageItineraryDialog 打開 |
 
 #### ❌ 禁止的做法
 
@@ -476,9 +476,7 @@ export function ParentDialog({ open, onOpenChange }) {
           <DialogHeader>
             <DialogTitle>主視窗</DialogTitle>
           </DialogHeader>
-          <Button onClick={() => setChildDialogOpen(true)}>
-            開啟子視窗
-          </Button>
+          <Button onClick={() => setChildDialogOpen(true)}>開啟子視窗</Button>
         </DialogContent>
       </Dialog>
 
@@ -524,7 +522,7 @@ const breadcrumb = useBreadcrumb()
 ```tsx
 <ResponsiveHeader
   title="訂單管理"
-  autoBreadcrumb  // 自動生成麵包屑
+  autoBreadcrumb // 自動生成麵包屑
 />
 ```
 
@@ -558,9 +556,7 @@ if (!data) return <NotFoundState resourceName="訂單" />
 ```tsx
 import { StoreSyncProvider } from '@/stores/sync'
 
-<StoreSyncProvider>
-  {children}
-</StoreSyncProvider>
+;<StoreSyncProvider>{children}</StoreSyncProvider>
 ```
 
 ### 發送同步事件
@@ -598,22 +594,22 @@ export async function POST(req: Request) {
 
 ## 📁 組件檔案位置索引
 
-| 組件/工具 | 檔案位置 |
-|---------|---------|
-| `ListPageLayout` | `src/components/layout/list-page-layout.tsx` |
-| `ResponsiveHeader` | `src/components/layout/responsive-header.tsx` |
-| `EnhancedTable` | `src/components/ui/enhanced-table/` |
-| `Table Cells` | `src/components/table-cells/index.tsx` |
-| `FieldError` | `src/components/ui/field-error.tsx` |
-| `FormField` | `src/components/ui/form-field.tsx` |
-| `NotFoundState` | `src/components/ui/not-found-state.tsx` |
-| `ManagedDialog` | `src/components/dialog/managed-dialog.tsx` |
-| `ErrorBoundary` | `src/components/error-boundary.tsx` |
-| `useBreadcrumb` | `src/hooks/useBreadcrumb.ts` |
-| `useManagedDialogState` | `src/hooks/useManagedDialogState.ts` |
-| `useListPageState` | `src/hooks/useListPageState.ts` |
-| `API Response` | `src/lib/api/response.ts` |
-| `Status Config` | `src/lib/status-config.ts` |
+| 組件/工具               | 檔案位置                                      |
+| ----------------------- | --------------------------------------------- |
+| `ListPageLayout`        | `src/components/layout/list-page-layout.tsx`  |
+| `ResponsiveHeader`      | `src/components/layout/responsive-header.tsx` |
+| `EnhancedTable`         | `src/components/ui/enhanced-table/`           |
+| `Table Cells`           | `src/components/table-cells/index.tsx`        |
+| `FieldError`            | `src/components/ui/field-error.tsx`           |
+| `FormField`             | `src/components/ui/form-field.tsx`            |
+| `NotFoundState`         | `src/components/ui/not-found-state.tsx`       |
+| `ManagedDialog`         | `src/components/dialog/managed-dialog.tsx`    |
+| `ErrorBoundary`         | `src/components/error-boundary.tsx`           |
+| `useBreadcrumb`         | `src/hooks/useBreadcrumb.ts`                  |
+| `useManagedDialogState` | `src/hooks/useManagedDialogState.ts`          |
+| `useListPageState`      | `src/hooks/useListPageState.ts`               |
+| `API Response`          | `src/lib/api/response.ts`                     |
+| `Status Config`         | `src/lib/status-config.ts`                    |
 
 ---
 
@@ -630,15 +626,15 @@ export async function POST(req: Request) {
 
 ### 莫蘭迪色系語意
 
-| 語意 | 顏色 | CSS | 用於 |
-|------|------|-----|------|
-| **等待/注意** | 莫蘭迪金 | `morandi-gold` | 待確認、開團、草稿 |
-| **就緒/安全** | 莫蘭迪綠 | `morandi-green` | 待出發、已確認、已核准 |
-| **進行中** | 翠綠 | `emerald-700` | 已出發、處理中 |
-| **需處理** | 莫蘭迪紅 | `morandi-red` | 待結團、異常、退件 |
-| **完成/歸檔** | 莫蘭迪灰 | `morandi-secondary` | 已結團、已歸還 |
-| **取消/無效** | 莫蘭迪淡灰 | `morandi-muted` | 取消、作廢 |
-| **深色強調** | 莫蘭迪主色 | `morandi-primary` | 已完成、已轉單、已鎖定 |
+| 語意          | 顏色       | CSS                 | 用於                   |
+| ------------- | ---------- | ------------------- | ---------------------- |
+| **等待/注意** | 莫蘭迪金   | `morandi-gold`      | 待確認、開團、草稿     |
+| **就緒/安全** | 莫蘭迪綠   | `morandi-green`     | 待出發、已確認、已核准 |
+| **進行中**    | 翠綠       | `emerald-700`       | 已出發、處理中         |
+| **需處理**    | 莫蘭迪紅   | `morandi-red`       | 待結團、異常、退件     |
+| **完成/歸檔** | 莫蘭迪灰   | `morandi-secondary` | 已結團、已歸還         |
+| **取消/無效** | 莫蘭迪淡灰 | `morandi-muted`     | 取消、作廢             |
+| **深色強調**  | 莫蘭迪主色 | `morandi-primary`   | 已完成、已轉單、已鎖定 |
 
 ### 使用方式
 
@@ -654,6 +650,7 @@ const config = getStatusConfig('tour', status)
 ```
 
 ### 禁止事項
+
 - ❌ 在元件裡自定義狀態顏色
 - ❌ 用 Tailwind 預設色系做狀態（yellow-100, blue-100 等）
 - ❌ 在 constants.ts 裡建立 STATUS_XXX_CLASSES 之類的重複對照表

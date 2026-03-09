@@ -31,10 +31,13 @@ export function MealSection({
   if (variant === 'grid') {
     return (
       <div>
-        <div className="text-xs font-medium mb-1" style={{ color: themeColor }}>{COMP_EDITOR_LABELS.LABEL_9126}</div>
+        <div className="text-xs font-medium mb-1" style={{ color: themeColor }}>
+          {COMP_EDITOR_LABELS.LABEL_9126}
+        </div>
         <div className="flex gap-4 text-sm">
           <span>
-            早：<EditableText
+            早：
+            <EditableText
               value={meals.breakfast || ''}
               fieldKey="meals-breakfast"
               editingField={editingField}
@@ -45,7 +48,8 @@ export function MealSection({
             />
           </span>
           <span>
-            午：<EditableText
+            午：
+            <EditableText
               value={meals.lunch || ''}
               fieldKey="meals-lunch"
               editingField={editingField}
@@ -56,7 +60,8 @@ export function MealSection({
             />
           </span>
           <span>
-            晚：<EditableText
+            晚：
+            <EditableText
               value={meals.dinner || ''}
               fieldKey="meals-dinner"
               editingField={editingField}

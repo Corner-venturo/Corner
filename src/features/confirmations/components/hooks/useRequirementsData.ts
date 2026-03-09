@@ -9,7 +9,11 @@ import { useAuthStore } from '@/stores'
 import { logger } from '@/lib/utils/logger'
 import type { Tour } from '@/stores/types'
 import type { CostCategory } from '@/features/quotes/types'
-import type { ConfirmedRequirementItem, ConfirmedRequirementsSnapshot, ProposalPackage } from '@/types/proposal.types'
+import type {
+  ConfirmedRequirementItem,
+  ConfirmedRequirementsSnapshot,
+  ProposalPackage,
+} from '@/types/proposal.types'
 import type { FlightInfo } from '@/types/flight.types'
 
 // 需求單類型
@@ -94,153 +98,179 @@ export function useRequirementsData({
   const mode = tourId ? 'tour' : 'proposal'
 
   // 載入資料
-  const loadData = useCallback(async (showLoading = true) => {
-    if (showLoading) setLoading(true)
-    else setRefreshing(true)
+  const loadData = useCallback(
+    async (showLoading = true) => {
+      if (showLoading) setLoading(true)
+      else setRefreshing(true)
 
-    try {
-      let quoteId = propQuoteId || null
-      let workspaceId: string | null = null
+      try {
+        let quoteId = propQuoteId || null
+        let workspaceId: string | null = null
 
-      if (mode === 'tour' && tourId) {
-        // 旅遊團模式：載入團資料
-        const { data: tourData } = await supabase
-          .from('tours')
-          .select('*')
-          .eq('id', tourId)
-          .single()
+        if (mode === 'tour' && tourId) {
+          // 旅遊團模式：載入團資料
+          const { data: tourData } = await supabase
+            .from('tours')
+            .select('*')
+            .eq('id', tourId)
+            .single()
 
-        if (!tourData) return
+          if (!tourData) return
 
-        setTour(tourData as Tour)
-        workspaceId = (tourData as Tour).workspace_id || null
+          setTour(tourData as Tour)
+          workspaceId = (tourData as Tour).workspace_id || null
 
-        // 取得報價單 ID
-        const tourQuoteId = (tourData as { quote_id?: string | null }).quote_id
-        const tourLockedQuoteId = (tourData as { locked_quote_id?: string | null }).locked_quote_id
-        quoteId = quoteId || tourQuoteId || tourLockedQuoteId || null
+          // 取得報價單 ID
+          const tourQuoteId = (tourData as { quote_id?: string | null }).quote_id
+          const tourLockedQuoteId = (tourData as { locked_quote_id?: string | null })
+            .locked_quote_id
+          quoteId = quoteId || tourQuoteId || tourLockedQuoteId || null
 
-        if (!quoteId) {
-          const { data: linkedQuote } = await supabase
-            .from('quotes')
-            .select('id')
+          if (!quoteId) {
+            const { data: linkedQuote } = await supabase
+              .from('quotes')
+              .select('id')
+              .eq('tour_id', tourId)
+              .limit(1)
+              .maybeSingle()
+            quoteId = linkedQuote?.id || null
+          }
+
+          // 載入航班資訊
+          if (tourData.outbound_flight) {
+            setOutboundFlight(tourData.outbound_flight as FlightInfo)
+            setReturnFlight(tourData.return_flight as FlightInfo | null)
+          }
+
+          // 載入已確認快照
+          if (
+            tourData.confirmed_requirements &&
+            typeof tourData.confirmed_requirements === 'object'
+          ) {
+            const snapshot = (
+              tourData.confirmed_requirements as unknown as ConfirmedRequirementsSnapshot
+            )?.snapshot
+            setConfirmedSnapshot(snapshot || [])
+          } else {
+            setConfirmedSnapshot([])
+          }
+
+          // 載入現有需求單
+          const { data: requests } = await supabase
+            .from('tour_requests')
+            .select(
+              'id, code, category, supplier_name, title, service_date, quantity, notes, status, quoted_cost, hidden, resource_id, resource_type'
+            )
             .eq('tour_id', tourId)
-            .limit(1)
-            .maybeSingle()
-          quoteId = linkedQuote?.id || null
+            .order('created_at', { ascending: true })
+          setExistingRequests((requests as TourRequest[]) || [])
+        } else if (mode === 'proposal' && proposalPackageId) {
+          // 提案套件模式：載入套件資料
+          const { data: pkgData } = await supabase
+            .from('proposal_packages')
+            .select('*, proposals(*)')
+            .eq('id', proposalPackageId)
+            .single()
+
+          if (!pkgData) return
+
+          setPkg(pkgData as unknown as ProposalPackage)
+          workspaceId = (pkgData as { workspace_id?: string }).workspace_id || null
+
+          // 取得報價單 ID
+          quoteId = quoteId || (pkgData as { quote_id?: string | null }).quote_id || null
+
+          // 載入已確認快照
+          if (
+            pkgData.confirmed_requirements &&
+            typeof pkgData.confirmed_requirements === 'object'
+          ) {
+            const snapshot = (
+              pkgData.confirmed_requirements as unknown as ConfirmedRequirementsSnapshot
+            )?.snapshot
+            setConfirmedSnapshot(snapshot || [])
+          } else {
+            setConfirmedSnapshot([])
+          }
+
+          // 載入現有需求單
+          const { data: requests } = await supabase
+            .from('tour_requests')
+            .select(
+              'id, code, category, supplier_name, title, service_date, quantity, notes, status, quoted_cost, hidden, resource_id, resource_type'
+            )
+            .eq('proposal_package_id', proposalPackageId)
+            .order('created_at', { ascending: true })
+          setExistingRequests((requests as TourRequest[]) || [])
         }
 
-        // 載入航班資訊
-        if (tourData.outbound_flight) {
-          setOutboundFlight(tourData.outbound_flight as FlightInfo)
-          setReturnFlight(tourData.return_flight as FlightInfo | null)
-        }
+        setLinkedQuoteId(quoteId)
 
-        // 載入已確認快照
-        if (tourData.confirmed_requirements && typeof tourData.confirmed_requirements === 'object') {
-          const snapshot = (tourData.confirmed_requirements as unknown as ConfirmedRequirementsSnapshot)?.snapshot
-          setConfirmedSnapshot(snapshot || [])
+        // 載入報價單內容
+        if (quoteId) {
+          const { data: quote } = await supabase
+            .from('quotes')
+            .select('categories, start_date')
+            .eq('id', quoteId)
+            .single()
+
+          if (quote) {
+            setQuoteCategories((quote.categories as unknown as CostCategory[]) || [])
+            setStartDate(quote.start_date || tour?.departure_date || null)
+          }
         } else {
-          setConfirmedSnapshot([])
+          setQuoteCategories([])
+          setStartDate(tour?.departure_date || null)
         }
-
-        // 載入現有需求單
-        const { data: requests } = await supabase
-          .from('tour_requests')
-          .select('id, code, category, supplier_name, title, service_date, quantity, notes, status, quoted_cost, hidden, resource_id, resource_type')
-          .eq('tour_id', tourId)
-          .order('created_at', { ascending: true })
-        setExistingRequests((requests as TourRequest[]) || [])
-
-      } else if (mode === 'proposal' && proposalPackageId) {
-        // 提案套件模式：載入套件資料
-        const { data: pkgData } = await supabase
-          .from('proposal_packages')
-          .select('*, proposals(*)')
-          .eq('id', proposalPackageId)
-          .single()
-
-        if (!pkgData) return
-
-        setPkg(pkgData as unknown as ProposalPackage)
-        workspaceId = (pkgData as { workspace_id?: string }).workspace_id || null
-
-        // 取得報價單 ID
-        quoteId = quoteId || (pkgData as { quote_id?: string | null }).quote_id || null
-
-        // 載入已確認快照
-        if (pkgData.confirmed_requirements && typeof pkgData.confirmed_requirements === 'object') {
-          const snapshot = (pkgData.confirmed_requirements as unknown as ConfirmedRequirementsSnapshot)?.snapshot
-          setConfirmedSnapshot(snapshot || [])
-        } else {
-          setConfirmedSnapshot([])
-        }
-
-        // 載入現有需求單
-        const { data: requests } = await supabase
-          .from('tour_requests')
-          .select('id, code, category, supplier_name, title, service_date, quantity, notes, status, quoted_cost, hidden, resource_id, resource_type')
-          .eq('proposal_package_id', proposalPackageId)
-          .order('created_at', { ascending: true })
-        setExistingRequests((requests as TourRequest[]) || [])
+      } catch (error) {
+        logger.error('載入需求資料失敗:', error)
+      } finally {
+        setLoading(false)
+        setRefreshing(false)
       }
-
-      setLinkedQuoteId(quoteId)
-
-      // 載入報價單內容
-      if (quoteId) {
-        const { data: quote } = await supabase
-          .from('quotes')
-          .select('categories, start_date')
-          .eq('id', quoteId)
-          .single()
-
-        if (quote) {
-          setQuoteCategories((quote.categories as unknown as CostCategory[]) || [])
-          setStartDate(quote.start_date || (tour?.departure_date) || null)
-        }
-      } else {
-        setQuoteCategories([])
-        setStartDate(tour?.departure_date || null)
-      }
-    } catch (error) {
-      logger.error('載入需求資料失敗:', error)
-    } finally {
-      setLoading(false)
-      setRefreshing(false)
-    }
-  }, [tourId, proposalPackageId, propQuoteId, mode, tour?.departure_date])
+    },
+    [tourId, proposalPackageId, propQuoteId, mode, tour?.departure_date]
+  )
 
   useEffect(() => {
     loadData(true)
   }, [loadData])
 
   // 計算日期
-  const calculateDate = useCallback((dayNum: number): string | null => {
-    if (!startDate) return null
-    const date = new Date(startDate)
-    date.setDate(date.getDate() + dayNum - 1)
-    return date.toISOString().split('T')[0]
-  }, [startDate])
+  const calculateDate = useCallback(
+    (dayNum: number): string | null => {
+      if (!startDate) return null
+      const date = new Date(startDate)
+      date.setDate(date.getDate() + dayNum - 1)
+      return date.toISOString().split('T')[0]
+    },
+    [startDate]
+  )
 
   // 格式化航班資訊
-  const formatFlightInfo = useCallback((flight: FlightInfo | null, type: '去程' | '回程'): string => {
-    if (!flight) return ''
-    const parts: string[] = []
-    if (flight.flightNumber) parts.push(flight.flightNumber)
-    if (flight.departureAirport && flight.arrivalAirport) {
-      parts.push(`${flight.departureAirport}→${flight.arrivalAirport}`)
-    }
-    if (flight.departureTime && flight.arrivalTime) {
-      parts.push(`${flight.departureTime}-${flight.arrivalTime}`)
-    }
-    return parts.length > 0 ? `【${type}】${parts.join(' ')}` : ''
-  }, [])
+  const formatFlightInfo = useCallback(
+    (flight: FlightInfo | null, type: '去程' | '回程'): string => {
+      if (!flight) return ''
+      const parts: string[] = []
+      if (flight.flightNumber) parts.push(flight.flightNumber)
+      if (flight.departureAirport && flight.arrivalAirport) {
+        parts.push(`${flight.departureAirport}→${flight.arrivalAirport}`)
+      }
+      if (flight.departureTime && flight.arrivalTime) {
+        parts.push(`${flight.departureTime}-${flight.arrivalTime}`)
+      }
+      return parts.length > 0 ? `【${type}】${parts.join(' ')}` : ''
+    },
+    []
+  )
 
   // 生成項目 key
-  const generateItemKey = useCallback((category: string, supplierName: string, title: string, serviceDate: string | null): string => {
-    return `${category}-${supplierName}-${title}-${serviceDate || 'no-date'}`
-  }, [])
+  const generateItemKey = useCallback(
+    (category: string, supplierName: string, title: string, serviceDate: string | null): string => {
+      return `${category}-${supplierName}-${title}-${serviceDate || 'no-date'}`
+    },
+    []
+  )
 
   // 從報價單解析項目
   const quoteItems = useMemo((): QuoteItem[] => {
@@ -361,7 +391,11 @@ export function useRequirementsData({
   // 是否有變更
   const hasUnconfirmedChanges = useMemo(() => {
     for (const cat of CATEGORIES) {
-      if (changeTrackByCategory[cat.key].some(item => item.type === 'new' || item.type === 'cancelled')) {
+      if (
+        changeTrackByCategory[cat.key].some(
+          item => item.type === 'new' || item.type === 'cancelled'
+        )
+      ) {
         return true
       }
     }

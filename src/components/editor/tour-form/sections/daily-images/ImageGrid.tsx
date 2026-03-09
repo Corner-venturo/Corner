@@ -29,7 +29,7 @@ function getImageUrl(image: string | DailyImage): string {
 
 // 工具函數：取得圖片 position
 function getImagePosition(image: string | DailyImage): string {
-  return typeof image === 'string' ? 'center' : (image.position || 'center')
+  return typeof image === 'string' ? 'center' : image.position || 'center'
 }
 
 // 可拖曳的縮圖組件
@@ -49,14 +49,9 @@ function SortableImageItem({
   const imageUrl = getImageUrl(image)
   const imagePosition = getImagePosition(image)
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: imageUrl })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: imageUrl,
+  })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -71,7 +66,8 @@ function SortableImageItem({
       style={style}
       className="relative group aspect-video rounded-lg overflow-hidden border border-morandi-container bg-morandi-container/20"
     >
-      <img src={imageUrl}
+      <img
+        src={imageUrl}
         alt={`圖片 ${index + 1}`}
         className="w-full h-full object-cover cursor-pointer"
         style={{ objectPosition: imagePosition }}
@@ -155,8 +151,8 @@ export function ImageGrid({
 
     if (!over || active.id === over.id) return
 
-    const oldIndex = imageUrls.findIndex((url) => url === active.id)
-    const newIndex = imageUrls.findIndex((url) => url === over.id)
+    const oldIndex = imageUrls.findIndex(url => url === active.id)
+    const newIndex = imageUrls.findIndex(url => url === over.id)
 
     if (oldIndex !== -1 && newIndex !== -1) {
       const newImages = arrayMove(images, oldIndex, newIndex)
@@ -167,11 +163,7 @@ export function ImageGrid({
   if (images.length === 0) return null
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={imageUrls} strategy={rectSortingStrategy}>
         <div className="grid grid-cols-4 gap-3 mb-4">
           {images.map((image, index) => (

@@ -15,10 +15,10 @@
  *        (解鎖回提案)
  */
 export const TOUR_STATUS_LIST = [
-  '開團',      // 可編輯行程
-  '待出發',    // 已確認出團，行程鎖定
-  '已結團',      // 團結束，結算獎金
-  '取消',      // 已取消
+  '開團', // 可編輯行程
+  '待出發', // 已確認出團，行程鎖定
+  '已結團', // 團結束，結算獎金
+  '取消', // 已取消
 ] as const
 
 export type TourStatusValue = (typeof TOUR_STATUS_LIST)[number]
@@ -102,7 +102,7 @@ export const QUOTE_STATUS_MAP = {
   draft: '草稿',
   proposed: '開團',
   revised: '修改中',
-  '待出發': '待出發',
+  待出發: '待出發',
   approved: '已核准',
   converted: '已轉單',
   rejected: '已拒絕',

@@ -8,7 +8,13 @@ import { toast } from 'sonner'
 import { TableColumn } from '@/components/ui/enhanced-table'
 import { CurrencyCell, DateCell } from '@/components/table-cells'
 import { useAuthStore } from '@/stores/auth-store'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { UNPAID_ORDERS_LABELS } from '../../constants/labels'
 
@@ -28,7 +34,10 @@ interface UnpaidOrder {
   days_since_departure: number
 }
 
-const PAYMENT_STATUS_MAP: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const PAYMENT_STATUS_MAP: Record<
+  string,
+  { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   unpaid: { label: UNPAID_ORDERS_LABELS.STATUS_UNPAID, variant: 'destructive' },
   partial: { label: UNPAID_ORDERS_LABELS.STATUS_PARTIAL, variant: 'secondary' },
   pending_deposit: { label: UNPAID_ORDERS_LABELS.STATUS_PENDING_DEPOSIT, variant: 'outline' },
@@ -38,7 +47,7 @@ export default function UnpaidOrdersPage() {
   const [data, setData] = useState<UnpaidOrder[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>('all')
-  const workspace_id = useAuthStore((s) => s.user?.workspace_id)
+  const workspace_id = useAuthStore(s => s.user?.workspace_id)
 
   useEffect(() => {
     if (!workspace_id) return
@@ -50,12 +59,14 @@ export default function UnpaidOrdersPage() {
       setLoading(true)
       const { data: orders, error } = await supabase
         .from('orders')
-        .select(`
+        .select(
+          `
           id, code, order_number, contact_person,
           total_amount, paid_amount, remaining_amount,
           payment_status, status,
           tours!inner(code, name, departure_date)
-        `)
+        `
+        )
         .eq('workspace_id', workspace_id!)
         .in('payment_status', ['unpaid', 'partial', 'pending_deposit'])
         .eq('is_active', true)
@@ -65,7 +76,7 @@ export default function UnpaidOrdersPage() {
       if (error) throw error
 
       const today = new Date()
-      const mapped: UnpaidOrder[] = (orders ?? []).map((o) => {
+      const mapped: UnpaidOrder[] = (orders ?? []).map(o => {
         const tour = Array.isArray(o.tours) ? o.tours[0] : o.tours
         const depDate = tour?.departure_date ? new Date(tour.departure_date) : null
         const daysSince = depDate ? Math.floor((today.getTime() - depDate.getTime()) / 86400000) : 0
@@ -97,8 +108,8 @@ export default function UnpaidOrdersPage() {
 
   const filtered = useMemo(() => {
     if (filter === 'all') return data
-    if (filter === 'overdue') return data.filter((d) => d.days_since_departure > 0)
-    return data.filter((d) => d.payment_status === filter)
+    if (filter === 'overdue') return data.filter(d => d.days_since_departure > 0)
+    return data.filter(d => d.payment_status === filter)
   }, [data, filter])
 
   const totalRemaining = useMemo(
@@ -110,18 +121,39 @@ export default function UnpaidOrdersPage() {
     { key: 'order_number', label: UNPAID_ORDERS_LABELS.COL_ORDER_NUMBER, sortable: true },
     { key: 'contact_person', label: UNPAID_ORDERS_LABELS.COL_CONTACT_PERSON, sortable: true },
     { key: 'tour_code', label: UNPAID_ORDERS_LABELS.COL_TOUR_CODE, sortable: true },
-    { key: 'departure_date', label: UNPAID_ORDERS_LABELS.COL_DEPARTURE_DATE, sortable: true, render: (value) => <DateCell date={value as string} /> },
+    {
+      key: 'departure_date',
+      label: UNPAID_ORDERS_LABELS.COL_DEPARTURE_DATE,
+      sortable: true,
+      render: value => <DateCell date={value as string} />,
+    },
     {
       key: 'payment_status',
       label: UNPAID_ORDERS_LABELS.COL_PAYMENT_STATUS,
       sortable: true,
       render: (_value, row) => {
         const info = PAYMENT_STATUS_MAP[row.payment_status]
-        return info ? <Badge variant={info.variant}>{info.label}</Badge> : <span>{row.payment_status}</span>
+        return info ? (
+          <Badge variant={info.variant}>{info.label}</Badge>
+        ) : (
+          <span>{row.payment_status}</span>
+        )
       },
     },
-    { key: 'total_amount', label: UNPAID_ORDERS_LABELS.COL_TOTAL_AMOUNT, sortable: true, align: 'right', render: (value) => <CurrencyCell amount={Number(value)} /> },
-    { key: 'paid_amount', label: UNPAID_ORDERS_LABELS.COL_PAID_AMOUNT, sortable: true, align: 'right', render: (value) => <CurrencyCell amount={Number(value)} /> },
+    {
+      key: 'total_amount',
+      label: UNPAID_ORDERS_LABELS.COL_TOTAL_AMOUNT,
+      sortable: true,
+      align: 'right',
+      render: value => <CurrencyCell amount={Number(value)} />,
+    },
+    {
+      key: 'paid_amount',
+      label: UNPAID_ORDERS_LABELS.COL_PAID_AMOUNT,
+      sortable: true,
+      align: 'right',
+      render: value => <CurrencyCell amount={Number(value)} />,
+    },
     {
       key: 'remaining_amount',
       label: UNPAID_ORDERS_LABELS.COL_REMAINING_AMOUNT,
@@ -140,9 +172,15 @@ export default function UnpaidOrdersPage() {
       align: 'center',
       render: (_value, row) => {
         if (row.days_since_departure > 0) {
-          return <Badge variant="destructive">{row.days_since_departure}{UNPAID_ORDERS_LABELS.DAYS_SUFFIX}</Badge>
+          return (
+            <Badge variant="destructive">
+              {row.days_since_departure}
+              {UNPAID_ORDERS_LABELS.DAYS_SUFFIX}
+            </Badge>
+          )
         }
-        if (row.days_since_departure === 0) return <span className="text-muted-foreground">{UNPAID_ORDERS_LABELS.TODAY}</span>
+        if (row.days_since_departure === 0)
+          return <span className="text-muted-foreground">{UNPAID_ORDERS_LABELS.TODAY}</span>
         return <span className="text-muted-foreground">{UNPAID_ORDERS_LABELS.NOT_DEPARTED}</span>
       },
     },
@@ -160,8 +198,12 @@ export default function UnpaidOrdersPage() {
       headerActions={
         <div className="flex items-center gap-3">
           <div className="text-sm text-muted-foreground">
-            {UNPAID_ORDERS_LABELS.TOTAL_REMAINING_PREFIX}<span className="font-semibold text-foreground">NT${totalRemaining.toLocaleString()}</span>
-            （{filtered.length}{UNPAID_ORDERS_LABELS.COUNT_SUFFIX}）
+            {UNPAID_ORDERS_LABELS.TOTAL_REMAINING_PREFIX}
+            <span className="font-semibold text-foreground">
+              NT${totalRemaining.toLocaleString()}
+            </span>
+            （{filtered.length}
+            {UNPAID_ORDERS_LABELS.COUNT_SUFFIX}）
           </div>
           <Select value={filter} onValueChange={setFilter}>
             <SelectTrigger className="w-[160px]">
@@ -172,7 +214,9 @@ export default function UnpaidOrdersPage() {
               <SelectItem value="overdue">{UNPAID_ORDERS_LABELS.OVERDUE}</SelectItem>
               <SelectItem value="unpaid">{UNPAID_ORDERS_LABELS.UNPAID}</SelectItem>
               <SelectItem value="partial">{UNPAID_ORDERS_LABELS.PARTIAL}</SelectItem>
-              <SelectItem value="pending_deposit">{UNPAID_ORDERS_LABELS.PENDING_DEPOSIT}</SelectItem>
+              <SelectItem value="pending_deposit">
+                {UNPAID_ORDERS_LABELS.PENDING_DEPOSIT}
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>

@@ -29,7 +29,8 @@ export function TourHeroSection({ data, viewMode }: TourHeroSectionProps) {
       {/* 動態背景 */}
       <div className="absolute inset-0">
         {data.coverImage ? (
-          <img src={data.coverImage}
+          <img
+            src={data.coverImage}
             alt="Cover"
             className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
             style={{ filter: 'brightness(0.7)' }}
@@ -64,7 +65,9 @@ export function TourHeroSection({ data, viewMode }: TourHeroSectionProps) {
                 : 'inline-block px-4 py-1.5 bg-card/10 backdrop-blur-md border border-white/20 rounded-full text-white/90 text-xs sm:text-sm font-medium mb-4'
             }
           >
-            <RichText html={data.tagline || `Venturo Travel ${new Date().getFullYear()} 秋季精選`} />
+            <RichText
+              html={data.tagline || `Venturo Travel ${new Date().getFullYear()} 秋季精選`}
+            />
           </motion.span>
 
           <motion.h1
@@ -185,7 +188,8 @@ export function TourHeroSection({ data, viewMode }: TourHeroSectionProps) {
                       : 'font-bold text-base sm:text-xl text-white'
                   }
                 >
-                  NT$ {data.price}{data.priceNote ? ` ${data.priceNote}` : ''}
+                  NT$ {data.price}
+                  {data.priceNote ? ` ${data.priceNote}` : ''}
                 </div>
               </div>
             )}

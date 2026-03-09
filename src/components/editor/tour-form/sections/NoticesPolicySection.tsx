@@ -85,14 +85,12 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
             <AlertCircle className="h-5 w-5 text-status-warning" />
             <div>
               <h3 className="font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_9164}</h3>
-              <p className="text-sm text-morandi-secondary">
-                {COMP_EDITOR_LABELS.LABEL_379}
-              </p>
+              <p className="text-sm text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_379}</p>
             </div>
           </div>
           <Switch
             checked={data.showNotices || false}
-            onCheckedChange={(checked) => {
+            onCheckedChange={checked => {
               onChange({
                 ...data,
                 showNotices: checked,
@@ -111,10 +109,12 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
                   <GripVertical className="h-4 w-4 text-morandi-muted/60" />
                 </div>
                 <div className="flex-1">
-                  <Label className="text-xs text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_104} {index + 1} 項</Label>
+                  <Label className="text-xs text-morandi-primary">
+                    {COMP_EDITOR_LABELS.LABEL_104} {index + 1} 項
+                  </Label>
                   <Textarea
                     value={notice}
-                    onChange={(e) => updateNotice(index, e.target.value)}
+                    onChange={e => updateNotice(index, e.target.value)}
                     placeholder={COMP_EDITOR_LABELS.輸入提醒事項}
                     className="mt-1 min-h-[60px]"
                   />
@@ -156,18 +156,19 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
             <FileX className="h-5 w-5 text-morandi-red" />
             <div>
               <h3 className="font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_9277}</h3>
-              <p className="text-sm text-morandi-secondary">
-                {COMP_EDITOR_LABELS.LABEL_4169}
-              </p>
+              <p className="text-sm text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_4169}</p>
             </div>
           </div>
           <Switch
             checked={data.showCancellationPolicy || false}
-            onCheckedChange={(checked) => {
+            onCheckedChange={checked => {
               onChange({
                 ...data,
                 showCancellationPolicy: checked,
-                cancellationPolicy: checked && cancellationPolicy.length === 0 ? getDefaultCancellationPolicy() : cancellationPolicy,
+                cancellationPolicy:
+                  checked && cancellationPolicy.length === 0
+                    ? getDefaultCancellationPolicy()
+                    : cancellationPolicy,
               })
             }}
           />
@@ -182,10 +183,12 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
                   <GripVertical className="h-4 w-4 text-morandi-muted/60" />
                 </div>
                 <div className="flex-1">
-                  <Label className="text-xs text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_104} {index + 1} 項</Label>
+                  <Label className="text-xs text-morandi-primary">
+                    {COMP_EDITOR_LABELS.LABEL_104} {index + 1} 項
+                  </Label>
                   <Textarea
                     value={policy}
-                    onChange={(e) => updateCancellationPolicy(index, e.target.value)}
+                    onChange={e => updateCancellationPolicy(index, e.target.value)}
                     placeholder={COMP_EDITOR_LABELS.輸入取消政策}
                     className="mt-1 min-h-[80px]"
                   />

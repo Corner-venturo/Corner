@@ -17,7 +17,9 @@ export default function NotFound() {
         <h2 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '0.5rem' }}>
           {ERROR_PAGE_LABELS.NOT_FOUND_9250}
         </h2>
-        <p style={{ color: 'var(--morandi-secondary)', marginBottom: '2rem' }}>{ERROR_PAGE_LABELS.LABEL_9421}</p>
+        <p style={{ color: 'var(--morandi-secondary)', marginBottom: '2rem' }}>
+          {ERROR_PAGE_LABELS.LABEL_9421}
+        </p>
         <Link
           href="/dashboard"
           style={{

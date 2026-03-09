@@ -24,11 +24,7 @@ import { useFileSystemStore } from '@/stores/file-system-store'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
-import {
-  formatFileSize,
-  getFileIcon,
-  FILE_CATEGORY_INFO,
-} from '@/types/file-system.types'
+import { formatFileSize, getFileIcon, FILE_CATEGORY_INFO } from '@/types/file-system.types'
 import { LABELS } from '../constants/labels'
 
 // 檔案圖示對應
@@ -48,12 +44,11 @@ interface FilePreviewProps {
 }
 
 export function FilePreview({ onBack }: FilePreviewProps) {
-  const { files, selectedFileIds, toggleFileStar, deleteFile, downloadFile } =
-    useFileSystemStore()
+  const { files, selectedFileIds, toggleFileStar, deleteFile, downloadFile } = useFileSystemStore()
 
   // 取得選中的檔案
   const selectedFiles = useMemo(() => {
-    return files.filter((f) => selectedFileIds.has(f.id))
+    return files.filter(f => selectedFileIds.has(f.id))
   }, [files, selectedFileIds])
 
   const file = selectedFiles[0]
@@ -68,20 +63,21 @@ export function FilePreview({ onBack }: FilePreviewProps) {
 
   // 多選模式
   if (selectedFiles.length > 1) {
-    const totalSize = selectedFiles.reduce(
-      (sum, f) => sum + (f.size_bytes || 0),
-      0
-    )
+    const totalSize = selectedFiles.reduce((sum, f) => sum + (f.size_bytes || 0), 0)
 
     return (
       <div className="h-full flex flex-col">
         {/* 標題 */}
         <div className="p-3 border-b border-border flex items-center justify-between">
-          <span className="text-sm font-medium">
-            {LABELS.selectedFiles(selectedFiles.length)}
-          </span>
+          <span className="text-sm font-medium">{LABELS.selectedFiles(selectedFiles.length)}</span>
           {onBack && (
-            <Button variant="ghost" size="icon" aria-label="Close" className="h-7 w-7 lg:hidden" onClick={onBack}>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Close"
+              className="h-7 w-7 lg:hidden"
+              onClick={onBack}
+            >
               <X className="w-4 h-4" />
             </Button>
           )}
@@ -133,8 +129,8 @@ export function FilePreview({ onBack }: FilePreviewProps) {
     let cancelled = false
     setImageLoading(true)
     fetch(`/api/files/${file.id}/download`)
-      .then((res) => res.json())
-      .then((data) => {
+      .then(res => res.json())
+      .then(data => {
         if (!cancelled && data.url) setImageUrl(data.url)
       })
       .catch(() => {
@@ -143,7 +139,9 @@ export function FilePreview({ onBack }: FilePreviewProps) {
       .finally(() => {
         if (!cancelled) setImageLoading(false)
       })
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [file.id, isImage])
 
   const handleDownload = async () => {
@@ -163,19 +161,21 @@ export function FilePreview({ onBack }: FilePreviewProps) {
         <span className="flex-1 font-medium text-sm truncate">{file.filename}</span>
         <Button
           variant="ghost"
-          size="icon" aria-label="Button"
+          size="icon"
+          aria-label="Button"
           className="h-7 w-7"
           onClick={() => toggleFileStar(file.id)}
         >
-          <Star
-            className={cn(
-              'w-4 h-4',
-              file.is_starred && 'fill-amber-400 text-amber-400'
-            )}
-          />
+          <Star className={cn('w-4 h-4', file.is_starred && 'fill-amber-400 text-amber-400')} />
         </Button>
         {onBack && (
-          <Button variant="ghost" size="icon" aria-label="Close" className="h-7 w-7 lg:hidden" onClick={onBack}>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Close"
+            className="h-7 w-7 lg:hidden"
+            onClick={onBack}
+          >
             <X className="w-4 h-4" />
           </Button>
         )}
@@ -192,18 +192,21 @@ export function FilePreview({ onBack }: FilePreviewProps) {
                   <span className="text-xs text-muted-foreground">{LABELS.loading}</span>
                 </div>
               ) : imageUrl ? (
-                <img src={imageUrl} alt={file.filename} className="max-w-full max-h-full object-contain" />
+                <img
+                  src={imageUrl}
+                  alt={file.filename}
+                  className="max-w-full max-h-full object-contain"
+                />
               ) : (
                 <Image className="w-16 h-16 text-muted-foreground" />
               )}
             </div>
           ) : (
             <div className="aspect-video bg-muted rounded-lg flex flex-col items-center justify-center">
-              <IconComponent
-                className="w-16 h-16"
-                style={{ color: categoryInfo.color }}
-              />
-              <p className="mt-2 text-sm text-muted-foreground">{file.extension?.toUpperCase() || LABELS.fileLabel}</p>
+              <IconComponent className="w-16 h-16" style={{ color: categoryInfo.color }} />
+              <p className="mt-2 text-sm text-muted-foreground">
+                {file.extension?.toUpperCase() || LABELS.fileLabel}
+              </p>
             </div>
           )}
         </div>
@@ -255,9 +258,7 @@ export function FilePreview({ onBack }: FilePreviewProps) {
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm text-muted-foreground">{LABELS.createdDate}</span>
-            <span className="text-sm">
-              {new Date(file.created_at).toLocaleString('zh-TW')}
-            </span>
+            <span className="text-sm">{new Date(file.created_at).toLocaleString('zh-TW')}</span>
           </div>
 
           {/* 下載次數 */}

@@ -13,8 +13,8 @@ export function CalendarStyles() {
       }
 
       .fc .fc-button {
-        background-color: #B8A99A;
-        border-color: #B8A99A;
+        background-color: #b8a99a;
+        border-color: #b8a99a;
         color: white;
         padding: 0.5rem 1rem;
         font-size: 0.875rem;
@@ -23,20 +23,20 @@ export function CalendarStyles() {
       }
 
       .fc .fc-button:hover {
-        background-color: #9E8C7A;
-        border-color: #9E8C7A;
+        background-color: #9e8c7a;
+        border-color: #9e8c7a;
       }
 
       .fc .fc-button:disabled {
-        background-color: #E8E4E0;
-        border-color: #E8E4E0;
-        color: #8C8C8C;
+        background-color: #e8e4e0;
+        border-color: #e8e4e0;
+        color: #8c8c8c;
         opacity: 0.6;
       }
 
       .fc .fc-button-primary:not(:disabled).fc-button-active {
-        background-color: #9E8C7A;
-        border-color: #9E8C7A;
+        background-color: #9e8c7a;
+        border-color: #9e8c7a;
       }
 
       /* 星期標題列 */
@@ -48,19 +48,19 @@ export function CalendarStyles() {
         letter-spacing: 0.1em;
         text-transform: uppercase;
         color: rgba(51, 51, 51, 0.6);
-        border-color: #E8E4E0;
+        border-color: #e8e4e0;
         border-bottom-width: 1px;
       }
 
       /* 周末標題特殊顏色 */
       .fc .fc-col-header-cell.fc-day-sat,
       .fc .fc-col-header-cell.fc-day-sun {
-        color: #B8A99A;
+        color: #b8a99a;
       }
 
       /* 日曆格子 */
       .fc .fc-daygrid-day {
-        border-color: #E8E4E0;
+        border-color: #e8e4e0;
         transition: background-color 0.2s;
       }
 
@@ -72,13 +72,13 @@ export function CalendarStyles() {
 
       .fc-theme-standard td,
       .fc-theme-standard th {
-        border-color: #E8E4E0;
+        border-color: #e8e4e0;
       }
 
       .fc-theme-standard .fc-scrollgrid {
-        border-color: #E8E4E0;
-        border-top: 1px solid #E8E4E0;
-        border-left: 1px solid #E8E4E0;
+        border-color: #e8e4e0;
+        border-top: 1px solid #e8e4e0;
+        border-left: 1px solid #e8e4e0;
       }
 
       /* 日期數字 */
@@ -98,13 +98,13 @@ export function CalendarStyles() {
       }
 
       .fc .fc-daygrid-day-number:hover {
-        background-color: #F9F8F6;
+        background-color: #f9f8f6;
       }
 
       /* 周末日期顏色 */
       .fc .fc-day-sat .fc-daygrid-day-number,
       .fc .fc-day-sun .fc-daygrid-day-number {
-        color: #B8A99A;
+        color: #b8a99a;
         font-weight: 600;
       }
 
@@ -120,7 +120,7 @@ export function CalendarStyles() {
       }
 
       .fc .fc-day-today .fc-daygrid-day-number {
-        background-color: #B8A99A;
+        background-color: #b8a99a;
         color: white;
         width: 28px;
         height: 28px;
@@ -188,7 +188,7 @@ export function CalendarStyles() {
 
       /* 更多連結 */
       .fc-daygrid-more-link {
-        color: #B8A99A !important;
+        color: #b8a99a !important;
         font-weight: 600 !important;
         text-decoration: none !important;
         padding: 2px 6px !important;
@@ -202,7 +202,7 @@ export function CalendarStyles() {
 
       .fc-daygrid-more-link:hover {
         background-color: rgba(184, 169, 154, 0.2) !important;
-        color: #9E8C7A !important;
+        color: #9e8c7a !important;
       }
 
       .fc-popover {
@@ -221,27 +221,27 @@ export function CalendarStyles() {
 
       /* 事件顏色類型 */
       .fc-event[data-event-type='tour'] {
-        border-left-color: #8FA9C2;
+        border-left-color: #8fa9c2;
         background-color: rgba(143, 169, 194, 0.2);
       }
 
       .fc-event[data-event-type='meeting'] {
-        border-left-color: #B8A99A;
+        border-left-color: #b8a99a;
         background-color: rgba(184, 169, 154, 0.1);
       }
 
       .fc-event[data-event-type='deadline'] {
-        border-left-color: #C77D7D;
+        border-left-color: #c77d7d;
         background-color: rgba(199, 125, 125, 0.1);
       }
 
       .fc-event[data-event-type='holiday'] {
-        border-left-color: #8FA38F;
+        border-left-color: #8fa38f;
         background-color: rgba(143, 163, 143, 0.2);
       }
 
       .fc-event[data-event-type='task'] {
-        border-left-color: #D4B483;
+        border-left-color: #d4b483;
         background-color: rgba(212, 180, 131, 0.1);
       }
 
@@ -294,7 +294,7 @@ export function CalendarStyles() {
       /* 時間軸樣式 */
       .fc .fc-timegrid-slot {
         height: 40px;
-        border-color: #E8E4E0;
+        border-color: #e8e4e0;
       }
 
       .fc .fc-timegrid-slot-label {
@@ -305,7 +305,7 @@ export function CalendarStyles() {
       }
 
       .fc .fc-timegrid-slot-lane {
-        border-color: #E8E4E0;
+        border-color: #e8e4e0;
       }
 
       /* 時間軸事件 */
@@ -336,28 +336,28 @@ export function CalendarStyles() {
       /* 全天事件區塊 */
       .fc .fc-timegrid-divider {
         padding: 0;
-        border-color: #E8E4E0;
+        border-color: #e8e4e0;
       }
 
       .fc .fc-daygrid-body {
-        border-color: #E8E4E0;
+        border-color: #e8e4e0;
       }
 
       /* 現在時間指示線 */
       .fc .fc-timegrid-now-indicator-line {
-        border-color: #B8A99A;
+        border-color: #b8a99a;
         border-width: 2px;
       }
 
       .fc .fc-timegrid-now-indicator-arrow {
-        border-color: #B8A99A;
+        border-color: #b8a99a;
         border-top-color: transparent;
         border-bottom-color: transparent;
       }
 
       /* 週視圖日期標題 */
       .fc .fc-timegrid-axis {
-        border-color: #E8E4E0;
+        border-color: #e8e4e0;
         background-color: rgba(249, 248, 246, 0.4);
       }
 
@@ -376,7 +376,7 @@ export function CalendarStyles() {
       /* 週/日視圖：今天的表頭用金色文字標記 */
       .fc-timeGridWeek-view .fc-col-header-cell.fc-day-today a,
       .fc-timeGridDay-view .fc-col-header-cell.fc-day-today a {
-        color: #B8A99A;
+        color: #b8a99a;
         font-weight: 700;
       }
 
@@ -390,7 +390,7 @@ export function CalendarStyles() {
       /* 拖曳佔位符 */
       .fc-event.fc-event-mirror {
         opacity: 0.5;
-        background-color: #B8A99A !important;
+        background-color: #b8a99a !important;
       }
 
       /* 可拖曳事件的游標 */

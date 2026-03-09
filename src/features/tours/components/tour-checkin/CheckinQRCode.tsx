@@ -172,16 +172,8 @@ export function CheckinQRCode({ tour }: CheckinQRCodeProps) {
       <div className="flex flex-col md:flex-row gap-6">
         {/* QR Code */}
         <div className="flex-shrink-0">
-          <div
-            ref={qrRef}
-            className="bg-white p-4 rounded-lg border border-border inline-block"
-          >
-            <QRCodeSVG
-              value={checkinUrl}
-              size={160}
-              level="M"
-              includeMargin={false}
-            />
+          <div ref={qrRef} className="bg-white p-4 rounded-lg border border-border inline-block">
+            <QRCodeSVG value={checkinUrl} size={160} level="M" includeMargin={false} />
           </div>
         </div>
 
@@ -214,30 +206,15 @@ export function CheckinQRCode({ tour }: CheckinQRCodeProps) {
 
           {/* 按鈕 */}
           <div className="flex flex-wrap gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCopyLink}
-              className="gap-1"
-            >
+            <Button variant="outline" size="sm" onClick={handleCopyLink} className="gap-1">
               <Copy size={14} />
               {CHECKIN_QR_CODE_LABELS.複製連結}
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleDownload}
-              className="gap-1"
-            >
+            <Button variant="outline" size="sm" onClick={handleDownload} className="gap-1">
               <Download size={14} />
               {CHECKIN_QR_CODE_LABELS.下載}
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handlePrint}
-              className="gap-1"
-            >
+            <Button variant="outline" size="sm" onClick={handlePrint} className="gap-1">
               <Printer size={14} />
               {CHECKIN_QR_CODE_LABELS.列印}
             </Button>

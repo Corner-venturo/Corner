@@ -4,15 +4,9 @@
  * 功能：選擇設計手冊或網頁行程表
  */
 
-
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Palette, Loader2, ExternalLink, BookOpen, Globe, FileText } from 'lucide-react'
 import type { Tour } from '@/stores/types'
@@ -161,7 +155,9 @@ export function LinkItineraryToTourDialog({
                       <BookOpen className="w-5 h-5 text-morandi-gold" />
                     </div>
                   </div>
-                  <span className="font-medium text-morandi-primary block mb-1">{TOUR_LINK_ITINERARY.brochure}</span>
+                  <span className="font-medium text-morandi-primary block mb-1">
+                    {TOUR_LINK_ITINERARY.brochure}
+                  </span>
                   <p className="text-xs text-morandi-secondary">
                     {TOUR_LINK_ITINERARY.brochure_desc}
                   </p>
@@ -177,7 +173,9 @@ export function LinkItineraryToTourDialog({
                       <Globe className="w-5 h-5 text-morandi-gold" />
                     </div>
                   </div>
-                  <span className="font-medium text-morandi-primary block mb-1">{TOUR_LINK_ITINERARY.web_itinerary}</span>
+                  <span className="font-medium text-morandi-primary block mb-1">
+                    {TOUR_LINK_ITINERARY.web_itinerary}
+                  </span>
                   <p className="text-xs text-morandi-secondary">
                     {TOUR_LINK_ITINERARY.web_itinerary_desc}
                   </p>

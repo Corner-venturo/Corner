@@ -37,37 +37,46 @@ export function useThreadState(allMessages: Message[]) {
   }, [allMessages])
 
   // 取得特定訊息的回覆數量（用於 UI 顯示「X 則回覆」）
-  const getReplyCount = useCallback((messageId: string): number => {
-    // 優先使用 reply_count 欄位（資料庫觸發器維護）
-    const message = allMessages.find(m => m.id === messageId)
-    if (message?.reply_count !== undefined) {
-      return message.reply_count
-    }
-    // 備用：手動計算
-    return allMessages.filter(m => m.parent_message_id === messageId && !m._deleted).length
-  }, [allMessages])
+  const getReplyCount = useCallback(
+    (messageId: string): number => {
+      // 優先使用 reply_count 欄位（資料庫觸發器維護）
+      const message = allMessages.find(m => m.id === messageId)
+      if (message?.reply_count !== undefined) {
+        return message.reply_count
+      }
+      // 備用：手動計算
+      return allMessages.filter(m => m.parent_message_id === messageId && !m._deleted).length
+    },
+    [allMessages]
+  )
 
   // 取得特定訊息的最後回覆時間
-  const getLastReplyAt = useCallback((messageId: string): string | null => {
-    const message = allMessages.find(m => m.id === messageId)
-    return message?.last_reply_at || null
-  }, [allMessages])
+  const getLastReplyAt = useCallback(
+    (messageId: string): string | null => {
+      const message = allMessages.find(m => m.id === messageId)
+      return message?.last_reply_at || null
+    },
+    [allMessages]
+  )
 
   // 取得特定訊息的回覆者（用於顯示頭像）
-  const getReplyUsers = useCallback((messageId: string): string[] => {
-    const replies = allMessages
-      .filter(m => m.parent_message_id === messageId && !m._deleted)
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  const getReplyUsers = useCallback(
+    (messageId: string): string[] => {
+      const replies = allMessages
+        .filter(m => m.parent_message_id === messageId && !m._deleted)
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
-    // 取得最近 3 位不重複的回覆者
-    const uniqueUsers: string[] = []
-    for (const reply of replies) {
-      if (!uniqueUsers.includes(reply.author_id) && uniqueUsers.length < 3) {
-        uniqueUsers.push(reply.author_id)
+      // 取得最近 3 位不重複的回覆者
+      const uniqueUsers: string[] = []
+      for (const reply of replies) {
+        if (!uniqueUsers.includes(reply.author_id) && uniqueUsers.length < 3) {
+          uniqueUsers.push(reply.author_id)
+        }
       }
-    }
-    return uniqueUsers
-  }, [allMessages])
+      return uniqueUsers
+    },
+    [allMessages]
+  )
 
   return {
     // 討論串面板狀態

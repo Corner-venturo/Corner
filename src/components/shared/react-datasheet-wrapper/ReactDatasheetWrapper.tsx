@@ -182,44 +182,49 @@ export function ReactDatasheetWrapper({
   )
 
   // Cell renderer with width support
-  const cellRenderer = useCallback((props: React.TdHTMLAttributes<HTMLTableCellElement> & {
-    editing?: boolean
-    selected?: boolean
-    updated?: boolean
-    width?: number
-    columnKey?: string
-    rowIndex?: number
-    attributesRenderer?: unknown
-    valueRenderer?: unknown
-    dataRenderer?: unknown
-  }) => {
-    const {
-      editing: _editing,
-      selected: _selected,
-      updated: _updated,
-      width,
-      columnKey: _columnKey,
-      rowIndex: _rowIndex,
-      attributesRenderer: _attributesRenderer,
-      valueRenderer: _valueRenderer,
-      dataRenderer: _dataRenderer,
-      ...tdProps
-    } = props
-    const cellWidth = width || 100
+  const cellRenderer = useCallback(
+    (
+      props: React.TdHTMLAttributes<HTMLTableCellElement> & {
+        editing?: boolean
+        selected?: boolean
+        updated?: boolean
+        width?: number
+        columnKey?: string
+        rowIndex?: number
+        attributesRenderer?: unknown
+        valueRenderer?: unknown
+        dataRenderer?: unknown
+      }
+    ) => {
+      const {
+        editing: _editing,
+        selected: _selected,
+        updated: _updated,
+        width,
+        columnKey: _columnKey,
+        rowIndex: _rowIndex,
+        attributesRenderer: _attributesRenderer,
+        valueRenderer: _valueRenderer,
+        dataRenderer: _dataRenderer,
+        ...tdProps
+      } = props
+      const cellWidth = width || 100
 
-    return (
-      <td
-        {...tdProps}
-        style={{
-          ...props.style,
-          padding: 0,
-          width: `${cellWidth}px`,
-          minWidth: `${cellWidth}px`,
-          maxWidth: `${cellWidth}px`,
-        }}
-      />
-    )
-  }, [])
+      return (
+        <td
+          {...tdProps}
+          style={{
+            ...props.style,
+            padding: 0,
+            width: `${cellWidth}px`,
+            minWidth: `${cellWidth}px`,
+            maxWidth: `${cellWidth}px`,
+          }}
+        />
+      )
+    },
+    []
+  )
 
   return (
     <div className={cn('excel-datasheet-wrapper', className)}>
@@ -241,7 +246,9 @@ export function ReactDatasheetWrapper({
           onCellsChanged={handleCellsChanged}
           valueRenderer={valueRenderer}
           dataRenderer={cell => cell.value}
-          onContextMenu={(e: React.MouseEvent, _cell: CellData, _i: number, _j: number) => e.preventDefault()}
+          onContextMenu={(e: React.MouseEvent, _cell: CellData, _i: number, _j: number) =>
+            e.preventDefault()
+          }
           onSelect={handleSelect}
           parsePaste={parsePaste}
           tabBehaviour="default"

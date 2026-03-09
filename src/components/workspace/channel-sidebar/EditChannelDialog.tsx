@@ -2,12 +2,7 @@
  * 編輯頻道 Dialog
  */
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Save, X } from 'lucide-react'
 import { COMP_WORKSPACE_LABELS } from '../constants/labels'
@@ -32,10 +27,12 @@ export function EditChannelDialog({
   onSave,
 }: EditChannelDialogProps) {
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent level={1} className="w-[400px]">
         <DialogHeader>
-          <DialogTitle className="text-morandi-primary">{COMP_WORKSPACE_LABELS.編輯頻道}</DialogTitle>
+          <DialogTitle className="text-morandi-primary">
+            {COMP_WORKSPACE_LABELS.編輯頻道}
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
@@ -64,11 +61,7 @@ export function EditChannelDialog({
           </div>
         </div>
         <div className="flex gap-2 mt-6">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="flex-1 gap-2"
-          >
+          <Button variant="outline" onClick={onClose} className="flex-1 gap-2">
             <X size={16} />
             {COMP_WORKSPACE_LABELS.CANCEL}
           </Button>

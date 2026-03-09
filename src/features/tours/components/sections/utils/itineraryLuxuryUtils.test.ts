@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { calculateDayLabels, calculateDayDate, getDayOfWeek, isLastMainDay } from './itineraryLuxuryUtils'
+import {
+  calculateDayLabels,
+  calculateDayDate,
+  getDayOfWeek,
+  isLastMainDay,
+} from './itineraryLuxuryUtils'
 import type { DailyItinerary } from '@/components/editor/tour-form/types'
 
 /** Build a minimal DailyItinerary fixture for unit tests. */
@@ -42,7 +47,13 @@ describe('calculateDayLabels', () => {
   })
 
   it('handles 5 days with alternatives', () => {
-    const itinerary = [makeDay(false), makeDay(false), makeDay(false), makeDay(true), makeDay(false)]
+    const itinerary = [
+      makeDay(false),
+      makeDay(false),
+      makeDay(false),
+      makeDay(true),
+      makeDay(false),
+    ]
     expect(calculateDayLabels(itinerary)).toEqual(['Day 1', 'Day 2', 'Day 3', 'Day 3-B', 'Day 4'])
   })
 })

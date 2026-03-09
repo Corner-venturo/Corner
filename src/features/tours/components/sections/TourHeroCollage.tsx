@@ -36,7 +36,10 @@ interface TourHeroCollageProps {
 }
 
 // 從標題或行程陣列中提取天數
-function extractDayNumber(title: string | undefined, dailyItinerary?: Array<{ dayLabel?: string }>): number {
+function extractDayNumber(
+  title: string | undefined,
+  dailyItinerary?: Array<{ dayLabel?: string }>
+): number {
   if (dailyItinerary && dailyItinerary.length > 0) {
     const lastDay = dailyItinerary[dailyItinerary.length - 1]
     if (lastDay?.dayLabel) {
@@ -122,7 +125,9 @@ export function TourHeroCollage({ data, viewMode }: TourHeroCollageProps) {
       />
 
       {/* 主要內容 */}
-      <div className={`relative z-10 text-center max-w-5xl mx-auto ${isMobile ? 'px-4 py-16' : 'px-6 py-20'}`}>
+      <div
+        className={`relative z-10 text-center max-w-5xl mx-auto ${isMobile ? 'px-4 py-16' : 'px-6 py-20'}`}
+      >
         {/* 標籤 */}
         {data.tagline && (
           <motion.div
@@ -182,7 +187,9 @@ export function TourHeroCollage({ data, viewMode }: TourHeroCollageProps) {
         </motion.h1>
 
         {/* 拍立得圖片區 */}
-        <div className={`relative mt-12 w-full max-w-3xl mx-auto ${isMobile ? 'h-[300px]' : 'h-[400px] lg:h-[500px]'}`}>
+        <div
+          className={`relative mt-12 w-full max-w-3xl mx-auto ${isMobile ? 'h-[300px]' : 'h-[400px] lg:h-[500px]'}`}
+        >
           {/* 主圖片（拍立得風格） */}
           <motion.div
             className="absolute inset-0 w-4/5 h-full mx-auto bg-card p-4 pb-16 z-10"
@@ -194,7 +201,8 @@ export function TourHeroCollage({ data, viewMode }: TourHeroCollageProps) {
             transition={{ duration: 0.5 }}
           >
             {coverImage ? (
-              <img src={coverImage}
+              <img
+                src={coverImage}
                 alt={data.title}
                 className="w-full h-full object-cover border border-[var(--morandi-primary)]"
                 style={{ filter: 'grayscale(100%) contrast(1.25)' }}
@@ -202,7 +210,9 @@ export function TourHeroCollage({ data, viewMode }: TourHeroCollageProps) {
             ) : (
               <div
                 className="w-full h-full border border-[var(--morandi-primary)]"
-                style={{ background: `repeating-linear-gradient(45deg, ${POP.yellow}22, ${POP.yellow}22 10px, ${POP.pink}11 10px, ${POP.pink}11 20px)` }}
+                style={{
+                  background: `repeating-linear-gradient(45deg, ${POP.yellow}22, ${POP.yellow}22 10px, ${POP.pink}11 10px, ${POP.pink}11 20px)`,
+                }}
               />
             )}
             {/* 手寫文字 */}
@@ -317,7 +327,12 @@ export function TourHeroCollage({ data, viewMode }: TourHeroCollageProps) {
         transition={{ duration: 1.5, repeat: Infinity }}
       >
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 14l-7 7m0 0l-7-7m7 7V3"
+          />
         </svg>
       </motion.div>
 

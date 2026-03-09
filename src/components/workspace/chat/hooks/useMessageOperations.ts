@@ -10,7 +10,12 @@ export function useMessageOperations() {
   const { user } = useAuthStore()
 
   const handleSendMessage = useCallback(
-    async (channelId: string, content: string, attachments?: MessageAttachment[], parentMessageId?: string) => {
+    async (
+      channelId: string,
+      content: string,
+      attachments?: MessageAttachment[],
+      parentMessageId?: string
+    ) => {
       if (!user) {
         throw new Error(COMP_WORKSPACE_LABELS.用戶未登入)
       }

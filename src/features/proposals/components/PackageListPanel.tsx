@@ -31,7 +31,7 @@ import { BrochurePreviewDialog } from './BrochurePreviewDialog'
 import { RequirementSyncDialog } from './RequirementSyncDialog'
 import type { Proposal, ProposalPackage, CreatePackageData } from '@/types/proposal.types'
 import { PROPOSAL_LABELS } from '../constants'
-import { PACKAGE_LIST_PANEL_LABELS } from '../constants/labels';
+import { PACKAGE_LIST_PANEL_LABELS } from '../constants/labels'
 
 interface PackageListPanelProps {
   proposal: Proposal
@@ -62,7 +62,9 @@ export function PackageListPanel({
 
   // 直接查詢國家列表（避免 useCountries 的認證狀態問題）
   // 排序與 useTourDestinations 一致：usage_count DESC → display_order ASC → name ASC
-  const [countries, setCountries] = useState<Array<{ id: string; name: string; is_active: boolean }>>([])
+  const [countries, setCountries] = useState<
+    Array<{ id: string; name: string; is_active: boolean }>
+  >([])
   useEffect(() => {
     const fetchCountries = async () => {
       const { data } = await supabase
@@ -74,10 +76,16 @@ export function PackageListPanel({
         .order('name', { ascending: true })
       if (data) {
         // 過濾掉 is_active 為 null 的資料
-        setCountries(data.filter(c => c.is_active === true) as Array<{ id: string; name: string; is_active: boolean }>)
+        setCountries(
+          data.filter(c => c.is_active === true) as Array<{
+            id: string
+            name: string
+            is_active: boolean
+          }>
+        )
       }
     }
-    fetchCountries().catch((err) => logger.error('[fetchCountries]', err))
+    fetchCountries().catch(err => logger.error('[fetchCountries]', err))
   }, [])
 
   // 取得目的地顯示名稱（國家 + 機場代碼）
@@ -159,10 +167,10 @@ export function PackageListPanel({
   // 刪除套件
   const handleDeletePackage = useCallback(
     async (pkg: ProposalPackage) => {
-      const confirmed = await confirm(
-        PROPOSAL_LABELS.packageList.deleteConfirm(pkg.version_name),
-        { type: 'warning', title: PROPOSAL_LABELS.packageList.deleteDialogTitle }
-      )
+      const confirmed = await confirm(PROPOSAL_LABELS.packageList.deleteConfirm(pkg.version_name), {
+        type: 'warning',
+        title: PROPOSAL_LABELS.packageList.deleteDialogTitle,
+      })
 
       if (confirmed) {
         try {
@@ -189,17 +197,20 @@ export function PackageListPanel({
   }, [])
 
   // 轉開團 - 導向旅遊團頁面（使用跟直接開團一樣的表單）
-  const handleConvertToTour = useCallback((pkg: ProposalPackage) => {
-    // 先關閉父 Dialog（避免轉開團成功後還顯示舊的 Dialog）
-    onNavigateAway?.()
-    // 帶上 proposal 和 package 資訊到 /tours 頁面
-    const params = new URLSearchParams({
-      action: 'create',
-      fromProposal: proposal.id,
-      packageId: pkg.id,
-    })
-    router.push(`/tours?${params.toString()}`)
-  }, [proposal.id, router, onNavigateAway])
+  const handleConvertToTour = useCallback(
+    (pkg: ProposalPackage) => {
+      // 先關閉父 Dialog（避免轉開團成功後還顯示舊的 Dialog）
+      onNavigateAway?.()
+      // 帶上 proposal 和 package 資訊到 /tours 頁面
+      const params = new URLSearchParams({
+        action: 'create',
+        fromProposal: proposal.id,
+        packageId: pkg.id,
+      })
+      router.push(`/tours?${params.toString()}`)
+    },
+    [proposal.id, router, onNavigateAway]
+  )
 
   // 建立或開啟報價單
   const handleQuoteClick = useCallback(
@@ -212,9 +223,10 @@ export function PackageListPanel({
 
       // 建立新報價單
       try {
-        const destinationDisplay = pkg.country_id && pkg.main_city_id
-          ? `${pkg.country_id} (${pkg.main_city_id})`
-          : pkg.country_id || ''
+        const destinationDisplay =
+          pkg.country_id && pkg.main_city_id
+            ? `${pkg.country_id} (${pkg.main_city_id})`
+            : pkg.country_id || ''
 
         // 計算住宿天數（總天數 - 1，最後一天不住宿）
         let accommodationDays = 0
@@ -291,8 +303,18 @@ export function PackageListPanel({
             // 建立完整的 categories
             categories = [
               { id: 'transport', name: PACKAGE_LIST_PANEL_LABELS.交通, items: [], total: 0 },
-              { id: 'group-transport', name: PACKAGE_LIST_PANEL_LABELS.團體分攤, items: [], total: 0 },
-              { id: 'accommodation', name: PACKAGE_LIST_PANEL_LABELS.住宿, items: accommodationItems, total: 0 },
+              {
+                id: 'group-transport',
+                name: PACKAGE_LIST_PANEL_LABELS.團體分攤,
+                items: [],
+                total: 0,
+              },
+              {
+                id: 'accommodation',
+                name: PACKAGE_LIST_PANEL_LABELS.住宿,
+                items: accommodationItems,
+                total: 0,
+              },
               { id: 'meals', name: PACKAGE_LIST_PANEL_LABELS.餐飲, items: mealItems, total: 0 },
               { id: 'activities', name: PACKAGE_LIST_PANEL_LABELS.活動, items: [], total: 0 },
               { id: 'others', name: PACKAGE_LIST_PANEL_LABELS.其他, items: [], total: 0 },
@@ -319,7 +341,8 @@ export function PackageListPanel({
           .insert({
             id: crypto.randomUUID(),
             name: proposal.title || pkg.version_name,
-            customer_name: proposal.customer_name || PROPOSAL_LABELS.packageList.customerPlaceholder,
+            customer_name:
+              proposal.customer_name || PROPOSAL_LABELS.packageList.customerPlaceholder,
             quote_type: 'standard',
             status: 'draft',
             destination: destinationDisplay,
@@ -345,10 +368,8 @@ export function PackageListPanel({
 
         if (newQuote) {
           // 更新套件關聯報價單
-           
-          await dynamicFrom('proposal_packages')
-            .update({ quote_id: newQuote.id })
-            .eq('id', pkg.id)
+
+          await dynamicFrom('proposal_packages').update({ quote_id: newQuote.id }).eq('id', pkg.id)
 
           onPackagesChange()
           router.push(`/quotes/${newQuote.id}`)
@@ -375,213 +396,225 @@ export function PackageListPanel({
           </div>
         ) : (
           <div className="h-full flex flex-col">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-morandi-container/40 border-b border-border/60">
-                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">{PROPOSAL_LABELS.packageList.versionCol}</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">{PROPOSAL_LABELS.packageList.destinationCol}</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">{PROPOSAL_LABELS.packageList.dateCol}</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">{PROPOSAL_LABELS.packageList.groupSizeCol}</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">{PROPOSAL_LABELS.packageList.operationsCol}</th>
-                <th className="px-4 py-2 text-right text-xs font-medium text-morandi-secondary"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {packages.map(pkg => (
-                <tr
-                  key={pkg.id}
-                  className={`border-b border-border/60 hover:bg-morandi-gold/5 ${
-                    pkg.is_selected ? 'bg-morandi-gold/10' : ''
-                  }`}
-                >
-                  {/* 版本名稱 */}
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-morandi-primary">
-                        {pkg.version_name}
-                      </span>
-                      {pkg.is_selected && (
-                        <Check size={14} className="text-morandi-gold" />
-                      )}
-                    </div>
-                  </td>
-
-                  {/* 目的地 */}
-                  <td className="px-4 py-3">
-                    <span className="text-sm text-morandi-primary">
-                      {getLocationName(pkg.country_id, pkg.main_city_id)}
-                    </span>
-                  </td>
-
-                  {/* 日期 */}
-                  <td className="px-4 py-3">
-                    <span className="text-sm text-morandi-primary">
-                      {pkg.start_date || '-'}
-                    </span>
-                  </td>
-
-                  {/* 人數 */}
-                  <td className="px-4 py-3">
-                    <span className="text-sm text-morandi-primary">
-                      {pkg.group_size ? PROPOSAL_LABELS.packageList.personUnit(pkg.group_size) : '-'}
-                    </span>
-                  </td>
-
-                  {/* 操作按鈕 */}
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1">
-                      {/* 行程表按鈕 - 直接開啟（已整合時間軸功能） */}
-                      <button
-                        onClick={() => {
-                          if (onOpenItineraryDialog) {
-                            onOpenItineraryDialog(pkg)
-                          } else {
-                            openItineraryDialog(pkg)
-                          }
-                        }}
-                        className={`p-1.5 rounded transition-colors ${
-                          pkg.itinerary_id
-                            ? 'text-morandi-green hover:bg-morandi-green/10'
-                            : 'text-morandi-secondary hover:bg-morandi-container/80'
-                        }`}
-                        title={PROPOSAL_LABELS.packageList.itineraryTitle}
-                      >
-                        <FileText size={16} />
-                      </button>
-                      {/* 簡易行程預覽 */}
-                      <button
-                        onClick={() => {
-                          if (pkg.itinerary_id) {
-                            setSelectedPackage(pkg)
-                            setBrochureDialogOpen(true)
-                          } else {
-                            void alert(PROPOSAL_LABELS.packageList.pleaseCreateItinerary, 'info')
-                          }
-                        }}
-                        className={`p-1.5 rounded transition-colors ${
-                          pkg.itinerary_id
-                            ? 'text-morandi-green hover:bg-morandi-green/10'
-                            : 'text-morandi-muted cursor-not-allowed'
-                        }`}
-                        title={PROPOSAL_LABELS.packageList.brochurePreviewTitle}
-                        disabled={!pkg.itinerary_id}
-                      >
-                        <Book size={16} />
-                      </button>
-                      {/* 網頁行程 */}
-                      <button
-                        onClick={() => {
-                          if (pkg.itinerary_id) {
-                            router.push(`/itinerary/new?itinerary_id=${pkg.itinerary_id}`)
-                          } else {
-                            void alert(PROPOSAL_LABELS.packageList.pleaseCreateItinerary, 'info')
-                          }
-                        }}
-                        className={`p-1.5 rounded transition-colors ${
-                          pkg.itinerary_id
-                            ? 'text-morandi-green hover:bg-morandi-green/10'
-                            : 'text-morandi-muted cursor-not-allowed'
-                        }`}
-                        title={PROPOSAL_LABELS.packageList.webItineraryTitle}
-                        disabled={!pkg.itinerary_id}
-                      >
-                        <Globe size={16} />
-                      </button>
-                      {/* 報價單 */}
-                      <button
-                        onClick={() => void handleQuoteClick(pkg)}
-                        className={`p-1.5 rounded transition-colors ${
-                          pkg.quote_id
-                            ? 'text-morandi-gold hover:bg-morandi-gold/10'
-                            : 'text-morandi-secondary hover:bg-morandi-container/80'
-                        }`}
-                        title={pkg.quote_id ? PROPOSAL_LABELS.packageList.viewQuote : PROPOSAL_LABELS.packageList.createQuote}
-                      >
-                        <DollarSign size={16} />
-                      </button>
-                      {/* 需求確認單 */}
-                      <button
-                        onClick={() => {
-                          if (pkg.quote_id) {
-                            setSelectedPackage(pkg)
-                            setRequirementDialogOpen(true)
-                          } else {
-                            void alert(PROPOSAL_LABELS.packageList.pleaseCreateQuote, 'info')
-                          }
-                        }}
-                        className={`p-1.5 rounded transition-colors ${
-                          pkg.quote_id
-                            ? 'text-morandi-green hover:bg-morandi-green/10'
-                            : 'text-morandi-muted cursor-not-allowed'
-                        }`}
-                        title={PROPOSAL_LABELS.packageList.requirementTitle}
-                        disabled={!pkg.quote_id}
-                      >
-                        <ClipboardList size={16} />
-                      </button>
-                      {/* 手冊設計 */}
-                      <button
-                        onClick={() => {
-                          if (pkg.itinerary_id) {
-                            router.push(`/brochure?itinerary_id=${pkg.itinerary_id}`)
-                          } else {
-                            void alert(PROPOSAL_LABELS.packageList.pleaseCreateItinerary, 'info')
-                          }
-                        }}
-                        className={`p-1.5 rounded transition-colors ${
-                          pkg.itinerary_id
-                            ? 'text-morandi-primary hover:bg-morandi-container/80'
-                            : 'text-morandi-muted cursor-not-allowed'
-                        }`}
-                        title={PROPOSAL_LABELS.packageList.brochureDesignTitle}
-                        disabled={!pkg.itinerary_id}
-                      >
-                        <BookMarked size={16} />
-                      </button>
-                    </div>
-                  </td>
-
-                  {/* 操作 */}
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-1">
-                      {canEdit && (
-                        <>
-                          <button
-                            onClick={() => handleDuplicatePackage(pkg)}
-                            className="p-1 text-morandi-secondary hover:text-morandi-primary"
-                            title={PROPOSAL_LABELS.packageList.copyTitle}
-                          >
-                            <Copy size={14} />
-                          </button>
-                          <button
-                            onClick={() => openEditDialog(pkg)}
-                            className="p-1 text-morandi-secondary hover:text-morandi-primary"
-                            title={PROPOSAL_LABELS.packageList.editTitle}
-                          >
-                            <Edit2 size={14} />
-                          </button>
-                          <button
-                            onClick={() => handleDeletePackage(pkg)}
-                            className="p-1 text-morandi-red/60 hover:text-morandi-red"
-                            title={PROPOSAL_LABELS.packageList.deleteTitle}
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                          <button
-                            onClick={() => handleConvertToTour(pkg)}
-                            className="ml-1 px-2 py-1 text-xs bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded"
-                            title={PROPOSAL_LABELS.packageList.convertToTour}
-                          >
-                            {PROPOSAL_LABELS.packageList.convertToTour}
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
+            <table className="w-full">
+              <thead>
+                <tr className="bg-morandi-container/40 border-b border-border/60">
+                  <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">
+                    {PROPOSAL_LABELS.packageList.versionCol}
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">
+                    {PROPOSAL_LABELS.packageList.destinationCol}
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">
+                    {PROPOSAL_LABELS.packageList.dateCol}
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">
+                    {PROPOSAL_LABELS.packageList.groupSizeCol}
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">
+                    {PROPOSAL_LABELS.packageList.operationsCol}
+                  </th>
+                  <th className="px-4 py-2 text-right text-xs font-medium text-morandi-secondary"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {packages.map(pkg => (
+                  <tr
+                    key={pkg.id}
+                    className={`border-b border-border/60 hover:bg-morandi-gold/5 ${
+                      pkg.is_selected ? 'bg-morandi-gold/10' : ''
+                    }`}
+                  >
+                    {/* 版本名稱 */}
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-morandi-primary">
+                          {pkg.version_name}
+                        </span>
+                        {pkg.is_selected && <Check size={14} className="text-morandi-gold" />}
+                      </div>
+                    </td>
+
+                    {/* 目的地 */}
+                    <td className="px-4 py-3">
+                      <span className="text-sm text-morandi-primary">
+                        {getLocationName(pkg.country_id, pkg.main_city_id)}
+                      </span>
+                    </td>
+
+                    {/* 日期 */}
+                    <td className="px-4 py-3">
+                      <span className="text-sm text-morandi-primary">{pkg.start_date || '-'}</span>
+                    </td>
+
+                    {/* 人數 */}
+                    <td className="px-4 py-3">
+                      <span className="text-sm text-morandi-primary">
+                        {pkg.group_size
+                          ? PROPOSAL_LABELS.packageList.personUnit(pkg.group_size)
+                          : '-'}
+                      </span>
+                    </td>
+
+                    {/* 操作按鈕 */}
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1">
+                        {/* 行程表按鈕 - 直接開啟（已整合時間軸功能） */}
+                        <button
+                          onClick={() => {
+                            if (onOpenItineraryDialog) {
+                              onOpenItineraryDialog(pkg)
+                            } else {
+                              openItineraryDialog(pkg)
+                            }
+                          }}
+                          className={`p-1.5 rounded transition-colors ${
+                            pkg.itinerary_id
+                              ? 'text-morandi-green hover:bg-morandi-green/10'
+                              : 'text-morandi-secondary hover:bg-morandi-container/80'
+                          }`}
+                          title={PROPOSAL_LABELS.packageList.itineraryTitle}
+                        >
+                          <FileText size={16} />
+                        </button>
+                        {/* 簡易行程預覽 */}
+                        <button
+                          onClick={() => {
+                            if (pkg.itinerary_id) {
+                              setSelectedPackage(pkg)
+                              setBrochureDialogOpen(true)
+                            } else {
+                              void alert(PROPOSAL_LABELS.packageList.pleaseCreateItinerary, 'info')
+                            }
+                          }}
+                          className={`p-1.5 rounded transition-colors ${
+                            pkg.itinerary_id
+                              ? 'text-morandi-green hover:bg-morandi-green/10'
+                              : 'text-morandi-muted cursor-not-allowed'
+                          }`}
+                          title={PROPOSAL_LABELS.packageList.brochurePreviewTitle}
+                          disabled={!pkg.itinerary_id}
+                        >
+                          <Book size={16} />
+                        </button>
+                        {/* 網頁行程 */}
+                        <button
+                          onClick={() => {
+                            if (pkg.itinerary_id) {
+                              router.push(`/itinerary/new?itinerary_id=${pkg.itinerary_id}`)
+                            } else {
+                              void alert(PROPOSAL_LABELS.packageList.pleaseCreateItinerary, 'info')
+                            }
+                          }}
+                          className={`p-1.5 rounded transition-colors ${
+                            pkg.itinerary_id
+                              ? 'text-morandi-green hover:bg-morandi-green/10'
+                              : 'text-morandi-muted cursor-not-allowed'
+                          }`}
+                          title={PROPOSAL_LABELS.packageList.webItineraryTitle}
+                          disabled={!pkg.itinerary_id}
+                        >
+                          <Globe size={16} />
+                        </button>
+                        {/* 報價單 */}
+                        <button
+                          onClick={() => void handleQuoteClick(pkg)}
+                          className={`p-1.5 rounded transition-colors ${
+                            pkg.quote_id
+                              ? 'text-morandi-gold hover:bg-morandi-gold/10'
+                              : 'text-morandi-secondary hover:bg-morandi-container/80'
+                          }`}
+                          title={
+                            pkg.quote_id
+                              ? PROPOSAL_LABELS.packageList.viewQuote
+                              : PROPOSAL_LABELS.packageList.createQuote
+                          }
+                        >
+                          <DollarSign size={16} />
+                        </button>
+                        {/* 需求確認單 */}
+                        <button
+                          onClick={() => {
+                            if (pkg.quote_id) {
+                              setSelectedPackage(pkg)
+                              setRequirementDialogOpen(true)
+                            } else {
+                              void alert(PROPOSAL_LABELS.packageList.pleaseCreateQuote, 'info')
+                            }
+                          }}
+                          className={`p-1.5 rounded transition-colors ${
+                            pkg.quote_id
+                              ? 'text-morandi-green hover:bg-morandi-green/10'
+                              : 'text-morandi-muted cursor-not-allowed'
+                          }`}
+                          title={PROPOSAL_LABELS.packageList.requirementTitle}
+                          disabled={!pkg.quote_id}
+                        >
+                          <ClipboardList size={16} />
+                        </button>
+                        {/* 手冊設計 */}
+                        <button
+                          onClick={() => {
+                            if (pkg.itinerary_id) {
+                              router.push(`/brochure?itinerary_id=${pkg.itinerary_id}`)
+                            } else {
+                              void alert(PROPOSAL_LABELS.packageList.pleaseCreateItinerary, 'info')
+                            }
+                          }}
+                          className={`p-1.5 rounded transition-colors ${
+                            pkg.itinerary_id
+                              ? 'text-morandi-primary hover:bg-morandi-container/80'
+                              : 'text-morandi-muted cursor-not-allowed'
+                          }`}
+                          title={PROPOSAL_LABELS.packageList.brochureDesignTitle}
+                          disabled={!pkg.itinerary_id}
+                        >
+                          <BookMarked size={16} />
+                        </button>
+                      </div>
+                    </td>
+
+                    {/* 操作 */}
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-end gap-1">
+                        {canEdit && (
+                          <>
+                            <button
+                              onClick={() => handleDuplicatePackage(pkg)}
+                              className="p-1 text-morandi-secondary hover:text-morandi-primary"
+                              title={PROPOSAL_LABELS.packageList.copyTitle}
+                            >
+                              <Copy size={14} />
+                            </button>
+                            <button
+                              onClick={() => openEditDialog(pkg)}
+                              className="p-1 text-morandi-secondary hover:text-morandi-primary"
+                              title={PROPOSAL_LABELS.packageList.editTitle}
+                            >
+                              <Edit2 size={14} />
+                            </button>
+                            <button
+                              onClick={() => handleDeletePackage(pkg)}
+                              className="p-1 text-morandi-red/60 hover:text-morandi-red"
+                              title={PROPOSAL_LABELS.packageList.deleteTitle}
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                            <button
+                              onClick={() => handleConvertToTour(pkg)}
+                              className="ml-1 px-2 py-1 text-xs bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded"
+                              title={PROPOSAL_LABELS.packageList.convertToTour}
+                            >
+                              {PROPOSAL_LABELS.packageList.convertToTour}
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

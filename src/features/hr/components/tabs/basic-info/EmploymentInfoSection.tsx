@@ -27,7 +27,9 @@ export function EmploymentInfoSection({
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_4197}</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">
+            {COMP_HR_LABELS.LABEL_4197}
+          </label>
           {isEditing ? (
             <Input
               value={formData.job_info.position || ''}
@@ -40,12 +42,16 @@ export function EmploymentInfoSection({
               placeholder={COMP_HR_LABELS.輸入職位}
             />
           ) : (
-            <p className="text-morandi-primary py-2">{employee.job_info?.position || COMP_HR_LABELS.未設定}</p>
+            <p className="text-morandi-primary py-2">
+              {employee.job_info?.position || COMP_HR_LABELS.未設定}
+            </p>
           )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_9610}</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">
+            {COMP_HR_LABELS.LABEL_9610}
+          </label>
           {isEditing ? (
             <DatePicker
               value={formData.job_info.hire_date}

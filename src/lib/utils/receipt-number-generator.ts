@@ -23,10 +23,7 @@ interface Receipt {
  * generateReceiptNumber('CNX250128A', existingReceipts)
  * // => 'CNX250128A-R01', 'CNX250128A-R02'...
  */
-export function generateReceiptNumber(
-  tourCode: string,
-  existingReceipts: Receipt[]
-): string {
+export function generateReceiptNumber(tourCode: string, existingReceipts: Receipt[]): string {
   const prefix = `${tourCode}-R`
   let maxNumber = 0
 
@@ -44,7 +41,6 @@ export function generateReceiptNumber(
   const nextNumber = (maxNumber + 1).toString().padStart(2, '0')
   return `${prefix}${nextNumber}`
 }
-
 
 /**
  * 驗證收款單號格式
@@ -64,9 +60,11 @@ export function isValidReceiptNumber(receiptNumber: string): boolean {
   // 更舊的格式：R + 日期 + 流水號
   const legacyFormatRegex = /^R\d{10}$/
 
-  return newFormatRegex.test(receiptNumber) ||
+  return (
+    newFormatRegex.test(receiptNumber) ||
     oldFormatRegex.test(receiptNumber) ||
     legacyFormatRegex.test(receiptNumber)
+  )
 }
 
 /**

@@ -44,7 +44,9 @@ function ErrorDisplay({ error, errorInfo, onRetry }: ErrorDisplayProps) {
             <AlertCircle className="w-8 h-8 text-morandi-red" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-morandi-primary">{COMPONENT_LABELS.LABEL_6301}</h1>
+            <h1 className="text-2xl font-bold text-morandi-primary">
+              {COMPONENT_LABELS.LABEL_6301}
+            </h1>
             <p className="text-morandi-secondary mt-1">{COMPONENT_LABELS.LABEL_1698}</p>
           </div>
         </div>
@@ -52,7 +54,9 @@ function ErrorDisplay({ error, errorInfo, onRetry }: ErrorDisplayProps) {
         <div className="space-y-4">
           {/* Error Message */}
           <div className="p-4 bg-morandi-red/5 border border-morandi-red/20 rounded-lg">
-            <p className="text-sm font-medium text-morandi-red mb-2">{COMPONENT_LABELS.LABEL_1425}</p>
+            <p className="text-sm font-medium text-morandi-red mb-2">
+              {COMPONENT_LABELS.LABEL_1425}
+            </p>
             <code className="text-sm text-morandi-primary break-words">
               {error?.message || '未知錯誤'}
             </code>
@@ -103,9 +107,7 @@ function ErrorDisplay({ error, errorInfo, onRetry }: ErrorDisplayProps) {
           </Button>
 
           {/* Hint */}
-          <p className="text-xs text-morandi-muted text-center">
-            {COMPONENT_LABELS.MANAGE_6909}
-          </p>
+          <p className="text-xs text-morandi-muted text-center">{COMPONENT_LABELS.MANAGE_6909}</p>
         </div>
       </div>
     </div>
@@ -132,10 +134,7 @@ function ErrorDisplay({ error, errorInfo, onRetry }: ErrorDisplayProps) {
  * </ErrorBoundary>
  * ```
  */
-export class ErrorBoundary extends React.Component<
-  ErrorBoundaryProps,
-  ErrorBoundaryState
-> {
+export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props)
     this.state = { hasError: false }
@@ -307,12 +306,7 @@ interface ErrorFallbackProps {
  * ```
  */
 export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
-  return (
-    <ErrorDisplay
-      error={error}
-      onRetry={resetError || (() => window.location.reload())}
-    />
-  )
+  return <ErrorDisplay error={error} onRetry={resetError || (() => window.location.reload())} />
 }
 
 // ============================================

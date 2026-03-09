@@ -4,7 +4,6 @@
  * 整合假別設定、請假申請、假別餘額
  */
 
-
 import React, { useState, useEffect } from 'react'
 import {
   Calendar,
@@ -23,15 +22,17 @@ import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, type Column } from '@/components/ui/enhanced-table'
 import { DateCell, StatusCell, ActionCell } from '@/components/table-cells'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DIALOG_SIZES } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DIALOG_SIZES,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
-import {
-  useLeaveTypes,
-  type LeaveType,
-  type LeaveTypeInput,
-} from '../../hooks/useLeaveTypes'
+import { useLeaveTypes, type LeaveType, type LeaveTypeInput } from '../../hooks/useLeaveTypes'
 import {
   useLeaveRequests,
   type LeaveRequest,
@@ -95,17 +96,13 @@ export function LeaveManagementPage() {
       key: 'code',
       label: L.col_code,
       width: '100px',
-      render: (_, row) => (
-        <span className="font-mono text-morandi-gold">{row.code}</span>
-      ),
+      render: (_, row) => <span className="font-mono text-morandi-gold">{row.code}</span>,
     },
     {
       key: 'name',
       label: L.col_type_name,
       width: '150px',
-      render: (_, row) => (
-        <span className="font-medium text-morandi-primary">{row.name}</span>
-      ),
+      render: (_, row) => <span className="font-medium text-morandi-primary">{row.name}</span>,
     },
     {
       key: 'days_per_year',
@@ -122,9 +119,11 @@ export function LeaveManagementPage() {
       label: L.col_is_paid,
       width: '80px',
       render: (_, row) => (
-        <span className={`px-2 py-0.5 rounded text-xs ${
-          row.is_paid !== false ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-        }`}>
+        <span
+          className={`px-2 py-0.5 rounded text-xs ${
+            row.is_paid !== false ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+          }`}
+        >
           {row.is_paid !== false ? L.yes : L.no}
         </span>
       ),
@@ -134,9 +133,13 @@ export function LeaveManagementPage() {
       label: L.col_requires_proof,
       width: '80px',
       render: (_, row) => (
-        <span className={`px-2 py-0.5 rounded text-xs ${
-          row.requires_proof === true ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-500'
-        }`}>
+        <span
+          className={`px-2 py-0.5 rounded text-xs ${
+            row.requires_proof === true
+              ? 'bg-yellow-100 text-yellow-700'
+              : 'bg-gray-100 text-gray-500'
+          }`}
+        >
           {row.requires_proof === true ? L.yes : L.no}
         </span>
       ),
@@ -146,9 +149,11 @@ export function LeaveManagementPage() {
       label: L.col_is_active,
       width: '80px',
       render: (_, row) => (
-        <span className={`px-2 py-0.5 rounded text-xs ${
-          row.is_active !== false ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-        }`}>
+        <span
+          className={`px-2 py-0.5 rounded text-xs ${
+            row.is_active !== false ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+          }`}
+        >
           {row.is_active !== false ? L.active : L.inactive}
         </span>
       ),
@@ -194,9 +199,7 @@ export function LeaveManagementPage() {
       key: 'leave_type_name',
       label: L.col_leave_type,
       width: '100px',
-      render: (_, row) => (
-        <span className="text-morandi-secondary">{row.leave_type_name}</span>
-      ),
+      render: (_, row) => <span className="text-morandi-secondary">{row.leave_type_name}</span>,
     },
     {
       key: 'start_date',
@@ -215,7 +218,9 @@ export function LeaveManagementPage() {
       label: L.col_days,
       width: '80px',
       render: (_, row) => (
-        <span className="font-mono text-morandi-primary">{row.days} {L.days_suffix}</span>
+        <span className="font-mono text-morandi-primary">
+          {row.days} {L.days_suffix}
+        </span>
       ),
     },
     {
@@ -300,7 +305,13 @@ export function LeaveManagementPage() {
   // 核准請假
   const handleApprove = async (request: LeaveRequest) => {
     const confirmed = await confirm(
-      L.confirm_approve_message(request.employee_name, request.leave_type_name, request.start_date, request.end_date, request.days),
+      L.confirm_approve_message(
+        request.employee_name,
+        request.leave_type_name,
+        request.start_date,
+        request.end_date,
+        request.days
+      ),
       {
         title: L.confirm_approve_title,
         type: 'info',
@@ -341,14 +352,17 @@ export function LeaveManagementPage() {
         { label: L.breadcrumb_leave, href: '/hr/leave' },
       ]}
     >
-
       {/* 頁籤 */}
       <div className="p-4 bg-card border-b border-border">
         <div className="flex gap-2">
           <Button
             variant={activeTab === 'requests' ? 'default' : 'outline'}
             onClick={() => setActiveTab('requests')}
-            className={activeTab === 'requests' ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white' : ''}
+            className={
+              activeTab === 'requests'
+                ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white'
+                : ''
+            }
           >
             <FileText size={16} className="mr-2" />
             {L.tab_requests}
@@ -356,7 +370,9 @@ export function LeaveManagementPage() {
           <Button
             variant={activeTab === 'types' ? 'default' : 'outline'}
             onClick={() => setActiveTab('types')}
-            className={activeTab === 'types' ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white' : ''}
+            className={
+              activeTab === 'types' ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white' : ''
+            }
           >
             <Settings size={16} className="mr-2" />
             {L.tab_types}
@@ -398,20 +414,12 @@ export function LeaveManagementPage() {
               </Button>
             </div>
 
-            <EnhancedTable
-              data={leaveTypes}
-              columns={typeColumns}
-              loading={typesLoading}
-            />
+            <EnhancedTable data={leaveTypes} columns={typeColumns} loading={typesLoading} />
           </div>
         )}
 
         {activeTab === 'requests' && (
-          <EnhancedTable
-            data={requests}
-            columns={requestColumns}
-            loading={requestsLoading}
-          />
+          <EnhancedTable data={requests} columns={requestColumns} loading={requestsLoading} />
         )}
 
         {requests.length === 0 && activeTab === 'requests' && !requestsLoading && (
@@ -427,7 +435,7 @@ export function LeaveManagementPage() {
         open={showTypeDialog}
         onOpenChange={setShowTypeDialog}
         editingType={editingType}
-        onSave={async (input) => {
+        onSave={async input => {
           if (editingType) {
             const success = await updateLeaveType(editingType.id, input)
             if (success) {
@@ -456,17 +464,14 @@ export function LeaveManagementPage() {
               <Label>{L.reject_label}</Label>
               <textarea
                 value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value)}
+                onChange={e => setRejectReason(e.target.value)}
                 className="w-full mt-1 px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-morandi-gold resize-none"
                 rows={3}
                 placeholder={L.reject_placeholder}
               />
             </div>
             <div className="flex justify-end gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setRejectDialogOpen(false)}
-              >
+              <Button variant="outline" onClick={() => setRejectDialogOpen(false)}>
                 <X size={16} className="mr-2" />
                 {L.btn_cancel}
               </Button>
@@ -557,7 +562,7 @@ function LeaveTypeDialog({
               <Label required>{L.label_type_name}</Label>
               <Input
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={e => setName(e.target.value)}
                 placeholder={L.placeholder_type_name}
                 className="mt-1"
               />
@@ -566,7 +571,7 @@ function LeaveTypeDialog({
               <Label required>{L.label_code}</Label>
               <Input
                 value={code}
-                onChange={(e) => setCode(e.target.value.toUpperCase())}
+                onChange={e => setCode(e.target.value.toUpperCase())}
                 placeholder={L.placeholder_code}
                 className="mt-1 font-mono"
               />
@@ -578,7 +583,7 @@ function LeaveTypeDialog({
             <Input
               type="number"
               value={daysPerYear}
-              onChange={(e) => setDaysPerYear(e.target.value)}
+              onChange={e => setDaysPerYear(e.target.value)}
               placeholder={L.placeholder_days}
               className="mt-1"
               min={0}
@@ -591,7 +596,7 @@ function LeaveTypeDialog({
               <input
                 type="checkbox"
                 checked={isPaid}
-                onChange={(e) => setIsPaid(e.target.checked)}
+                onChange={e => setIsPaid(e.target.checked)}
                 className="w-4 h-4 rounded border-border text-morandi-gold focus:ring-morandi-gold"
               />
               <span className="text-sm text-morandi-primary">{L.checkbox_paid}</span>
@@ -601,7 +606,7 @@ function LeaveTypeDialog({
               <input
                 type="checkbox"
                 checked={requiresProof}
-                onChange={(e) => setRequiresProof(e.target.checked)}
+                onChange={e => setRequiresProof(e.target.checked)}
                 className="w-4 h-4 rounded border-border text-morandi-gold focus:ring-morandi-gold"
               />
               <span className="text-sm text-morandi-primary">{L.checkbox_proof}</span>
@@ -611,7 +616,7 @@ function LeaveTypeDialog({
               <input
                 type="checkbox"
                 checked={isActive}
-                onChange={(e) => setIsActive(e.target.checked)}
+                onChange={e => setIsActive(e.target.checked)}
                 className="w-4 h-4 rounded border-border text-morandi-gold focus:ring-morandi-gold"
               />
               <span className="text-sm text-morandi-primary">{L.checkbox_active}</span>
@@ -619,10 +624,7 @@ function LeaveTypeDialog({
           </div>
 
           <div className="flex justify-end gap-2 pt-4 border-t border-border">
-            <Button
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
               <X size={16} className="mr-2" />
               {L.btn_cancel}
             </Button>

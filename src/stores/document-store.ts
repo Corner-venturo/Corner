@@ -117,15 +117,31 @@ interface DocumentState {
 
   // Actions
   loadDocument: (type: DocumentType, documentId: string) => Promise<void>
-  loadOrCreateDocument: (type: DocumentType, entityId: string, workspaceId: string, entityType?: BrochureEntityType, designType?: string, forceCreate?: boolean) => Promise<string>
-  saveVersion: (canvasData: Json, thumbnailUrl?: string, designType?: string) => Promise<DocumentVersion | null>
+  loadOrCreateDocument: (
+    type: DocumentType,
+    entityId: string,
+    workspaceId: string,
+    entityType?: BrochureEntityType,
+    designType?: string,
+    forceCreate?: boolean
+  ) => Promise<string>
+  saveVersion: (
+    canvasData: Json,
+    thumbnailUrl?: string,
+    designType?: string
+  ) => Promise<DocumentVersion | null>
   loadVersion: (versionId: string) => Promise<void>
   restoreVersion: (versionId: string) => Promise<void>
   fetchVersions: () => Promise<void>
 
   // Template actions
   applyTemplate: (templateId: string) => Promise<Json | null>
-  saveAsTemplate: (name: string, category: string, canvasData: Json, thumbnailUrl?: string) => Promise<DesignTemplate | null>
+  saveAsTemplate: (
+    name: string,
+    category: string,
+    canvasData: Json,
+    thumbnailUrl?: string
+  ) => Promise<DesignTemplate | null>
   fetchTemplates: (type: DocumentType) => Promise<DesignTemplate[]>
 
   // State setters
@@ -162,7 +178,6 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
   // Load Document
   // ============================================
   loadDocument: async (type: DocumentType, documentId: string) => {
-    
     set({
       isLoading: true,
       loadingStage: 'fetching_document',
@@ -240,13 +255,19 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
   // ============================================
   // Load or Create Document
   // ============================================
-  loadOrCreateDocument: async (type: DocumentType, entityId: string, workspaceId: string, entityType: BrochureEntityType = 'tour', designType?: string, forceCreate?: boolean) => {
+  loadOrCreateDocument: async (
+    type: DocumentType,
+    entityId: string,
+    workspaceId: string,
+    entityType: BrochureEntityType = 'tour',
+    designType?: string,
+    forceCreate?: boolean
+  ) => {
     const tableName = type === 'brochure' ? 'brochure_documents' : 'itinerary_documents'
 
     // Determine which field to use based on entity type
-    const entityField = entityType === 'tour' ? 'tour_id' :
-                        entityType === 'package' ? 'package_id' :
-                        'itinerary_id'
+    const entityField =
+      entityType === 'tour' ? 'tour_id' : entityType === 'package' ? 'package_id' : 'itinerary_id'
 
     set({
       isLoading: true,
@@ -260,10 +281,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       // 如果不是強制建立，嘗試查找現有文件
       if (!forceCreate) {
         // 1. Try to find existing document for this entity (and design_type if specified)
-        let query = supabase
-          .from(tableName)
-          .select('id')
-          .eq(entityField, entityId)
+        let query = supabase.from(tableName).select('id').eq(entityField, entityId)
 
         // 如果指定了 designType，也要匹配（這樣 A5 和 A4 可以分開）
         if (type === 'brochure' && designType) {
@@ -390,7 +408,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
     const { documentType } = get()
     if (!documentType) return
 
-        const versionTable = documentType === 'brochure' ? 'brochure_versions' : 'itinerary_versions'
+    const versionTable = documentType === 'brochure' ? 'brochure_versions' : 'itinerary_versions'
 
     set({
       isLoading: true,
@@ -428,7 +446,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
     const { documentType, document } = get()
     if (!documentType || !document) return
 
-        const versionTable = documentType === 'brochure' ? 'brochure_versions' : 'itinerary_versions'
+    const versionTable = documentType === 'brochure' ? 'brochure_versions' : 'itinerary_versions'
     const docTable = documentType === 'brochure' ? 'brochure_documents' : 'itinerary_documents'
 
     set({
@@ -497,7 +515,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
     const { documentType, document } = get()
     if (!documentType || !document) return
 
-        const versionTable = documentType === 'brochure' ? 'brochure_versions' : 'itinerary_versions'
+    const versionTable = documentType === 'brochure' ? 'brochure_versions' : 'itinerary_versions'
 
     try {
       const { data: versions, error } = await supabase
@@ -521,7 +539,6 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
   // Apply Template
   // ============================================
   applyTemplate: async (templateId: string) => {
-    
     set({
       isLoading: true,
       loadingStage: 'fetching_document',
@@ -562,7 +579,12 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
   // ============================================
   // Save As Template
   // ============================================
-  saveAsTemplate: async (name: string, category: string, canvasData: Json, thumbnailUrl?: string) => {
+  saveAsTemplate: async (
+    name: string,
+    category: string,
+    canvasData: Json,
+    thumbnailUrl?: string
+  ) => {
     const { documentType, document } = get()
     if (!documentType || !document) return null
 
@@ -596,7 +618,6 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
   // Fetch Templates
   // ============================================
   fetchTemplates: async (type: DocumentType) => {
-    
     try {
       const workspaceId = getWorkspaceId()
       let query = supabase

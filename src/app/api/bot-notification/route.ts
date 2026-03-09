@@ -39,7 +39,9 @@ export async function POST(request: NextRequest) {
       .from('channels')
       .select('*')
       .eq('type', 'direct')
-      .or(`name.ilike.dm:${SYSTEM_BOT_ID}:${recipient_id},name.ilike.dm:${recipient_id}:${SYSTEM_BOT_ID}`)
+      .or(
+        `name.ilike.dm:${SYSTEM_BOT_ID}:${recipient_id},name.ilike.dm:${recipient_id}:${SYSTEM_BOT_ID}`
+      )
       .single()
 
     let channelId: string
@@ -64,7 +66,7 @@ export async function POST(request: NextRequest) {
         .insert({
           name: `dm:${SYSTEM_BOT_ID}:${recipient_id}`,
           type: 'direct',
-          channel_type: 'DIRECT',  // 必須大寫，與 RPC 一致
+          channel_type: 'DIRECT', // 必須大寫，與 RPC 一致
           is_announcement: false,
           workspace_id: recipientData.workspace_id,
           created_by: SYSTEM_BOT_ID,
@@ -78,12 +80,20 @@ export async function POST(request: NextRequest) {
       }
 
       // 加入頻道成員
-      await supabase
-        .from('channel_members')
-        .insert([
-          { channel_id: newChannel.id, employee_id: SYSTEM_BOT_ID, role: 'owner', workspace_id: recipientData.workspace_id },
-          { channel_id: newChannel.id, employee_id: recipient_id, role: 'member', workspace_id: recipientData.workspace_id },
-        ])
+      await supabase.from('channel_members').insert([
+        {
+          channel_id: newChannel.id,
+          employee_id: SYSTEM_BOT_ID,
+          role: 'owner',
+          workspace_id: recipientData.workspace_id,
+        },
+        {
+          channel_id: newChannel.id,
+          employee_id: recipient_id,
+          role: 'member',
+          workspace_id: recipientData.workspace_id,
+        },
+      ])
 
       channelId = newChannel.id
     }

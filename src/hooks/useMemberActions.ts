@@ -70,7 +70,9 @@ interface MemberActionsReturn {
  * 新增/刪除時會自動同步更新訂單的 member_count
  */
 export function useMemberActions(): MemberActionsReturn {
-  const create = async (data: Omit<Member, 'id' | 'created_at' | 'updated_at'>): Promise<Member> => {
+  const create = async (
+    data: Omit<Member, 'id' | 'created_at' | 'updated_at'>
+  ): Promise<Member> => {
     const now = new Date().toISOString()
     const workspace_id = getCurrentWorkspaceId()
 
@@ -98,9 +100,13 @@ export function useMemberActions(): MemberActionsReturn {
       passport_expiry: newMember.passport_expiry ?? null,
       id_number: (memberData.id_number as string | null) ?? null,
       gender: newMember.gender ?? null,
-      birth_date: (memberData.birth_date as string | null) ?? (memberData.birth_date as string | null) ?? null,
+      birth_date:
+        (memberData.birth_date as string | null) ??
+        (memberData.birth_date as string | null) ??
+        null,
       // 其他常用欄位
-      pnr: (memberData.reservation_code as string | null) ?? (memberData.pnr as string | null) ?? null,
+      pnr:
+        (memberData.reservation_code as string | null) ?? (memberData.pnr as string | null) ?? null,
       customer_id: (memberData.customer_id as string | null) ?? null,
       workspace_id: workspace_id ?? null,
     }
@@ -134,14 +140,21 @@ export function useMemberActions(): MemberActionsReturn {
     const updatedData = {
       ...updates,
       // 處理欄位名稱對應
-      ...(updates.passport_name !== undefined || (updates as Record<string, unknown>).name_en !== undefined
+      ...(updates.passport_name !== undefined ||
+      (updates as Record<string, unknown>).name_en !== undefined
         ? { passport_name: updates.passport_name ?? (updates as Record<string, unknown>).name_en }
         : {}),
-      ...(updates.birth_date !== undefined || (updates as Record<string, unknown>).birth_date !== undefined
+      ...(updates.birth_date !== undefined ||
+      (updates as Record<string, unknown>).birth_date !== undefined
         ? { birth_date: updates.birth_date ?? (updates as Record<string, unknown>).birth_date }
         : {}),
-      ...((updates as Record<string, unknown>).reservation_code !== undefined || (updates as Record<string, unknown>).pnr !== undefined
-        ? { pnr: (updates as Record<string, unknown>).reservation_code ?? (updates as Record<string, unknown>).pnr }
+      ...((updates as Record<string, unknown>).reservation_code !== undefined ||
+      (updates as Record<string, unknown>).pnr !== undefined
+        ? {
+            pnr:
+              (updates as Record<string, unknown>).reservation_code ??
+              (updates as Record<string, unknown>).pnr,
+          }
         : {}),
     }
 

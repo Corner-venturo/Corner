@@ -36,7 +36,10 @@ export function useCompanyColumns({ onView, onEdit, onDelete }: UseCompanyColumn
                 <div>
                   <div className="font-medium">{company.company_name}</div>
                   {company.tax_id && (
-                    <div className="text-xs text-morandi-muted">{COMPANY_LABELS.COL_TAX_ID_PREFIX}{company.tax_id}</div>
+                    <div className="text-xs text-morandi-muted">
+                      {COMPANY_LABELS.COL_TAX_ID_PREFIX}
+                      {company.tax_id}
+                    </div>
                   )}
                 </div>
               </div>
@@ -48,7 +51,7 @@ export function useCompanyColumns({ onView, onEdit, onDelete }: UseCompanyColumn
         key: 'vip_level',
         label: COMPANY_LABELS.COL_VIP_LEVEL,
         width: '100px',
-        render: (value) => {
+        render: value => {
           const level = value as number
           const colors: Record<number, string> = {
             0: 'bg-morandi-container/20 text-morandi-muted',
@@ -117,7 +120,9 @@ export function useCompanyColumns({ onView, onEdit, onDelete }: UseCompanyColumn
                 </span>
               </div>
               <div className="text-xs text-morandi-muted mt-1">
-                {company.payment_terms === 0 ? COMPANY_LABELS.DETAIL_PAYMENT_IMMEDIATE : `${company.payment_terms} ${COMPANY_LABELS.DETAIL_PAYMENT_DAYS}`}
+                {company.payment_terms === 0
+                  ? COMPANY_LABELS.DETAIL_PAYMENT_IMMEDIATE
+                  : `${company.payment_terms} ${COMPANY_LABELS.DETAIL_PAYMENT_DAYS}`}
               </div>
             </div>
           )
@@ -127,14 +132,11 @@ export function useCompanyColumns({ onView, onEdit, onDelete }: UseCompanyColumn
         key: 'credit_limit',
         label: COMPANY_LABELS.COL_CREDIT_LIMIT,
         width: '120px',
-        render: (value) => {
+        render: value => {
           const limit = value as number
           return (
             <div className="text-right text-sm">
-              <CurrencyCell
-                amount={limit}
-                className="text-morandi-secondary"
-              />
+              <CurrencyCell amount={limit} className="text-morandi-secondary" />
             </div>
           )
         },
@@ -143,7 +145,7 @@ export function useCompanyColumns({ onView, onEdit, onDelete }: UseCompanyColumn
         key: 'created_at',
         label: COMPANY_LABELS.COL_CREATED_DATE,
         width: '120px',
-        render: (value) => (
+        render: value => (
           <DateCell
             date={value as string}
             showIcon={false}
@@ -163,7 +165,7 @@ export function useCompanyColumns({ onView, onEdit, onDelete }: UseCompanyColumn
                 <button
                   className="p-1 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
                   title={COMPANY_LABELS.COL_EDIT_TITLE}
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation()
                     onEdit(company)
                   }}
@@ -175,7 +177,7 @@ export function useCompanyColumns({ onView, onEdit, onDelete }: UseCompanyColumn
                 <button
                   className="p-1 text-morandi-secondary hover:text-status-danger hover:bg-status-danger-bg rounded transition-colors"
                   title={COMPANY_LABELS.COL_DELETE_TITLE}
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation()
                     onDelete(company)
                   }}

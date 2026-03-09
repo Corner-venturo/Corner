@@ -10,7 +10,6 @@
  * 5. 付款條件設定
  */
 
-
 import { logger } from '@/lib/utils/logger'
 import { useState, useCallback } from 'react'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
@@ -41,18 +40,21 @@ export default function CompaniesPage() {
     setIsDetailOpen(true)
   }, [])
 
-  const handleUpdateFromDetail = useCallback(async (data: CreateCompanyData) => {
-    if (!selectedCompany) return
+  const handleUpdateFromDetail = useCallback(
+    async (data: CreateCompanyData) => {
+      if (!selectedCompany) return
 
-    try {
-      await updateCompany(selectedCompany.id, data)
-      setSelectedCompany({ ...selectedCompany, ...data } as Company)
-      await alert(L.UPDATE_SUCCESS, 'success')
-    } catch (error) {
-      logger.error('Failed to update company:', error)
-      await alert(L.UPDATE_FAILED, 'error')
-    }
-  }, [selectedCompany])
+      try {
+        await updateCompany(selectedCompany.id, data)
+        setSelectedCompany({ ...selectedCompany, ...data } as Company)
+        await alert(L.UPDATE_SUCCESS, 'success')
+      } catch (error) {
+        logger.error('Failed to update company:', error)
+        await alert(L.UPDATE_FAILED, 'error')
+      }
+    },
+    [selectedCompany]
+  )
 
   const handleCreate = useCallback(async (data: CreateCompanyData) => {
     try {
@@ -65,19 +67,22 @@ export default function CompaniesPage() {
     }
   }, [])
 
-  const handleEdit = useCallback(async (data: CreateCompanyData) => {
-    if (!editingCompany) return
+  const handleEdit = useCallback(
+    async (data: CreateCompanyData) => {
+      if (!editingCompany) return
 
-    try {
-      await updateCompany(editingCompany.id, data)
-      setEditingCompany(undefined)
-      setIsDialogOpen(false)
-      await alert(L.UPDATE_SUCCESS, 'success')
-    } catch (error) {
-      logger.error('Failed to update company:', error)
-      await alert(L.UPDATE_FAILED, 'error')
-    }
-  }, [editingCompany])
+      try {
+        await updateCompany(editingCompany.id, data)
+        setEditingCompany(undefined)
+        setIsDialogOpen(false)
+        await alert(L.UPDATE_SUCCESS, 'success')
+      } catch (error) {
+        logger.error('Failed to update company:', error)
+        await alert(L.UPDATE_FAILED, 'error')
+      }
+    },
+    [editingCompany]
+  )
 
   const handleOpenCreateDialog = useCallback(() => {
     setEditingCompany(undefined)
@@ -104,9 +109,8 @@ export default function CompaniesPage() {
       let confirmMsg: string
       if (contacts && contacts.length > 0) {
         const contactNames = contacts.map(c => c.name).join('、')
-        const contactInfo = contacts.length > 5
-          ? L.CONTACTS_OVERFLOW(contactNames, contacts.length)
-          : contactNames
+        const contactInfo =
+          contacts.length > 5 ? L.CONTACTS_OVERFLOW(contactNames, contacts.length) : contactNames
         confirmMsg = L.DELETE_WITH_CONTACTS(contacts.length, contactInfo, company.company_name)
       } else {
         confirmMsg = L.DELETE_SIMPLE(company.company_name)

@@ -8,7 +8,11 @@
 import React, { useMemo } from 'react'
 import { Clock, MapPin, Coffee, UtensilsCrossed, Moon, Building2, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { TimelineItineraryData, TimelineDay, TimelineAttraction } from '@/types/timeline-itinerary.types'
+import type {
+  TimelineItineraryData,
+  TimelineDay,
+  TimelineAttraction,
+} from '@/types/timeline-itinerary.types'
 import { DOCUMENTS_LABELS } from './constants/labels'
 
 interface TimelineItineraryPreviewProps {
@@ -38,11 +42,11 @@ function DaySection({ day }: { day: TimelineDay }) {
       {/* Day 標題 */}
       <div className="flex items-center gap-2 mb-2 pb-1 border-b border-border/50">
         <span className="text-xs font-medium text-morandi-gold">Day {day.dayNumber}</span>
-        {day.date && (
-          <span className="text-xs text-morandi-secondary">{formatDate(day.date)}</span>
-        )}
+        {day.date && <span className="text-xs text-morandi-secondary">{formatDate(day.date)}</span>}
         {day.title && (
-          <span className="text-xs text-morandi-primary font-medium flex-1 truncate">{day.title}</span>
+          <span className="text-xs text-morandi-primary font-medium flex-1 truncate">
+            {day.title}
+          </span>
         )}
       </div>
 
@@ -74,10 +78,14 @@ function AttractionItem({ attraction }: { attraction: TimelineAttraction }) {
   // 餐食圖標
   const MealIcon = useMemo(() => {
     switch (attraction.mealType) {
-      case 'breakfast': return Coffee
-      case 'lunch': return UtensilsCrossed
-      case 'dinner': return Moon
-      default: return null
+      case 'breakfast':
+        return Coffee
+      case 'lunch':
+        return UtensilsCrossed
+      case 'dinner':
+        return Moon
+      default:
+        return null
     }
   }, [attraction.mealType])
 
@@ -114,7 +122,11 @@ function AttractionItem({ attraction }: { attraction: TimelineAttraction }) {
   )
 }
 
-export function TimelineItineraryPreview({ data, loading, className }: TimelineItineraryPreviewProps) {
+export function TimelineItineraryPreview({
+  data,
+  loading,
+  className,
+}: TimelineItineraryPreviewProps) {
   if (loading) {
     return (
       <div className={cn('flex items-center justify-center py-6', className)}>
@@ -137,9 +149,7 @@ export function TimelineItineraryPreview({ data, loading, className }: TimelineI
       {/* 標題 */}
       {(data.title || data.subtitle) && (
         <div className="pb-2 mb-2 border-b border-border">
-          {data.title && (
-            <h4 className="text-sm font-medium text-morandi-primary">{data.title}</h4>
-          )}
+          {data.title && <h4 className="text-sm font-medium text-morandi-primary">{data.title}</h4>}
           {data.subtitle && (
             <p className="text-xs text-morandi-secondary mt-0.5">{data.subtitle}</p>
           )}
@@ -148,7 +158,7 @@ export function TimelineItineraryPreview({ data, loading, className }: TimelineI
 
       {/* 每日行程 */}
       <div className="max-h-[300px] overflow-y-auto pr-1">
-        {data.days.map((day) => (
+        {data.days.map(day => (
           <DaySection key={day.id} day={day} />
         ))}
       </div>

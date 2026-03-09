@@ -1,6 +1,6 @@
 /**
  * useAirports - 統一機場資料來源
- * 
+ *
  * 從 ref_airports 讀取，取代舊的 useTourDestinations
  * - is_favorite = true 的機場排在最前面
  * - 按國家篩選
@@ -56,7 +56,7 @@ async function fetchAirports(): Promise<Airport[]> {
     logger.error('載入機場資料失敗:', error)
     throw error
   }
-  
+
   return (data || []) as Airport[]
 }
 
@@ -74,7 +74,7 @@ async function fetchCountries(): Promise<CountryInfo[]> {
     logger.error('載入國家列表失敗:', error)
     throw error
   }
-  
+
   return (data || []) as CountryInfo[]
 }
 
@@ -86,21 +86,14 @@ export function useAirports(options: UseAirportsOptions = {}) {
   const { enabled = true } = options
 
   // 載入所有機場
-  const { 
-    data: airports = [], 
+  const {
+    data: airports = [],
     isLoading: airportsLoading,
-    error: airportsError 
-  } = useSWR<Airport[]>(
-    enabled ? AIRPORTS_CACHE_KEY : null,
-    fetchAirports,
-    SWR_CONFIG
-  )
+    error: airportsError,
+  } = useSWR<Airport[]>(enabled ? AIRPORTS_CACHE_KEY : null, fetchAirports, SWR_CONFIG)
 
   // 載入國家列表（RLS 自動根據 auth session 過濾 workspace）
-  const {
-    data: countriesData = [],
-    isLoading: countriesLoading,
-  } = useSWR<CountryInfo[]>(
+  const { data: countriesData = [], isLoading: countriesLoading } = useSWR<CountryInfo[]>(
     enabled ? COUNTRIES_CACHE_KEY : null,
     fetchCountries,
     SWR_CONFIG
@@ -135,7 +128,7 @@ export function useAirports(options: UseAirportsOptions = {}) {
     (countryName: string): Airport[] => {
       const countryCode = countryNameToCode[countryName]
       if (!countryCode) return []
-      
+
       return airports
         .filter(a => a.country_code === countryCode)
         .sort((a, b) => (b.usage_count || 0) - (a.usage_count || 0))
@@ -188,17 +181,17 @@ export function useAirports(options: UseAirportsOptions = {}) {
       // 先取得目前的 usage_count
       const airport = airports.find(a => a.iata_code === iataCode)
       const currentCount = airport?.usage_count || 0
-      
+
       const { error } = await supabase
         .from('ref_airports')
         .update({ usage_count: currentCount + 1 })
         .eq('iata_code', iataCode)
-      
+
       if (error) {
         logger.error('更新 usage_count 失敗:', error)
         return
       }
-      
+
       // 重新載入
       mutate(AIRPORTS_CACHE_KEY)
     },

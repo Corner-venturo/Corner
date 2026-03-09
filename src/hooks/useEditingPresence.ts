@@ -14,15 +14,15 @@ interface EditorInfo {
 }
 
 interface UseEditingPresenceOptions {
-  resourceType: string  // 'itinerary' | 'order' | 'quote' | 'contract' 等
-  resourceId: string    // 資源的 ID
-  enabled?: boolean     // 是否啟用（預設 true）
+  resourceType: string // 'itinerary' | 'order' | 'quote' | 'contract' 等
+  resourceId: string // 資源的 ID
+  enabled?: boolean // 是否啟用（預設 true）
 }
 
 interface UseEditingPresenceReturn {
-  otherEditors: EditorInfo[]      // 其他正在編輯的人
-  isOtherEditing: boolean         // 是否有其他人在編輯
-  currentEditors: EditorInfo[]    // 所有編輯者（包含自己）
+  otherEditors: EditorInfo[] // 其他正在編輯的人
+  isOtherEditing: boolean // 是否有其他人在編輯
+  currentEditors: EditorInfo[] // 所有編輯者（包含自己）
 }
 
 /**
@@ -79,7 +79,7 @@ export function useEditingPresence({
       })
 
       // 訂閱並追蹤自己的 presence
-      await channel.subscribe(async (status) => {
+      await channel.subscribe(async status => {
         if (status === 'SUBSCRIBED' && channel) {
           await channel.track({
             name: user.name || user.email || '未知用戶',
@@ -90,7 +90,7 @@ export function useEditingPresence({
       })
     }
 
-    setupPresence().catch((err) => logger.error('[setupPresence]', err))
+    setupPresence().catch(err => logger.error('[setupPresence]', err))
 
     // 清理函數
     return () => {

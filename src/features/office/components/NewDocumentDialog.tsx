@@ -3,12 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { FileSpreadsheet, FileText } from 'lucide-react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { OFFICE_LABELS } from '../constants/labels'
 
 type DocumentType = 'spreadsheet' | 'document' | 'slides'
@@ -80,7 +75,7 @@ export function NewDocumentDialog({ open, onOpenChange }: NewDocumentDialogProps
             <input
               type="text"
               value={docName}
-              onChange={(e) => setDocName(e.target.value)}
+              onChange={e => setDocName(e.target.value)}
               placeholder={OFFICE_LABELS.未命名文件}
               className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
             />
@@ -92,7 +87,7 @@ export function NewDocumentDialog({ open, onOpenChange }: NewDocumentDialogProps
               {OFFICE_LABELS.SELECT_3424}
             </label>
             <div className="space-y-2">
-              {documentTypes.map((option) => (
+              {documentTypes.map(option => (
                 <button
                   key={option.type}
                   onClick={() => setSelectedType(option.type)}
@@ -111,8 +106,18 @@ export function NewDocumentDialog({ open, onOpenChange }: NewDocumentDialogProps
                   </div>
                   {selectedType === option.type && (
                     <div className="ml-auto w-5 h-5 rounded-full bg-morandi-gold flex items-center justify-center">
-                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      <svg
+                        className="w-3 h-3 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={3}
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                     </div>
                   )}

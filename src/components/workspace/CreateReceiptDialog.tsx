@@ -4,7 +4,13 @@ import { getTodayString } from '@/lib/utils/format-date'
 
 import { useState } from 'react'
 import { DollarSign, Calendar, X, Save } from 'lucide-react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { createReceiptOrder } from '@/data'
@@ -63,7 +69,9 @@ export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateR
         workspace_id: user?.workspace_id || '',
       }
 
-      const receipt = await createReceiptOrder(receiptData as Omit<ReceiptOrder, 'id' | 'created_at' | 'updated_at'>)
+      const receipt = await createReceiptOrder(
+        receiptData as Omit<ReceiptOrder, 'id' | 'created_at' | 'updated_at'>
+      )
       onSuccess(receipt.id)
       onClose()
     } catch (error) {
@@ -73,7 +81,7 @@ export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateR
   }
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Dialog open={open} onOpenChange={isOpen => !isOpen && onClose()}>
       <DialogContent level={1} className="max-w-[500px]">
         <DialogHeader className="pb-3 border-b border-morandi-gold/20">
           <DialogTitle className="flex items-center gap-2">
@@ -86,11 +94,15 @@ export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateR
         <div className="space-y-4 my-4">
           {/* 訂單資訊 */}
           <div className="bg-morandi-container/5 rounded-lg p-3 border border-morandi-gold/20">
-            <div className="text-sm font-medium text-morandi-secondary mb-2">{COMP_WORKSPACE_LABELS.LABEL_1002}</div>
+            <div className="text-sm font-medium text-morandi-secondary mb-2">
+              {COMP_WORKSPACE_LABELS.LABEL_1002}
+            </div>
             <div className="space-y-1">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-morandi-secondary">{COMP_WORKSPACE_LABELS.LABEL_9754}</span>
-                <span className="font-medium text-morandi-primary">{order.order_number || '-'}</span>
+                <span className="font-medium text-morandi-primary">
+                  {order.order_number || '-'}
+                </span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-morandi-secondary">{COMP_WORKSPACE_LABELS.LABEL_6286}</span>
@@ -106,7 +118,11 @@ export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateR
               </div>
               <div className="flex items-center justify-between text-sm pt-2 border-t border-morandi-gold/20">
                 <span className="text-morandi-secondary">{COMP_WORKSPACE_LABELS.LABEL_385}</span>
-                <CurrencyCell amount={order.gap} variant="expense" className="text-lg font-semibold" />
+                <CurrencyCell
+                  amount={order.gap}
+                  variant="expense"
+                  className="text-lg font-semibold"
+                />
               </div>
             </div>
           </div>
@@ -184,7 +200,10 @@ export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateR
 
         {/* 底部操作按鈕 */}
         <DialogFooter className="pt-3 border-t border-morandi-gold/20">
-          <button className="btn-morandi-secondary !py-2 !px-4 flex items-center gap-2" onClick={onClose}>
+          <button
+            className="btn-morandi-secondary !py-2 !px-4 flex items-center gap-2"
+            onClick={onClose}
+          >
             <X size={16} />
             {COMP_WORKSPACE_LABELS.CANCEL}
           </button>

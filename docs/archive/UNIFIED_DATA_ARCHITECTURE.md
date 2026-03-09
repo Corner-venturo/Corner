@@ -78,9 +78,9 @@ export const useTours = createEntityHook<Tour>('tours', {
   },
   // 快取配置
   cache: {
-    ttl: 60000,           // 60 秒快取
-    staleTime: 30000,     // 30 秒內視為新鮮
-    dedupe: true,         // 去重複請求
+    ttl: 60000, // 60 秒快取
+    staleTime: 30000, // 30 秒內視為新鮮
+    dedupe: true, // 去重複請求
   },
 })
 ```
@@ -98,13 +98,13 @@ interface EntityHook<T> {
   error: string | null
 
   // 列表操作
-  list: () => { items: T[], loading: boolean, error: string | null }
-  listSlim: () => { items: Partial<T>[], loading: boolean }
+  list: () => { items: T[]; loading: boolean; error: string | null }
+  listSlim: () => { items: Partial<T>[]; loading: boolean }
   listPaginated: (params: PaginationParams) => PaginatedResult<T>
-  listByFilter: (filter: FilterParams) => { items: T[], loading: boolean }
+  listByFilter: (filter: FilterParams) => { items: T[]; loading: boolean }
 
   // 單筆操作
-  get: (id: string) => { item: T | null, loading: boolean }
+  get: (id: string) => { item: T | null; loading: boolean }
 
   // CRUD
   create: (data: CreateData<T>) => Promise<T>
@@ -129,21 +129,21 @@ interface EntityHook<T> {
 const CACHE_CONFIG = {
   // 高頻資料（tours, orders）
   high: {
-    ttl: 60000,           // 1 分鐘
-    staleTime: 30000,     // 30 秒
+    ttl: 60000, // 1 分鐘
+    staleTime: 30000, // 30 秒
     revalidateOnFocus: false,
     revalidateOnReconnect: true,
   },
   // 中頻資料（quotes, itineraries）
   medium: {
-    ttl: 300000,          // 5 分鐘
-    staleTime: 60000,     // 1 分鐘
+    ttl: 300000, // 5 分鐘
+    staleTime: 60000, // 1 分鐘
     revalidateOnFocus: false,
   },
   // 低頻資料（regions, settings）
   low: {
-    ttl: 3600000,         // 1 小時
-    staleTime: 300000,    // 5 分鐘
+    ttl: 3600000, // 1 小時
+    staleTime: 300000, // 5 分鐘
     revalidateOnFocus: false,
   },
 }
@@ -240,18 +240,20 @@ export function createEntityHook<T extends { id: string }>(
     const { user, isAuthenticated, _hasHydrated } = useAuthStore()
     const swrKey = _hasHydrated && isAuthenticated && user?.id ? cacheKey : null
 
-    const { data, error, isLoading, mutate: mutateSelf } = useSWR<T[]>(
+    const {
+      data,
+      error,
+      isLoading,
+      mutate: mutateSelf,
+    } = useSWR<T[]>(
       swrKey,
       async () => {
-        let query = supabase
-          .from(tableName as 'tours')
-          .select(config.list?.select || '*')
+        let query = supabase.from(tableName as 'tours').select(config.list?.select || '*')
 
         if (config.list?.orderBy) {
-          query = query.order(
-            config.list.orderBy.column as string,
-            { ascending: config.list.orderBy.ascending }
-          )
+          query = query.order(config.list.orderBy.column as string, {
+            ascending: config.list.orderBy.ascending,
+          })
         }
 
         const { data, error } = await query
@@ -301,11 +303,14 @@ export function createEntityHook<T extends { id: string }>(
   // ============================================
   function useDetail(id: string | null) {
     const { user, isAuthenticated, _hasHydrated } = useAuthStore()
-    const swrKey = _hasHydrated && isAuthenticated && user?.id && id
-      ? `${cacheKey}-${id}`
-      : null
+    const swrKey = _hasHydrated && isAuthenticated && user?.id && id ? `${cacheKey}-${id}` : null
 
-    const { data, error, isLoading, mutate: mutateSelf } = useSWR<T | null>(
+    const {
+      data,
+      error,
+      isLoading,
+      mutate: mutateSelf,
+    } = useSWR<T | null>(
       swrKey,
       async () => {
         if (!id) return null
@@ -341,11 +346,17 @@ export function createEntityHook<T extends { id: string }>(
     searchFields?: string[]
   }) {
     const { user, isAuthenticated, _hasHydrated } = useAuthStore()
-    const swrKey = _hasHydrated && isAuthenticated && user?.id
-      ? `${cacheKey}-paginated-${JSON.stringify(params)}`
-      : null
+    const swrKey =
+      _hasHydrated && isAuthenticated && user?.id
+        ? `${cacheKey}-paginated-${JSON.stringify(params)}`
+        : null
 
-    const { data, error, isLoading, mutate: mutateSelf } = useSWR(
+    const {
+      data,
+      error,
+      isLoading,
+      mutate: mutateSelf,
+    } = useSWR(
       swrKey,
       async () => {
         const from = (params.page - 1) * params.pageSize
@@ -375,10 +386,9 @@ export function createEntityHook<T extends { id: string }>(
 
         // Apply order
         if (config.list?.orderBy) {
-          query = query.order(
-            config.list.orderBy.column as string,
-            { ascending: config.list.orderBy.ascending }
-          )
+          query = query.order(config.list.orderBy.column as string, {
+            ascending: config.list.orderBy.ascending,
+          })
         }
 
         const { data, count, error } = await query
@@ -407,12 +417,15 @@ export function createEntityHook<T extends { id: string }>(
   function useDictionary() {
     const { items, loading } = useListSlim()
 
-    const dictionary = (items || []).reduce((acc, item) => {
-      if (item.id) {
-        acc[item.id] = item
-      }
-      return acc
-    }, {} as Record<string, Partial<T>>)
+    const dictionary = (items || []).reduce(
+      (acc, item) => {
+        if (item.id) {
+          acc[item.id] = item
+        }
+        return acc
+      },
+      {} as Record<string, Partial<T>>
+    )
 
     return {
       dictionary,
@@ -659,14 +672,14 @@ function TourDetailDialog({ tourId }) {
 ```typescript
 // Before ❌
 const tourStore = useTourStore()
-const tour = tourStore.items.find(t => t.id === order.tour_id)  // O(n)
+const tour = tourStore.items.find(t => t.id === order.tour_id) // O(n)
 const tourName = tour?.name || ''
 
 // After ✅
 import { useTourDictionary } from '@/data'
 
 const { get } = useTourDictionary()
-const tourName = get(order.tour_id)?.name || ''  // O(1)
+const tourName = get(order.tour_id)?.name || '' // O(1)
 ```
 
 ### 5.4 CRUD 操作
@@ -692,11 +705,13 @@ await deleteTour(id)
 ## 六、遷移計畫
 
 ### Phase 1: 建立核心（1-2 天）
+
 - [ ] 建立 `src/data/core/createEntityHook.ts`
 - [ ] 建立型別定義
 - [ ] 建立 tours entity 作為範本
 
 ### Phase 2: 遷移主要 entities（2-3 天）
+
 - [ ] tours
 - [ ] orders
 - [ ] members
@@ -704,11 +719,13 @@ await deleteTour(id)
 - [ ] itineraries
 
 ### Phase 3: 遷移頁面（漸進式）
+
 - [ ] 從最常用的頁面開始
 - [ ] 保持舊 store 可用，逐步替換
 - [ ] 每個頁面獨立測試
 
 ### Phase 4: 清理（1 天）
+
 - [ ] 移除未使用的 store 方法
 - [ ] 移除舊的 fetchAll 呼叫
 - [ ] 更新文檔
@@ -717,16 +734,16 @@ await deleteTour(id)
 
 ## 七、效益
 
-| 指標 | Before | After |
-|------|--------|-------|
-| 程式碼一致性 | 各頁面各自實作 | 統一 factory |
-| 快取命中率 | ~0%（每次都 fetch）| ~80%+ |
-| 首次載入請求數 | 5-10 個（瀑布式）| 1-2 個（平行）|
-| 重複程式碼 | 大量 fetchAll | 0 |
-| ID→Name 查詢 | O(n) find | O(1) dictionary |
-| 維護難度 | 高（分散各處）| 低（集中管理）|
+| 指標           | Before              | After           |
+| -------------- | ------------------- | --------------- |
+| 程式碼一致性   | 各頁面各自實作      | 統一 factory    |
+| 快取命中率     | ~0%（每次都 fetch） | ~80%+           |
+| 首次載入請求數 | 5-10 個（瀑布式）   | 1-2 個（平行）  |
+| 重複程式碼     | 大量 fetchAll       | 0               |
+| ID→Name 查詢   | O(n) find           | O(1) dictionary |
+| 維護難度       | 高（分散各處）      | 低（集中管理）  |
 
 ---
 
-*文件建立日期：2026-01-12*
-*目標：一個媽媽生的統一架構*
+_文件建立日期：2026-01-12_
+_目標：一個媽媽生的統一架構_

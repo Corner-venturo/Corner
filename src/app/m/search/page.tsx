@@ -28,19 +28,32 @@ export default function MobileSearchPage() {
 
       {/* 搜尋提示 */}
       <div className="px-4 mt-4">
-        <h3 className="text-sm font-medium text-morandi-secondary mb-3">{SEARCH_LABELS.SEARCH_4837}</h3>
+        <h3 className="text-sm font-medium text-morandi-secondary mb-3">
+          {SEARCH_LABELS.SEARCH_4837}
+        </h3>
         <div className="space-y-2 text-sm text-morandi-secondary">
           <div className="flex items-start gap-2">
             <span className="text-morandi-gold">•</span>
-            <span>輸入團號如 <span className="text-morandi-primary font-medium">CNX250128A</span> {SEARCH_LABELS.LABEL_1787}</span>
+            <span>
+              輸入團號如 <span className="text-morandi-primary font-medium">CNX250128A</span>{' '}
+              {SEARCH_LABELS.LABEL_1787}
+            </span>
           </div>
           <div className="flex items-start gap-2">
             <span className="text-morandi-gold">•</span>
-            <span>輸入成員姓名如 <span className="text-morandi-primary font-medium">{SEARCH_LABELS.LABEL_4921}</span> {SEARCH_LABELS.SEARCH_4129}</span>
+            <span>
+              輸入成員姓名如{' '}
+              <span className="text-morandi-primary font-medium">{SEARCH_LABELS.LABEL_4921}</span>{' '}
+              {SEARCH_LABELS.SEARCH_4129}
+            </span>
           </div>
           <div className="flex items-start gap-2">
             <span className="text-morandi-gold">•</span>
-            <span>輸入目的地如 <span className="text-morandi-primary font-medium">{SEARCH_LABELS.LABEL_7261}</span> {SEARCH_LABELS.SEARCH_9017}</span>
+            <span>
+              輸入目的地如{' '}
+              <span className="text-morandi-primary font-medium">{SEARCH_LABELS.LABEL_7261}</span>{' '}
+              {SEARCH_LABELS.SEARCH_9017}
+            </span>
           </div>
           <div className="flex items-start gap-2">
             <span className="text-morandi-gold">•</span>

@@ -1,11 +1,7 @@
 'use client'
 
 import React, { useState, useCallback, useMemo } from 'react'
-import {
-  Edit2,
-  Trash2,
-  Archive,
-} from 'lucide-react'
+import { Edit2, Trash2, Archive } from 'lucide-react'
 import { useProposals, useProposalPackages } from '@/data'
 import { useAuthStore } from '@/stores'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
@@ -40,10 +36,7 @@ interface ProposalsTableContentProps {
 
 export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableContentProps) {
   const { user } = useAuthStore()
-  const {
-    items: proposals,
-    refresh: refreshProposals,
-  } = useProposals()
+  const { items: proposals, refresh: refreshProposals } = useProposals()
   const { items: allPackages, refresh: refreshPackages } = useProposalPackages()
 
   // 對話框狀態
@@ -109,12 +102,16 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
   const handleDeleteProposal = useCallback(
     async (proposal: Proposal) => {
       const packages = getProposalPackages(proposal.id)
-      const packageInfo = packages.length > 0 ? PROPOSAL_LABELS.table.deletePackageWarning(packages.length) : ''
+      const packageInfo =
+        packages.length > 0 ? PROPOSAL_LABELS.table.deletePackageWarning(packages.length) : ''
 
-      const confirmed = await confirm(`${PROPOSAL_LABELS.table.deleteConfirm(proposal.title)}${packageInfo}`, {
-        type: 'warning',
-        title: PROPOSAL_LABELS.table.deleteTitle,
-      })
+      const confirmed = await confirm(
+        `${PROPOSAL_LABELS.table.deleteConfirm(proposal.title)}${packageInfo}`,
+        {
+          type: 'warning',
+          title: PROPOSAL_LABELS.table.deleteTitle,
+        }
+      )
 
       if (confirmed) {
         try {
@@ -195,9 +192,7 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
         label: PROPOSAL_LABELS.table.departDateCol,
         sortable: true,
         width: '100px',
-        render: (_, proposal) => (
-          <DateCell date={proposal.expected_start_date} showIcon={false} />
-        ),
+        render: (_, proposal) => <DateCell date={proposal.expected_start_date} showIcon={false} />,
       },
       {
         key: 'destination',
@@ -271,7 +266,7 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
         data={filteredProposals}
         columns={columns}
         onRowClick={proposal => openDetailDialog(proposal)}
-        actions={(proposal) => renderActions(proposal)}
+        actions={proposal => renderActions(proposal)}
         actionsWidth="50%"
         bordered
         emptyMessage={PROPOSAL_LABELS.table.emptyMessage}
@@ -280,7 +275,7 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
       {/* 提案詳細對話框 */}
       <ProposalDetailDialog
         open={detailDialogOpen}
-        onOpenChange={(open) => {
+        onOpenChange={open => {
           setDetailDialogOpen(open)
           if (!open) setSelectedProposal(null)
         }}

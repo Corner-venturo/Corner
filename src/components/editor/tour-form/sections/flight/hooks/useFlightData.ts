@@ -48,7 +48,13 @@ export function useFlightData({ data, updateFlightField }: UseFlightDataProps) {
       airline: currentAirline,
       arrivalAirport: currentArrival,
     }
-  }, [data.outboundFlight?.airline, data.outboundFlight?.arrivalAirport, data.returnFlight?.airline, data.returnFlight?.departureAirport, updateFlightField])
+  }, [
+    data.outboundFlight?.airline,
+    data.outboundFlight?.arrivalAirport,
+    data.returnFlight?.airline,
+    data.returnFlight?.departureAirport,
+    updateFlightField,
+  ])
 
   // 自動計算行程天數（根據出發日期和回程日期）
   const tripDays = useMemo(() => {

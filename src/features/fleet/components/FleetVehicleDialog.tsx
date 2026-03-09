@@ -3,15 +3,25 @@
  * FleetVehicleDialog - 車輛新增/編輯對話框
  */
 
-
 import { VEHICLE_DIALOG_LABELS } from '../constants/labels'
 
 import React from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import type { FleetVehicleFormData, FleetDriver, VehicleType, VehicleStatus } from '@/types/fleet.types'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import type {
+  FleetVehicleFormData,
+  FleetDriver,
+  VehicleType,
+  VehicleStatus,
+} from '@/types/fleet.types'
 import { VEHICLE_TYPE_OPTIONS, VEHICLE_STATUS_OPTIONS } from '@/types/fleet.types'
 
 interface FleetVehicleDialogProps {
@@ -49,7 +59,9 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
       <div className="space-y-6">
         {/* 基本資訊 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{VEHICLE_DIALOG_LABELS.BASIC_INFO}</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">
+            {VEHICLE_DIALOG_LABELS.BASIC_INFO}
+          </h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary">
@@ -63,7 +75,9 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{VEHICLE_DIALOG_LABELS.VEHICLE_NAME}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {VEHICLE_DIALOG_LABELS.VEHICLE_NAME}
+              </label>
               <Input
                 value={formData.vehicle_name}
                 onChange={e => onFormFieldChange('vehicle_name', e.target.value)}
@@ -72,7 +86,9 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{VEHICLE_DIALOG_LABELS.VEHICLE_STATUS}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {VEHICLE_DIALOG_LABELS.VEHICLE_STATUS}
+              </label>
               <Select
                 value={formData.status}
                 onValueChange={value => onFormFieldChange('status', value as VehicleStatus)}
@@ -94,10 +110,14 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
 
         {/* 車輛規格 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{VEHICLE_DIALOG_LABELS.VEHICLE_SPECS}</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">
+            {VEHICLE_DIALOG_LABELS.VEHICLE_SPECS}
+          </h4>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{VEHICLE_DIALOG_LABELS.VEHICLE_TYPE}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {VEHICLE_DIALOG_LABELS.VEHICLE_TYPE}
+              </label>
               <Select
                 value={formData.vehicle_type}
                 onValueChange={value => onFormFieldChange('vehicle_type', value as VehicleType)}
@@ -115,7 +135,9 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{VEHICLE_DIALOG_LABELS.SEATS}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {VEHICLE_DIALOG_LABELS.SEATS}
+              </label>
               <Input
                 type="number"
                 value={formData.capacity}
@@ -127,7 +149,9 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{VEHICLE_DIALOG_LABELS.BRAND}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {VEHICLE_DIALOG_LABELS.BRAND}
+              </label>
               <Input
                 value={formData.brand}
                 onChange={e => onFormFieldChange('brand', e.target.value)}
@@ -136,7 +160,9 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{VEHICLE_DIALOG_LABELS.MODEL}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {VEHICLE_DIALOG_LABELS.MODEL}
+              </label>
               <Input
                 value={formData.model}
                 onChange={e => onFormFieldChange('model', e.target.value)}
@@ -145,11 +171,15 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{VEHICLE_DIALOG_LABELS.MANUFACTURE_YEAR}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {VEHICLE_DIALOG_LABELS.MANUFACTURE_YEAR}
+              </label>
               <Input
                 type="number"
                 value={formData.year || ''}
-                onChange={e => onFormFieldChange('year', e.target.value ? parseInt(e.target.value) : null)}
+                onChange={e =>
+                  onFormFieldChange('year', e.target.value ? parseInt(e.target.value) : null)
+                }
                 placeholder={VEHICLE_DIALOG_LABELS.EXAMPLE_1039}
                 className="mt-1"
                 min={1990}
@@ -157,7 +187,9 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{VEHICLE_DIALOG_LABELS.VIN}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {VEHICLE_DIALOG_LABELS.VIN}
+              </label>
               <Input
                 value={formData.vin}
                 onChange={e => onFormFieldChange('vin', e.target.value.toUpperCase())}
@@ -166,7 +198,9 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{VEHICLE_DIALOG_LABELS.CURRENT_MILEAGE}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {VEHICLE_DIALOG_LABELS.CURRENT_MILEAGE}
+              </label>
               <Input
                 type="number"
                 value={formData.current_mileage}
@@ -181,10 +215,14 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
 
         {/* 重要日期 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{VEHICLE_DIALOG_LABELS.IMPORTANT_DATES}</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">
+            {VEHICLE_DIALOG_LABELS.IMPORTANT_DATES}
+          </h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{VEHICLE_DIALOG_LABELS.REGISTRATION_DATE}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {VEHICLE_DIALOG_LABELS.REGISTRATION_DATE}
+              </label>
               <Input
                 type="date"
                 value={formData.registration_date}
@@ -193,7 +231,9 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{VEHICLE_DIALOG_LABELS.INSPECTION_EXPIRY}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {VEHICLE_DIALOG_LABELS.INSPECTION_EXPIRY}
+              </label>
               <Input
                 type="date"
                 value={formData.inspection_due_date}
@@ -202,7 +242,9 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{VEHICLE_DIALOG_LABELS.INSURANCE_EXPIRY}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {VEHICLE_DIALOG_LABELS.INSURANCE_EXPIRY}
+              </label>
               <Input
                 type="date"
                 value={formData.insurance_due_date}
@@ -211,7 +253,9 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{VEHICLE_DIALOG_LABELS.LABEL_9755}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {VEHICLE_DIALOG_LABELS.LABEL_9755}
+              </label>
               <Input
                 type="date"
                 value={formData.next_maintenance_date}
@@ -220,11 +264,18 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{VEHICLE_DIALOG_LABELS.LABEL_974}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {VEHICLE_DIALOG_LABELS.LABEL_974}
+              </label>
               <Input
                 type="number"
                 value={formData.next_maintenance_km || ''}
-                onChange={e => onFormFieldChange('next_maintenance_km', e.target.value ? parseInt(e.target.value) : null)}
+                onChange={e =>
+                  onFormFieldChange(
+                    'next_maintenance_km',
+                    e.target.value ? parseInt(e.target.value) : null
+                  )
+                }
                 placeholder={VEHICLE_DIALOG_LABELS.LABEL_5555}
                 className="mt-1"
                 min={0}
@@ -235,7 +286,9 @@ export const FleetVehicleDialog: React.FC<FleetVehicleDialogProps> = ({
 
         {/* 備註 */}
         <div>
-          <label className="text-sm font-medium text-morandi-primary">{VEHICLE_DIALOG_LABELS.REMARKS}</label>
+          <label className="text-sm font-medium text-morandi-primary">
+            {VEHICLE_DIALOG_LABELS.REMARKS}
+          </label>
           <Textarea
             value={formData.notes}
             onChange={e => onFormFieldChange('notes', e.target.value)}

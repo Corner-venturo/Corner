@@ -20,8 +20,18 @@ interface NewItemData {
 }
 
 interface ManualFlightData {
-  outbound: { airline: string; flightNumber: string; departureAirport: string; arrivalAirport: string }
-  return: { airline: string; flightNumber: string; departureAirport: string; arrivalAirport: string }
+  outbound: {
+    airline: string
+    flightNumber: string
+    departureAirport: string
+    arrivalAirport: string
+  }
+  return: {
+    airline: string
+    flightNumber: string
+    departureAirport: string
+    arrivalAirport: string
+  }
 }
 
 interface InlineAddRowProps {
@@ -70,7 +80,7 @@ function TransportAddRow({
       <td className="px-3 py-2 border-r border-border/30">
         <select
           value={transportSubType || ''}
-          onChange={(e) => onSelectTransportType(e.target.value as TransportSubType)}
+          onChange={e => onSelectTransportType(e.target.value as TransportSubType)}
           className="text-sm bg-transparent border-0 outline-none cursor-pointer -ml-1"
           style={{
             WebkitAppearance: 'none',
@@ -78,7 +88,7 @@ function TransportAddRow({
             appearance: 'none',
             paddingRight: '16px',
             backgroundImage:
-              'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%238b8680\' stroke-width=\'2\'%3E%3Cpath d=\'m6 9 6 6 6-6\'/%3E%3C/svg%3E")',
+              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b8680' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")",
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'right center',
           }}
@@ -94,10 +104,7 @@ function TransportAddRow({
         <>
           <td colSpan={8} className="px-3 py-2"></td>
           <td className="px-2 py-2 text-right">
-            <button
-              onClick={onCancelAdd}
-              className="text-morandi-red hover:underline text-xs"
-            >
+            <button onClick={onCancelAdd} className="text-morandi-red hover:underline text-xs">
               {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.取消}
             </button>
           </td>
@@ -161,8 +168,12 @@ function FlightAddContent({
   onSetManualFlight: React.Dispatch<React.SetStateAction<ManualFlightData>>
   onCancel: () => void
 }) {
-  const outboundFlight = Array.isArray(tour.outbound_flight) ? tour.outbound_flight[0] : tour.outbound_flight
-  const returnFlight = Array.isArray(tour.return_flight) ? tour.return_flight[0] : tour.return_flight
+  const outboundFlight = Array.isArray(tour.outbound_flight)
+    ? tour.outbound_flight[0]
+    : tour.outbound_flight
+  const returnFlight = Array.isArray(tour.return_flight)
+    ? tour.return_flight[0]
+    : tour.return_flight
 
   if (outboundFlight || returnFlight) {
     return (
@@ -170,20 +181,16 @@ function FlightAddContent({
         <div className="text-sm space-x-4">
           {outboundFlight && (
             <span>
-              <span className="text-morandi-green">
-                {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.去程}
-              </span>{' '}
+              <span className="text-morandi-green">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.去程}</span>{' '}
               {outboundFlight.airline} {outboundFlight.flightNumber}{' '}
               {outboundFlight.departureAirport}→{outboundFlight.arrivalAirport}
             </span>
           )}
           {returnFlight && (
             <span>
-              <span className="text-morandi-gold">
-                {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.回程}
-              </span>{' '}
-              {returnFlight.airline} {returnFlight.flightNumber}{' '}
-              {returnFlight.departureAirport}→{returnFlight.arrivalAirport}
+              <span className="text-morandi-gold">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.回程}</span>{' '}
+              {returnFlight.airline} {returnFlight.flightNumber} {returnFlight.departureAirport}→
+              {returnFlight.arrivalAirport}
             </span>
           )}
         </div>
@@ -204,7 +211,7 @@ function FlightAddContent({
   if (manualFlightMode) {
     return (
       <div className="space-y-2">
-        {(['outbound', 'return'] as const).map((direction) => (
+        {(['outbound', 'return'] as const).map(direction => (
           <div key={direction} className="flex items-center gap-2 text-sm">
             <span
               className={`font-medium w-10 ${
@@ -218,8 +225,8 @@ function FlightAddContent({
             <input
               placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.航空}
               value={manualFlight[direction].airline}
-              onChange={(e) =>
-                onSetManualFlight((prev) => ({
+              onChange={e =>
+                onSetManualFlight(prev => ({
                   ...prev,
                   [direction]: { ...prev[direction], airline: e.target.value },
                 }))
@@ -229,8 +236,8 @@ function FlightAddContent({
             <input
               placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.航班}
               value={manualFlight[direction].flightNumber}
-              onChange={(e) =>
-                onSetManualFlight((prev) => ({
+              onChange={e =>
+                onSetManualFlight(prev => ({
                   ...prev,
                   [direction]: { ...prev[direction], flightNumber: e.target.value },
                 }))
@@ -240,8 +247,8 @@ function FlightAddContent({
             <input
               placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.起飛}
               value={manualFlight[direction].departureAirport}
-              onChange={(e) =>
-                onSetManualFlight((prev) => ({
+              onChange={e =>
+                onSetManualFlight(prev => ({
                   ...prev,
                   [direction]: { ...prev[direction], departureAirport: e.target.value },
                 }))
@@ -252,8 +259,8 @@ function FlightAddContent({
             <input
               placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.抵達}
               value={manualFlight[direction].arrivalAirport}
-              onChange={(e) =>
-                onSetManualFlight((prev) => ({
+              onChange={e =>
+                onSetManualFlight(prev => ({
                   ...prev,
                   [direction]: { ...prev[direction], arrivalAirport: e.target.value },
                 }))
@@ -324,14 +331,14 @@ function VehicleAddCells({
         <div className="flex items-center gap-1">
           <DatePicker
             value={newItemData.service_date}
-            onChange={(date) => onNewItemChange('service_date', date)}
+            onChange={date => onNewItemChange('service_date', date)}
             placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.開始}
             buttonClassName="h-8 text-xs border-0 shadow-none"
           />
           <span className="text-morandi-secondary text-xs">~</span>
           <DatePicker
             value={newItemData.service_date_end}
-            onChange={(date) => onNewItemChange('service_date_end', date)}
+            onChange={date => onNewItemChange('service_date_end', date)}
             placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.結束_選填}
             buttonClassName="h-8 text-xs border-0 shadow-none"
             clearable
@@ -341,7 +348,7 @@ function VehicleAddCells({
       <td className="p-0 border-r border-border/30" style={{ maxWidth: '100px' }}>
         <input
           value={newItemData.supplier_name}
-          onChange={(e) => onNewItemChange('supplier_name', e.target.value)}
+          onChange={e => onNewItemChange('supplier_name', e.target.value)}
           placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.車行}
           className="w-full h-full px-2 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
         />
@@ -349,7 +356,7 @@ function VehicleAddCells({
       <td className="p-0 border-r border-border/30">
         <input
           value={newItemData.title}
-          onChange={(e) => onNewItemChange('title', e.target.value)}
+          onChange={e => onNewItemChange('title', e.target.value)}
           placeholder={
             newItemData.service_date_end
               ? TOUR_CONFIRMATION_SHEET_PAGE_LABELS.全程用車
@@ -399,14 +406,14 @@ function GenericAddRow({
           ref={firstInputRef}
           type="date"
           value={newItemData.service_date}
-          onChange={(e) => onNewItemChange('service_date', e.target.value)}
+          onChange={e => onNewItemChange('service_date', e.target.value)}
           className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50"
         />
       </td>
       <td className="p-0 border-r border-border/30">
         <input
           value={newItemData.supplier_name}
-          onChange={(e) => onNewItemChange('supplier_name', e.target.value)}
+          onChange={e => onNewItemChange('supplier_name', e.target.value)}
           placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.輸入供應商}
           className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
         />
@@ -414,7 +421,7 @@ function GenericAddRow({
       <td className="p-0 border-r border-border/30">
         <input
           value={newItemData.title}
-          onChange={(e) => onNewItemChange('title', e.target.value)}
+          onChange={e => onNewItemChange('title', e.target.value)}
           placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.輸入項目說明}
           className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
         />
@@ -455,7 +462,7 @@ function InlineNumericCells({
         <input
           type="number"
           value={newItemData.unit_price}
-          onChange={(e) => onNewItemChange('unit_price', e.target.value)}
+          onChange={e => onNewItemChange('unit_price', e.target.value)}
           placeholder="0"
           className={`${inputClass} text-right font-mono`}
         />
@@ -464,7 +471,7 @@ function InlineNumericCells({
         <input
           type="number"
           value={newItemData.quantity}
-          onChange={(e) => onNewItemChange('quantity', e.target.value)}
+          onChange={e => onNewItemChange('quantity', e.target.value)}
           placeholder="0"
           className={`${inputClass} text-center`}
         />
@@ -473,7 +480,7 @@ function InlineNumericCells({
         <input
           type="number"
           value={newItemData.expected_cost}
-          onChange={(e) => onNewItemChange('expected_cost', e.target.value)}
+          onChange={e => onNewItemChange('expected_cost', e.target.value)}
           placeholder="0"
           className={`${inputClass} text-right font-mono`}
         />
@@ -482,7 +489,7 @@ function InlineNumericCells({
         <input
           type="number"
           value={newItemData.actual_cost}
-          onChange={(e) => onNewItemChange('actual_cost', e.target.value)}
+          onChange={e => onNewItemChange('actual_cost', e.target.value)}
           placeholder="0"
           className={`${inputClass} text-right font-mono`}
         />
@@ -490,7 +497,7 @@ function InlineNumericCells({
       <td className="p-0 border-r border-border/30">
         <input
           value={newItemData.notes}
-          onChange={(e) => onNewItemChange('notes', e.target.value)}
+          onChange={e => onNewItemChange('notes', e.target.value)}
           placeholder={TOUR_CONFIRMATION_SHEET_PAGE_LABELS.備註}
           className={inputClass}
         />

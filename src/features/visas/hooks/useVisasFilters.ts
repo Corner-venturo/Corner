@@ -8,23 +8,26 @@ import type { Visa, VisaStatus } from '@/stores/types'
  * 第一筆勾選的狀態決定可以一起勾選哪些狀態
  */
 const SELECTION_COMPATIBILITY: Record<VisaStatus, VisaStatus[]> = {
-  pending: ['pending', 'rejected'],      // 待送件可勾：待送件、退件
-  submitted: ['submitted'],               // 已送件可勾：已送件
-  collected: ['collected', 'rejected'],   // 已取件可勾：已取件、退件
+  pending: ['pending', 'rejected'], // 待送件可勾：待送件、退件
+  submitted: ['submitted'], // 已送件可勾：已送件
+  collected: ['collected', 'rejected'], // 已取件可勾：已取件、退件
   rejected: ['rejected', 'pending', 'collected'], // 退件可勾：退件、待送件、已取件
-  returned: [],                           // 已歸還：不能勾選
+  returned: [], // 已歸還：不能勾選
 }
 
 /**
  * 按鈕可用性規則
  * 根據已勾選的狀態，決定哪些按鈕可以按
  */
-export const BUTTON_AVAILABILITY: Record<VisaStatus, {
-  submit: boolean   // 送件
-  pickup: boolean   // 取件
-  return: boolean   // 歸還
-  reject: boolean   // 退件
-}> = {
+export const BUTTON_AVAILABILITY: Record<
+  VisaStatus,
+  {
+    submit: boolean // 送件
+    pickup: boolean // 取件
+    return: boolean // 歸還
+    reject: boolean // 退件
+  }
+> = {
   pending: { submit: true, pickup: false, return: false, reject: true },
   submitted: { submit: true, pickup: true, return: false, reject: true },
   collected: { submit: true, pickup: false, return: true, reject: true },
@@ -85,40 +88,46 @@ export function useVisasFilters(visas: Visa[]) {
   }, [selectedStatuses])
 
   // 判斷某個簽證是否可以被勾選
-  const canSelectVisa = useCallback((visaId: string): boolean => {
-    // 已歸還的不能勾選
-    const visa = visas.find(v => v.id === visaId)
-    if (!visa || visa.status === 'returned') return false
+  const canSelectVisa = useCallback(
+    (visaId: string): boolean => {
+      // 已歸還的不能勾選
+      const visa = visas.find(v => v.id === visaId)
+      if (!visa || visa.status === 'returned') return false
 
-    // 如果沒有選擇任何項目，可以勾選
-    if (!firstSelectedStatus) return true
+      // 如果沒有選擇任何項目，可以勾選
+      if (!firstSelectedStatus) return true
 
-    // 檢查是否在相容列表中
-    const compatibleStatuses = SELECTION_COMPATIBILITY[firstSelectedStatus]
-    return compatibleStatuses.includes(visa.status as VisaStatus)
-  }, [visas, firstSelectedStatus])
+      // 檢查是否在相容列表中
+      const compatibleStatuses = SELECTION_COMPATIBILITY[firstSelectedStatus]
+      return compatibleStatuses.includes(visa.status as VisaStatus)
+    },
+    [visas, firstSelectedStatus]
+  )
 
   // 包裝 setSelectedRows，加入相容性檢查
-  const handleSelectionChange = useCallback((newSelection: string[]) => {
-    // 如果清空選擇，直接設定
-    if (newSelection.length === 0) {
-      setSelectedRows([])
-      return
-    }
+  const handleSelectionChange = useCallback(
+    (newSelection: string[]) => {
+      // 如果清空選擇，直接設定
+      if (newSelection.length === 0) {
+        setSelectedRows([])
+        return
+      }
 
-    // 如果是第一次選擇，直接設定
-    if (selectedRows.length === 0) {
-      // 檢查是否為已歸還（不能選）
-      const visa = visas.find(v => v.id === newSelection[0])
-      if (visa?.status === 'returned') return
-      setSelectedRows(newSelection)
-      return
-    }
+      // 如果是第一次選擇，直接設定
+      if (selectedRows.length === 0) {
+        // 檢查是否為已歸還（不能選）
+        const visa = visas.find(v => v.id === newSelection[0])
+        if (visa?.status === 'returned') return
+        setSelectedRows(newSelection)
+        return
+      }
 
-    // 過濾掉不相容的選擇
-    const validSelection = newSelection.filter(id => canSelectVisa(id))
-    setSelectedRows(validSelection)
-  }, [selectedRows, visas, canSelectVisa])
+      // 過濾掉不相容的選擇
+      const validSelection = newSelection.filter(id => canSelectVisa(id))
+      setSelectedRows(validSelection)
+    },
+    [selectedRows, visas, canSelectVisa]
+  )
 
   return {
     activeTab,

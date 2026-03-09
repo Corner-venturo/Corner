@@ -60,7 +60,7 @@ export function TodoCard({ todo, onToggle, onClick, className }: TodoCardProps) 
       <div className="flex items-start gap-3">
         {/* 勾選按鈕 */}
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation()
             onToggle?.()
           }}
@@ -76,12 +76,7 @@ export function TodoCard({ todo, onToggle, onClick, className }: TodoCardProps) 
         <div className="flex-1 min-w-0">
           {/* 標題 + 優先級 */}
           <div className="flex items-start gap-2 mb-1">
-            <span
-              className={cn(
-                'font-medium text-morandi-primary',
-                isCompleted && 'line-through'
-              )}
-            >
+            <span className={cn('font-medium text-morandi-primary', isCompleted && 'line-through')}>
               {todo.title}
             </span>
             {todo.priority === 'urgent' || todo.priority === 'high' ? (
@@ -93,9 +88,7 @@ export function TodoCard({ todo, onToggle, onClick, className }: TodoCardProps) 
 
           {/* 描述 */}
           {todo.description && (
-            <p className="text-sm text-morandi-secondary mb-2 line-clamp-2">
-              {todo.description}
-            </p>
+            <p className="text-sm text-morandi-secondary mb-2 line-clamp-2">{todo.description}</p>
           )}
 
           {/* 標籤：團號、截止日、指派人 */}
@@ -107,12 +100,7 @@ export function TodoCard({ todo, onToggle, onClick, className }: TodoCardProps) 
               </div>
             )}
             {dueInfo && (
-              <div
-                className={cn(
-                  'flex items-center gap-1',
-                  dueInfo.isOverdue && 'text-red-600'
-                )}
-              >
+              <div className={cn('flex items-center gap-1', dueInfo.isOverdue && 'text-red-600')}>
                 {dueInfo.isOverdue ? <AlertCircle size={12} /> : <Clock size={12} />}
                 <span>{dueInfo.text}</span>
               </div>

@@ -36,7 +36,9 @@ export default function Error({
           <div className="rounded-lg bg-card border border-border p-4 text-left">
             <p className="text-sm font-mono text-destructive break-words">{error.message}</p>
             {error.digest && (
-              <p className="text-xs text-muted-foreground mt-2">{L.ERROR_ID}: {error.digest}</p>
+              <p className="text-xs text-muted-foreground mt-2">
+                {L.ERROR_ID}: {error.digest}
+              </p>
             )}
           </div>
         )}

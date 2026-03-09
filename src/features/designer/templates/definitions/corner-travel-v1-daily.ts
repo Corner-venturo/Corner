@@ -6,7 +6,12 @@
  * - 右頁：Day N+1 行程 + 景點介紹 + 圖片
  */
 import type { PageTemplate, TemplateData, DailyDetailData } from './types'
-import type { CanvasElement, TextElement, ShapeElement, ImageElement } from '@/features/designer/components/types'
+import type {
+  CanvasElement,
+  TextElement,
+  ShapeElement,
+  ImageElement,
+} from '@/features/designer/components/types'
 
 // A5 尺寸
 const A5_WIDTH = 559
@@ -310,7 +315,9 @@ export const cornerTravelV1DailyLeft: PageTemplate = {
       opacity: 1,
       locked: false,
       visible: true,
-      content: data.cityDescription || '作為日本的政治、經濟與文化中心，東京是一座將傳統與現代完美融合的國際大都會。這座從江戶時代演變而來的城市，在明治維新後改名東京，逐步發展成為世界級的超大型都市圈。',
+      content:
+        data.cityDescription ||
+        '作為日本的政治、經濟與文化中心，東京是一座將傳統與現代完美融合的國際大都會。這座從江戶時代演變而來的城市，在明治維新後改名東京，逐步發展成為世界級的超大型都市圈。',
       style: {
         fontFamily: 'Noto Sans TC',
         fontSize: 9,
@@ -389,7 +396,7 @@ export const cornerTravelV1DailyLeft: PageTemplate = {
       opacity: 1,
       locked: false,
       visible: true,
-      content: String((dayNumber * 2) + 1).padStart(2, '0'),
+      content: String(dayNumber * 2 + 1).padStart(2, '0'),
       style: {
         fontFamily: 'Noto Sans TC',
         fontSize: 8,
@@ -592,7 +599,9 @@ export const cornerTravelV1DailyRight: PageTemplate = {
       opacity: 1,
       locked: false,
       visible: true,
-      content: data.attractionDescription || '標高3,776公尺的富士山是日本最高峰，也是最具代表性的自然地標。這座休眠火山以其完美的圓錐形山體聞名於世，四季呈現不同風貌，無論遠觀近賞都令人震撼。',
+      content:
+        data.attractionDescription ||
+        '標高3,776公尺的富士山是日本最高峰，也是最具代表性的自然地標。這座休眠火山以其完美的圓錐形山體聞名於世，四季呈現不同風貌，無論遠觀近賞都令人震撼。',
       style: {
         fontFamily: 'Noto Sans TC',
         fontSize: 9,
@@ -698,7 +707,7 @@ export const cornerTravelV1DailyRight: PageTemplate = {
       opacity: 1,
       locked: false,
       visible: true,
-      content: String((dayNumber * 2) + 2).padStart(2, '0'),
+      content: String(dayNumber * 2 + 2).padStart(2, '0'),
       style: {
         fontFamily: 'Noto Sans TC',
         fontSize: 8,

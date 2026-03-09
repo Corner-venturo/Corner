@@ -132,7 +132,16 @@ export async function POST(req: NextRequest) {
 
     const validation = await validateBody(req, createLinkPayRequestSchema)
     if (!validation.success) return validation.error
-    const { receipt_number, user_name, email, payment_name, create_user, amount, end_date, gender } = validation.data
+    const {
+      receipt_number,
+      user_name,
+      email,
+      payment_name,
+      create_user,
+      amount,
+      end_date,
+      gender,
+    } = validation.data
 
     const supabase = getSupabaseAdminClient()
 
@@ -150,7 +159,8 @@ export async function POST(req: NextRequest) {
 
     // 組裝付款名稱
     const tourName = (receipt.tours as { name?: string } | null)?.name || receipt.tour_name || ''
-    const finalPaymentName = payment_name || `${removePunctuations(tourName)} ${receipt.receipt_account || ''}`
+    const finalPaymentName =
+      payment_name || `${removePunctuations(tourName)} ${receipt.receipt_account || ''}`
 
     // 生成唯一訂單號（移除 - 和 _ 以符合銀聯卡規範）
     const timestamp = Date.now()
@@ -200,9 +210,7 @@ export async function POST(req: NextRequest) {
       updated_by: create_user || null,
     }
 
-    const { error: logError } = await supabase
-      .from('linkpay_logs')
-      .insert(logData)
+    const { error: logError } = await supabase.from('linkpay_logs').insert(logData)
 
     if (logError) {
       logger.error('建立 LinkPay 記錄失敗:', logError)
@@ -258,7 +266,11 @@ export async function POST(req: NextRequest) {
           end_date: end_date,
         })
       } else {
-        return errorResponse(ret_msg || '產生付款連結失敗，請稍候再嘗試。', 400, ErrorCode.EXTERNAL_API_ERROR)
+        return errorResponse(
+          ret_msg || '產生付款連結失敗，請稍候再嘗試。',
+          400,
+          ErrorCode.EXTERNAL_API_ERROR
+        )
       }
     } catch (apiError) {
       logger.error('台新 API 呼叫失敗:', apiError)

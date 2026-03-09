@@ -6,11 +6,14 @@
 
 const { createClient } = require('@supabase/supabase-js')
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://pfqvdacxowpgfamuvnsn.supabase.co'
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyNjU3MzUxMCwiZXhwIjoyMDQyMTQ5NTEwfQ.Dk-bnafBmET0TWFWzpS7wGLq7W4e-TQ1m4Zma3Hn67s'
+const supabaseUrl =
+  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://pfqvdacxowpgfamuvnsn.supabase.co'
+const supabaseServiceKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyNjU3MzUxMCwiZXhwIjoyMDQyMTQ5NTEwfQ.Dk-bnafBmET0TWFWzpS7wGLq7W4e-TQ1m4Zma3Hn67s'
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: { autoRefreshToken: false, persistSession: false }
+  auth: { autoRefreshToken: false, persistSession: false },
 })
 
 async function executeSql(sql, description) {
@@ -19,10 +22,14 @@ async function executeSql(sql, description) {
     const { data, error } = await supabase.rpc('exec_sql', { sql_query: sql })
     if (error) {
       // 嘗試直接執行（某些 SQL 不支援 rpc）
-      const { error: directError } = await supabase.from('_').select('*').limit(0).then(() => {
-        // 這裡用 raw query
-        return { error: null }
-      })
+      const { error: directError } = await supabase
+        .from('_')
+        .select('*')
+        .limit(0)
+        .then(() => {
+          // 這裡用 raw query
+          return { error: null }
+        })
       if (directError) {
         console.log(`⚠️  無法執行: ${error.message}`)
         console.log(`   嘗試使用替代方案...`)

@@ -9,18 +9,18 @@
 export type FolderType = 'root' | 'tour' | 'customer' | 'supplier' | 'template' | 'custom'
 
 export type FileCategory =
-  | 'contract'       // 合約
-  | 'quote'          // 報價單
-  | 'itinerary'      // 行程表
-  | 'passport'       // 護照
-  | 'visa'           // 簽證
-  | 'ticket'         // 機票/車票
-  | 'voucher'        // 訂房確認/憑證
-  | 'invoice'        // 發票/收據
-  | 'insurance'      // 保險
-  | 'photo'          // 照片
+  | 'contract' // 合約
+  | 'quote' // 報價單
+  | 'itinerary' // 行程表
+  | 'passport' // 護照
+  | 'visa' // 簽證
+  | 'ticket' // 機票/車票
+  | 'voucher' // 訂房確認/憑證
+  | 'invoice' // 發票/收據
+  | 'insurance' // 保險
+  | 'photo' // 照片
   | 'email_attachment' // 郵件附件
-  | 'other'          // 其他
+  | 'other' // 其他
 
 export type FileSource = 'upload' | 'email' | 'scan' | 'import'
 
@@ -234,7 +234,10 @@ export interface FileSystemState {
 // 分類顯示資訊
 // ============================================================================
 
-export const FILE_CATEGORY_INFO: Record<FileCategory, { label: string; icon: string; color: string }> = {
+export const FILE_CATEGORY_INFO: Record<
+  FileCategory,
+  { label: string; icon: string; color: string }
+> = {
   contract: { label: '合約', icon: 'FileSignature', color: '#8B5CF6' },
   quote: { label: '報價單', icon: 'FileText', color: '#3B82F6' },
   itinerary: { label: '行程表', icon: 'Map', color: '#10B981' },

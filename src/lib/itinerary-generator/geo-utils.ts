@@ -15,12 +15,7 @@ import { DEFAULT_SCHEDULING_CONFIG } from './types'
  * @param lon2 經度2
  * @returns 距離（公里）
  */
-export function calculateDistance(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-): number {
+export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371 // 地球半徑（公里）
   const dLat = ((lat2 - lat1) * Math.PI) / 180
   const dLon = ((lon2 - lon1) * Math.PI) / 180
@@ -135,9 +130,7 @@ export function filterNearbyAttractions(
   }
 
   // 按距離排序
-  return nearby.sort((a, b) =>
-    (a.distanceFromPrevious || 0) - (b.distanceFromPrevious || 0)
-  )
+  return nearby.sort((a, b) => (a.distanceFromPrevious || 0) - (b.distanceFromPrevious || 0))
 }
 
 /**
@@ -205,12 +198,7 @@ export function calculateTotalDistance(attractions: Attraction[]): number {
     const curr = attractions[i]
 
     if (prev.latitude && prev.longitude && curr.latitude && curr.longitude) {
-      total += calculateDistance(
-        prev.latitude,
-        prev.longitude,
-        curr.latitude,
-        curr.longitude
-      )
+      total += calculateDistance(prev.latitude, prev.longitude, curr.latitude, curr.longitude)
     }
   }
 

@@ -57,9 +57,7 @@ export function usePublish({
     if (!data.id) return null
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
     const tourCode = linkedTourCode || data.tourCode
-    return tourCode
-      ? `${baseUrl}/view/${tourCode}`
-      : `${baseUrl}/view/${data.id}`
+    return tourCode ? `${baseUrl}/view/${tourCode}` : `${baseUrl}/view/${data.id}`
   }, [data.id, data.tourCode, linkedTourCode])
 
   // 轉換資料格式（camelCase → snake_case）
@@ -228,7 +226,10 @@ export function usePublish({
       onVersionChange(updatedRecords.length - 1, newVersion)
     } catch (error) {
       logger.error('另存新版本失敗:', error)
-      await alert('另存新版本失敗：' + (error instanceof Error ? error.message : '未知錯誤'), 'error')
+      await alert(
+        '另存新版本失敗：' + (error instanceof Error ? error.message : '未知錯誤'),
+        'error'
+      )
     } finally {
       setSaving(false)
     }

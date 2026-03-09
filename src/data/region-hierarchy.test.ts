@@ -149,14 +149,24 @@ describe('formatRegionDisplay', () => {
 describe('getRegionDisplayName', () => {
   it('should include country and city', () => {
     const result = getRegionDisplayName({
-      country: 'japan', countryName: '日本', city: 'tokyo', cityName: '東京', order: 1,
+      country: 'japan',
+      countryName: '日本',
+      city: 'tokyo',
+      cityName: '東京',
+      order: 1,
     })
     expect(result).toBe('日本 / 東京')
   })
 
   it('should include region when present', () => {
     const result = getRegionDisplayName({
-      country: 'japan', countryName: '日本', region: 'kanto', regionName: '關東', city: 'tokyo', cityName: '東京', order: 1,
+      country: 'japan',
+      countryName: '日本',
+      region: 'kanto',
+      regionName: '關東',
+      city: 'tokyo',
+      cityName: '東京',
+      order: 1,
     })
     expect(result).toBe('日本 / 關東 / 東京')
   })

@@ -8,7 +8,11 @@ interface MembersPrintOptions {
   columns: ExportColumnsConfig
 }
 
-export function generateMembersPrintContent({ tour, members, columns }: MembersPrintOptions): string {
+export function generateMembersPrintContent({
+  tour,
+  members,
+  columns,
+}: MembersPrintOptions): string {
   const selectedColumns = Object.entries(columns)
     .filter(([, selected]) => selected)
     .map(([key]) => key as keyof ExportColumnsConfig)
@@ -16,22 +20,48 @@ export function generateMembersPrintContent({ tour, members, columns }: MembersP
   const tableRows = members
     .map((member, index) => {
       const cells = selectedColumns
-        .map((col) => {
+        .map(col => {
           let value = ''
           switch (col) {
-            case 'identity': value = member.identity || ''; break
-            case 'chinese_name': value = member.chinese_name || ''; break
-            case 'passport_name': value = member.passport_name || ''; break
-            case 'birth_date': value = member.birth_date || ''; break
-            case 'gender': value = member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : ''; break
-            case 'id_number': value = member.id_number || ''; break
-            case 'passport_number': value = member.passport_number || ''; break
-            case 'passport_expiry': value = member.passport_expiry || ''; break
-            case 'special_meal': value = member.special_meal || ''; break
-            case 'total_payable': value = member.total_payable?.toLocaleString() || ''; break
-            case 'deposit_amount': value = member.deposit_amount?.toLocaleString() || ''; break
-            case 'balance': value = member.balance_amount?.toLocaleString() || ''; break
-            case 'remarks': value = member.remarks || ''; break
+            case 'identity':
+              value = member.identity || ''
+              break
+            case 'chinese_name':
+              value = member.chinese_name || ''
+              break
+            case 'passport_name':
+              value = member.passport_name || ''
+              break
+            case 'birth_date':
+              value = member.birth_date || ''
+              break
+            case 'gender':
+              value = member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : ''
+              break
+            case 'id_number':
+              value = member.id_number || ''
+              break
+            case 'passport_number':
+              value = member.passport_number || ''
+              break
+            case 'passport_expiry':
+              value = member.passport_expiry || ''
+              break
+            case 'special_meal':
+              value = member.special_meal || ''
+              break
+            case 'total_payable':
+              value = member.total_payable?.toLocaleString() || ''
+              break
+            case 'deposit_amount':
+              value = member.deposit_amount?.toLocaleString() || ''
+              break
+            case 'balance':
+              value = member.balance_amount?.toLocaleString() || ''
+              break
+            case 'remarks':
+              value = member.remarks || ''
+              break
           }
           return `<td style="border: 1px solid #ddd; padding: 8px;">${value}</td>`
         })
@@ -42,7 +72,10 @@ export function generateMembersPrintContent({ tour, members, columns }: MembersP
     .join('')
 
   const headerCells = selectedColumns
-    .map((col) => `<th style="border: 1px solid #ddd; padding: 8px; background: #f5f5f5;">${COLUMN_LABELS[col]}</th>`)
+    .map(
+      col =>
+        `<th style="border: 1px solid #ddd; padding: 8px; background: #f5f5f5;">${COLUMN_LABELS[col]}</th>`
+    )
     .join('')
 
   return `

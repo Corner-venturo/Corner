@@ -9,9 +9,9 @@ import { UI_LABELS } from './constants/labels'
 
 // 圖片位置設定的型別
 export interface ImagePositionSettings {
-  x: number      // 水平位置 0-100 (百分比，50 = 置中)
-  y: number      // 垂直位置 0-100 (百分比，50 = 置中)
-  scale: number  // 縮放比例 1-3 (1 = 原始大小)
+  x: number // 水平位置 0-100 (百分比，50 = 置中)
+  y: number // 垂直位置 0-100 (百分比，50 = 置中)
+  scale: number // 縮放比例 1-3 (1 = 原始大小)
 }
 
 // 預設值
@@ -22,7 +22,9 @@ export const defaultImagePosition: ImagePositionSettings = {
 }
 
 // 將設定轉換為 CSS style
-export function getImagePositionStyle(settings?: ImagePositionSettings | string | null): React.CSSProperties {
+export function getImagePositionStyle(
+  settings?: ImagePositionSettings | string | null
+): React.CSSProperties {
   // 相容舊格式 (字串如 'center', 'top', 'center 30%')
   if (!settings) {
     return { objectFit: 'cover', objectPosition: 'center' }
@@ -57,7 +59,9 @@ export function getImagePositionStyle(settings?: ImagePositionSettings | string 
 }
 
 // 解析舊格式字串為新格式
-export function parseImagePosition(value?: string | ImagePositionSettings | null): ImagePositionSettings {
+export function parseImagePosition(
+  value?: string | ImagePositionSettings | null
+): ImagePositionSettings {
   if (!value) return { ...defaultImagePosition }
 
   if (typeof value === 'object') {
@@ -102,7 +106,7 @@ interface ImagePositionEditorProps {
   imageSrc: string
   currentPosition?: ImagePositionSettings | string | null
   onConfirm: (settings: ImagePositionSettings) => void
-  aspectRatio?: number  // 預覽框的比例，預設 16/9
+  aspectRatio?: number // 預覽框的比例，預設 16/9
   title?: string
 }
 
@@ -138,38 +142,44 @@ export function ImagePositionEditor({
   }, [position, onConfirm, onClose])
 
   // 拖曳開始
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault()
-    setIsDragging(true)
-    dragStartRef.current = {
-      x: e.clientX,
-      y: e.clientY,
-      posX: position.x,
-      posY: position.y,
-    }
-  }, [position])
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
+      setIsDragging(true)
+      dragStartRef.current = {
+        x: e.clientX,
+        y: e.clientY,
+        posX: position.x,
+        posY: position.y,
+      }
+    },
+    [position]
+  )
 
   // 拖曳中
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging || !previewRef.current) return
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isDragging || !previewRef.current) return
 
-    const rect = previewRef.current.getBoundingClientRect()
-    const deltaX = e.clientX - dragStartRef.current.x
-    const deltaY = e.clientY - dragStartRef.current.y
+      const rect = previewRef.current.getBoundingClientRect()
+      const deltaX = e.clientX - dragStartRef.current.x
+      const deltaY = e.clientY - dragStartRef.current.y
 
-    // 將像素位移轉換為百分比（反向移動，因為是移動圖片而非視窗）
-    const percentX = (deltaX / rect.width) * 100
-    const percentY = (deltaY / rect.height) * 100
+      // 將像素位移轉換為百分比（反向移動，因為是移動圖片而非視窗）
+      const percentX = (deltaX / rect.width) * 100
+      const percentY = (deltaY / rect.height) * 100
 
-    // 縮放越大，移動範圍越大
-    const moveMultiplier = position.scale
+      // 縮放越大，移動範圍越大
+      const moveMultiplier = position.scale
 
-    setPosition(prev => ({
-      ...prev,
-      x: Math.max(0, Math.min(100, dragStartRef.current.posX - percentX * moveMultiplier)),
-      y: Math.max(0, Math.min(100, dragStartRef.current.posY - percentY * moveMultiplier)),
-    }))
-  }, [isDragging, position.scale])
+      setPosition(prev => ({
+        ...prev,
+        x: Math.max(0, Math.min(100, dragStartRef.current.posX - percentX * moveMultiplier)),
+        y: Math.max(0, Math.min(100, dragStartRef.current.posY - percentY * moveMultiplier)),
+      }))
+    },
+    [isDragging, position.scale]
+  )
 
   // 拖曳結束
   const handleMouseUp = useCallback(() => {
@@ -189,7 +199,7 @@ export function ImagePositionEditor({
   }, [isDragging, handleMouseMove, handleMouseUp])
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Dialog open={open} onOpenChange={isOpen => !isOpen && onClose()}>
       <DialogContent level={1} className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
@@ -203,7 +213,8 @@ export function ImagePositionEditor({
             style={{ aspectRatio: aspectRatio }}
             onMouseDown={handleMouseDown}
           >
-            <img src={imageSrc}
+            <img
+              src={imageSrc}
               alt={UI_LABELS.PREVIEW}
               className="w-full h-full object-cover pointer-events-none"
               style={{
@@ -215,7 +226,9 @@ export function ImagePositionEditor({
             />
             {/* 拖曳提示 */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className={`bg-black/50 text-white px-3 py-1.5 rounded-full text-sm flex items-center gap-2 transition-opacity ${isDragging ? 'opacity-0' : 'opacity-70'}`}>
+              <div
+                className={`bg-black/50 text-white px-3 py-1.5 rounded-full text-sm flex items-center gap-2 transition-opacity ${isDragging ? 'opacity-0' : 'opacity-70'}`}
+              >
                 <Move size={14} />
                 {UI_LABELS.LABEL_4538}
               </div>
@@ -232,7 +245,7 @@ export function ImagePositionEditor({
                 min={1}
                 max={3}
                 step={0.1}
-                onValueChange={(values) => setPosition(prev => ({ ...prev, scale: values[0] }))}
+                onValueChange={values => setPosition(prev => ({ ...prev, scale: values[0] }))}
                 className="flex-1"
               />
               <ZoomIn size={16} className="text-morandi-secondary flex-shrink-0" />
@@ -253,7 +266,7 @@ export function ImagePositionEditor({
                 { label: '左下', x: 0, y: 100 },
                 { label: '下', x: 50, y: 100 },
                 { label: '右下', x: 100, y: 100 },
-              ].map((preset) => (
+              ].map(preset => (
                 <button
                   key={preset.label}
                   type="button"
@@ -283,11 +296,7 @@ export function ImagePositionEditor({
               </Button>
 
               <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={onClose}
-                >
+                <Button type="button" variant="outline" onClick={onClose}>
                   {UI_LABELS.CANCEL}
                 </Button>
                 <Button
@@ -302,9 +311,7 @@ export function ImagePositionEditor({
           </div>
 
           {/* 提示文字 */}
-          <p className="text-xs text-morandi-secondary text-center">
-            {UI_LABELS.LABEL_5032}
-          </p>
+          <p className="text-xs text-morandi-secondary text-center">{UI_LABELS.LABEL_5032}</p>
         </div>
       </DialogContent>
     </Dialog>

@@ -170,7 +170,9 @@ export function ConversationChat({
                 value={message}
                 onChange={e => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={isAnnouncement ? LABELS.announcementPlaceholder : LABELS.replyPlaceholder}
+                placeholder={
+                  isAnnouncement ? LABELS.announcementPlaceholder : LABELS.replyPlaceholder
+                }
                 className="w-full min-h-[40px] max-h-[120px] px-3 py-2 pr-20 text-sm border border-border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
                 rows={1}
               />
@@ -194,11 +196,7 @@ export function ConversationChat({
               disabled={!message.trim() || isSending}
               className="h-10 px-4 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
-              {isSending ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                <Send size={16} />
-              )}
+              {isSending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
             </Button>
           </div>
         )}
@@ -242,7 +240,8 @@ function MessageBubble({
         )}
       >
         {senderAvatar ? (
-          <img src={senderAvatar}
+          <img
+            src={senderAvatar}
             alt={senderName}
             className="w-full h-full rounded-full object-cover"
           />

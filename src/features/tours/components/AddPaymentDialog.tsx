@@ -7,7 +7,13 @@ import type { Order } from '@/stores/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Plus, X } from 'lucide-react'
 
 interface AddPaymentDialogProps {
@@ -22,7 +28,12 @@ interface AddPaymentDialogProps {
     method: string
     status: '已確認' | '待確認'
   }
-  onNewPaymentChange: (payment: { amount: number; description: string; method: string; status: '已確認' | '待確認' }) => void
+  onNewPaymentChange: (payment: {
+    amount: number
+    description: string
+    method: string
+    status: '已確認' | '待確認'
+  }) => void
   onAddPayment: () => void
 }
 
@@ -44,8 +55,13 @@ export const AddPaymentDialog = React.memo(function AddPaymentDialog({
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-morandi-primary">{ADD_PAYMENT_LABELS.RELATED_ORDER}</label>
-            <Select value={selectedOrderId || '__none__'} onValueChange={(v) => onSelectedOrderIdChange(v === '__none__' ? '' : v)}>
+            <label className="text-sm font-medium text-morandi-primary">
+              {ADD_PAYMENT_LABELS.RELATED_ORDER}
+            </label>
+            <Select
+              value={selectedOrderId || '__none__'}
+              onValueChange={v => onSelectedOrderIdChange(v === '__none__' ? '' : v)}
+            >
               <SelectTrigger className="mt-1 w-full">
                 <SelectValue placeholder={ADD_PAYMENT_LABELS.LABEL_9638} />
               </SelectTrigger>
@@ -61,20 +77,22 @@ export const AddPaymentDialog = React.memo(function AddPaymentDialog({
           </div>
 
           <div>
-            <label className="text-sm font-medium text-morandi-primary">{ADD_PAYMENT_LABELS.AMOUNT}</label>
+            <label className="text-sm font-medium text-morandi-primary">
+              {ADD_PAYMENT_LABELS.AMOUNT}
+            </label>
             <Input
               type="number"
               value={newPayment.amount || ''}
-              onChange={e =>
-                onNewPaymentChange({ ...newPayment, amount: Number(e.target.value) })
-              }
+              onChange={e => onNewPaymentChange({ ...newPayment, amount: Number(e.target.value) })}
               placeholder="0"
               className="mt-1"
             />
           </div>
 
           <div>
-            <label className="text-sm font-medium text-morandi-primary">{ADD_PAYMENT_LABELS.DESCRIPTION}</label>
+            <label className="text-sm font-medium text-morandi-primary">
+              {ADD_PAYMENT_LABELS.DESCRIPTION}
+            </label>
             <Input
               value={newPayment.description}
               onChange={e => onNewPaymentChange({ ...newPayment, description: e.target.value })}
@@ -84,7 +102,9 @@ export const AddPaymentDialog = React.memo(function AddPaymentDialog({
           </div>
 
           <div>
-            <label className="text-sm font-medium text-morandi-primary">{ADD_PAYMENT_LABELS.PAYMENT_METHOD}</label>
+            <label className="text-sm font-medium text-morandi-primary">
+              {ADD_PAYMENT_LABELS.PAYMENT_METHOD}
+            </label>
             <Select
               value={newPayment.method}
               onValueChange={value => onNewPaymentChange({ ...newPayment, method: value })}
@@ -102,7 +122,9 @@ export const AddPaymentDialog = React.memo(function AddPaymentDialog({
           </div>
 
           <div>
-            <label className="text-sm font-medium text-morandi-primary">{ADD_PAYMENT_LABELS.CONFIRM_2526}</label>
+            <label className="text-sm font-medium text-morandi-primary">
+              {ADD_PAYMENT_LABELS.CONFIRM_2526}
+            </label>
             <Select
               value={newPayment.status}
               onValueChange={value =>

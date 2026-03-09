@@ -22,7 +22,9 @@ export const usePayments = () => {
     createPaymentRequest: async (
       data: Omit<PaymentRequest, 'id' | 'created_at' | 'updated_at' | 'request_number'>
     ) => {
-      return await paymentRequestService.create(data as Parameters<typeof paymentRequestService.create>[0])
+      return await paymentRequestService.create(
+        data as Parameters<typeof paymentRequestService.create>[0]
+      )
     },
 
     updatePaymentRequest: async (id: string, data: Partial<PaymentRequest>) => {
@@ -51,10 +53,12 @@ export const usePayments = () => {
 
     addPaymentItems: async (
       requestId: string,
-      items: Array<Omit<
-        PaymentRequestItem,
-        'id' | 'request_id' | 'item_number' | 'subtotal' | 'created_at' | 'updated_at'
-      >>
+      items: Array<
+        Omit<
+          PaymentRequestItem,
+          'id' | 'request_id' | 'item_number' | 'subtotal' | 'created_at' | 'updated_at'
+        >
+      >
     ) => {
       return await paymentRequestService.addItems(requestId, items)
     },

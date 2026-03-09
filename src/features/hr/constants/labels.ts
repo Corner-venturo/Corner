@@ -84,8 +84,7 @@ export const PAYROLL_PAGE_LABELS = {
     `確定要標記 ${year}年${month}月 的薪資為已發放嗎？`,
   confirm_paid_title: '標記發放',
   toast_paid: '已標記為發放',
-  records_dialog_title: (year: number, month: number) =>
-    `${year}年${month}月 薪資明細`,
+  records_dialog_title: (year: number, month: number) => `${year}年${month}月 薪資明細`,
   records_dialog_title_default: '薪資明細',
   summary_employees: '員工數',
   summary_gross: '應發總額',
@@ -116,8 +115,7 @@ export const PAYROLL_PAGE_LABELS = {
   payslip_unpaid_leave: (days: number) => `無薪假扣款（${days} 天）`,
   payslip_other_deductions: '其他扣款',
   payslip_net: '實發薪資',
-  payslip_work_days: (actual: number, total: number) =>
-    `出勤天數：${actual} / ${total} 天`,
+  payslip_work_days: (actual: number, total: number) => `出勤天數：${actual} / ${total} 天`,
   payslip_paid_leave: (days: number) => `有薪假天數：${days} 天`,
   payslip_unpaid_leave_days: (days: number) => `無薪假天數：${days} 天`,
   btn_print: '列印',
@@ -166,7 +164,13 @@ export const LEAVE_PAGE_LABELS = {
   confirm_delete_message: (name: string) => `確定要刪除「${name}」假別嗎？`,
   confirm_delete_title: '刪除假別',
   toast_type_deleted: '假別已刪除',
-  confirm_approve_message: (name: string | undefined, type: string | undefined, start: string, end: string, days: number) =>
+  confirm_approve_message: (
+    name: string | undefined,
+    type: string | undefined,
+    start: string,
+    end: string,
+    days: number
+  ) =>
     `確定要核准「${name}」的請假申請嗎？\n\n假別：${type}\n期間：${start} ~ ${end}\n天數：${days} 天`,
   confirm_approve_title: '核准請假',
   toast_approved: '已核准請假申請',
@@ -302,4 +306,4 @@ export const COMP_HR_LABELS = {
 
   LABEL_PINYIN: '護照拼音',
   LABEL_AUTH_EMAIL: '登入 Email',
-};
+}

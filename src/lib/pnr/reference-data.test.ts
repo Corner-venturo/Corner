@@ -3,7 +3,16 @@ import { describe, it, expect, beforeEach } from 'vitest'
 // We need to mock supabase before importing the module
 import { vi } from 'vitest'
 vi.mock('@/lib/supabase/client', () => ({
-  supabase: { from: () => ({ select: () => ({ eq: () => ({ data: [], error: null }), order: () => ({ data: [], error: null }), data: [], error: null }) }) },
+  supabase: {
+    from: () => ({
+      select: () => ({
+        eq: () => ({ data: [], error: null }),
+        order: () => ({ data: [], error: null }),
+        data: [],
+        error: null,
+      }),
+    }),
+  },
 }))
 vi.mock('@/lib/utils/logger', () => ({
   logger: { log: vi.fn(), error: vi.fn(), warn: vi.fn() },

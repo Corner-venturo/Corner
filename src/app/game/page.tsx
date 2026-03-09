@@ -6,28 +6,27 @@ import { Grid3X3, Edit3, Eye } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 import { GAME_OFFICE_LABELS } from './constants/labels'
 
-const PhaserOffice = dynamic(
-  () => import('@/features/game-office/components/PhaserOffice'),
-  { ssr: false, loading: () => <div className="flex-1 bg-[#1a1a2e] animate-pulse" /> }
-)
+const PhaserOffice = dynamic(() => import('@/features/game-office/components/PhaserOffice'), {
+  ssr: false,
+  loading: () => <div className="flex-1 bg-[#1a1a2e] animate-pulse" />,
+})
 
-const RightPanel = dynamic(
-  () => import('@/features/game-office/components/RightPanel'),
-  { ssr: false }
-)
+const RightPanel = dynamic(() => import('@/features/game-office/components/RightPanel'), {
+  ssr: false,
+})
 
 // Map game assets to ERP routes
 const ASSET_ROUTES: Record<string, { label: string; path: string }> = {
-  'BendedScreen_A_Tile': { label: '訂單管理', path: '/workspace/orders' },
-  'OldPC_A_Tile': { label: '訂單管理', path: '/workspace/orders' },
-  'OldPC_B_Tile': { label: '訂單管理', path: '/workspace/orders' },
-  'PcTower_Tile': { label: '系統設定', path: '/workspace/settings' },
-  'RotationScreen_A_Tile': { label: '團體管理', path: '/workspace/tours' },
-  'RotationScreen_B_Tile': { label: '團體管理', path: '/workspace/tours' },
-  'RotationScreen_C_Tile': { label: '報表', path: '/workspace/reports' },
-  'MeetingTable_Tile': { label: '會議室', path: '/meeting' },
-  'Whiteboard_Tile': { label: '會議室', path: '/meeting' },
-  'ConferenceTable_Tile': { label: '會議室', path: '/meeting' },
+  BendedScreen_A_Tile: { label: '訂單管理', path: '/workspace/orders' },
+  OldPC_A_Tile: { label: '訂單管理', path: '/workspace/orders' },
+  OldPC_B_Tile: { label: '訂單管理', path: '/workspace/orders' },
+  PcTower_Tile: { label: '系統設定', path: '/workspace/settings' },
+  RotationScreen_A_Tile: { label: '團體管理', path: '/workspace/tours' },
+  RotationScreen_B_Tile: { label: '團體管理', path: '/workspace/tours' },
+  RotationScreen_C_Tile: { label: '報表', path: '/workspace/reports' },
+  MeetingTable_Tile: { label: '會議室', path: '/meeting' },
+  Whiteboard_Tile: { label: '會議室', path: '/meeting' },
+  ConferenceTable_Tile: { label: '會議室', path: '/meeting' },
 }
 
 export default function GameOfficePage() {
@@ -63,7 +62,9 @@ export default function GameOfficePage() {
           <button
             onClick={() => setShowGrid(!showGrid)}
             className={`absolute top-3 left-3 z-10 flex items-center gap-1 px-3 py-1.5 text-xs rounded border transition-colors ${
-              showGrid ? 'border-[var(--border)] text-white bg-gray-800/80' : 'border-[var(--border)] text-gray-500 bg-gray-900/80'
+              showGrid
+                ? 'border-[var(--border)] text-white bg-gray-800/80'
+                : 'border-[var(--border)] text-gray-500 bg-gray-900/80'
             }`}
           >
             <Grid3X3 className="w-3 h-3" />

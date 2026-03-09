@@ -78,10 +78,14 @@ export async function renderGradientShape(
     const x2 = 50 + Math.cos(rad) * 50
     const y2 = 50 + Math.sin(rad) * 50
 
-    const stops = gradient.stops.map((s) => `<stop offset="${s.offset * 100}%" stop-color="${s.color}" />`).join('\n')
+    const stops = gradient.stops
+      .map(s => `<stop offset="${s.offset * 100}%" stop-color="${s.color}" />`)
+      .join('\n')
     gradientDef = `<linearGradient id="${gradId}" x1="${x1}%" y1="${y1}%" x2="${x2}%" y2="${y2}%">${stops}</linearGradient>`
   } else {
-    const stops = gradient.stops.map((s) => `<stop offset="${s.offset * 100}%" stop-color="${s.color}" />`).join('\n')
+    const stops = gradient.stops
+      .map(s => `<stop offset="${s.offset * 100}%" stop-color="${s.color}" />`)
+      .join('\n')
     gradientDef = `<radialGradient id="${gradId}" cx="50%" cy="50%" r="50%">${stops}</radialGradient>`
   }
 

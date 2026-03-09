@@ -5,7 +5,6 @@
  * 顯示已確認的需求，可派給司機
  */
 
-
 import React, { useState, useEffect } from 'react'
 import { logger } from '@/lib/utils/logger'
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
@@ -27,15 +26,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import {
-  Truck,
-  User,
-  Calendar,
-  MapPin,
-  CheckCircle2,
-  Clock,
-  AlertCircle,
-} from 'lucide-react'
+import { Truck, User, Calendar, MapPin, CheckCircle2, Clock, AlertCircle } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 import { supabase } from '@/lib/supabase/client'
 import { format } from 'date-fns'
@@ -69,8 +60,16 @@ interface Driver {
 
 const DISPATCH_STATUS_CONFIG = {
   pending: { label: SUPPLIER_LABELS.DISPATCH_PENDING, variant: 'outline' as const, icon: Clock },
-  assigned: { label: SUPPLIER_LABELS.DISPATCH_ASSIGNED, variant: 'secondary' as const, icon: Truck },
-  completed: { label: SUPPLIER_LABELS.DISPATCH_COMPLETED, variant: 'default' as const, icon: CheckCircle2 },
+  assigned: {
+    label: SUPPLIER_LABELS.DISPATCH_ASSIGNED,
+    variant: 'secondary' as const,
+    icon: Truck,
+  },
+  completed: {
+    label: SUPPLIER_LABELS.DISPATCH_COMPLETED,
+    variant: 'default' as const,
+    icon: CheckCircle2,
+  },
 }
 
 export function SupplierDispatchPage() {
@@ -93,7 +92,8 @@ export function SupplierDispatchPage() {
         // 載入已確認的需求（從 tour_requests 表）
         const { data: requestsData } = await supabase
           .from('tour_requests')
-          .select(`
+          .select(
+            `
             id,
             code,
             tour_id,
@@ -108,13 +108,14 @@ export function SupplierDispatchPage() {
             reply_content,
             assigned_vehicle_id,
             assignee_name
-          `)
+          `
+          )
           .eq('recipient_workspace_id', user.workspace_id)
           .eq('response_status', 'accepted')
 
         // 整理需求資料
         const confirmedRequests: ConfirmedRequest[] = (requestsData || []).map(r => {
-          const replyContent = r.reply_content as { 
+          const replyContent = r.reply_content as {
             driver_id?: string
             driver_name?: string
             dispatch_status?: string
@@ -130,7 +131,8 @@ export function SupplierDispatchPage() {
             title: r.title || '',
             quantity: r.quantity || 1,
             notes: r.notes || null,
-            dispatch_status: (replyContent?.dispatch_status as 'pending' | 'assigned' | 'completed') || 'pending',
+            dispatch_status:
+              (replyContent?.dispatch_status as 'pending' | 'assigned' | 'completed') || 'pending',
             assigned_driver_id: replyContent?.driver_id || r.assigned_vehicle_id || null,
             assigned_driver_name: replyContent?.driver_name || r.assignee_name || null,
           }
@@ -173,7 +175,7 @@ export function SupplierDispatchPage() {
     setIsAssigning(true)
     try {
       const driver = drivers.find(d => d.id === selectedDriverId)
-      
+
       // 取得現有 reply_content 並更新
       const { data: currentData } = await supabase
         .from('tour_requests')
@@ -182,7 +184,7 @@ export function SupplierDispatchPage() {
         .single()
 
       const existingContent = (currentData?.reply_content || {}) as Record<string, unknown>
-      
+
       // 更新 reply_content 和 assignee_name（保留現有資料）
       const { error } = await supabase
         .from('tour_requests')
@@ -240,7 +242,11 @@ export function SupplierDispatchPage() {
       render: (_, row) => (
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4 text-morandi-secondary" />
-          <span>{row.service_date ? format(new Date(row.service_date), 'MM/dd (EEE)', { locale: zhTW }) : '-'}</span>
+          <span>
+            {row.service_date
+              ? format(new Date(row.service_date), 'MM/dd (EEE)', { locale: zhTW })
+              : '-'}
+          </span>
         </div>
       ),
     },
@@ -248,9 +254,7 @@ export function SupplierDispatchPage() {
       key: 'tour_code',
       label: SUPPLIER_LABELS.COL_TOUR_CODE,
       width: '120px',
-      render: (_, row) => (
-        <span className="font-mono text-sm">{row.tour_code || '-'}</span>
-      ),
+      render: (_, row) => <span className="font-mono text-sm">{row.tour_code || '-'}</span>,
     },
     {
       key: 'title',
@@ -270,7 +274,11 @@ export function SupplierDispatchPage() {
       key: 'quantity',
       label: SUPPLIER_LABELS.COL_QUANTITY,
       width: '80px',
-      render: (_, row) => <span>{row.quantity} {SUPPLIER_LABELS.UNIT_VEHICLE}</span>,
+      render: (_, row) => (
+        <span>
+          {row.quantity} {SUPPLIER_LABELS.UNIT_VEHICLE}
+        </span>
+      ),
     },
     {
       key: 'dispatch_status',
@@ -315,18 +323,16 @@ export function SupplierDispatchPage() {
           onClick={() => setSelectedRequest(row)}
           disabled={row.dispatch_status === 'completed'}
         >
-          {row.dispatch_status === 'pending' ? SUPPLIER_LABELS.BTN_ASSIGN : SUPPLIER_LABELS.BTN_MODIFY}
+          {row.dispatch_status === 'pending'
+            ? SUPPLIER_LABELS.BTN_ASSIGN
+            : SUPPLIER_LABELS.BTN_MODIFY}
         </Button>
       ),
     },
   ]
 
   return (
-    <ContentPageLayout
-      title={SUPPLIER_LABELS.MANAGE_5809}
-      icon={Truck}
-    >
-
+    <ContentPageLayout title={SUPPLIER_LABELS.MANAGE_5809} icon={Truck}>
       {/* 篩選器 */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
@@ -364,9 +370,7 @@ export function SupplierDispatchPage() {
         <DialogContent level={2}>
           <DialogHeader>
             <DialogTitle>{SUPPLIER_LABELS.LABEL_8625}</DialogTitle>
-            <DialogDescription>
-              {SUPPLIER_LABELS.LABEL_2651}
-            </DialogDescription>
+            <DialogDescription>{SUPPLIER_LABELS.LABEL_2651}</DialogDescription>
           </DialogHeader>
 
           {selectedRequest && (
@@ -376,15 +380,18 @@ export function SupplierDispatchPage() {
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-morandi-secondary" />
                   <span>
-                    {selectedRequest.service_date 
-                      ? format(new Date(selectedRequest.service_date), 'yyyy/MM/dd (EEE)', { locale: zhTW })
+                    {selectedRequest.service_date
+                      ? format(new Date(selectedRequest.service_date), 'yyyy/MM/dd (EEE)', {
+                          locale: zhTW,
+                        })
                       : '-'}
                   </span>
                 </div>
                 <div className="font-medium">{selectedRequest.title}</div>
                 {selectedRequest.tour_code && (
                   <div className="text-sm text-morandi-secondary">
-                    {SUPPLIER_LABELS.TOUR_CODE_LABEL}{selectedRequest.tour_code}
+                    {SUPPLIER_LABELS.TOUR_CODE_LABEL}
+                    {selectedRequest.tour_code}
                   </div>
                 )}
               </div>
@@ -427,10 +434,7 @@ export function SupplierDispatchPage() {
             <Button variant="outline" onClick={() => setSelectedRequest(null)}>
               {SUPPLIER_LABELS.CANCEL}
             </Button>
-            <Button
-              onClick={handleAssign}
-              disabled={!selectedDriverId || isAssigning}
-            >
+            <Button onClick={handleAssign} disabled={!selectedDriverId || isAssigning}>
               {isAssigning ? SUPPLIER_LABELS.ASSIGNING : SUPPLIER_LABELS.CONFIRM_ASSIGN}
             </Button>
           </DialogFooter>

@@ -40,15 +40,18 @@ export async function getServerAuth(): Promise<AuthResult> {
   const supabase = await createSupabaseServerClient()
 
   // 1. 取得 Supabase Auth 用戶
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
 
   if (authError || !user) {
     return {
       success: false,
       error: {
         error: '請先登入',
-        code: 'NOT_AUTHENTICATED'
-      }
+        code: 'NOT_AUTHENTICATED',
+      },
     }
   }
 
@@ -93,8 +96,8 @@ export async function getServerAuth(): Promise<AuthResult> {
         success: false,
         error: {
           error: '找不到員工資料',
-          code: 'EMPLOYEE_NOT_FOUND'
-        }
+          code: 'EMPLOYEE_NOT_FOUND',
+        },
       }
     }
 
@@ -107,8 +110,8 @@ export async function getServerAuth(): Promise<AuthResult> {
       success: false,
       error: {
         error: '找不到工作空間',
-        code: 'NO_WORKSPACE'
-      }
+        code: 'NO_WORKSPACE',
+      },
     }
   }
 
@@ -117,8 +120,8 @@ export async function getServerAuth(): Promise<AuthResult> {
     data: {
       user,
       workspaceId,
-      employeeId: employeeId || user.id
-    }
+      employeeId: employeeId || user.id,
+    },
   }
 }
 
@@ -129,7 +132,10 @@ export async function getServerAuth(): Promise<AuthResult> {
 export async function getServerUser(): Promise<{ user: User } | { error: string }> {
   const supabase = await createSupabaseServerClient()
 
-  const { data: { user }, error } = await supabase.auth.getUser()
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser()
 
   if (error || !user) {
     return { error: '請先登入' }

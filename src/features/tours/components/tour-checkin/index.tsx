@@ -125,11 +125,7 @@ export function TourCheckin({ tour }: TourCheckinProps) {
 
       // 更新本地狀態
       setMembers(prev =>
-        prev.map(m =>
-          m.id === memberId
-            ? { ...m, checked_in: false, checked_in_at: null }
-            : m
-        )
+        prev.map(m => (m.id === memberId ? { ...m, checked_in: false, checked_in_at: null } : m))
       )
       toast.success(COMP_TOURS_LABELS.已取消報到)
     } catch (error) {
@@ -148,16 +144,10 @@ export function TourCheckin({ tour }: TourCheckinProps) {
   return (
     <div className="space-y-6">
       {/* 報到設定 + 統計 */}
-      <CheckinSettings
-        enableCheckin={enableCheckin}
-        onToggle={handleToggleCheckin}
-        stats={stats}
-      />
+      <CheckinSettings enableCheckin={enableCheckin} onToggle={handleToggleCheckin} stats={stats} />
 
       {/* QR Code */}
-      {enableCheckin && (
-        <CheckinQRCode tour={tour} />
-      )}
+      {enableCheckin && <CheckinQRCode tour={tour} />}
 
       {/* 報到名單 */}
       <CheckinMemberList

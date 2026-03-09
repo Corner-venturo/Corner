@@ -81,10 +81,10 @@ export default function DatabasePage() {
         <div className="mb-8 bg-gradient-to-r from-morandi-gold/10 to-morandi-primary/10 rounded-lg border border-morandi-gold/20 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-medium text-morandi-primary mb-2">{DATABASE_LABELS.STATS_TITLE}</h2>
-              <p className="text-morandi-secondary text-sm">
-                {DATABASE_LABELS.STATS_DESC}
-              </p>
+              <h2 className="text-xl font-medium text-morandi-primary mb-2">
+                {DATABASE_LABELS.STATS_TITLE}
+              </h2>
+              <p className="text-morandi-secondary text-sm">{DATABASE_LABELS.STATS_DESC}</p>
             </div>
             <div className="flex space-x-6">
               <div className="text-center">
@@ -147,15 +147,21 @@ export default function DatabasePage() {
 
         {/* 快速操作區域 */}
         <div className="mt-8 bg-card border border-border rounded-lg p-6">
-          <h3 className="text-lg font-medium text-morandi-primary mb-4">{DATABASE_LABELS.QUICK_ACTIONS}</h3>
+          <h3 className="text-lg font-medium text-morandi-primary mb-4">
+            {DATABASE_LABELS.QUICK_ACTIONS}
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Button
               variant="outline"
               className="h-auto p-4 text-left flex flex-col items-start"
               onClick={() => router.push('/database/attractions')}
             >
-              <div className="font-medium text-morandi-primary">{DATABASE_LABELS.MANAGE_REGIONS}</div>
-              <div className="text-sm text-morandi-secondary mt-1">{DATABASE_LABELS.MANAGE_REGIONS_DESC}</div>
+              <div className="font-medium text-morandi-primary">
+                {DATABASE_LABELS.MANAGE_REGIONS}
+              </div>
+              <div className="text-sm text-morandi-secondary mt-1">
+                {DATABASE_LABELS.MANAGE_REGIONS_DESC}
+              </div>
             </Button>
             <Button
               variant="outline"
@@ -163,15 +169,21 @@ export default function DatabasePage() {
               onClick={() => router.push('/database/transportation-rates')}
             >
               <div className="font-medium text-morandi-primary">{DATABASE_LABELS.ADD_RATES}</div>
-              <div className="text-sm text-morandi-secondary mt-1">{DATABASE_LABELS.ADD_RATES_DESC}</div>
+              <div className="text-sm text-morandi-secondary mt-1">
+                {DATABASE_LABELS.ADD_RATES_DESC}
+              </div>
             </Button>
             <Button
               variant="outline"
               className="h-auto p-4 text-left flex flex-col items-start"
               onClick={() => router.push('/database/attractions')}
             >
-              <div className="font-medium text-morandi-primary">{DATABASE_LABELS.ADD_ATTRACTIONS}</div>
-              <div className="text-sm text-morandi-secondary mt-1">{DATABASE_LABELS.ADD_ATTRACTIONS_DESC}</div>
+              <div className="font-medium text-morandi-primary">
+                {DATABASE_LABELS.ADD_ATTRACTIONS}
+              </div>
+              <div className="text-sm text-morandi-secondary mt-1">
+                {DATABASE_LABELS.ADD_ATTRACTIONS_DESC}
+              </div>
             </Button>
           </div>
         </div>

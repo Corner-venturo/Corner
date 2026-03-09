@@ -33,20 +33,23 @@ const LABELS = {
  */
 export async function updateRequestFields(
   item_id: string,
-  fields: Pick<CoreItemUpdate,
-    'supplier_id' | 'supplier_name' | 'request_status' |
-    'request_sent_at' | 'request_reply_at' |
-    'reply_content' | 'reply_cost' |
-    'estimated_cost' | 'quoted_cost'
-  >,
+  fields: Pick<
+    CoreItemUpdate,
+    | 'supplier_id'
+    | 'supplier_name'
+    | 'request_status'
+    | 'request_sent_at'
+    | 'request_reply_at'
+    | 'reply_content'
+    | 'reply_cost'
+    | 'estimated_cost'
+    | 'quoted_cost'
+  >
 ): Promise<{ success: boolean; message?: string }> {
   logger.log(LABELS.UPDATE_START, { item_id, fields: Object.keys(fields) })
 
   try {
-    const { error } = await supabase
-      .from('tour_itinerary_items')
-      .update(fields)
-      .eq('id', item_id)
+    const { error } = await supabase.from('tour_itinerary_items').update(fields).eq('id', item_id)
 
     if (error) {
       logger.error(LABELS.UPDATE_ERROR, { item_id, error })
@@ -65,7 +68,7 @@ export async function updateRequestFields(
  * 發送需求：更新 request_status = 'sent'，記錄時間
  */
 export async function markRequestSent(
-  item_ids: string[],
+  item_ids: string[]
 ): Promise<{ success: boolean; count: number }> {
   logger.log(LABELS.BATCH_UPDATE_START, { action: 'sent', count: item_ids.length })
 
@@ -94,7 +97,7 @@ export async function markRequestSent(
  */
 export async function markRequestReplied(
   item_id: string,
-  reply: Pick<CoreItemUpdate, 'reply_content' | 'reply_cost'>,
+  reply: Pick<CoreItemUpdate, 'reply_content' | 'reply_cost'>
 ): Promise<{ success: boolean; message?: string }> {
   return updateRequestFields(item_id, {
     request_status: 'replied',
@@ -107,7 +110,7 @@ export async function markRequestReplied(
  * 確認需求
  */
 export async function markRequestConfirmed(
-  item_id: string,
+  item_id: string
 ): Promise<{ success: boolean; message?: string }> {
   return updateRequestFields(item_id, {
     request_status: 'confirmed',
@@ -118,7 +121,7 @@ export async function markRequestConfirmed(
  * 取消需求
  */
 export async function markRequestCancelled(
-  item_id: string,
+  item_id: string
 ): Promise<{ success: boolean; message?: string }> {
   return updateRequestFields(item_id, {
     request_status: 'cancelled',
@@ -130,7 +133,7 @@ export async function markRequestCancelled(
  * 只取有報價或有供應商的項目（已進入需求階段的）
  */
 export async function fetchRequestableItems(
-  tour_id: string,
+  tour_id: string
 ): Promise<{ success: boolean; items: TourItineraryItem[]; message?: string }> {
   try {
     const { data, error } = await supabase

@@ -8,7 +8,7 @@
  * - 只追蹤 isDirty 狀態
  * - 載入時完整渲染，不做增量更新
  * - 儲存時導出 canvas JSON
- * 
+ *
  * 架構：
  * - 拆分為多個子 hooks，各負責獨立功能
  * - 此檔案負責組合所有子 hooks
@@ -155,7 +155,7 @@ export function useBrochureEditorV2(
   onTextEditRef.current = onTextEdit
 
   // Document store for isDirty tracking
-  const setIsDirty = useDocumentStore((s) => s.setIsDirty)
+  const setIsDirty = useDocumentStore(s => s.setIsDirty)
 
   const markDirty = useCallback(() => {
     setIsDirty(true)
@@ -164,10 +164,10 @@ export function useBrochureEditorV2(
   // ============================================
   // Sub-hooks: Core (needs getCanvas from history)
   // ============================================
-  
+
   // History hook (needs getCanvas function)
   const getCanvas = useCallback(() => fabricCanvasRef.current, [])
-  
+
   const history = useCanvasHistory(getCanvas, {
     maxSize: 30,
     debounceMs: 300,
@@ -249,25 +249,37 @@ export function useBrochureEditorV2(
   // ============================================
   // Wrapped IO functions (bind canvas)
   // ============================================
-  const loadCanvasData = useCallback(async (data: Record<string, unknown>) => {
-    await io.loadCanvasData(fabricCanvasRef.current, data, core.applyControlStyles)
-  }, [io, fabricCanvasRef, core.applyControlStyles])
+  const loadCanvasData = useCallback(
+    async (data: Record<string, unknown>) => {
+      await io.loadCanvasData(fabricCanvasRef.current, data, core.applyControlStyles)
+    },
+    [io, fabricCanvasRef, core.applyControlStyles]
+  )
 
-  const loadCanvasElements = useCallback(async (elementsData: CanvasElement[]) => {
-    await io.loadCanvasElements(fabricCanvasRef.current, elementsData)
-  }, [io, fabricCanvasRef])
+  const loadCanvasElements = useCallback(
+    async (elementsData: CanvasElement[]) => {
+      await io.loadCanvasElements(fabricCanvasRef.current, elementsData)
+    },
+    [io, fabricCanvasRef]
+  )
 
-  const loadCanvasPage = useCallback(async (page: CanvasPage) => {
-    await io.loadCanvasPage(fabricCanvasRef.current, page, core.applyControlStyles)
-  }, [io, fabricCanvasRef, core.applyControlStyles])
+  const loadCanvasPage = useCallback(
+    async (page: CanvasPage) => {
+      await io.loadCanvasPage(fabricCanvasRef.current, page, core.applyControlStyles)
+    },
+    [io, fabricCanvasRef, core.applyControlStyles]
+  )
 
   const exportCanvasData = useCallback(() => {
     return io.exportCanvasData(fabricCanvasRef.current)
   }, [io, fabricCanvasRef])
 
-  const exportThumbnail = useCallback((opts?: { quality?: number; multiplier?: number }) => {
-    return io.exportThumbnail(fabricCanvasRef.current, opts)
-  }, [io, fabricCanvasRef])
+  const exportThumbnail = useCallback(
+    (opts?: { quality?: number; multiplier?: number }) => {
+      return io.exportThumbnail(fabricCanvasRef.current, opts)
+    },
+    [io, fabricCanvasRef]
+  )
 
   // ============================================
   // Wrapped History functions (bind canvas)

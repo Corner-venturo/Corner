@@ -122,7 +122,7 @@ export function useRestaurantSelector({
         .order('name')
       setCountries(data || [])
     }
-    loadCountries().catch((err) => logger.error('[loadCountries]', err))
+    loadCountries().catch(err => logger.error('[loadCountries]', err))
   }, [isOpen])
 
   // 打開對話框時自動選擇行程的國家
@@ -202,7 +202,7 @@ export function useRestaurantSelector({
         .order('name')
       setRegions(data || [])
     }
-    loadRegions().catch((err) => logger.error('[loadRegions]', err))
+    loadRegions().catch(err => logger.error('[loadRegions]', err))
   }, [isOpen, selectedCountryId])
 
   // 載入城市列表（根據區域或國家）
@@ -228,7 +228,7 @@ export function useRestaurantSelector({
       const { data } = await query
       setCities(data || [])
     }
-    loadCities().catch((err) => logger.error('[loadCities]', err))
+    loadCities().catch(err => logger.error('[loadCities]', err))
   }, [isOpen, selectedCountryId, selectedRegionId])
 
   // 載入餐廳資料（包含一般餐廳和米其林餐廳）
@@ -249,7 +249,8 @@ export function useRestaurantSelector({
         if (!showMichelinOnly) {
           let restaurantQuery = supabase
             .from('restaurants')
-            .select(`
+            .select(
+              `
               id, name, name_en, country_id, region_id, city_id,
               cuisine_type, category, meal_type, description,
               specialties, price_range, avg_price_lunch, avg_price_dinner,
@@ -258,7 +259,8 @@ export function useRestaurantSelector({
               latitude, longitude, address, phone, google_maps_url,
               regions(name),
               cities!inner(name)
-            `)
+            `
+            )
             .eq('is_active', true)
             .eq('country_id', selectedCountryId)
             .order('is_featured', { ascending: false })
@@ -283,7 +285,7 @@ export function useRestaurantSelector({
 
           if (restaurantData) {
             // 透過 unknown 中轉處理 Supabase 的複雜型別
-            (restaurantData as unknown as RestaurantQueryResult[]).forEach((item) => {
+            ;(restaurantData as unknown as RestaurantQueryResult[]).forEach(item => {
               results.push({
                 id: item.id,
                 name: item.name,
@@ -326,7 +328,8 @@ export function useRestaurantSelector({
         if (includeMichelin) {
           let michelinQuery = supabase
             .from('michelin_restaurants')
-            .select(`
+            .select(
+              `
               id, name, name_en, country_id, city_id,
               michelin_stars, bib_gourmand, green_star,
               cuisine_type, description, signature_dishes,
@@ -335,7 +338,8 @@ export function useRestaurantSelector({
               thumbnail, images, is_active,
               latitude, longitude, address, phone, google_maps_url,
               cities!inner(name)
-            `)
+            `
+            )
             .eq('is_active', true)
             .eq('country_id', selectedCountryId)
             .order('michelin_stars', { ascending: false })
@@ -349,7 +353,7 @@ export function useRestaurantSelector({
 
           if (michelinData) {
             // 透過 unknown 中轉處理 Supabase 的複雜型別
-            (michelinData as unknown as MichelinQueryResult[]).forEach((item) => {
+            ;(michelinData as unknown as MichelinQueryResult[]).forEach(item => {
               results.push({
                 id: item.id,
                 name: item.name,
@@ -401,7 +405,15 @@ export function useRestaurantSelector({
     }
 
     loadRestaurants()
-  }, [isOpen, selectedCountryId, selectedRegionId, selectedCityId, selectedCategory, includeMichelin, showMichelinOnly])
+  }, [
+    isOpen,
+    selectedCountryId,
+    selectedRegionId,
+    selectedCityId,
+    selectedCategory,
+    includeMichelin,
+    showMichelinOnly,
+  ])
 
   // 搜尋過濾
   const filteredRestaurants = useMemo(() => {

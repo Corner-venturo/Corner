@@ -25,7 +25,7 @@ export async function getOrCreateDmChannel(otherUserId: string) {
   if (error) {
     logger.error('Error calling get_or_create_dm_channel RPC:', {
       error,
-      params: { p_user_1_id: employeeId, p_user_2_id: otherUserId, p_workspace_id: workspaceId }
+      params: { p_user_1_id: employeeId, p_user_2_id: otherUserId, p_workspace_id: workspaceId },
     })
     throw new Error(`Could not get or create DM channel: ${error.message}`)
   }

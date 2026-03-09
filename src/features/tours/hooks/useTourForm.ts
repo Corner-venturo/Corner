@@ -13,10 +13,7 @@ interface UseTourFormProps {
   setNewTour: React.Dispatch<React.SetStateAction<NewTourData>>
 }
 
-export function useTourForm({
-  newTour,
-  setNewTour,
-}: UseTourFormProps) {
+export function useTourForm({ newTour, setNewTour }: UseTourFormProps) {
   // 航班查詢狀態
   const [loadingOutbound, setLoadingOutbound] = useState(false)
   const [loadingReturn, setLoadingReturn] = useState(false)
@@ -49,7 +46,9 @@ export function useTourForm({
         if (result.warning) {
           toast.warning(result.warning, { duration: 5000 })
         } else {
-          toast.success(TOUR_FORM_LABELS.FLIGHT_FOUND(result.data.airline, result.data.flightNumber))
+          toast.success(
+            TOUR_FORM_LABELS.FLIGHT_FOUND(result.data.airline, result.data.flightNumber)
+          )
         }
       }
     } catch {
@@ -87,7 +86,9 @@ export function useTourForm({
         if (result.warning) {
           toast.warning(result.warning, { duration: 5000 })
         } else {
-          toast.success(TOUR_FORM_LABELS.FLIGHT_FOUND(result.data.airline, result.data.flightNumber))
+          toast.success(
+            TOUR_FORM_LABELS.FLIGHT_FOUND(result.data.airline, result.data.flightNumber)
+          )
         }
       }
     } catch {

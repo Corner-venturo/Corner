@@ -29,7 +29,6 @@ export function useSyncOperations({
   updateItinerary,
   router,
 }: UseSyncOperationsProps) {
-
   // 建立行程表
   const handleCreateItinerary = useCallback(() => {
     if (!quote) return
@@ -66,7 +65,8 @@ export function useSyncOperations({
         const nameMatch = item.name.match(/Day\s*(\d+)(?:-\d+)?\s*住宿/)
         return {
           day: nameMatch ? parseInt(nameMatch[1]) : 1,
-          name: item.description || item.name.replace(/Day\s*\d+(?:-\d+)?\s*住宿\s*-?\s*/, '').trim(),
+          name:
+            item.description || item.name.replace(/Day\s*\d+(?:-\d+)?\s*住宿\s*-?\s*/, '').trim(),
           note: item.notes || '',
         }
       })
@@ -128,7 +128,10 @@ export function useSyncOperations({
     if (!mealsCategory || mealsCategory.items.length === 0) return null
 
     type MealType = 'lunch' | 'dinner'
-    const mealUpdates: Record<number, Record<MealType, { name: string; isSelfArranged: boolean }>> = {}
+    const mealUpdates: Record<
+      number,
+      Record<MealType, { name: string; isSelfArranged: boolean }>
+    > = {}
 
     mealsCategory.items.forEach((item: CostItem) => {
       const match = item.name.match(/Day\s*(\d+)\s*(午餐|晚餐)\s*-?\s*(.*)/)
@@ -153,7 +156,9 @@ export function useSyncOperations({
       if (!updates) return
 
       if (updates.lunch) {
-        const newValue = updates.lunch.isSelfArranged ? QUOTE_SYNC_LABELS.MEAL_SELF : (updates.lunch.name || '')
+        const newValue = updates.lunch.isSelfArranged
+          ? QUOTE_SYNC_LABELS.MEAL_SELF
+          : updates.lunch.name || ''
         const oldValue = day.meals.lunch || ''
         if (newValue && newValue !== oldValue) {
           diffs.push({
@@ -167,7 +172,9 @@ export function useSyncOperations({
       }
 
       if (updates.dinner) {
-        const newValue = updates.dinner.isSelfArranged ? QUOTE_SYNC_LABELS.MEAL_SELF : (updates.dinner.name || '')
+        const newValue = updates.dinner.isSelfArranged
+          ? QUOTE_SYNC_LABELS.MEAL_SELF
+          : updates.dinner.name || ''
         const oldValue = day.meals.dinner || ''
         if (newValue && newValue !== oldValue) {
           diffs.push({
@@ -185,35 +192,38 @@ export function useSyncOperations({
   }, [quote, categories, itineraries])
 
   // 確認同步
-  const handleConfirmSync = useCallback((syncDiffs: MealDiff[]) => {
-    if (!quote?.itinerary_id) return
+  const handleConfirmSync = useCallback(
+    (syncDiffs: MealDiff[]) => {
+      if (!quote?.itinerary_id) return
 
-    const itinerary = itineraries.find(i => i.id === quote.itinerary_id)
-    if (!itinerary) return
+      const itinerary = itineraries.find(i => i.id === quote.itinerary_id)
+      if (!itinerary) return
 
-    const updatedDailyItinerary = itinerary.daily_itinerary.map((day, index) => {
-      const dayNumber = index + 1
-      const dayDiffs = syncDiffs.filter(d => d.day === dayNumber)
-      if (dayDiffs.length === 0) return day
+      const updatedDailyItinerary = itinerary.daily_itinerary.map((day, index) => {
+        const dayNumber = index + 1
+        const dayDiffs = syncDiffs.filter(d => d.day === dayNumber)
+        if (dayDiffs.length === 0) return day
 
-      const newMeals = { ...day.meals }
-      dayDiffs.forEach(diff => {
-        if (diff.type === 'lunch') {
-          newMeals.lunch = diff.newValue
-        } else if (diff.type === 'dinner') {
-          newMeals.dinner = diff.newValue
-        }
+        const newMeals = { ...day.meals }
+        dayDiffs.forEach(diff => {
+          if (diff.type === 'lunch') {
+            newMeals.lunch = diff.newValue
+          } else if (diff.type === 'dinner') {
+            newMeals.dinner = diff.newValue
+          }
+        })
+
+        return { ...day, meals: newMeals }
       })
 
-      return { ...day, meals: newMeals }
-    })
+      updateItinerary(itinerary.id, {
+        daily_itinerary: updatedDailyItinerary,
+      })
 
-    updateItinerary(itinerary.id, {
-      daily_itinerary: updatedDailyItinerary,
-    })
-
-    toast.success(QUOTE_SYNC_LABELS.SYNC_MEALS_SUCCESS)
-  }, [quote, itineraries, updateItinerary])
+      toast.success(QUOTE_SYNC_LABELS.SYNC_MEALS_SUCCESS)
+    },
+    [quote, itineraries, updateItinerary]
+  )
 
   // 從行程表同步住宿名稱
   const handleSyncAccommodationFromItinerary = useCallback(() => {

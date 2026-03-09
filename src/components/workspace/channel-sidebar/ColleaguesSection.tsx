@@ -4,7 +4,6 @@
  * 顯示兩個辦公室的員工（不含機器人）
  */
 
-
 import { useState, useEffect, useMemo } from 'react'
 import { ChevronDown, ChevronRight, User, Building2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -110,9 +109,7 @@ export function ColleaguesSection({
         {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
         <User size={14} />
         <span>{COMP_WORKSPACE_LABELS.同事}</span>
-        <span className="text-xs text-morandi-muted ml-auto">
-          {totalColleagues}
-        </span>
+        <span className="text-xs text-morandi-muted ml-auto">{totalColleagues}</span>
       </button>
 
       {isExpanded && (
@@ -151,7 +148,8 @@ export function ColleaguesSection({
                         )}
                       >
                         {emp.avatar ? (
-                          <img src={emp.avatar}
+                          <img
+                            src={emp.avatar}
                             alt=""
                             className="w-5 h-5 rounded-full object-cover"
                           />

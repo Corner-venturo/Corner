@@ -27,10 +27,13 @@ class OrderService extends BaseService<Order & BaseEntity> {
     const store = useOrderStore.getState()
     return {
       getAll: () => store.items as (Order & BaseEntity)[],
-      getById: (id: string) => store.items.find(o => o.id === id) as (Order & BaseEntity) | undefined,
+      getById: (id: string) =>
+        store.items.find(o => o.id === id) as (Order & BaseEntity) | undefined,
       add: async (order: Order & BaseEntity) => {
         const { id, created_at, updated_at, ...createData } = order
-        const result = await store.create(createData as unknown as Parameters<typeof store.create>[0])
+        const result = await store.create(
+          createData as unknown as Parameters<typeof store.create>[0]
+        )
         await invalidateOrders()
         return result as Order & BaseEntity
       },

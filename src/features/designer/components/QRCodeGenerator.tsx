@@ -57,12 +57,15 @@ export function QRCodeGenerator({ onGenerate }: QRCodeGeneratorProps) {
   }, [])
 
   // 輸入變更時更新預覽
-  const handleContentChange = useCallback((value: string) => {
-    setContent(value)
-    // 延遲生成預覽
-    const timer = setTimeout(() => generatePreview(value), 300)
-    return () => clearTimeout(timer)
-  }, [generatePreview])
+  const handleContentChange = useCallback(
+    (value: string) => {
+      setContent(value)
+      // 延遲生成預覽
+      const timer = setTimeout(() => generatePreview(value), 300)
+      return () => clearTimeout(timer)
+    },
+    [generatePreview]
+  )
 
   // 生成並插入 QR Code
   const handleGenerate = useCallback(async () => {
@@ -95,16 +98,14 @@ export function QRCodeGenerator({ onGenerate }: QRCodeGeneratorProps) {
           <QrCode size={16} className="text-morandi-gold" />
           <span className="text-sm font-medium">QR Code 生成器</span>
         </div>
-        <p className="text-[10px] text-morandi-secondary">
-          {DESIGNER_LABELS.GENERATING_239}
-        </p>
+        <p className="text-[10px] text-morandi-secondary">{DESIGNER_LABELS.GENERATING_239}</p>
       </div>
 
       <div className="flex-1 overflow-auto p-3 space-y-4">
         {/* 類型選擇 */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-2 w-full">
-            {QR_TEMPLATES.map((template) => (
+            {QR_TEMPLATES.map(template => (
               <TabsTrigger key={template.id} value={template.id} className="text-xs">
                 <template.icon size={12} className="mr-1" />
                 {template.label}
@@ -112,11 +113,11 @@ export function QRCodeGenerator({ onGenerate }: QRCodeGeneratorProps) {
             ))}
           </TabsList>
 
-          {QR_TEMPLATES.map((template) => (
+          {QR_TEMPLATES.map(template => (
             <TabsContent key={template.id} value={template.id} className="mt-3">
               <Input
                 value={content}
-                onChange={(e) => handleContentChange(e.target.value)}
+                onChange={e => handleContentChange(e.target.value)}
                 placeholder={template.placeholder}
                 className="text-sm"
               />
@@ -147,11 +148,7 @@ export function QRCodeGenerator({ onGenerate }: QRCodeGeneratorProps) {
           disabled={!content.trim() || isGenerating}
           className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
         >
-          {isGenerating ? (
-            <Loader2 size={14} className="animate-spin" />
-          ) : (
-            <QrCode size={14} />
-          )}
+          {isGenerating ? <Loader2 size={14} className="animate-spin" /> : <QrCode size={14} />}
           插入 QR Code
         </Button>
       </div>

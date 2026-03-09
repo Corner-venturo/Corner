@@ -51,7 +51,7 @@ export const ErrorCode = {
   OPERATION_FAILED: 'OPERATION_FAILED',
 } as const
 
-export type ErrorCodeType = typeof ErrorCode[keyof typeof ErrorCode]
+export type ErrorCodeType = (typeof ErrorCode)[keyof typeof ErrorCode]
 
 /**
  * 建立成功回應
@@ -140,8 +140,7 @@ export const ApiError = {
   /**
    * 403 Forbidden - 禁止存取
    */
-  forbidden: (message: string = '權限不足') =>
-    errorResponse(message, 403, ErrorCode.FORBIDDEN),
+  forbidden: (message: string = '權限不足') => errorResponse(message, 403, ErrorCode.FORBIDDEN),
 
   /**
    * 404 Not Found - 找不到資源

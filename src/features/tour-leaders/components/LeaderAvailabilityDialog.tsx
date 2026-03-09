@@ -5,13 +5,24 @@
  * 用於管理單一領隊的可用檔期
  */
 
-
 import React, { useState, useCallback, useMemo } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DIALOG_SIZES } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DIALOG_SIZES,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Calendar, Plus, Pencil, Trash2, X, Save, AlertCircle } from 'lucide-react'
@@ -98,21 +109,24 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
     setFormData(emptyFormData)
   }, [])
 
-  const handleDelete = useCallback(async (item: LeaderAvailability) => {
-    const confirmed = await confirm(TOUR_LEADERS_LABELS.CONFIRM_DELETE_AVAILABILITY, {
-      title: TOUR_LEADERS_LABELS.DELETE_AVAILABILITY_TITLE,
-      type: 'warning',
-    })
-    if (!confirmed) return
+  const handleDelete = useCallback(
+    async (item: LeaderAvailability) => {
+      const confirmed = await confirm(TOUR_LEADERS_LABELS.CONFIRM_DELETE_AVAILABILITY, {
+        title: TOUR_LEADERS_LABELS.DELETE_AVAILABILITY_TITLE,
+        type: 'warning',
+      })
+      if (!confirmed) return
 
-    try {
-      await deleteItem(item.id)
-      await alert(TOUR_LEADERS_LABELS.AVAILABILITY_DELETED, 'success')
-    } catch (error) {
-      logger.error('Delete availability error:', error)
-      await alert(TOUR_LEADERS_LABELS.DELETE_AVAILABILITY_FAILED, 'error')
-    }
-  }, [deleteItem])
+      try {
+        await deleteItem(item.id)
+        await alert(TOUR_LEADERS_LABELS.AVAILABILITY_DELETED, 'success')
+      } catch (error) {
+        logger.error('Delete availability error:', error)
+        await alert(TOUR_LEADERS_LABELS.DELETE_AVAILABILITY_FAILED, 'error')
+      }
+    },
+    [deleteItem]
+  )
 
   const handleSubmit = useCallback(async () => {
     if (!leader) return
@@ -151,22 +165,26 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
     }
   }, [leader, formData, editingId, create, update, handleCancelForm])
 
-  const handleFieldChange = useCallback(<K extends keyof AvailabilityFormData>(
-    field: K,
-    value: AvailabilityFormData[K]
-  ) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-  }, [])
+  const handleFieldChange = useCallback(
+    <K extends keyof AvailabilityFormData>(field: K, value: AvailabilityFormData[K]) => {
+      setFormData(prev => ({ ...prev, [field]: value }))
+    },
+    []
+  )
 
   if (!leader) return null
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent level={1} className={cn(DIALOG_SIZES.lg, 'max-h-[85vh] overflow-hidden flex flex-col')}>
+      <DialogContent
+        level={1}
+        className={cn(DIALOG_SIZES.lg, 'max-h-[85vh] overflow-hidden flex flex-col')}
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-morandi-gold" />
-            {leader.name}{TOUR_LEADERS_LABELS.AVAILABILITY_SUFFIX}
+            {leader.name}
+            {TOUR_LEADERS_LABELS.AVAILABILITY_SUFFIX}
           </DialogTitle>
         </DialogHeader>
 
@@ -195,7 +213,7 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
                   </label>
                   <DatePicker
                     value={formData.available_start_date}
-                    onChange={(date) => handleFieldChange('available_start_date', date)}
+                    onChange={date => handleFieldChange('available_start_date', date)}
                     placeholder={TOUR_LEADERS_LABELS.PLACEHOLDER_START_DATE}
                     className="mt-1"
                   />
@@ -206,16 +224,20 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
                   </label>
                   <DatePicker
                     value={formData.available_end_date}
-                    onChange={(date) => handleFieldChange('available_end_date', date)}
+                    onChange={date => handleFieldChange('available_end_date', date)}
                     placeholder={TOUR_LEADERS_LABELS.PLACEHOLDER_END_DATE}
                     className="mt-1"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-morandi-primary">{TOUR_LEADERS_LABELS.COL_STATUS}</label>
+                  <label className="text-sm font-medium text-morandi-primary">
+                    {TOUR_LEADERS_LABELS.COL_STATUS}
+                  </label>
                   <Select
                     value={formData.status}
-                    onValueChange={(value) => handleFieldChange('status', value as LeaderAvailabilityStatus)}
+                    onValueChange={value =>
+                      handleFieldChange('status', value as LeaderAvailabilityStatus)
+                    }
                   >
                     <SelectTrigger className="mt-1">
                       <SelectValue />
@@ -230,10 +252,12 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-morandi-primary">{TOUR_LEADERS_LABELS.NOTES}</label>
+                  <label className="text-sm font-medium text-morandi-primary">
+                    {TOUR_LEADERS_LABELS.NOTES}
+                  </label>
                   <Input
                     value={formData.notes}
-                    onChange={(e) => handleFieldChange('notes', e.target.value)}
+                    onChange={e => handleFieldChange('notes', e.target.value)}
                     placeholder={TOUR_LEADERS_LABELS.PLACEHOLDER_NOTES_OPTIONAL}
                     className="mt-1"
                   />
@@ -272,7 +296,9 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
             </h4>
 
             {isLoading ? (
-              <div className="text-center py-8 text-morandi-secondary">{TOUR_LEADERS_LABELS.LOADING}</div>
+              <div className="text-center py-8 text-morandi-secondary">
+                {TOUR_LEADERS_LABELS.LOADING}
+              </div>
             ) : leaderAvailability.length === 0 ? (
               <div className="text-center py-8 text-morandi-secondary flex flex-col items-center gap-2">
                 <AlertCircle size={24} className="text-morandi-muted" />
@@ -280,8 +306,9 @@ export const LeaderAvailabilityDialog: React.FC<LeaderAvailabilityDialogProps> =
               </div>
             ) : (
               <div className="space-y-2">
-                {leaderAvailability.map((item) => {
-                  const statusConfig = LEADER_AVAILABILITY_STATUS_CONFIG[item.status as LeaderAvailabilityStatus]
+                {leaderAvailability.map(item => {
+                  const statusConfig =
+                    LEADER_AVAILABILITY_STATUS_CONFIG[item.status as LeaderAvailabilityStatus]
                   const startDate = parseLocalDate(item.available_start_date)
                   const endDate = parseLocalDate(item.available_end_date)
 

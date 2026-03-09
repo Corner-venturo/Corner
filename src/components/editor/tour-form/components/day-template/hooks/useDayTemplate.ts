@@ -18,7 +18,10 @@ export function useDayTemplate({ dayData, style }: UseDayTemplateProps) {
   const [editingField, setEditingField] = useState<string | null>(null)
   const [uploading, setUploading] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [uploadTarget, setUploadTarget] = useState<{ type: 'activity' | 'day'; index?: number } | null>(null)
+  const [uploadTarget, setUploadTarget] = useState<{
+    type: 'activity' | 'day'
+    index?: number
+  } | null>(null)
 
   // 更新欄位
   const updateField = (field: keyof DailyItinerary, value: unknown) => {
@@ -39,15 +42,15 @@ export function useDayTemplate({ dayData, style }: UseDayTemplateProps) {
   const addActivity = () => {
     setEditingDay(prev => ({
       ...prev,
-      activities: [
-        ...prev.activities,
-        { icon: '📍', title: '', description: '', image: '' }
-      ],
+      activities: [...prev.activities, { icon: '📍', title: '', description: '', image: '' }],
     }))
   }
 
   // 處理圖片上傳
-  const handleImageUpload = async (file: File, target: { type: 'activity' | 'day'; index?: number }) => {
+  const handleImageUpload = async (
+    file: File,
+    target: { type: 'activity' | 'day'; index?: number }
+  ) => {
     if (!file.type.startsWith('image/')) {
       toast.error(COMP_EDITOR_LABELS.請選擇圖片檔案)
       return
@@ -67,9 +70,7 @@ export function useDayTemplate({ dayData, style }: UseDayTemplateProps) {
 
       if (uploadError) throw uploadError
 
-      const { data: urlData } = supabase.storage
-        .from('workspace-files')
-        .getPublicUrl(filePath)
+      const { data: urlData } = supabase.storage.from('workspace-files').getPublicUrl(filePath)
 
       if (target.type === 'activity' && target.index !== undefined) {
         updateActivity(target.index, 'image', urlData.publicUrl)
@@ -92,8 +93,10 @@ export function useDayTemplate({ dayData, style }: UseDayTemplateProps) {
   }
 
   // 取得主圖（第一個有圖的活動或每日圖片）
-  const mainImage = editingDay.activities.find(a => a.image)?.image ||
-    (editingDay.images?.[0] && (typeof editingDay.images[0] === 'string' ? editingDay.images[0] : editingDay.images[0].url))
+  const mainImage =
+    editingDay.activities.find(a => a.image)?.image ||
+    (editingDay.images?.[0] &&
+      (typeof editingDay.images[0] === 'string' ? editingDay.images[0] : editingDay.images[0].url))
 
   return {
     editingDay,

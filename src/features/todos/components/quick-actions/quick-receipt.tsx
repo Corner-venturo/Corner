@@ -22,13 +22,13 @@ import { usePaymentData } from '@/app/(main)/finance/payments/hooks/usePaymentDa
 import type { ReceiptItem } from '@/stores'
 import { alert } from '@/lib/ui/alert-dialog'
 import { ReceiptType, RECEIPT_TYPE_OPTIONS } from '@/types/receipt.types'
-import { 
-  FORM_LABELS, 
-  PLACEHOLDER_LABELS, 
-  BUTTON_LABELS, 
-  CONTACT_LABELS, 
-  BANK_OPTIONS, 
-  MESSAGE_LABELS 
+import {
+  FORM_LABELS,
+  PLACEHOLDER_LABELS,
+  BUTTON_LABELS,
+  CONTACT_LABELS,
+  BANK_OPTIONS,
+  MESSAGE_LABELS,
 } from '@/features/todos/constants/labels'
 
 interface QuickReceiptProps {
@@ -183,7 +183,9 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
       {/* 第一排：固定欄位（所有收款方式都有） */}
       <div className="grid grid-cols-3 gap-3">
         <div>
-          <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.paymentMethod}</Label>
+          <Label className="text-sm font-medium text-morandi-primary">
+            {FORM_LABELS.paymentMethod}
+          </Label>
           <Select
             value={paymentItem.receipt_type?.toString()}
             onValueChange={value => updatePaymentItem({ receipt_type: Number(value) })}
@@ -213,7 +215,9 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
         </div>
 
         <div>
-          <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.transactionDate}</Label>
+          <Label className="text-sm font-medium text-morandi-primary">
+            {FORM_LABELS.transactionDate}
+          </Label>
           <DateInput
             value={paymentItem.transaction_date || ''}
             onChange={value => updatePaymentItem({ transaction_date: value })}
@@ -224,7 +228,9 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.payerName}</Label>
+          <Label className="text-sm font-medium text-morandi-primary">
+            {FORM_LABELS.payerName}
+          </Label>
           <Input
             placeholder={PLACEHOLDER_LABELS.enterPayerName}
             value={paymentItem.receipt_account || ''}
@@ -260,7 +266,9 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
       {paymentItem.receipt_type === ReceiptType.BANK_TRANSFER && (
         <div className="grid grid-cols-2 gap-3 pt-3 border-t">
           <div>
-            <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.depositAccount}</Label>
+            <Label className="text-sm font-medium text-morandi-primary">
+              {FORM_LABELS.depositAccount}
+            </Label>
             <Select
               value={paymentItem.account_info || ''}
               onValueChange={value => updatePaymentItem({ account_info: value })}
@@ -290,7 +298,9 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
       {paymentItem.receipt_type === ReceiptType.CREDIT_CARD && (
         <div className="grid grid-cols-3 gap-3 pt-3 border-t">
           <div>
-            <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.cardLastFour}</Label>
+            <Label className="text-sm font-medium text-morandi-primary">
+              {FORM_LABELS.cardLastFour}
+            </Label>
             <Input
               placeholder="1234"
               value={paymentItem.card_last_four || ''}
@@ -302,7 +312,9 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
             />
           </div>
           <div>
-            <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.authCode}</Label>
+            <Label className="text-sm font-medium text-morandi-primary">
+              {FORM_LABELS.authCode}
+            </Label>
             <Input
               placeholder={PLACEHOLDER_LABELS.enterAuthCode}
               value={paymentItem.auth_code || ''}
@@ -326,7 +338,9 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
       {paymentItem.receipt_type === ReceiptType.CHECK && (
         <div className="grid grid-cols-2 gap-3 pt-3 border-t">
           <div>
-            <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.checkNumber}</Label>
+            <Label className="text-sm font-medium text-morandi-primary">
+              {FORM_LABELS.checkNumber}
+            </Label>
             <Input
               placeholder={PLACEHOLDER_LABELS.enterCheckNumber}
               value={paymentItem.check_number || ''}
@@ -335,7 +349,9 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
             />
           </div>
           <div>
-            <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.issueBank}</Label>
+            <Label className="text-sm font-medium text-morandi-primary">
+              {FORM_LABELS.issueBank}
+            </Label>
             <Input
               placeholder={PLACEHOLDER_LABELS.enterBankName}
               value={paymentItem.check_bank || ''}
@@ -360,7 +376,9 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.paymentDeadline}</Label>
+              <Label className="text-sm font-medium text-morandi-primary">
+                {FORM_LABELS.paymentDeadline}
+              </Label>
               <DateInput
                 value={paymentItem.pay_dateline || ''}
                 onChange={value => updatePaymentItem({ pay_dateline: value })}

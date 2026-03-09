@@ -164,7 +164,7 @@ test.describe.serial('待辦事項完整生命週期測試', () => {
     // 找到該行的刪除按鈕
     const deleteButton = todoRow.locator('button[title*="刪除"], button:has(svg)').last()
 
-    if (!await deleteButton.isVisible({ timeout: 3000 }).catch(() => false)) {
+    if (!(await deleteButton.isVisible({ timeout: 3000 }).catch(() => false))) {
       // 嘗試找其他方式的刪除按鈕
       const allButtons = await todoRow.locator('button').all()
       console.log(`找到 ${allButtons.length} 個按鈕`)
@@ -194,11 +194,16 @@ test.describe.serial('待辦事項完整生命週期測試', () => {
     await page.waitForTimeout(500)
 
     // 確認對話框
-    const confirmDialog = page.locator('[role="alertdialog"], [role="dialog"]').filter({ hasText: /確定|刪除|確認/ })
+    const confirmDialog = page
+      .locator('[role="alertdialog"], [role="dialog"]')
+      .filter({ hasText: /確定|刪除|確認/ })
     if (await confirmDialog.isVisible({ timeout: 3000 }).catch(() => false)) {
       console.log('確認對話框已出現')
 
-      const confirmButton = confirmDialog.locator('button').filter({ hasText: /確認刪除|確定|刪除$/ }).first()
+      const confirmButton = confirmDialog
+        .locator('button')
+        .filter({ hasText: /確認刪除|確定|刪除$/ })
+        .first()
       if (await confirmButton.isVisible({ timeout: 2000 }).catch(() => false)) {
         console.log('點擊確認按鈕...')
         await confirmButton.click()
@@ -215,7 +220,7 @@ test.describe.serial('待辦事項完整生命週期測試', () => {
 
     // 確認該待辦不在列表中
     const deletedTodo = page.locator('table tbody tr').filter({ hasText: createdTodoTitle! })
-    const stillExists = await deletedTodo.count() > 0
+    const stillExists = (await deletedTodo.count()) > 0
 
     if (stillExists) {
       console.log('待辦仍可見，嘗試重新載入頁面...')
@@ -223,7 +228,8 @@ test.describe.serial('待辦事項完整生命週期測試', () => {
       await page.waitForLoadState('networkidle')
       await page.waitForTimeout(1000)
 
-      const afterReloadExists = await page.locator('table tbody tr').filter({ hasText: createdTodoTitle! }).count() > 0
+      const afterReloadExists =
+        (await page.locator('table tbody tr').filter({ hasText: createdTodoTitle! }).count()) > 0
       expect(afterReloadExists).toBe(false)
       console.log(`✅ 重新載入後待辦 ${createdTodoTitle} 確認已刪除`)
     } else {

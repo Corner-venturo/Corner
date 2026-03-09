@@ -32,7 +32,7 @@ export function generateHotelPrintContent({ tour, members }: HotelPrintOptions):
       const hotelRows =
         hotels
           .map(
-            (h) => `
+            h => `
         <tr>
           <td style="padding: 12px; border: 1px solid #ddd;">${h.name}</td>
           <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">${h.checkin}</td>

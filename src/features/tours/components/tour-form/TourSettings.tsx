@@ -39,7 +39,10 @@ export function TourSettings({ newTour, setNewTour }: TourSettingsProps) {
       {/* 團控人員選擇（選填） */}
       <div>
         <label className="block text-sm font-medium text-morandi-primary mb-1">
-          {TOUR_SETTINGS.controller_label} <span className="text-morandi-secondary font-normal">{TOUR_SETTINGS.controller_optional}</span>
+          {TOUR_SETTINGS.controller_label}{' '}
+          <span className="text-morandi-secondary font-normal">
+            {TOUR_SETTINGS.controller_optional}
+          </span>
         </label>
         <Combobox
           options={controllers.map(emp => ({

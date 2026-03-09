@@ -72,7 +72,7 @@ export function useDesignerSetup({
       setManualItineraryId(selectedItineraryId)
       setSelectedDesignType(type)
 
-      const style = styleSeries.find((s) => s.id === styleId) || styleSeries[0]
+      const style = styleSeries.find(s => s.id === styleId) || styleSeries[0]
       setSelectedStyle(style)
 
       const effectiveEntityId = selectedTourId
@@ -102,13 +102,11 @@ export function useDesignerSetup({
               return_date:
                 (itineraryData as { return_date?: string | null }).return_date ?? undefined,
               duration_days: itineraryData.duration_days ?? undefined,
-              meeting_info:
-                (itineraryData.meeting_info as Record<string, unknown>) ?? undefined,
+              meeting_info: (itineraryData.meeting_info as Record<string, unknown>) ?? undefined,
               leader: (itineraryData.leader as Record<string, unknown>) ?? undefined,
               outbound_flight:
                 (itineraryData.outbound_flight as Record<string, unknown>) ?? undefined,
-              return_flight:
-                (itineraryData.return_flight as Record<string, unknown>) ?? undefined,
+              return_flight: (itineraryData.return_flight as Record<string, unknown>) ?? undefined,
               daily_itinerary:
                 (itineraryData.daily_itinerary as Array<Record<string, unknown>>) ?? undefined,
             })
@@ -139,10 +137,8 @@ export function useDesignerSetup({
               departure_date: tourData.departure_date ?? undefined,
               return_date: tourData.return_date ?? undefined,
               duration_days: durationDays,
-              outbound_flight:
-                (tourData.outbound_flight as Record<string, unknown>) ?? undefined,
-              return_flight:
-                (tourData.return_flight as Record<string, unknown>) ?? undefined,
+              outbound_flight: (tourData.outbound_flight as Record<string, unknown>) ?? undefined,
+              return_flight: (tourData.return_flight as Record<string, unknown>) ?? undefined,
             })
           }
         }
@@ -196,14 +192,7 @@ export function useDesignerSetup({
 
       if (entityId && workspaceId) {
         try {
-          await loadOrCreateDocument(
-            'brochure',
-            entityId,
-            workspaceId,
-            entityType,
-            undefined,
-            true
-          )
+          await loadOrCreateDocument('brochure', entityId, workspaceId, entityType, undefined, true)
         } catch (err) {
           logger.error('Failed to create document:', err)
         }

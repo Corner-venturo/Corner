@@ -30,10 +30,16 @@ const DropdownMenu = React.forwardRef<
     <div ref={ref} className={cn('relative', className)} {...props}>
       {React.Children.map(children, child =>
         React.isValidElement(child)
-          ? React.cloneElement(child as React.ReactElement<{ isOpen?: boolean; onOpenChange?: (open: boolean) => void }>, {
-              isOpen,
-              onOpenChange: handleOpenChange,
-            })
+          ? React.cloneElement(
+              child as React.ReactElement<{
+                isOpen?: boolean
+                onOpenChange?: (open: boolean) => void
+              }>,
+              {
+                isOpen,
+                onOpenChange: handleOpenChange,
+              }
+            )
           : child
       )}
     </div>
@@ -145,7 +151,7 @@ const DropdownMenuItem = React.forwardRef<
         'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
         className
       )}
-      onClick={(e) => {
+      onClick={e => {
         onClick?.(e)
         closeMenu?.(false)
       }}
@@ -163,16 +169,15 @@ const DropdownMenuSeparator = React.forwardRef<
 ))
 DropdownMenuSeparator.displayName = 'DropdownMenuSeparator'
 
-const DropdownMenuLabel = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn('px-2 py-1.5 text-sm font-semibold text-morandi-primary', className)}
-    {...props}
-  />
-))
+const DropdownMenuLabel = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn('px-2 py-1.5 text-sm font-semibold text-morandi-primary', className)}
+      {...props}
+    />
+  )
+)
 DropdownMenuLabel.displayName = 'DropdownMenuLabel'
 
 const DropdownMenuCheckboxItem = React.forwardRef<
@@ -190,7 +195,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
       'focus:bg-morandi-container focus:text-morandi-primary',
       className
     )}
-    onClick={(e) => {
+    onClick={e => {
       e.stopPropagation()
       onCheckedChange?.(!checked)
     }}

@@ -112,9 +112,12 @@ export function IconPicker({ onSelectIcon }: IconPickerProps) {
     return () => clearTimeout(timer)
   }, [search, selectedSet])
 
-  const handleSelect = useCallback((iconName: string) => {
-    onSelectIcon(iconName, selectedSet)
-  }, [selectedSet, onSelectIcon])
+  const handleSelect = useCallback(
+    (iconName: string) => {
+      onSelectIcon(iconName, selectedSet)
+    },
+    [selectedSet, onSelectIcon]
+  )
 
   return (
     <div className="flex flex-col h-full">
@@ -124,7 +127,7 @@ export function IconPicker({ onSelectIcon }: IconPickerProps) {
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-morandi-secondary" />
           <Input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
             placeholder={DESIGNER_LABELS.SEARCH_5417}
             className="pl-8 pr-8 h-8 text-sm"
           />
@@ -146,7 +149,7 @@ export function IconPicker({ onSelectIcon }: IconPickerProps) {
             <SelectValue placeholder={DESIGNER_LABELS.SELECT_5236} />
           </SelectTrigger>
           <SelectContent>
-            {ICON_SETS.map((set) => (
+            {ICON_SETS.map(set => (
               <SelectItem key={set.prefix} value={set.prefix}>
                 <span className="flex items-center gap-2">
                   <span>{set.name}</span>
@@ -160,7 +163,8 @@ export function IconPicker({ onSelectIcon }: IconPickerProps) {
 
       {/* 授權提示 */}
       <div className="px-2 py-1 text-[10px] text-morandi-secondary bg-morandi-container/30">
-        共 {ICON_SETS.length} 個圖示集 · {ICONS_BY_SET[selectedSet]?.length || 0} 個圖示 · 可商用印刷
+        共 {ICON_SETS.length} 個圖示集 · {ICONS_BY_SET[selectedSet]?.length || 0} 個圖示 ·
+        可商用印刷
       </div>
 
       {/* 圖示列表 */}
@@ -171,7 +175,7 @@ export function IconPicker({ onSelectIcon }: IconPickerProps) {
           </div>
         ) : (
           <div className="grid grid-cols-5 gap-1 p-2">
-            {icons.map((iconName) => (
+            {icons.map(iconName => (
               <button
                 key={iconName}
                 onClick={() => handleSelect(iconName)}

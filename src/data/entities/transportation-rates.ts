@@ -40,17 +40,20 @@ export interface TransportationRate {
   deleted_by: string | null
 }
 
-export const transportationRateEntity = createEntityHook<TransportationRate>('transportation_rates', {
-  list: {
-    select: '*',
-    orderBy: { column: 'display_order', ascending: true },
-  },
-  slim: {
-    select: 'id,country_id,country_name,vehicle_type,price,currency,is_active',
-  },
-  detail: { select: '*' },
-  cache: CACHE_PRESETS.medium,
-})
+export const transportationRateEntity = createEntityHook<TransportationRate>(
+  'transportation_rates',
+  {
+    list: {
+      select: '*',
+      orderBy: { column: 'display_order', ascending: true },
+    },
+    slim: {
+      select: 'id,country_id,country_name,vehicle_type,price,currency,is_active',
+    },
+    detail: { select: '*' },
+    cache: CACHE_PRESETS.medium,
+  }
+)
 
 export const useTransportationRates = transportationRateEntity.useList
 export const useTransportationRatesSlim = transportationRateEntity.useListSlim

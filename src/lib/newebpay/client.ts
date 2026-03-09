@@ -16,7 +16,13 @@
  * - 環境變數：QUOTAGUARD_STATIC_URL
  */
 
-import { aesEncrypt, aesDecrypt, generateTransactionNo, convertTaxType, formatInvoiceDate } from './crypto'
+import {
+  aesEncrypt,
+  aesDecrypt,
+  generateTransactionNo,
+  convertTaxType,
+  formatInvoiceDate,
+} from './crypto'
 import { ProxyAgent, fetch as undiciFetch } from 'undici'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
@@ -29,10 +35,10 @@ const API_ENDPOINTS = {
 
 // API 路徑（注意：沒有 /Api 前綴）
 const API_PATHS = {
-  issue: '/invoice_issue',       // 開立收據
-  void: '/invoice_invalid',      // 作廢收據
+  issue: '/invoice_issue', // 開立收據
+  void: '/invoice_invalid', // 作廢收據
   allowance: '/allowance_issue', // 開立折讓
-  query: '/invoice_search',      // 查詢收據
+  query: '/invoice_search', // 查詢收據
 }
 
 interface NewebPayConfig {
@@ -160,7 +166,11 @@ function parseUrlEncodedResponse(responseText: string): Record<string, string> {
 /**
  * 發送請求到藍新 API
  */
-async function sendRequest(path: string, postData: Record<string, unknown>, workspaceId: string): Promise<Record<string, string>> {
+async function sendRequest(
+  path: string,
+  postData: Record<string, unknown>,
+  workspaceId: string
+): Promise<Record<string, string>> {
   const config = await getNewebPayConfig(workspaceId)
   const baseUrl = config.isProduction ? API_ENDPOINTS.production : API_ENDPOINTS.test
 
@@ -193,12 +203,12 @@ async function sendRequest(path: string, postData: Record<string, unknown>, work
   if (proxyUrl) {
     logger.log('[NewebPay] 使用 Quotaguard proxy 發送請求')
     const proxyAgent = new ProxyAgent(proxyUrl)
-    response = await undiciFetch(requestUrl, {
+    response = (await undiciFetch(requestUrl, {
       method: 'POST',
       headers: requestHeaders,
       body: requestBody,
       dispatcher: proxyAgent,
-    }) as unknown as Response
+    })) as unknown as Response
   } else {
     // 本地開發或有固定 IP 的環境直接發送
     response = await fetch(requestUrl, {
@@ -280,7 +290,7 @@ export async function issueInvoice(params: IssueInvoiceParams & { workspaceId: s
     原始UBN: params.buyerInfo.buyerUBN,
     清理後UBN: cleanUBN,
     是否有效: isValidUBN,
-    類型: category
+    類型: category,
   })
 
   // 判斷是即時開立還是預約開立

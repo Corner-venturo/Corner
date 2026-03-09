@@ -5,7 +5,9 @@
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = 'https://pfqvdacxowpgfamuvnsn.supabase.co'
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyODcwOTMxOCwiZXhwIjoyMDQ0Mjg1MzE4fQ.T-hP6f6fXmYLn8Z1YEKqL2O7_9LkbXJ6Z3XqGqvCQxI'
+const supabaseKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyODcwOTMxOCwiZXhwIjoyMDQ0Mjg1MzE4fQ.T-hP6f6fXmYLn8Z1YEKqL2O7_9LkbXJ6Z3XqGqvCQxI'
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
@@ -71,8 +73,12 @@ async function checkWilliamTodos() {
     visibleTodos.slice(0, 5).forEach(todo => {
       console.log(`   - ${todo.title} (狀態: ${todo.status})`)
       console.log(`     Creator: ${todo.creator === williamId ? '✓ William' : todo.creator}`)
-      console.log(`     Assignee: ${todo.assignee === williamId ? '✓ William' : todo.assignee || '無'}`)
-      console.log(`     Visibility: ${todo.visibility?.includes(williamId) ? '✓ 包含 William' : '不包含'}`)
+      console.log(
+        `     Assignee: ${todo.assignee === williamId ? '✓ William' : todo.assignee || '無'}`
+      )
+      console.log(
+        `     Visibility: ${todo.visibility?.includes(williamId) ? '✓ 包含 William' : '不包含'}`
+      )
     })
     if (visibleTodos.length > 5) {
       console.log(`   ... 還有 ${visibleTodos.length - 5} 個`)

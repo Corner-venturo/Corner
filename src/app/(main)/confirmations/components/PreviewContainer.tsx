@@ -15,7 +15,9 @@ export function PreviewContainer({ formData }: PreviewContainerProps) {
         <div className="flex items-center gap-4">
           <h2 className="text-lg font-semibold text-morandi-primary">{LABELS.LIVE_PREVIEW}</h2>
           <span className="text-sm text-morandi-secondary">
-            {formData.type === 'accommodation' ? LABELS.ACCOMMODATION_CONFIRMATION_TITLE : LABELS.FLIGHT_CONFIRMATION_TITLE}
+            {formData.type === 'accommodation'
+              ? LABELS.ACCOMMODATION_CONFIRMATION_TITLE
+              : LABELS.FLIGHT_CONFIRMATION_TITLE}
           </span>
         </div>
       </div>

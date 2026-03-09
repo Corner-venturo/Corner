@@ -9,10 +9,10 @@
 
 ### 兩套系統並存
 
-| 系統 | 檔案數 | 使用方式 |
-|------|--------|----------|
-| **Zustand Stores** | 25+ | `useTourStore()`, `useOrderStore()` |
-| **SWR Hooks** | 5 | `useTours()`, `useOrders()` (cloud-hooks.ts) |
+| 系統               | 檔案數 | 使用方式                                     |
+| ------------------ | ------ | -------------------------------------------- |
+| **Zustand Stores** | 25+    | `useTourStore()`, `useOrderStore()`          |
+| **SWR Hooks**      | 5      | `useTours()`, `useOrders()` (cloud-hooks.ts) |
 
 ### 問題
 
@@ -34,24 +34,24 @@
 
 這些 Store 有複雜邏輯或全域狀態，不適合用 SWR：
 
-| Store | 原因 |
-|-------|------|
-| `auth-store.ts` | 認證狀態，非資料庫資料 |
-| `ui-store.ts` | UI 狀態 |
-| `regions-store.ts` | 國家/城市靜態資料 |
-| `workspace/*` | Workspace 相關狀態 |
+| Store              | 原因                   |
+| ------------------ | ---------------------- |
+| `auth-store.ts`    | 認證狀態，非資料庫資料 |
+| `ui-store.ts`      | UI 狀態                |
+| `regions-store.ts` | 國家/城市靜態資料      |
+| `workspace/*`      | Workspace 相關狀態     |
 
 ### 優先遷移的 Store
 
 這些 Store 只是簡單 CRUD，可以用 SWR 取代：
 
-| Store | SWR Hook | 優先級 |
-|-------|----------|--------|
-| `tour-store.ts` | `useTours()` | 已有 ✅ |
-| `order-store.ts` | `useOrders()` | 已有 ✅ |
-| `customer-store.ts` | `useCustomers()` | 已有 ✅ |
-| `quote-store.ts` | `useQuotes()` | 已有 ✅ |
-| `itinerary-store.ts` | `useItineraries()` | 已有 ✅ |
+| Store                      | SWR Hook               | 優先級  |
+| -------------------------- | ---------------------- | ------- |
+| `tour-store.ts`            | `useTours()`           | 已有 ✅ |
+| `order-store.ts`           | `useOrders()`          | 已有 ✅ |
+| `customer-store.ts`        | `useCustomers()`       | 已有 ✅ |
+| `quote-store.ts`           | `useQuotes()`          | 已有 ✅ |
+| `itinerary-store.ts`       | `useItineraries()`     | 已有 ✅ |
 | `payment-request-store.ts` | `usePaymentRequests()` | 已有 ✅ |
 
 ---
@@ -62,30 +62,30 @@
 
 ```typescript
 // 核心業務
-useTours()              // 團行程
-useOrders()             // 訂單
-useCustomers()          // 客戶
-useQuotes()             // 報價單
-useItineraries()        // 行程表
+useTours() // 團行程
+useOrders() // 訂單
+useCustomers() // 客戶
+useQuotes() // 報價單
+useItineraries() // 行程表
 
 // 財務
-usePaymentRequests()    // 付款申請
+usePaymentRequests() // 付款申請
 usePaymentRequestItems() // 付款項目
 useDisbursementOrders() // 支出單
-useReceiptOrders()      // 收款單
+useReceiptOrders() // 收款單
 
 // 人員
-useMembers()            // 團員
-useEmployees()          // 員工
+useMembers() // 團員
+useEmployees() // 員工
 
 // 其他
-useTodosCloud()         // 待辦
-useVisas()              // 簽證
-useSuppliers()          // 供應商
-useAirportImages()      // 機場圖片
-useCustomerGroups()     // 客戶群組
-useProposals()          // 提案
-useProposalPackages()   // 團體套件
+useTodosCloud() // 待辦
+useVisas() // 簽證
+useSuppliers() // 供應商
+useAirportImages() // 機場圖片
+useCustomerGroups() // 客戶群組
+useProposals() // 提案
+useProposalPackages() // 團體套件
 ```
 
 ### 使用方式
@@ -104,7 +104,9 @@ import { useTourStore } from '@/stores'
 
 function MyComponent() {
   const { items, fetchAll, add, update, delete: remove } = useTourStore()
-  useEffect(() => { fetchAll() }, []) // 需要手動 fetch
+  useEffect(() => {
+    fetchAll()
+  }, []) // 需要手動 fetch
   // ...
 }
 ```
@@ -115,11 +117,11 @@ function MyComponent() {
 
 SWR Hooks 已設定分層快取（見 `src/lib/swr/config.ts`）：
 
-| 資料類型 | 策略 | dedupingInterval |
-|---------|------|------------------|
-| tours, customers, quotes | STATIC | 60 秒 |
-| orders, payments | DYNAMIC | 10 秒 |
-| todos, calendar_events | REALTIME | 3 秒 |
+| 資料類型                 | 策略     | dedupingInterval |
+| ------------------------ | -------- | ---------------- |
+| tours, customers, quotes | STATIC   | 60 秒            |
+| orders, payments         | DYNAMIC  | 10 秒            |
+| todos, calendar_events   | REALTIME | 3 秒             |
 
 ---
 
@@ -153,8 +155,8 @@ function ToursPage() {
 
 ## 時程
 
-| 階段 | 目標 | 時間 |
-|------|------|------|
+| 階段    | 目標         | 時間     |
+| ------- | ------------ | -------- |
 | Phase 1 | 新功能用 SWR | 立即生效 |
 | Phase 2 | 高頻頁面遷移 | 隨機會改 |
 | Phase 3 | 廢棄舊 Store | 無時間表 |

@@ -25,16 +25,14 @@ interface CalendarEvent {
  * 2. 事件類型篩選（根據 settings）
  * 3. 個人/公司事項的可見性篩選
  */
-export function useCalendarFilters(
-  calendarEvents: CalendarEvent[],
-  settings: CalendarSettings
-) {
+export function useCalendarFilters(calendarEvents: CalendarEvent[], settings: CalendarSettings) {
   const { user } = useAuthStore()
   const { workspaces, loadWorkspaces } = useWorkspaceStore()
 
   // Workspace 篩選狀態（只有超級管理員能用）
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(null)
-  const isSuperAdmin = user?.roles?.includes('super_admin') || user?.permissions?.includes('super_admin')
+  const isSuperAdmin =
+    user?.roles?.includes('super_admin') || user?.permissions?.includes('super_admin')
 
   // 初始化時從 localStorage 讀取篩選狀態
   const workspaceInitRef = useRef(false)

@@ -68,32 +68,26 @@ export const schemas = {
     z.string().regex(/^(0[2-9]\d{7,8}|09\d{8})$/, message),
 
   /** 手機 (台灣格式) */
-  mobile: (message = '請輸入有效的手機號碼') =>
-    z.string().regex(/^09\d{8}$/, message),
+  mobile: (message = '請輸入有效的手機號碼') => z.string().regex(/^09\d{8}$/, message),
 
   /** 身分證字號 */
-  nationalId: (message = '請輸入有效的身分證字號') =>
-    z.string().regex(/^[A-Z][12]\d{8}$/, message),
+  nationalId: (message = '請輸入有效的身分證字號') => z.string().regex(/^[A-Z][12]\d{8}$/, message),
 
   /** 護照號碼 */
   passportNumber: (message = '請輸入有效的護照號碼') =>
     z.string().regex(/^[A-Z0-9]{6,9}$/, message),
 
   /** 日期 (YYYY-MM-DD) */
-  dateString: (message = '請輸入有效的日期') =>
-    z.string().regex(/^\d{4}-\d{2}-\d{2}$/, message),
+  dateString: (message = '請輸入有效的日期') => z.string().regex(/^\d{4}-\d{2}-\d{2}$/, message),
 
   /** 正數 */
-  positiveNumber: (message = '請輸入正數') =>
-    z.number().positive(message),
+  positiveNumber: (message = '請輸入正數') => z.number().positive(message),
 
   /** 非負數 */
-  nonNegativeNumber: (message = '請輸入非負數') =>
-    z.number().nonnegative(message),
+  nonNegativeNumber: (message = '請輸入非負數') => z.number().nonnegative(message),
 
   /** 金額 (最多兩位小數) */
-  amount: (message = '請輸入有效的金額') =>
-    z.number().nonnegative(message).multipleOf(0.01),
+  amount: (message = '請輸入有效的金額') => z.number().nonnegative(message).multipleOf(0.01),
 }
 
 /**

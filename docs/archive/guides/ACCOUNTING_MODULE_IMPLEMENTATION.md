@@ -78,6 +78,7 @@ CREATE TABLE workspace_modules (
 ```
 
 **用途**：
+
 - 控制模組顯示/隱藏
 - 計費依據
 - 功能權限控制
@@ -99,6 +100,7 @@ CREATE TABLE accounting_subjects (
 ```
 
 **預設科目**（已在 migration 中建立）：
+
 - `1101` 現金
 - `1102` 銀行存款
 - `1103` 應收帳款
@@ -129,6 +131,7 @@ CREATE TABLE vouchers (
 ```
 
 **狀態說明**：
+
 - `draft` 草稿：可修改、可刪除
 - `posted` 已過帳：不可修改、計入總帳
 - `void` 作廢：標記刪除、保留紀錄
@@ -151,6 +154,7 @@ CREATE TABLE voucher_entries (
 ```
 
 **檢查規則**：
+
 - 每筆分錄必須 「借方 > 0 且貸方 = 0」 或 「借方 = 0 且貸方 > 0」
 - 傳票的 總借方 = 總貸方（借貸平衡）
 
@@ -171,6 +175,7 @@ CREATE TABLE general_ledger (
 ```
 
 **自動計算邏輯**：
+
 - 傳票過帳時，自動更新對應科目的總帳
 - `期末餘額 = 期初餘額 + 借方合計 - 貸方合計`（資產、費用）
 - `期末餘額 = 期初餘額 + 貸方合計 - 借方合計`（負債、收入、權益）
@@ -303,16 +308,17 @@ export default function AccountingLayout({ children }: { children: React.Node })
 ```typescript
 // 會計功能細分權限
 const ACCOUNTING_PERMISSIONS = {
-  VIEW_SUBJECTS: 'accounting:view_subjects',       // 查看科目表
-  MANAGE_SUBJECTS: 'accounting:manage_subjects',   // 管理科目表
-  CREATE_VOUCHER: 'accounting:create_voucher',     // 建立傳票
-  POST_VOUCHER: 'accounting:post_voucher',         // 過帳傳票
-  VOID_VOUCHER: 'accounting:void_voucher',         // 作廢傳票
-  VIEW_REPORTS: 'accounting:view_reports',         // 查看報表
+  VIEW_SUBJECTS: 'accounting:view_subjects', // 查看科目表
+  MANAGE_SUBJECTS: 'accounting:manage_subjects', // 管理科目表
+  CREATE_VOUCHER: 'accounting:create_voucher', // 建立傳票
+  POST_VOUCHER: 'accounting:post_voucher', // 過帳傳票
+  VOID_VOUCHER: 'accounting:void_voucher', // 作廢傳票
+  VIEW_REPORTS: 'accounting:view_reports', // 查看報表
 }
 ```
 
 **權限檢查範例**：
+
 ```typescript
 // 只有會計主管可以過帳
 const canPost = user.permissions.includes('accounting:post_voucher')
@@ -359,6 +365,7 @@ async function handlePayment(orderId: string, paymentAmount: number, paymentDate
 ```
 
 **拋轉傳票內容**：
+
 ```
 借：銀行存款 (1102)     $100,000
 貸：團費收入 (4101)     $100,000
@@ -387,6 +394,7 @@ async function createPaymentRequest(data: PaymentRequestCreate) {
 ```
 
 **拋轉傳票內容**：
+
 ```
 借：旅遊成本-住宿 (5102)  $50,000
 貸：應付帳款 (2101)       $50,000
@@ -417,6 +425,7 @@ async function confirmPayment(requestId: string, paymentDate: string) {
 ```
 
 **拋轉傳票內容**：
+
 ```
 借：應付帳款 (2101)      $50,000
 貸：銀行存款 (1102)      $50,000
@@ -453,44 +462,44 @@ function FinanceDashboard() {
 export const AUTO_VOUCHER_RULES = {
   // 訂單收款
   ORDER_PAYMENT: {
-    debit: '1102',  // 銀行存款
+    debit: '1102', // 銀行存款
     credit: '4101', // 團費收入
-    description: (order: Order) => `訂單 ${order.code} 收款`
+    description: (order: Order) => `訂單 ${order.code} 收款`,
   },
 
   // 請款單（依供應商類型區分）
   PAYMENT_REQUEST: {
     transportation: {
-      debit: '5101',  // 旅遊成本-交通
+      debit: '5101', // 旅遊成本-交通
       credit: '2101', // 應付帳款
     },
     accommodation: {
-      debit: '5102',  // 旅遊成本-住宿
+      debit: '5102', // 旅遊成本-住宿
       credit: '2101',
     },
     meal: {
-      debit: '5103',  // 旅遊成本-餐飲
+      debit: '5103', // 旅遊成本-餐飲
       credit: '2101',
     },
     ticket: {
-      debit: '5104',  // 旅遊成本-門票
+      debit: '5104', // 旅遊成本-門票
       credit: '2101',
     },
     insurance: {
-      debit: '5105',  // 旅遊成本-保險
+      debit: '5105', // 旅遊成本-保險
       credit: '2101',
     },
     other: {
-      debit: '5106',  // 旅遊成本-其他
+      debit: '5106', // 旅遊成本-其他
       credit: '2101',
     },
   },
 
   // 付款確認
   PAYMENT_CONFIRM: {
-    debit: '2101',  // 應付帳款
+    debit: '2101', // 應付帳款
     credit: '1102', // 銀行存款
-    description: (request: PaymentRequest) => `付款 - ${request.code}`
+    description: (request: PaymentRequest) => `付款 - ${request.code}`,
   },
 }
 ```
@@ -639,10 +648,7 @@ export class VoucherAutoGenerator {
 import { createStore } from './create-store-main'
 import type { AccountingSubject } from '@/types/accounting-pro.types'
 
-export const useAccountingSubjectStore = createStore<AccountingSubject>(
-  'accounting_subjects',
-  'AS'
-)
+export const useAccountingSubjectStore = createStore<AccountingSubject>('accounting_subjects', 'AS')
 
 // 樹狀結構轉換
 export function buildSubjectTree(subjects: AccountingSubject[]): AccountingSubjectNode[] {

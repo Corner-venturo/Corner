@@ -37,7 +37,13 @@ import { logger } from '@/lib/utils/logger'
 /**
  * 實體類型
  */
-export type SyncEntityType = 'tour' | 'order' | 'member' | 'itinerary' | 'payment_request' | 'receipt_order'
+export type SyncEntityType =
+  | 'tour'
+  | 'order'
+  | 'member'
+  | 'itinerary'
+  | 'payment_request'
+  | 'receipt_order'
 
 /**
  * 同步事件配置
@@ -80,10 +86,7 @@ interface ZustandStore<T> {
 /**
  * 發送 CREATED 事件
  */
-export function emitCreated<T>(
-  config: SyncEventConfig<T>,
-  item: T
-): void {
+export function emitCreated<T>(config: SyncEventConfig<T>, item: T): void {
   const { entityType, getEntityId, getTourId, getOrderId } = config
   const payload = buildEventPayload(entityType, item, getEntityId, getTourId, getOrderId)
 
@@ -99,7 +102,14 @@ export function emitUpdated<T>(
   changedFields?: string[]
 ): void {
   const { entityType, getEntityId, getTourId, getOrderId } = config
-  const payload = buildEventPayload(entityType, item, getEntityId, getTourId, getOrderId, changedFields)
+  const payload = buildEventPayload(
+    entityType,
+    item,
+    getEntityId,
+    getTourId,
+    getOrderId,
+    changedFields
+  )
 
   emitEventByType(entityType, 'UPDATED', payload)
 }
@@ -107,11 +117,7 @@ export function emitUpdated<T>(
 /**
  * 發送 DELETED 事件
  */
-export function emitDeleted<T>(
-  config: SyncEventConfig<T>,
-  entityId: string,
-  item?: T
-): void {
+export function emitDeleted<T>(config: SyncEventConfig<T>, entityId: string, item?: T): void {
   const { entityType, getTourId, getOrderId } = config
 
   const tourId = item && getTourId ? getTourId(item) : undefined
@@ -146,10 +152,16 @@ function emitEventByType(
       storeEvents.emit(`ITINERARY_${action}` as StoreEventType, payload as ItineraryEventPayload)
       break
     case 'payment_request':
-      storeEvents.emit(`PAYMENT_REQUEST_${action}` as StoreEventType, payload as PaymentRequestEventPayload)
+      storeEvents.emit(
+        `PAYMENT_REQUEST_${action}` as StoreEventType,
+        payload as PaymentRequestEventPayload
+      )
       break
     case 'receipt_order':
-      storeEvents.emit(`RECEIPT_ORDER_${action}` as StoreEventType, payload as ReceiptOrderEventPayload)
+      storeEvents.emit(
+        `RECEIPT_ORDER_${action}` as StoreEventType,
+        payload as ReceiptOrderEventPayload
+      )
       break
   }
 }
@@ -256,36 +268,40 @@ function buildDeletePayload(
 // 預設的同步配置
 export const TOUR_SYNC_CONFIG: SyncEventConfig<{ id: string }> = {
   entityType: 'tour',
-  getEntityId: (item) => item.id,
+  getEntityId: item => item.id,
 }
 
 export const ORDER_SYNC_CONFIG: SyncEventConfig<{ id: string; tour_id?: string }> = {
   entityType: 'order',
-  getEntityId: (item) => item.id,
-  getTourId: (item) => item.tour_id,
+  getEntityId: item => item.id,
+  getTourId: item => item.tour_id,
 }
 
 export const MEMBER_SYNC_CONFIG: SyncEventConfig<{ id: string; order_id?: string }> = {
   entityType: 'member',
-  getEntityId: (item) => item.id,
-  getOrderId: (item) => item.order_id,
+  getEntityId: item => item.id,
+  getOrderId: item => item.order_id,
 }
 
 export const ITINERARY_SYNC_CONFIG: SyncEventConfig<{ id: string; tour_id?: string }> = {
   entityType: 'itinerary',
-  getEntityId: (item) => item.id,
-  getTourId: (item) => item.tour_id,
+  getEntityId: item => item.id,
+  getTourId: item => item.tour_id,
 }
 
 export const PAYMENT_REQUEST_SYNC_CONFIG: SyncEventConfig<{ id: string; tour_id?: string }> = {
   entityType: 'payment_request',
-  getEntityId: (item) => item.id,
-  getTourId: (item) => item.tour_id,
+  getEntityId: item => item.id,
+  getTourId: item => item.tour_id,
 }
 
-export const RECEIPT_ORDER_SYNC_CONFIG: SyncEventConfig<{ id: string; tour_id?: string; order_id?: string }> = {
+export const RECEIPT_ORDER_SYNC_CONFIG: SyncEventConfig<{
+  id: string
+  tour_id?: string
+  order_id?: string
+}> = {
   entityType: 'receipt_order',
-  getEntityId: (item) => item.id,
-  getTourId: (item) => item.tour_id,
-  getOrderId: (item) => item.order_id,
+  getEntityId: item => item.id,
+  getTourId: item => item.tour_id,
+  getOrderId: item => item.order_id,
 }

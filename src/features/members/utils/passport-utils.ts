@@ -20,8 +20,8 @@ export async function convertPdfToImages(pdfFile: File): Promise<File[]> {
     canvas.height = viewport.height
     const context = canvas.getContext('2d')!
     await page.render({ canvasContext: context, viewport }).promise
-    const blob = await new Promise<Blob>((resolve) =>
-      canvas.toBlob((b) => resolve(b!), 'image/jpeg', 0.85)
+    const blob = await new Promise<Blob>(resolve =>
+      canvas.toBlob(b => resolve(b!), 'image/jpeg', 0.85)
     )
     images.push(new File([blob], `${pdfFile.name}_page${i}.jpg`, { type: 'image/jpeg' }))
   }
@@ -32,7 +32,7 @@ export async function compressImage(file: File, quality = 0.6): Promise<File> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
-    reader.onload = (e) => {
+    reader.onload = e => {
       const img = new Image()
       img.src = e.target?.result as string
       img.onload = () => {
@@ -53,7 +53,7 @@ export async function compressImage(file: File, quality = 0.6): Promise<File> {
         const ctx = canvas.getContext('2d')!
         ctx.drawImage(img, 0, 0, width, height)
         canvas.toBlob(
-          async (blob) => {
+          async blob => {
             if (blob) {
               const compressedFile = new File([blob], file.name, {
                 type: 'image/jpeg',

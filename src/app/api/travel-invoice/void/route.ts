@@ -30,7 +30,7 @@ async function checkVoidPermission(employeeId: string): Promise<boolean> {
   if (error || !data) return false
 
   const roles = data.roles as string[] | null
-  return roles?.some((r) => VOID_INVOICE_ALLOWED_ROLES.includes(r)) ?? false
+  return roles?.some(r => VOID_INVOICE_ALLOWED_ROLES.includes(r)) ?? false
 }
 
 export async function POST(request: NextRequest) {

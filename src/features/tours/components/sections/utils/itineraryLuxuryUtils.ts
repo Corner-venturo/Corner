@@ -16,13 +16,13 @@ export const LUXURY = {
 
 // Day 卡片背景色循環（7天不重複）
 export const DAY_COLORS = [
-  '#2C5F4D',  // 深綠
-  '#8F4F4F',  // 酒紅
-  '#4A6FA5',  // 靛藍
-  '#6B5B4F',  // 摩卡棕
-  '#5D6D7E',  // 石板灰
-  '#7D5A50',  // 赤褐
-  '#3D5A45',  // 森林綠
+  '#2C5F4D', // 深綠
+  '#8F4F4F', // 酒紅
+  '#4A6FA5', // 靛藍
+  '#6B5B4F', // 摩卡棕
+  '#5D6D7E', // 石板灰
+  '#7D5A50', // 赤褐
+  '#3D5A45', // 森林綠
 ]
 
 // 計算 dayLabel
@@ -48,7 +48,10 @@ export function calculateDayLabels(itinerary: TourFormData['dailyItinerary']): s
 
 // 根據出發日期和實際天數（非 index）計算該天的日期
 // actualDayNumber 是從 1 開始的實際天數，建議行程不增加天數
-export function calculateDayDate(departureDate: string | undefined, actualDayNumber: number): string {
+export function calculateDayDate(
+  departureDate: string | undefined,
+  actualDayNumber: number
+): string {
   if (!departureDate || isNaN(actualDayNumber) || actualDayNumber < 1) return ''
   try {
     const date = new Date(departureDate)
@@ -58,7 +61,20 @@ export function calculateDayDate(departureDate: string | undefined, actualDayNum
     const month = date.getMonth()
     const day = date.getDate()
     if (isNaN(month) || isNaN(day)) return ''
-    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+    const months = [
+      'JAN',
+      'FEB',
+      'MAR',
+      'APR',
+      'MAY',
+      'JUN',
+      'JUL',
+      'AUG',
+      'SEP',
+      'OCT',
+      'NOV',
+      'DEC',
+    ]
     return `${months[month]} ${day}`
   } catch {
     return ''
@@ -78,7 +94,10 @@ export function getDayOfWeek(dateStr: string | undefined): string {
 }
 
 // 判斷是否為實際的最後一天（考慮替代行程）
-export function isLastMainDay(itinerary: TourFormData['dailyItinerary'], currentIndex: number): boolean {
+export function isLastMainDay(
+  itinerary: TourFormData['dailyItinerary'],
+  currentIndex: number
+): boolean {
   // 找出最後一個「非替代行程」的索引
   let lastMainDayIndex = -1
   for (let i = itinerary.length - 1; i >= 0; i--) {

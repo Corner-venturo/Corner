@@ -3,7 +3,13 @@
 import React, { useCallback, useMemo } from 'react'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { EnhancedTableProps, RowData, TableColumn, SelectionConfig, ExpandableConfig } from './types'
+import {
+  EnhancedTableProps,
+  RowData,
+  TableColumn,
+  SelectionConfig,
+  ExpandableConfig,
+} from './types'
 import { useTableState } from './useTableState'
 import { TableHeader } from './TableHeader'
 import { TableBody } from './TableBody'
@@ -43,8 +49,12 @@ export function EnhancedTable<T extends RowData = RowData>({
   const typedExpandable = expandable as unknown as ExpandableConfig<RowData> | undefined
   const typedActions = actions as unknown as ((row: RowData) => React.ReactNode) | undefined
   const typedRowClassName = rowClassName as unknown as ((row: RowData) => string) | undefined
-  const typedOnRowClick = onRowClick as unknown as ((row: RowData, rowIndex?: number) => void) | undefined
-  const typedOnRowDoubleClick = onRowDoubleClick as unknown as ((row: RowData, rowIndex: number) => void) | undefined
+  const typedOnRowClick = onRowClick as unknown as
+    | ((row: RowData, rowIndex?: number) => void)
+    | undefined
+  const typedOnRowDoubleClick = onRowDoubleClick as unknown as
+    | ((row: RowData, rowIndex: number) => void)
+    | undefined
   // Handle loading aliases
   const actualLoading = loading || isLoading || false
   const {
@@ -71,35 +81,51 @@ export function EnhancedTable<T extends RowData = RowData>({
   })
 
   // Helper functions for selection and expandable
-  const getRowId = useCallback((row: RowData, index: number): string => {
-    if (typedSelection?.getRowId) return typedSelection.getRowId(row, index)
-    if (typedExpandable?.getRowId) return typedExpandable.getRowId(row, index)
-    return ((row as Record<string, unknown>).id as string) || ((row as Record<string, unknown>)._id as string) || index.toString()
-  }, [typedSelection, typedExpandable])
+  const getRowId = useCallback(
+    (row: RowData, index: number): string => {
+      if (typedSelection?.getRowId) return typedSelection.getRowId(row, index)
+      if (typedExpandable?.getRowId) return typedExpandable.getRowId(row, index)
+      return (
+        ((row as Record<string, unknown>).id as string) ||
+        ((row as Record<string, unknown>)._id as string) ||
+        index.toString()
+      )
+    },
+    [typedSelection, typedExpandable]
+  )
 
-  const isRowSelected = useCallback((row: RowData, index: number): boolean => {
-    if (!typedSelection) return false
-    const rowId = getRowId(row, index)
-    return typedSelection.selected.includes(rowId)
-  }, [typedSelection, getRowId])
+  const isRowSelected = useCallback(
+    (row: RowData, index: number): boolean => {
+      if (!typedSelection) return false
+      const rowId = getRowId(row, index)
+      return typedSelection.selected.includes(rowId)
+    },
+    [typedSelection, getRowId]
+  )
 
-  const isRowExpanded = useCallback((row: RowData, index: number): boolean => {
-    if (!typedExpandable) return false
-    const rowId = getRowId(row, index)
-    return typedExpandable.expanded.includes(rowId)
-  }, [typedExpandable, getRowId])
+  const isRowExpanded = useCallback(
+    (row: RowData, index: number): boolean => {
+      if (!typedExpandable) return false
+      const rowId = getRowId(row, index)
+      return typedExpandable.expanded.includes(rowId)
+    },
+    [typedExpandable, getRowId]
+  )
 
-  const toggleSelection = useCallback((row: RowData, index: number) => {
-    if (!typedSelection) return
-    const rowId = getRowId(row, index)
-    const isSelected = typedSelection.selected.includes(rowId)
+  const toggleSelection = useCallback(
+    (row: RowData, index: number) => {
+      if (!typedSelection) return
+      const rowId = getRowId(row, index)
+      const isSelected = typedSelection.selected.includes(rowId)
 
-    if (isSelected) {
-      typedSelection.onChange(typedSelection.selected.filter(id => id !== rowId))
-    } else {
-      typedSelection.onChange([...typedSelection.selected, rowId])
-    }
-  }, [typedSelection, getRowId])
+      if (isSelected) {
+        typedSelection.onChange(typedSelection.selected.filter(id => id !== rowId))
+      } else {
+        typedSelection.onChange([...typedSelection.selected, rowId])
+      }
+    },
+    [typedSelection, getRowId]
+  )
 
   const toggleSelectAll = useCallback(() => {
     if (!typedSelection) return
@@ -122,24 +148,38 @@ export function EnhancedTable<T extends RowData = RowData>({
   }, [typedSelection, paginatedData, getRowId, startIndex])
 
   // Calculate if all visible rows are selected
-  const allVisibleSelected = useMemo(() => typedSelection
-    ? paginatedData.length > 0 &&
-      paginatedData.every((row, index) => isRowSelected(row, startIndex + index))
-    : false, [typedSelection, paginatedData, isRowSelected, startIndex])
-  const someVisibleSelected = useMemo(() => typedSelection
-    ? paginatedData.some((row, index) => isRowSelected(row, startIndex + index))
-    : false, [typedSelection, paginatedData, isRowSelected, startIndex])
+  const allVisibleSelected = useMemo(
+    () =>
+      typedSelection
+        ? paginatedData.length > 0 &&
+          paginatedData.every((row, index) => isRowSelected(row, startIndex + index))
+        : false,
+    [typedSelection, paginatedData, isRowSelected, startIndex]
+  )
+  const someVisibleSelected = useMemo(
+    () =>
+      typedSelection
+        ? paginatedData.some((row, index) => isRowSelected(row, startIndex + index))
+        : false,
+    [typedSelection, paginatedData, isRowSelected, startIndex]
+  )
 
-  const handleSortWrapper = useCallback((columnKey: string) => {
-    handleSort(columnKey)
-    onSort?.(columnKey, sortColumn === columnKey && sortDirection === 'asc' ? 'desc' : 'asc')
-  }, [handleSort, onSort, sortColumn, sortDirection])
+  const handleSortWrapper = useCallback(
+    (columnKey: string) => {
+      handleSort(columnKey)
+      onSort?.(columnKey, sortColumn === columnKey && sortDirection === 'asc' ? 'desc' : 'asc')
+    },
+    [handleSort, onSort, sortColumn, sortDirection]
+  )
 
-  const handleFilterChange = useCallback((key: string, value: string) => {
-    updateFilter(key, value)
-    const newFilters = { ...filters, [key]: value === '__all__' ? '' : value }
-    onFilter?.(newFilters)
-  }, [updateFilter, onFilter, filters])
+  const handleFilterChange = useCallback(
+    (key: string, value: string) => {
+      updateFilter(key, value)
+      const newFilters = { ...filters, [key]: value === '__all__' ? '' : value }
+      onFilter?.(newFilters)
+    },
+    [updateFilter, onFilter, filters]
+  )
 
   // Error state (loading state now handled in TableBody to keep table structure visible)
   if (error) {
@@ -151,7 +191,9 @@ export function EnhancedTable<T extends RowData = RowData>({
         )}
       >
         <div className="flex items-center justify-center py-8 text-status-danger">
-          <span>{ENHANCED_TABLE_LABELS.LABEL_6824} {error}</span>
+          <span>
+            {ENHANCED_TABLE_LABELS.LABEL_6824} {error}
+          </span>
         </div>
       </div>
     )

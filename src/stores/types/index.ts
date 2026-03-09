@@ -111,10 +111,7 @@ export type {
 export { PROPOSAL_STATUS_CONFIG, ARCHIVE_REASON_CONFIG } from '@/types/proposal.types'
 
 // 獎金型別
-export {
-  BonusSettingType,
-  BonusCalculationType,
-} from "@/types/bonus.types"
+export { BonusSettingType, BonusCalculationType } from '@/types/bonus.types'
 
 export type {
   TourBonusSetting,
@@ -122,4 +119,4 @@ export type {
   BonusResult,
   ProfitCalculationResult,
   ProfitTableRow,
-} from "@/types/bonus.types"
+} from '@/types/bonus.types'

@@ -14,12 +14,12 @@
 
 ```typescript
 // ❌ 絕對禁止
-function handleData(data: any) { }
+function handleData(data: any) {}
 const items: any[] = []
 const result: any = await fetch()
 
 // ✅ 必須使用明確類型
-function handleData(data: CustomerData) { }
+function handleData(data: CustomerData) {}
 const items: Customer[] = []
 const result: ApiResponse = await fetch()
 
@@ -32,6 +32,7 @@ function handleData(data: unknown) {
 ```
 
 **例外情況**（需要團隊審查）：
+
 - 第三方套件沒有類型定義
 - 動態 JSON 解析（但仍需立即驗證）
 
@@ -39,15 +40,16 @@ function handleData(data: unknown) {
 
 ### 🚫 規則 #2: 單一文件行數限制
 
-| 文件類型 | 最大行數 | 超過時的處理 |
-|---------|---------|-------------|
-| 組件 (.tsx) | 300 行 | 🔴 必須拆分 |
-| Hook | 200 行 | 🔴 必須拆分 |
-| 工具函數 | 150 行 | 🔴 必須拆分 |
-| 類型定義 | 500 行 | 🔴 必須拆分 |
-| API 路由 | 200 行 | 🔴 必須拆分 |
+| 文件類型    | 最大行數 | 超過時的處理 |
+| ----------- | -------- | ------------ |
+| 組件 (.tsx) | 300 行   | 🔴 必須拆分  |
+| Hook        | 200 行   | 🔴 必須拆分  |
+| 工具函數    | 150 行   | 🔴 必須拆分  |
+| 類型定義    | 500 行   | 🔴 必須拆分  |
+| API 路由    | 200 行   | 🔴 必須拆分  |
 
 **檢查命令**：
+
 ```bash
 # 找出所有超過 300 行的組件
 find src -name "*.tsx" -exec wc -l {} \; | awk '$1 > 300 {print}'
@@ -132,7 +134,7 @@ function createUser(
   workspace: string,
   department: string,
   active: boolean
-) { }
+) {}
 
 // ✅ 正確：使用物件參數
 interface CreateUserParams {
@@ -144,7 +146,7 @@ interface CreateUserParams {
   active: boolean
 }
 
-function createUser(params: CreateUserParams) { }
+function createUser(params: CreateUserParams) {}
 
 // 使用時更清晰
 createUser({
@@ -198,6 +200,7 @@ src/components/
 ### 強制啟用 TypeScript 嚴格模式
 
 `tsconfig.json`:
+
 ```json
 {
   "compilerOptions": {
@@ -224,9 +227,9 @@ interface User {
   id: string
   name: string
   email: string
-  role: 'admin' | 'user' | 'viewer'  // 使用聯合類型，不是 string
-  workspace: Workspace  // 使用接口，不是 any
-  createdAt: string  // 或 Date
+  role: 'admin' | 'user' | 'viewer' // 使用聯合類型，不是 string
+  workspace: Workspace // 使用接口，不是 any
+  createdAt: string // 或 Date
   updatedAt: string
 }
 
@@ -238,7 +241,7 @@ interface ApiResponse<T> {
 }
 
 // ✅ 正確：條件類型
-type UserRole = User['role']  // 從接口提取
+type UserRole = User['role'] // 從接口提取
 type RequiredKeys<T> = {
   [K in keyof T]-?: T[K]
 }
@@ -261,6 +264,7 @@ type RequiredKeys<T> = {
 ### 拆分範例
 
 #### 拆分前（2110 行！）
+
 ```typescript
 // ❌ src/app/(main)/customers/page.tsx (2110 行)
 function CustomersPage() {
@@ -274,6 +278,7 @@ function CustomersPage() {
 ```
 
 #### 拆分後
+
 ```typescript
 // ✅ src/app/(main)/customers/page.tsx (100 行)
 function CustomersPage() {
@@ -314,6 +319,7 @@ export function CustomerFilters() {
 ### ESLint 規則
 
 創建 `.eslintrc.strict.json`:
+
 ```json
 {
   "extends": ["./.eslintrc.json"],
@@ -333,6 +339,7 @@ export function CustomerFilters() {
 ### Pre-commit Hook
 
 `.husky/pre-commit`:
+
 ```bash
 #!/bin/sh
 
@@ -358,6 +365,7 @@ echo "✅ 所有檢查通過！"
 ### 檢查腳本
 
 `scripts/check-file-size.sh`:
+
 ```bash
 #!/bin/bash
 
@@ -386,6 +394,7 @@ exit 0
 ```
 
 `scripts/check-any-usage.sh`:
+
 ```bash
 #!/bin/bash
 
@@ -410,14 +419,14 @@ exit 0
 
 ### 必須達成的目標
 
-| 指標 | 目標值 | 當前值 | 狀態 |
-|------|--------|--------|------|
-| TypeScript 嚴格模式 | 100% | ？ | ⚠️ |
-| any 類型使用 | 0 處 | 26+ 處 | ❌ |
-| 超過 300 行的文件 | 0 個 | 8 個 | ❌ |
-| 超過 500 行的文件 | 0 個 | 6 個 | ❌ |
-| 測試覆蓋率 | >80% | ？ | ⚠️ |
-| ESLint 錯誤 | 0 個 | ？ | ⚠️ |
+| 指標                | 目標值 | 當前值 | 狀態 |
+| ------------------- | ------ | ------ | ---- |
+| TypeScript 嚴格模式 | 100%   | ？     | ⚠️   |
+| any 類型使用        | 0 處   | 26+ 處 | ❌   |
+| 超過 300 行的文件   | 0 個   | 8 個   | ❌   |
+| 超過 500 行的文件   | 0 個   | 6 個   | ❌   |
+| 測試覆蓋率          | >80%   | ？     | ⚠️   |
+| ESLint 錯誤         | 0 個   | ？     | ⚠️   |
 
 ### 每週檢查清單
 
@@ -460,12 +469,12 @@ exit 0
 
 ### 違規等級
 
-| 等級 | 違規內容 | 處理方式 |
-|------|---------|---------|
-| 🔴 嚴重 | 使用 any 類型 | PR 立即退回 |
-| 🔴 嚴重 | 單文件超過 500 行 | PR 立即退回 |
-| 🟠 高 | 單文件超過 300 行 | 要求說明或拆分 |
-| 🟡 中 | 函數超過 50 行 | 建議重構 |
+| 等級    | 違規內容          | 處理方式       |
+| ------- | ----------------- | -------------- |
+| 🔴 嚴重 | 使用 any 類型     | PR 立即退回    |
+| 🔴 嚴重 | 單文件超過 500 行 | PR 立即退回    |
+| 🟠 高   | 單文件超過 300 行 | 要求說明或拆分 |
+| 🟡 中   | 函數超過 50 行    | 建議重構       |
 
 ### Code Review 檢查清單
 
@@ -508,12 +517,14 @@ logger.warn('警告:', message)
 ```
 
 **Logger 優勢**：
+
 - 統一格式
 - 可控制輸出級別
 - 生產環境可關閉
 - 便於追蹤問題
 
 **例外情況**：
+
 1. `src/lib/utils/logger.ts` - Logger 本身的實現
 2. `scripts/` - 開發工具腳本
 
@@ -529,8 +540,8 @@ logger.warn('警告:', message)
 
 ```typescript
 // ❌ 錯誤：會被解析為 UTC 午夜
-new Date('2024-01-15')           // → 2024-01-15T00:00:00.000Z (UTC)
-parseISO('2024-01-15')           // → 2024-01-15T00:00:00.000Z (UTC)
+new Date('2024-01-15') // → 2024-01-15T00:00:00.000Z (UTC)
+parseISO('2024-01-15') // → 2024-01-15T00:00:00.000Z (UTC)
 // 在台灣 (UTC+8) 顯示為 2024-01-15 08:00:00，可能導致日期比較錯誤
 ```
 
@@ -551,13 +562,13 @@ if (isSameDay(startOfDay(date1), startOfDay(date2))) { ... }
 
 ### 日期工具函式
 
-| 函式 | 用途 | 位置 |
-|------|------|------|
-| `parseLocalDate(dateStr)` | 解析日期字串為本地時間 | `@/lib/utils/format-date` |
+| 函式                            | 用途                        | 位置                      |
+| ------------------------------- | --------------------------- | ------------------------- |
+| `parseLocalDate(dateStr)`       | 解析日期字串為本地時間      | `@/lib/utils/format-date` |
 | `toTaipeiDateString(isoString)` | ISO → 台灣日期 `YYYY-MM-DD` | `@/lib/utils/format-date` |
-| `toTaipeiTimeString(isoString)` | ISO → 台灣時間 `HH:MM` | `@/lib/utils/format-date` |
-| `startOfDay(date)` | 取得日期午夜時間 | `@/lib/utils/format-date` |
-| `formatDate(date)` | 格式化為 `YYYY-MM-DD` | `@/lib/utils/format-date` |
+| `toTaipeiTimeString(isoString)` | ISO → 台灣時間 `HH:MM`      | `@/lib/utils/format-date` |
+| `startOfDay(date)`              | 取得日期午夜時間            | `@/lib/utils/format-date` |
+| `formatDate(date)`              | 格式化為 `YYYY-MM-DD`       | `@/lib/utils/format-date` |
 
 ### ❌ 禁止的做法
 
@@ -587,11 +598,11 @@ function myParseDate(str) { ... }  // 應使用統一工具
 // ❌ 危險模式：callback 中使用外部狀態變數
 const handleSave = useCallback(() => {
   updateField('image', url)
-  updateField('position', { x: 50, y: 50 })  // data 可能已過時
-}, [updateField])  // 缺少 data 依賴
+  updateField('position', { x: 50, y: 50 }) // data 可能已過時
+}, [updateField]) // 缺少 data 依賴
 
 // ❌ 危險模式：SWR mutate 使用過時陣列
-mutate(KEY, [...items, newItem], false)  // items 可能是 stale
+mutate(KEY, [...items, newItem], false) // items 可能是 stale
 ```
 
 ### ✅ 正確做法
@@ -607,7 +618,7 @@ const handleSave = useCallback(() => {
 }, [data, onChange])
 
 // ✅ 方案 2：SWR 使用 functional update
-mutate(KEY, (currentItems) => [...(currentItems || []), newItem], false)
+mutate(KEY, currentItems => [...(currentItems || []), newItem], false)
 
 // ✅ 方案 3：React setState 使用 functional update
 setItems(prev => [...prev, newItem])
@@ -615,13 +626,13 @@ setItems(prev => [...prev, newItem])
 
 ### 必須檢查的情境
 
-| 情境 | 檢查項目 |
-|------|---------|
-| SWR mutate 樂觀更新 | 必須使用 `(current) => ...` 函式形式 |
-| 連續多次 setState | 考慮合併為單次更新 |
-| useCallback 中使用外部狀態 | 確認依賴陣列完整 |
-| 事件處理器中讀取狀態 | 使用 `useRef` 或 functional update |
-| 異步操作後更新狀態 | 確認使用最新值 |
+| 情境                       | 檢查項目                             |
+| -------------------------- | ------------------------------------ |
+| SWR mutate 樂觀更新        | 必須使用 `(current) => ...` 函式形式 |
+| 連續多次 setState          | 考慮合併為單次更新                   |
+| useCallback 中使用外部狀態 | 確認依賴陣列完整                     |
+| 事件處理器中讀取狀態       | 使用 `useRef` 或 functional update   |
+| 異步操作後更新狀態         | 確認使用最新值                       |
 
 ### 開發時自問
 
@@ -641,12 +652,12 @@ setItems(prev => [...prev, newItem])
 ```typescript
 // ❌ 錯誤：在 Server Component 中使用 client hooks
 // page.tsx (Server Component)
-import { useMyHook } from './hooks'  // 會報錯！
+import { useMyHook } from './hooks' // 會報錯！
 
 // ❌ 錯誤：barrel export 混合 server/client
 // features/index.ts
-export * from './components'  // 包含 client components
-export * from './hooks'       // 包含 client hooks
+export * from './components' // 包含 client components
+export * from './hooks' // 包含 client hooks
 ```
 
 ### ✅ 正確做法
@@ -689,32 +700,32 @@ import { useMyHook } from './hooks'
 
 ### 檔案命名
 
-| 類型 | 格式 | 範例 |
-|------|------|------|
-| 組件 | PascalCase | `CustomerTable.tsx` |
-| Hooks | camelCase | `useCustomerStore.ts` |
-| 工具 | kebab-case | `format-date.ts` |
-| 型別 | kebab-case + `.types.ts` | `customer.types.ts` |
-| 常數 | kebab-case + `.constants.ts` | `status.constants.ts` |
+| 類型  | 格式                         | 範例                  |
+| ----- | ---------------------------- | --------------------- |
+| 組件  | PascalCase                   | `CustomerTable.tsx`   |
+| Hooks | camelCase                    | `useCustomerStore.ts` |
+| 工具  | kebab-case                   | `format-date.ts`      |
+| 型別  | kebab-case + `.types.ts`     | `customer.types.ts`   |
+| 常數  | kebab-case + `.constants.ts` | `status.constants.ts` |
 
 ### 變數命名
 
 ```typescript
 // ✅ 組件：PascalCase
-function CustomerTable() { }
+function CustomerTable() {}
 
 // ✅ Hook：use 前綴 + camelCase
-function useCustomerData() { }
+function useCustomerData() {}
 
 // ✅ 常數：UPPER_SNAKE_CASE
 const MAX_RETRY_COUNT = 3
 
 // ✅ 函數/變數：camelCase
-const fetchCustomers = async () => { }
+const fetchCustomers = async () => {}
 const customerList = []
 
 // ✅ 型別/介面：PascalCase
-interface Customer { }
+interface Customer {}
 type CustomerStatus = 'active' | 'inactive'
 
 // ✅ 私有變數：_ 前綴（僅在 class 中）
@@ -729,18 +740,19 @@ class Store {
 
 以下是 2025-12-25 技術債清理時記錄的現存 `as any` 使用。**新代碼絕對禁止新增**。
 
-| 檔案 | 數量 | 原因 |
-|------|------|------|
-| `src/stores/cloud-store-factory.ts` | 8 | Supabase 泛型 store 類型推導 |
-| `src/stores/order-store.ts` | 5 | Supabase 關聯查詢類型 |
-| `src/stores/passport-ocr-store.ts` | 4 | OCR API 回應類型 |
-| `src/stores/quote-store.ts` | 4 | 報價單複雜嵌套類型 |
-| `src/stores/tour-store.ts` | 3 | 團號關聯查詢 |
-| `src/lib/supabase/admin.ts` | 2 | Supabase Admin 類型 |
-| `src/app/api/` 各 route | 7 | API 請求/回應類型轉換 |
-| 其他散落 | 10 | 各種 edge case |
+| 檔案                                | 數量 | 原因                         |
+| ----------------------------------- | ---- | ---------------------------- |
+| `src/stores/cloud-store-factory.ts` | 8    | Supabase 泛型 store 類型推導 |
+| `src/stores/order-store.ts`         | 5    | Supabase 關聯查詢類型        |
+| `src/stores/passport-ocr-store.ts`  | 4    | OCR API 回應類型             |
+| `src/stores/quote-store.ts`         | 4    | 報價單複雜嵌套類型           |
+| `src/stores/tour-store.ts`          | 3    | 團號關聯查詢                 |
+| `src/lib/supabase/admin.ts`         | 2    | Supabase Admin 類型          |
+| `src/app/api/` 各 route             | 7    | API 請求/回應類型轉換        |
+| 其他散落                            | 10   | 各種 edge case               |
 
 **規則**：
+
 1. 現存的 43 處 `as any` 已凍結，不再增加
 2. 新代碼絕對禁止使用 `as any`
 3. 修改現有檔案時，鼓勵順便修復該檔案的 `as any`
@@ -753,4 +765,4 @@ class Store {
 
 ---
 
-*⚠️ 本規範為強制執行，不符合規範的 PR 將被退回。*
+_⚠️ 本規範為強制執行，不符合規範的 PR 將被退回。_

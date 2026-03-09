@@ -195,7 +195,8 @@ export const COMP_ORDERS_LABELS = {
   未配對: '未配對',
   位有建議客戶: '位有建議客戶',
   位已選擇客戶: '位已選擇客戶',
-  建議客戶說明: '系統已從客戶資料庫找到相似護照拼音的客戶，您可以在「建議客戶」欄選擇後自動建立成員。',
+  建議客戶說明:
+    '系統已從客戶資料庫找到相似護照拼音的客戶，您可以在「建議客戶」欄選擇後自動建立成員。',
   建議客戶無訂單說明: '找到建議客戶，但因未指定訂單，無法建立新成員。請先選擇要新增成員的訂單。',
   快速設定所有人訂單: '快速設定所有人訂單：',
   請選擇: '-- 請選擇 --',
@@ -249,7 +250,8 @@ export const COMP_ORDERS_LABELS = {
   LABEL_8424: '性別：',
 
   自訂費用欄位: '自訂費用欄位',
-  找到N位符合的顧客: (count: number, matchTypeLabel: string) => `找到 ${count} 位符合的顧客（依 ${matchTypeLabel}）`,
+  找到N位符合的顧客: (count: number, matchTypeLabel: string) =>
+    `找到 ${count} 位符合的顧客（依 ${matchTypeLabel}）`,
 
   PLEASE_SELECT_2473: '請選擇要新增成員的訂單',
 
@@ -276,7 +278,7 @@ export const COMP_ORDERS_LABELS = {
   ACTIONS: '操作',
   筆: '筆',
   尚無訂單: '尚無訂單',
-};
+}
 
 // MemberTableHeader 相關標籤
 export const MEMBER_TABLE_HEADER_LABELS = {
@@ -304,7 +306,7 @@ export const MEMBER_TABLE_HEADER_LABELS = {
   actions: '操作',
 
   LABEL_7281: '附加費用',
-};
+}
 
 // ExportDialog 相關標籤
 export const EXPORT_DIALOG_LABELS = {
@@ -361,7 +363,7 @@ export const EXPORT_DIALOG_LABELS = {
   VISA_FIRST: '首辦',
   VISA_TW_PASS: '台胞證',
   VISA_LOST: '遺失件',
-};
+}
 
 // 護照衝突 Dialog 標籤
 export const PASSPORT_CONFLICT_LABELS = {
@@ -379,7 +381,7 @@ export const PASSPORT_CONFLICT_LABELS = {
   success: '已更新 {count} 位團員的護照資料',
   fail: '更新衝突成員失敗',
   writeback_fail: '回寫客戶護照資料失敗',
-};
+}
 
 // 批次簽證對話框標籤
 export const BATCH_VISA_LABELS = {
@@ -399,7 +401,7 @@ export const BATCH_VISA_LABELS = {
   toast_success: (count: number) => `已建立 ${count} 筆簽證`,
   toast_fail: '批次建立簽證失敗，請稍後再試',
   toast_no_selection: '請至少勾選一位團員的一種簽證',
-};
+}
 
 // ============================================================
 // Order Service
@@ -427,7 +429,8 @@ export const PASSPORT_UPLOAD_LABELS = {
 // Simple Order Table
 // ============================================================
 export const SIMPLE_ORDER_TABLE_LABELS = {
-  DELETE_CONFIRM: (orderNumber: string) => `確定要刪除訂單「${orderNumber}」嗎？\n\n此操作會影響：\n- 團員名單將被移除\n- 收款記錄將被刪除\n- 旅遊團人數統計將更新\n\n此操作無法復原！`,
+  DELETE_CONFIRM: (orderNumber: string) =>
+    `確定要刪除訂單「${orderNumber}」嗎？\n\n此操作會影響：\n- 團員名單將被移除\n- 收款記錄將被刪除\n- 旅遊團人數統計將更新\n\n此操作無法復原！`,
 }
 
 // ============================================================

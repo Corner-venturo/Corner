@@ -8,7 +8,15 @@ vi.mock('bcryptjs', () => ({
   },
 }))
 
-import { generateToken, verifyToken, hasPermission, hasRole, hashPassword, verifyPassword, getUserFromToken } from './auth'
+import {
+  generateToken,
+  verifyToken,
+  hasPermission,
+  hasRole,
+  hashPassword,
+  verifyPassword,
+  getUserFromToken,
+} from './auth'
 import type { AuthPayload } from './auth'
 
 const samplePayload: AuthPayload = {
@@ -72,20 +80,24 @@ describe('verifyToken', () => {
   })
 
   it('returns null for expired token', () => {
-    const expiredToken = btoa(JSON.stringify({
-      ...samplePayload,
-      exp: Date.now() - 1000,
-      iss: 'venturo-app',
-    }))
+    const expiredToken = btoa(
+      JSON.stringify({
+        ...samplePayload,
+        exp: Date.now() - 1000,
+        iss: 'venturo-app',
+      })
+    )
     expect(verifyToken(expiredToken)).toBeNull()
   })
 
   it('returns null for wrong issuer', () => {
-    const badToken = btoa(JSON.stringify({
-      ...samplePayload,
-      exp: Date.now() + 100000,
-      iss: 'wrong-app',
-    }))
+    const badToken = btoa(
+      JSON.stringify({
+        ...samplePayload,
+        exp: Date.now() + 100000,
+        iss: 'wrong-app',
+      })
+    )
     expect(verifyToken(badToken)).toBeNull()
   })
 

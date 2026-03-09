@@ -16,11 +16,11 @@ export interface ApiUsageCheckResult {
 
 // API 月度限制設定
 export const API_LIMITS = {
-  google_vision: 980,      // Google Vision 免費額度 1000，保守設 980
-  gemini: 1500,            // Gemini 免費 60/分鐘
-  ocr_space: 25000,        // OCR.space 免費額度 25000/月
-  gemini_image_edit: 500,  // Gemini 圖片編輯月度限制
-  gemini_suggest: 500,     // Gemini 景點建議月度限制
+  google_vision: 980, // Google Vision 免費額度 1000，保守設 980
+  gemini: 1500, // Gemini 免費 60/分鐘
+  ocr_space: 25000, // OCR.space 免費額度 25000/月
+  gemini_image_edit: 500, // Gemini 圖片編輯月度限制
+  gemini_suggest: 500, // Gemini 景點建議月度限制
 } as const
 
 export type ApiName = keyof typeof API_LIMITS
@@ -113,19 +113,17 @@ export async function updateApiUsage(
     const remaining = Math.max(0, limit - newCount)
 
     // 使用 upsert 更新或新增記錄
-    const { error } = await supabase
-      .from('api_usage')
-      .upsert(
-        {
-          api_name: apiName,
-          month: currentMonth,
-          usage_count: newCount,
-          updated_at: new Date().toISOString(),
-        },
-        {
-          onConflict: 'api_name,month',
-        }
-      )
+    const { error } = await supabase.from('api_usage').upsert(
+      {
+        api_name: apiName,
+        month: currentMonth,
+        usage_count: newCount,
+        updated_at: new Date().toISOString(),
+      },
+      {
+        onConflict: 'api_name,month',
+      }
+    )
 
     if (error) {
       logger.error(`更新 ${apiName} 使用量失敗:`, error)

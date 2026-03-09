@@ -14,7 +14,9 @@ import { ApiError } from '@/lib/api/response'
 export async function GET() {
   // Auth 檢查：需要有效的 Supabase session
   const supabaseAuth = await createSupabaseServerClient()
-  const { data: { session } } = await supabaseAuth.auth.getSession()
+  const {
+    data: { session },
+  } = await supabaseAuth.auth.getSession()
   if (!session) {
     return ApiError.unauthorized()
   }

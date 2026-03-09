@@ -121,7 +121,7 @@ export function ChannelList({
     scope: 'workspace' as const,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-  }));
+  }))
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
@@ -149,10 +149,7 @@ export function ChannelList({
           )}
 
           {/* 1.5 VENTURO 機器人（公告下方） */}
-          <BotSection
-            onSelectBot={onSelectMember}
-            selectedBotId={selectedChannelId}
-          />
+          <BotSection onSelectBot={onSelectMember} selectedBotId={selectedChannelId} />
 
           {/* 🔥 2. 我的最愛（starred channels） */}
           {favoriteChannels.length > 0 && (
@@ -224,7 +221,7 @@ export function ChannelList({
               onAddClick={() => {}}
             />
           )}
-          
+
           {/* 同事區塊（按辦公室分組） */}
           <ColleaguesSection
             isExpanded={expandedSections.colleagues !== false}

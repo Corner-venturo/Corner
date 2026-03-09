@@ -56,7 +56,7 @@ export function calculateMAC(params: Record<string, string | undefined>): string
   const sortedKeys = Object.keys(filteredParams).sort()
 
   // 串接成 key=value 格式
-  const dataString = sortedKeys.map((key) => `${key}=${filteredParams[key]}`).join('&')
+  const dataString = sortedKeys.map(key => `${key}=${filteredParams[key]}`).join('&')
 
   // 計算 HMAC-SHA256
   const hmac = crypto.createHmac('sha256', TAISHIN_MAC_KEY)

@@ -119,7 +119,6 @@ export default function LoginPage() {
     }
   }
 
-
   return (
     <div className="flex items-center justify-center h-screen bg-gradient-to-br from-morandi-light via-white to-morandi-container/20">
       <div className="bg-card p-8 rounded-xl shadow-lg max-w-md w-full">
@@ -189,7 +188,9 @@ export default function LoginPage() {
 
           {/* 密碼 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-2">{LABELS.PASSWORD}</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-2">
+              {LABELS.PASSWORD}
+            </label>
             <div className="relative">
               <Lock
                 size={18}
@@ -223,7 +224,10 @@ export default function LoginPage() {
               onChange={e => setRememberMe(e.target.checked)}
               className="w-4 h-4 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
             />
-            <label htmlFor="rememberMe" className="text-sm text-morandi-primary cursor-pointer select-none">
+            <label
+              htmlFor="rememberMe"
+              className="text-sm text-morandi-primary cursor-pointer select-none"
+            >
               {LABELS.LABEL_3877}
             </label>
           </div>
@@ -260,7 +264,6 @@ export default function LoginPage() {
             </Button>
           </div>
         )}
-
       </div>
     </div>
   )

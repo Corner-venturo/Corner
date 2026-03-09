@@ -45,22 +45,22 @@ const FORBIDDEN_CLASS_PATTERNS = [
     message: '請使用 shadow-lg 或 shadow-md 代替 $1（過度）',
     suggestion: 'shadow-lg',
   },
-];
+]
 
 // 禁止的硬編碼顏色（應使用 CSS 變數）
 const FORBIDDEN_HARDCODED_COLORS = [
   // 不包含 Morandi 主題色，只禁止非設計系統的顏色
   { pattern: /#(?:gray|grey)/i, message: '請使用 CSS 變數代替硬編碼灰色' },
-];
+]
 
 /**
  * 檢查 JSX 屬性中的 className 違規
  */
 function checkClassName(context, node, value) {
-  if (typeof value !== 'string') return;
+  if (typeof value !== 'string') return
 
   for (const rule of FORBIDDEN_CLASS_PATTERNS) {
-    const matches = value.matchAll(rule.pattern);
+    const matches = value.matchAll(rule.pattern)
     for (const match of matches) {
       context.report({
         node,
@@ -69,7 +69,7 @@ function checkClassName(context, node, value) {
           found: match[0],
           suggestion: rule.suggestion,
         },
-      });
+      })
     }
   }
 }
@@ -79,26 +79,38 @@ function checkClassName(context, node, value) {
  */
 function checkStyleForHardcodedColors(context, node, styleValue) {
   // 只檢查物件格式的 style
-  if (!styleValue || typeof styleValue !== 'object') return;
+  if (!styleValue || typeof styleValue !== 'object') return
 
-  const colorProperties = ['color', 'backgroundColor', 'borderColor', 'background'];
+  const colorProperties = ['color', 'backgroundColor', 'borderColor', 'background']
 
   for (const prop of colorProperties) {
     if (styleValue[prop] && typeof styleValue[prop] === 'string') {
-      const value = styleValue[prop];
+      const value = styleValue[prop]
       // 檢查是否是硬編碼的 hex 顏色（排除 CSS 變數）
       if (/^#[0-9a-fA-F]{3,8}$/.test(value) && !value.includes('var(')) {
         // 排除 Morandi 設計系統的顏色
         const morandiColors = [
-          '#3a3633', '#8b8680', '#c9aa7c', '#c4a572', '#a08968', '#b8996b',
-          '#9fa68f', '#c08374', '#e8e5e0', '#b8b2aa', '#f6f4f1', '#d4c4b0',
-          '#B8A99A', '#FAF7F2', '#333333', // 允許這些常用的
-        ];
+          '#3a3633',
+          '#8b8680',
+          '#c9aa7c',
+          '#c4a572',
+          '#a08968',
+          '#b8996b',
+          '#9fa68f',
+          '#c08374',
+          '#e8e5e0',
+          '#b8b2aa',
+          '#f6f4f1',
+          '#d4c4b0',
+          '#B8A99A',
+          '#FAF7F2',
+          '#333333', // 允許這些常用的
+        ]
         if (!morandiColors.some(c => c.toLowerCase() === value.toLowerCase())) {
           context.report({
             node,
             message: `避免在 style 中硬編碼顏色 "${value}"，請使用 CSS 變數如 var(--morandi-gold)`,
-          });
+          })
         }
       }
     }
@@ -131,26 +143,26 @@ module.exports = {
         return {
           // 檢查 JSX 屬性
           JSXAttribute(node) {
-            if (node.name.name !== 'className') return;
+            if (node.name.name !== 'className') return
 
             // 處理字串字面值
             if (node.value && node.value.type === 'Literal') {
-              checkClassName(context, node, node.value.value);
+              checkClassName(context, node, node.value.value)
             }
 
             // 處理模板字串
             if (node.value && node.value.type === 'JSXExpressionContainer') {
-              const expr = node.value.expression;
+              const expr = node.value.expression
 
               // 簡單字串
               if (expr.type === 'Literal') {
-                checkClassName(context, node, expr.value);
+                checkClassName(context, node, expr.value)
               }
 
               // 模板字串
               if (expr.type === 'TemplateLiteral') {
                 for (const quasi of expr.quasis) {
-                  checkClassName(context, node, quasi.value.raw);
+                  checkClassName(context, node, quasi.value.raw)
                 }
               }
 
@@ -158,18 +170,18 @@ module.exports = {
               if (expr.type === 'CallExpression') {
                 for (const arg of expr.arguments) {
                   if (arg.type === 'Literal' && typeof arg.value === 'string') {
-                    checkClassName(context, node, arg.value);
+                    checkClassName(context, node, arg.value)
                   }
                   if (arg.type === 'TemplateLiteral') {
                     for (const quasi of arg.quasis) {
-                      checkClassName(context, node, quasi.value.raw);
+                      checkClassName(context, node, quasi.value.raw)
                     }
                   }
                 }
               }
             }
           },
-        };
+        }
       },
     },
 
@@ -190,10 +202,10 @@ module.exports = {
         schema: [],
       },
       create(context) {
-        const filename = context.getFilename();
+        const filename = context.getFilename()
 
         // 只檢查 page.tsx 檔案
-        if (!filename.endsWith('page.tsx')) return {};
+        if (!filename.endsWith('page.tsx')) return {}
 
         // 排除特殊頁面
         const excludedPaths = [
@@ -202,20 +214,20 @@ module.exports = {
           '/view/',
           '/confirm/',
           '/m/', // 手機版頁面
-        ];
-        if (excludedPaths.some(p => filename.includes(p))) return {};
+        ]
+        if (excludedPaths.some(p => filename.includes(p))) return {}
 
-        let hasStandardLayout = false;
-        let hasListPageLayout = false;
+        let hasStandardLayout = false
+        let hasListPageLayout = false
 
         return {
           ImportDeclaration(node) {
-            const source = node.source.value;
+            const source = node.source.value
             if (source.includes('standard-page-layout') || source.includes('StandardPageLayout')) {
-              hasStandardLayout = true;
+              hasStandardLayout = true
             }
             if (source.includes('list-page-layout') || source.includes('ListPageLayout')) {
-              hasListPageLayout = true;
+              hasListPageLayout = true
             }
           },
           'Program:exit'(node) {
@@ -223,10 +235,10 @@ module.exports = {
               context.report({
                 node,
                 messageId: 'missingLayout',
-              });
+              })
             }
           },
-        };
+        }
       },
     },
 
@@ -243,45 +255,52 @@ module.exports = {
           recommended: true,
         },
         messages: {
-          customModal: '發現自訂 Modal 遮罩層 (fixed inset-0)，請使用標準 Dialog 組件 from @/components/ui/dialog',
+          customModal:
+            '發現自訂 Modal 遮罩層 (fixed inset-0)，請使用標準 Dialog 組件 from @/components/ui/dialog',
         },
         schema: [],
       },
       create(context) {
-        const filename = context.getFilename();
+        const filename = context.getFilename()
 
         // 排除標準 Dialog 組件本身
-        if (filename.includes('/ui/dialog.tsx') ||
-            filename.includes('/ui/sheet.tsx') ||
-            filename.includes('/ui/drawer.tsx')) {
-          return {};
+        if (
+          filename.includes('/ui/dialog.tsx') ||
+          filename.includes('/ui/sheet.tsx') ||
+          filename.includes('/ui/drawer.tsx')
+        ) {
+          return {}
         }
 
         return {
           JSXAttribute(node) {
-            if (node.name.name !== 'className') return;
+            if (node.name.name !== 'className') return
 
-            let classValue = '';
+            let classValue = ''
             if (node.value && node.value.type === 'Literal') {
-              classValue = node.value.value || '';
+              classValue = node.value.value || ''
             } else if (node.value && node.value.type === 'JSXExpressionContainer') {
-              const expr = node.value.expression;
+              const expr = node.value.expression
               if (expr.type === 'Literal') {
-                classValue = expr.value || '';
+                classValue = expr.value || ''
               }
             }
 
             // 檢查是否是自訂遮罩層模式
-            if (classValue.includes('fixed') &&
-                classValue.includes('inset-0') &&
-                (classValue.includes('bg-black') || classValue.includes('z-50') || classValue.includes('z-['))) {
+            if (
+              classValue.includes('fixed') &&
+              classValue.includes('inset-0') &&
+              (classValue.includes('bg-black') ||
+                classValue.includes('z-50') ||
+                classValue.includes('z-['))
+            ) {
               context.report({
                 node,
                 messageId: 'customModal',
-              });
+              })
             }
           },
-        };
+        }
       },
     },
 
@@ -297,62 +316,95 @@ module.exports = {
           recommended: true,
         },
         messages: {
-          missingIcon: '按鈕 "{{ text }}" 缺少圖標，主要操作按鈕應包含圖標（如 Save, Check, Plus, X, Trash2）',
+          missingIcon:
+            '按鈕 "{{ text }}" 缺少圖標，主要操作按鈕應包含圖標（如 Save, Check, Plus, X, Trash2）',
         },
         schema: [],
       },
       create(context) {
-        const filename = context.getFilename();
+        const filename = context.getFilename()
 
         // 只檢查 Dialog 相關檔案
         if (!filename.includes('Dialog') && !filename.includes('dialog')) {
-          return {};
+          return {}
         }
 
-        const actionKeywords = ['儲存', '保存', '確認', '新增', '取消', '刪除', 'Save', 'Confirm', 'Add', 'Cancel', 'Delete', '提交', 'Submit'];
+        const actionKeywords = [
+          '儲存',
+          '保存',
+          '確認',
+          '新增',
+          '取消',
+          '刪除',
+          'Save',
+          'Confirm',
+          'Add',
+          'Cancel',
+          'Delete',
+          '提交',
+          'Submit',
+        ]
 
         return {
           JSXElement(node) {
             // 檢查是否是 Button 組件
-            const openingElement = node.openingElement;
-            if (!openingElement || !openingElement.name) return;
+            const openingElement = node.openingElement
+            if (!openingElement || !openingElement.name) return
 
-            const elementName = openingElement.name.name;
-            if (elementName !== 'Button') return;
+            const elementName = openingElement.name.name
+            if (elementName !== 'Button') return
 
             // 獲取按鈕的子元素
-            const children = node.children || [];
-            let hasIcon = false;
-            let buttonText = '';
+            const children = node.children || []
+            let hasIcon = false
+            let buttonText = ''
 
             for (const child of children) {
               // 檢查是否有圖標組件
               if (child.type === 'JSXElement') {
-                const childName = child.openingElement?.name?.name || '';
+                const childName = child.openingElement?.name?.name || ''
                 // 常見圖標組件名稱
-                if (['Save', 'Check', 'Plus', 'X', 'Trash2', 'Edit2', 'RefreshCw', 'Upload', 'Download', 'Search', 'Printer'].includes(childName)) {
-                  hasIcon = true;
+                if (
+                  [
+                    'Save',
+                    'Check',
+                    'Plus',
+                    'X',
+                    'Trash2',
+                    'Edit2',
+                    'RefreshCw',
+                    'Upload',
+                    'Download',
+                    'Search',
+                    'Printer',
+                  ].includes(childName)
+                ) {
+                  hasIcon = true
                 }
               }
               // 收集文字內容
               if (child.type === 'JSXText') {
-                buttonText += child.value.trim();
+                buttonText += child.value.trim()
               }
               if (child.type === 'Literal') {
-                buttonText += String(child.value).trim();
+                buttonText += String(child.value).trim()
               }
             }
 
             // 如果按鈕文字包含操作關鍵字但沒有圖標，報告警告
-            if (buttonText && actionKeywords.some(keyword => buttonText.includes(keyword)) && !hasIcon) {
+            if (
+              buttonText &&
+              actionKeywords.some(keyword => buttonText.includes(keyword)) &&
+              !hasIcon
+            ) {
               context.report({
                 node,
                 messageId: 'missingIcon',
                 data: { text: buttonText },
-              });
+              })
             }
           },
-        };
+        }
       },
     },
 
@@ -368,7 +420,8 @@ module.exports = {
           recommended: true,
         },
         messages: {
-          inconsistentLabel: '表單標籤樣式不一致，建議使用：block text-sm font-medium text-morandi-primary mb-2',
+          inconsistentLabel:
+            '表單標籤樣式不一致，建議使用：block text-sm font-medium text-morandi-primary mb-2',
           wrongColor: '表單標籤應使用 text-morandi-primary 而非 text-morandi-secondary',
         },
         schema: [],
@@ -376,34 +429,37 @@ module.exports = {
       create(context) {
         return {
           JSXElement(node) {
-            const openingElement = node.openingElement;
-            if (!openingElement || !openingElement.name) return;
+            const openingElement = node.openingElement
+            if (!openingElement || !openingElement.name) return
 
-            const elementName = openingElement.name.name;
-            if (elementName !== 'label' && elementName !== 'Label') return;
+            const elementName = openingElement.name.name
+            if (elementName !== 'label' && elementName !== 'Label') return
 
             // 獲取 className
             const classNameAttr = openingElement.attributes?.find(
               attr => attr.type === 'JSXAttribute' && attr.name?.name === 'className'
-            );
+            )
 
-            if (!classNameAttr || !classNameAttr.value) return;
+            if (!classNameAttr || !classNameAttr.value) return
 
-            let classValue = '';
+            let classValue = ''
             if (classNameAttr.value.type === 'Literal') {
-              classValue = classNameAttr.value.value || '';
+              classValue = classNameAttr.value.value || ''
             }
 
             // 檢查是否使用了錯誤的顏色
-            if (classValue.includes('text-morandi-secondary') && !classValue.includes('text-morandi-primary')) {
+            if (
+              classValue.includes('text-morandi-secondary') &&
+              !classValue.includes('text-morandi-primary')
+            ) {
               context.report({
                 node,
                 messageId: 'wrongColor',
-              });
+              })
             }
           },
-        };
+        }
       },
     },
   },
-};
+}

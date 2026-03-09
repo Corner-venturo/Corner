@@ -109,12 +109,9 @@ export function useSheetItemActions({
     setTransportSubType(type)
   }, [])
 
-  const handleNewItemChange = useCallback(
-    (field: keyof typeof EMPTY_NEW_ITEM, value: string) => {
-      setNewItemData((prev) => ({ ...prev, [field]: value }))
-    },
-    []
-  )
+  const handleNewItemChange = useCallback((field: keyof typeof EMPTY_NEW_ITEM, value: string) => {
+    setNewItemData(prev => ({ ...prev, [field]: value }))
+  }, [])
 
   // 從航班資訊創建項目
   const handleAddFlightItems = useCallback(async () => {
@@ -122,7 +119,9 @@ export function useSheetItemActions({
     setSavingNew(true)
     try {
       if (tour.outbound_flight) {
-        const outbound = Array.isArray(tour.outbound_flight) ? tour.outbound_flight[0] : tour.outbound_flight
+        const outbound = Array.isArray(tour.outbound_flight)
+          ? tour.outbound_flight[0]
+          : tour.outbound_flight
         if (!outbound) return
         await addItem({
           sheet_id: sheetId,
@@ -149,7 +148,9 @@ export function useSheetItemActions({
         })
       }
       if (tour.return_flight) {
-        const returnFlight = Array.isArray(tour.return_flight) ? tour.return_flight[0] : tour.return_flight
+        const returnFlight = Array.isArray(tour.return_flight)
+          ? tour.return_flight[0]
+          : tour.return_flight
         if (!returnFlight) return
         await addItem({
           sheet_id: sheetId,
@@ -285,7 +286,11 @@ export function useSheetItemActions({
       for (const day of itinerary.daily_itinerary) {
         const meals = day.meals
         const mealTypes = [
-          { key: 'breakfast', label: TOUR_CONFIRMATION_SHEET_PAGE_LABELS.早餐, value: meals?.breakfast },
+          {
+            key: 'breakfast',
+            label: TOUR_CONFIRMATION_SHEET_PAGE_LABELS.早餐,
+            value: meals?.breakfast,
+          },
           { key: 'lunch', label: TOUR_CONFIRMATION_SHEET_PAGE_LABELS.午餐, value: meals?.lunch },
           { key: 'dinner', label: TOUR_CONFIRMATION_SHEET_PAGE_LABELS.晚餐, value: meals?.dinner },
         ]
@@ -333,7 +338,10 @@ export function useSheetItemActions({
     setSavingNew(true)
     try {
       for (const day of itinerary.daily_itinerary) {
-        if (day.accommodation && day.accommodation !== TOUR_CONFIRMATION_SHEET_PAGE_LABELS.溫暖的家) {
+        if (
+          day.accommodation &&
+          day.accommodation !== TOUR_CONFIRMATION_SHEET_PAGE_LABELS.溫暖的家
+        ) {
           await addItem({
             sheet_id: sheetId,
             category: 'accommodation',
@@ -420,7 +428,7 @@ export function useSheetItemActions({
         other: ['other'],
       }
 
-      const filteredRequests = tourRequests.filter((req) =>
+      const filteredRequests = tourRequests.filter(req =>
         categoryMap[category].includes(req.category)
       )
       if (filteredRequests.length === 0) return
@@ -476,7 +484,7 @@ export function useSheetItemActions({
         activity: ['activity', 'attraction'],
         other: ['other'],
       }
-      return tourRequests.some((req) => categoryMap[category].includes(req.category))
+      return tourRequests.some(req => categoryMap[category].includes(req.category))
     },
     [tourRequests]
   )

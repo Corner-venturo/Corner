@@ -3,7 +3,6 @@
  * 飯店區塊編輯器
  */
 
-
 import { useCallback } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -26,23 +25,26 @@ export function HotelsBlockEditor({ data, onChange }: HotelsBlockEditorProps) {
     })
   }, [hotels, onChange])
 
-  const updateHotel = useCallback((index: number, field: keyof HotelInfo, value: string | string[]) => {
-    const newHotels = [...hotels]
-    newHotels[index] = { ...newHotels[index], [field]: value }
-    onChange({ hotels: newHotels })
-  }, [hotels, onChange])
+  const updateHotel = useCallback(
+    (index: number, field: keyof HotelInfo, value: string | string[]) => {
+      const newHotels = [...hotels]
+      newHotels[index] = { ...newHotels[index], [field]: value }
+      onChange({ hotels: newHotels })
+    },
+    [hotels, onChange]
+  )
 
-  const removeHotel = useCallback((index: number) => {
-    onChange({ hotels: hotels.filter((_, i) => i !== index) })
-  }, [hotels, onChange])
+  const removeHotel = useCallback(
+    (index: number) => {
+      onChange({ hotels: hotels.filter((_, i) => i !== index) })
+    },
+    [hotels, onChange]
+  )
 
   return (
     <div className="space-y-2">
       {hotels.map((hotel, index) => (
-        <div
-          key={index}
-          className="flex items-start gap-2 p-2 bg-morandi-container/30 rounded-lg"
-        >
+        <div key={index} className="flex items-start gap-2 p-2 bg-morandi-container/30 rounded-lg">
           <Building size={14} className="text-morandi-gold mt-2" />
           <div className="flex-1 space-y-1">
             <Input
@@ -60,7 +62,8 @@ export function HotelsBlockEditor({ data, onChange }: HotelsBlockEditorProps) {
           </div>
           <Button
             variant="ghost"
-            size="icon" aria-label="Delete"
+            size="icon"
+            aria-label="Delete"
             className="h-8 w-8 text-status-danger hover:text-status-danger hover:bg-status-danger-bg"
             onClick={() => removeHotel(index)}
           >
@@ -69,12 +72,7 @@ export function HotelsBlockEditor({ data, onChange }: HotelsBlockEditorProps) {
         </div>
       ))}
 
-      <Button
-        variant="outline"
-        size="sm"
-        className="w-full gap-2"
-        onClick={addHotel}
-      >
+      <Button variant="outline" size="sm" className="w-full gap-2" onClick={addHotel}>
         <Plus size={14} />
         {COMP_EDITOR_LABELS.ADD_9618}
       </Button>

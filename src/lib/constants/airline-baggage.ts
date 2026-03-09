@@ -4,35 +4,35 @@
  */
 
 export interface BaggageAllowance {
-  pieces: number      // 件數
-  weightKg: number    // 每件重量(公斤)
-  weightLb: number    // 每件重量(磅)
+  pieces: number // 件數
+  weightKg: number // 每件重量(公斤)
+  weightLb: number // 每件重量(磅)
 }
 
 export interface FareClassBaggage {
-  fareClass: string       // 票種代碼 (如 C, J, D)
-  fareName: string        // 票種名稱 (如 尊寵, 經典, 基本)
+  fareClass: string // 票種代碼 (如 C, J, D)
+  fareName: string // 票種名稱 (如 尊寵, 經典, 基本)
   allowance: BaggageAllowance
 }
 
 export interface CabinBaggage {
-  cabin: string           // 艙等名稱
+  cabin: string // 艙等名稱
   fareClasses: FareClassBaggage[]
 }
 
 export interface AirlineRoutePolicy {
-  routeType: string       // 航線類型
-  description: string     // 描述
+  routeType: string // 航線類型
+  description: string // 描述
   cabins: CabinBaggage[]
 }
 
 export interface AirlineBaggagePolicy {
-  code: string            // IATA 代碼
-  name: string            // 航空公司名稱
-  nameEn: string          // 英文名稱
+  code: string // IATA 代碼
+  name: string // 航空公司名稱
+  nameEn: string // 英文名稱
   routes: AirlineRoutePolicy[]
-  lastUpdated: string     // 最後更新日期
-  notes?: string[]        // 備註
+  lastUpdated: string // 最後更新日期
+  notes?: string[] // 備註
 }
 
 // 長榮航空
@@ -49,29 +49,69 @@ export const EVA_AIR: AirlineBaggagePolicy = {
         {
           cabin: '皇璽桂冠艙 / 桂冠艙 / 商務艙',
           fareClasses: [
-            { fareClass: 'C', fareName: '尊寵', allowance: { pieces: 2, weightKg: 32, weightLb: 70 } },
-            { fareClass: 'J', fareName: '經典', allowance: { pieces: 2, weightKg: 32, weightLb: 70 } },
-            { fareClass: 'D', fareName: '基本', allowance: { pieces: 2, weightKg: 32, weightLb: 70 } },
-          ]
+            {
+              fareClass: 'C',
+              fareName: '尊寵',
+              allowance: { pieces: 2, weightKg: 32, weightLb: 70 },
+            },
+            {
+              fareClass: 'J',
+              fareName: '經典',
+              allowance: { pieces: 2, weightKg: 32, weightLb: 70 },
+            },
+            {
+              fareClass: 'D',
+              fareName: '基本',
+              allowance: { pieces: 2, weightKg: 32, weightLb: 70 },
+            },
+          ],
         },
         {
           cabin: '豪華經濟艙',
           fareClasses: [
-            { fareClass: 'K', fareName: '尊寵', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'T/L', fareName: '經典', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'P', fareName: '基本', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-          ]
+            {
+              fareClass: 'K',
+              fareName: '尊寵',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'T/L',
+              fareName: '經典',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'P',
+              fareName: '基本',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+          ],
         },
         {
           cabin: '經濟艙',
           fareClasses: [
-            { fareClass: 'B/Y', fareName: '尊寵', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'Q/H/M', fareName: '經典', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'V/W/S', fareName: '基本', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'A', fareName: '輕省', allowance: { pieces: 1, weightKg: 23, weightLb: 50 } },
-          ]
+            {
+              fareClass: 'B/Y',
+              fareName: '尊寵',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'Q/H/M',
+              fareName: '經典',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'V/W/S',
+              fareName: '基本',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'A',
+              fareName: '輕省',
+              allowance: { pieces: 1, weightKg: 23, weightLb: 50 },
+            },
+          ],
         },
-      ]
+      ],
     },
     {
       routeType: 'short-haul',
@@ -80,36 +120,76 @@ export const EVA_AIR: AirlineBaggagePolicy = {
         {
           cabin: '皇璽桂冠艙 / 桂冠艙 / 商務艙',
           fareClasses: [
-            { fareClass: 'C', fareName: '尊寵', allowance: { pieces: 2, weightKg: 32, weightLb: 70 } },
-            { fareClass: 'J', fareName: '經典', allowance: { pieces: 2, weightKg: 32, weightLb: 70 } },
-            { fareClass: 'D', fareName: '基本', allowance: { pieces: 2, weightKg: 32, weightLb: 70 } },
-          ]
+            {
+              fareClass: 'C',
+              fareName: '尊寵',
+              allowance: { pieces: 2, weightKg: 32, weightLb: 70 },
+            },
+            {
+              fareClass: 'J',
+              fareName: '經典',
+              allowance: { pieces: 2, weightKg: 32, weightLb: 70 },
+            },
+            {
+              fareClass: 'D',
+              fareName: '基本',
+              allowance: { pieces: 2, weightKg: 32, weightLb: 70 },
+            },
+          ],
         },
         {
           cabin: '豪華經濟艙',
           fareClasses: [
-            { fareClass: 'K', fareName: '尊寵', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'T/L', fareName: '經典', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'P', fareName: '基本', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-          ]
+            {
+              fareClass: 'K',
+              fareName: '尊寵',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'T/L',
+              fareName: '經典',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'P',
+              fareName: '基本',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+          ],
         },
         {
           cabin: '經濟艙',
           fareClasses: [
-            { fareClass: 'B/Y', fareName: '尊寵', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'Q/H/M', fareName: '經典', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'V/W/S', fareName: '基本', allowance: { pieces: 1, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'A', fareName: '輕省', allowance: { pieces: 1, weightKg: 23, weightLb: 50 } },
-          ]
+            {
+              fareClass: 'B/Y',
+              fareName: '尊寵',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'Q/H/M',
+              fareName: '經典',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'V/W/S',
+              fareName: '基本',
+              allowance: { pieces: 1, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'A',
+              fareName: '輕省',
+              allowance: { pieces: 1, weightKg: 23, weightLb: 50 },
+            },
+          ],
         },
-      ]
+      ],
     },
   ],
   notes: [
     '以上為免費託運行李額度，不含手提行李',
     '手提行李: 1件 7公斤 + 1件隨身物品',
     '嬰兒票可額外託運1件嬰兒車',
-  ]
+  ],
 }
 
 // 中華航空
@@ -126,26 +206,54 @@ export const CHINA_AIRLINES: AirlineBaggagePolicy = {
         {
           cabin: '商務艙',
           fareClasses: [
-            { fareClass: 'C/J/D', fareName: '全艙等', allowance: { pieces: 2, weightKg: 32, weightLb: 70 } },
-          ]
+            {
+              fareClass: 'C/J/D',
+              fareName: '全艙等',
+              allowance: { pieces: 2, weightKg: 32, weightLb: 70 },
+            },
+          ],
         },
         {
           cabin: '豪華經濟艙',
           fareClasses: [
-            { fareClass: 'W', fareName: '全艙等', allowance: { pieces: 2, weightKg: 28, weightLb: 62 } },
-          ]
+            {
+              fareClass: 'W',
+              fareName: '全艙等',
+              allowance: { pieces: 2, weightKg: 28, weightLb: 62 },
+            },
+          ],
         },
         {
           cabin: '經濟艙',
           fareClasses: [
-            { fareClass: 'X', fareName: '酬賓機票', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'M/B/Y', fareName: '靈活', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'T/V/K', fareName: '標準', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'N/H/Q/R', fareName: '基本', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'L', fareName: '特惠', allowance: { pieces: 1, weightKg: 23, weightLb: 50 } },
-          ]
+            {
+              fareClass: 'X',
+              fareName: '酬賓機票',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'M/B/Y',
+              fareName: '靈活',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'T/V/K',
+              fareName: '標準',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'N/H/Q/R',
+              fareName: '基本',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'L',
+              fareName: '特惠',
+              allowance: { pieces: 1, weightKg: 23, weightLb: 50 },
+            },
+          ],
         },
-      ]
+      ],
     },
     {
       routeType: 'short-haul',
@@ -154,20 +262,44 @@ export const CHINA_AIRLINES: AirlineBaggagePolicy = {
         {
           cabin: '商務艙',
           fareClasses: [
-            { fareClass: 'C/J/D', fareName: '全艙等', allowance: { pieces: 2, weightKg: 32, weightLb: 70 } },
-          ]
+            {
+              fareClass: 'C/J/D',
+              fareName: '全艙等',
+              allowance: { pieces: 2, weightKg: 32, weightLb: 70 },
+            },
+          ],
         },
         {
           cabin: '經濟艙',
           fareClasses: [
-            { fareClass: 'X', fareName: '酬賓機票', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'M/B/Y', fareName: '靈活', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'T/V/K', fareName: '標準', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'N/H/Q/R', fareName: '基本', allowance: { pieces: 1, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'L', fareName: '特惠', allowance: { pieces: 1, weightKg: 23, weightLb: 50 } },
-          ]
+            {
+              fareClass: 'X',
+              fareName: '酬賓機票',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'M/B/Y',
+              fareName: '靈活',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'T/V/K',
+              fareName: '標準',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'N/H/Q/R',
+              fareName: '基本',
+              allowance: { pieces: 1, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'L',
+              fareName: '特惠',
+              allowance: { pieces: 1, weightKg: 23, weightLb: 50 },
+            },
+          ],
         },
-      ]
+      ],
     },
     {
       routeType: 'transtasman',
@@ -176,20 +308,37 @@ export const CHINA_AIRLINES: AirlineBaggagePolicy = {
         {
           cabin: '經濟艙',
           fareClasses: [
-            { fareClass: 'X', fareName: '酬賓機票', allowance: { pieces: 1, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'M/B/Y', fareName: '靈活', allowance: { pieces: 1, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'T/V/K', fareName: '標準', allowance: { pieces: 1, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'N/H/Q/R', fareName: '基本', allowance: { pieces: 0, weightKg: 0, weightLb: 0 } },
-            { fareClass: 'L', fareName: '特惠', allowance: { pieces: 0, weightKg: 0, weightLb: 0 } },
-          ]
+            {
+              fareClass: 'X',
+              fareName: '酬賓機票',
+              allowance: { pieces: 1, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'M/B/Y',
+              fareName: '靈活',
+              allowance: { pieces: 1, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'T/V/K',
+              fareName: '標準',
+              allowance: { pieces: 1, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'N/H/Q/R',
+              fareName: '基本',
+              allowance: { pieces: 0, weightKg: 0, weightLb: 0 },
+            },
+            {
+              fareClass: 'L',
+              fareName: '特惠',
+              allowance: { pieces: 0, weightKg: 0, weightLb: 0 },
+            },
+          ],
         },
-      ]
+      ],
     },
   ],
-  notes: [
-    '每件行李重量限制為 23 公斤（50 磅）',
-    '手提行李: 1件 7公斤',
-  ]
+  notes: ['每件行李重量限制為 23 公斤（50 磅）', '手提行李: 1件 7公斤'],
 }
 
 // 星宇航空
@@ -206,40 +355,82 @@ export const STARLUX: AirlineBaggagePolicy = {
         {
           cabin: '頭等艙',
           fareClasses: [
-            { fareClass: 'AF', fareName: '全額', allowance: { pieces: 3, weightKg: 32, weightLb: 70 } },
-          ]
+            {
+              fareClass: 'AF',
+              fareName: '全額',
+              allowance: { pieces: 3, weightKg: 32, weightLb: 70 },
+            },
+          ],
         },
         {
           cabin: '商務艙',
           fareClasses: [
-            { fareClass: 'J', fareName: '全額', allowance: { pieces: 2, weightKg: 32, weightLb: 70 } },
-            { fareClass: 'C', fareName: '基本', allowance: { pieces: 2, weightKg: 32, weightLb: 70 } },
-            { fareClass: 'D', fareName: '超值', allowance: { pieces: 2, weightKg: 32, weightLb: 70 } },
-          ]
+            {
+              fareClass: 'J',
+              fareName: '全額',
+              allowance: { pieces: 2, weightKg: 32, weightLb: 70 },
+            },
+            {
+              fareClass: 'C',
+              fareName: '基本',
+              allowance: { pieces: 2, weightKg: 32, weightLb: 70 },
+            },
+            {
+              fareClass: 'D',
+              fareName: '超值',
+              allowance: { pieces: 2, weightKg: 32, weightLb: 70 },
+            },
+          ],
         },
         {
           cabin: '豪華經濟艙',
           fareClasses: [
-            { fareClass: 'W', fareName: '全額', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'R', fareName: '基本', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'E', fareName: '超值', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-          ]
+            {
+              fareClass: 'W',
+              fareName: '全額',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'R',
+              fareName: '基本',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'E',
+              fareName: '超值',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+          ],
         },
         {
           cabin: '經濟艙',
           fareClasses: [
-            { fareClass: 'H/B/Y', fareName: '全額', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'L/M/K', fareName: '基本', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'N/S/V', fareName: '超值', allowance: { pieces: 1, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'Q', fareName: '限量', allowance: { pieces: 1, weightKg: 23, weightLb: 50 } },
-          ]
+            {
+              fareClass: 'H/B/Y',
+              fareName: '全額',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'L/M/K',
+              fareName: '基本',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'N/S/V',
+              fareName: '超值',
+              allowance: { pieces: 1, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'Q',
+              fareName: '限量',
+              allowance: { pieces: 1, weightKg: 23, weightLb: 50 },
+            },
+          ],
         },
-      ]
+      ],
     },
   ],
-  notes: [
-    '手提行李: 1件 7公斤 + 1件隨身物品',
-  ]
+  notes: ['手提行李: 1件 7公斤 + 1件隨身物品'],
 }
 
 // 日本航空
@@ -256,22 +447,32 @@ export const JAL: AirlineBaggagePolicy = {
         {
           cabin: '商務艙',
           fareClasses: [
-            { fareClass: 'C/J/D', fareName: '全艙等', allowance: { pieces: 3, weightKg: 32, weightLb: 70 } },
-          ]
+            {
+              fareClass: 'C/J/D',
+              fareName: '全艙等',
+              allowance: { pieces: 3, weightKg: 32, weightLb: 70 },
+            },
+          ],
         },
         {
           cabin: '經濟艙',
           fareClasses: [
-            { fareClass: 'Y/B/H/K', fareName: 'Flex', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'M/L/V', fareName: 'Saver', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-          ]
+            {
+              fareClass: 'Y/B/H/K',
+              fareName: 'Flex',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'M/L/V',
+              fareName: 'Saver',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+          ],
         },
-      ]
+      ],
     },
   ],
-  notes: [
-    '手提行李: 1件 10公斤',
-  ]
+  notes: ['手提行李: 1件 10公斤'],
 }
 
 // 全日空
@@ -288,32 +489,36 @@ export const ANA: AirlineBaggagePolicy = {
         {
           cabin: '商務艙',
           fareClasses: [
-            { fareClass: 'C/J/D', fareName: '全艙等', allowance: { pieces: 2, weightKg: 32, weightLb: 70 } },
-          ]
+            {
+              fareClass: 'C/J/D',
+              fareName: '全艙等',
+              allowance: { pieces: 2, weightKg: 32, weightLb: 70 },
+            },
+          ],
         },
         {
           cabin: '經濟艙',
           fareClasses: [
-            { fareClass: 'Y/B/M', fareName: 'Flex', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-            { fareClass: 'H/K/L', fareName: 'Basic', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
-          ]
+            {
+              fareClass: 'Y/B/M',
+              fareName: 'Flex',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+            {
+              fareClass: 'H/K/L',
+              fareName: 'Basic',
+              allowance: { pieces: 2, weightKg: 23, weightLb: 50 },
+            },
+          ],
         },
-      ]
+      ],
     },
   ],
-  notes: [
-    '手提行李: 1件 10公斤',
-  ]
+  notes: ['手提行李: 1件 10公斤'],
 }
 
 // 所有航空公司
-export const ALL_AIRLINES: AirlineBaggagePolicy[] = [
-  EVA_AIR,
-  CHINA_AIRLINES,
-  STARLUX,
-  JAL,
-  ANA,
-]
+export const ALL_AIRLINES: AirlineBaggagePolicy[] = [EVA_AIR, CHINA_AIRLINES, STARLUX, JAL, ANA]
 
 // 根據航空公司代碼取得政策
 export function getAirlineBaggagePolicy(code: string): AirlineBaggagePolicy | undefined {

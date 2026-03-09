@@ -3,7 +3,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { calculateExpression } from '@/hooks/useCalculableInput'
 
-interface CalcInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value'> {
+interface CalcInputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'onChange' | 'value'
+> {
   value: number | null | undefined
   onChange: (value: number | null) => void
   /** Excel 式公式儲存：原始公式（如 "100+50"） */
@@ -29,9 +32,7 @@ export const CalcInput: React.FC<CalcInputProps> = ({
   onFocus,
   ...props
 }) => {
-  const [displayValue, setDisplayValue] = useState<string>(
-    value != null ? String(value) : ''
-  )
+  const [displayValue, setDisplayValue] = useState<string>(value != null ? String(value) : '')
   const [isExpression, setIsExpression] = useState(false)
   const [isFocused, setIsFocused] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)

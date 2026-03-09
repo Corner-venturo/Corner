@@ -6,10 +6,10 @@
 
 ## 目標
 
-*   徹底移除所有 IndexedDB 相關的程式碼和基礎設施。
-*   將所有資料操作統一透過 Supabase 進行。
-*   導入 SWR 等資料獲取庫，以高效管理雲端資料的快取與狀態，同時保持優良的使用者體驗。
-*   提升程式碼的可維護性、可讀性，降低新功能開發與除錯的複雜度。
+- 徹底移除所有 IndexedDB 相關的程式碼和基礎設施。
+- 將所有資料操作統一透過 Supabase 進行。
+- 導入 SWR 等資料獲取庫，以高效管理雲端資料的快取與狀態，同時保持優良的使用者體驗。
+- 提升程式碼的可維護性、可讀性，降低新功能開發與除錯的複雜度。
 
 ## 執行計畫
 
@@ -38,16 +38,16 @@
 
 將 Phase 1 的成功經驗複製到所有其他資料模組。針對下列每一個模組，重複「建立 Hook → 重構 UI → 驗證 → 移除舊程式碼」的流程。建議一次處理一個模組，確保每次迭代都穩定。
 
-*   Tours
-*   Orders
-*   Quotes
-*   Customers
-*   Itineraries
-*   Payment Requests & Receipts
-*   Suppliers
-*   Regions & Attractions
-*   Employees & Members
-*   ...以及 `use-realtime-hooks.ts` 中列出的所有其他實體。
+- Tours
+- Orders
+- Quotes
+- Customers
+- Itineraries
+- Payment Requests & Receipts
+- Suppliers
+- Regions & Attractions
+- Employees & Members
+- ...以及 `use-realtime-hooks.ts` 中列出的所有其他實體。
 
 ---
 

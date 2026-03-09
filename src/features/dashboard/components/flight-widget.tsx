@@ -27,13 +27,14 @@ import {
   type AirportFlightItem,
 } from '../actions/flight-actions'
 import { DatePicker } from '@/components/ui/date-picker'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 type SearchMode = 'flight' | 'airport'
 type AirportDirection = 'departure' | 'arrival'
@@ -314,7 +315,7 @@ export function FlightWidget() {
               </label>
               <DatePicker
                 value={queryDate}
-                onChange={(date) => setQueryDate(date)}
+                onChange={date => setQueryDate(date)}
                 placeholder={FLIGHT_WIDGET_LABELS.SELECT_5234}
                 className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm"
               />
@@ -370,7 +371,12 @@ export function FlightWidget() {
                     <p className="text-xs text-morandi-secondary">{flightData.airline}</p>
                   </div>
                 </div>
-                <span className={cn('text-xs px-2.5 py-1 rounded-full font-semibold', getStatusColor(flightData.statusText))}>
+                <span
+                  className={cn(
+                    'text-xs px-2.5 py-1 rounded-full font-semibold',
+                    getStatusColor(flightData.statusText)
+                  )}
+                >
                   {flightData.statusText}
                 </span>
               </div>
@@ -379,7 +385,9 @@ export function FlightWidget() {
               <div className="bg-card/50 rounded-lg p-3 space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex-1">
-                    <p className="text-xs text-morandi-secondary mb-1">{FLIGHT_WIDGET_LABELS.DEPARTURE}</p>
+                    <p className="text-xs text-morandi-secondary mb-1">
+                      {FLIGHT_WIDGET_LABELS.DEPARTURE}
+                    </p>
                     <p className="font-bold text-base text-morandi-primary">
                       {flightData.departure.iata}
                     </p>
@@ -390,11 +398,15 @@ export function FlightWidget() {
                   <div className="flex flex-col items-center">
                     <ArrowRight className="w-5 h-5 text-morandi-secondary/50" />
                     {flightData.duration && (
-                      <p className="text-[10px] text-morandi-secondary mt-1">{flightData.duration}</p>
+                      <p className="text-[10px] text-morandi-secondary mt-1">
+                        {flightData.duration}
+                      </p>
                     )}
                   </div>
                   <div className="flex-1 text-right">
-                    <p className="text-xs text-morandi-secondary mb-1">{FLIGHT_WIDGET_LABELS.ARRIVAL}</p>
+                    <p className="text-xs text-morandi-secondary mb-1">
+                      {FLIGHT_WIDGET_LABELS.ARRIVAL}
+                    </p>
                     <p className="font-bold text-base text-morandi-primary">
                       {flightData.arrival.iata}
                     </p>
@@ -441,7 +453,9 @@ export function FlightWidget() {
               {/* 機型 */}
               {flightData.aircraft && (
                 <div className="bg-card/50 rounded-lg p-2.5">
-                  <p className="text-xs text-morandi-secondary mb-1">{FLIGHT_WIDGET_LABELS.AIRCRAFT}</p>
+                  <p className="text-xs text-morandi-secondary mb-1">
+                    {FLIGHT_WIDGET_LABELS.AIRCRAFT}
+                  </p>
                   <p className="font-semibold text-sm text-morandi-primary">
                     {flightData.aircraft}
                   </p>
@@ -449,7 +463,6 @@ export function FlightWidget() {
               )}
             </div>
           )}
-
         </div>
       </div>
 
@@ -463,10 +476,14 @@ export function FlightWidget() {
               </div>
               <div>
                 <span className="text-lg font-semibold text-morandi-primary">
-                  {COMMON_AIRPORTS.find(a => a.code === airportCode)?.name || airportCode}{FLIGHT_WIDGET_LABELS.AIRPORT_FLIGHTS_SUFFIX}
+                  {COMMON_AIRPORTS.find(a => a.code === airportCode)?.name || airportCode}
+                  {FLIGHT_WIDGET_LABELS.AIRPORT_FLIGHTS_SUFFIX}
                 </span>
                 <p className="text-sm text-morandi-secondary font-normal mt-0.5">
-                  {queryDate}{FLIGHT_WIDGET_LABELS.FLIGHT_COUNT_PREFIX}{airportFlights.length}{FLIGHT_WIDGET_LABELS.FLIGHT_COUNT_SUFFIX}
+                  {queryDate}
+                  {FLIGHT_WIDGET_LABELS.FLIGHT_COUNT_PREFIX}
+                  {airportFlights.length}
+                  {FLIGHT_WIDGET_LABELS.FLIGHT_COUNT_SUFFIX}
                 </p>
               </div>
             </DialogTitle>
@@ -476,45 +493,75 @@ export function FlightWidget() {
             <table className="w-full text-sm">
               <thead className="bg-muted sticky top-0">
                 <tr>
-                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">{FLIGHT_WIDGET_LABELS.TIME}</th>
-                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">{FLIGHT_WIDGET_LABELS.FLIGHT}</th>
-                  <th className="px-3 py-3 text-center font-semibold text-morandi-primary">{FLIGHT_WIDGET_LABELS.DEPARTURE}</th>
+                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">
+                    {FLIGHT_WIDGET_LABELS.TIME}
+                  </th>
+                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">
+                    {FLIGHT_WIDGET_LABELS.FLIGHT}
+                  </th>
+                  <th className="px-3 py-3 text-center font-semibold text-morandi-primary">
+                    {FLIGHT_WIDGET_LABELS.DEPARTURE}
+                  </th>
                   <th className="px-2 py-3 text-center font-semibold text-morandi-secondary w-8"></th>
-                  <th className="px-3 py-3 text-center font-semibold text-morandi-primary">{FLIGHT_WIDGET_LABELS.ARRIVAL}</th>
-                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">{FLIGHT_WIDGET_LABELS.TERMINAL}</th>
-                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">{FLIGHT_WIDGET_LABELS.STATUS}</th>
+                  <th className="px-3 py-3 text-center font-semibold text-morandi-primary">
+                    {FLIGHT_WIDGET_LABELS.ARRIVAL}
+                  </th>
+                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">
+                    {FLIGHT_WIDGET_LABELS.TERMINAL}
+                  </th>
+                  <th className="px-3 py-3 text-left font-semibold text-morandi-primary">
+                    {FLIGHT_WIDGET_LABELS.STATUS}
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {airportFlights.map((flight, idx) => (
-                  <tr key={`${flight.flightNumber}-${idx}`} className="hover:bg-muted/50 transition-colors">
+                  <tr
+                    key={`${flight.flightNumber}-${idx}`}
+                    className="hover:bg-muted/50 transition-colors"
+                  >
                     <td className="px-3 py-3">
                       <p className="font-semibold text-morandi-primary">{flight.scheduledTime}</p>
                       {flight.estimatedTime && flight.estimatedTime !== flight.scheduledTime && (
-                        <p className="text-xs text-morandi-secondary">{FLIGHT_WIDGET_LABELS.LABEL_6009} {flight.estimatedTime}</p>
+                        <p className="text-xs text-morandi-secondary">
+                          {FLIGHT_WIDGET_LABELS.LABEL_6009} {flight.estimatedTime}
+                        </p>
                       )}
                     </td>
                     <td className="px-3 py-3">
-                      <p className="font-mono font-medium text-morandi-primary">{flight.flightNumber}</p>
-                      <p className="text-xs text-morandi-secondary truncate max-w-[100px]">{flight.airline}</p>
+                      <p className="font-mono font-medium text-morandi-primary">
+                        {flight.flightNumber}
+                      </p>
+                      <p className="text-xs text-morandi-secondary truncate max-w-[100px]">
+                        {flight.airline}
+                      </p>
                     </td>
                     <td className="px-3 py-3 text-center">
                       <p className="font-bold text-morandi-primary">{airportCode}</p>
-                      <p className="text-xs text-morandi-secondary">{COMMON_AIRPORTS.find(a => a.code === airportCode)?.name || ''}</p>
+                      <p className="text-xs text-morandi-secondary">
+                        {COMMON_AIRPORTS.find(a => a.code === airportCode)?.name || ''}
+                      </p>
                     </td>
                     <td className="px-2 py-3 text-center">
                       <ArrowRight className="w-4 h-4 text-morandi-secondary/50 mx-auto" />
                     </td>
                     <td className="px-3 py-3 text-center">
                       <p className="font-bold text-morandi-primary">{flight.destinationIata}</p>
-                      <p className="text-xs text-morandi-secondary truncate max-w-[80px] mx-auto">{flight.destination}</p>
+                      <p className="text-xs text-morandi-secondary truncate max-w-[80px] mx-auto">
+                        {flight.destination}
+                      </p>
                     </td>
                     <td className="px-3 py-3 text-morandi-secondary text-xs">
                       {flight.terminal ? `T${flight.terminal}` : '-'}
                       {flight.gate && ` · ${flight.gate}`}
                     </td>
                     <td className="px-3 py-3">
-                      <span className={cn('text-xs px-2 py-1 rounded-full font-medium', getStatusColor(flight.status))}>
+                      <span
+                        className={cn(
+                          'text-xs px-2 py-1 rounded-full font-medium',
+                          getStatusColor(flight.status)
+                        )}
+                      >
                         {flight.status}
                       </span>
                     </td>

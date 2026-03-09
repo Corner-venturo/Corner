@@ -1,12 +1,4 @@
-import {
-  Calculator,
-  DollarSign,
-  Clock,
-  Clipboard,
-  Cloud,
-  Plane,
-  CloudSun,
-} from 'lucide-react'
+import { Calculator, DollarSign, Clock, Clipboard, Cloud, Plane, CloudSun } from 'lucide-react'
 import type { WidgetConfig } from '../types'
 import { CalculatorWidget } from './calculator-widget'
 import { CurrencyWidget } from './currency-widget'
@@ -24,14 +16,14 @@ export const AVAILABLE_WIDGETS: Array<Omit<WidgetConfig, 'id'> & { id: string }>
     name: '航班查詢',
     icon: Plane,
     component: FlightWidget,
-    span: 1
+    span: 1,
   },
   {
     id: 'weather',
     name: '天氣查詢',
     icon: Cloud,
     component: WeatherWidget,
-    span: 1
+    span: 1,
   },
   {
     id: 'weather-weekly',
@@ -45,27 +37,27 @@ export const AVAILABLE_WIDGETS: Array<Omit<WidgetConfig, 'id'> & { id: string }>
     name: '計算機',
     icon: Calculator,
     component: CalculatorWidget,
-    span: 1
+    span: 1,
   },
   {
     id: 'currency',
     name: '匯率換算',
     icon: DollarSign,
     component: CurrencyWidget,
-    span: 1
+    span: 1,
   },
   {
     id: 'timer',
     name: '計時器',
     icon: Clock,
     component: TimerWidget,
-    span: 1
+    span: 1,
   },
   {
     id: 'notes',
     name: '便條紙',
     icon: Clipboard,
     component: NotesWidget,
-    span: 1
+    span: 1,
   },
 ]

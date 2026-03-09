@@ -3,13 +3,18 @@
  * LeaderScheduleDialog - 領隊調度新增/編輯對話框
  */
 
-
 import React from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui/date-picker'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import type { LeaderScheduleFormData } from '@/types/fleet.types'
 import type { TourLeader } from '@/types/tour-leader.types'
 import { SCHEDULING_LABELS } from './constants/labels'
@@ -43,7 +48,11 @@ export const LeaderScheduleDialog: React.FC<LeaderScheduleDialogProps> = ({
       open={isOpen}
       onOpenChange={open => !open && onClose()}
       title={isEditMode ? '編輯領隊調度' : '新增領隊調度'}
-      subtitle={selectedLeader ? `${selectedLeader.name}${selectedLeader.english_name ? ` (${selectedLeader.english_name})` : ''}` : '選擇領隊'}
+      subtitle={
+        selectedLeader
+          ? `${selectedLeader.name}${selectedLeader.english_name ? ` (${selectedLeader.english_name})` : ''}`
+          : '選擇領隊'
+      }
       onSubmit={onSubmit}
       submitLabel={isEditMode ? '儲存變更' : '新增調度'}
       submitDisabled={!formData.leader_id || !formData.start_date || !formData.end_date}
@@ -52,7 +61,9 @@ export const LeaderScheduleDialog: React.FC<LeaderScheduleDialogProps> = ({
       <div className="space-y-6">
         {/* 領隊選擇 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{SCHEDULING_LABELS.LABEL_6841}</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">
+            {SCHEDULING_LABELS.LABEL_6841}
+          </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary">
@@ -66,18 +77,25 @@ export const LeaderScheduleDialog: React.FC<LeaderScheduleDialogProps> = ({
                   <SelectValue placeholder={SCHEDULING_LABELS.SELECT_9576} />
                 </SelectTrigger>
                 <SelectContent>
-                  {leaders.filter(l => l.status === 'active').map(leader => (
-                    <SelectItem key={leader.id} value={leader.id}>
-                      {leader.name} {leader.english_name ? `(${leader.english_name})` : ''}
-                    </SelectItem>
-                  ))}
+                  {leaders
+                    .filter(l => l.status === 'active')
+                    .map(leader => (
+                      <SelectItem key={leader.id} value={leader.id}>
+                        {leader.name} {leader.english_name ? `(${leader.english_name})` : ''}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>
             {selectedLeader && (
               <div className="flex items-center">
                 <div className="text-sm text-morandi-secondary">
-                  {selectedLeader.phone && <span>{SCHEDULING_LABELS.LABEL_9704}{selectedLeader.phone}</span>}
+                  {selectedLeader.phone && (
+                    <span>
+                      {SCHEDULING_LABELS.LABEL_9704}
+                      {selectedLeader.phone}
+                    </span>
+                  )}
                 </div>
               </div>
             )}
@@ -86,7 +104,9 @@ export const LeaderScheduleDialog: React.FC<LeaderScheduleDialogProps> = ({
 
         {/* 日期範圍 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{SCHEDULING_LABELS.LABEL_5968}</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">
+            {SCHEDULING_LABELS.LABEL_5968}
+          </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary">
@@ -115,10 +135,14 @@ export const LeaderScheduleDialog: React.FC<LeaderScheduleDialogProps> = ({
 
         {/* 團資訊 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{SCHEDULING_LABELS.LABEL_535}</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">
+            {SCHEDULING_LABELS.LABEL_535}
+          </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.LABEL_9750}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {SCHEDULING_LABELS.LABEL_9750}
+              </label>
               <Input
                 value={formData.tour_code}
                 onChange={e => onFormFieldChange('tour_code', e.target.value)}
@@ -127,7 +151,9 @@ export const LeaderScheduleDialog: React.FC<LeaderScheduleDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.LABEL_5475}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {SCHEDULING_LABELS.LABEL_5475}
+              </label>
               <Input
                 value={formData.destination}
                 onChange={e => onFormFieldChange('destination', e.target.value)}
@@ -136,7 +162,9 @@ export const LeaderScheduleDialog: React.FC<LeaderScheduleDialogProps> = ({
               />
             </div>
             <div className="md:col-span-2">
-              <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.LABEL_4953}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {SCHEDULING_LABELS.LABEL_4953}
+              </label>
               <Input
                 value={formData.tour_name}
                 onChange={e => onFormFieldChange('tour_name', e.target.value)}
@@ -149,7 +177,9 @@ export const LeaderScheduleDialog: React.FC<LeaderScheduleDialogProps> = ({
 
         {/* 備註 */}
         <div>
-          <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.REMARKS}</label>
+          <label className="text-sm font-medium text-morandi-primary">
+            {SCHEDULING_LABELS.REMARKS}
+          </label>
           <Textarea
             value={formData.notes}
             onChange={e => onFormFieldChange('notes', e.target.value)}

@@ -3,7 +3,6 @@
  * TourLeadersList - 領隊列表
  */
 
-
 import React from 'react'
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'
 import { Badge } from '@/components/ui/badge'
@@ -20,7 +19,10 @@ interface TourLeadersListProps {
   onAvailability?: (item: TourLeader) => void
 }
 
-const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const STATUS_CONFIG: Record<
+  string,
+  { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   active: { label: TOUR_LEADERS_LABELS.STATUS_ACTIVE, variant: 'default' },
   inactive: { label: TOUR_LEADERS_LABELS.STATUS_INACTIVE, variant: 'secondary' },
 }

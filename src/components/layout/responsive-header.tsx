@@ -4,7 +4,13 @@ import { useState, memo } from 'react'
 import Link from 'next/link'
 import { useAuthStore } from '@/stores/auth-store'
 import { cn } from '@/lib/utils'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useBreadcrumb, type BreadcrumbItem } from '@/hooks/useBreadcrumb'
 import { ChevronRight } from 'lucide-react'
 import { COMP_LAYOUT_LABELS } from './constants/labels'
@@ -227,7 +233,9 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">全部{props.filterLabel || COMP_LAYOUT_LABELS.篩選}</SelectItem>
+                <SelectItem value="all">
+                  全部{props.filterLabel || COMP_LAYOUT_LABELS.篩選}
+                </SelectItem>
                 {props.filterOptions.map(option => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
@@ -276,9 +284,7 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
         )}
 
         {/* 自訂操作按鈕 */}
-        {props.customActions && (
-          <div className="flex items-center mr-4">{props.customActions}</div>
-        )}
+        {props.customActions && <div className="flex items-center mr-4">{props.customActions}</div>}
 
         {/* 操作按鈕 - actions 和 onAdd 可以同時顯示 */}
         <div className="flex items-center gap-3">

@@ -30,23 +30,23 @@ const MIN_ATTRACTIONS_PER_DAY = 2
 interface RequestBody {
   // 城市：支持 ID 或名稱
   cityId?: string
-  countryId?: string        // 國家 ID
-  destination?: string      // 目的地名稱（向後兼容）
+  countryId?: string // 國家 ID
+  destination?: string // 目的地名稱（向後兼容）
   numDays: number
   departureDate: string
   // 航班時間：支持兩種格式
   outboundFlight?: {
-    arrivalTime: string     // HH:mm
+    arrivalTime: string // HH:mm
   }
   returnFlight?: {
-    departureTime: string   // HH:mm
+    departureTime: string // HH:mm
   }
-  arrivalTime?: string      // 向後兼容：直接的時間
-  departureTime?: string    // 向後兼容：直接的時間
+  arrivalTime?: string // 向後兼容：直接的時間
+  departureTime?: string // 向後兼容：直接的時間
   // 住宿安排和風格
-  accommodations?: AccommodationPlan[] | string[]  // 支持 AccommodationPlan[] 或字串陣列（住宿名稱）
+  accommodations?: AccommodationPlan[] | string[] // 支持 AccommodationPlan[] 或字串陣列（住宿名稱）
   style?: ItineraryStyle
-  theme?: string            // 向後兼容：舊版本用 theme
+  theme?: string // 向後兼容：舊版本用 theme
 }
 
 export async function POST(request: NextRequest) {
@@ -70,7 +70,8 @@ export async function POST(request: NextRequest) {
     let resolvedCountryName = ''
 
     // 檢查 cityId 是否為 UUID 格式
-    const isUUID = (str: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)
+    const isUUID = (str: string) =>
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)
 
     // 如果 cityId 不是 UUID，可能是機場代碼（如 FUK）
     if (cityId && !isUUID(cityId)) {
@@ -204,7 +205,8 @@ export async function POST(request: NextRequest) {
     // 7. 查詢景點（根據城市或國家）
     let attractionsQuery = supabase
       .from('attractions')
-      .select(`
+      .select(
+        `
         id,
         name,
         english_name,
@@ -231,7 +233,8 @@ export async function POST(request: NextRequest) {
         data_verified,
         created_at,
         updated_at
-      `)
+      `
+      )
       .eq('is_active', true)
       .order('display_order', { ascending: true })
 
@@ -310,8 +313,12 @@ export async function POST(request: NextRequest) {
     const minRequiredAttractions = body.numDays * MIN_ATTRACTIONS_PER_DAY
     const hasEnoughAttractions = (attractions?.length || 0) >= minRequiredAttractions
 
-    logger.log(`[Itinerary] 景點查詢結果: ${attractions?.length || 0} 個, 需要: ${minRequiredAttractions} 個`)
-    logger.log(`[Itinerary] cityId=${cityId}, countryId=${countryId}, cityName=${cityName}, countryName=${countryName}`)
+    logger.log(
+      `[Itinerary] 景點查詢結果: ${attractions?.length || 0} 個, 需要: ${minRequiredAttractions} 個`
+    )
+    logger.log(
+      `[Itinerary] cityId=${cityId}, countryId=${countryId}, cityName=${cityName}, countryName=${countryName}`
+    )
 
     if (!hasEnoughAttractions) {
       logger.log(`[Itinerary] 🤖 景點不足，切換到 Gemini AI 生成`)
@@ -330,9 +337,12 @@ export async function POST(request: NextRequest) {
             arrivalTime: '',
             departureTime: departureTime,
           },
-          accommodations: body.accommodations && Array.isArray(body.accommodations) && typeof body.accommodations[0] === 'object'
-            ? body.accommodations as AccommodationPlan[]
-            : undefined,
+          accommodations:
+            body.accommodations &&
+            Array.isArray(body.accommodations) &&
+            typeof body.accommodations[0] === 'object'
+              ? (body.accommodations as AccommodationPlan[])
+              : undefined,
           style: style,
         },
         cityName,
@@ -340,7 +350,9 @@ export async function POST(request: NextRequest) {
       )
 
       const geminiResult = await generateItineraryWithGemini(geminiRequest)
-      logger.log(`[Itinerary] Gemini 結果: success=${geminiResult.success}, error=${geminiResult.error || 'none'}`)
+      logger.log(
+        `[Itinerary] Gemini 結果: success=${geminiResult.success}, error=${geminiResult.error || 'none'}`
+      )
 
       if (geminiResult.success) {
         logger.log(`[Itinerary] ✅ Gemini 生成成功，共 ${geminiResult.dailyItinerary.length} 天`)
@@ -348,13 +360,16 @@ export async function POST(request: NextRequest) {
           dailyItinerary: geminiResult.dailyItinerary,
           city: cityName,
           stats: {
-            totalAttractions: geminiResult.dailyItinerary.reduce((sum, day) => sum + day.activities.length, 0),
+            totalAttractions: geminiResult.dailyItinerary.reduce(
+              (sum, day) => sum + day.activities.length,
+              0
+            ),
             totalDuration: 0,
             attractionsInDb: attractions?.length || 0,
             suggestedRelaxDays: 0,
           },
           warnings: [],
-          generatedBy: 'gemini',  // 標記由 Gemini 生成
+          generatedBy: 'gemini', // 標記由 Gemini 生成
         })
       } else {
         logger.warn('[Itinerary] Gemini 生成失敗，回退到規則引擎:', geminiResult.error)
@@ -391,10 +406,7 @@ export async function POST(request: NextRequest) {
 
     // 11. 生成行程（規則引擎）
     logger.log(`[Itinerary] 📋 使用規則引擎生成，景點數: ${attractions?.length || 0}`)
-    const result = await generateItinerary(
-      generateRequest,
-      (attractions || []) as Attraction[]
-    )
+    const result = await generateItinerary(generateRequest, (attractions || []) as Attraction[])
 
     // 12. 返回結果
     logger.log(`[Itinerary] ✅ 規則引擎生成完成，共 ${result.dailyItinerary.length} 天`)
@@ -403,9 +415,8 @@ export async function POST(request: NextRequest) {
       city: cityName,
       stats: result.stats,
       warnings: result.warnings,
-      generatedBy: 'rules',  // 標記由規則引擎生成
+      generatedBy: 'rules', // 標記由規則引擎生成
     })
-
   } catch (error) {
     logger.error('生成行程失敗:', error)
     captureException(error, { module: 'itineraries.generate' })

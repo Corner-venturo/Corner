@@ -55,7 +55,9 @@ export function TravelerMessageList({
   }, [messages.length])
 
   // 取得發送者資訊
-  const getSenderInfo = (senderId: string): { name: string; isEmployee: boolean; avatar?: string } => {
+  const getSenderInfo = (
+    senderId: string
+  ): { name: string; isEmployee: boolean; avatar?: string } => {
     // 檢查是否為員工
     const employee = employees.find(e => e.id === senderId)
     if (employee) {
@@ -103,7 +105,10 @@ export function TravelerMessageList({
           )}
         </div>
         <h3 className="text-lg font-medium text-white mb-2">
-          {conversationType === 'tour_announcement' ? COMP_WORKSPACE_LABELS.團公告 : COMP_WORKSPACE_LABELS.客服對話}尚未開啟
+          {conversationType === 'tour_announcement'
+            ? COMP_WORKSPACE_LABELS.團公告
+            : COMP_WORKSPACE_LABELS.客服對話}
+          尚未開啟
         </h3>
         <p className="text-sm text-violet-300 text-center mb-4">
           {COMP_WORKSPACE_LABELS.LABEL_9993}
@@ -148,9 +153,10 @@ export function TravelerMessageList({
           const isOwnMessage = message.sender_id === currentUserId || senderInfo.isEmployee
 
           // 檢查是否需要顯示日期分隔符
-          const showDateSeparator = index === 0 ||
+          const showDateSeparator =
+            index === 0 ||
             new Date(message.created_at).toDateString() !==
-            new Date(messages[index - 1].created_at).toDateString()
+              new Date(messages[index - 1].created_at).toDateString()
 
           return (
             <div key={message.id}>
@@ -158,18 +164,17 @@ export function TravelerMessageList({
               {showDateSeparator && (
                 <div className="flex items-center justify-center my-4">
                   <div className="bg-[#2d2640] text-violet-300 text-xs px-3 py-1 rounded-full border border-violet-500/30">
-                    {format(new Date(message.created_at), COMP_WORKSPACE_LABELS.yyyy年MM月dd日_EEEE, { locale: zhTW })}
+                    {format(
+                      new Date(message.created_at),
+                      COMP_WORKSPACE_LABELS.yyyy年MM月dd日_EEEE,
+                      { locale: zhTW }
+                    )}
                   </div>
                 </div>
               )}
 
               {/* 訊息氣泡 */}
-              <div
-                className={cn(
-                  'flex gap-2',
-                  isOwnMessage ? 'flex-row-reverse' : 'flex-row'
-                )}
-              >
+              <div className={cn('flex gap-2', isOwnMessage ? 'flex-row-reverse' : 'flex-row')}>
                 {/* 頭像 */}
                 <div
                   className={cn(
@@ -180,7 +185,8 @@ export function TravelerMessageList({
                   )}
                 >
                   {senderInfo.avatar ? (
-                    <img src={senderInfo.avatar}
+                    <img
+                      src={senderInfo.avatar}
                       alt={senderInfo.name}
                       className="w-full h-full rounded-full object-cover"
                     />
@@ -199,9 +205,7 @@ export function TravelerMessageList({
                   {/* 發送者名稱 */}
                   <span className="text-xs text-violet-400 mb-1">
                     {senderInfo.name}
-                    {senderInfo.isEmployee && (
-                      <span className="ml-1 text-violet-500">(員工)</span>
-                    )}
+                    {senderInfo.isEmployee && <span className="ml-1 text-violet-500">(員工)</span>}
                   </span>
 
                   {/* 訊息氣泡 */}

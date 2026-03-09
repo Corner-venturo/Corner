@@ -6,15 +6,32 @@ import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Building2, Plane, Search, CalendarDays, Loader2, X, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { DatePicker } from '@/components/ui/date-picker'
 import {
-  useItineraries, createItinerary, updateItinerary, deleteItinerary,
-  useQuotes, createQuote, updateQuote,
+  useItineraries,
+  createItinerary,
+  updateItinerary,
+  deleteItinerary,
+  useQuotes,
+  createQuote,
+  updateQuote,
   useEmployeesSlim,
   useToursSlim,
   useCountries,
@@ -32,7 +49,13 @@ import { useItineraryFilters } from './hooks/useItineraryFilters'
 import { stripHtml } from '@/lib/utils/string-utils'
 import { LABELS } from './constants/labels'
 
-const statusFilters = [LABELS.ALL, LABELS.STATUS_PROPOSAL, LABELS.STATUS_ACTIVE, LABELS.STATUS_TEMPLATE, LABELS.STATUS_CLOSED]
+const statusFilters = [
+  LABELS.ALL,
+  LABELS.STATUS_PROPOSAL,
+  LABELS.STATUS_ACTIVE,
+  LABELS.STATUS_TEMPLATE,
+  LABELS.STATUS_CLOSED,
+]
 
 export default function ItineraryPage() {
   const router = useRouter()
@@ -45,7 +68,8 @@ export default function ItineraryPage() {
   // 🔧 優化：countries 只用於新增對話框，cities 已不需要（Itinerary 有 denormalized 欄位）
   const { items: countries } = useCountries()
 
-  const isSuperAdmin = user?.roles?.includes('super_admin') || user?.permissions?.includes('super_admin')
+  const isSuperAdmin =
+    user?.roles?.includes('super_admin') || user?.permissions?.includes('super_admin')
 
   useEffect(() => {
     if (isSuperAdmin && workspaces.length === 0) {
@@ -69,7 +93,10 @@ export default function ItineraryPage() {
   })
 
   const actions = useItineraryActions({
-    updateItinerary: updateItinerary as (id: string, data: Partial<Itinerary>) => Promise<Itinerary | void>,
+    updateItinerary: updateItinerary as (
+      id: string,
+      data: Partial<Itinerary>
+    ) => Promise<Itinerary | void>,
     deleteItinerary: deleteItinerary as unknown as (id: string) => Promise<void>,
     createItinerary: createItinerary as (data: Partial<Itinerary>) => Promise<Itinerary | null>,
     createQuote: createQuote as (data: Partial<Quote>) => Promise<Quote | null>,
@@ -121,9 +148,8 @@ export default function ItineraryPage() {
 
   // Memoize filtered employees for author select to prevent infinite re-renders
   const filteredEmployeesForSelect = useMemo(() => {
-    return employees.filter(emp =>
-      emp.id !== user?.id &&
-      itineraries.some(it => it.created_by === emp.id)
+    return employees.filter(
+      emp => emp.id !== user?.id && itineraries.some(it => it.created_by === emp.id)
     )
   }, [employees, user?.id, itineraries])
 
@@ -176,7 +202,7 @@ export default function ItineraryPage() {
               <Building2 size={14} className="text-morandi-blue" />
               <Select
                 value={localStorage.getItem('itinerary_workspace_filter') || 'all'}
-                onValueChange={(value) => {
+                onValueChange={value => {
                   if (value === 'all') {
                     localStorage.removeItem('itinerary_workspace_filter')
                   } else {
@@ -202,7 +228,6 @@ export default function ItineraryPage() {
         </div>
       }
     >
-
       {/* 新增行程對話框 */}
       <CreateItineraryDialog
         isOpen={pageState.isTypeSelectOpen}
@@ -235,23 +260,23 @@ export default function ItineraryPage() {
         onSubmit={actions.handleDuplicateSubmit}
       />
 
-        <div className="h-full">
-          <EnhancedTable
-            columns={tableColumns as TableColumn[]}
-            data={filteredItineraries}
-            onRowClick={(itinerary) => actions.handleRowClick(itinerary as Itinerary)}
-            rowClassName={(row) => {
-              const itinerary = row as Itinerary
-              if (itinerary.tour_id) {
-                return 'bg-morandi-blue/5 hover:bg-morandi-blue/10'
-              }
-              if (!itinerary.tour_id && !itinerary.is_template) {
-                return 'bg-status-danger-bg hover:bg-status-danger-bg'
-              }
-              return ''
-            }}
-          />
-        </div>
+      <div className="h-full">
+        <EnhancedTable
+          columns={tableColumns as TableColumn[]}
+          data={filteredItineraries}
+          onRowClick={itinerary => actions.handleRowClick(itinerary as Itinerary)}
+          rowClassName={row => {
+            const itinerary = row as Itinerary
+            if (itinerary.tour_id) {
+              return 'bg-morandi-blue/5 hover:bg-morandi-blue/10'
+            }
+            if (!itinerary.tour_id && !itinerary.is_template) {
+              return 'bg-status-danger-bg hover:bg-status-danger-bg'
+            }
+            return ''
+          }}
+        />
+      </div>
     </ContentPageLayout>
   )
 }
@@ -374,7 +399,12 @@ function CreateItineraryDialog({
                 </Button>
                 <Button
                   onClick={onCreateItinerary}
-                  disabled={formState.isCreatingItinerary || !formState.newItineraryTitle.trim() || !formState.newItineraryDepartureDate || !formState.newItineraryDays}
+                  disabled={
+                    formState.isCreatingItinerary ||
+                    !formState.newItineraryTitle.trim() ||
+                    !formState.newItineraryDepartureDate ||
+                    !formState.newItineraryDays
+                  }
                   className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1"
                 >
                   {formState.isCreatingItinerary ? (
@@ -420,7 +450,9 @@ function FlightInputSection({ formState, flightSearch }: FlightInputSectionProps
             <div className="flex items-center gap-2">
               <span className="text-xs font-medium text-morandi-primary">{LABELS.OUTBOUND}</span>
               {formState.newItineraryOutboundFlight?.departureDate && (
-                <span className="text-xs text-morandi-gold font-medium">({formState.newItineraryOutboundFlight.departureDate})</span>
+                <span className="text-xs text-morandi-gold font-medium">
+                  ({formState.newItineraryOutboundFlight.departureDate})
+                </span>
               )}
             </div>
             <Button
@@ -428,10 +460,17 @@ function FlightInputSection({ formState, flightSearch }: FlightInputSectionProps
               variant="outline"
               size="sm"
               onClick={flightSearch.handleSearchOutboundFlight}
-              disabled={flightSearch.loadingOutboundFlight || !formState.newItineraryOutboundFlight?.flightNumber}
+              disabled={
+                flightSearch.loadingOutboundFlight ||
+                !formState.newItineraryOutboundFlight?.flightNumber
+              }
               className="h-5 text-[10px] gap-1 px-2"
             >
-              {flightSearch.loadingOutboundFlight ? <Loader2 size={10} className="animate-spin" /> : <Search size={10} />}
+              {flightSearch.loadingOutboundFlight ? (
+                <Loader2 size={10} className="animate-spin" />
+              ) : (
+                <Search size={10} />
+              )}
               {LABELS.SEARCH_BUTTON}
             </Button>
           </div>
@@ -439,7 +478,9 @@ function FlightInputSection({ formState, flightSearch }: FlightInputSectionProps
           {flightSearch.outboundSegments.length > 0 && (
             <div className="bg-card p-2 rounded border border-morandi-gold/30 space-y-1">
               <div className="flex items-center justify-between">
-                <p className="text-[10px] text-morandi-secondary">{LABELS.MULTIPLE_SEGMENTS_SELECT}</p>
+                <p className="text-[10px] text-morandi-secondary">
+                  {LABELS.MULTIPLE_SEGMENTS_SELECT}
+                </p>
                 <button
                   type="button"
                   onClick={flightSearch.clearOutboundSegments}
@@ -468,12 +509,108 @@ function FlightInputSection({ formState, flightSearch }: FlightInputSectionProps
             </div>
           )}
           <div className="grid grid-cols-6 gap-1">
-            <Input placeholder={LABELS.FLIGHT} value={formState.newItineraryOutboundFlight?.flightNumber || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, flightNumber: e.target.value, airline: prev?.airline || '', departureAirport: prev?.departureAirport || 'TPE', arrivalAirport: prev?.arrivalAirport || '', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder={LABELS.AIRLINE} value={formState.newItineraryOutboundFlight?.airline || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, airline: e.target.value, flightNumber: prev?.flightNumber || '', departureAirport: prev?.departureAirport || 'TPE', arrivalAirport: prev?.arrivalAirport || '', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder={LABELS.DEPARTURE} value={formState.newItineraryOutboundFlight?.departureAirport || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, departureAirport: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', arrivalAirport: prev?.arrivalAirport || '', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder={LABELS.ARRIVAL} value={formState.newItineraryOutboundFlight?.arrivalAirport || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, arrivalAirport: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || 'TPE', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder={LABELS.TAKEOFF} value={formState.newItineraryOutboundFlight?.departureTime || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, departureTime: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || 'TPE', arrivalAirport: prev?.arrivalAirport || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder={LABELS.LANDING} value={formState.newItineraryOutboundFlight?.arrivalTime || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, arrivalTime: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || 'TPE', arrivalAirport: prev?.arrivalAirport || '', departureTime: prev?.departureTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+            <Input
+              placeholder={LABELS.FLIGHT}
+              value={formState.newItineraryOutboundFlight?.flightNumber || ''}
+              onChange={e =>
+                formState.setNewItineraryOutboundFlight(prev => ({
+                  ...prev,
+                  flightNumber: e.target.value,
+                  airline: prev?.airline || '',
+                  departureAirport: prev?.departureAirport || 'TPE',
+                  arrivalAirport: prev?.arrivalAirport || '',
+                  departureTime: prev?.departureTime || '',
+                  arrivalTime: prev?.arrivalTime || '',
+                  departureDate: prev?.departureDate || '',
+                }))
+              }
+              className="text-[10px] h-7"
+            />
+            <Input
+              placeholder={LABELS.AIRLINE}
+              value={formState.newItineraryOutboundFlight?.airline || ''}
+              onChange={e =>
+                formState.setNewItineraryOutboundFlight(prev => ({
+                  ...prev,
+                  airline: e.target.value,
+                  flightNumber: prev?.flightNumber || '',
+                  departureAirport: prev?.departureAirport || 'TPE',
+                  arrivalAirport: prev?.arrivalAirport || '',
+                  departureTime: prev?.departureTime || '',
+                  arrivalTime: prev?.arrivalTime || '',
+                  departureDate: prev?.departureDate || '',
+                }))
+              }
+              className="text-[10px] h-7"
+            />
+            <Input
+              placeholder={LABELS.DEPARTURE}
+              value={formState.newItineraryOutboundFlight?.departureAirport || ''}
+              onChange={e =>
+                formState.setNewItineraryOutboundFlight(prev => ({
+                  ...prev,
+                  departureAirport: e.target.value,
+                  flightNumber: prev?.flightNumber || '',
+                  airline: prev?.airline || '',
+                  arrivalAirport: prev?.arrivalAirport || '',
+                  departureTime: prev?.departureTime || '',
+                  arrivalTime: prev?.arrivalTime || '',
+                  departureDate: prev?.departureDate || '',
+                }))
+              }
+              className="text-[10px] h-7"
+            />
+            <Input
+              placeholder={LABELS.ARRIVAL}
+              value={formState.newItineraryOutboundFlight?.arrivalAirport || ''}
+              onChange={e =>
+                formState.setNewItineraryOutboundFlight(prev => ({
+                  ...prev,
+                  arrivalAirport: e.target.value,
+                  flightNumber: prev?.flightNumber || '',
+                  airline: prev?.airline || '',
+                  departureAirport: prev?.departureAirport || 'TPE',
+                  departureTime: prev?.departureTime || '',
+                  arrivalTime: prev?.arrivalTime || '',
+                  departureDate: prev?.departureDate || '',
+                }))
+              }
+              className="text-[10px] h-7"
+            />
+            <Input
+              placeholder={LABELS.TAKEOFF}
+              value={formState.newItineraryOutboundFlight?.departureTime || ''}
+              onChange={e =>
+                formState.setNewItineraryOutboundFlight(prev => ({
+                  ...prev,
+                  departureTime: e.target.value,
+                  flightNumber: prev?.flightNumber || '',
+                  airline: prev?.airline || '',
+                  departureAirport: prev?.departureAirport || 'TPE',
+                  arrivalAirport: prev?.arrivalAirport || '',
+                  arrivalTime: prev?.arrivalTime || '',
+                  departureDate: prev?.departureDate || '',
+                }))
+              }
+              className="text-[10px] h-7"
+            />
+            <Input
+              placeholder={LABELS.LANDING}
+              value={formState.newItineraryOutboundFlight?.arrivalTime || ''}
+              onChange={e =>
+                formState.setNewItineraryOutboundFlight(prev => ({
+                  ...prev,
+                  arrivalTime: e.target.value,
+                  flightNumber: prev?.flightNumber || '',
+                  airline: prev?.airline || '',
+                  departureAirport: prev?.departureAirport || 'TPE',
+                  arrivalAirport: prev?.arrivalAirport || '',
+                  departureTime: prev?.departureTime || '',
+                  departureDate: prev?.departureDate || '',
+                }))
+              }
+              className="text-[10px] h-7"
+            />
           </div>
         </div>
 
@@ -483,7 +620,9 @@ function FlightInputSection({ formState, flightSearch }: FlightInputSectionProps
             <div className="flex items-center gap-2">
               <span className="text-xs font-medium text-morandi-primary">{LABELS.RETURN}</span>
               {formState.newItineraryReturnFlight?.departureDate && (
-                <span className="text-xs text-morandi-gold font-medium">({formState.newItineraryReturnFlight.departureDate})</span>
+                <span className="text-xs text-morandi-gold font-medium">
+                  ({formState.newItineraryReturnFlight.departureDate})
+                </span>
               )}
             </div>
             <Button
@@ -491,10 +630,17 @@ function FlightInputSection({ formState, flightSearch }: FlightInputSectionProps
               variant="outline"
               size="sm"
               onClick={flightSearch.handleSearchReturnFlight}
-              disabled={flightSearch.loadingReturnFlight || !formState.newItineraryReturnFlight?.flightNumber}
+              disabled={
+                flightSearch.loadingReturnFlight ||
+                !formState.newItineraryReturnFlight?.flightNumber
+              }
               className="h-5 text-[10px] gap-1 px-2"
             >
-              {flightSearch.loadingReturnFlight ? <Loader2 size={10} className="animate-spin" /> : <Search size={10} />}
+              {flightSearch.loadingReturnFlight ? (
+                <Loader2 size={10} className="animate-spin" />
+              ) : (
+                <Search size={10} />
+              )}
               {LABELS.SEARCH_BUTTON}
             </Button>
           </div>
@@ -502,7 +648,9 @@ function FlightInputSection({ formState, flightSearch }: FlightInputSectionProps
           {flightSearch.returnSegments.length > 0 && (
             <div className="bg-card p-2 rounded border border-morandi-gold/30 space-y-1">
               <div className="flex items-center justify-between">
-                <p className="text-[10px] text-morandi-secondary">{LABELS.MULTIPLE_SEGMENTS_SELECT}</p>
+                <p className="text-[10px] text-morandi-secondary">
+                  {LABELS.MULTIPLE_SEGMENTS_SELECT}
+                </p>
                 <button
                   type="button"
                   onClick={flightSearch.clearReturnSegments}
@@ -531,12 +679,108 @@ function FlightInputSection({ formState, flightSearch }: FlightInputSectionProps
             </div>
           )}
           <div className="grid grid-cols-6 gap-1">
-            <Input placeholder={LABELS.FLIGHT} value={formState.newItineraryReturnFlight?.flightNumber || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, flightNumber: e.target.value, airline: prev?.airline || '', departureAirport: prev?.departureAirport || '', arrivalAirport: prev?.arrivalAirport || 'TPE', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder={LABELS.AIRLINE} value={formState.newItineraryReturnFlight?.airline || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, airline: e.target.value, flightNumber: prev?.flightNumber || '', departureAirport: prev?.departureAirport || '', arrivalAirport: prev?.arrivalAirport || 'TPE', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder={LABELS.DEPARTURE} value={formState.newItineraryReturnFlight?.departureAirport || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, departureAirport: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', arrivalAirport: prev?.arrivalAirport || 'TPE', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder={LABELS.ARRIVAL} value={formState.newItineraryReturnFlight?.arrivalAirport || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, arrivalAirport: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || '', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder={LABELS.TAKEOFF} value={formState.newItineraryReturnFlight?.departureTime || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, departureTime: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || '', arrivalAirport: prev?.arrivalAirport || 'TPE', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
-            <Input placeholder={LABELS.LANDING} value={formState.newItineraryReturnFlight?.arrivalTime || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, arrivalTime: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || '', arrivalAirport: prev?.arrivalAirport || 'TPE', departureTime: prev?.departureTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+            <Input
+              placeholder={LABELS.FLIGHT}
+              value={formState.newItineraryReturnFlight?.flightNumber || ''}
+              onChange={e =>
+                formState.setNewItineraryReturnFlight(prev => ({
+                  ...prev,
+                  flightNumber: e.target.value,
+                  airline: prev?.airline || '',
+                  departureAirport: prev?.departureAirport || '',
+                  arrivalAirport: prev?.arrivalAirport || 'TPE',
+                  departureTime: prev?.departureTime || '',
+                  arrivalTime: prev?.arrivalTime || '',
+                  departureDate: prev?.departureDate || '',
+                }))
+              }
+              className="text-[10px] h-7"
+            />
+            <Input
+              placeholder={LABELS.AIRLINE}
+              value={formState.newItineraryReturnFlight?.airline || ''}
+              onChange={e =>
+                formState.setNewItineraryReturnFlight(prev => ({
+                  ...prev,
+                  airline: e.target.value,
+                  flightNumber: prev?.flightNumber || '',
+                  departureAirport: prev?.departureAirport || '',
+                  arrivalAirport: prev?.arrivalAirport || 'TPE',
+                  departureTime: prev?.departureTime || '',
+                  arrivalTime: prev?.arrivalTime || '',
+                  departureDate: prev?.departureDate || '',
+                }))
+              }
+              className="text-[10px] h-7"
+            />
+            <Input
+              placeholder={LABELS.DEPARTURE}
+              value={formState.newItineraryReturnFlight?.departureAirport || ''}
+              onChange={e =>
+                formState.setNewItineraryReturnFlight(prev => ({
+                  ...prev,
+                  departureAirport: e.target.value,
+                  flightNumber: prev?.flightNumber || '',
+                  airline: prev?.airline || '',
+                  arrivalAirport: prev?.arrivalAirport || 'TPE',
+                  departureTime: prev?.departureTime || '',
+                  arrivalTime: prev?.arrivalTime || '',
+                  departureDate: prev?.departureDate || '',
+                }))
+              }
+              className="text-[10px] h-7"
+            />
+            <Input
+              placeholder={LABELS.ARRIVAL}
+              value={formState.newItineraryReturnFlight?.arrivalAirport || ''}
+              onChange={e =>
+                formState.setNewItineraryReturnFlight(prev => ({
+                  ...prev,
+                  arrivalAirport: e.target.value,
+                  flightNumber: prev?.flightNumber || '',
+                  airline: prev?.airline || '',
+                  departureAirport: prev?.departureAirport || '',
+                  departureTime: prev?.departureTime || '',
+                  arrivalTime: prev?.arrivalTime || '',
+                  departureDate: prev?.departureDate || '',
+                }))
+              }
+              className="text-[10px] h-7"
+            />
+            <Input
+              placeholder={LABELS.TAKEOFF}
+              value={formState.newItineraryReturnFlight?.departureTime || ''}
+              onChange={e =>
+                formState.setNewItineraryReturnFlight(prev => ({
+                  ...prev,
+                  departureTime: e.target.value,
+                  flightNumber: prev?.flightNumber || '',
+                  airline: prev?.airline || '',
+                  departureAirport: prev?.departureAirport || '',
+                  arrivalAirport: prev?.arrivalAirport || 'TPE',
+                  arrivalTime: prev?.arrivalTime || '',
+                  departureDate: prev?.departureDate || '',
+                }))
+              }
+              className="text-[10px] h-7"
+            />
+            <Input
+              placeholder={LABELS.LANDING}
+              value={formState.newItineraryReturnFlight?.arrivalTime || ''}
+              onChange={e =>
+                formState.setNewItineraryReturnFlight(prev => ({
+                  ...prev,
+                  arrivalTime: e.target.value,
+                  flightNumber: prev?.flightNumber || '',
+                  airline: prev?.airline || '',
+                  departureAirport: prev?.departureAirport || '',
+                  arrivalAirport: prev?.arrivalAirport || 'TPE',
+                  departureTime: prev?.departureTime || '',
+                  departureDate: prev?.departureDate || '',
+                }))
+              }
+              className="text-[10px] h-7"
+            />
           </div>
         </div>
       </div>
@@ -629,7 +873,14 @@ function DailyItineraryPreview({ formState }: DailyItineraryPreviewProps) {
               date.setDate(date.getDate() + i)
               dateLabel = `${date.getMonth() + 1}/${date.getDate()}`
             }
-            const dayData = formState.newItineraryDailyData[i] || { title: '', breakfast: '', lunch: '', dinner: '', accommodation: '', isSameAccommodation: false }
+            const dayData = formState.newItineraryDailyData[i] || {
+              title: '',
+              breakfast: '',
+              lunch: '',
+              dinner: '',
+              accommodation: '',
+              isSameAccommodation: false,
+            }
             const effectiveAccommodation = getEffectiveAccommodation(i)
 
             return (
@@ -638,10 +889,18 @@ function DailyItineraryPreview({ formState }: DailyItineraryPreviewProps) {
                   <span className="bg-morandi-gold text-white text-xs font-bold px-2 py-0.5 rounded">
                     Day {dayNum}
                   </span>
-                  {dateLabel && <span className="text-xs text-morandi-secondary">({dateLabel})</span>}
+                  {dateLabel && (
+                    <span className="text-xs text-morandi-secondary">({dateLabel})</span>
+                  )}
                 </div>
                 <Input
-                  placeholder={isFirst ? LABELS.ARRIVE_DESTINATION : isLast ? LABELS.RETURN_TAIWAN : LABELS.DAILY_TITLE}
+                  placeholder={
+                    isFirst
+                      ? LABELS.ARRIVE_DESTINATION
+                      : isLast
+                        ? LABELS.RETURN_TAIWAN
+                        : LABELS.DAILY_TITLE
+                  }
                   className="h-8 text-sm mb-2"
                   value={dayData.title}
                   onChange={e => updateDayData(i, 'title', e.target.value)}
@@ -680,7 +939,9 @@ function DailyItineraryPreview({ formState }: DailyItineraryPreviewProps) {
                         <span className="text-xs text-morandi-secondary">
                           {LABELS.SAME_ACCOMMODATION}
                           {dayData.isSameAccommodation && effectiveAccommodation && (
-                            <span className="text-morandi-gold ml-1">（{effectiveAccommodation}）</span>
+                            <span className="text-morandi-gold ml-1">
+                              （{effectiveAccommodation}）
+                            </span>
                           )}
                         </span>
                       </label>
@@ -717,7 +978,13 @@ interface PasswordDialogProps {
   onSubmit: () => void
 }
 
-function PasswordDialog({ isOpen, onOpenChange, passwordInput, onPasswordChange, onSubmit }: PasswordDialogProps) {
+function PasswordDialog({
+  isOpen,
+  onOpenChange,
+  passwordInput,
+  onPasswordChange,
+  onSubmit,
+}: PasswordDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent level={1} className="max-w-sm">
@@ -725,9 +992,7 @@ function PasswordDialog({ isOpen, onOpenChange, passwordInput, onPasswordChange,
           <DialogTitle>{LABELS.EDIT_ONGOING_ITINERARY}</DialogTitle>
         </DialogHeader>
         <div className="py-4">
-          <p className="text-sm text-morandi-secondary mb-4">
-            {LABELS.EDIT_PASSWORD_WARNING}
-          </p>
+          <p className="text-sm text-morandi-secondary mb-4">{LABELS.EDIT_PASSWORD_WARNING}</p>
           <Input
             type="password"
             placeholder={LABELS.ENTER_COMPANY_PASSWORD}
@@ -786,7 +1051,10 @@ function DuplicateDialog({
         </DialogHeader>
         <div className="py-4 space-y-4">
           <p className="text-sm text-morandi-secondary">
-            {LABELS.COPYING_PREFIX}<span className="font-medium text-morandi-primary">{stripHtml(duplicateSource?.title)}</span>
+            {LABELS.COPYING_PREFIX}
+            <span className="font-medium text-morandi-primary">
+              {stripHtml(duplicateSource?.title)}
+            </span>
           </p>
           <div className="space-y-2">
             <Label htmlFor="duplicateTourCode">{LABELS.ITINERARY_CODE_REQUIRED}</Label>
@@ -812,7 +1080,8 @@ function DuplicateDialog({
             />
           </div>
           <p className="text-xs text-morandi-muted">
-            {LABELS.COPY_DESCRIPTION1}<br />
+            {LABELS.COPY_DESCRIPTION1}
+            <br />
             {LABELS.COPY_DESCRIPTION2}
           </p>
         </div>

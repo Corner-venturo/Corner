@@ -59,38 +59,104 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { href: '/dashboard', label: COMP_LAYOUT_LABELS.首頁, icon: Home },
-  { href: '/calendar', label: COMP_LAYOUT_LABELS.行事曆, icon: Calendar, requiredPermission: 'calendar' },
-  { href: '/workspace', label: COMP_LAYOUT_LABELS.工作空間, icon: Building2, requiredPermission: 'workspace' },
+  {
+    href: '/calendar',
+    label: COMP_LAYOUT_LABELS.行事曆,
+    icon: Calendar,
+    requiredPermission: 'calendar',
+  },
+  {
+    href: '/workspace',
+    label: COMP_LAYOUT_LABELS.工作空間,
+    icon: Building2,
+    requiredPermission: 'workspace',
+  },
   // 郵件系統暫時隱藏（目前使用 Google Workspace）
   // { href: '/mail', label: '郵件', icon: Mail, requiredPermission: 'workspace' },
   // 旅伴通訊已整合到工作頻道中，此路由暫時隱藏
   // { href: '/traveler-chat', label: '旅伴通訊', icon: MessageCircle, requiredPermission: 'workspace' },
-  { href: '/todos', label: COMP_LAYOUT_LABELS.待辦事項, icon: CheckSquare, requiredPermission: 'todos' },
+  {
+    href: '/todos',
+    label: COMP_LAYOUT_LABELS.待辦事項,
+    icon: CheckSquare,
+    requiredPermission: 'todos',
+  },
   { href: '/tours', label: COMP_LAYOUT_LABELS.旅遊團, icon: MapPin, requiredPermission: 'tours' },
-  { href: '/orders', label: COMP_LAYOUT_LABELS.訂單, icon: ShoppingCart, requiredPermission: 'orders' },
-  { href: '/itinerary', label: COMP_LAYOUT_LABELS.行程管理, icon: Route, requiredPermission: 'itinerary' },
+  {
+    href: '/orders',
+    label: COMP_LAYOUT_LABELS.訂單,
+    icon: ShoppingCart,
+    requiredPermission: 'orders',
+  },
+  {
+    href: '/itinerary',
+    label: COMP_LAYOUT_LABELS.行程管理,
+    icon: Route,
+    requiredPermission: 'itinerary',
+  },
   {
     href: '/finance',
     label: COMP_LAYOUT_LABELS.財務系統,
     icon: CreditCard,
     children: [
-      { href: '/finance/payments', label: COMP_LAYOUT_LABELS.收款管理, icon: CreditCard, requiredPermission: 'payments' },
-      { href: '/finance/requests', label: COMP_LAYOUT_LABELS.請款管理, icon: TrendingDown, requiredPermission: 'requests' },
-      { href: '/finance/treasury', label: COMP_LAYOUT_LABELS.出納管理, icon: Wallet, requiredPermission: 'disbursement' },
+      {
+        href: '/finance/payments',
+        label: COMP_LAYOUT_LABELS.收款管理,
+        icon: CreditCard,
+        requiredPermission: 'payments',
+      },
+      {
+        href: '/finance/requests',
+        label: COMP_LAYOUT_LABELS.請款管理,
+        icon: TrendingDown,
+        requiredPermission: 'requests',
+      },
+      {
+        href: '/finance/treasury',
+        label: COMP_LAYOUT_LABELS.出納管理,
+        icon: Wallet,
+        requiredPermission: 'disbursement',
+      },
       // { href: '/erp-accounting/vouchers', label: COMP_LAYOUT_LABELS.會計傳票, icon: FileText, requiredPermission: 'vouchers' }, // V2: 會計模組已移除
-      { href: '/finance/travel-invoice', label: COMP_LAYOUT_LABELS.代轉發票, icon: FileText, requiredPermission: 'travel_invoice', restrictedFeature: 'travel_invoices' },
-      { href: '/finance/reports', label: COMP_LAYOUT_LABELS.報表管理, icon: BarChart3, requiredPermission: 'reports' },
+      {
+        href: '/finance/travel-invoice',
+        label: COMP_LAYOUT_LABELS.代轉發票,
+        icon: FileText,
+        requiredPermission: 'travel_invoice',
+        restrictedFeature: 'travel_invoices',
+      },
+      {
+        href: '/finance/reports',
+        label: COMP_LAYOUT_LABELS.報表管理,
+        icon: BarChart3,
+        requiredPermission: 'reports',
+      },
     ],
   },
-  { href: '/visas', label: COMP_LAYOUT_LABELS.簽證管理, icon: FileCheck, requiredPermission: 'visas' },
+  {
+    href: '/visas',
+    label: COMP_LAYOUT_LABELS.簽證管理,
+    icon: FileCheck,
+    requiredPermission: 'visas',
+  },
   {
     href: '/design',
     label: COMP_LAYOUT_LABELS.設計,
     icon: Palette,
     requiredPermission: 'design',
     children: [
-      { href: '/brochures', label: COMP_LAYOUT_LABELS.手冊, icon: BookOpen, requiredPermission: 'design' },
-      { href: '/marketing', label: COMP_LAYOUT_LABELS.行銷素材, icon: Megaphone, requiredPermission: 'design' },
+      {
+        href: '/brochures',
+        label: COMP_LAYOUT_LABELS.手冊,
+        icon: BookOpen,
+        requiredPermission: 'design',
+      },
+      {
+        href: '/marketing',
+        label: COMP_LAYOUT_LABELS.行銷素材,
+        icon: Megaphone,
+        requiredPermission: 'design',
+      },
     ],
   },
   {
@@ -99,8 +165,18 @@ const menuItems: MenuItem[] = [
     icon: FileSpreadsheet,
     requiredPermission: 'office',
     children: [
-      { href: '/office', label: COMP_LAYOUT_LABELS.文件列表, icon: FileSpreadsheet, requiredPermission: 'office' },
-      { href: '/office/editor', label: COMP_LAYOUT_LABELS.新增文件, icon: FileSpreadsheet, requiredPermission: 'office' },
+      {
+        href: '/office',
+        label: COMP_LAYOUT_LABELS.文件列表,
+        icon: FileSpreadsheet,
+        requiredPermission: 'office',
+      },
+      {
+        href: '/office/editor',
+        label: COMP_LAYOUT_LABELS.新增文件,
+        icon: FileSpreadsheet,
+        requiredPermission: 'office',
+      },
     ],
   },
   // 合約管理和確認單管理已整合到團的操作中，不需要獨立入口
@@ -112,20 +188,70 @@ const menuItems: MenuItem[] = [
     icon: Database,
     requiredPermission: 'database',
     children: [
-      { href: '/customers', label: COMP_LAYOUT_LABELS.顧客管理, icon: Users, requiredPermission: 'customers' },
-      { href: '/database/attractions', label: COMP_LAYOUT_LABELS.旅遊資料庫, icon: MapPin, requiredPermission: 'database' },
-      { href: '/database/transportation-rates', label: COMP_LAYOUT_LABELS.車資管理, icon: Bus, requiredPermission: 'database' },
-      { href: '/database/suppliers', label: COMP_LAYOUT_LABELS.供應商管理, icon: Building2, requiredPermission: 'database' },
-      { href: '/database/tour-leaders', label: COMP_LAYOUT_LABELS.領隊資料, icon: Users, requiredPermission: 'database' },
-      { href: '/database/company-assets', label: COMP_LAYOUT_LABELS.公司資源管理, icon: ImageIcon, requiredPermission: 'database' },
-      { href: '/database/archive-management', label: COMP_LAYOUT_LABELS.封存管理, icon: Archive, requiredPermission: 'database' },
+      {
+        href: '/customers',
+        label: COMP_LAYOUT_LABELS.顧客管理,
+        icon: Users,
+        requiredPermission: 'customers',
+      },
+      {
+        href: '/database/attractions',
+        label: COMP_LAYOUT_LABELS.旅遊資料庫,
+        icon: MapPin,
+        requiredPermission: 'database',
+      },
+      {
+        href: '/database/transportation-rates',
+        label: COMP_LAYOUT_LABELS.車資管理,
+        icon: Bus,
+        requiredPermission: 'database',
+      },
+      {
+        href: '/database/suppliers',
+        label: COMP_LAYOUT_LABELS.供應商管理,
+        icon: Building2,
+        requiredPermission: 'database',
+      },
+      {
+        href: '/database/tour-leaders',
+        label: COMP_LAYOUT_LABELS.領隊資料,
+        icon: Users,
+        requiredPermission: 'database',
+      },
+      {
+        href: '/database/company-assets',
+        label: COMP_LAYOUT_LABELS.公司資源管理,
+        icon: ImageIcon,
+        requiredPermission: 'database',
+      },
+      {
+        href: '/database/archive-management',
+        label: COMP_LAYOUT_LABELS.封存管理,
+        icon: Archive,
+        requiredPermission: 'database',
+      },
     ],
   },
   { href: '/meeting', label: COMP_LAYOUT_LABELS.會議室, icon: MessagesSquare },
   { href: '/hr', label: COMP_LAYOUT_LABELS.人資管理, icon: UserCog, requiredPermission: 'hr' },
-  { href: '/tenants', label: COMP_LAYOUT_LABELS.租戶管理, icon: Building, requiredPermission: 'super_admin_only' },
-  { href: '/scheduling', label: COMP_LAYOUT_LABELS.資源調度, icon: Calendar, requiredPermission: 'hr' },
-  { href: '/database/fleet', label: COMP_LAYOUT_LABELS.車隊管理, icon: Bus, requiredPermission: 'hr' },
+  {
+    href: '/tenants',
+    label: COMP_LAYOUT_LABELS.租戶管理,
+    icon: Building,
+    requiredPermission: 'super_admin_only',
+  },
+  {
+    href: '/scheduling',
+    label: COMP_LAYOUT_LABELS.資源調度,
+    icon: Calendar,
+    requiredPermission: 'hr',
+  },
+  {
+    href: '/database/fleet',
+    label: COMP_LAYOUT_LABELS.車隊管理,
+    icon: Bus,
+    requiredPermission: 'hr',
+  },
   // { href: '/esims', label: COMP_LAYOUT_LABELS.網卡管理, icon: Wifi, requiredPermission: 'hr', restrictedFeature: 'esim' },
 ]
 
@@ -144,7 +270,7 @@ export function Sidebar() {
   const { user } = useAuthStore()
   const [mounted, setMounted] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false) // 點擊固定展開
-  const [isHovered, setIsHovered] = useState(false)   // 滑鼠懸停暫時展開
+  const [isHovered, setIsHovered] = useState(false) // 滑鼠懸停暫時展開
   const [expandedMenus, setExpandedMenus] = useState<string[]>([])
 
   // 實際顯示狀態：固定展開 或 懸停展開
@@ -177,9 +303,7 @@ export function Sidebar() {
       setExpandedMenus([href])
       return
     }
-    setExpandedMenus(prev =>
-      prev.includes(href) ? prev.filter(h => h !== href) : [...prev, href]
-    )
+    setExpandedMenus(prev => (prev.includes(href) ? prev.filter(h => h !== href) : [...prev, href]))
   }
 
   // 滑鼠進入/離開側邊欄
@@ -207,7 +331,10 @@ export function Sidebar() {
   const userPermissions = useMemo(() => user?.permissions || [], [user?.permissions])
   const userRoles = useMemo(() => user?.roles || [], [user?.roles])
   const hiddenMenuItems = useMemo(() => user?.hidden_menu_items || [], [user?.hidden_menu_items])
-  const preferredFeatures = useMemo(() => user?.preferred_features || [], [user?.preferred_features])
+  const preferredFeatures = useMemo(
+    () => user?.preferred_features || [],
+    [user?.preferred_features]
+  )
 
   const isSuperAdmin =
     userPermissions.includes('super_admin') ||
@@ -216,7 +343,8 @@ export function Sidebar() {
     userRoles.includes('super_admin')
 
   // 檢查是否為供應商 workspace
-  const isSupplierWorkspace = user?.workspace_type === 'vehicle_supplier' || user?.workspace_type === 'guide_supplier'
+  const isSupplierWorkspace =
+    user?.workspace_type === 'vehicle_supplier' || user?.workspace_type === 'guide_supplier'
   const isVehicleSupplier = user?.workspace_type === 'vehicle_supplier'
 
   const visibleMenuItems = useMemo(() => {
@@ -237,7 +365,10 @@ export function Sidebar() {
         .map(item => {
           if (isMenuItemHidden(item.href, hiddenMenuItems)) return null
           // 檢查功能限制（非 TP/TC 不可見）
-          if (item.restrictedFeature && !isFeatureAvailable(item.restrictedFeature, workspaceCode)) {
+          if (
+            item.restrictedFeature &&
+            !isFeatureAvailable(item.restrictedFeature, workspaceCode)
+          ) {
             return null
           }
           if (!isSuperAdmin && preferredFeatures.length > 0 && item.requiredPermission) {
@@ -257,21 +388,30 @@ export function Sidebar() {
         .filter((item): item is MenuItem => item !== null)
     }
     return filterMenuByPermissions(menuItems)
-  }, [user?.id, user?.workspace_code, user?.workspace_type, isSupplierWorkspace, isVehicleSupplier, isSuperAdmin, preferredFeatures, hiddenMenuItems, userPermissions])
+  }, [
+    user?.id,
+    user?.workspace_code,
+    user?.workspace_type,
+    isSupplierWorkspace,
+    isVehicleSupplier,
+    isSuperAdmin,
+    preferredFeatures,
+    hiddenMenuItems,
+    userPermissions,
+  ])
 
   const visiblePersonalToolItems = useMemo(() => {
     // 供應商不顯示個人工具
     if (isSupplierWorkspace) return []
 
     // 簡化版篩選（個人工具不需要 restrictedFeature 或 preferredFeatures 檢查）
-    return personalToolItems
-      .filter(item => {
-        if (!user) return !item.requiredPermission
-        if (isMenuItemHidden(item.href, hiddenMenuItems)) return false
-        if (!item.requiredPermission) return true
-        if (isSuperAdmin) return true
-        return userPermissions.includes(item.requiredPermission)
-      })
+    return personalToolItems.filter(item => {
+      if (!user) return !item.requiredPermission
+      if (isMenuItemHidden(item.href, hiddenMenuItems)) return false
+      if (!item.requiredPermission) return true
+      if (isSuperAdmin) return true
+      return userPermissions.includes(item.requiredPermission)
+    })
   }, [user?.id, isSupplierWorkspace, isSuperAdmin, hiddenMenuItems, userPermissions])
 
   // 渲染菜單項目
@@ -292,10 +432,7 @@ export function Sidebar() {
             )}
             onClick={() => toggleSubmenu(item.href)}
           >
-            <item.icon
-              size={18}
-              className="absolute left-5 top-1/2 -translate-y-1/2"
-            />
+            <item.icon size={18} className="absolute left-5 top-1/2 -translate-y-1/2" />
             {showExpanded && (
               <>
                 <span className="ml-12 block text-left leading-9">{item.label}</span>
@@ -336,10 +473,7 @@ export function Sidebar() {
         >
           <item.icon
             size={isChild ? 14 : 18}
-            className={cn(
-              'absolute top-1/2 -translate-y-1/2',
-              isChild ? 'left-8' : 'left-5'
-            )}
+            className={cn('absolute top-1/2 -translate-y-1/2', isChild ? 'left-8' : 'left-5')}
           />
           {showExpanded && (
             <span className={cn('block text-left leading-9', isChild ? 'ml-14' : 'ml-12')}>
@@ -368,9 +502,7 @@ export function Sidebar() {
             <span className="text-white font-semibold text-lg">V</span>
           </div>
           {showExpanded && (
-            <div className="ml-[58px] text-xl font-bold text-morandi-primary">
-              CORNER
-            </div>
+            <div className="ml-[58px] text-xl font-bold text-morandi-primary">CORNER</div>
           )}
         </div>
       </div>
@@ -388,7 +520,15 @@ export function Sidebar() {
             icon: Settings,
             children: [
               { href: '/settings', label: COMP_LAYOUT_LABELS.個人設定, icon: Settings },
-              ...(isSuperAdmin ? [{ href: '/settings/company', label: COMP_LAYOUT_LABELS.公司資訊, icon: Building2 }] : []),
+              ...(isSuperAdmin
+                ? [
+                    {
+                      href: '/settings/company',
+                      label: COMP_LAYOUT_LABELS.公司資訊,
+                      icon: Building2,
+                    },
+                  ]
+                : []),
             ],
           })}
         </ul>

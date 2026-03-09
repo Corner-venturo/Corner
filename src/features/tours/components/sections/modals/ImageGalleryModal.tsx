@@ -19,7 +19,7 @@ type ImageGalleryModalProps = {
 
 function isArtGallery(
   variant: 'luxury' | 'art' | undefined,
-  gallery: LuxuryGalleryState | ArtGalleryState,
+  gallery: LuxuryGalleryState | ArtGalleryState
 ): gallery is ArtGalleryState {
   return variant === 'art'
 }
@@ -41,12 +41,10 @@ export function ImageGalleryModal(props: ImageGalleryModalProps) {
   const currentTitle = isArt
     ? (imageGallery as ArtGalleryState).title
     : (images as ImageInfo[])[currentIndex].title
-  const currentDescription = !isArt
-    ? (images as ImageInfo[])[currentIndex].description
-    : undefined
+  const currentDescription = !isArt ? (images as ImageInfo[])[currentIndex].description : undefined
 
   return (
-    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={true} onOpenChange={open => !open && onClose()}>
       <DialogContent
         level={2}
         className={`max-w-5xl w-full border-none p-0 gap-0 ${!isArt ? 'bg-black/90' : ''}`}
@@ -101,7 +99,8 @@ export function ImageGalleryModal(props: ImageGalleryModalProps) {
               transition={{ duration: 0.2 }}
               className={isArt ? 'max-w-5xl max-h-[85vh] mx-6' : 'max-w-5xl max-h-[80vh] relative'}
             >
-              <img src={currentUrl}
+              <img
+                src={currentUrl}
                 alt={currentTitle || ''}
                 className={
                   isArt
@@ -121,9 +120,7 @@ export function ImageGalleryModal(props: ImageGalleryModalProps) {
                     </h3>
                   )}
                   {currentDescription && (
-                    <p className="text-white/80 text-sm">
-                      {currentDescription}
-                    </p>
+                    <p className="text-white/80 text-sm">{currentDescription}</p>
                   )}
                 </div>
               )}
@@ -139,9 +136,7 @@ export function ImageGalleryModal(props: ImageGalleryModalProps) {
                       key={idx}
                       onClick={() => onSelectIndex(idx)}
                       className={`w-2 h-2 transition-all ${
-                        idx === currentIndex
-                          ? 'bg-card w-8'
-                          : 'bg-card/30 hover:bg-card/50'
+                        idx === currentIndex ? 'bg-card w-8' : 'bg-card/30 hover:bg-card/50'
                       }`}
                       aria-label={`View image ${idx + 1}`}
                     />
@@ -157,10 +152,7 @@ export function ImageGalleryModal(props: ImageGalleryModalProps) {
                       }`}
                       aria-label={`View image ${idx + 1}`}
                     >
-                      <img src={img.url}
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={img.url} alt="" className="w-full h-full object-cover" />
                     </button>
                   ))}
             </div>

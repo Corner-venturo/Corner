@@ -17,20 +17,17 @@ interface GenerateReportPayload {
   format: 'pdf' | 'excel' | 'csv'
 }
 
-registerTaskHandler<GenerateReportPayload>(
-  TaskTypes.GENERATE_REPORT,
-  async (payload, task) => {
-    logger.info('Generating report', { reportType: payload.reportType, taskId: task.id })
+registerTaskHandler<GenerateReportPayload>(TaskTypes.GENERATE_REPORT, async (payload, task) => {
+  logger.info('Generating report', { reportType: payload.reportType, taskId: task.id })
 
-    // [Planned] 整合報表生成服務 (e.g., Puppeteer for PDF, ExcelJS for Excel)
-    // 目前回傳模擬結果
+  // [Planned] 整合報表生成服務 (e.g., Puppeteer for PDF, ExcelJS for Excel)
+  // 目前回傳模擬結果
 
-    return {
-      reportUrl: `/reports/${task.id}.${payload.format}`,
-      generatedAt: new Date().toISOString(),
-    }
+  return {
+    reportUrl: `/reports/${task.id}.${payload.format}`,
+    generatedAt: new Date().toISOString(),
   }
-)
+})
 
 // ==================== 發送郵件 ====================
 interface SendEmailPayload {
@@ -41,20 +38,17 @@ interface SendEmailPayload {
   data?: Record<string, unknown>
 }
 
-registerTaskHandler<SendEmailPayload>(
-  TaskTypes.SEND_EMAIL,
-  async (payload, task) => {
-    logger.info('Sending email', { to: payload.to, subject: payload.subject, taskId: task.id })
+registerTaskHandler<SendEmailPayload>(TaskTypes.SEND_EMAIL, async (payload, task) => {
+  logger.info('Sending email', { to: payload.to, subject: payload.subject, taskId: task.id })
 
-    // [Planned] 整合郵件服務 (e.g., Resend, SendGrid)
-    // 目前回傳模擬結果
+  // [Planned] 整合郵件服務 (e.g., Resend, SendGrid)
+  // 目前回傳模擬結果
 
-    return {
-      sent: true,
-      sentAt: new Date().toISOString(),
-    }
+  return {
+    sent: true,
+    sentAt: new Date().toISOString(),
   }
-)
+})
 
 // ==================== 發送通知 ====================
 interface SendNotificationPayload {
@@ -65,20 +59,17 @@ interface SendNotificationPayload {
   link?: string
 }
 
-registerTaskHandler<SendNotificationPayload>(
-  TaskTypes.SEND_NOTIFICATION,
-  async (payload, task) => {
-    logger.info('Sending notification', { userId: payload.userId, taskId: task.id })
+registerTaskHandler<SendNotificationPayload>(TaskTypes.SEND_NOTIFICATION, async (payload, task) => {
+  logger.info('Sending notification', { userId: payload.userId, taskId: task.id })
 
-    // [Planned] 整合即時通知 (e.g., Supabase Realtime, WebSocket)
-    // 目前回傳模擬結果
+  // [Planned] 整合即時通知 (e.g., Supabase Realtime, WebSocket)
+  // 目前回傳模擬結果
 
-    return {
-      notified: true,
-      notifiedAt: new Date().toISOString(),
-    }
+  return {
+    notified: true,
+    notifiedAt: new Date().toISOString(),
   }
-)
+})
 
 // ==================== 生成 PDF ====================
 interface GeneratePDFPayload {
@@ -87,20 +78,17 @@ interface GeneratePDFPayload {
   filename?: string
 }
 
-registerTaskHandler<GeneratePDFPayload>(
-  TaskTypes.GENERATE_PDF,
-  async (payload, task) => {
-    logger.info('Generating PDF', { templateId: payload.templateId, taskId: task.id })
+registerTaskHandler<GeneratePDFPayload>(TaskTypes.GENERATE_PDF, async (payload, task) => {
+  logger.info('Generating PDF', { templateId: payload.templateId, taskId: task.id })
 
-    // [Planned] 整合 PDF 生成服務 (e.g., Puppeteer, pdf-lib)
-    // 目前回傳模擬結果
+  // [Planned] 整合 PDF 生成服務 (e.g., Puppeteer, pdf-lib)
+  // 目前回傳模擬結果
 
-    return {
-      pdfUrl: `/pdfs/${task.id}.pdf`,
-      generatedAt: new Date().toISOString(),
-    }
+  return {
+    pdfUrl: `/pdfs/${task.id}.pdf`,
+    generatedAt: new Date().toISOString(),
   }
-)
+})
 
 // ==================== 資料同步 ====================
 interface SyncDataPayload {
@@ -110,21 +98,18 @@ interface SyncDataPayload {
   entityIds?: string[]
 }
 
-registerTaskHandler<SyncDataPayload>(
-  TaskTypes.SYNC_DATA,
-  async (payload, task) => {
-    logger.info('Syncing data', { source: payload.source, target: payload.target, taskId: task.id })
+registerTaskHandler<SyncDataPayload>(TaskTypes.SYNC_DATA, async (payload, task) => {
+  logger.info('Syncing data', { source: payload.source, target: payload.target, taskId: task.id })
 
-    // [Planned] 整合外部系統資料同步 (e.g., Google Calendar, CRM)
-    // 目前回傳模擬結果
+  // [Planned] 整合外部系統資料同步 (e.g., Google Calendar, CRM)
+  // 目前回傳模擬結果
 
-    return {
-      synced: true,
-      syncedAt: new Date().toISOString(),
-      recordsProcessed: payload.entityIds?.length || 0,
-    }
+  return {
+    synced: true,
+    syncedAt: new Date().toISOString(),
+    recordsProcessed: payload.entityIds?.length || 0,
   }
-)
+})
 
 // ==================== 清理舊資料 ====================
 interface CleanupOldDataPayload {
@@ -133,23 +118,20 @@ interface CleanupOldDataPayload {
   dryRun?: boolean
 }
 
-registerTaskHandler<CleanupOldDataPayload>(
-  TaskTypes.CLEANUP_OLD_DATA,
-  async (payload, task) => {
-    logger.info('Cleaning up old data', { tableName: payload.tableName, taskId: task.id })
+registerTaskHandler<CleanupOldDataPayload>(TaskTypes.CLEANUP_OLD_DATA, async (payload, task) => {
+  logger.info('Cleaning up old data', { tableName: payload.tableName, taskId: task.id })
 
-    // [Planned] 實作資料清理排程
-    // 注意：危險操作，需啟用 dry-run 模式測試
-    // 目前回傳模擬結果
+  // [Planned] 實作資料清理排程
+  // 注意：危險操作，需啟用 dry-run 模式測試
+  // 目前回傳模擬結果
 
-    return {
-      cleaned: true,
-      cleanedAt: new Date().toISOString(),
-      recordsDeleted: 0,
-      dryRun: payload.dryRun || false,
-    }
+  return {
+    cleaned: true,
+    cleanedAt: new Date().toISOString(),
+    recordsDeleted: 0,
+    dryRun: payload.dryRun || false,
   }
-)
+})
 
 // 導出所有已註冊的處理器（用於檢查）
 export const taskHandlers = {

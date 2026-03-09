@@ -28,7 +28,10 @@ interface TourHeroArtProps {
 }
 
 // 從標題或行程陣列中提取天數
-function extractDayNumber(title: string | undefined, dailyItinerary?: Array<{ dayLabel?: string }>): number {
+function extractDayNumber(
+  title: string | undefined,
+  dailyItinerary?: Array<{ dayLabel?: string }>
+): number {
   // 優先從 dailyItinerary 計算天數
   if (dailyItinerary && dailyItinerary.length > 0) {
     // 檢查最後一個 dayLabel，可能是 "Day 5" 或 "Day 3-4" 這種格式
@@ -65,13 +68,11 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
   const isMobile = viewMode === 'mobile'
   const dayNumber = data.days || extractDayNumber(data.title, data.dailyItinerary)
   const dateDisplay = formatDateShort(data.departureDate)
-  const coverImage = (data.coverImage && data.coverImage.trim() !== '') ? data.coverImage : DEFAULT_COVER
+  const coverImage =
+    data.coverImage && data.coverImage.trim() !== '' ? data.coverImage : DEFAULT_COVER
 
   return (
-    <header
-      className="relative w-full overflow-hidden"
-      style={{ backgroundColor: ART.paper }}
-    >
+    <header className="relative w-full overflow-hidden" style={{ backgroundColor: ART.paper }}>
       {/* 背景斜切色塊 */}
       <div
         className="absolute top-0 right-0 w-1/2 h-full pointer-events-none"
@@ -82,8 +83,9 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
       />
 
       {/* 主要內容容器 */}
-      <div className={`relative z-10 ${isMobile ? 'px-6 pt-24 pb-12' : 'max-w-7xl mx-auto px-8 py-16 lg:py-20'}`}>
-
+      <div
+        className={`relative z-10 ${isMobile ? 'px-6 pt-24 pb-12' : 'max-w-7xl mx-auto px-8 py-16 lg:py-20'}`}
+      >
         {/* 桌面版：左右佈局 */}
         {!isMobile ? (
           <div className="flex items-center gap-12 min-h-[600px]">
@@ -148,27 +150,45 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
                 style={{ borderColor: `${ART.ink}15` }}
               >
                 <div>
-                  <span className="block text-[10px] uppercase tracking-[0.2em] mb-1" style={{ color: '#9CA3AF' }}>
+                  <span
+                    className="block text-[10px] uppercase tracking-[0.2em] mb-1"
+                    style={{ color: '#9CA3AF' }}
+                  >
                     Departure
                   </span>
-                  <span className="text-xl" style={{ fontFamily: "'Cinzel', serif", color: ART.ink }}>
+                  <span
+                    className="text-xl"
+                    style={{ fontFamily: "'Cinzel', serif", color: ART.ink }}
+                  >
                     {dateDisplay || '--'}
                   </span>
                 </div>
                 <div>
-                  <span className="block text-[10px] uppercase tracking-[0.2em] mb-1" style={{ color: '#9CA3AF' }}>
+                  <span
+                    className="block text-[10px] uppercase tracking-[0.2em] mb-1"
+                    style={{ color: '#9CA3AF' }}
+                  >
                     Duration
                   </span>
-                  <span className="text-xl" style={{ fontFamily: "'Cinzel', serif", color: ART.ink }}>
+                  <span
+                    className="text-xl"
+                    style={{ fontFamily: "'Cinzel', serif", color: ART.ink }}
+                  >
                     {dayNumber} DAYS
                   </span>
                 </div>
                 {data.price && (
                   <div>
-                    <span className="block text-[10px] uppercase tracking-[0.2em] mb-1" style={{ color: '#9CA3AF' }}>
+                    <span
+                      className="block text-[10px] uppercase tracking-[0.2em] mb-1"
+                      style={{ color: '#9CA3AF' }}
+                    >
                       Price
                     </span>
-                    <span className="text-xl" style={{ fontFamily: "'Cinzel', serif", color: ART.ink }}>
+                    <span
+                      className="text-xl"
+                      style={{ fontFamily: "'Cinzel', serif", color: ART.ink }}
+                    >
                       {data.price}
                     </span>
                   </div>
@@ -207,12 +227,12 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
                   style={{ borderColor: ART.ink, backgroundColor: '#e5e5e5' }}
                 >
                   {coverImage ? (
-                    <img src={coverImage}
-                      alt={data.title}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={coverImage} alt={data.title} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full" style={{ background: `linear-gradient(135deg, ${ART.clay}33, ${ART.ink}11)` }} />
+                    <div
+                      className="w-full h-full"
+                      style={{ background: `linear-gradient(135deg, ${ART.clay}33, ${ART.ink}11)` }}
+                    />
                   )}
                 </div>
 
@@ -250,7 +270,10 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
               className="absolute top-[30px] right-0 flex flex-col gap-2 text-right"
             >
               <div>
-                <span className="text-[9px] uppercase tracking-[0.15em] mr-2" style={{ color: '#9CA3AF' }}>
+                <span
+                  className="text-[9px] uppercase tracking-[0.15em] mr-2"
+                  style={{ color: '#9CA3AF' }}
+                >
                   Departure
                 </span>
                 <span className="text-sm" style={{ fontFamily: "'Cinzel', serif", color: ART.ink }}>
@@ -258,7 +281,10 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
                 </span>
               </div>
               <div>
-                <span className="text-[9px] uppercase tracking-[0.15em] mr-2" style={{ color: '#9CA3AF' }}>
+                <span
+                  className="text-[9px] uppercase tracking-[0.15em] mr-2"
+                  style={{ color: '#9CA3AF' }}
+                >
                   Duration
                 </span>
                 <span className="text-sm" style={{ fontFamily: "'Cinzel', serif", color: ART.ink }}>
@@ -267,10 +293,16 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
               </div>
               {data.price && (
                 <div>
-                  <span className="text-[9px] uppercase tracking-[0.15em] mr-2" style={{ color: '#9CA3AF' }}>
+                  <span
+                    className="text-[9px] uppercase tracking-[0.15em] mr-2"
+                    style={{ color: '#9CA3AF' }}
+                  >
                     Price
                   </span>
-                  <span className="text-sm" style={{ fontFamily: "'Cinzel', serif", color: ART.ink }}>
+                  <span
+                    className="text-sm"
+                    style={{ fontFamily: "'Cinzel', serif", color: ART.ink }}
+                  >
                     {data.price}
                   </span>
                 </div>
@@ -335,12 +367,12 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
                 style={{ borderColor: ART.ink }}
               >
                 {coverImage ? (
-                  <img src={coverImage}
-                    alt={data.title}
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={coverImage} alt={data.title} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full" style={{ background: `linear-gradient(135deg, ${ART.clay}33, ${ART.ink}11)` }} />
+                  <div
+                    className="w-full h-full"
+                    style={{ background: `linear-gradient(135deg, ${ART.clay}33, ${ART.ink}11)` }}
+                  />
                 )}
               </div>
             </motion.div>

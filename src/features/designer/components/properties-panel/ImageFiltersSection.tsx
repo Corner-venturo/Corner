@@ -29,7 +29,11 @@ const FILTER_PRESETS = [
   { id: 'warm', label: '暖調', icon: '🔥' },
 ]
 
-export function ImageFiltersSection({ canvas, selectedObject, onUpdate }: ImageFiltersSectionProps) {
+export function ImageFiltersSection({
+  canvas,
+  selectedObject,
+  onUpdate,
+}: ImageFiltersSectionProps) {
   const [brightness, setBrightness] = useState(0)
   const [contrast, setContrast] = useState(0)
   const [saturation, setSaturation] = useState(0)
@@ -48,64 +52,66 @@ export function ImageFiltersSection({ canvas, selectedObject, onUpdate }: ImageF
   }, [selectedObject])
 
   // 套用濾鏡
-  const applyFilters = useCallback((
-    brightnessVal: number,
-    contrastVal: number,
-    saturationVal: number,
-    preset: string
-  ) => {
-    if (!selectedObject || !canvas) return
+  const applyFilters = useCallback(
+    (brightnessVal: number, contrastVal: number, saturationVal: number, preset: string) => {
+      if (!selectedObject || !canvas) return
 
-    // 清除現有濾鏡
-    selectedObject.filters = []
+      // 清除現有濾鏡
+      selectedObject.filters = []
 
-    // 套用預設濾鏡
-    switch (preset) {
-      case 'grayscale':
-        selectedObject.filters.push(new fabric.filters.Grayscale())
-        break
-      case 'sepia':
-        selectedObject.filters.push(new fabric.filters.Sepia())
-        break
-      case 'vintage':
-        selectedObject.filters.push(new fabric.filters.Sepia())
-        selectedObject.filters.push(new fabric.filters.Brightness({ brightness: -0.1 }))
-        selectedObject.filters.push(new fabric.filters.Contrast({ contrast: 0.1 }))
-        break
-      case 'cool':
-        // 冷調效果：增加藍色、降低飽和度
-        selectedObject.filters.push(new fabric.filters.Saturation({ saturation: -0.2 }))
-        break
-      case 'warm':
-        // 暖調效果：增加飽和度
-        selectedObject.filters.push(new fabric.filters.Saturation({ saturation: 0.3 }))
-        break
-    }
+      // 套用預設濾鏡
+      switch (preset) {
+        case 'grayscale':
+          selectedObject.filters.push(new fabric.filters.Grayscale())
+          break
+        case 'sepia':
+          selectedObject.filters.push(new fabric.filters.Sepia())
+          break
+        case 'vintage':
+          selectedObject.filters.push(new fabric.filters.Sepia())
+          selectedObject.filters.push(new fabric.filters.Brightness({ brightness: -0.1 }))
+          selectedObject.filters.push(new fabric.filters.Contrast({ contrast: 0.1 }))
+          break
+        case 'cool':
+          // 冷調效果：增加藍色、降低飽和度
+          selectedObject.filters.push(new fabric.filters.Saturation({ saturation: -0.2 }))
+          break
+        case 'warm':
+          // 暖調效果：增加飽和度
+          selectedObject.filters.push(new fabric.filters.Saturation({ saturation: 0.3 }))
+          break
+      }
 
-    // 套用自訂調整（亮度、對比、飽和度）
-    if (brightnessVal !== 0) {
-      selectedObject.filters.push(new fabric.filters.Brightness({ brightness: brightnessVal / 100 }))
-    }
-    if (contrastVal !== 0) {
-      selectedObject.filters.push(new fabric.filters.Contrast({ contrast: contrastVal / 100 }))
-    }
-    if (saturationVal !== 0 && preset !== 'cool' && preset !== 'warm') {
-      selectedObject.filters.push(new fabric.filters.Saturation({ saturation: saturationVal / 100 }))
-    }
+      // 套用自訂調整（亮度、對比、飽和度）
+      if (brightnessVal !== 0) {
+        selectedObject.filters.push(
+          new fabric.filters.Brightness({ brightness: brightnessVal / 100 })
+        )
+      }
+      if (contrastVal !== 0) {
+        selectedObject.filters.push(new fabric.filters.Contrast({ contrast: contrastVal / 100 }))
+      }
+      if (saturationVal !== 0 && preset !== 'cool' && preset !== 'warm') {
+        selectedObject.filters.push(
+          new fabric.filters.Saturation({ saturation: saturationVal / 100 })
+        )
+      }
 
-    // 套用濾鏡
-    selectedObject.applyFilters()
+      // 套用濾鏡
+      selectedObject.applyFilters()
 
-    // 儲存設定到物件（供下次讀取）
-    const obj = selectedObject as unknown as Record<string, unknown>
-    obj.__filterBrightness = brightnessVal
-    obj.__filterContrast = contrastVal
-    obj.__filterSaturation = saturationVal
-    obj.__filterPreset = preset
+      // 儲存設定到物件（供下次讀取）
+      const obj = selectedObject as unknown as Record<string, unknown>
+      obj.__filterBrightness = brightnessVal
+      obj.__filterContrast = contrastVal
+      obj.__filterSaturation = saturationVal
+      obj.__filterPreset = preset
 
-    canvas.renderAll()
-    onUpdate()
-  }, [canvas, selectedObject, onUpdate])
+      canvas.renderAll()
+      onUpdate()
+    },
+    [canvas, selectedObject, onUpdate]
+  )
 
   const handlePresetChange = (preset: string) => {
     setActivePreset(preset)
@@ -140,19 +146,18 @@ export function ImageFiltersSection({ canvas, selectedObject, onUpdate }: ImageF
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-1">
           <Sparkles size={12} className="text-morandi-secondary" />
-          <Label className="text-xs text-morandi-primary">{PROPERTIES_PANEL_LABELS.LABEL_5975}</Label>
+          <Label className="text-xs text-morandi-primary">
+            {PROPERTIES_PANEL_LABELS.LABEL_5975}
+          </Label>
         </div>
-        <button
-          onClick={handleReset}
-          className="text-[10px] text-morandi-gold hover:underline"
-        >
+        <button onClick={handleReset} className="text-[10px] text-morandi-gold hover:underline">
           {PROPERTIES_PANEL_LABELS.RESET}
         </button>
       </div>
 
       {/* 預設濾鏡 */}
       <div className="grid grid-cols-3 gap-1 mb-3">
-        {FILTER_PRESETS.map((preset) => (
+        {FILTER_PRESETS.map(preset => (
           <button
             key={preset.id}
             onClick={() => handlePresetChange(preset.id)}
@@ -174,7 +179,9 @@ export function ImageFiltersSection({ canvas, selectedObject, onUpdate }: ImageF
         {/* 亮度 */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <Label className="text-[10px] text-morandi-muted">{PROPERTIES_PANEL_LABELS.LABEL_126}</Label>
+            <Label className="text-[10px] text-morandi-muted">
+              {PROPERTIES_PANEL_LABELS.LABEL_126}
+            </Label>
             <span className="text-[10px] text-morandi-muted">{brightness}</span>
           </div>
           <Slider
@@ -189,7 +196,9 @@ export function ImageFiltersSection({ canvas, selectedObject, onUpdate }: ImageF
         {/* 對比 */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <Label className="text-[10px] text-morandi-muted">{PROPERTIES_PANEL_LABELS.LABEL_9716}</Label>
+            <Label className="text-[10px] text-morandi-muted">
+              {PROPERTIES_PANEL_LABELS.LABEL_9716}
+            </Label>
             <span className="text-[10px] text-morandi-muted">{contrast}</span>
           </div>
           <Slider
@@ -204,7 +213,9 @@ export function ImageFiltersSection({ canvas, selectedObject, onUpdate }: ImageF
         {/* 飽和度 */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <Label className="text-[10px] text-morandi-muted">{PROPERTIES_PANEL_LABELS.LABEL_6868}</Label>
+            <Label className="text-[10px] text-morandi-muted">
+              {PROPERTIES_PANEL_LABELS.LABEL_6868}
+            </Label>
             <span className="text-[10px] text-morandi-muted">{saturation}</span>
           </div>
           <Slider

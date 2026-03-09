@@ -18,11 +18,29 @@ export const memoComponent: DesignComponent = {
 
     // 標題
     elements.push({
-      id: `comp-memo-title-${ts}`, type: 'text', name: '備忘錄標題',
-      x, y, width: 200, height: 24,
-      zIndex: 2, rotation: 0, opacity: 1, locked: false, visible: true,
+      id: `comp-memo-title-${ts}`,
+      type: 'text',
+      name: '備忘錄標題',
+      x,
+      y,
+      width: 200,
+      height: 24,
+      zIndex: 2,
+      rotation: 0,
+      opacity: 1,
+      locked: false,
+      visible: true,
       content: '📋 旅遊備忘錄',
-      style: { fontFamily: p.fontFamily, fontSize: 14, fontWeight: '700', fontStyle: 'normal', color: p.primary, textAlign: 'left', lineHeight: 1.2, letterSpacing: 0.5 },
+      style: {
+        fontFamily: p.fontFamily,
+        fontSize: 14,
+        fontWeight: '700',
+        fontStyle: 'normal',
+        color: p.primary,
+        textAlign: 'left',
+        lineHeight: 1.2,
+        letterSpacing: 0.5,
+      },
     } as TextElement)
 
     const items = [
@@ -37,28 +55,77 @@ export const memoComponent: DesignComponent = {
 
       // 背景
       elements.push({
-        id: `comp-memo-bg-${i}-${ts}`, type: 'shape', name: `${item.title}背景`, variant: 'rectangle',
-        x, y: iy, width, height: 40,
-        zIndex: 0, rotation: 0, opacity: 1, locked: false, visible: true,
-        fill: i % 2 === 0 ? p.lightBg : 'transparent', stroke: 'transparent', strokeWidth: 0, cornerRadius: 4,
+        id: `comp-memo-bg-${i}-${ts}`,
+        type: 'shape',
+        name: `${item.title}背景`,
+        variant: 'rectangle',
+        x,
+        y: iy,
+        width,
+        height: 40,
+        zIndex: 0,
+        rotation: 0,
+        opacity: 1,
+        locked: false,
+        visible: true,
+        fill: i % 2 === 0 ? p.lightBg : 'transparent',
+        stroke: 'transparent',
+        strokeWidth: 0,
+        cornerRadius: 4,
       } as ShapeElement)
 
       // 圖標 + 標題
       elements.push({
-        id: `comp-memo-head-${i}-${ts}`, type: 'text', name: `${item.title}`,
-        x: x + 8, y: iy + 4, width: 180, height: 16,
-        zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
+        id: `comp-memo-head-${i}-${ts}`,
+        type: 'text',
+        name: `${item.title}`,
+        x: x + 8,
+        y: iy + 4,
+        width: 180,
+        height: 16,
+        zIndex: 1,
+        rotation: 0,
+        opacity: 1,
+        locked: false,
+        visible: true,
         content: `${item.icon} ${item.title}`,
-        style: { fontFamily: p.fontFamily, fontSize: 11, fontWeight: '600', fontStyle: 'normal', color: p.primary, textAlign: 'left', lineHeight: 1, letterSpacing: 0.3 },
+        style: {
+          fontFamily: p.fontFamily,
+          fontSize: 11,
+          fontWeight: '600',
+          fontStyle: 'normal',
+          color: p.primary,
+          textAlign: 'left',
+          lineHeight: 1,
+          letterSpacing: 0.3,
+        },
       } as TextElement)
 
       // 內容
       elements.push({
-        id: `comp-memo-text-${i}-${ts}`, type: 'text', name: `${item.title}內容`,
-        x: x + 28, y: iy + 22, width: width - 36, height: 14,
-        zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
+        id: `comp-memo-text-${i}-${ts}`,
+        type: 'text',
+        name: `${item.title}內容`,
+        x: x + 28,
+        y: iy + 22,
+        width: width - 36,
+        height: 14,
+        zIndex: 1,
+        rotation: 0,
+        opacity: 1,
+        locked: false,
+        visible: true,
         content: item.content,
-        style: { fontFamily: p.fontFamily, fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: p.secondary, textAlign: 'left', lineHeight: 1.3, letterSpacing: 0.3 },
+        style: {
+          fontFamily: p.fontFamily,
+          fontSize: 10,
+          fontWeight: '400',
+          fontStyle: 'normal',
+          color: p.secondary,
+          textAlign: 'left',
+          lineHeight: 1.3,
+          letterSpacing: 0.3,
+        },
       } as TextElement)
     })
 

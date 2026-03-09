@@ -16,7 +16,18 @@ import { PricingDetailsSection } from './tour-form/sections/PricingDetailsSectio
 import { PriceTiersSection } from './tour-form/sections/PriceTiersSection'
 import { FAQSection } from './tour-form/sections/FAQSection'
 import { NoticesPolicySection } from './tour-form/sections/NoticesPolicySection'
-import { Image, Plane, Star, MapPin, Users, Building2, DollarSign, HelpCircle, AlertCircle, ChevronDown } from 'lucide-react'
+import {
+  Image,
+  Plane,
+  Star,
+  MapPin,
+  Users,
+  Building2,
+  DollarSign,
+  HelpCircle,
+  AlertCircle,
+  ChevronDown,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { TierPricing } from '@/stores/types/quote.types'
 import { COMP_EDITOR_LABELS } from './constants/labels'
@@ -25,7 +36,7 @@ interface TourFormProps {
   data: TourFormData
   onChange: (data: TourFormData) => void
   quoteTierPricings?: TierPricing[]
-  hasLinkedQuote?: boolean  // 是否有關聯報價單（用於鎖定住宿編輯）
+  hasLinkedQuote?: boolean // 是否有關聯報價單（用於鎖定住宿編輯）
 }
 
 // 導覽項目配置
@@ -73,7 +84,9 @@ export function TourForm({ data, onChange, quoteTierPricings, hasLinkedQuote }: 
   const dayLabels = calculateDayLabels(data.dailyItinerary)
 
   // 行程備份（用於復原功能）
-  const [itineraryBackup, setItineraryBackup] = useState<TourFormData['dailyItinerary'] | null>(null)
+  const [itineraryBackup, setItineraryBackup] = useState<TourFormData['dailyItinerary'] | null>(
+    null
+  )
 
   const {
     selectedCountry,
@@ -124,7 +137,7 @@ export function TourForm({ data, onChange, quoteTierPricings, hasLinkedQuote }: 
 
       scrollContainer.scrollTo({
         top: offset,
-        behavior: 'smooth'
+        behavior: 'smooth',
       })
     }
   }
@@ -134,7 +147,7 @@ export function TourForm({ data, onChange, quoteTierPricings, hasLinkedQuote }: 
       {/* 快速導覽列 */}
       <div className="sticky top-0 z-10 bg-card/95 backdrop-blur-sm border-b border-morandi-container/30 px-4 py-2">
         <div className="flex items-center gap-1 overflow-x-auto overflow-y-visible scrollbar-hide">
-          {navItems.map((item) => {
+          {navItems.map(item => {
             const Icon = item.icon
             const isActive = activeSection === item.id
             const isItinerary = item.id === 'section-itinerary'
@@ -146,7 +159,9 @@ export function TourForm({ data, onChange, quoteTierPricings, hasLinkedQuote }: 
                 <div key={item.id} className="relative">
                   <button
                     type="button"
-                    onClick={() => hasDays ? setShowDayNav(!showDayNav) : scrollToSection(item.id)}
+                    onClick={() =>
+                      hasDays ? setShowDayNav(!showDayNav) : scrollToSection(item.id)
+                    }
                     className={cn(
                       'flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all',
                       isActive || showDayNav
@@ -156,7 +171,12 @@ export function TourForm({ data, onChange, quoteTierPricings, hasLinkedQuote }: 
                   >
                     <Icon size={12} />
                     {item.label}
-                    {hasDays && <ChevronDown size={10} className={cn('transition-transform', showDayNav && 'rotate-180')} />}
+                    {hasDays && (
+                      <ChevronDown
+                        size={10}
+                        className={cn('transition-transform', showDayNav && 'rotate-180')}
+                      />
+                    )}
                   </button>
 
                   {/* 下拉選單 */}
@@ -249,61 +269,61 @@ export function TourForm({ data, onChange, quoteTierPricings, hasLinkedQuote }: 
                 }
               }}
               onGenerateDailyItinerary={(days: number, departureDate: string) => {
-              // 備份當前行程（用於復原）
-              if (data.dailyItinerary && data.dailyItinerary.length > 0) {
-                setItineraryBackup([...data.dailyItinerary])
-              }
+                // 備份當前行程（用於復原）
+                if (data.dailyItinerary && data.dailyItinerary.length > 0) {
+                  setItineraryBackup([...data.dailyItinerary])
+                }
 
-              // 解析出發日期
-              const parseDepartureDate = (dateStr: string): Date | null => {
-                if (!dateStr) return null
-                let parts: string[]
-                if (dateStr.includes('/')) {
-                  parts = dateStr.split('/')
-                } else if (dateStr.includes('-')) {
-                  parts = dateStr.split('-')
-                } else {
+                // 解析出發日期
+                const parseDepartureDate = (dateStr: string): Date | null => {
+                  if (!dateStr) return null
+                  let parts: string[]
+                  if (dateStr.includes('/')) {
+                    parts = dateStr.split('/')
+                  } else if (dateStr.includes('-')) {
+                    parts = dateStr.split('-')
+                  } else {
+                    return null
+                  }
+                  if (parts.length === 3) {
+                    const [year, month, day] = parts.map(Number)
+                    return new Date(year, month - 1, day)
+                  }
                   return null
                 }
-                if (parts.length === 3) {
-                  const [year, month, day] = parts.map(Number)
-                  return new Date(year, month - 1, day)
+
+                const baseDepartureDate = parseDepartureDate(departureDate)
+                if (!baseDepartureDate) return
+
+                // 計算每天的日期
+                const formatDate = (date: Date): string => {
+                  const year = date.getFullYear()
+                  const month = String(date.getMonth() + 1).padStart(2, '0')
+                  const day = String(date.getDate()).padStart(2, '0')
+                  return `${year}/${month}/${day}`
                 }
-                return null
-              }
 
-              const baseDepartureDate = parseDepartureDate(departureDate)
-              if (!baseDepartureDate) return
+                // 生成空白的每日行程
+                const newDailyItinerary = Array.from({ length: days }, (_, i) => {
+                  const dayDate = new Date(baseDepartureDate)
+                  dayDate.setDate(dayDate.getDate() + i)
+                  return {
+                    dayLabel: `Day ${i + 1}`,
+                    date: formatDate(dayDate),
+                    title: '',
+                    highlight: '',
+                    description: '',
+                    activities: [],
+                    recommendations: [],
+                    meals: { breakfast: '', lunch: '', dinner: '' },
+                    accommodation: '',
+                    images: [],
+                  }
+                })
 
-              // 計算每天的日期
-              const formatDate = (date: Date): string => {
-                const year = date.getFullYear()
-                const month = String(date.getMonth() + 1).padStart(2, '0')
-                const day = String(date.getDate()).padStart(2, '0')
-                return `${year}/${month}/${day}`
-              }
-
-              // 生成空白的每日行程
-              const newDailyItinerary = Array.from({ length: days }, (_, i) => {
-                const dayDate = new Date(baseDepartureDate)
-                dayDate.setDate(dayDate.getDate() + i)
-                return {
-                  dayLabel: `Day ${i + 1}`,
-                  date: formatDate(dayDate),
-                  title: '',
-                  highlight: '',
-                  description: '',
-                  activities: [],
-                  recommendations: [],
-                  meals: { breakfast: '', lunch: '', dinner: '' },
-                  accommodation: '',
-                  images: [],
-                }
-              })
-
-              onChange({ ...data, dailyItinerary: newDailyItinerary })
-            }}
-          />
+                onChange({ ...data, dailyItinerary: newDailyItinerary })
+              }}
+            />
           </div>
 
           {/* 行程特色 */}
@@ -317,9 +337,13 @@ export function TourForm({ data, onChange, quoteTierPricings, hasLinkedQuote }: 
                 <Star size={20} className="text-white" />
               </div>
               <div className="text-left flex-1">
-                <h2 className="text-base font-bold text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_9157}</h2>
+                <h2 className="text-base font-bold text-morandi-primary">
+                  {COMP_EDITOR_LABELS.LABEL_9157}
+                </h2>
                 <p className="text-xs text-morandi-secondary">
-                  {data.showFeatures !== false ? COMP_EDITOR_LABELS.已啟用 : COMP_EDITOR_LABELS.未啟用}
+                  {data.showFeatures !== false
+                    ? COMP_EDITOR_LABELS.已啟用
+                    : COMP_EDITOR_LABELS.未啟用}
                 </p>
               </div>
               <input
@@ -386,7 +410,11 @@ export function TourForm({ data, onChange, quoteTierPricings, hasLinkedQuote }: 
         {/* 團費說明 */}
         <div id="section-pricing" className="space-y-8">
           {/* 價格方案（4人、6人、8人包團） */}
-          <PriceTiersSection data={data} onChange={onChange} quoteTierPricings={quoteTierPricings} />
+          <PriceTiersSection
+            data={data}
+            onChange={onChange}
+            quoteTierPricings={quoteTierPricings}
+          />
 
           {/* 詳細團費（費用包含/不含） */}
           <PricingDetailsSection

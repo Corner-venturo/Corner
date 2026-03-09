@@ -73,7 +73,9 @@ export function useTourEdit(params: UseTourEditParams) {
 
   // Form state
   const [submitting, setSubmitting] = useState(false)
-  const [availableCities, setAvailableCities] = useState<Array<{ id: string; code: string; name: string }>>([])
+  const [availableCities, setAvailableCities] = useState<
+    Array<{ id: string; code: string; name: string }>
+  >([])
   const initializedRef = useRef(false)
   const [loadingOutbound, setLoadingOutbound] = useState(false)
   const [loadingReturn, setLoadingReturn] = useState(false)
@@ -84,9 +86,12 @@ export function useTourEdit(params: UseTourEditParams) {
   const [pendingUpdatedTour, setPendingUpdatedTour] = useState<Tour | null>(null)
 
   // Helper function to get cities by country
-  const getCitiesByCountry = useCallback((countryId: string) => {
-    return cities.filter(c => c.country_id === countryId)
-  }, [cities])
+  const getCitiesByCountry = useCallback(
+    (countryId: string) => {
+      return cities.filter(c => c.country_id === countryId)
+    },
+    [cities]
+  )
 
   const [formData, setFormData] = useState<EditFormData>({
     name: '',
@@ -133,7 +138,11 @@ export function useTourEdit(params: UseTourEditParams) {
         return_date: tour.return_date || '',
         description: tour.description || '',
         outboundFlight: tourOutbound || { ...emptyFlightInfo },
-        returnFlight: tourReturn || { ...emptyFlightInfo, departureAirport: '', arrivalAirport: 'TPE' },
+        returnFlight: tourReturn || {
+          ...emptyFlightInfo,
+          departureAirport: '',
+          arrivalAirport: 'TPE',
+        },
         isSpecial: tour.status === COMP_TOURS_LABELS.特殊團,
         enable_checkin: tour.enable_checkin || false,
       })
@@ -204,7 +213,11 @@ export function useTourEdit(params: UseTourEditParams) {
       return_date: tour.return_date || '',
       description: tour.description || '',
       outboundFlight: tourOutbound || { ...emptyFlightInfo },
-      returnFlight: tourReturn || { ...emptyFlightInfo, departureAirport: '', arrivalAirport: 'TPE' },
+      returnFlight: tourReturn || {
+        ...emptyFlightInfo,
+        departureAirport: '',
+        arrivalAirport: 'TPE',
+      },
       isSpecial: tour.status === COMP_TOURS_LABELS.特殊團,
       enable_checkin: tour.enable_checkin || false,
     })
@@ -226,19 +239,18 @@ export function useTourEdit(params: UseTourEditParams) {
   )
 
   // Update flight field
-  const updateFlightField = useCallback((
-    flightType: 'outboundFlight' | 'returnFlight',
-    field: keyof FlightInfo,
-    value: string
-  ) => {
-    setFormData(prev => ({
-      ...prev,
-      [flightType]: {
-        ...prev[flightType],
-        [field]: value,
-      },
-    }))
-  }, [])
+  const updateFlightField = useCallback(
+    (flightType: 'outboundFlight' | 'returnFlight', field: keyof FlightInfo, value: string) => {
+      setFormData(prev => ({
+        ...prev,
+        [flightType]: {
+          ...prev[flightType],
+          [field]: value,
+        },
+      }))
+    },
+    []
+  )
 
   // Search outbound flight
   const handleSearchOutbound = useCallback(async () => {
@@ -343,39 +355,42 @@ export function useTourEdit(params: UseTourEditParams) {
   }, [])
 
   // Check if itinerary needs sync after tour update
-  const checkItinerarySync = useCallback(async (
-    tourId: string,
-    newDepartureDate: string,
-    newReturnDate: string
-  ): Promise<ItinerarySyncInfo | null> => {
-    // Fetch linked itinerary
-    const { data: itinerary, error } = await supabase
-      .from('itineraries')
-      .select('*')
-      .eq('tour_id', tourId)
-      .single()
+  const checkItinerarySync = useCallback(
+    async (
+      tourId: string,
+      newDepartureDate: string,
+      newReturnDate: string
+    ): Promise<ItinerarySyncInfo | null> => {
+      // Fetch linked itinerary
+      const { data: itinerary, error } = await supabase
+        .from('itineraries')
+        .select('*')
+        .eq('tour_id', tourId)
+        .single()
 
-    if (error || !itinerary) {
-      // No linked itinerary, no sync needed
-      return null
-    }
+      if (error || !itinerary) {
+        // No linked itinerary, no sync needed
+        return null
+      }
 
-    const newDays = calculateTourDays(newDepartureDate, newReturnDate)
-    const dailyItinerary = itinerary.daily_itinerary as unknown as DailyItineraryDay[] | null
-    const currentDays = dailyItinerary?.length || 0
+      const newDays = calculateTourDays(newDepartureDate, newReturnDate)
+      const dailyItinerary = itinerary.daily_itinerary as unknown as DailyItineraryDay[] | null
+      const currentDays = dailyItinerary?.length || 0
 
-    if (newDays === currentDays) {
-      // Days match, no sync needed
-      return null
-    }
+      if (newDays === currentDays) {
+        // Days match, no sync needed
+        return null
+      }
 
-    return {
-      itinerary: itinerary as unknown as Itinerary,
-      currentDays,
-      newDays,
-      action: newDays > currentDays ? 'increase' : 'decrease',
-    }
-  }, [calculateTourDays])
+      return {
+        itinerary: itinerary as unknown as Itinerary,
+        currentDays,
+        newDays,
+        action: newDays > currentDays ? 'increase' : 'decrease',
+      }
+    },
+    [calculateTourDays]
+  )
 
   // Handle form submission
   const handleSubmit = useCallback(async () => {
@@ -406,7 +421,12 @@ export function useTourEdit(params: UseTourEditParams) {
 
       // Clean empty flight info (convert to Json for Supabase)
       const cleanFlightInfo = (flight: FlightInfo): Json | null => {
-        if (!flight.flightNumber && !flight.airline && !flight.departureTime && !flight.arrivalTime) {
+        if (
+          !flight.flightNumber &&
+          !flight.airline &&
+          !flight.departureTime &&
+          !flight.arrivalTime
+        ) {
           return null
         }
         return flight as unknown as Json
@@ -445,8 +465,8 @@ export function useTourEdit(params: UseTourEditParams) {
       const updatedTour = data as Tour
 
       // Check if dates changed and itinerary needs sync
-      const datesChanged = tour.departure_date !== formData.departure_date ||
-        tour.return_date !== formData.return_date
+      const datesChanged =
+        tour.departure_date !== formData.departure_date || tour.return_date !== formData.return_date
 
       if (datesChanged) {
         const syncNeeded = await checkItinerarySync(
@@ -479,111 +499,119 @@ export function useTourEdit(params: UseTourEditParams) {
   // Generate date label for itinerary day
   const generateDateLabel = useCallback((departureDate: string, dayIndex: number): string => {
     const date = addDays(parseISO(departureDate), dayIndex)
-    const weekdays = [COMP_TOURS_LABELS.日, COMP_TOURS_LABELS.一, COMP_TOURS_LABELS.二, COMP_TOURS_LABELS.三, COMP_TOURS_LABELS.四, COMP_TOURS_LABELS.五, COMP_TOURS_LABELS.六]
+    const weekdays = [
+      COMP_TOURS_LABELS.日,
+      COMP_TOURS_LABELS.一,
+      COMP_TOURS_LABELS.二,
+      COMP_TOURS_LABELS.三,
+      COMP_TOURS_LABELS.四,
+      COMP_TOURS_LABELS.五,
+      COMP_TOURS_LABELS.六,
+    ]
     const weekday = weekdays[date.getDay()]
     return `${format(date, 'M/d', { locale: zhTW })} (${weekday})`
   }, [])
 
   // Handle itinerary sync
-  const handleSync = useCallback(async (
-    action: 'adjust' | 'ignore',
-    daysToRemove?: number[]
-  ) => {
-    if (!syncInfo || !pendingUpdatedTour) {
-      closeSyncDialog()
-      onSuccess?.(pendingUpdatedTour!)
-      onClose()
-      return
-    }
+  const handleSync = useCallback(
+    async (action: 'adjust' | 'ignore', daysToRemove?: number[]) => {
+      if (!syncInfo || !pendingUpdatedTour) {
+        closeSyncDialog()
+        onSuccess?.(pendingUpdatedTour!)
+        onClose()
+        return
+      }
 
-    if (action === 'ignore') {
-      // User chose to ignore, close everything
+      if (action === 'ignore') {
+        // User chose to ignore, close everything
+        closeSyncDialog()
+        onSuccess?.(pendingUpdatedTour)
+        onClose()
+        return
+      }
+
+      // action === 'adjust'
+      try {
+        const itinerary = syncInfo.itinerary
+        const dailyItinerary = [...(itinerary.daily_itinerary || [])] as DailyItineraryDay[]
+
+        if (syncInfo.action === 'decrease' && daysToRemove) {
+          // Remove selected days (sort descending to avoid index shift issues)
+          const sortedIndices = [...daysToRemove].sort((a, b) => b - a)
+          for (const idx of sortedIndices) {
+            dailyItinerary.splice(idx, 1)
+          }
+
+          // Update day labels and dates
+          dailyItinerary.forEach((day, idx) => {
+            day.dayLabel = `Day ${idx + 1}`
+            day.date = generateDateLabel(formData.departure_date, idx)
+          })
+        } else if (syncInfo.action === 'increase') {
+          // Add new days at the end
+          const daysToAdd = syncInfo.newDays - syncInfo.currentDays
+
+          // Find the last day's template (usually "返回台灣" pattern)
+          const lastDay = dailyItinerary[dailyItinerary.length - 1]
+
+          for (let i = 0; i < daysToAdd; i++) {
+            const newDayIndex = dailyItinerary.length
+            const newDay: DailyItineraryDay = {
+              dayLabel: `Day ${newDayIndex + 1}`,
+              date: generateDateLabel(formData.departure_date, newDayIndex),
+              title: COMP_TOURS_LABELS.自由活動,
+              highlight: '',
+              description: '',
+              activities: [],
+              recommendations: [],
+              meals: {
+                breakfast: COMP_TOURS_LABELS.飯店早餐,
+                lunch: COMP_TOURS_LABELS.敬請自理,
+                dinner: COMP_TOURS_LABELS.敬請自理,
+              },
+              accommodation: lastDay?.accommodation || '',
+              images: [],
+            }
+            dailyItinerary.push(newDay)
+          }
+
+          // Update all day dates based on new departure date
+          dailyItinerary.forEach((day, idx) => {
+            day.dayLabel = `Day ${idx + 1}`
+            day.date = generateDateLabel(formData.departure_date, idx)
+          })
+        }
+
+        // Update itinerary in database
+        const { error } = await supabase
+          .from('itineraries')
+          .update({
+            daily_itinerary: dailyItinerary as unknown as Json,
+            departure_date: formData.departure_date,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', itinerary.id)
+
+        if (error) {
+          logger.error(COMP_TOURS_LABELS.同步行程表失敗_2, error)
+          toast.error(COMP_TOURS_LABELS.同步行程表失敗)
+        } else {
+          toast.success(COMP_TOURS_LABELS.行程表已同步更新)
+          // Invalidate itinerary cache
+          mutate(`itinerary-${itinerary.id}`)
+          mutate('itineraries')
+        }
+      } catch (error) {
+        logger.error(COMP_TOURS_LABELS.同步行程表失敗_2, error)
+        toast.error(COMP_TOURS_LABELS.同步行程表失敗)
+      }
+
       closeSyncDialog()
       onSuccess?.(pendingUpdatedTour)
       onClose()
-      return
-    }
-
-    // action === 'adjust'
-    try {
-      const itinerary = syncInfo.itinerary
-      const dailyItinerary = [...(itinerary.daily_itinerary || [])] as DailyItineraryDay[]
-
-      if (syncInfo.action === 'decrease' && daysToRemove) {
-        // Remove selected days (sort descending to avoid index shift issues)
-        const sortedIndices = [...daysToRemove].sort((a, b) => b - a)
-        for (const idx of sortedIndices) {
-          dailyItinerary.splice(idx, 1)
-        }
-
-        // Update day labels and dates
-        dailyItinerary.forEach((day, idx) => {
-          day.dayLabel = `Day ${idx + 1}`
-          day.date = generateDateLabel(formData.departure_date, idx)
-        })
-      } else if (syncInfo.action === 'increase') {
-        // Add new days at the end
-        const daysToAdd = syncInfo.newDays - syncInfo.currentDays
-
-        // Find the last day's template (usually "返回台灣" pattern)
-        const lastDay = dailyItinerary[dailyItinerary.length - 1]
-
-        for (let i = 0; i < daysToAdd; i++) {
-          const newDayIndex = dailyItinerary.length
-          const newDay: DailyItineraryDay = {
-            dayLabel: `Day ${newDayIndex + 1}`,
-            date: generateDateLabel(formData.departure_date, newDayIndex),
-            title: COMP_TOURS_LABELS.自由活動,
-            highlight: '',
-            description: '',
-            activities: [],
-            recommendations: [],
-            meals: {
-              breakfast: COMP_TOURS_LABELS.飯店早餐,
-              lunch: COMP_TOURS_LABELS.敬請自理,
-              dinner: COMP_TOURS_LABELS.敬請自理,
-            },
-            accommodation: lastDay?.accommodation || '',
-            images: [],
-          }
-          dailyItinerary.push(newDay)
-        }
-
-        // Update all day dates based on new departure date
-        dailyItinerary.forEach((day, idx) => {
-          day.dayLabel = `Day ${idx + 1}`
-          day.date = generateDateLabel(formData.departure_date, idx)
-        })
-      }
-
-      // Update itinerary in database
-      const { error } = await supabase
-        .from('itineraries')
-        .update({
-          daily_itinerary: dailyItinerary as unknown as Json,
-          departure_date: formData.departure_date,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', itinerary.id)
-
-      if (error) {
-        logger.error(COMP_TOURS_LABELS.同步行程表失敗_2, error)
-        toast.error(COMP_TOURS_LABELS.同步行程表失敗)
-      } else {
-        toast.success(COMP_TOURS_LABELS.行程表已同步更新)
-        // Invalidate itinerary cache
-        mutate(`itinerary-${itinerary.id}`)
-        mutate('itineraries')
-      }
-    } catch (error) {
-      logger.error(COMP_TOURS_LABELS.同步行程表失敗_2, error)
-      toast.error(COMP_TOURS_LABELS.同步行程表失敗)
-    }
-
-    closeSyncDialog()
-    onSuccess?.(pendingUpdatedTour)
-    onClose()
-  }, [syncInfo, pendingUpdatedTour, formData.departure_date, generateDateLabel, onSuccess, onClose])
+    },
+    [syncInfo, pendingUpdatedTour, formData.departure_date, generateDateLabel, onSuccess, onClose]
+  )
 
   // Close sync dialog
   const closeSyncDialog = useCallback(() => {

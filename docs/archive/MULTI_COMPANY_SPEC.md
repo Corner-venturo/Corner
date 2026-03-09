@@ -7,10 +7,10 @@
 
 ## 公司類型
 
-| 類型 | 公司代碼 | 說明 |
-|------|---------|------|
-| **完整功能** | TP, TC | 擁有所有功能，可管理其他公司 |
-| **受限功能** | JY, 其他 | 受限功能，完全獨立資料 |
+| 類型         | 公司代碼 | 說明                         |
+| ------------ | -------- | ---------------------------- |
+| **完整功能** | TP, TC   | 擁有所有功能，可管理其他公司 |
+| **受限功能** | JY, 其他 | 受限功能，完全獨立資料       |
 
 ---
 
@@ -18,28 +18,28 @@
 
 ### 不可使用的功能
 
-| 功能 | 說明 | 實作位置 |
-|------|------|---------|
-| **Timebox** | 時間盒排程功能 | 側邊欄隱藏 |
-| **LinkPay** | LinkPay 付款方式 | 付款選項隱藏 |
-| **會計系統** | 傳票、會計報表 | 側邊欄隱藏 |
-| **行程編輯器** | 視覺化行程編輯 | 側邊欄隱藏 |
-| **跨公司員工管理** | 新增員工時選擇其他公司 | 選擇器隱藏 |
+| 功能               | 說明                   | 實作位置     |
+| ------------------ | ---------------------- | ------------ |
+| **Timebox**        | 時間盒排程功能         | 側邊欄隱藏   |
+| **LinkPay**        | LinkPay 付款方式       | 付款選項隱藏 |
+| **會計系統**       | 傳票、會計報表         | 側邊欄隱藏   |
+| **行程編輯器**     | 視覺化行程編輯         | 側邊欄隱藏   |
+| **跨公司員工管理** | 新增員工時選擇其他公司 | 選擇器隱藏   |
 
 ### 可使用的功能
 
-| 功能 | 說明 |
-|------|------|
+| 功能       | 說明                   |
+| ---------- | ---------------------- |
 | 旅遊團管理 | 建立、編輯、管理旅遊團 |
-| 訂單管理 | 建立、編輯訂單 |
-| 客戶管理 | 管理客戶資料 |
-| 報價單 | 建立、編輯報價單 |
-| 收款/請款 | 財務收款請款功能 |
-| 簽證管理 | 簽證申請追蹤 |
-| 員工管理 | 管理自己公司的員工 |
-| 行事曆 | 公司行事曆 |
-| 頻道/訊息 | 內部溝通 |
-| 待辦事項 | 任務管理 |
+| 訂單管理   | 建立、編輯訂單         |
+| 客戶管理   | 管理客戶資料           |
+| 報價單     | 建立、編輯報價單       |
+| 收款/請款  | 財務收款請款功能       |
+| 簽證管理   | 簽證申請追蹤           |
+| 員工管理   | 管理自己公司的員工     |
+| 行事曆     | 公司行事曆             |
+| 頻道/訊息  | 內部溝通               |
+| 待辦事項   | 任務管理               |
 
 ---
 
@@ -49,38 +49,38 @@
 
 每家公司只能看到自己的資料，透過 RLS (Row Level Security) 強制執行：
 
-| 資料表 | 說明 |
-|--------|------|
-| `customers` | 客戶資料 |
-| `tours` | 旅遊團 |
-| `orders` | 訂單 |
-| `order_members` | 訂單成員 |
-| `quotes` | 報價單 |
-| `itineraries` | 行程表 |
-| `receipts` | 收款單 |
-| `payment_requests` | 請款單 |
-| `disbursement_orders` | 出納單 |
-| `visas` | 簽證 |
-| `todos` | 待辦事項 |
-| `calendar_events` | 行事曆事件 |
-| `channels` | 頻道 |
-| `messages` | 訊息 |
-| `employees` | 員工（employee_number 在公司內唯一，store 啟用 workspaceScoped） |
-| `tour_documents` | 團文件 |
+| 資料表                | 說明                                                             |
+| --------------------- | ---------------------------------------------------------------- |
+| `customers`           | 客戶資料                                                         |
+| `tours`               | 旅遊團                                                           |
+| `orders`              | 訂單                                                             |
+| `order_members`       | 訂單成員                                                         |
+| `quotes`              | 報價單                                                           |
+| `itineraries`         | 行程表                                                           |
+| `receipts`            | 收款單                                                           |
+| `payment_requests`    | 請款單                                                           |
+| `disbursement_orders` | 出納單                                                           |
+| `visas`               | 簽證                                                             |
+| `todos`               | 待辦事項                                                         |
+| `calendar_events`     | 行事曆事件                                                       |
+| `channels`            | 頻道                                                             |
+| `messages`            | 訊息                                                             |
+| `employees`           | 員工（employee_number 在公司內唯一，store 啟用 workspaceScoped） |
+| `tour_documents`      | 團文件                                                           |
 
 ### 共享資料（全公司可見，目前僅 TP/TC 有資料）
 
-| 資料表 | 說明 | 備註 |
-|--------|------|------|
-| `countries` | 國家 | 基礎地理資料 |
-| `regions` | 地區 | 基礎地理資料 |
-| `cities` | 城市 | 基礎地理資料 |
-| `destinations` | 目的地 | 旅遊目的地 |
-| `attractions` | 景點 | 旅遊資料庫 |
-| `michelin_restaurants` | 米其林餐廳 | 旅遊資料庫 |
-| `premium_experiences` | 頂級體驗 | 旅遊資料庫 |
-| `suppliers` | 供應商 | 可考慮未來隔離 |
-| `tour_leaders` | 領隊 | 可考慮未來隔離 |
+| 資料表                 | 說明       | 備註           |
+| ---------------------- | ---------- | -------------- |
+| `countries`            | 國家       | 基礎地理資料   |
+| `regions`              | 地區       | 基礎地理資料   |
+| `cities`               | 城市       | 基礎地理資料   |
+| `destinations`         | 目的地     | 旅遊目的地     |
+| `attractions`          | 景點       | 旅遊資料庫     |
+| `michelin_restaurants` | 米其林餐廳 | 旅遊資料庫     |
+| `premium_experiences`  | 頂級體驗   | 旅遊資料庫     |
+| `suppliers`            | 供應商     | 可考慮未來隔離 |
+| `tour_leaders`         | 領隊       | 可考慮未來隔離 |
 
 ---
 
@@ -93,6 +93,7 @@
 ```
 
 範例：
+
 - TP 的 E001：`TP_E001@venturo.com`
 - TC 的 E001：`TC_E001@venturo.com`
 - JY 的 E001：`JY_E001@venturo.com`
@@ -152,6 +153,7 @@ COMMIT;
 ### 2. 建立 Supabase Auth 帳號
 
 透過 API 或 Dashboard 建立：
+
 - Email: `XX_E001@venturo.com`
 - Password: 初始密碼
 
@@ -176,11 +178,7 @@ COMMIT;
 // src/lib/feature-restrictions.ts
 const FULL_FEATURE_WORKSPACES = ['TP', 'TC']
 
-export type RestrictedFeature =
-  | 'timebox'
-  | 'linkpay'
-  | 'accounting'
-  | 'itinerary_editor'
+export type RestrictedFeature = 'timebox' | 'linkpay' | 'accounting' | 'itinerary_editor'
 
 export function hasFullFeatures(workspaceCode: string): boolean
 export function isFeatureAvailable(feature: RestrictedFeature, workspaceCode: string): boolean

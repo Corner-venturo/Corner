@@ -1,6 +1,6 @@
 /**
  * 旅客年齡驗證器
- * 
+ *
  * 功能：
  * 1. 根據出生日期和起飛日期計算年齡
  * 2. 驗證旅客類型是否正確（INF/CHD/ADT）
@@ -35,9 +35,18 @@ function calculateAge(birthDate: Date, targetDate: Date): number {
  */
 function parseAmadeusDateString(dateStr: string): Date | null {
   const monthMap: Record<string, number> = {
-    'JAN': 0, 'FEB': 1, 'MAR': 2, 'APR': 3,
-    'MAY': 4, 'JUN': 5, 'JUL': 6, 'AUG': 7,
-    'SEP': 8, 'OCT': 9, 'NOV': 10, 'DEC': 11
+    JAN: 0,
+    FEB: 1,
+    MAR: 2,
+    APR: 3,
+    MAY: 4,
+    JUN: 5,
+    JUL: 6,
+    AUG: 7,
+    SEP: 8,
+    OCT: 9,
+    NOV: 10,
+    DEC: 11,
   }
 
   const match = dateStr.match(/^(\d{2})([A-Z]{3})(\d{2})$/i)
@@ -45,7 +54,7 @@ function parseAmadeusDateString(dateStr: string): Date | null {
 
   const day = parseInt(match[1])
   const month = monthMap[match[2].toUpperCase()]
-  const year = parseInt(match[3]) + 2000  // 假設 2000 年代
+  const year = parseInt(match[3]) + 2000 // 假設 2000 年代
 
   if (month === undefined) return null
 
@@ -78,9 +87,10 @@ export function validatePassengerAge(
       expectedType: passenger.type === 'INS' ? 'INF' : passenger.type,
       actualType: passenger.type,
       isValid: true,
-      suggestion: passenger.type === 'INF' || passenger.type === 'INS' || passenger.type === 'CHD'
-        ? '建議輸入出生日期以驗證年齡'
-        : undefined
+      suggestion:
+        passenger.type === 'INF' || passenger.type === 'INS' || passenger.type === 'CHD'
+          ? '建議輸入出生日期以驗證年齡'
+          : undefined,
     }
   }
 
@@ -94,7 +104,7 @@ export function validatePassengerAge(
       expectedType: passenger.type === 'INS' ? 'INF' : passenger.type,
       actualType: passenger.type,
       isValid: false,
-      warning: `出生日期格式錯誤：${passenger.birthDate}`
+      warning: `出生日期格式錯誤：${passenger.birthDate}`,
     }
   }
 
@@ -103,14 +113,14 @@ export function validatePassengerAge(
   const actualType = passenger.type === 'INS' ? 'INF' : passenger.type
 
   const isValid = expectedType === actualType
-  const ageOnDeparture = Math.floor(ageInYears * 10) / 10  // 保留一位小數
+  const ageOnDeparture = Math.floor(ageInYears * 10) / 10 // 保留一位小數
 
   let warning: string | undefined
   let suggestion: string | undefined
 
   if (!isValid) {
     warning = `⚠️ 年齡驗證失敗：起飛時 ${ageOnDeparture.toFixed(1)} 歲，應為 ${expectedType}，但 PNR 標示為 ${actualType}`
-    
+
     if (actualType === 'INF' && expectedType === 'CHD') {
       suggestion = '起飛時已滿 2 歲，請改訂兒童票（CHD）並加訂座位'
     } else if (actualType === 'INF' && expectedType === 'ADT') {
@@ -139,7 +149,7 @@ export function validatePassengerAge(
     actualType,
     isValid,
     warning,
-    suggestion
+    suggestion,
   }
 }
 
@@ -162,24 +172,23 @@ export function validateAllPassengerAges(
     return []
   }
 
-  return passengers.map(passenger => 
-    validatePassengerAge(passenger, departureDate)
-  )
+  return passengers.map(passenger => validatePassengerAge(passenger, departureDate))
 }
 
 /**
  * 檢查是否有嬰兒數量超過成人數量的問題
  */
-export function validateInfantAdultRatio(
-  passengers: PassengerInfo[]
-): { isValid: boolean; error?: string } {
+export function validateInfantAdultRatio(passengers: PassengerInfo[]): {
+  isValid: boolean
+  error?: string
+} {
   const adults = passengers.filter(p => p.type === 'ADT').length
   const infants = passengers.filter(p => p.type === 'INF' || p.type === 'INS').length
 
   if (infants > adults) {
     return {
       isValid: false,
-      error: `嬰兒數量（${infants}）超過成人數量（${adults}）。每位成人最多只能帶 1 位嬰兒。`
+      error: `嬰兒數量（${infants}）超過成人數量（${adults}）。每位成人最多只能帶 1 位嬰兒。`,
     }
   }
 

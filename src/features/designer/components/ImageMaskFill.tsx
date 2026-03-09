@@ -10,12 +10,7 @@ import { useState, useRef } from 'react'
 import * as fabric from 'fabric'
 import { Upload, X, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { logger } from '@/lib/utils/logger'
 import { DESIGNER_LABELS } from './constants/labels'
 
@@ -131,14 +126,15 @@ export function ImageMaskFillDialog({
           >
             {imageUrl ? (
               <div className="relative">
-                <img src={imageUrl}
+                <img
+                  src={imageUrl}
                   alt={DESIGNER_LABELS.PREVIEW}
                   className="max-h-48 mx-auto rounded"
                 />
                 <button
                   type="button"
                   className="absolute top-2 right-2 p-1 bg-white rounded-full shadow"
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation()
                     setImageUrl(null)
                   }}
@@ -149,12 +145,8 @@ export function ImageMaskFillDialog({
             ) : (
               <>
                 <Upload className="mx-auto mb-2 text-morandi-secondary" size={32} />
-                <p className="text-sm text-morandi-secondary">
-                  {DESIGNER_LABELS.UPLOADING_338}
-                </p>
-                <p className="text-xs text-morandi-muted mt-1">
-                  {DESIGNER_LABELS.LABEL_6759}
-                </p>
+                <p className="text-sm text-morandi-secondary">{DESIGNER_LABELS.UPLOADING_338}</p>
+                <p className="text-xs text-morandi-muted mt-1">{DESIGNER_LABELS.LABEL_6759}</p>
               </>
             )}
           </div>
@@ -169,9 +161,7 @@ export function ImageMaskFillDialog({
 
           {/* 提示 */}
           <div className="bg-morandi-container/30 rounded-lg p-3">
-            <p className="text-xs text-morandi-secondary">
-              📌 圖片會自動裁切成選取的形狀
-            </p>
+            <p className="text-xs text-morandi-secondary">📌 圖片會自動裁切成選取的形狀</p>
           </div>
 
           {/* 按鈕 */}
@@ -345,7 +335,7 @@ export const MASK_SHAPES = [
     category: 'special',
     create: (size: number) => {
       const s = size / 100
-      const path = `M ${50*s},${90*s} C ${20*s},${60*s} ${0*s},${35*s} ${0*s},${25*s} C ${0*s},${10*s} ${15*s},${0*s} ${30*s},${0*s} C ${40*s},${0*s} ${50*s},${10*s} ${50*s},${20*s} C ${50*s},${10*s} ${60*s},${0*s} ${70*s},${0*s} C ${85*s},${0*s} ${100*s},${10*s} ${100*s},${25*s} C ${100*s},${35*s} ${80*s},${60*s} ${50*s},${90*s} Z`
+      const path = `M ${50 * s},${90 * s} C ${20 * s},${60 * s} ${0 * s},${35 * s} ${0 * s},${25 * s} C ${0 * s},${10 * s} ${15 * s},${0 * s} ${30 * s},${0 * s} C ${40 * s},${0 * s} ${50 * s},${10 * s} ${50 * s},${20 * s} C ${50 * s},${10 * s} ${60 * s},${0 * s} ${70 * s},${0 * s} C ${85 * s},${0 * s} ${100 * s},${10 * s} ${100 * s},${25 * s} C ${100 * s},${35 * s} ${80 * s},${60 * s} ${50 * s},${90 * s} Z`
       return new fabric.Path(path)
     },
   },
@@ -376,13 +366,13 @@ export const MASK_SHAPES = [
     create: (size: number) => {
       const s = size / 100
       // 六角雪花 SVG
-      const path = `M ${50*s},${0*s} L ${50*s},${100*s} M ${0*s},${25*s} L ${100*s},${75*s} M ${0*s},${75*s} L ${100*s},${25*s}
-        M ${50*s},${15*s} L ${40*s},${25*s} M ${50*s},${15*s} L ${60*s},${25*s}
-        M ${50*s},${85*s} L ${40*s},${75*s} M ${50*s},${85*s} L ${60*s},${75*s}
-        M ${15*s},${32*s} L ${25*s},${25*s} M ${15*s},${32*s} L ${15*s},${45*s}
-        M ${85*s},${68*s} L ${75*s},${75*s} M ${85*s},${68*s} L ${85*s},${55*s}
-        M ${15*s},${68*s} L ${25*s},${75*s} M ${15*s},${68*s} L ${15*s},${55*s}
-        M ${85*s},${32*s} L ${75*s},${25*s} M ${85*s},${32*s} L ${85*s},${45*s}`
+      const path = `M ${50 * s},${0 * s} L ${50 * s},${100 * s} M ${0 * s},${25 * s} L ${100 * s},${75 * s} M ${0 * s},${75 * s} L ${100 * s},${25 * s}
+        M ${50 * s},${15 * s} L ${40 * s},${25 * s} M ${50 * s},${15 * s} L ${60 * s},${25 * s}
+        M ${50 * s},${85 * s} L ${40 * s},${75 * s} M ${50 * s},${85 * s} L ${60 * s},${75 * s}
+        M ${15 * s},${32 * s} L ${25 * s},${25 * s} M ${15 * s},${32 * s} L ${15 * s},${45 * s}
+        M ${85 * s},${68 * s} L ${75 * s},${75 * s} M ${85 * s},${68 * s} L ${85 * s},${55 * s}
+        M ${15 * s},${68 * s} L ${25 * s},${75 * s} M ${15 * s},${68 * s} L ${15 * s},${55 * s}
+        M ${85 * s},${32 * s} L ${75 * s},${25 * s} M ${85 * s},${32 * s} L ${85 * s},${45 * s}`
       return new fabric.Path(path)
     },
   },
@@ -392,7 +382,7 @@ export const MASK_SHAPES = [
     category: 'special',
     create: (size: number) => {
       const s = size / 100
-      const path = `M ${50*s},${0*s} L ${25*s},${35*s} L ${35*s},${35*s} L ${15*s},${60*s} L ${30*s},${60*s} L ${10*s},${85*s} L ${40*s},${85*s} L ${40*s},${100*s} L ${60*s},${100*s} L ${60*s},${85*s} L ${90*s},${85*s} L ${70*s},${60*s} L ${85*s},${60*s} L ${65*s},${35*s} L ${75*s},${35*s} Z`
+      const path = `M ${50 * s},${0 * s} L ${25 * s},${35 * s} L ${35 * s},${35 * s} L ${15 * s},${60 * s} L ${30 * s},${60 * s} L ${10 * s},${85 * s} L ${40 * s},${85 * s} L ${40 * s},${100 * s} L ${60 * s},${100 * s} L ${60 * s},${85 * s} L ${90 * s},${85 * s} L ${70 * s},${60 * s} L ${85 * s},${60 * s} L ${65 * s},${35 * s} L ${75 * s},${35 * s} Z`
       return new fabric.Path(path)
     },
   },
@@ -402,7 +392,7 @@ export const MASK_SHAPES = [
     category: 'special',
     create: (size: number) => {
       const s = size / 100
-      const path = `M ${25*s},${70*s} A ${20*s},${20*s} 0 1,1 ${25*s},${50*s} A ${15*s},${15*s} 0 1,1 ${50*s},${35*s} A ${18*s},${18*s} 0 1,1 ${80*s},${50*s} A ${15*s},${15*s} 0 1,1 ${80*s},${70*s} Z`
+      const path = `M ${25 * s},${70 * s} A ${20 * s},${20 * s} 0 1,1 ${25 * s},${50 * s} A ${15 * s},${15 * s} 0 1,1 ${50 * s},${35 * s} A ${18 * s},${18 * s} 0 1,1 ${80 * s},${50 * s} A ${15 * s},${15 * s} 0 1,1 ${80 * s},${70 * s} Z`
       return new fabric.Path(path)
     },
   },
@@ -413,12 +403,12 @@ export const MASK_SHAPES = [
     create: (size: number) => {
       const s = size / 100
       // 五瓣花
-      const path = `M ${50*s},${30*s} A ${15*s},${15*s} 0 1,1 ${50*s},${0*s} A ${15*s},${15*s} 0 1,1 ${50*s},${30*s}
-        M ${70*s},${40*s} A ${15*s},${15*s} 0 1,1 ${95*s},${30*s} A ${15*s},${15*s} 0 1,1 ${70*s},${40*s}
-        M ${65*s},${65*s} A ${15*s},${15*s} 0 1,1 ${85*s},${85*s} A ${15*s},${15*s} 0 1,1 ${65*s},${65*s}
-        M ${35*s},${65*s} A ${15*s},${15*s} 0 1,1 ${15*s},${85*s} A ${15*s},${15*s} 0 1,1 ${35*s},${65*s}
-        M ${30*s},${40*s} A ${15*s},${15*s} 0 1,1 ${5*s},${30*s} A ${15*s},${15*s} 0 1,1 ${30*s},${40*s}
-        M ${50*s},${35*s} A ${12*s},${12*s} 0 1,0 ${50*s},${60*s} A ${12*s},${12*s} 0 1,0 ${50*s},${35*s}`
+      const path = `M ${50 * s},${30 * s} A ${15 * s},${15 * s} 0 1,1 ${50 * s},${0 * s} A ${15 * s},${15 * s} 0 1,1 ${50 * s},${30 * s}
+        M ${70 * s},${40 * s} A ${15 * s},${15 * s} 0 1,1 ${95 * s},${30 * s} A ${15 * s},${15 * s} 0 1,1 ${70 * s},${40 * s}
+        M ${65 * s},${65 * s} A ${15 * s},${15 * s} 0 1,1 ${85 * s},${85 * s} A ${15 * s},${15 * s} 0 1,1 ${65 * s},${65 * s}
+        M ${35 * s},${65 * s} A ${15 * s},${15 * s} 0 1,1 ${15 * s},${85 * s} A ${15 * s},${15 * s} 0 1,1 ${35 * s},${65 * s}
+        M ${30 * s},${40 * s} A ${15 * s},${15 * s} 0 1,1 ${5 * s},${30 * s} A ${15 * s},${15 * s} 0 1,1 ${30 * s},${40 * s}
+        M ${50 * s},${35 * s} A ${12 * s},${12 * s} 0 1,0 ${50 * s},${60 * s} A ${12 * s},${12 * s} 0 1,0 ${50 * s},${35 * s}`
       return new fabric.Path(path)
     },
   },
@@ -428,7 +418,7 @@ export const MASK_SHAPES = [
     category: 'special',
     create: (size: number) => {
       const s = size / 100
-      const path = `M ${50*s},${0*s} Q ${100*s},${30*s} ${100*s},${60*s} Q ${100*s},${100*s} ${50*s},${100*s} Q ${0*s},${100*s} ${0*s},${60*s} Q ${0*s},${30*s} ${50*s},${0*s} M ${50*s},${20*s} L ${50*s},${90*s}`
+      const path = `M ${50 * s},${0 * s} Q ${100 * s},${30 * s} ${100 * s},${60 * s} Q ${100 * s},${100 * s} ${50 * s},${100 * s} Q ${0 * s},${100 * s} ${0 * s},${60 * s} Q ${0 * s},${30 * s} ${50 * s},${0 * s} M ${50 * s},${20 * s} L ${50 * s},${90 * s}`
       return new fabric.Path(path)
     },
   },
@@ -438,7 +428,7 @@ export const MASK_SHAPES = [
     category: 'special',
     create: (size: number) => {
       const s = size / 100
-      const path = `M ${50*s},${0*s} L ${100*s},${30*s} L ${50*s},${100*s} L ${0*s},${30*s} Z M ${0*s},${30*s} L ${100*s},${30*s} M ${25*s},${30*s} L ${50*s},${0*s} L ${75*s},${30*s}`
+      const path = `M ${50 * s},${0 * s} L ${100 * s},${30 * s} L ${50 * s},${100 * s} L ${0 * s},${30 * s} Z M ${0 * s},${30 * s} L ${100 * s},${30 * s} M ${25 * s},${30 * s} L ${50 * s},${0 * s} L ${75 * s},${30 * s}`
       return new fabric.Path(path)
     },
   },
@@ -448,7 +438,7 @@ export const MASK_SHAPES = [
     category: 'special',
     create: (size: number) => {
       const s = size / 100
-      const path = `M ${50*s},${20*s} Q ${20*s},${0*s} ${5*s},${25*s} Q ${0*s},${50*s} ${25*s},${60*s} Q ${10*s},${80*s} ${30*s},${90*s} Q ${45*s},${75*s} ${50*s},${60*s} Q ${55*s},${75*s} ${70*s},${90*s} Q ${90*s},${80*s} ${75*s},${60*s} Q ${100*s},${50*s} ${95*s},${25*s} Q ${80*s},${0*s} ${50*s},${20*s}`
+      const path = `M ${50 * s},${20 * s} Q ${20 * s},${0 * s} ${5 * s},${25 * s} Q ${0 * s},${50 * s} ${25 * s},${60 * s} Q ${10 * s},${80 * s} ${30 * s},${90 * s} Q ${45 * s},${75 * s} ${50 * s},${60 * s} Q ${55 * s},${75 * s} ${70 * s},${90 * s} Q ${90 * s},${80 * s} ${75 * s},${60 * s} Q ${100 * s},${50 * s} ${95 * s},${25 * s} Q ${80 * s},${0 * s} ${50 * s},${20 * s}`
       return new fabric.Path(path)
     },
   },
@@ -461,7 +451,7 @@ export const MASK_SHAPES = [
     create: (size: number) => {
       const s = size / 100
       // 拍立得相框（下方留白較多）
-      const path = `M ${5*s},${0*s} L ${95*s},${0*s} L ${95*s},${100*s} L ${5*s},${100*s} Z M ${10*s},${5*s} L ${90*s},${5*s} L ${90*s},${75*s} L ${10*s},${75*s} Z`
+      const path = `M ${5 * s},${0 * s} L ${95 * s},${0 * s} L ${95 * s},${100 * s} L ${5 * s},${100 * s} Z M ${10 * s},${5 * s} L ${90 * s},${5 * s} L ${90 * s},${75 * s} L ${10 * s},${75 * s} Z`
       return new fabric.Path(path)
     },
   },
@@ -476,22 +466,22 @@ export const MASK_SHAPES = [
       const step = 8
       // 上邊
       for (let i = 0; i <= 100; i += step) {
-        path += `M ${i*s},${0*s} A ${3*s},${3*s} 0 1,0 ${(i+step/2)*s},${0*s} `
+        path += `M ${i * s},${0 * s} A ${3 * s},${3 * s} 0 1,0 ${(i + step / 2) * s},${0 * s} `
       }
       // 右邊
       for (let i = 0; i <= 100; i += step) {
-        path += `M ${100*s},${i*s} A ${3*s},${3*s} 0 1,0 ${100*s},${(i+step/2)*s} `
+        path += `M ${100 * s},${i * s} A ${3 * s},${3 * s} 0 1,0 ${100 * s},${(i + step / 2) * s} `
       }
       // 下邊
       for (let i = 100; i >= 0; i -= step) {
-        path += `M ${i*s},${100*s} A ${3*s},${3*s} 0 1,0 ${(i-step/2)*s},${100*s} `
+        path += `M ${i * s},${100 * s} A ${3 * s},${3 * s} 0 1,0 ${(i - step / 2) * s},${100 * s} `
       }
       // 左邊
       for (let i = 100; i >= 0; i -= step) {
-        path += `M ${0*s},${i*s} A ${3*s},${3*s} 0 1,0 ${0*s},${(i-step/2)*s} `
+        path += `M ${0 * s},${i * s} A ${3 * s},${3 * s} 0 1,0 ${0 * s},${(i - step / 2) * s} `
       }
       // 內框
-      path += `M ${10*s},${10*s} L ${90*s},${10*s} L ${90*s},${90*s} L ${10*s},${90*s} Z`
+      path += `M ${10 * s},${10 * s} L ${90 * s},${10 * s} L ${90 * s},${90 * s} L ${10 * s},${90 * s} Z`
       return new fabric.Path(path)
     },
   },
@@ -501,7 +491,7 @@ export const MASK_SHAPES = [
     category: 'frame',
     create: (size: number) => {
       const s = size / 100
-      const path = `M ${0*s},${100*s} L ${0*s},${40*s} A ${50*s},${40*s} 0 0,1 ${100*s},${40*s} L ${100*s},${100*s} Z`
+      const path = `M ${0 * s},${100 * s} L ${0 * s},${40 * s} A ${50 * s},${40 * s} 0 0,1 ${100 * s},${40 * s} L ${100 * s},${100 * s} Z`
       return new fabric.Path(path)
     },
   },

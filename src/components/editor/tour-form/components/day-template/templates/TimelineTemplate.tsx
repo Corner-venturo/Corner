@@ -37,7 +37,9 @@ export function TimelineTemplate({
       {/* 標題區 */}
       <div className="p-6 bg-[#4a6fa5] text-white">
         <div className="flex items-center gap-4">
-          <div className="text-5xl font-light opacity-30">{String(dayIndex + 1).padStart(2, '0')}</div>
+          <div className="text-5xl font-light opacity-30">
+            {String(dayIndex + 1).padStart(2, '0')}
+          </div>
           <div>
             <div className="text-sm opacity-80">{dateDisplay}</div>
             <EditableText

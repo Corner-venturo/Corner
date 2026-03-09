@@ -35,9 +35,18 @@ export function TourLeaderSectionArt({ data, viewMode }: TourLeaderSectionArtPro
     <section className="py-24 relative overflow-hidden" style={{ backgroundColor: colors.paper }}>
       {/* 背景裝飾線條 */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/3 w-px h-full" style={{ backgroundColor: `${colors.ink}08` }} />
-        <div className="absolute top-0 right-1/3 w-px h-full" style={{ backgroundColor: `${colors.ink}08` }} />
-        <div className="absolute top-1/2 left-0 w-full h-px" style={{ backgroundColor: `${colors.ink}08` }} />
+        <div
+          className="absolute top-0 left-1/3 w-px h-full"
+          style={{ backgroundColor: `${colors.ink}08` }}
+        />
+        <div
+          className="absolute top-0 right-1/3 w-px h-full"
+          style={{ backgroundColor: `${colors.ink}08` }}
+        />
+        <div
+          className="absolute top-1/2 left-0 w-full h-px"
+          style={{ backgroundColor: `${colors.ink}08` }}
+        />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
@@ -80,7 +89,9 @@ export function TourLeaderSectionArt({ data, viewMode }: TourLeaderSectionArtPro
           </div>
         </motion.div>
 
-        <div className={`grid ${isMobile ? 'grid-cols-1 gap-12' : 'lg:grid-cols-12 gap-16'} items-start`}>
+        <div
+          className={`grid ${isMobile ? 'grid-cols-1 gap-12' : 'lg:grid-cols-12 gap-16'} items-start`}
+        >
           {/* 左側：領隊卡片 */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -99,7 +110,8 @@ export function TourLeaderSectionArt({ data, viewMode }: TourLeaderSectionArtPro
               {/* 領隊照片 */}
               <div className="aspect-[4/5] w-full relative overflow-hidden">
                 {data.leader?.photo ? (
-                  <img src={data.leader.photo}
+                  <img
+                    src={data.leader.photo}
                     alt={data.leader?.name || '領隊'}
                     className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
                   />
@@ -222,7 +234,12 @@ export function TourLeaderSectionArt({ data, viewMode }: TourLeaderSectionArtPro
                         className="w-10 h-10 flex items-center justify-center border-2"
                         style={{ borderColor: colors.ink }}
                       >
-                        <svg className="w-5 h-5" style={{ color: colors.ink }} fill="currentColor" viewBox="0 0 24 24">
+                        <svg
+                          className="w-5 h-5"
+                          style={{ color: colors.ink }}
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
                           <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
                         </svg>
                       </div>
@@ -395,7 +412,10 @@ export function TourLeaderSectionArt({ data, viewMode }: TourLeaderSectionArtPro
                 boxShadow: '4px 4px 0px 0px rgba(28,28,28,1)',
               }}
             >
-              <div className="flex items-center gap-4 mb-6 pb-4 border-b" style={{ borderColor: `${colors.ink}20` }}>
+              <div
+                className="flex items-center gap-4 mb-6 pb-4 border-b"
+                style={{ borderColor: `${colors.ink}20` }}
+              >
                 <span
                   className="text-xs tracking-[0.2em] uppercase px-3 py-1 border"
                   style={{

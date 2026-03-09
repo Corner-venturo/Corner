@@ -27,7 +27,9 @@ test.describe.serial('訂單完整生命週期測試', () => {
     // 訂單頁面使用 div 結構，計算訂單數量
     // 找所有訂單編號（格式如 CNX261121A-O01）
     const orderCodePattern = /[A-Z]{3}\d{6}[A-Z]-O\d{2}/
-    const initialOrderCodes = await page.locator('text=/[A-Z]{3}\\d{6}[A-Z]-O\\d{2}/').allTextContents()
+    const initialOrderCodes = await page
+      .locator('text=/[A-Z]{3}\\d{6}[A-Z]-O\\d{2}/')
+      .allTextContents()
     const initialRowCount = initialOrderCodes.length
     console.log(`創建前訂單數量: ${initialRowCount}`)
 
@@ -52,7 +54,7 @@ test.describe.serial('訂單完整生命週期測試', () => {
     await expect(tourListbox).toBeVisible({ timeout: 5000 })
 
     const tourOption = tourListbox.locator('button').first()
-    if (!await tourOption.isVisible({ timeout: 3000 }).catch(() => false)) {
+    if (!(await tourOption.isVisible({ timeout: 3000 }).catch(() => false))) {
       console.log('沒有可用的旅遊團，跳過測試')
       await dialog.locator('button').filter({ hasText: '取消' }).click()
       test.skip()
@@ -168,7 +170,11 @@ test.describe.serial('訂單完整生命週期測試', () => {
     if (alertMessage) {
       console.log(`表單驗證失敗: ${alertMessage}`)
       // alert 可能阻止了表單提交，取消對話框
-      await dialog.locator('button').filter({ hasText: '取消' }).click().catch(() => {})
+      await dialog
+        .locator('button')
+        .filter({ hasText: '取消' })
+        .click()
+        .catch(() => {})
       test.skip()
       return
     }
@@ -265,7 +271,9 @@ test.describe.serial('訂單完整生命週期測試', () => {
     // 點擊「查看成員」按鈕來查看訂單詳情
     // 找到該訂單的區域
     const orderSection = page.locator(`text=${createdOrderCode}`).first()
-    const orderRow = orderSection.locator('xpath=ancestor::div[contains(@class, "flex") or contains(@class, "grid")]').first()
+    const orderRow = orderSection
+      .locator('xpath=ancestor::div[contains(@class, "flex") or contains(@class, "grid")]')
+      .first()
 
     // 找查看成員按鈕
     const viewButton = orderRow.locator('button').filter({ hasText: '查看成員' }).first()
@@ -282,7 +290,10 @@ test.describe.serial('訂單完整生命週期測試', () => {
         console.log('對話框內容:', dialogContent?.substring(0, 100))
 
         // 關閉對話框
-        const closeButton = detailDialog.locator('button').filter({ hasText: /關閉|取消|Close/ }).first()
+        const closeButton = detailDialog
+          .locator('button')
+          .filter({ hasText: /關閉|取消|Close/ })
+          .first()
         if (await closeButton.isVisible()) {
           await closeButton.click()
         } else {
@@ -355,7 +366,11 @@ test.describe.serial('訂單完整生命週期測試', () => {
         // 向上找到最近的包含刪除按鈕的容器
         // 訂單行的結構：div > (訂單編號 + ... + 操作按鈕區)
         // 從訂單編號向上找，然後找同級的刪除按鈕
-        const siblingDeleteButton = orderCodeElement.locator('xpath=following-sibling::div//button[@title="刪除訂單"] | ../following-sibling::div//button[@title="刪除訂單"] | ../..//button[@title="刪除訂單"]').first()
+        const siblingDeleteButton = orderCodeElement
+          .locator(
+            'xpath=following-sibling::div//button[@title="刪除訂單"] | ../following-sibling::div//button[@title="刪除訂單"] | ../..//button[@title="刪除訂單"]'
+          )
+          .first()
 
         if (await siblingDeleteButton.isVisible({ timeout: 2000 }).catch(() => false)) {
           targetDeleteButton = siblingDeleteButton
@@ -364,7 +379,10 @@ test.describe.serial('訂單完整生命週期測試', () => {
       }
     }
 
-    if (!targetDeleteButton || !(await targetDeleteButton.isVisible({ timeout: 3000 }).catch(() => false))) {
+    if (
+      !targetDeleteButton ||
+      !(await targetDeleteButton.isVisible({ timeout: 3000 }).catch(() => false))
+    ) {
       console.log('⚠️ 找不到目標訂單的刪除按鈕')
       const pageContent = await page.content()
       const hasOrderCode = pageContent.includes(createdOrderCode!)
@@ -380,12 +398,17 @@ test.describe.serial('訂單完整生命週期測試', () => {
     await page.waitForTimeout(500)
 
     // 確認對話框使用 AlertDialog
-    const confirmDialog = page.locator('[role="alertdialog"], [role="dialog"]').filter({ hasText: /確定要刪除/ })
+    const confirmDialog = page
+      .locator('[role="alertdialog"], [role="dialog"]')
+      .filter({ hasText: /確定要刪除/ })
     if (await confirmDialog.isVisible({ timeout: 3000 }).catch(() => false)) {
       console.log('確認對話框已出現')
 
       // 找到確認按鈕
-      const confirmButton = confirmDialog.locator('button').filter({ hasText: /^確定$|^確認$/ }).first()
+      const confirmButton = confirmDialog
+        .locator('button')
+        .filter({ hasText: /^確定$|^確認$/ })
+        .first()
       if (await confirmButton.isVisible({ timeout: 2000 }).catch(() => false)) {
         console.log('點擊確認按鈕...')
         await confirmButton.click({ force: true })
@@ -417,7 +440,7 @@ test.describe.serial('訂單完整生命週期測試', () => {
     // 等待頁面更新後再檢查
     await page.waitForTimeout(500)
     const deletedOrderLocator = page.locator(`text="${createdOrderCode}"`)
-    const stillExists = await deletedOrderLocator.count() > 0
+    const stillExists = (await deletedOrderLocator.count()) > 0
 
     if (stillExists) {
       // 可能是頁面還沒更新，嘗試重新載入
@@ -426,7 +449,7 @@ test.describe.serial('訂單完整生命週期測試', () => {
       await page.waitForLoadState('networkidle')
       await page.waitForTimeout(1000)
 
-      const afterReloadExists = await page.locator(`text="${createdOrderCode}"`).count() > 0
+      const afterReloadExists = (await page.locator(`text="${createdOrderCode}"`).count()) > 0
       expect(afterReloadExists).toBe(false)
       console.log(`✅ 重新載入後訂單 ${createdOrderCode} 確認已刪除`)
     } else {

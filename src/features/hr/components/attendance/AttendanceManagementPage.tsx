@@ -3,26 +3,20 @@
  * 出勤紀錄管理頁面
  */
 
-
 import React, { useState, useEffect } from 'react'
-import {
-  Clock,
-  Calendar,
-  Plus,
-  Edit2,
-  Trash2,
-  Check,
-  X,
-  Filter,
-  LogIn,
-  LogOut,
-} from 'lucide-react'
+import { Clock, Calendar, Plus, Edit2, Trash2, Check, X, Filter, LogIn, LogOut } from 'lucide-react'
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, type Column } from '@/components/ui/enhanced-table'
 import { DateCell, ActionCell } from '@/components/table-cells'
 import { DatePicker } from '@/components/ui/date-picker'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DIALOG_SIZES } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DIALOG_SIZES,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
@@ -93,14 +87,16 @@ export function AttendanceManagementPage() {
         .order('employee_number', { ascending: true })
 
       if (data) {
-        setEmployees(data.map(e => ({
-          id: e.id,
-          name: e.display_name || e.chinese_name || L.unknown_employee,
-        })))
+        setEmployees(
+          data.map(e => ({
+            id: e.id,
+            name: e.display_name || e.chinese_name || L.unknown_employee,
+          }))
+        )
       }
     }
 
-    loadEmployees().catch((err) => logger.error('[loadEmployees]', err))
+    loadEmployees().catch(err => logger.error('[loadEmployees]', err))
   }, [user?.workspace_id])
 
   // 載入紀錄
@@ -136,9 +132,7 @@ export function AttendanceManagementPage() {
       label: L.col_clock_in,
       width: '100px',
       render: (_, row) => (
-        <span className="font-mono text-morandi-secondary">
-          {row.clock_in || '-'}
-        </span>
+        <span className="font-mono text-morandi-secondary">{row.clock_in || '-'}</span>
       ),
     },
     {
@@ -146,9 +140,7 @@ export function AttendanceManagementPage() {
       label: L.col_clock_out,
       width: '100px',
       render: (_, row) => (
-        <span className="font-mono text-morandi-secondary">
-          {row.clock_out || '-'}
-        </span>
+        <span className="font-mono text-morandi-secondary">{row.clock_out || '-'}</span>
       ),
     },
     {
@@ -166,8 +158,12 @@ export function AttendanceManagementPage() {
       label: L.col_overtime,
       width: '80px',
       render: (_, row) => (
-        <span className={`font-mono ${row.overtime_hours && row.overtime_hours > 0 ? 'text-morandi-gold' : 'text-morandi-muted'}`}>
-          {row.overtime_hours !== null && row.overtime_hours > 0 ? `${row.overtime_hours.toFixed(1)} h` : '-'}
+        <span
+          className={`font-mono ${row.overtime_hours && row.overtime_hours > 0 ? 'text-morandi-gold' : 'text-morandi-muted'}`}
+        >
+          {row.overtime_hours !== null && row.overtime_hours > 0
+            ? `${row.overtime_hours.toFixed(1)} h`
+            : '-'}
         </span>
       ),
     },
@@ -175,22 +171,21 @@ export function AttendanceManagementPage() {
       key: 'status',
       label: L.col_status,
       width: '80px',
-      render: (_, row) => row.status ? (
-        <span className={`px-2 py-0.5 rounded text-xs ${ATTENDANCE_STATUS_COLORS[row.status]}`}>
-          {ATTENDANCE_STATUS_LABELS[row.status]}
-        </span>
-      ) : (
-        <span className="text-morandi-muted">-</span>
-      ),
+      render: (_, row) =>
+        row.status ? (
+          <span className={`px-2 py-0.5 rounded text-xs ${ATTENDANCE_STATUS_COLORS[row.status]}`}>
+            {ATTENDANCE_STATUS_LABELS[row.status]}
+          </span>
+        ) : (
+          <span className="text-morandi-muted">-</span>
+        ),
     },
     {
       key: 'notes',
       label: L.col_notes,
       width: '150px',
       render: (_, row) => (
-        <span className="text-sm text-morandi-secondary truncate">
-          {row.notes || '-'}
-        </span>
+        <span className="text-sm text-morandi-secondary truncate">{row.notes || '-'}</span>
       ),
     },
     {
@@ -243,13 +238,10 @@ export function AttendanceManagementPage() {
 
   // 刪除
   const handleDelete = async (record: AttendanceRecord) => {
-    const confirmed = await confirm(
-      L.confirm_delete_message(record.employee_name, record.date),
-      {
-        title: L.confirm_delete_title,
-        type: 'warning',
-      }
-    )
+    const confirmed = await confirm(L.confirm_delete_message(record.employee_name, record.date), {
+      title: L.confirm_delete_title,
+      type: 'warning',
+    })
     if (!confirmed) return
 
     const success = await deleteRecord(record.id)
@@ -306,7 +298,6 @@ export function AttendanceManagementPage() {
         </Button>
       }
     >
-
       {/* 篩選區 */}
       <div className="p-4 bg-card border-b border-border">
         <div className="flex flex-wrap items-end gap-4">
@@ -329,12 +320,14 @@ export function AttendanceManagementPage() {
             <Filter size={16} className="text-morandi-secondary" />
             <select
               value={selectedEmployeeId}
-              onChange={(e) => setSelectedEmployeeId(e.target.value)}
+              onChange={e => setSelectedEmployeeId(e.target.value)}
               className="px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-morandi-gold"
             >
               <option value="">{L.all_employees}</option>
               {employees.map(emp => (
-                <option key={emp.id} value={emp.id}>{emp.name}</option>
+                <option key={emp.id} value={emp.id}>
+                  {emp.name}
+                </option>
               ))}
             </select>
           </div>
@@ -362,22 +355,22 @@ export function AttendanceManagementPage() {
           </div>
           <div className="text-center">
             <div className="text-sm text-morandi-secondary">{L.summary_total_hours}</div>
-            <div className="text-xl font-bold text-morandi-primary">{summary.total_work_hours.toFixed(1)} h</div>
+            <div className="text-xl font-bold text-morandi-primary">
+              {summary.total_work_hours.toFixed(1)} h
+            </div>
           </div>
           <div className="text-center">
             <div className="text-sm text-morandi-secondary">{L.summary_total_overtime}</div>
-            <div className="text-xl font-bold text-morandi-gold">{summary.total_overtime_hours.toFixed(1)} h</div>
+            <div className="text-xl font-bold text-morandi-gold">
+              {summary.total_overtime_hours.toFixed(1)} h
+            </div>
           </div>
         </div>
       </div>
 
       {/* 表格 */}
       <div className="flex-1 overflow-auto p-4">
-        <EnhancedTable
-          data={records}
-          columns={columns}
-          loading={loading}
-        />
+        <EnhancedTable data={records} columns={columns} loading={loading} />
 
         {records.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -399,13 +392,15 @@ export function AttendanceManagementPage() {
                 <Label required>{L.label_employee}</Label>
                 <select
                   value={formEmployeeId}
-                  onChange={(e) => setFormEmployeeId(e.target.value)}
+                  onChange={e => setFormEmployeeId(e.target.value)}
                   className="w-full mt-1 px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-morandi-gold"
                   disabled={!!editingRecord}
                 >
                   <option value="">{L.placeholder_employee}</option>
                   {employees.map(emp => (
-                    <option key={emp.id} value={emp.id}>{emp.name}</option>
+                    <option key={emp.id} value={emp.id}>
+                      {emp.name}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -427,7 +422,7 @@ export function AttendanceManagementPage() {
                 <Input
                   type="time"
                   value={formClockIn}
-                  onChange={(e) => setFormClockIn(e.target.value)}
+                  onChange={e => setFormClockIn(e.target.value)}
                   className="mt-1"
                 />
               </div>
@@ -436,7 +431,7 @@ export function AttendanceManagementPage() {
                 <Input
                   type="time"
                   value={formClockOut}
-                  onChange={(e) => setFormClockOut(e.target.value)}
+                  onChange={e => setFormClockOut(e.target.value)}
                   className="mt-1"
                 />
               </div>
@@ -446,11 +441,13 @@ export function AttendanceManagementPage() {
               <Label>{L.label_status}</Label>
               <select
                 value={formStatus}
-                onChange={(e) => setFormStatus(e.target.value as AttendanceStatus)}
+                onChange={e => setFormStatus(e.target.value as AttendanceStatus)}
                 className="w-full mt-1 px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-morandi-gold"
               >
                 {Object.entries(ATTENDANCE_STATUS_LABELS).map(([value, label]) => (
-                  <option key={value} value={value}>{label}</option>
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -459,17 +456,14 @@ export function AttendanceManagementPage() {
               <Label>{L.label_notes}</Label>
               <Input
                 value={formNotes}
-                onChange={(e) => setFormNotes(e.target.value)}
+                onChange={e => setFormNotes(e.target.value)}
                 placeholder={L.placeholder_notes}
                 className="mt-1"
               />
             </div>
 
             <div className="flex justify-end gap-2 pt-4 border-t border-border">
-              <Button
-                variant="outline"
-                onClick={() => setShowDialog(false)}
-              >
+              <Button variant="outline" onClick={() => setShowDialog(false)}>
                 <X size={16} className="mr-2" />
                 {L.btn_cancel}
               </Button>

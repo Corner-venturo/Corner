@@ -3,7 +3,6 @@
  * PrintableQuotation - 團體報價單列印版
  */
 
-
 import React from 'react'
 import { ParticipantCounts, SellingPrices } from '../../../types'
 import { PrintableWrapper } from '../shared/PrintableWrapper'
@@ -12,7 +11,7 @@ import { QuotationPricingTable } from './QuotationPricingTable'
 import { QuotationInclusions } from './QuotationInclusions'
 import { QuotationTerms } from './QuotationTerms'
 import { Quote } from '@/types/models.types'
-import { PRINTABLE_QUOTATION_LABELS } from '../../../constants/labels';
+import { PRINTABLE_QUOTATION_LABELS } from '../../../constants/labels'
 
 interface TierPricingForPrint {
   participant_count: number
@@ -72,10 +71,7 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
         validUntil={quote?.valid_until ?? undefined}
         tierLabel={tierLabel}
       />
-      <QuotationPricingTable
-        sellingPrices={sellingPrices}
-        tierPricings={tierPricings}
-      />
+      <QuotationPricingTable sellingPrices={sellingPrices} tierPricings={tierPricings} />
       <QuotationInclusions />
       <QuotationTerms validUntil={quote?.valid_until ?? undefined} />
     </PrintableWrapper>

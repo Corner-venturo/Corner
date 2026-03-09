@@ -6,10 +6,7 @@ import { useState, useRef } from 'react'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import type { Visa } from '@/stores/types'
-import {
-  findActiveOrderConflicts,
-  type ActiveOrderConflict,
-} from '@/lib/utils/sync-passport-image'
+import { findActiveOrderConflicts, type ActiveOrderConflict } from '@/lib/utils/sync-passport-image'
 
 // 從 URL 提取檔名並刪除舊照片（僅處理 storage URL，忽略 base64）
 async function deleteOldPassportImage(oldUrl: string | null | undefined): Promise<void> {
@@ -135,7 +132,7 @@ export function useBatchPickup({ pendingVisas, updateVisa, onComplete }: UseBatc
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
       reader.readAsDataURL(file)
-      reader.onload = (e) => {
+      reader.onload = e => {
         const img = new Image()
         img.src = e.target?.result as string
         img.onload = () => {
@@ -161,7 +158,7 @@ export function useBatchPickup({ pendingVisas, updateVisa, onComplete }: UseBatc
           ctx?.drawImage(img, 0, 0, width, height)
 
           canvas.toBlob(
-            async (blob) => {
+            async blob => {
               if (blob) {
                 const compressedFile = new File([blob], file.name, {
                   type: 'image/jpeg',
@@ -194,9 +191,7 @@ export function useBatchPickup({ pendingVisas, updateVisa, onComplete }: UseBatc
     setIsProcessing(true)
     try {
       // 壓縮圖片
-      const compressedFiles = await Promise.all(
-        files.map(file => compressImage(file))
-      )
+      const compressedFiles = await Promise.all(files.map(file => compressImage(file)))
 
       // 呼叫 OCR API
       const formData = new FormData()
@@ -226,23 +221,25 @@ export function useBatchPickup({ pendingVisas, updateVisa, onComplete }: UseBatc
           const name = ocr.customer.name
 
           // 先找完全匹配的
-          matchedVisa = pendingVisas.find(v => {
-            // 比對申請人姓名（中文）
-            if (v.applicant_name === name) return true
-            return false
-          }) || null
+          matchedVisa =
+            pendingVisas.find(v => {
+              // 比對申請人姓名（中文）
+              if (v.applicant_name === name) return true
+              return false
+            }) || null
 
           // 如果沒找到，試著用護照拼音的姓氏比對
           if (!matchedVisa && romanization) {
             // 護照拼音格式通常是 "WANG/XIAOMING"，取姓氏
             const surname = romanization.split('/')[0]
             if (surname) {
-              matchedVisa = pendingVisas.find(v => {
-                // 簡單的姓氏比對（中文姓氏通常在最前面）
-                const applicantSurname = v.applicant_name?.charAt(0)
-                // 這裡可以加入更複雜的拼音轉換邏輯
-                return false // 暫時不用這個邏輯
-              }) || null
+              matchedVisa =
+                pendingVisas.find(v => {
+                  // 簡單的姓氏比對（中文姓氏通常在最前面）
+                  const applicantSurname = v.applicant_name?.charAt(0)
+                  // 這裡可以加入更複雜的拼音轉換邏輯
+                  return false // 暫時不用這個邏輯
+                }) || null
             }
           }
         }
@@ -333,12 +330,16 @@ export function useBatchPickup({ pendingVisas, updateVisa, onComplete }: UseBatc
 
               if (customer) {
                 // 如果有新圖片且顧客有舊的 storage 圖片，先記錄舊 URL
-                const oldPassportUrl = item.ocrResult.imageBase64 ? customer.passport_image_url : null
+                const oldPassportUrl = item.ocrResult.imageBase64
+                  ? customer.passport_image_url
+                  : null
 
                 await updateCustomer(customer.id, {
-                  passport_number: item.ocrResult.customer.passport_number || customer.passport_number,
+                  passport_number:
+                    item.ocrResult.customer.passport_number || customer.passport_number,
                   passport_name: item.ocrResult.customer.passport_name || customer.passport_name,
-                  passport_expiry: item.ocrResult.customer.passport_expiry || customer.passport_expiry,
+                  passport_expiry:
+                    item.ocrResult.customer.passport_expiry || customer.passport_expiry,
                   birth_date: item.ocrResult.customer.birth_date || customer.birth_date,
                   gender: item.ocrResult.customer.gender || customer.gender,
                   passport_image_url: item.ocrResult.imageBase64 || customer.passport_image_url,

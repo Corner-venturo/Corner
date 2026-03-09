@@ -23,7 +23,7 @@ const TABLES_TO_CHECK = [
   'quotes',
   'receipts',
   'suppliers',
-  'tours'
+  'tours',
 ]
 
 async function executeSQL(sql) {
@@ -34,14 +34,16 @@ async function executeSQL(sql) {
       path: `/v1/projects/${PROJECT_REF}/database/query`,
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${SUPABASE_ACCESS_TOKEN}`,
-        'Content-Type': 'application/json'
-      }
+        Authorization: `Bearer ${SUPABASE_ACCESS_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
     }
 
-    const req = https.request(options, (res) => {
+    const req = https.request(options, res => {
       let data = ''
-      res.on('data', (chunk) => { data += chunk })
+      res.on('data', chunk => {
+        data += chunk
+      })
       res.on('end', () => {
         if (res.statusCode === 200 || res.statusCode === 201) {
           resolve(JSON.parse(data))
@@ -76,7 +78,7 @@ async function checkTable(tableName) {
       table: tableName,
       columns: result,
       hasCreatedBy: result.some(col => col.column_name === 'created_by'),
-      hasUpdatedBy: result.some(col => col.column_name === 'updated_by')
+      hasUpdatedBy: result.some(col => col.column_name === 'updated_by'),
     }
   } catch (error) {
     return {
@@ -84,14 +86,14 @@ async function checkTable(tableName) {
       error: error.message,
       columns: [],
       hasCreatedBy: false,
-      hasUpdatedBy: false
+      hasUpdatedBy: false,
     }
   }
 }
 
 async function main() {
   console.log('🔍 檢查所有表格的 created_by 和 updated_by 欄位\n')
-  console.log('=' .repeat(70))
+  console.log('='.repeat(70))
 
   const results = []
 
@@ -102,7 +104,9 @@ async function main() {
 
   // 分類顯示
   const complete = results.filter(r => r.hasCreatedBy && r.hasUpdatedBy)
-  const partial = results.filter(r => (r.hasCreatedBy || r.hasUpdatedBy) && !(r.hasCreatedBy && r.hasUpdatedBy))
+  const partial = results.filter(
+    r => (r.hasCreatedBy || r.hasUpdatedBy) && !(r.hasCreatedBy && r.hasUpdatedBy)
+  )
   const missing = results.filter(r => !r.hasCreatedBy && !r.hasUpdatedBy && !r.error)
   const errors = results.filter(r => r.error)
 

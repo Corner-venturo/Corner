@@ -19,7 +19,7 @@ import type {
   QueueType,
   QueueStatus,
   QueueStats,
-  QUEUE_TYPE_LABELS
+  QUEUE_TYPE_LABELS,
 } from '@/types/pnr.types'
 
 type PnrQueueItem = Database['public']['Tables']['pnr_queue_items']['Row']
@@ -46,65 +46,57 @@ export const QUEUE_RULES: QueueRule[] = [
     type: 'pending_ticket',
     title: '待開票',
     priority: 10,
-    check: (pnr) =>
-      pnr.status === 'active' &&
-      pnr.ticketing_deadline !== null &&
-      !isTicketed(pnr),
-    getDueDate: (pnr) =>
-      pnr.ticketing_deadline ? new Date(pnr.ticketing_deadline) : null,
-    getDescription: (pnr) =>
-      `出票期限: ${pnr.ticketing_deadline ? formatDate(pnr.ticketing_deadline) : '未知'}`
+    check: pnr => pnr.status === 'active' && pnr.ticketing_deadline !== null && !isTicketed(pnr),
+    getDueDate: pnr => (pnr.ticketing_deadline ? new Date(pnr.ticketing_deadline) : null),
+    getDescription: pnr =>
+      `出票期限: ${pnr.ticketing_deadline ? formatDate(pnr.ticketing_deadline) : '未知'}`,
   },
   {
     type: 'pending_confirm',
     title: '待確認',
     priority: 8,
-    check: (pnr) =>
+    check: pnr =>
       pnr.segments?.some((s: PNRSegment) => s.status === 'UC' || s.status === 'UN') ?? false,
-    getDescription: (pnr) => {
+    getDescription: pnr => {
       const ucSegments = pnr.segments?.filter(
         (s: PNRSegment) => s.status === 'UC' || s.status === 'UN'
       )
       return `待確認航段: ${ucSegments?.map((s: PNRSegment) => `${s.airline}${s.flightNumber}`).join(', ')}`
-    }
+    },
   },
   {
     type: 'ssr_pending',
     title: 'SSR 未確認',
     priority: 6,
-    check: (pnr) => {
+    check: pnr => {
       // 檢查是否有未確認的 SSR
       if (!pnr.special_requests) return false
-      return pnr.special_requests.some(
-        (ssr) => ssr.raw?.includes('UN') || ssr.raw?.includes('NN')
-      )
+      return pnr.special_requests.some(ssr => ssr.raw?.includes('UN') || ssr.raw?.includes('NN'))
     },
-    getDescription: () => 'SSR 請求尚未被航空公司確認'
+    getDescription: () => 'SSR 請求尚未被航空公司確認',
   },
   {
     type: 'schedule_change',
     title: '航變處理',
     priority: 9,
-    check: (pnr) => {
+    check: pnr => {
       // 透過 PNR 的 has_schedule_change 欄位判斷
       return (pnr as PNR & { has_schedule_change?: boolean }).has_schedule_change === true
     },
-    getDescription: () => '航班有變更，需要處理'
+    getDescription: () => '航班有變更，需要處理',
   },
   {
     type: 'seat_request',
     title: '座位請求',
     priority: 4,
-    check: (pnr) => {
+    check: pnr => {
       if (!pnr.special_requests) return false
       return pnr.special_requests.some(
-        (ssr) =>
-          ssr.category === 'SEAT' &&
-          (ssr.raw?.includes('RQ') || ssr.raw?.includes('NN'))
+        ssr => ssr.category === 'SEAT' && (ssr.raw?.includes('RQ') || ssr.raw?.includes('NN'))
       )
     },
-    getDescription: () => '座位請求待處理'
-  }
+    getDescription: () => '座位請求待處理',
+  },
 ]
 
 // =====================================================
@@ -141,7 +133,7 @@ export async function evaluatePnrForQueues(
       description: rule.getDescription?.(pnr),
       priority: rule.priority,
       dueDate: rule.getDueDate?.(pnr) || null,
-      createdBy: options?.createdBy
+      createdBy: options?.createdBy,
     })
 
     if (item) {
@@ -184,10 +176,8 @@ export async function createQueueItem(
       reminder_at: options?.reminderAt?.toISOString() || null,
       assigned_to: options?.assignedTo || null,
       status: 'pending',
-      metadata: options?.metadata
-        ? JSON.parse(JSON.stringify(options.metadata))
-        : null,
-      created_by: options?.createdBy || null
+      metadata: options?.metadata ? JSON.parse(JSON.stringify(options.metadata)) : null,
+      created_by: options?.createdBy || null,
     }
 
     const { data, error } = await supabase
@@ -222,7 +212,7 @@ export async function updateQueueItemStatus(
   try {
     const updates: Record<string, unknown> = {
       status,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     }
 
     if (status === 'completed') {
@@ -231,10 +221,7 @@ export async function updateQueueItemStatus(
       updates.resolution_notes = options?.resolutionNotes || null
     }
 
-    const { error } = await supabase
-      .from('pnr_queue_items')
-      .update(updates)
-      .eq('id', itemId)
+    const { error } = await supabase.from('pnr_queue_items').update(updates).eq('id', itemId)
 
     if (error) {
       logger.error('[Queue] Failed to update queue item:', error)
@@ -275,27 +262,21 @@ export async function completeQueueItem(
 /**
  * 取消 Queue 項目
  */
-export async function cancelQueueItem(
-  itemId: string,
-  notes?: string
-): Promise<boolean> {
+export async function cancelQueueItem(itemId: string, notes?: string): Promise<boolean> {
   return updateQueueItemStatus(itemId, 'cancelled', { resolutionNotes: notes })
 }
 
 /**
  * 指派 Queue 項目
  */
-export async function assignQueueItem(
-  itemId: string,
-  assignedTo: string
-): Promise<boolean> {
+export async function assignQueueItem(itemId: string, assignedTo: string): Promise<boolean> {
   try {
     const { error } = await supabase
       .from('pnr_queue_items')
       .update({
         assigned_to: assignedTo,
         status: 'in_progress',
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq('id', itemId)
 
@@ -363,13 +344,11 @@ export async function getPnrQueueItems(
 /**
  * 取得 Workspace 的待處理項目
  */
-export async function getDueItems(
-  options?: {
-    assignedTo?: string
-    queueType?: QueueType
-    limit?: number
-  }
-): Promise<PnrQueueItem[]> {
+export async function getDueItems(options?: {
+  assignedTo?: string
+  queueType?: QueueType
+  limit?: number
+}): Promise<PnrQueueItem[]> {
   try {
     const now = new Date().toISOString()
 
@@ -411,9 +390,7 @@ export async function getDueItems(
 /**
  * 取得逾期項目
  */
-export async function getOverdueItems(
-  limit: number = 50
-): Promise<PnrQueueItem[]> {
+export async function getOverdueItems(limit: number = 50): Promise<PnrQueueItem[]> {
   try {
     const now = new Date().toISOString()
 
@@ -450,7 +427,7 @@ export async function getQueueStats(): Promise<QueueStats> {
     revalidation: 0,
     reissue: 0,
     overdue: 0,
-    total: 0
+    total: 0,
   }
 
   try {
@@ -561,7 +538,7 @@ async function updatePnrQueueCount(pnrId: string): Promise<void> {
       .from('pnr_records')
       .update({
         queue_count: count || 0,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq('id', pnrId)
   } catch (err) {
@@ -583,7 +560,7 @@ function getDefaultTitle(queueType: QueueType): string {
     revalidation: '需 Revalidation',
     reissue: '需 Reissue',
     refund: '退票處理',
-    custom: '自訂任務'
+    custom: '自訂任務',
   }
   return labels[queueType] || queueType
 }
@@ -592,9 +569,11 @@ function getDefaultTitle(queueType: QueueType): string {
  * 檢查 PNR 是否已開票
  */
 function isTicketed(pnr: PNR): boolean {
-  return pnr.status === 'ticketed' ||
+  return (
+    pnr.status === 'ticketed' ||
     pnr.segments?.every((s: PNRSegment) => s.status === 'TK') ||
     (pnr as PNR & { ticket_issued_at?: string }).ticket_issued_at != null
+  )
 }
 
 /**
@@ -620,5 +599,5 @@ export default {
   getPnrQueueItems,
   getDueItems,
   getOverdueItems,
-  getQueueStats
+  getQueueStats,
 }

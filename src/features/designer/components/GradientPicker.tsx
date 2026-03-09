@@ -11,11 +11,7 @@ import { useState } from 'react'
 import dynamic from 'next/dynamic'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 import { Loader2 } from 'lucide-react'
 import { DESIGNER_LABELS } from './constants/labels'
@@ -40,7 +36,7 @@ const PRESET_GRADIENTS = [
 ]
 
 interface GradientPickerProps {
-  value: string  // CSS gradient string or solid color
+  value: string // CSS gradient string or solid color
   onChange: (value: string, isSolid: boolean) => void
   className?: string
 }
@@ -59,21 +55,15 @@ export function GradientPicker({ value, onChange, className }: GradientPickerPro
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          className={cn('w-full h-10 p-1 justify-start gap-2', className)}
-        >
-          <div
-            className="w-6 h-6 rounded border border-border"
-            style={previewStyle}
-          />
+        <Button variant="outline" className={cn('w-full h-10 p-1 justify-start gap-2', className)}>
+          <div className="w-6 h-6 rounded border border-border" style={previewStyle} />
           <span className="text-xs text-morandi-secondary truncate">
             {mode === 'solid' ? '純色' : '漸層'}
           </span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0" align="start">
-        <Tabs value={mode} onValueChange={(v) => setMode(v as 'solid' | 'gradient')}>
+        <Tabs value={mode} onValueChange={v => setMode(v as 'solid' | 'gradient')}>
           <TabsList className="w-full grid grid-cols-2">
             <TabsTrigger value="solid">{DESIGNER_LABELS.LABEL_3502}</TabsTrigger>
             <TabsTrigger value="gradient">{DESIGNER_LABELS.LABEL_6118}</TabsTrigger>
@@ -82,7 +72,7 @@ export function GradientPicker({ value, onChange, className }: GradientPickerPro
           <TabsContent value="solid" className="p-3">
             <SolidColorPicker
               value={value?.includes('gradient') ? '#c9aa7c' : value}
-              onChange={(color) => onChange(color, true)}
+              onChange={color => onChange(color, true)}
             />
           </TabsContent>
 
@@ -97,7 +87,9 @@ export function GradientPicker({ value, onChange, className }: GradientPickerPro
                     type="button"
                     className={cn(
                       'w-full h-8 rounded border-2 transition-all',
-                      value === gradient ? 'border-morandi-gold' : 'border-transparent hover:border-morandi-gold/50'
+                      value === gradient
+                        ? 'border-morandi-gold'
+                        : 'border-transparent hover:border-morandi-gold/50'
                     )}
                     style={{ background: gradient }}
                     onClick={() => onChange(gradient, false)}
@@ -110,8 +102,12 @@ export function GradientPicker({ value, onChange, className }: GradientPickerPro
             <div>
               <p className="text-xs text-morandi-secondary mb-2">{DESIGNER_LABELS.LABEL_4278}</p>
               <GradientColorPicker
-                value={value?.includes('gradient') ? value : 'linear-gradient(90deg, #c9aa7c 0%, #e8d5b7 100%)'}
-                onChange={(gradient) => onChange(gradient, false)}
+                value={
+                  value?.includes('gradient')
+                    ? value
+                    : 'linear-gradient(90deg, #c9aa7c 0%, #e8d5b7 100%)'
+                }
+                onChange={gradient => onChange(gradient, false)}
               />
             </div>
           </TabsContent>
@@ -124,30 +120,44 @@ export function GradientPicker({ value, onChange, className }: GradientPickerPro
 // 純色選擇器
 function SolidColorPicker({
   value,
-  onChange
+  onChange,
 }: {
   value: string
   onChange: (color: string) => void
 }) {
   // 莫蘭迪色票
   const MORANDI_COLORS = [
-    '#3a3633', '#8b8680', '#b8b2aa', '#d4c4b0',
-    '#c9aa7c', '#b8996b', '#c08374', '#e8b4a8',
-    '#9fa68f', '#c5cdb8', '#a8c0b9', '#b4c4d0',
-    '#e8e5e0', '#f6f4f1', '#ffffff', '#3a3633',
+    '#3a3633',
+    '#8b8680',
+    '#b8b2aa',
+    '#d4c4b0',
+    '#c9aa7c',
+    '#b8996b',
+    '#c08374',
+    '#e8b4a8',
+    '#9fa68f',
+    '#c5cdb8',
+    '#a8c0b9',
+    '#b4c4d0',
+    '#e8e5e0',
+    '#f6f4f1',
+    '#ffffff',
+    '#3a3633',
   ]
 
   return (
     <div className="space-y-3">
       {/* 預設色票 */}
       <div className="grid grid-cols-8 gap-1">
-        {MORANDI_COLORS.map((color) => (
+        {MORANDI_COLORS.map(color => (
           <button
             key={color}
             type="button"
             className={cn(
               'w-6 h-6 rounded border-2 transition-all',
-              value === color ? 'border-morandi-gold' : 'border-transparent hover:border-morandi-gold/50'
+              value === color
+                ? 'border-morandi-gold'
+                : 'border-transparent hover:border-morandi-gold/50'
             )}
             style={{ backgroundColor: color }}
             onClick={() => onChange(color)}
@@ -160,13 +170,13 @@ function SolidColorPicker({
         <input
           type="color"
           value={value || '#c9aa7c'}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={e => onChange(e.target.value)}
           className="w-8 h-8 rounded cursor-pointer"
         />
         <input
           type="text"
           value={value || '#c9aa7c'}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={e => onChange(e.target.value)}
           className="flex-1 px-2 py-1 text-sm border rounded"
           placeholder="#c9aa7c"
         />
@@ -177,7 +187,7 @@ function SolidColorPicker({
 
 // 漸層自訂選擇器 - 使用 dynamic import
 const DynamicColorPicker = dynamic(
-  () => import('react-best-gradient-color-picker').then((mod) => mod.default),
+  () => import('react-best-gradient-color-picker').then(mod => mod.default),
   {
     loading: () => (
       <div className="flex items-center justify-center h-[180px]">
@@ -225,11 +235,7 @@ function GradientColorPicker({
  * 將 CSS gradient 轉換為 fabric.js Gradient 物件
  * 回傳格式給 fabric.FabricObject.set('fill', ...) 使用
  */
-export function cssGradientToFabric(
-  cssGradient: string,
-  width: number,
-  height: number
-): unknown {
+export function cssGradientToFabric(cssGradient: string, width: number, height: number): unknown {
   // 如果不是漸層，直接回傳
   if (!cssGradient?.includes('gradient')) {
     return cssGradient
@@ -301,9 +307,9 @@ function angleToCoords(angle: number, width: number, height: number) {
   const sin = Math.sin(rad)
 
   return {
-    x1: width / 2 - cos * width / 2,
-    y1: height / 2 - sin * height / 2,
-    x2: width / 2 + cos * width / 2,
-    y2: height / 2 + sin * height / 2,
+    x1: width / 2 - (cos * width) / 2,
+    y1: height / 2 - (sin * height) / 2,
+    x2: width / 2 + (cos * width) / 2,
+    y2: height / 2 + (sin * height) / 2,
   }
 }

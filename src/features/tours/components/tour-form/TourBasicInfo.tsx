@@ -14,10 +14,7 @@ interface TourBasicInfoProps {
   setNewTour: React.Dispatch<React.SetStateAction<NewTourData>>
 }
 
-export function TourBasicInfo({
-  newTour,
-  setNewTour,
-}: TourBasicInfoProps) {
+export function TourBasicInfo({ newTour, setNewTour }: TourBasicInfoProps) {
   // 處理國家變更
   const handleCountryChange = (country: string, airportCode: string) => {
     setNewTour(prev => ({
@@ -40,7 +37,9 @@ export function TourBasicInfo({
   return (
     <div className="space-y-4">
       <div>
-        <label className="text-sm font-medium text-morandi-primary">{TOUR_BASIC_INFO.label_name}</label>
+        <label className="text-sm font-medium text-morandi-primary">
+          {TOUR_BASIC_INFO.label_name}
+        </label>
         <Input
           value={newTour.name}
           onChange={e => setNewTour(prev => ({ ...prev, name: e.target.value }))}
@@ -60,7 +59,9 @@ export function TourBasicInfo({
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium text-morandi-primary">{TOUR_BASIC_INFO.label_departure}</label>
+          <label className="text-sm font-medium text-morandi-primary">
+            {TOUR_BASIC_INFO.label_departure}
+          </label>
           <SimpleDateInput
             value={newTour.departure_date}
             onChange={departure_date => {
@@ -83,7 +84,9 @@ export function TourBasicInfo({
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-morandi-primary">{TOUR_BASIC_INFO.label_return}</label>
+          <label className="text-sm font-medium text-morandi-primary">
+            {TOUR_BASIC_INFO.label_return}
+          </label>
           <SimpleDateInput
             value={newTour.return_date}
             onChange={return_date => {
@@ -98,7 +101,9 @@ export function TourBasicInfo({
       </div>
 
       <div>
-        <label className="text-sm font-medium text-morandi-primary">{TOUR_BASIC_INFO.label_description}</label>
+        <label className="text-sm font-medium text-morandi-primary">
+          {TOUR_BASIC_INFO.label_description}
+        </label>
         <Input
           value={newTour.description || ''}
           onChange={e => setNewTour(prev => ({ ...prev, description: e.target.value }))}

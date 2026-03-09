@@ -281,7 +281,15 @@ export interface Itinerary {
   city: string
   status: TourStatus
   cover_style?: 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage' // 封面風格
-  flight_style?: 'original' | 'chinese' | 'japanese' | 'luxury' | 'art' | 'none' | 'dreamscape' | 'collage' // 航班卡片風格
+  flight_style?:
+    | 'original'
+    | 'chinese'
+    | 'japanese'
+    | 'luxury'
+    | 'art'
+    | 'none'
+    | 'dreamscape'
+    | 'collage' // 航班卡片風格
   itinerary_style?: 'original' | 'luxury' | 'art' | 'dreamscape' // 每日行程風格
   price?: string | null // 價格（如：39,800）
   price_note?: string | null // 價格備註（如：起、/人）
@@ -482,12 +490,12 @@ export interface Tour extends BaseEntity {
  * - 取消：已取消
  */
 export type TourStatus =
-  | '開團'      // 可編輯行程
-  | '待出發'    // 已確認出團，行程鎖定
-  | '已出發'    // 團已出發
-  | '待結團'    // 等待結算
-  | '已結團'    // 團結束，結算獎金
-  | '取消'      // 已取消
+  | '開團' // 可編輯行程
+  | '待出發' // 已確認出團，行程鎖定
+  | '已出發' // 團已出發
+  | '待結團' // 等待結算
+  | '已結團' // 團結束，結算獎金
+  | '取消' // 已取消
 
 /**
  * ContractStatus - 合約狀態（英文）

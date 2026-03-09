@@ -31,19 +31,21 @@ export function useCoverInfo({ data, onChange }: UseCoverInfoProps) {
 
   // 從資料庫載入的封面風格選項
   const coverStyleOptions = useMemo(() => {
-    return coverTemplates
-      .map(template => ({
-        value: template.id as CoverStyleType,
-        label: template.name,
-        description: template.description || '',
-        color: getTemplateColor(template.id),
-        previewImage: template.preview_image_url ?? undefined,
-      }))
+    return coverTemplates.map(template => ({
+      value: template.id as CoverStyleType,
+      label: template.name,
+      description: template.description || '',
+      color: getTemplateColor(template.id),
+      previewImage: template.preview_image_url ?? undefined,
+    }))
   }, [coverTemplates])
 
   // 取得當前風格的顏色
-  const currentStyleOption = coverStyleOptions.find(o => o.value === (data.coverStyle || 'original'))
-  const currentStyleColor = currentStyleOption?.color || getTemplateColor(data.coverStyle || 'original')
+  const currentStyleOption = coverStyleOptions.find(
+    o => o.value === (data.coverStyle || 'original')
+  )
+  const currentStyleColor =
+    currentStyleOption?.color || getTemplateColor(data.coverStyle || 'original')
 
   // 處理封面風格變更
   const handleCoverStyleChange = (style: CoverStyleType) => {

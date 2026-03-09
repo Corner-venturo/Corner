@@ -4,7 +4,6 @@
  * 出納單表單區塊（出帳日期、出納單號、狀態篩選）
  */
 
-
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import {
@@ -71,7 +70,9 @@ export function DisbursementForm({
           </SelectTrigger>
           <SelectContent>
             {STATUS_OPTIONS.map(opt => (
-              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>

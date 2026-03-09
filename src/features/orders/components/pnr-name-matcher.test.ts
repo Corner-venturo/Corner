@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { normalizeName, splitPassportName, calculateSimilarity, findBestMatch } from './pnr-name-matcher'
+import {
+  normalizeName,
+  splitPassportName,
+  calculateSimilarity,
+  findBestMatch,
+} from './pnr-name-matcher'
 
 describe('normalizeName', () => {
   it('converts to uppercase', () => {

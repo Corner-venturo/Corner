@@ -107,7 +107,20 @@ describe('formatMonthShort', () => {
     expect(formatMonthShort('invalid')).toBe('')
   })
   it('handles all months', () => {
-    const expected = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+    const expected = [
+      'JAN',
+      'FEB',
+      'MAR',
+      'APR',
+      'MAY',
+      'JUN',
+      'JUL',
+      'AUG',
+      'SEP',
+      'OCT',
+      'NOV',
+      'DEC',
+    ]
     for (let i = 0; i < 12; i++) {
       expect(formatMonthShort(new Date(2024, i, 1))).toBe(expected[i])
     }

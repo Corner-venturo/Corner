@@ -18,7 +18,13 @@ interface EventDetailDialogProps {
   onDelete: (eventId: string) => void
 }
 
-export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: EventDetailDialogProps) {
+export function EventDetailDialog({
+  open,
+  event,
+  onClose,
+  onEdit,
+  onDelete,
+}: EventDetailDialogProps) {
   const { confirm, confirmDialogProps } = useConfirmDialog()
   const { user } = useAuthStore()
 

@@ -8,6 +8,7 @@
 ## 📋 功能說明
 
 ### 已完成的部分 ✅
+
 - ✅ 權限已新增：`'accounting'`（會計模組）
 - ✅ 路由已建立：`/accounting`
 - ✅ 側邊欄已整合：底部個人工具區顯示「記帳管理」
@@ -15,6 +16,7 @@
 - ✅ 前端邏輯完成：sidebar.tsx 已整合過濾機制
 
 ### 待執行的部分 ⏳
+
 - ⏳ **資料庫欄位**：需要新增 `employees.hidden_menu_items`
 
 ---
@@ -63,6 +65,7 @@ WHERE table_name = 'employees'
 ```
 
 **預期結果**：
+
 ```
 column_name         | data_type | column_default
 --------------------+-----------+----------------
@@ -89,6 +92,7 @@ hidden_menu_items   | ARRAY     | '{}'::text[]
 目前支援隱藏以下功能（核心功能如「首頁」「工作區」「設定」不可隱藏）：
 
 **業務管理**：
+
 - 旅遊團（tours）
 - 報價單（quotes）
 - 訂單（orders）
@@ -103,12 +107,14 @@ hidden_menu_items   | ARRAY     | '{}'::text[]
 - 資料庫（database）
 
 **財務管理**：
+
 - 財務（finance）
 - 會計（accounting）⭐ 新增
 - 收款（payments）
 - 支出（disbursement）
 
 **人力資源**：
+
 - 人資（hr）
 - 考勤（attendance）
 
@@ -137,6 +143,7 @@ Sidebar 重新渲染（過濾隱藏項目）
 ### 核心程式碼
 
 #### 1. 選單設定頁面
+
 **檔案**：`src/app/settings/menu/page.tsx`
 
 ```typescript
@@ -150,6 +157,7 @@ const handleSave = async () => {
 ```
 
 #### 2. 側邊欄過濾邏輯
+
 **檔案**：`src/components/layout/sidebar.tsx`（第 365-433 行）
 
 ```typescript
@@ -160,7 +168,7 @@ const visibleMenuItems = useMemo(() => {
     .map(item => {
       // 檢查是否被使用者隱藏
       if (isMenuItemHidden(item.href, hiddenMenuItems)) {
-        return null  // 隱藏此項目
+        return null // 隱藏此項目
       }
       // ... 權限檢查
     })
@@ -169,6 +177,7 @@ const visibleMenuItems = useMemo(() => {
 ```
 
 #### 3. 隱藏判斷函數
+
 **檔案**：`src/constants/menu-items.ts`
 
 ```typescript
@@ -210,14 +219,17 @@ export function isMenuItemHidden(href: string, hiddenMenuItems: string[]): boole
 ## 📁 相關檔案
 
 ### Migration 檔案
+
 - `supabase/migrations/20251117170000_add_hidden_menu_items.sql`
 
 ### 前端檔案
+
 - `src/app/settings/menu/page.tsx` - 選單設定頁面
 - `src/constants/menu-items.ts` - 選單項目定義
 - `src/components/layout/sidebar.tsx` - 側邊欄（過濾邏輯）
 
 ### 型別定義
+
 - `src/types/employee.types.ts` - Employee 型別（需包含 `hidden_menu_items?: string[]`）
 
 ---
@@ -231,6 +243,7 @@ export function isMenuItemHidden(href: string, hiddenMenuItems: string[]): boole
 **位置**：`src/app/settings/page.tsx`
 
 **新增區塊**：
+
 ```tsx
 <Card>
   <CardHeader>

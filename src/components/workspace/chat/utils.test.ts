@@ -5,22 +5,32 @@ vi.mock('date-fns', () => ({
   format: (date: Date, fmt: string) => {
     const pad = (n: number) => n.toString().padStart(2, '0')
     if (fmt === 'HH:mm') return `${pad(date.getHours())}:${pad(date.getMinutes())}`
-    if (fmt === 'MM/dd HH:mm') return `${pad(date.getMonth() + 1)}/${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
+    if (fmt === 'MM/dd HH:mm')
+      return `${pad(date.getMonth() + 1)}/${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
     return ''
   },
   isToday: (date: Date) => {
     const now = new Date()
-    return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate()
+    return (
+      date.getFullYear() === now.getFullYear() &&
+      date.getMonth() === now.getMonth() &&
+      date.getDate() === now.getDate()
+    )
   },
   isYesterday: (date: Date) => {
     const yesterday = new Date()
     yesterday.setDate(yesterday.getDate() - 1)
-    return date.getFullYear() === yesterday.getFullYear() && date.getMonth() === yesterday.getMonth() && date.getDate() === yesterday.getDate()
+    return (
+      date.getFullYear() === yesterday.getFullYear() &&
+      date.getMonth() === yesterday.getMonth() &&
+      date.getDate() === yesterday.getDate()
+    )
   },
 }))
 
 vi.mock('@/services/storage', () => ({
-  getPublicUrlFromStorage: (path: string, bucket: string) => `https://storage.example.com/${bucket}/${path}`,
+  getPublicUrlFromStorage: (path: string, bucket: string) =>
+    `https://storage.example.com/${bucket}/${path}`,
 }))
 
 vi.mock('./constants', () => ({
@@ -97,8 +107,7 @@ describe('formatFileSize', () => {
 })
 
 describe('validateFile', () => {
-  const makeFile = (name: string, size: number, type: string) =>
-    ({ name, size, type } as File)
+  const makeFile = (name: string, size: number, type: string) => ({ name, size, type }) as File
 
   it('accepts valid image', () => {
     const result = validateFile(makeFile('photo.jpg', 1000, 'image/jpeg'))

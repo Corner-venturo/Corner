@@ -52,86 +52,85 @@ export const useQuoteSave = ({
   tierPricings,
 }: UseQuoteSaveProps) => {
   // 直接儲存到報價單主欄位
-  const handleSave = useCallback(
-    () => {
-      if (!quote) {
-        logger.error('[handleSave] quote 為 undefined，無法儲存')
-        return
-      }
+  const handleSave = useCallback(() => {
+    if (!quote) {
+      logger.error('[handleSave] quote 為 undefined，無法儲存')
+      return
+    }
 
-      try {
-        // 快速報價單資料
-        const quickQuoteData = quickQuoteCustomerInfo ? {
-          customer_name: quickQuoteCustomerInfo.customer_name,
-          contact_phone: quickQuoteCustomerInfo.contact_phone,
-          contact_address: quickQuoteCustomerInfo.contact_address,
-          tour_code: quickQuoteCustomerInfo.tour_code,
-          handler_name: quickQuoteCustomerInfo.handler_name,
-          issue_date: quickQuoteCustomerInfo.issue_date,
-          received_amount: quickQuoteCustomerInfo.received_amount,
-          expense_description: quickQuoteCustomerInfo.expense_description,
-          quick_quote_items: quickQuoteItems || [],
-        } : {}
+    try {
+      // 快速報價單資料
+      const quickQuoteData = quickQuoteCustomerInfo
+        ? {
+            customer_name: quickQuoteCustomerInfo.customer_name,
+            contact_phone: quickQuoteCustomerInfo.contact_phone,
+            contact_address: quickQuoteCustomerInfo.contact_address,
+            tour_code: quickQuoteCustomerInfo.tour_code,
+            handler_name: quickQuoteCustomerInfo.handler_name,
+            issue_date: quickQuoteCustomerInfo.issue_date,
+            received_amount: quickQuoteCustomerInfo.received_amount,
+            expense_description: quickQuoteCustomerInfo.expense_description,
+            quick_quote_items: quickQuoteItems || [],
+          }
+        : {}
 
-        // 砍次表資料
-        const tierPricingsData = tierPricings || []
+      // 砍次表資料
+      const tierPricingsData = tierPricings || []
 
-        updateQuote(quote.id, {
-          name: quoteName,
-          categories: updatedCategories,
-          total_cost,
-          group_size: groupSize,
-          accommodation_days: accommodationDays,
-          participant_counts: participantCounts,
-          selling_prices: sellingPrices,
-          tier_pricings: tierPricingsData,
-          ...quickQuoteData,
+      updateQuote(quote.id, {
+        name: quoteName,
+        categories: updatedCategories,
+        total_cost,
+        group_size: groupSize,
+        accommodation_days: accommodationDays,
+        participant_counts: participantCounts,
+        selling_prices: sellingPrices,
+        tier_pricings: tierPricingsData,
+        ...quickQuoteData,
+      })
+
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), UI_DELAYS.SUCCESS_MESSAGE)
+
+      // 同步報價欄位到核心表
+      syncQuotePricingToCore(updatedCategories, quote.tour_id ?? null)
+        .then(result => {
+          if (result.success && result.synced_count > 0) {
+            logger.log('核心表同步:', result.synced_count, 'items')
+          }
         })
+        .catch(err => logger.error('核心表同步錯誤:', err))
 
-        setSaveSuccess(true)
-        setTimeout(() => setSaveSuccess(false), UI_DELAYS.SUCCESS_MESSAGE)
-
-        // 同步報價欄位到核心表
-        syncQuotePricingToCore(updatedCategories, quote.tour_id ?? null)
+      // 同步飯店到行程表
+      const accommodationItems =
+        updatedCategories.find(cat => cat.id === 'accommodation')?.items || []
+      if (accommodationItems.length > 0) {
+        syncHotelsFromQuoteToItinerary(quote.id, accommodationItems)
           .then(result => {
-            if (result.success && result.synced_count > 0) {
-              logger.log('核心表同步:', result.synced_count, 'items')
+            if (!result.success && result.message !== '無關聯行程表，跳過同步') {
+              logger.warn('飯店同步到行程表:', result.message)
             }
           })
-          .catch(err => logger.error('核心表同步錯誤:', err))
-
-        // 同步飯店到行程表
-        const accommodationItems = updatedCategories
-          .find(cat => cat.id === 'accommodation')?.items || []
-        if (accommodationItems.length > 0) {
-          syncHotelsFromQuoteToItinerary(quote.id, accommodationItems)
-            .then(result => {
-              if (!result.success && result.message !== '無關聯行程表，跳過同步') {
-                logger.warn('飯店同步到行程表:', result.message)
-              }
-            })
-            .catch(err => logger.error('飯店同步錯誤:', err))
-        }
-      } catch (error) {
-        logger.error('儲存失敗:', error)
+          .catch(err => logger.error('飯店同步錯誤:', err))
       }
-    },
-    [
-      quote,
-      updatedCategories,
-      total_cost,
-      groupSize,
-      quoteName,
-      accommodationDays,
-      participantCounts,
-      sellingPrices,
-      updateQuote,
-      setSaveSuccess,
-      quickQuoteItems,
-      quickQuoteCustomerInfo,
-      tierPricings,
-    ]
-  )
+    } catch (error) {
+      logger.error('儲存失敗:', error)
+    }
+  }, [
+    quote,
+    updatedCategories,
+    total_cost,
+    groupSize,
+    quoteName,
+    accommodationDays,
+    participantCounts,
+    sellingPrices,
+    updateQuote,
+    setSaveSuccess,
+    quickQuoteItems,
+    quickQuoteCustomerInfo,
+    tierPricings,
+  ])
 
   return {
     handleSave,

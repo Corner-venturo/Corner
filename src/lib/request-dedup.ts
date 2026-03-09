@@ -20,10 +20,7 @@ const REQUEST_TIMEOUT = 30000 // 30 秒
  * 如果有相同 key 的請求正在進行，返回該請求的 Promise
  * 否則執行新請求
  */
-export async function dedup<T>(
-  key: string,
-  fn: () => Promise<T>
-): Promise<T> {
+export async function dedup<T>(key: string, fn: () => Promise<T>): Promise<T> {
   const now = Date.now()
 
   // 清理過期的請求
@@ -82,10 +79,7 @@ export async function swrFetch<T>(
   fn: () => Promise<T>,
   options: SWROptions = {}
 ): Promise<T> {
-  const {
-    staleTime = DEFAULT_STALE_TIME,
-    cacheTime = DEFAULT_CACHE_TIME,
-  } = options
+  const { staleTime = DEFAULT_STALE_TIME, cacheTime = DEFAULT_CACHE_TIME } = options
 
   const now = Date.now()
   const cached = cache.get(key) as CacheEntry<T> | undefined

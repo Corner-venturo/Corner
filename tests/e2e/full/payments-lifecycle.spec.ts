@@ -66,7 +66,7 @@ test.describe.serial('收款單完整生命週期測試', () => {
       // 如果不是第一次，需要重新打開下拉選單
       if (i > 0) {
         await tourInput.click()
-        await tourInput.fill('')  // 清空搜尋以顯示所有選項
+        await tourInput.fill('') // 清空搜尋以顯示所有選項
         await page.waitForTimeout(500)
         await expect(tourListbox).toBeVisible({ timeout: 3000 })
       }
@@ -129,7 +129,7 @@ test.describe.serial('收款單完整生命週期測試', () => {
     }
 
     // ========== 第四步：填寫收款資料 ==========
-    const testAmount = 8888  // 使用特殊金額方便識別
+    const testAmount = 8888 // 使用特殊金額方便識別
 
     // 找到金額輸入框（在收款項目區塊內）
     const amountInput = dialog.locator('input[type="number"]').first()
@@ -151,7 +151,10 @@ test.describe.serial('收款單完整生命週期測試', () => {
 
     // ========== 第五步：提交表單 ==========
     // 注意：按鈕文字是動態的「新增收款單 (共 N 項)」
-    const submitButton = dialog.locator('button').filter({ hasText: /新增收款單.*共.*項/ }).first()
+    const submitButton = dialog
+      .locator('button')
+      .filter({ hasText: /新增收款單.*共.*項/ })
+      .first()
     await expect(submitButton).toBeVisible({ timeout: 3000 })
 
     const isEnabled = await submitButton.isEnabled()
@@ -167,10 +170,12 @@ test.describe.serial('收款單完整生命週期測試', () => {
     }
 
     // 監聽 API 回應
-    const responsePromise = page.waitForResponse(
-      response => response.url().includes('/api/') && response.request().method() === 'POST',
-      { timeout: 15000 }
-    ).catch(() => null)
+    const responsePromise = page
+      .waitForResponse(
+        response => response.url().includes('/api/') && response.request().method() === 'POST',
+        { timeout: 15000 }
+      )
+      .catch(() => null)
 
     console.log('提交收款單...')
     await submitButton.click()
@@ -265,7 +270,10 @@ test.describe.serial('收款單完整生命週期測試', () => {
       console.log('對話框內容包含收款單號:', dialogContent?.includes(createdReceiptCode!) || false)
 
       // 關閉對話框
-      const closeButton = detailDialog.locator('button').filter({ hasText: /關閉|取消|Close/ }).first()
+      const closeButton = detailDialog
+        .locator('button')
+        .filter({ hasText: /關閉|取消|Close/ })
+        .first()
       if (await closeButton.isVisible()) {
         await closeButton.click()
       } else {
@@ -349,7 +357,7 @@ test.describe.serial('收款單完整生命週期測試', () => {
           expect(stillExists).toBe(false)
 
           console.log(`✅ 收款單 ${createdReceiptCode} 已成功刪除`)
-          createdReceiptCode = null  // 清除記錄
+          createdReceiptCode = null // 清除記錄
         } else {
           console.log('⚠️ 在詳情對話框中找不到刪除按鈕')
           // 關閉對話框
@@ -382,7 +390,7 @@ test.describe.serial('收款單完整生命週期測試', () => {
             const confirmButton = confirmDialog.locator('button').filter({ hasText: '確認' })
             if (await confirmButton.isVisible({ timeout: 2000 }).catch(() => false)) {
               console.log('點擊確認按鈕...')
-              await confirmButton.click({ force: true })  // force 繞過遮罩問題
+              await confirmButton.click({ force: true }) // force 繞過遮罩問題
             }
           }
 

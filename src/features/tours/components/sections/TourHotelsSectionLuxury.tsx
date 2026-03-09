@@ -31,10 +31,7 @@ export function TourHotelsSectionLuxury({ data, viewMode }: TourHotelsSectionLux
   const isSingleHotel = hotels.length === 1
 
   return (
-    <section
-      className={isMobile ? 'py-12' : 'py-24'}
-      style={{ backgroundColor: '#151515' }}
-    >
+    <section className={isMobile ? 'py-12' : 'py-24'} style={{ backgroundColor: '#151515' }}>
       <div className={isMobile ? 'px-4' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'}>
         {/* 標題區 */}
         <motion.div
@@ -48,7 +45,7 @@ export function TourHotelsSectionLuxury({ data, viewMode }: TourHotelsSectionLux
             style={{
               color: LUXURY.secondary,
               fontFamily: "'Noto Serif TC', serif",
-              fontSize: isMobile ? '1rem' : '1.125rem'
+              fontSize: isMobile ? '1rem' : '1.125rem',
             }}
           >
             Rest & Relax
@@ -57,7 +54,7 @@ export function TourHotelsSectionLuxury({ data, viewMode }: TourHotelsSectionLux
             className={`font-bold ${isMobile ? 'text-2xl' : 'text-3xl'}`}
             style={{
               color: '#ECECEC',
-              fontFamily: "'Noto Serif TC', serif"
+              fontFamily: "'Noto Serif TC', serif",
             }}
           >
             {TOURS_LABELS.LABEL_4386}
@@ -69,22 +66,19 @@ export function TourHotelsSectionLuxury({ data, viewMode }: TourHotelsSectionLux
           <SingleHotelLayout hotel={hotels[0]} />
         ) : (
           /* 多個飯店：網格佈局 */
-          <div className={`grid ${
-            isMobile
-              ? 'grid-cols-1 gap-8'
-              : hotels.length === 2
-                ? 'md:grid-cols-2 gap-8 max-w-4xl mx-auto'
-                : hotels.length === 3
-                  ? 'md:grid-cols-3 gap-8'
-                  : 'md:grid-cols-2 lg:grid-cols-4 gap-8'
-          }`}>
+          <div
+            className={`grid ${
+              isMobile
+                ? 'grid-cols-1 gap-8'
+                : hotels.length === 2
+                  ? 'md:grid-cols-2 gap-8 max-w-4xl mx-auto'
+                  : hotels.length === 3
+                    ? 'md:grid-cols-3 gap-8'
+                    : 'md:grid-cols-2 lg:grid-cols-4 gap-8'
+            }`}
+          >
             {hotels.map((hotel, index) => (
-              <HotelCard
-                key={index}
-                hotel={hotel}
-                isMobile={isMobile}
-                delay={index * 0.1}
-              />
+              <HotelCard key={index} hotel={hotel} isMobile={isMobile} delay={index * 0.1} />
             ))}
           </div>
         )}
@@ -110,12 +104,12 @@ function SingleHotelLayout({ hotel }: { hotel: HotelInfo }) {
 
   const goToPrev = (e: React.MouseEvent) => {
     e.stopPropagation()
-    setCurrentIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1))
+    setCurrentIndex(prev => (prev === 0 ? allImages.length - 1 : prev - 1))
   }
 
   const goToNext = (e: React.MouseEvent) => {
     e.stopPropagation()
-    setCurrentIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1))
+    setCurrentIndex(prev => (prev === allImages.length - 1 ? 0 : prev + 1))
   }
 
   return (
@@ -128,7 +122,8 @@ function SingleHotelLayout({ hotel }: { hotel: HotelInfo }) {
       {/* 左側：圖片輪播 */}
       <div className="relative aspect-[4/3] rounded-lg overflow-hidden shadow-lg group">
         {currentImage ? (
-          <img src={currentImage}
+          <img
+            src={currentImage}
             alt={hotel.name || TOURS_LABELS.HOTEL}
             className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
           />
@@ -167,14 +162,12 @@ function SingleHotelLayout({ hotel }: { hotel: HotelInfo }) {
               {allImages.map((_, idx) => (
                 <button
                   key={idx}
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation()
                     setCurrentIndex(idx)
                   }}
                   className={`w-2 h-2 rounded-full transition-all ${
-                    idx === currentIndex
-                      ? 'bg-card w-6'
-                      : 'bg-card/50 hover:bg-card/80'
+                    idx === currentIndex ? 'bg-card w-6' : 'bg-card/50 hover:bg-card/80'
                   }`}
                   aria-label={`${TOURS_LABELS.SWITCH_TO_PREFIX}${idx + 1}${TOURS_LABELS.SWITCH_TO_SUFFIX}`}
                 />
@@ -197,35 +190,28 @@ function SingleHotelLayout({ hotel }: { hotel: HotelInfo }) {
             className="text-3xl font-bold mb-4"
             style={{
               color: '#ECECEC',
-              fontFamily: "'Noto Serif TC', serif"
+              fontFamily: "'Noto Serif TC', serif",
             }}
           >
             {hotel.name || TOURS_LABELS.SELECTED_HOTEL}
           </h3>
 
           {/* 分隔線 */}
-          <div
-            className="w-16 h-0.5 mb-6"
-            style={{ backgroundColor: LUXURY.secondary }}
-          />
+          <div className="w-16 h-0.5 mb-6" style={{ backgroundColor: LUXURY.secondary }} />
         </div>
 
         {hotel.description && (
-          <p
-            className="text-base leading-relaxed"
-            style={{ color: '#B2BEC3' }}
-          >
+          <p className="text-base leading-relaxed" style={{ color: '#B2BEC3' }}>
             {hotel.description}
           </p>
         )}
 
         {/* 圖片數量提示 */}
         {hasMultipleImages && (
-          <p
-            className="text-xs"
-            style={{ color: LUXURY.muted }}
-          >
-            {TOURS_LABELS.PHOTO_COUNT_PREFIX}{allImages.length}{TOURS_LABELS.PHOTO_COUNT_SUFFIX}
+          <p className="text-xs" style={{ color: LUXURY.muted }}>
+            {TOURS_LABELS.PHOTO_COUNT_PREFIX}
+            {allImages.length}
+            {TOURS_LABELS.PHOTO_COUNT_SUFFIX}
           </p>
         )}
       </div>
@@ -237,7 +223,7 @@ function SingleHotelLayout({ hotel }: { hotel: HotelInfo }) {
 function HotelCard({
   hotel,
   isMobile,
-  delay
+  delay,
 }: {
   hotel: HotelInfo
   isMobile: boolean
@@ -258,12 +244,12 @@ function HotelCard({
 
   const goToPrev = (e: React.MouseEvent) => {
     e.stopPropagation()
-    setCurrentIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1))
+    setCurrentIndex(prev => (prev === 0 ? allImages.length - 1 : prev - 1))
   }
 
   const goToNext = (e: React.MouseEvent) => {
     e.stopPropagation()
-    setCurrentIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1))
+    setCurrentIndex(prev => (prev === allImages.length - 1 ? 0 : prev + 1))
   }
 
   return (
@@ -277,7 +263,8 @@ function HotelCard({
       {/* 圖片區 */}
       <div className="relative h-64 rounded-md overflow-hidden mb-6 shadow-lg">
         {currentImage ? (
-          <img src={currentImage}
+          <img
+            src={currentImage}
             alt={hotel.name || TOURS_LABELS.HOTEL}
             className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
           />
@@ -319,14 +306,12 @@ function HotelCard({
               {allImages.map((_, idx) => (
                 <button
                   key={idx}
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation()
                     setCurrentIndex(idx)
                   }}
                   className={`w-1.5 h-1.5 rounded-full transition-all ${
-                    idx === currentIndex
-                      ? 'bg-card w-4'
-                      : 'bg-card/50 hover:bg-card/80'
+                    idx === currentIndex ? 'bg-card w-4' : 'bg-card/50 hover:bg-card/80'
                   }`}
                   aria-label={`${TOURS_LABELS.SWITCH_TO_PREFIX}${idx + 1}${TOURS_LABELS.SWITCH_TO_SUFFIX}`}
                 />
@@ -342,24 +327,18 @@ function HotelCard({
           className={`font-medium mb-2 ${isMobile ? 'text-lg' : 'text-xl'}`}
           style={{
             color: '#ECECEC',
-            fontFamily: "'Noto Serif TC', serif"
+            fontFamily: "'Noto Serif TC', serif",
           }}
         >
           {hotel.name || TOURS_LABELS.SELECTED_HOTEL}
         </h3>
 
         {/* 分隔線 */}
-        <div
-          className="w-8 h-px mx-auto mb-3"
-          style={{ backgroundColor: LUXURY.secondary }}
-        />
+        <div className="w-8 h-px mx-auto mb-3" style={{ backgroundColor: LUXURY.secondary }} />
 
         {/* 描述 */}
         {hotel.description && (
-          <p
-            className="text-xs leading-relaxed"
-            style={{ color: '#B2BEC3' }}
-          >
+          <p className="text-xs leading-relaxed" style={{ color: '#B2BEC3' }}>
             {hotel.description}
           </p>
         )}

@@ -3,10 +3,9 @@
  * DailyScheduleEditor - 簡易模式每日行程編輯器
  */
 
-
 import { Input } from '@/components/ui/input'
 import type { DailyScheduleItem } from './types'
-import { DAILY_SCHEDULE_EDITOR_LABELS, ITINERARY_DIALOG_LABELS } from '../../constants/labels';
+import { DAILY_SCHEDULE_EDITOR_LABELS, ITINERARY_DIALOG_LABELS } from '../../constants/labels'
 
 interface DailyScheduleEditorProps {
   dailySchedule: DailyScheduleItem[]
@@ -43,7 +42,13 @@ export function DailyScheduleEditor({
             <Input
               value={day.route || ''}
               onChange={e => onUpdateDay(idx, 'route', e.target.value)}
-              placeholder={isFirst ? DAILY_SCHEDULE_EDITOR_LABELS.抵達目的地 : isLast ? DAILY_SCHEDULE_EDITOR_LABELS.返回台灣 : DAILY_SCHEDULE_EDITOR_LABELS.今日行程標題}
+              placeholder={
+                isFirst
+                  ? DAILY_SCHEDULE_EDITOR_LABELS.抵達目的地
+                  : isLast
+                    ? DAILY_SCHEDULE_EDITOR_LABELS.返回台灣
+                    : DAILY_SCHEDULE_EDITOR_LABELS.今日行程標題
+              }
               className="h-8 text-sm mb-2"
             />
             {/* 表格式餐食（三欄） */}
@@ -51,7 +56,11 @@ export function DailyScheduleEditor({
               {/* 早餐 */}
               <div className="relative">
                 <Input
-                  value={day.hotelBreakfast ? DAILY_SCHEDULE_EDITOR_LABELS.飯店早餐 : (day.meals.breakfast || '')}
+                  value={
+                    day.hotelBreakfast
+                      ? DAILY_SCHEDULE_EDITOR_LABELS.飯店早餐
+                      : day.meals.breakfast || ''
+                  }
                   onChange={e => onUpdateDay(idx, 'meals.breakfast', e.target.value)}
                   placeholder={ITINERARY_DIALOG_LABELS.早餐}
                   className="h-8 text-xs pl-7"
@@ -70,7 +79,9 @@ export function DailyScheduleEditor({
               {/* 午餐 */}
               <div className="relative">
                 <Input
-                  value={day.lunchSelf ? DAILY_SCHEDULE_EDITOR_LABELS.敬請自理 : (day.meals.lunch || '')}
+                  value={
+                    day.lunchSelf ? DAILY_SCHEDULE_EDITOR_LABELS.敬請自理 : day.meals.lunch || ''
+                  }
                   onChange={e => onUpdateDay(idx, 'meals.lunch', e.target.value)}
                   placeholder={ITINERARY_DIALOG_LABELS.午餐}
                   className="h-8 text-xs pl-7"
@@ -87,7 +98,7 @@ export function DailyScheduleEditor({
               {/* 晚餐 */}
               <div className="relative">
                 <Input
-                  value={day.dinnerSelf ? '敬請自理' : (day.meals.dinner || '')}
+                  value={day.dinnerSelf ? '敬請自理' : day.meals.dinner || ''}
                   onChange={e => onUpdateDay(idx, 'meals.dinner', e.target.value)}
                   placeholder={ITINERARY_DIALOG_LABELS.晚餐}
                   className="h-8 text-xs pl-7"
@@ -106,7 +117,11 @@ export function DailyScheduleEditor({
             {!isLast && (
               <div className="relative mt-1.5">
                 <Input
-                  value={day.sameAsPrevious ? `同上 (${getPreviousAccommodation(idx) || ''})` : (day.accommodation || '')}
+                  value={
+                    day.sameAsPrevious
+                      ? `同上 (${getPreviousAccommodation(idx) || ''})`
+                      : day.accommodation || ''
+                  }
                   onChange={e => onUpdateDay(idx, 'accommodation', e.target.value)}
                   placeholder={DAILY_SCHEDULE_EDITOR_LABELS.住宿飯店}
                   className="h-8 text-xs pl-7"

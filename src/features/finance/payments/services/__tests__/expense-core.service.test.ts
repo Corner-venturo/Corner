@@ -7,15 +7,8 @@ vi.mock('swr', () => ({
 describe('expense-core.service', () => {
   describe('recalculateExpenseStats logic', () => {
     it('should calculate total_cost from payment request items', () => {
-      const items = [
-        { subtotal: 10000 },
-        { subtotal: 5000 },
-        { subtotal: 3000 },
-      ]
-      const totalCost = items.reduce(
-        (sum, item) => sum + (item.subtotal || 0),
-        0
-      )
+      const items = [{ subtotal: 10000 }, { subtotal: 5000 }, { subtotal: 3000 }]
+      const totalCost = items.reduce((sum, item) => sum + (item.subtotal || 0), 0)
       expect(totalCost).toBe(18000)
     })
 
@@ -29,15 +22,8 @@ describe('expense-core.service', () => {
     })
 
     it('should handle null subtotal values', () => {
-      const items = [
-        { subtotal: 10000 },
-        { subtotal: null },
-        { subtotal: 5000 },
-      ]
-      const totalCost = items.reduce(
-        (sum, item) => sum + (item.subtotal || 0),
-        0
-      )
+      const items = [{ subtotal: 10000 }, { subtotal: null }, { subtotal: 5000 }]
+      const totalCost = items.reduce((sum, item) => sum + (item.subtotal || 0), 0)
       expect(totalCost).toBe(15000)
     })
 
@@ -56,27 +42,14 @@ describe('expense-core.service', () => {
     // === 新增邊界測試 ===
 
     it('subtotal 為 0 的項目不影響加總', () => {
-      const items = [
-        { subtotal: 10000 },
-        { subtotal: 0 },
-        { subtotal: 5000 },
-      ]
-      const totalCost = items.reduce(
-        (sum, item) => sum + (item.subtotal || 0),
-        0
-      )
+      const items = [{ subtotal: 10000 }, { subtotal: 0 }, { subtotal: 5000 }]
+      const totalCost = items.reduce((sum, item) => sum + (item.subtotal || 0), 0)
       expect(totalCost).toBe(15000)
     })
 
     it('所有 subtotal 都為 null', () => {
-      const items = [
-        { subtotal: null },
-        { subtotal: null },
-      ]
-      const totalCost = items.reduce(
-        (sum, item) => sum + (item.subtotal || 0),
-        0
-      )
+      const items = [{ subtotal: null }, { subtotal: null }]
+      const totalCost = items.reduce((sum, item) => sum + (item.subtotal || 0), 0)
       expect(totalCost).toBe(0)
     })
 
@@ -84,33 +57,20 @@ describe('expense-core.service', () => {
       const items = Array.from({ length: 100 }, (_, i) => ({
         subtotal: (i + 1) * 100,
       }))
-      const totalCost = items.reduce(
-        (sum, item) => sum + (item.subtotal || 0),
-        0
-      )
+      const totalCost = items.reduce((sum, item) => sum + (item.subtotal || 0), 0)
       // sum of 100+200+...+10000 = 100 * (1+2+...+100) = 100 * 5050 = 505000
       expect(totalCost).toBe(505000)
     })
 
     it('負數 subtotal（退款/扣除）', () => {
-      const items = [
-        { subtotal: 10000 },
-        { subtotal: -2000 },
-        { subtotal: 5000 },
-      ]
-      const totalCost = items.reduce(
-        (sum, item) => sum + (item.subtotal || 0),
-        0
-      )
+      const items = [{ subtotal: 10000 }, { subtotal: -2000 }, { subtotal: 5000 }]
+      const totalCost = items.reduce((sum, item) => sum + (item.subtotal || 0), 0)
       expect(totalCost).toBe(13000)
     })
 
     it('只有一筆請款項目', () => {
       const items = [{ subtotal: 50000 }]
-      const totalCost = items.reduce(
-        (sum, item) => sum + (item.subtotal || 0),
-        0
-      )
+      const totalCost = items.reduce((sum, item) => sum + (item.subtotal || 0), 0)
       expect(totalCost).toBe(50000)
     })
 

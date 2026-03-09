@@ -3,6 +3,7 @@
 ## Status: 基礎建設已完成，核心功能測試模式
 
 ## 設計日期
+
 2026-03-04 ~ 03-06
 
 ---
@@ -13,6 +14,7 @@
 **解法**：AI 自己開會討論 → William 只看結論 + 審核
 
 **創新點**：
+
 - AI 定時開會（不等人問）
 - 角色動態切換（業務會議 vs 技術會議）
 - 會議記錄完整保留
@@ -22,29 +24,29 @@
 
 ## 實體 AI（3 個）
 
-| AI | 位置 | 角色 |
-|----|------|------|
-| 🌙 Yuzuki | Mac mini (CORNER) | 技術開發 |
-| 👔 Carson AI | Mac mini（同辦公室） | 行政協調 |
+| AI             | 位置                 | 角色     |
+| -------------- | -------------------- | -------- |
+| 🌙 Yuzuki      | Mac mini (CORNER)    | 技術開發 |
+| 👔 Carson AI   | Mac mini（同辦公室） | 行政協調 |
 | 💰 會計姐姐 AI | Mac mini（同辦公室） | 財務管理 |
 
 ## 虛擬 AI 庫存（4 個，由 Yuzuki spawn）
 
-| 虛擬 AI | 個性 | 用途 |
-|---------|------|------|
+| 虛擬 AI       | 個性     | 用途                 |
+| ------------- | -------- | -------------------- |
 | 📊 業務分析師 | 穩健謹慎 | 業務會議提供數據觀點 |
-| 📱 行銷專員 | 樂觀進取 | 行銷會議主導討論 |
-| 🤔 批判質疑者 | 悲觀反駁 | 任何會議提出質疑 |
-| 🔧 技術審查員 | 謹慎細節 | 技術會議審查方案 |
+| 📱 行銷專員   | 樂觀進取 | 行銷會議主導討論     |
+| 🤔 批判質疑者 | 悲觀反駁 | 任何會議提出質疑     |
+| 🔧 技術審查員 | 謹慎細節 | 技術會議審查方案     |
 
 ## 預設會議室（4 間）
 
-| 會議室 | 時間 | 參與者 |
-|--------|------|--------|
-| 📊 業務會議 | 每日 00:00 | Yuzuki, Carson, 業務分析師 |
-| 📱 行銷會議 | 每日 00:30 | Yuzuki, 行銷專員 |
-| 💻 技術會議 | 每日 01:00 | Yuzuki, 技術審查員 |
-| 💰 財務會議 | 每週一 00:00 | Yuzuki, 會計姐姐, Carson |
+| 會議室      | 時間         | 參與者                     |
+| ----------- | ------------ | -------------------------- |
+| 📊 業務會議 | 每日 00:00   | Yuzuki, Carson, 業務分析師 |
+| 📱 行銷會議 | 每日 00:30   | Yuzuki, 行銷專員           |
+| 💻 技術會議 | 每日 01:00   | Yuzuki, 技術審查員         |
+| 💰 財務會議 | 每週一 00:00 | Yuzuki, 會計姐姐, Carson   |
 
 ---
 
@@ -129,6 +131,7 @@ src/features/ai-meeting/
 ```
 
 ## 通訊機制
+
 - Supabase Realtime Presence（即時狀態）
 - Supabase Realtime Channel（會議訊息）
 
@@ -139,6 +142,7 @@ src/features/ai-meeting/
 ## 已完成的部分
 
 ### ERP 前端（已有 code）
+
 - ✅ `/meeting` 聊天室頁面（WebSocket 即時通訊）
 - ✅ `/api/meeting/send` API（訊息 + AI 回應）
 - ✅ `/api/meeting/summary` API（會議摘要）
@@ -146,11 +150,13 @@ src/features/ai-meeting/
 - ⚠️ AI 回應目前是**硬編碼測試模式**，未真正呼叫 OpenClaw
 
 ### OpenClaw 側
+
 - ✅ `venturo-ai-chat` skill 已建立
 - ✅ Yuzuki 端點已設定（http://100.89.92.46:3067）
 - ✅ Carson workspace 存在（~/.openclaw/workspace-carson/）
 
 ### 基礎建設（2026-03-06 完成）
+
 - ✅ 播報員 Bot 架構（一個大腦，兩張嘴）
 - ✅ LaunchAgent 排程系統（6 個定時任務）
 - ✅ Cron jobs 全部改用 Haiku（不搶 Sonnet 額度）
@@ -161,28 +167,33 @@ src/features/ai-meeting/
 ## 下一步（待開發）
 
 ### Phase 1: 打通 AI 真實回應 ← 現在
+
 - [ ] `/api/meeting/send` 改成真正呼叫 `ai-endpoints.ts` 的 `callAI()`
 - [ ] 測試 Yuzuki 能從 ERP 會議室收到訊息並回覆
 - [ ] `/meeting` 加入側邊選單（一般 UI 入口）
 - [ ] `/game` 像素辦公室加會議室物件 → 點擊開啟 `/meeting`（Game UI 入口）
 
 ### 路由策略（William 確認 2026-03-06）
+
 - **兩個入口、同一個功能**
 - 一般 UI：側邊選單 → `/meeting`
 - Game UI：像素辦公室 → 點會議室物件 → `/meeting`
 - 會議室本體只有一份 code，不用維護兩套
 
 ### Phase 2: AI 機器人管理 UI
+
 - [ ] `/settings/ai-bots` 頁面
 - [ ] 對話式建立虛擬 AI
 - [ ] 即時顯示 AI 在線狀態（Supabase Presence）
 
 ### Phase 3: 會議排程 + 自動開會
+
 - [ ] 會議室排程功能
 - [ ] AI 定時自動開會（Cron 觸發）
 - [ ] 會議記錄存 DB
 
 ### Phase 4: 多 AI 協作
+
 - [ ] Carson AI 上線
 - [ ] 虛擬 AI spawn 機制
 - [ ] 多 AI 同時討論

@@ -9,6 +9,7 @@
 ## 🚨 背景說明
 
 Supabase CLI 執行 `db push` 時持續遇到以下錯誤：
+
 ```
 failed to connect as temp role: SSL connection is required (SQLSTATE XX000)
 ```
@@ -35,6 +36,7 @@ failed to connect as temp role: SSL connection is required (SQLSTATE XX000)
 **檔案位置**：`supabase/migrations/20251117133000_create_accounting_module.sql`
 
 **執行方式**：
+
 1. 複製以下完整 SQL 內容
 2. 貼到 SQL Editor
 3. 點擊 **Run** 執行
@@ -272,6 +274,7 @@ COMMIT;
 </details>
 
 **預期結果**：
+
 - ✅ 5 個資料表建立成功
 - ✅ 29 個會計科目插入成功
 - ✅ 索引和觸發器建立成功
@@ -283,6 +286,7 @@ COMMIT;
 **檔案位置**：`supabase/migrations/20251117140000_add_tour_closing_fields.sql`
 
 **執行方式**：
+
 1. 開啟新的 SQL Query
 2. 複製以下 SQL 內容
 3. 點擊 **Run** 執行
@@ -315,6 +319,7 @@ COMMIT;
 ```
 
 **預期結果**：
+
 - ✅ tours 表格新增 3 個欄位
 - ✅ 索引建立成功
 
@@ -356,6 +361,7 @@ WHERE table_name = 'tours'
 ```
 
 **預期結果**：
+
 ```
 資料表數量：5 個
 會計科目數量：29 個
@@ -381,12 +387,15 @@ tours 欄位：3 個新欄位
 ## 🚨 常見問題
 
 ### Q1: 執行時出現 "relation already exists" 錯誤
+
 **A**: 這是正常的，代表該資料表已存在。SQL 中使用了 `IF NOT EXISTS`，可以安全重複執行。
 
 ### Q2: 會計科目插入失敗
+
 **A**: 檢查是否已存在相同的科目代碼。使用 `ON CONFLICT DO NOTHING` 可避免重複插入。
 
 ### Q3: tours 欄位新增失敗
+
 **A**: 可能欄位已存在。使用 `IF NOT EXISTS` 可安全重複執行。
 
 ---
@@ -394,6 +403,7 @@ tours 欄位：3 個新欄位
 ## 📞 需要協助？
 
 如遇到問題，請檢查：
+
 1. Supabase Dashboard 的錯誤訊息
 2. 執行的 SQL 是否完整複製
 3. 是否有權限執行 DDL 語句

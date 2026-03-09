@@ -33,17 +33,17 @@
 
 ### Z-Index 層級
 
-| 元素 | 普通對話框 | 巢狀對話框 |
-|------|-----------|-----------|
-| 遮罩 (Overlay) | z-[9998] | z-[10001] |
-| 內容 (Content) | z-[9999] | z-[10002] |
-| 關閉按鈕 | z-[10000] | z-[10003] |
+| 元素           | 普通對話框 | 巢狀對話框 |
+| -------------- | ---------- | ---------- |
+| 遮罩 (Overlay) | z-[9998]   | z-[10001]  |
+| 內容 (Content) | z-[9999]   | z-[10002]  |
+| 關閉按鈕       | z-[10000]  | z-[10003]  |
 
 ### 遮罩透明度
 
-| 類型 | 透明度 | 說明 |
-|------|--------|------|
-| 普通對話框 | `bg-black/60` | 60% 黑色 + 模糊效果 |
+| 類型       | 透明度        | 說明                             |
+| ---------- | ------------- | -------------------------------- |
+| 普通對話框 | `bg-black/60` | 60% 黑色 + 模糊效果              |
 | 巢狀對話框 | `bg-black/40` | 40% 黑色，無模糊（避免疊加過黑） |
 
 疊加效果：60% + (40% × 40%) ≈ 76%（比原本的 84% 更接近單層效果）
@@ -76,7 +76,9 @@
 export function TourCloseDialog({ open, onOpenChange }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent nested> {/* 永遠加 nested */}
+      <DialogContent nested>
+        {' '}
+        {/* 永遠加 nested */}
         <DialogHeader>
           <DialogTitle>結團確認</DialogTitle>
         </DialogHeader>
@@ -148,10 +150,12 @@ export function TourDetailDialog() {
 ## 已知需要修正的檔案
 
 ### 已正確實作
+
 - [x] `src/features/finance/payments/components/AddReceiptDialog.tsx`
 - [x] `src/features/finance/requests/components/AddRequestDialog.tsx`
 
 ### 需要修正（從 TourDetailDialog 開啟）
+
 - [ ] `src/components/tours/tour-close-dialog.tsx`
 - [ ] `src/components/tours/tour-edit-dialog.tsx`
 - [ ] `src/components/tours/components/AddPaymentDialog.tsx`
@@ -159,6 +163,7 @@ export function TourDetailDialog() {
 - [ ] `src/features/tours/components/TourConfirmationDialog.tsx`
 
 ### 需要檢查
+
 - [ ] `src/app/(main)/finance/payments/components/CreateReceiptDialog.tsx`
 - [ ] `src/app/(main)/finance/payments/components/BatchConfirmReceiptDialog.tsx`
 

@@ -14,15 +14,16 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = getSupabaseAdminClient()
-  const { error } = await supabase
-    .from('ref_airports')
-    .upsert({
+  const { error } = await supabase.from('ref_airports').upsert(
+    {
       iata_code,
       city_name_zh,
       country_code,
       usage_count: 1,
       is_favorite: false,
-    }, { onConflict: 'iata_code' })
+    },
+    { onConflict: 'iata_code' }
+  )
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })

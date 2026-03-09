@@ -24,26 +24,76 @@ const L = PREFERRED_FEATURES_LABELS
 const AVAILABLE_FEATURES: FeatureOption[] = [
   // 核心功能
   { id: 'calendar', label: L.FEATURE_CALENDAR, description: L.DESC_CALENDAR, category: L.CAT_CORE },
-  { id: 'workspace', label: L.FEATURE_WORKSPACE, description: L.DESC_WORKSPACE, category: L.CAT_CORE },
+  {
+    id: 'workspace',
+    label: L.FEATURE_WORKSPACE,
+    description: L.DESC_WORKSPACE,
+    category: L.CAT_CORE,
+  },
   { id: 'todos', label: L.FEATURE_TODOS, description: L.DESC_TODOS, category: L.CAT_CORE },
 
   // 業務功能
   { id: 'tours', label: L.FEATURE_TOURS, description: L.DESC_TOURS, category: L.CAT_BUSINESS },
   { id: 'orders', label: L.FEATURE_ORDERS, description: L.DESC_ORDERS, category: L.CAT_BUSINESS },
   { id: 'quotes', label: L.FEATURE_QUOTES, description: L.DESC_QUOTES, category: L.CAT_BUSINESS },
-  { id: 'customers', label: L.FEATURE_CUSTOMERS, description: L.DESC_CUSTOMERS, category: L.CAT_BUSINESS },
-  { id: 'business', label: L.FEATURE_BUSINESS, description: L.DESC_BUSINESS, category: L.CAT_BUSINESS },
-  { id: 'confirmations', label: L.FEATURE_CONFIRMATIONS, description: L.DESC_CONFIRMATIONS, category: L.CAT_BUSINESS },
-  { id: 'contracts', label: L.FEATURE_CONTRACTS, description: L.DESC_CONTRACTS, category: L.CAT_BUSINESS },
+  {
+    id: 'customers',
+    label: L.FEATURE_CUSTOMERS,
+    description: L.DESC_CUSTOMERS,
+    category: L.CAT_BUSINESS,
+  },
+  {
+    id: 'business',
+    label: L.FEATURE_BUSINESS,
+    description: L.DESC_BUSINESS,
+    category: L.CAT_BUSINESS,
+  },
+  {
+    id: 'confirmations',
+    label: L.FEATURE_CONFIRMATIONS,
+    description: L.DESC_CONFIRMATIONS,
+    category: L.CAT_BUSINESS,
+  },
+  {
+    id: 'contracts',
+    label: L.FEATURE_CONTRACTS,
+    description: L.DESC_CONTRACTS,
+    category: L.CAT_BUSINESS,
+  },
   { id: 'visas', label: L.FEATURE_VISAS, description: L.DESC_VISAS, category: L.CAT_BUSINESS },
 
   // 財務功能
   { id: 'finance', label: L.FEATURE_FINANCE, description: L.DESC_FINANCE, category: L.CAT_FINANCE },
-  { id: 'payments', label: L.FEATURE_PAYMENTS, description: L.DESC_PAYMENTS, category: L.CAT_FINANCE },
-  { id: 'requests', label: L.FEATURE_REQUESTS, description: L.DESC_REQUESTS, category: L.CAT_FINANCE },
-  { id: 'disbursement', label: L.FEATURE_DISBURSEMENT, description: L.DESC_DISBURSEMENT, category: L.CAT_FINANCE },
-  { id: 'accounting', label: L.FEATURE_ACCOUNTING, description: L.DESC_ACCOUNTING, category: L.CAT_FINANCE },
-  { id: 'vouchers', label: L.FEATURE_VOUCHERS, description: L.DESC_VOUCHERS, category: L.CAT_FINANCE },
+  {
+    id: 'payments',
+    label: L.FEATURE_PAYMENTS,
+    description: L.DESC_PAYMENTS,
+    category: L.CAT_FINANCE,
+  },
+  {
+    id: 'requests',
+    label: L.FEATURE_REQUESTS,
+    description: L.DESC_REQUESTS,
+    category: L.CAT_FINANCE,
+  },
+  {
+    id: 'disbursement',
+    label: L.FEATURE_DISBURSEMENT,
+    description: L.DESC_DISBURSEMENT,
+    category: L.CAT_FINANCE,
+  },
+  {
+    id: 'accounting',
+    label: L.FEATURE_ACCOUNTING,
+    description: L.DESC_ACCOUNTING,
+    category: L.CAT_FINANCE,
+  },
+  {
+    id: 'vouchers',
+    label: L.FEATURE_VOUCHERS,
+    description: L.DESC_VOUCHERS,
+    category: L.CAT_FINANCE,
+  },
   { id: 'reports', label: L.FEATURE_REPORTS, description: L.DESC_REPORTS, category: L.CAT_FINANCE },
 
   // 資料管理
@@ -51,7 +101,12 @@ const AVAILABLE_FEATURES: FeatureOption[] = [
 
   // 管理功能
   { id: 'hr', label: L.FEATURE_HR, description: L.DESC_HR, category: L.CAT_MANAGEMENT },
-  { id: 'settings', label: L.FEATURE_SETTINGS, description: L.DESC_SETTINGS, category: L.CAT_MANAGEMENT },
+  {
+    id: 'settings',
+    label: L.FEATURE_SETTINGS,
+    description: L.DESC_SETTINGS,
+    category: L.CAT_MANAGEMENT,
+  },
 ]
 
 export function PreferredFeaturesSettings() {
@@ -73,13 +128,16 @@ export function PreferredFeaturesSettings() {
     } else {
       // 沒有設定時，預設全部顯示（管理員）
       const userPermissions = user?.permissions || []
-      const isAdmin = userPermissions.includes('admin') || userPermissions.includes('super_admin') || userPermissions.includes('*')
+      const isAdmin =
+        userPermissions.includes('admin') ||
+        userPermissions.includes('super_admin') ||
+        userPermissions.includes('*')
       if (isAdmin) {
         setSelectedFeatures(AVAILABLE_FEATURES.map(f => f.id))
       } else {
-        const defaultFeatures = AVAILABLE_FEATURES
-          .filter(f => userPermissions.includes(f.id))
-          .map(f => f.id)
+        const defaultFeatures = AVAILABLE_FEATURES.filter(f => userPermissions.includes(f.id)).map(
+          f => f.id
+        )
         setSelectedFeatures(defaultFeatures)
       }
     }
@@ -95,24 +153,27 @@ export function PreferredFeaturesSettings() {
   }, [])
 
   // 實際儲存到資料庫（延遲執行）
-  const saveToDatabase = useCallback(async (features: string[]) => {
-    if (!user) return
+  const saveToDatabase = useCallback(
+    async (features: string[]) => {
+      if (!user) return
 
-    setIsSaving(true)
-    try {
-      // 更新資料庫
-      await updateEmployee(user.id, { preferred_features: features })
+      setIsSaving(true)
+      try {
+        // 更新資料庫
+        await updateEmployee(user.id, { preferred_features: features })
 
-      // 顯示儲存成功訊息
-      setShowSavedMessage(true)
-      setHasUnsavedChanges(false)
-      setTimeout(() => setShowSavedMessage(false), 2000)
-    } catch (error) {
-      logger.error('儲存失敗:', error)
-    } finally {
-      setIsSaving(false)
-    }
-  }, [user])
+        // 顯示儲存成功訊息
+        setShowSavedMessage(true)
+        setHasUnsavedChanges(false)
+        setTimeout(() => setShowSavedMessage(false), 2000)
+      } catch (error) {
+        logger.error('儲存失敗:', error)
+      } finally {
+        setIsSaving(false)
+      }
+    },
+    [user]
+  )
 
   // 處理點擊（立即更新 UI，延遲儲存資料庫）
   const handleToggleFeature = (featureId: string) => {
@@ -193,13 +254,16 @@ export function PreferredFeaturesSettings() {
   }
 
   // 按類別分組功能
-  const featuresByCategory = AVAILABLE_FEATURES.reduce((acc, feature) => {
-    if (!acc[feature.category]) {
-      acc[feature.category] = []
-    }
-    acc[feature.category].push(feature)
-    return acc
-  }, {} as Record<string, FeatureOption[]>)
+  const featuresByCategory = AVAILABLE_FEATURES.reduce(
+    (acc, feature) => {
+      if (!acc[feature.category]) {
+        acc[feature.category] = []
+      }
+      acc[feature.category].push(feature)
+      return acc
+    },
+    {} as Record<string, FeatureOption[]>
+  )
 
   const categories = Object.keys(featuresByCategory)
 
@@ -245,7 +309,9 @@ export function PreferredFeaturesSettings() {
             )}
             {hasUnsavedChanges && !isSaving && !showSavedMessage && (
               <div className="flex items-center gap-2 px-3 py-1.5 bg-status-warning-bg border border-status-warning/30 rounded-lg text-status-warning">
-                <span className="text-sm font-medium">{PREFERRED_FEATURES_LABELS.PENDING_SAVE}</span>
+                <span className="text-sm font-medium">
+                  {PREFERRED_FEATURES_LABELS.PENDING_SAVE}
+                </span>
               </div>
             )}
           </div>
@@ -269,17 +335,14 @@ export function PreferredFeaturesSettings() {
 
         {/* 快速操作按鈕 */}
         <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleResetToDefaults}
-            disabled={isSaving}
-          >
+          <Button variant="outline" size="sm" onClick={handleResetToDefaults} disabled={isSaving}>
             <Star size={14} className="mr-1" />
             {PREFERRED_FEATURES_LABELS.LABEL_1762}
           </Button>
           <span className="text-xs text-morandi-secondary">
-            {L.SELECTED_COUNT_PREFIX}{selectedFeatures.length}{L.SELECTED_COUNT_SUFFIX}
+            {L.SELECTED_COUNT_PREFIX}
+            {selectedFeatures.length}
+            {L.SELECTED_COUNT_SUFFIX}
           </span>
         </div>
 
@@ -320,7 +383,11 @@ export function PreferredFeaturesSettings() {
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-morandi-primary text-sm mb-0.5">
                           {feature.label}
-                          {!canSelect && <span className="text-xs ml-1 text-morandi-secondary">{L.NO_PERMISSION}</span>}
+                          {!canSelect && (
+                            <span className="text-xs ml-1 text-morandi-secondary">
+                              {L.NO_PERMISSION}
+                            </span>
+                          )}
                         </p>
                         <p className="text-xs text-morandi-secondary line-clamp-2">
                           {feature.description}

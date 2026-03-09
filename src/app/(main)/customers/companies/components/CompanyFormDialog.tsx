@@ -3,7 +3,6 @@
  * 企業客戶表單對話框（新增/編輯）
  */
 
-
 import { useState, useEffect } from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
@@ -154,7 +153,9 @@ export function CompanyFormDialog({
       <div className="space-y-6">
         {/* 基本資訊 */}
         <div className="space-y-4">
-          <h3 className="text-sm font-medium text-morandi-primary border-b pb-2">{L.section_basic}</h3>
+          <h3 className="text-sm font-medium text-morandi-primary border-b pb-2">
+            {L.section_basic}
+          </h3>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
@@ -235,7 +236,9 @@ export function CompanyFormDialog({
 
         {/* 付款資訊 */}
         <div className="space-y-4">
-          <h3 className="text-sm font-medium text-morandi-primary border-b pb-2">{L.section_payment}</h3>
+          <h3 className="text-sm font-medium text-morandi-primary border-b pb-2">
+            {L.section_payment}
+          </h3>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -301,7 +304,9 @@ export function CompanyFormDialog({
 
         {/* 發票資訊 */}
         <div className="space-y-4">
-          <h3 className="text-sm font-medium text-morandi-primary border-b pb-2">{L.section_invoice}</h3>
+          <h3 className="text-sm font-medium text-morandi-primary border-b pb-2">
+            {L.section_invoice}
+          </h3>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
@@ -309,9 +314,7 @@ export function CompanyFormDialog({
               <Input
                 id="invoice_title"
                 value={formData.invoice_title || ''}
-                onChange={e =>
-                  setFormData({ ...formData, invoice_title: e.target.value || null })
-                }
+                onChange={e => setFormData({ ...formData, invoice_title: e.target.value || null })}
                 placeholder={L.placeholder_invoice_title}
               />
             </div>
@@ -334,9 +337,7 @@ export function CompanyFormDialog({
                 id="invoice_email"
                 type="email"
                 value={formData.invoice_email || ''}
-                onChange={e =>
-                  setFormData({ ...formData, invoice_email: e.target.value || null })
-                }
+                onChange={e => setFormData({ ...formData, invoice_email: e.target.value || null })}
                 placeholder="invoice@company.com"
               />
             </div>

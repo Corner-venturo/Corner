@@ -43,7 +43,9 @@ async function checkQuotes() {
     console.log('  (無)')
   } else {
     quickQuotes.forEach(q => {
-      console.log(`  - ${q.code || '(無編號)'} | ${q.customer_name || '(無客戶)'} | ${q.created_at} | active: ${q.is_active}`)
+      console.log(
+        `  - ${q.code || '(無編號)'} | ${q.customer_name || '(無客戶)'} | ${q.created_at} | active: ${q.is_active}`
+      )
     })
   }
 
@@ -75,10 +77,12 @@ async function checkQuotes() {
   }
 }
 
-checkQuotes().then(() => {
-  console.log('\n✅ 檢查完成\n')
-  process.exit(0)
-}).catch(err => {
-  console.error('❌ 執行失敗:', err)
-  process.exit(1)
-})
+checkQuotes()
+  .then(() => {
+    console.log('\n✅ 檢查完成\n')
+    process.exit(0)
+  })
+  .catch(err => {
+    console.error('❌ 執行失敗:', err)
+    process.exit(1)
+  })

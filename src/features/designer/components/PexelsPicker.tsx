@@ -45,14 +45,14 @@ export function PexelsPicker({ onSelectImage }: PexelsPickerProps) {
     try {
       const result = await searchPexelsPhotos(query, {
         page: pageNum,
-        perPage: 80,  // Pexels 上限
+        perPage: 80, // Pexels 上限
         orientation: 'landscape',
       })
 
       if (pageNum === 1) {
         setPhotos(result.photos)
       } else {
-        setPhotos((prev) => [...prev, ...result.photos])
+        setPhotos(prev => [...prev, ...result.photos])
       }
 
       setTotalResults(result.total_results)
@@ -112,9 +112,7 @@ export function PexelsPicker({ onSelectImage }: PexelsPickerProps) {
           <ExternalLink size={24} className="text-morandi-secondary" />
         </div>
         <h3 className="font-medium text-morandi-primary mb-2">Pexels API 未設定</h3>
-        <p className="text-sm text-morandi-secondary mb-4">
-          {DESIGNER_LABELS.SETTINGS_9925}
-        </p>
+        <p className="text-sm text-morandi-secondary mb-4">{DESIGNER_LABELS.SETTINGS_9925}</p>
         <a
           href="https://www.pexels.com/api/"
           target="_blank"
@@ -136,7 +134,7 @@ export function PexelsPicker({ onSelectImage }: PexelsPickerProps) {
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-morandi-secondary" />
           <Input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={DESIGNER_LABELS.SEARCH_2404}
             className="pl-8 pr-8 h-8 text-sm"
@@ -195,15 +193,13 @@ export function PexelsPicker({ onSelectImage }: PexelsPickerProps) {
       )}
 
       {/* 錯誤訊息 */}
-      {error && (
-        <div className="p-3 bg-morandi-red/10 text-morandi-red text-sm">{error}</div>
-      )}
+      {error && <div className="p-3 bg-morandi-red/10 text-morandi-red text-sm">{error}</div>}
 
       {/* 圖片列表 */}
       <div className="flex-1 overflow-auto">
         {photos.length > 0 ? (
           <div className="grid grid-cols-2 gap-1 p-2">
-            {photos.map((photo) => (
+            {photos.map(photo => (
               <button
                 key={photo.id}
                 onClick={() => handleSelect(photo)}
@@ -224,9 +220,7 @@ export function PexelsPicker({ onSelectImage }: PexelsPickerProps) {
                 </div>
                 {/* 攝影師標註 */}
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <p className="text-[9px] text-white truncate">
-                    by {photo.photographer}
-                  </p>
+                  <p className="text-[9px] text-white truncate">by {photo.photographer}</p>
                 </div>
               </button>
             ))}

@@ -14,16 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  Check,
-  X,
-  Plus,
-  Trash2,
-  DollarSign,
-  Shield,
-  FileText,
-  AlertTriangle,
-} from 'lucide-react'
+import { Check, X, Plus, Trash2, DollarSign, Shield, FileText, AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
@@ -72,11 +63,7 @@ const getDefaultPricingDetails = (): PricingDetails => ({
   ],
 })
 
-export function PricingDetailsSection({
-  data,
-  updateField,
-  onChange,
-}: PricingDetailsSectionProps) {
+export function PricingDetailsSection({ data, updateField, onChange }: PricingDetailsSectionProps) {
   const pricingDetails = data.pricingDetails || getDefaultPricingDetails()
 
   // 更新 pricingDetails
@@ -146,8 +133,8 @@ export function PricingDetailsSection({
   const handleInsuranceChange = (amount: string) => {
     updatePricingDetails({ insurance_amount: amount })
     // 更新包含項目中的保險文字
-    const insuranceIndex = pricingDetails.included_items.findIndex(
-      item => item.text.includes(COMP_EDITOR_LABELS.旅遊責任險)
+    const insuranceIndex = pricingDetails.included_items.findIndex(item =>
+      item.text.includes(COMP_EDITOR_LABELS.旅遊責任險)
     )
     if (insuranceIndex !== -1) {
       const newItems = [...pricingDetails.included_items]
@@ -172,23 +159,21 @@ export function PricingDetailsSection({
           <DollarSign className="h-5 w-5 text-morandi-primary" />
           <div>
             <h3 className="font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_8607}</h3>
-            <p className="text-sm text-morandi-secondary">
-              {COMP_EDITOR_LABELS.LABEL_5515}
-            </p>
+            <p className="text-sm text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_5515}</p>
           </div>
         </div>
         <Switch
           checked={data.showPricingDetails || false}
-          onCheckedChange={(checked) => {
+          onCheckedChange={checked => {
             // 同時更新 showPricingDetails 和 pricingDetails.show_pricing_details
             const newPricingDetails = {
               ...pricingDetails,
-              show_pricing_details: checked
+              show_pricing_details: checked,
             }
             onChange({
               ...data,
               showPricingDetails: checked,
-              pricingDetails: newPricingDetails
+              pricingDetails: newPricingDetails,
             })
           }}
         />
@@ -224,12 +209,14 @@ export function PricingDetailsSection({
                     type="text"
                     placeholder={COMP_EDITOR_LABELS.輸入金額}
                     className="w-24"
-                    onChange={(e) => {
+                    onChange={e => {
                       const customAmount = e.target.value
                       handleInsuranceChange(customAmount)
                     }}
                   />
-                  <span className="text-sm text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_646}</span>
+                  <span className="text-sm text-morandi-secondary">
+                    {COMP_EDITOR_LABELS.LABEL_646}
+                  </span>
                 </div>
               )}
             </div>
@@ -270,7 +257,7 @@ export function PricingDetailsSection({
                   </button>
                   <Input
                     value={item.text}
-                    onChange={(e) => updateIncludedItem(index, { text: e.target.value })}
+                    onChange={e => updateIncludedItem(index, { text: e.target.value })}
                     placeholder={COMP_EDITOR_LABELS.輸入項目內容}
                     className="flex-1"
                   />
@@ -323,7 +310,7 @@ export function PricingDetailsSection({
                   </button>
                   <Input
                     value={item.text}
-                    onChange={(e) => updateExcludedItem(index, { text: e.target.value })}
+                    onChange={e => updateExcludedItem(index, { text: e.target.value })}
                     placeholder={COMP_EDITOR_LABELS.輸入項目內容}
                     className="flex-1"
                   />
@@ -367,7 +354,7 @@ export function PricingDetailsSection({
                   </span>
                   <Textarea
                     value={note}
-                    onChange={(e) => updateNote(index, e.target.value)}
+                    onChange={e => updateNote(index, e.target.value)}
                     placeholder={COMP_EDITOR_LABELS.輸入注意事項}
                     className="flex-1 min-h-[60px] resize-none"
                     rows={2}

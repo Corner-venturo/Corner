@@ -8,7 +8,11 @@ import PresetSheetsZhTW from '@univerjs/presets/preset-sheets-core/locales/zh-TW
 import type { Univer, IWorkbookData } from '@univerjs/core'
 import type { FUniver } from '@univerjs/core/facade'
 import { UniverBackToListPlugin } from '../plugins/back-to-list-plugin'
-import { UniverFileOperationsPlugin, setFileOperationCallbacks, clearFileOperationCallbacks } from '../plugins/file-operations-plugin'
+import {
+  UniverFileOperationsPlugin,
+  setFileOperationCallbacks,
+  clearFileOperationCallbacks,
+} from '../plugins/file-operations-plugin'
 import { OFFICE_LABELS } from '../constants/labels'
 
 // CSS
@@ -176,7 +180,7 @@ export function UniverSpreadsheet({
 
         // 監聽命令執行，觸發自動儲存
         if (autoSave) {
-          univerAPI.onCommandExecuted((command) => {
+          univerAPI.onCommandExecuted(command => {
             // 過濾掉不需要觸發儲存的命令（如選取、滾動等）
             const skipCommands = [
               'sheet.operation.set-selections',
@@ -188,7 +192,6 @@ export function UniverSpreadsheet({
             }
           })
         }
-
       } catch (error) {
         logger.error(OFFICE_LABELS.Univer_Spreadsheet_初始化失敗, error)
       }
@@ -215,11 +218,5 @@ export function UniverSpreadsheet({
     }
   }, [initialData, documentName, autoSave, triggerAutoSave])
 
-  return (
-    <div
-      ref={containerRef}
-      className={className}
-      style={{ width: '100%', height: '100%' }}
-    />
-  )
+  return <div ref={containerRef} className={className} style={{ width: '100%', height: '100%' }} />
 }

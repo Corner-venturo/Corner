@@ -5,7 +5,6 @@
  * 整合工具箱、畫布和預覽功能
  */
 
-
 import { useMemo } from 'react'
 import { BlockCanvas } from './BlockCanvas'
 import { BlockToolbox } from './BlockToolbox'
@@ -43,7 +42,7 @@ export function BlockEditor({
   // 使用 hook 管理狀態
   const editor = useBlockEditor({
     initialBlocks: resolvedInitialBlocks,
-    onBlocksChange: (blocks) => {
+    onBlocksChange: blocks => {
       onBlocksChange?.(blocks)
       if (onDataChange) {
         const data = blocksToTourData(blocks)
@@ -71,10 +70,7 @@ export function BlockEditor({
       {showToolbox && (
         <div className="w-48 shrink-0">
           <div className="sticky top-4">
-            <BlockToolbox
-              blocks={editor.blocks}
-              onAddBlock={(type) => editor.addBlock(type)}
-            />
+            <BlockToolbox blocks={editor.blocks} onAddBlock={type => editor.addBlock(type)} />
           </div>
         </div>
       )}

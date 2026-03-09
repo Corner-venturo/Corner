@@ -68,12 +68,12 @@ export function useChannelSidebarState() {
     setIsCreatingDm(true)
     try {
       const dmChannel = await getOrCreateDmChannel(memberId)
-      
+
       // 🔧 修復：DM 建立後刷新頻道列表，確保新頻道出現在 sidebar
       if (dmChannel && currentWorkspace) {
         await loadChannels(currentWorkspace.id)
       }
-      
+
       return dmChannel as Channel | null
     } catch (error) {
       logger.error('Failed to create or get DM channel:', error)
@@ -87,9 +87,7 @@ export function useChannelSidebarState() {
   // 檢查是否已加入頻道
   const checkIsMember = (channelId: string): boolean => {
     if (allChannelMembers.length > 0) {
-      return allChannelMembers.some(
-        m => m.channel_id === channelId && m.employee_id === user?.id
-      )
+      return allChannelMembers.some(m => m.channel_id === channelId && m.employee_id === user?.id)
     }
     const members = channelMembers[channelId] || []
     return members.some(m => m.employeeId === user?.id)
@@ -160,10 +158,13 @@ export function useChannelSidebarState() {
     const channel = channels.find((ch: Channel) => ch.id === channelId)
     if (!channel) return
 
-    const confirmed = await confirm(`確定要封存 #${channel.name} 頻道嗎？\n封存後頻道將移至「封存」區域。`, {
-      title: COMP_WORKSPACE_LABELS.封存頻道,
-      type: 'warning',
-    })
+    const confirmed = await confirm(
+      `確定要封存 #${channel.name} 頻道嗎？\n封存後頻道將移至「封存」區域。`,
+      {
+        title: COMP_WORKSPACE_LABELS.封存頻道,
+        type: 'warning',
+      }
+    )
     if (!confirmed) return
 
     try {

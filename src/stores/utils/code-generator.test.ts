@@ -11,7 +11,12 @@ import {
 // Mock logger
 vi.mock('@/lib/utils/logger', () => ({ logger: { log: vi.fn() } }))
 
-const makeEntity = (code: string) => ({ id: crypto.randomUUID(), code, created_at: '', updated_at: '' })
+const makeEntity = (code: string) => ({
+  id: crypto.randomUUID(),
+  code,
+  created_at: '',
+  updated_at: '',
+})
 
 describe('generateTourCode', () => {
   it('generates first tour code for a date', () => {

@@ -71,10 +71,7 @@ describe('tour-stats.service', () => {
         id: `member-${i}`,
         total_payable: 15000,
       }))
-      const totalAmount = members.reduce(
-        (sum, m) => sum + (m.total_payable || 0),
-        0
-      )
+      const totalAmount = members.reduce((sum, m) => sum + (m.total_payable || 0), 0)
       expect(members.length).toBe(50)
       expect(totalAmount).toBe(750000)
     })

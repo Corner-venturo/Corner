@@ -31,9 +31,7 @@ import { errorResponse, ErrorCode } from './response'
 /**
  * 驗證結果型別
  */
-type ValidationResult<T> =
-  | { success: true; data: T }
-  | { success: false; error: NextResponse }
+type ValidationResult<T> = { success: true; data: T } | { success: false; error: NextResponse }
 
 /**
  * 格式化 Zod 錯誤訊息
@@ -71,11 +69,7 @@ export async function validateBody<T>(
     if (!result.success) {
       return {
         success: false,
-        error: errorResponse(
-          formatZodError(result.error),
-          400,
-          ErrorCode.VALIDATION_ERROR
-        ),
+        error: errorResponse(formatZodError(result.error), 400, ErrorCode.VALIDATION_ERROR),
       }
     }
 
@@ -83,11 +77,7 @@ export async function validateBody<T>(
   } catch (err) {
     return {
       success: false,
-      error: errorResponse(
-        '無法解析請求內容',
-        400,
-        ErrorCode.INVALID_FORMAT
-      ),
+      error: errorResponse('無法解析請求內容', 400, ErrorCode.INVALID_FORMAT),
     }
   }
 }
@@ -107,10 +97,7 @@ export async function validateBody<T>(
  * const result = validateQuery(request, QuerySchema)
  * if (!result.success) return result.error
  */
-export function validateQuery<T>(
-  request: NextRequest,
-  schema: ZodSchema<T>
-): ValidationResult<T> {
+export function validateQuery<T>(request: NextRequest, schema: ZodSchema<T>): ValidationResult<T> {
   const searchParams = request.nextUrl.searchParams
   const params: Record<string, string | string[]> = {}
 
@@ -129,11 +116,7 @@ export function validateQuery<T>(
   if (!result.success) {
     return {
       success: false,
-      error: errorResponse(
-        formatZodError(result.error),
-        400,
-        ErrorCode.VALIDATION_ERROR
-      ),
+      error: errorResponse(formatZodError(result.error), 400, ErrorCode.VALIDATION_ERROR),
     }
   }
 
@@ -163,11 +146,7 @@ export function validateParams<T>(
   if (!result.success) {
     return {
       success: false,
-      error: errorResponse(
-        formatZodError(result.error),
-        400,
-        ErrorCode.VALIDATION_ERROR
-      ),
+      error: errorResponse(formatZodError(result.error), 400, ErrorCode.VALIDATION_ERROR),
     }
   }
 

@@ -9,7 +9,13 @@ import { AssignmentSectionProps } from './types'
 import { useEmployeesSlim } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { DatePicker } from '@/components/ui/date-picker'
-import { FORM_LABELS, COMMON_LABELS, PLACEHOLDER_LABELS, TOOLTIP_LABELS, TODO_STATUS_LABELS } from '@/features/todos/constants/labels'
+import {
+  FORM_LABELS,
+  COMMON_LABELS,
+  PLACEHOLDER_LABELS,
+  TOOLTIP_LABELS,
+  TODO_STATUS_LABELS,
+} from '@/features/todos/constants/labels'
 
 export function AssignmentSection({ todo, onUpdate, readOnly = false }: AssignmentSectionProps) {
   const router = useRouter()
@@ -22,10 +28,17 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
     if (todo.assignee) {
       // 優先檢查當前登入用戶，再檢查員工列表
       if (user?.id === todo.assignee) {
-        setAssigneeName(user.display_name || user.chinese_name || user.personal_info?.email || COMMON_LABELS.unknownEmployee)
+        setAssigneeName(
+          user.display_name ||
+            user.chinese_name ||
+            user.personal_info?.email ||
+            COMMON_LABELS.unknownEmployee
+        )
       } else {
         const assignee = employees.find(e => e.id === todo.assignee)
-        setAssigneeName(assignee?.display_name || assignee?.chinese_name || COMMON_LABELS.unknownEmployee)
+        setAssigneeName(
+          assignee?.display_name || assignee?.chinese_name || COMMON_LABELS.unknownEmployee
+        )
       }
     } else {
       setAssigneeName('')
@@ -51,7 +64,9 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
         {assigneeName && (
           <div className="flex items-center gap-3 pb-3 border-b border-border">
             <UserCheck size={18} className="text-morandi-gold" />
-            <span className="text-sm text-morandi-secondary min-w-[60px]">{FORM_LABELS.assignTo}</span>
+            <span className="text-sm text-morandi-secondary min-w-[60px]">
+              {FORM_LABELS.assignTo}
+            </span>
             <div className="flex items-center gap-2 px-3 py-1.5 bg-morandi-gold/10 border border-morandi-gold/30 rounded-lg">
               <span className="text-sm font-medium text-morandi-gold">{assigneeName}</span>
               {!readOnly && (
@@ -109,7 +124,8 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
                 todo.status === 'pending'
                   ? 'bg-morandi-muted text-white shadow-md'
                   : 'bg-morandi-container/30 border border-morandi-muted/20 text-morandi-secondary',
-                !readOnly && 'hover:bg-morandi-muted/10 hover:border-morandi-muted/40 hover:text-morandi-muted',
+                !readOnly &&
+                  'hover:bg-morandi-muted/10 hover:border-morandi-muted/40 hover:text-morandi-muted',
                 readOnly && 'cursor-default'
               )}
             >
@@ -123,7 +139,8 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
                 todo.status === 'in_progress'
                   ? 'bg-morandi-gold text-white shadow-md'
                   : 'bg-morandi-container/30 border border-morandi-gold/20 text-morandi-secondary',
-                !readOnly && 'hover:bg-morandi-gold/10 hover:border-morandi-gold/40 hover:text-morandi-gold',
+                !readOnly &&
+                  'hover:bg-morandi-gold/10 hover:border-morandi-gold/40 hover:text-morandi-gold',
                 readOnly && 'cursor-default'
               )}
             >
@@ -137,7 +154,8 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
                 todo.status === 'completed'
                   ? 'bg-morandi-green text-white shadow-md'
                   : 'bg-morandi-container/30 border border-morandi-green/20 text-morandi-secondary',
-                !readOnly && 'hover:bg-morandi-green/10 hover:border-morandi-green/40 hover:text-morandi-green',
+                !readOnly &&
+                  'hover:bg-morandi-green/10 hover:border-morandi-green/40 hover:text-morandi-green',
                 readOnly && 'cursor-default'
               )}
             >
@@ -151,7 +169,8 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
                 todo.status === 'cancelled'
                   ? 'bg-morandi-red text-white shadow-md'
                   : 'bg-morandi-container/30 border border-morandi-red/20 text-morandi-secondary',
-                !readOnly && 'hover:bg-morandi-red/10 hover:border-morandi-red/40 hover:text-morandi-red',
+                !readOnly &&
+                  'hover:bg-morandi-red/10 hover:border-morandi-red/40 hover:text-morandi-red',
                 readOnly && 'cursor-default'
               )}
             >

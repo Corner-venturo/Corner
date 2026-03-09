@@ -29,7 +29,7 @@ async function checkIsAdmin(employeeId: string): Promise<boolean> {
   if (error || !data) return false
 
   const roles = data.roles as string[] | null
-  return roles?.some((r) => r === 'admin' || r === 'super_admin') ?? false
+  return roles?.some(r => r === 'admin' || r === 'super_admin') ?? false
 }
 
 export async function POST(request: NextRequest) {

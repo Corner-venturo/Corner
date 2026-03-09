@@ -4,7 +4,7 @@ export const LABELS = {
   EDIT_CONFIRMATION: '編輯確認單',
   CONFIRMATIONS_MANAGEMENT: '確認單管理',
   HOME: '首頁',
-  
+
   // 按钮文字
   IMPORT_PNR: '匯入 PNR',
   PRINT: '列印',
@@ -21,14 +21,14 @@ export const LABELS = {
   SEARCH: '搜尋',
   CONFIRM: '確認',
   CLOSE: '關閉',
-  
+
   // 状态和消息
   LOADING: '載入中...',
   LOADING_SHORT: '載入中',
   PLEASE_WAIT: '請等待...',
   NOT_FOUND_TITLE: '找不到該確認單',
   NOT_FOUND_DESCRIPTION: '您要找的確認單可能已被刪除或不存在',
-  
+
   // 表单验证和提示
   BOOKING_NUMBER_REQUIRED: '請填寫訂單編號',
   CONFIRMATION_UPDATED: '確認單已更新',
@@ -37,10 +37,10 @@ export const LABELS = {
   PNR_PARSE_SUCCESS: 'PNR 解析成功！',
   PNR_FORMAT_ERROR: 'PNR 格式錯誤，請檢查內容',
   PASTE_PNR_CONTENT: '請貼上 PNR 內容',
-  
+
   // 航班相关
   ECONOMY_CLASS: '經濟',
-  
+
   // 表单标签
   BOOKING_NUMBER: '訂單編號 *',
   CONFIRMATION_NUMBER: '飯店確認編號',
@@ -61,7 +61,7 @@ export const LABELS = {
   GUEST_CAPACITY: '入住人數',
   MEAL_INFO: '餐點資訊',
   IMPORTANT_NOTES: '重要城市資訊 / 備註',
-  
+
   // PrintableConfirmation.tsx
   FLIGHT_CONFIRMATION_TITLE: '機票確認單',
   ACCOMMODATION_CONFIRMATION_TITLE: '住宿確認單',
@@ -70,7 +70,7 @@ export const LABELS = {
   REMARKS: '備註',
   CORNER_TRAVEL: '', // deprecated: 改從 workspace 讀取
   CORNER_TRAVEL_COMPANY: '', // deprecated: 改從 workspace 讀取
-  
+
   // Flight related
   DISCLAIMER: '**** 此文件資訊僅提供參考, 實際資訊以航空公司及相關旅遊供應商為準 ****',
   PASSENGER_NAME: '旅客姓名',
@@ -86,7 +86,7 @@ export const LABELS = {
   TICKET_NUMBER: '機票號碼',
   AIRLINE_CONTACT: '航空公司確認電話',
   IMPORTANT_INFO: '重要資訊',
-  
+
   // Accommodation related
   CHECK_IN: '入住',
   CHECK_OUT: '退房',
@@ -98,11 +98,11 @@ export const LABELS = {
   GUEST_NAME_COLON: '旅客姓名：',
   GUEST_CAPACITY_COLON: '入住人數：',
   MEAL_CONTENT: '餐點內容',
-  
+
   // AccommodationForm.tsx additional labels
   ADD_MEAL: '+ 新增餐點',
   SELECT_DATE_PLACEHOLDER: '選擇日期',
-  
+
   // FlightForm.tsx labels
   PASSENGER_INFO: '旅客資訊',
   EN_NAME: '英文姓名',
@@ -245,6 +245,7 @@ export const FLIGHT_FORM_LABELS = {
   CHECKED_DETAIL: '託運行李詳情',
   CHECKED_DETAIL_PLACEHOLDER: '每人 1 件，每件 23 公斤 每件尺寸 (長+寬+高) 上限 158 公分',
   PERSONAL_ITEM_DETAIL: '個人物品詳情',
-  PERSONAL_ITEM_DETAIL_PLACEHOLDER: '每人 1 件 請聯繫航空公司以進一步了解行李政策 必須置於您前面座位的下方。',
+  PERSONAL_ITEM_DETAIL_PLACEHOLDER:
+    '每人 1 件 請聯繫航空公司以進一步了解行李政策 必須置於您前面座位的下方。',
   ADD_BAGGAGE_DETAIL: '+ 新增行李詳細資訊',
 }

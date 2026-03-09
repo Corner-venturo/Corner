@@ -33,7 +33,7 @@ const parsePrice = (value: string): string => {
 
 // 從報價單的 TierPricing 轉換為行程表的 PriceTier
 const convertFromQuoteTierPricings = (tierPricings: TierPricing[]): PriceTier[] => {
-  return tierPricings.map((tier) => ({
+  return tierPricings.map(tier => ({
     label: `${tier.participant_count}人成團`,
     sublabel: COMP_EDITOR_LABELS.每人,
     price: formatPrice(String(tier.selling_prices?.adult || 0)),
@@ -118,10 +118,10 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
         <div className="flex items-center gap-3">
           <Users className="h-5 w-5 text-morandi-primary" />
           <div>
-            <h3 className="font-medium text-morandi-primary">{COMP_EDITOR_LABELS.多人數價格方案}</h3>
-            <p className="text-sm text-morandi-secondary">
-              {COMP_EDITOR_LABELS.LABEL_6795}
-            </p>
+            <h3 className="font-medium text-morandi-primary">
+              {COMP_EDITOR_LABELS.多人數價格方案}
+            </h3>
+            <p className="text-sm text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_6795}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -140,7 +140,7 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
           )}
           <Switch
             checked={data.showPriceTiers || false}
-            onCheckedChange={(checked) => {
+            onCheckedChange={checked => {
               onChange({
                 ...data,
                 showPriceTiers: checked,
@@ -155,12 +155,14 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
       {data.showPriceTiers && (
         <div className="space-y-4">
           {/* 價格方案列表 - 根據數量自適應 */}
-          <div className={cn(
-            'grid gap-4',
-            priceTiers.length === 1 && 'grid-cols-1',
-            priceTiers.length === 2 && 'grid-cols-1 md:grid-cols-2',
-            priceTiers.length >= 3 && 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-          )}>
+          <div
+            className={cn(
+              'grid gap-4',
+              priceTiers.length === 1 && 'grid-cols-1',
+              priceTiers.length === 2 && 'grid-cols-1 md:grid-cols-2',
+              priceTiers.length >= 3 && 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+            )}
+          >
             {priceTiers.map((tier, index) => (
               <div
                 key={index}
@@ -188,17 +190,19 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
 
                 {/* 方案名稱 */}
                 <div>
-                  <Label className="text-xs text-morandi-primary">{COMP_EDITOR_LABELS.方案名稱}</Label>
+                  <Label className="text-xs text-morandi-primary">
+                    {COMP_EDITOR_LABELS.方案名稱}
+                  </Label>
                   <div className="flex gap-2 mt-1">
                     <Input
                       value={tier.label}
-                      onChange={(e) => updatePriceTier(index, { label: e.target.value })}
+                      onChange={e => updatePriceTier(index, { label: e.target.value })}
                       placeholder={COMP_EDITOR_LABELS.如_4人包團}
                       className="flex-1"
                     />
                     <Input
                       value={tier.sublabel || ''}
-                      onChange={(e) => updatePriceTier(index, { sublabel: e.target.value })}
+                      onChange={e => updatePriceTier(index, { sublabel: e.target.value })}
                       placeholder={COMP_EDITOR_LABELS.每人}
                       className="w-20"
                     />
@@ -212,12 +216,12 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
                     <span className="text-sm text-morandi-secondary">NT$</span>
                     <Input
                       value={tier.price}
-                      onChange={(e) => {
+                      onChange={e => {
                         // 只允許數字和逗號
                         const value = e.target.value.replace(/[^\d,]/g, '')
                         updatePriceTier(index, { price: value })
                       }}
-                      onBlur={(e) => {
+                      onBlur={e => {
                         // 失去焦點時格式化
                         const formatted = formatPrice(tier.price)
                         if (formatted !== tier.price) {
@@ -229,7 +233,7 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
                     />
                     <Input
                       value={tier.priceNote || ''}
-                      onChange={(e) => updatePriceTier(index, { priceNote: e.target.value })}
+                      onChange={e => updatePriceTier(index, { priceNote: e.target.value })}
                       placeholder={COMP_EDITOR_LABELS.起}
                       className="w-16"
                     />
@@ -238,10 +242,12 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
 
                 {/* 加購說明 */}
                 <div>
-                  <Label className="text-xs text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_9399}</Label>
+                  <Label className="text-xs text-morandi-primary">
+                    {COMP_EDITOR_LABELS.LABEL_9399}
+                  </Label>
                   <Input
                     value={tier.addon || ''}
-                    onChange={(e) => updatePriceTier(index, { addon: e.target.value })}
+                    onChange={e => updatePriceTier(index, { addon: e.target.value })}
                     placeholder={COMP_EDITOR_LABELS.如_加購1日包車_每人_NT_900}
                     className="mt-1"
                   />

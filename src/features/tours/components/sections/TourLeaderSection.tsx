@@ -18,7 +18,11 @@ interface TourLeaderSectionProps {
   coverStyle?: CoverStyleType
 }
 
-export function TourLeaderSection({ data, viewMode, coverStyle = 'original' }: TourLeaderSectionProps) {
+export function TourLeaderSection({
+  data,
+  viewMode,
+  coverStyle = 'original',
+}: TourLeaderSectionProps) {
   // Art 風格使用專用組件
   if (coverStyle === 'art') {
     return <TourLeaderSectionArt data={data} viewMode={viewMode} />
@@ -35,7 +39,10 @@ export function TourLeaderSection({ data, viewMode, coverStyle = 'original' }: T
   }
 
   return (
-    <section id="contact" className={viewMode === 'mobile' ? 'bg-card pt-6 pb-8' : 'bg-card pt-8 pb-16'}>
+    <section
+      id="contact"
+      className={viewMode === 'mobile' ? 'bg-card pt-6 pb-8' : 'bg-card pt-8 pb-16'}
+    >
       <div className={viewMode === 'mobile' ? 'px-4' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -49,7 +56,13 @@ export function TourLeaderSection({ data, viewMode, coverStyle = 'original' }: T
           />
         </motion.div>
 
-        <div className={viewMode === 'mobile' ? 'space-y-4' : 'grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto'}>
+        <div
+          className={
+            viewMode === 'mobile'
+              ? 'space-y-4'
+              : 'grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto'
+          }
+        >
           {/* 領隊資訊 */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -70,37 +83,74 @@ export function TourLeaderSection({ data, viewMode, coverStyle = 'original' }: T
             >
               {TOURS_LABELS.LABEL_6841}
             </h3>
-            <div className={viewMode === 'mobile' ? 'flex items-start gap-4' : 'flex items-start gap-6'}>
+            <div
+              className={
+                viewMode === 'mobile' ? 'flex items-start gap-4' : 'flex items-start gap-6'
+              }
+            >
               {/* 領隊頭像 */}
               {data.leader?.photo ? (
-                <img src={data.leader.photo}
+                <img
+                  src={data.leader.photo}
                   alt={data.leader?.name || 'Tour Leader'}
-                  className={viewMode === 'mobile' ? 'w-16 h-16 rounded-full object-cover flex-shrink-0 border-2 border-morandi-container' : 'w-20 h-20 rounded-full object-cover flex-shrink-0 border-2 border-morandi-container'}
+                  className={
+                    viewMode === 'mobile'
+                      ? 'w-16 h-16 rounded-full object-cover flex-shrink-0 border-2 border-morandi-container'
+                      : 'w-20 h-20 rounded-full object-cover flex-shrink-0 border-2 border-morandi-container'
+                  }
                 />
               ) : (
                 <div
-                  className={viewMode === 'mobile' ? 'w-16 h-16 rounded-full bg-morandi-container/30 flex items-center justify-center flex-shrink-0' : 'w-20 h-20 rounded-full bg-morandi-container/30 flex items-center justify-center flex-shrink-0'}
+                  className={
+                    viewMode === 'mobile'
+                      ? 'w-16 h-16 rounded-full bg-morandi-container/30 flex items-center justify-center flex-shrink-0'
+                      : 'w-20 h-20 rounded-full bg-morandi-container/30 flex items-center justify-center flex-shrink-0'
+                  }
                 >
-                  <User className={viewMode === 'mobile' ? 'w-8 h-8 text-morandi-secondary' : 'w-10 h-10 text-morandi-secondary'} />
+                  <User
+                    className={
+                      viewMode === 'mobile'
+                        ? 'w-8 h-8 text-morandi-secondary'
+                        : 'w-10 h-10 text-morandi-secondary'
+                    }
+                  />
                 </div>
               )}
               <div className={viewMode === 'mobile' ? 'space-y-3 flex-1' : 'space-y-4 flex-1'}>
                 <div>
                   <p className="text-xs text-morandi-secondary mb-1">{TOURS_LABELS.LABEL_9854}</p>
-                  <p className={viewMode === 'mobile' ? 'text-base font-semibold text-morandi-primary' : 'text-lg font-semibold text-morandi-primary'}>
+                  <p
+                    className={
+                      viewMode === 'mobile'
+                        ? 'text-base font-semibold text-morandi-primary'
+                        : 'text-lg font-semibold text-morandi-primary'
+                    }
+                  >
                     {data.leader?.name || '待定'}
                     {data.leader?.englishName && ` ${data.leader.englishName}`}
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-morandi-secondary mb-1">{TOURS_LABELS.LABEL_4428}</p>
-                  <p className={viewMode === 'mobile' ? 'text-base font-semibold text-morandi-primary' : 'text-lg font-semibold text-morandi-primary'}>
+                  <p
+                    className={
+                      viewMode === 'mobile'
+                        ? 'text-base font-semibold text-morandi-primary'
+                        : 'text-lg font-semibold text-morandi-primary'
+                    }
+                  >
                     {data.leader?.domesticPhone || '待定'}
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-morandi-secondary mb-1">{TOURS_LABELS.LABEL_2358}</p>
-                  <p className={viewMode === 'mobile' ? 'text-base font-semibold text-morandi-primary' : 'text-lg font-semibold text-morandi-primary'}>
+                  <p
+                    className={
+                      viewMode === 'mobile'
+                        ? 'text-base font-semibold text-morandi-primary'
+                        : 'text-lg font-semibold text-morandi-primary'
+                    }
+                  >
                     {data.leader?.overseasPhone || '待定'}
                   </p>
                 </div>
@@ -131,13 +181,25 @@ export function TourLeaderSection({ data, viewMode, coverStyle = 'original' }: T
             <div className={viewMode === 'mobile' ? 'space-y-3' : 'space-y-4'}>
               <div>
                 <p className="text-xs text-morandi-secondary mb-1">{TOURS_LABELS.LABEL_9036}</p>
-                <p className={viewMode === 'mobile' ? 'text-lg font-semibold text-status-info' : 'text-xl font-semibold text-status-info'}>
+                <p
+                  className={
+                    viewMode === 'mobile'
+                      ? 'text-lg font-semibold text-status-info'
+                      : 'text-xl font-semibold text-status-info'
+                  }
+                >
                   {data.meetingInfo?.time || '待定'}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-morandi-secondary mb-1">{TOURS_LABELS.LABEL_863}</p>
-                <p className={viewMode === 'mobile' ? 'text-base font-semibold text-morandi-primary' : 'text-lg font-semibold text-morandi-primary'}>
+                <p
+                  className={
+                    viewMode === 'mobile'
+                      ? 'text-base font-semibold text-morandi-primary'
+                      : 'text-lg font-semibold text-morandi-primary'
+                  }
+                >
                   {data.meetingInfo?.location || '待定'}
                 </p>
               </div>

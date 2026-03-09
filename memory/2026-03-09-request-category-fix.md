@@ -13,11 +13,13 @@
 **檔案**: `src/features/finance/requests/hooks/useRequestForm.ts`
 
 **Before**:
+
 ```typescript
 category: REQUEST_FORM_HOOK_LABELS.OTHER as PaymentItemCategory, // Default category
 ```
 
 **After**:
+
 ```typescript
 category: '' as PaymentItemCategory, // 不預設類別，由用戶選擇
 ```
@@ -29,11 +31,13 @@ category: '' as PaymentItemCategory, // 不預設類別，由用戶選擇
 **檔案**: `src/features/finance/requests/hooks/useRequestForm.ts` (addNewEmptyItem 函數)
 
 **Before**:
+
 ```typescript
 category: REQUEST_FORM_HOOK_LABELS.OTHER as PaymentItemCategory,
 ```
 
 **After**:
+
 ```typescript
 category: '' as PaymentItemCategory, // 不預設類別，由用戶選擇
 ```
@@ -45,11 +49,15 @@ category: '' as PaymentItemCategory, // 不預設類別，由用戶選擇
 **檔案**: `src/features/finance/requests/components/AddRequestDialog.tsx`
 
 **Before**:
+
 ```typescript
-const [batchCategory, setBatchCategory] = useState<PaymentItemCategory>(REQUEST_TYPE_LABELS.CAT_OTHER as PaymentItemCategory)
+const [batchCategory, setBatchCategory] = useState<PaymentItemCategory>(
+  REQUEST_TYPE_LABELS.CAT_OTHER as PaymentItemCategory
+)
 ```
 
 **After**:
+
 ```typescript
 const [batchCategory, setBatchCategory] = useState<PaymentItemCategory>('' as PaymentItemCategory) // 不預設類別，由用戶選擇
 ```
@@ -59,11 +67,13 @@ const [batchCategory, setBatchCategory] = useState<PaymentItemCategory>('' as Pa
 ### 4️⃣ 加上 Placeholder 提示
 
 **批量請款** (`AddRequestDialog.tsx`):
+
 ```typescript
 <SelectValue placeholder="請選擇類別" />
 ```
 
 **項目清單** (`RequestItemList.tsx`):
+
 ```typescript
 <SelectValue placeholder="類別" />
 ```

@@ -4,7 +4,6 @@
  * 可勾選要匯入的餐點（含早餐選項）
  */
 
-
 import React, { useState, useMemo, useEffect } from 'react'
 import {
   Dialog,
@@ -17,7 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Loader2, UtensilsCrossed, Sun, Cloud, Moon, X, Download } from 'lucide-react'
 import { CostItem } from '../types'
-import { IMPORT_ACTIVITIES_DIALOG_LABELS, IMPORT_MEALS_DIALOG_LABELS } from '../constants/labels';
+import { IMPORT_ACTIVITIES_DIALOG_LABELS, IMPORT_MEALS_DIALOG_LABELS } from '../constants/labels'
 import { QUOTE_COMPONENT_LABELS } from '../constants/labels'
 
 interface MealItem {
@@ -34,12 +33,7 @@ interface ImportMealsDialogProps {
   onImport: (items: CostItem[]) => void
 }
 
-export function ImportMealsDialog({
-  isOpen,
-  onClose,
-  meals,
-  onImport,
-}: ImportMealsDialogProps) {
+export function ImportMealsDialog({ isOpen, onClose, meals, onImport }: ImportMealsDialogProps) {
   const [selectedMeals, setSelectedMeals] = useState<Set<string>>(new Set())
   const [includeBreakfast, setIncludeBreakfast] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -141,9 +135,7 @@ export function ImportMealsDialog({
             <UtensilsCrossed className="w-5 h-5 text-[var(--morandi-gold)]" />
             {IMPORT_MEALS_DIALOG_LABELS.LABEL_6478}
           </DialogTitle>
-          <DialogDescription>
-            {IMPORT_MEALS_DIALOG_LABELS.SELECT_4642}
-          </DialogDescription>
+          <DialogDescription>{IMPORT_MEALS_DIALOG_LABELS.SELECT_4642}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 mt-2">
@@ -152,7 +144,7 @@ export function ImportMealsDialog({
             <label className="flex items-center gap-2 text-sm">
               <Checkbox
                 checked={includeBreakfast}
-                onCheckedChange={(checked) => setIncludeBreakfast(checked === true)}
+                onCheckedChange={checked => setIncludeBreakfast(checked === true)}
               />
               <span>{IMPORT_MEALS_DIALOG_LABELS.LABEL_9424}</span>
             </label>
@@ -160,7 +152,9 @@ export function ImportMealsDialog({
               onClick={handleSelectAll}
               className="text-xs text-[var(--morandi-gold)] hover:underline"
             >
-              {selectedMeals.size === filteredMeals.length ? IMPORT_ACTIVITIES_DIALOG_LABELS.取消全選 : IMPORT_ACTIVITIES_DIALOG_LABELS.全選}
+              {selectedMeals.size === filteredMeals.length
+                ? IMPORT_ACTIVITIES_DIALOG_LABELS.取消全選
+                : IMPORT_ACTIVITIES_DIALOG_LABELS.全選}
             </button>
           </div>
 
@@ -192,9 +186,7 @@ export function ImportMealsDialog({
                           <div className="text-sm font-medium text-[var(--morandi-text)] truncate">
                             {meal.name}
                           </div>
-                          <div className="text-xs text-[var(--morandi-secondary)]">
-                            {meal.type}
-                          </div>
+                          <div className="text-xs text-[var(--morandi-secondary)]">{meal.type}</div>
                         </div>
                       </button>
                     )
@@ -223,11 +215,7 @@ export function ImportMealsDialog({
               disabled={selectedMeals.size === 0 || isLoading}
               className="flex-1 bg-[var(--morandi-gold)] hover:bg-[var(--morandi-gold-hover)] text-white gap-1"
             >
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Download size={16} />
-              )}
+              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download size={16} />}
               匯入 {selectedMeals.size > 0 ? `(${selectedMeals.size})` : ''}
             </Button>
           </div>

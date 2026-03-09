@@ -5,7 +5,6 @@
  * 包含較少使用的區塊編輯器
  */
 
-
 import { useCallback } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -38,15 +37,21 @@ export function FocusCardsBlockEditor({ data, onChange }: FocusCardsBlockEditorP
     onChange({ focusCards: [...cards, { title: '', src: '' }] })
   }, [cards, onChange])
 
-  const updateCard = useCallback((index: number, field: 'title' | 'src', value: string) => {
-    const newCards = [...cards]
-    newCards[index] = { ...newCards[index], [field]: value }
-    onChange({ focusCards: newCards })
-  }, [cards, onChange])
+  const updateCard = useCallback(
+    (index: number, field: 'title' | 'src', value: string) => {
+      const newCards = [...cards]
+      newCards[index] = { ...newCards[index], [field]: value }
+      onChange({ focusCards: newCards })
+    },
+    [cards, onChange]
+  )
 
-  const removeCard = useCallback((index: number) => {
-    onChange({ focusCards: cards.filter((_, i) => i !== index) })
-  }, [cards, onChange])
+  const removeCard = useCallback(
+    (index: number) => {
+      onChange({ focusCards: cards.filter((_, i) => i !== index) })
+    },
+    [cards, onChange]
+  )
 
   return (
     <div className="space-y-2">
@@ -67,7 +72,13 @@ export function FocusCardsBlockEditor({ data, onChange }: FocusCardsBlockEditorP
               className="h-8 text-sm"
             />
           </div>
-          <Button variant="ghost" size="icon" aria-label="Delete" className="h-8 w-8 text-status-danger" onClick={() => removeCard(index)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Delete"
+            className="h-8 w-8 text-status-danger"
+            onClick={() => removeCard(index)}
+          >
             <Trash2 size={14} />
           </Button>
         </div>
@@ -93,23 +104,32 @@ export function LeaderMeetingBlockEditor({ data, onChange }: LeaderMeetingBlockE
   const leader = data.leader || { name: '', domesticPhone: '', overseasPhone: '' }
   const points = data.meetingPoints || []
 
-  const updateLeader = useCallback((field: string, value: string) => {
-    onChange({ leader: { ...leader, [field]: value } })
-  }, [leader, onChange])
+  const updateLeader = useCallback(
+    (field: string, value: string) => {
+      onChange({ leader: { ...leader, [field]: value } })
+    },
+    [leader, onChange]
+  )
 
   const addPoint = useCallback(() => {
     onChange({ meetingPoints: [...points, { time: '', location: '' }] })
   }, [points, onChange])
 
-  const updatePoint = useCallback((index: number, field: 'time' | 'location', value: string) => {
-    const newPoints = [...points]
-    newPoints[index] = { ...newPoints[index], [field]: value }
-    onChange({ meetingPoints: newPoints })
-  }, [points, onChange])
+  const updatePoint = useCallback(
+    (index: number, field: 'time' | 'location', value: string) => {
+      const newPoints = [...points]
+      newPoints[index] = { ...newPoints[index], [field]: value }
+      onChange({ meetingPoints: newPoints })
+    },
+    [points, onChange]
+  )
 
-  const removePoint = useCallback((index: number) => {
-    onChange({ meetingPoints: points.filter((_, i) => i !== index) })
-  }, [points, onChange])
+  const removePoint = useCallback(
+    (index: number) => {
+      onChange({ meetingPoints: points.filter((_, i) => i !== index) })
+    },
+    [points, onChange]
+  )
 
   return (
     <div className="space-y-3">
@@ -157,7 +177,13 @@ export function LeaderMeetingBlockEditor({ data, onChange }: LeaderMeetingBlockE
                 placeholder={COMP_EDITOR_LABELS.地點}
                 className="h-8 text-sm flex-1"
               />
-              <Button variant="ghost" size="icon" aria-label="Delete" className="h-8 w-8 text-status-danger" onClick={() => removePoint(index)}>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Delete"
+                className="h-8 w-8 text-status-danger"
+                onClick={() => removePoint(index)}
+              >
                 <Trash2 size={14} />
               </Button>
             </div>
@@ -187,9 +213,18 @@ export function PricingBlockEditor({ data, onChange }: PricingBlockEditorProps) 
   return (
     <div className="text-sm text-morandi-primary">
       <div className="space-y-2">
-        <div>{COMP_EDITOR_LABELS.LABEL_8398}{pricing.included_items?.length || 0} 項</div>
-        <div>{COMP_EDITOR_LABELS.LABEL_4198}{pricing.excluded_items?.length || 0} 項</div>
-        <div>{COMP_EDITOR_LABELS.LABEL_1507}{pricing.notes?.length || 0} 條</div>
+        <div>
+          {COMP_EDITOR_LABELS.LABEL_8398}
+          {pricing.included_items?.length || 0} 項
+        </div>
+        <div>
+          {COMP_EDITOR_LABELS.LABEL_4198}
+          {pricing.excluded_items?.length || 0} 項
+        </div>
+        <div>
+          {COMP_EDITOR_LABELS.LABEL_1507}
+          {pricing.notes?.length || 0} 條
+        </div>
         <p className="text-xs mt-2">（詳細編輯請使用完整版編輯器）</p>
       </div>
     </div>
@@ -212,15 +247,21 @@ export function PriceTiersBlockEditor({ data, onChange }: PriceTiersBlockEditorP
     onChange({ priceTiers: [...tiers, { label: '', price: '' }] })
   }, [tiers, onChange])
 
-  const updateTier = useCallback((index: number, field: string, value: string) => {
-    const newTiers = [...tiers]
-    newTiers[index] = { ...newTiers[index], [field]: value }
-    onChange({ priceTiers: newTiers })
-  }, [tiers, onChange])
+  const updateTier = useCallback(
+    (index: number, field: string, value: string) => {
+      const newTiers = [...tiers]
+      newTiers[index] = { ...newTiers[index], [field]: value }
+      onChange({ priceTiers: newTiers })
+    },
+    [tiers, onChange]
+  )
 
-  const removeTier = useCallback((index: number) => {
-    onChange({ priceTiers: tiers.filter((_, i) => i !== index) })
-  }, [tiers, onChange])
+  const removeTier = useCallback(
+    (index: number) => {
+      onChange({ priceTiers: tiers.filter((_, i) => i !== index) })
+    },
+    [tiers, onChange]
+  )
 
   return (
     <div className="space-y-2">
@@ -238,7 +279,13 @@ export function PriceTiersBlockEditor({ data, onChange }: PriceTiersBlockEditorP
             placeholder={COMP_EDITOR_LABELS.價格}
             className="h-8 text-sm w-28"
           />
-          <Button variant="ghost" size="icon" aria-label="Delete" className="h-8 w-8 text-status-danger" onClick={() => removeTier(index)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Delete"
+            className="h-8 w-8 text-status-danger"
+            onClick={() => removeTier(index)}
+          >
             <Trash2 size={14} />
           </Button>
         </div>
@@ -267,15 +314,21 @@ export function FAQsBlockEditor({ data, onChange }: FAQsBlockEditorProps) {
     onChange({ faqs: [...faqs, { question: '', answer: '' }] })
   }, [faqs, onChange])
 
-  const updateFaq = useCallback((index: number, field: 'question' | 'answer', value: string) => {
-    const newFaqs = [...faqs]
-    newFaqs[index] = { ...newFaqs[index], [field]: value }
-    onChange({ faqs: newFaqs })
-  }, [faqs, onChange])
+  const updateFaq = useCallback(
+    (index: number, field: 'question' | 'answer', value: string) => {
+      const newFaqs = [...faqs]
+      newFaqs[index] = { ...newFaqs[index], [field]: value }
+      onChange({ faqs: newFaqs })
+    },
+    [faqs, onChange]
+  )
 
-  const removeFaq = useCallback((index: number) => {
-    onChange({ faqs: faqs.filter((_, i) => i !== index) })
-  }, [faqs, onChange])
+  const removeFaq = useCallback(
+    (index: number) => {
+      onChange({ faqs: faqs.filter((_, i) => i !== index) })
+    },
+    [faqs, onChange]
+  )
 
   return (
     <div className="space-y-2">
@@ -289,7 +342,13 @@ export function FAQsBlockEditor({ data, onChange }: FAQsBlockEditorProps) {
               placeholder={COMP_EDITOR_LABELS.問題}
               className="h-8 text-sm flex-1"
             />
-            <Button variant="ghost" size="icon" aria-label="Delete" className="h-8 w-8 text-status-danger" onClick={() => removeFaq(index)}>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Delete"
+              className="h-8 w-8 text-status-danger"
+              onClick={() => removeFaq(index)}
+            >
               <Trash2 size={14} />
             </Button>
           </div>
@@ -325,15 +384,21 @@ export function NoticesBlockEditor({ data, onChange }: NoticesBlockEditorProps) 
     onChange({ notices: [...notices, ''] })
   }, [notices, onChange])
 
-  const updateNotice = useCallback((index: number, value: string) => {
-    const newNotices = [...notices]
-    newNotices[index] = value
-    onChange({ notices: newNotices })
-  }, [notices, onChange])
+  const updateNotice = useCallback(
+    (index: number, value: string) => {
+      const newNotices = [...notices]
+      newNotices[index] = value
+      onChange({ notices: newNotices })
+    },
+    [notices, onChange]
+  )
 
-  const removeNotice = useCallback((index: number) => {
-    onChange({ notices: notices.filter((_, i) => i !== index) })
-  }, [notices, onChange])
+  const removeNotice = useCallback(
+    (index: number) => {
+      onChange({ notices: notices.filter((_, i) => i !== index) })
+    },
+    [notices, onChange]
+  )
 
   return (
     <div className="space-y-2">
@@ -346,7 +411,13 @@ export function NoticesBlockEditor({ data, onChange }: NoticesBlockEditorProps) 
             placeholder={COMP_EDITOR_LABELS.提醒事項}
             className="h-8 text-sm flex-1"
           />
-          <Button variant="ghost" size="icon" aria-label="Delete" className="h-8 w-8 text-status-danger" onClick={() => removeNotice(index)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Delete"
+            className="h-8 w-8 text-status-danger"
+            onClick={() => removeNotice(index)}
+          >
             <Trash2 size={14} />
           </Button>
         </div>
@@ -375,15 +446,21 @@ export function CancellationBlockEditor({ data, onChange }: CancellationBlockEdi
     onChange({ cancellationPolicy: [...policies, ''] })
   }, [policies, onChange])
 
-  const updatePolicy = useCallback((index: number, value: string) => {
-    const newPolicies = [...policies]
-    newPolicies[index] = value
-    onChange({ cancellationPolicy: newPolicies })
-  }, [policies, onChange])
+  const updatePolicy = useCallback(
+    (index: number, value: string) => {
+      const newPolicies = [...policies]
+      newPolicies[index] = value
+      onChange({ cancellationPolicy: newPolicies })
+    },
+    [policies, onChange]
+  )
 
-  const removePolicy = useCallback((index: number) => {
-    onChange({ cancellationPolicy: policies.filter((_, i) => i !== index) })
-  }, [policies, onChange])
+  const removePolicy = useCallback(
+    (index: number) => {
+      onChange({ cancellationPolicy: policies.filter((_, i) => i !== index) })
+    },
+    [policies, onChange]
+  )
 
   return (
     <div className="space-y-2">
@@ -396,7 +473,13 @@ export function CancellationBlockEditor({ data, onChange }: CancellationBlockEdi
             placeholder={COMP_EDITOR_LABELS.取消政策}
             className="h-8 text-sm flex-1"
           />
-          <Button variant="ghost" size="icon" aria-label="Delete" className="h-8 w-8 text-status-danger" onClick={() => removePolicy(index)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Delete"
+            className="h-8 w-8 text-status-danger"
+            onClick={() => removePolicy(index)}
+          >
             <Trash2 size={14} />
           </Button>
         </div>

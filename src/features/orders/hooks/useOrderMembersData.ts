@@ -147,12 +147,13 @@ export function useOrderMembersData({
       }
 
       // 收集所有有 customer_id 的成員
-      const customerIds = membersData
-        .map(m => m.customer_id)
-        .filter(Boolean) as string[]
+      const customerIds = membersData.map(m => m.customer_id).filter(Boolean) as string[]
 
       // 如果有 customer_id，批次查詢顧客驗證狀態和護照照片
-      let customerDataMap: Record<string, { verification_status: string; passport_image_url: string | null }> = {}
+      let customerDataMap: Record<
+        string,
+        { verification_status: string; passport_image_url: string | null }
+      > = {}
       if (customerIds.length > 0) {
         const { data: customersData } = await supabase
           .from('customers')
@@ -161,10 +162,13 @@ export function useOrderMembersData({
 
         if (customersData) {
           customerDataMap = Object.fromEntries(
-            customersData.map(c => [c.id, {
-              verification_status: c.verification_status || '',
-              passport_image_url: c.passport_image_url || null,
-            }])
+            customersData.map(c => [
+              c.id,
+              {
+                verification_status: c.verification_status || '',
+                passport_image_url: c.passport_image_url || null,
+              },
+            ])
           )
         }
       }
@@ -270,10 +274,7 @@ export function useOrderMembersData({
         identity: COMP_ORDERS_LABELS.大人,
       }))
 
-      const { data, error } = await supabase
-        .from('order_members')
-        .insert(newMembers)
-        .select()
+      const { data, error } = await supabase.from('order_members').insert(newMembers).select()
 
       if (error) throw error
       setMembers([...members, ...(data || [])])
@@ -298,7 +299,7 @@ export function useOrderMembersData({
 
     // 批次更新資料庫中的 sort_order
     try {
-      const updates = membersWithNewOrder.map((member) => ({
+      const updates = membersWithNewOrder.map(member => ({
         id: member.id,
         sort_order: member.sort_order,
       }))
@@ -306,10 +307,7 @@ export function useOrderMembersData({
       // 使用 Promise.all 批次更新
       await Promise.all(
         updates.map(({ id, sort_order }) =>
-          supabase
-            .from('order_members')
-            .update({ sort_order })
-            .eq('id', id)
+          supabase.from('order_members').update({ sort_order }).eq('id', id)
         )
       )
     } catch (error) {
@@ -326,7 +324,8 @@ export function useOrderMembersData({
   const handleDeleteMember = async (memberId: string) => {
     // 找到要刪除的成員，顯示名稱讓使用者確認
     const memberToDelete = members.find(m => m.id === memberId)
-    const memberName = memberToDelete?.chinese_name || memberToDelete?.passport_name || COMP_ORDERS_LABELS.此成員
+    const memberName =
+      memberToDelete?.chinese_name || memberToDelete?.passport_name || COMP_ORDERS_LABELS.此成員
 
     const confirmed = await confirm(MEMBER_DATA_LABELS.DELETE_CONFIRM(memberName), {
       title: COMP_ORDERS_LABELS.刪除成員,
@@ -378,7 +377,7 @@ export function useOrderMembersData({
     // 構建訂閱的 filter
     // 團體模式：監聽該團所有訂單的成員
     // 單一訂單模式：監聽該訂單的成員
-    const targetOrderIds = mode === 'tour' ? tourOrders.map(o => o.id) : (orderId ? [orderId] : [])
+    const targetOrderIds = mode === 'tour' ? tourOrders.map(o => o.id) : orderId ? [orderId] : []
     if (targetOrderIds.length === 0) return
 
     // 建立訂閱頻道
@@ -412,9 +411,7 @@ export function useOrderMembersData({
             })
           } else if (payload.eventType === 'UPDATE' && newRecord) {
             // 更新成員
-            setMembers(prev =>
-              prev.map(m => m.id === newRecord.id ? { ...m, ...newRecord } : m)
-            )
+            setMembers(prev => prev.map(m => (m.id === newRecord.id ? { ...m, ...newRecord } : m)))
           } else if (payload.eventType === 'DELETE' && oldRecord) {
             // 刪除成員
             setMembers(prev => prev.filter(m => m.id !== oldRecord.id))

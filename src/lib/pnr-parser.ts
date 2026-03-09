@@ -5,4 +5,4 @@
  *
  * 向後兼容：所有匯出保持不變
  */
-export * from './pnr-parser/index';
+export * from './pnr-parser/index'

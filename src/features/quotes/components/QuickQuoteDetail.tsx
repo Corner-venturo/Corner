@@ -3,7 +3,6 @@
  * QuickQuoteDetail - 快速報價單詳細頁面
  */
 
-
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -13,12 +12,8 @@ import { Quote } from '@/stores/types'
 import type { Quote as PrintableQuote } from '@/types/quote.types'
 import { PrintableQuickQuote } from './PrintableQuickQuote'
 import { useQuickQuoteDetail } from '../hooks/useQuickQuoteDetail'
-import {
-  QuickQuoteHeader,
-  QuickQuoteItemsTable,
-  QuickQuoteSummary,
-} from './quick-quote'
-import { QUICK_QUOTE_DETAIL_LABELS } from '../constants/labels';
+import { QuickQuoteHeader, QuickQuoteItemsTable, QuickQuoteSummary } from './quick-quote'
+import { QUICK_QUOTE_DETAIL_LABELS } from '../constants/labels'
 
 interface QuickQuoteDetailProps {
   quote: Quote
@@ -26,7 +21,11 @@ interface QuickQuoteDetailProps {
   viewModeToggle?: React.ReactNode
 }
 
-export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpdate, viewModeToggle }) => {
+export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({
+  quote,
+  onUpdate,
+  viewModeToggle,
+}) => {
   const router = useRouter()
 
   // 使用自定義 hook 管理所有狀態和邏輯
@@ -75,7 +74,11 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
             {/* 非編輯模式 */}
             {!isEditing && (
               <>
-                <Button onClick={() => setShowPrintPreview(true)} variant="outline" className="gap-2">
+                <Button
+                  onClick={() => setShowPrintPreview(true)}
+                  variant="outline"
+                  className="gap-2"
+                >
                   <Printer className="h-4 w-4" />
                   {QUICK_QUOTE_DETAIL_LABELS.PRINT}
                 </Button>
@@ -109,11 +112,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
 
       <div className="w-full max-w-7xl mx-auto p-6 space-y-6">
         {/* 客戶資訊 */}
-        <QuickQuoteHeader
-          formData={formData}
-          isEditing={isEditing}
-          onFieldChange={setFormField}
-        />
+        <QuickQuoteHeader formData={formData} isEditing={isEditing} onFieldChange={setFormField} />
 
         {/* 收費明細表 */}
         <QuickQuoteItemsTable
@@ -134,16 +133,18 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
           balanceAmount={balanceAmount}
           isEditing={isEditing}
           expenseDescription={formData.expense_description}
-          onReceivedAmountChange={(value) => setFormField('received_amount', value)}
-          onExpenseDescriptionChange={(value) => setFormField('expense_description', value)}
+          onReceivedAmountChange={value => setFormField('received_amount', value)}
+          onExpenseDescriptionChange={value => setFormField('expense_description', value)}
         />
 
         {/* 列印預覽對話框 */}
         <PrintableQuickQuote
-          quote={{
-            ...quote,
-            ...formData,
-          } as unknown as PrintableQuote}
+          quote={
+            {
+              ...quote,
+              ...formData,
+            } as unknown as PrintableQuote
+          }
           items={items}
           isOpen={showPrintPreview}
           onClose={() => setShowPrintPreview(false)}

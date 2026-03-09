@@ -23,11 +23,11 @@ interface RelatedImagesPreviewerProps {
   className?: string
 }
 
-export function RelatedImagesPreviewer({ 
-  activityTitle, 
-  currentImageUrl, 
+export function RelatedImagesPreviewer({
+  activityTitle,
+  currentImageUrl,
   onSelectImage,
-  className = ''
+  className = '',
 }: RelatedImagesPreviewerProps) {
   const [relatedImages, setRelatedImages] = useState<RelatedImage[]>([])
   const [loading, setLoading] = useState(false)
@@ -45,20 +45,17 @@ export function RelatedImagesPreviewer({
   const loadRelatedImages = async () => {
     try {
       setLoading(true)
-      
+
       // 搜尋包含景點名稱關鍵字的圖片 - 改進搜尋邏輯
       const keywords = activityTitle.split(/[・\s&]+/).filter(k => k.length > 0)
-      
+
       if (keywords.length === 0) {
         setRelatedImages([])
         return
       }
 
       // 先檢查表格是否存在
-      const { error: checkError } = await supabase
-        .from('image_library')
-        .select('id')
-        .limit(1)
+      const { error: checkError } = await supabase.from('image_library').select('id').limit(1)
 
       if (checkError) {
         logger.error(COMP_EDITOR_LABELS.圖庫表格不存在, checkError)
@@ -77,13 +74,11 @@ export function RelatedImagesPreviewer({
       // 首先嘗試精確匹配
       queryBuilder = queryBuilder.eq('name', activityTitle)
 
-      const { data, error } = await queryBuilder
-        .order('created_at', { ascending: false })
-        .limit(6)
+      const { data, error } = await queryBuilder.order('created_at', { ascending: false }).limit(6)
 
       if (error) {
         logger.error(COMP_EDITOR_LABELS.載入相關圖片失敗, error)
-        
+
         // 如果 OR 查詢失敗，回退到簡單搜尋
         const { data: fallbackData, error: fallbackError } = await supabase
           .from('image_library')
@@ -99,19 +94,19 @@ export function RelatedImagesPreviewer({
           setRelatedImages([])
           return
         }
-        
+
         // 使用回退搜尋結果
-        const filteredImages = (fallbackData || []).filter(img =>
-          img.public_url !== currentImageUrl
-        ).map(img => ({ ...img, tags: img.tags ?? [] }))
+        const filteredImages = (fallbackData || [])
+          .filter(img => img.public_url !== currentImageUrl)
+          .map(img => ({ ...img, tags: img.tags ?? [] }))
         setRelatedImages(filteredImages)
         return
       }
 
       // 排除當前使用的圖片
-      const filteredImages = (data || []).filter(img =>
-        img.public_url !== currentImageUrl
-      ).map(img => ({ ...img, tags: img.tags ?? [] }))
+      const filteredImages = (data || [])
+        .filter(img => img.public_url !== currentImageUrl)
+        .map(img => ({ ...img, tags: img.tags ?? [] }))
 
       setRelatedImages(filteredImages)
     } catch (error) {
@@ -142,7 +137,7 @@ export function RelatedImagesPreviewer({
           </div>
         ) : relatedImages.length > 0 ? (
           <>
-            {relatedImages.map((image) => (
+            {relatedImages.map(image => (
               <motion.div
                 key={image.id}
                 whileHover={{ scale: 1.1 }}

@@ -6,7 +6,7 @@ import type { AddTimelineOptions, FabricObjectWithData } from './types'
 
 /**
  * useCanvasTimeline - 時間軸功能 Hook
- * 
+ *
  * 功能：
  * - addTimeline: 添加時間軸（垂直或水平）
  * - addTimelinePoint: 在選中的時間軸上新增時間點
@@ -27,137 +27,140 @@ export function useCanvasTimeline(options: UseCanvasTimelineOptions): UseCanvasT
   // ============================================
   // Add Timeline
   // ============================================
-  const addTimeline = useCallback((opts?: AddTimelineOptions) => {
-    const canvas = getCanvas()
-    if (!canvas) return
+  const addTimeline = useCallback(
+    (opts?: AddTimelineOptions) => {
+      const canvas = getCanvas()
+      if (!canvas) return
 
-    const pointCount = opts?.pointCount || 3
-    const isVertical = opts?.orientation !== 'horizontal'
-    const timelineId = `timeline-${Date.now()}`
-    const itemSpacing = 36
+      const pointCount = opts?.pointCount || 3
+      const isVertical = opts?.orientation !== 'horizontal'
+      const timelineId = `timeline-${Date.now()}`
+      const itemSpacing = 36
 
-    const startX = opts?.x ?? 100
-    const startY = opts?.y ?? 150
+      const startX = opts?.x ?? 100
+      const startY = opts?.y ?? 150
 
-    const allElements: fabric.FabricObject[] = []
+      const allElements: fabric.FabricObject[] = []
 
-    if (isVertical) {
-      // 垂直時間軸線
-      const lineHeight = pointCount * itemSpacing
-      const mainLine = new fabric.Rect({
-        left: startX + 52,
-        top: startY + 12,
-        width: 2,
-        height: lineHeight,
-        fill: '#c9aa7c',
-        opacity: 0.4,
-        selectable: true,
-      }) as fabric.Rect & FabricObjectWithData
-      mainLine.data = { timelineId, role: 'line', orientation: 'vertical', pointCount }
-      allElements.push(mainLine)
+      if (isVertical) {
+        // 垂直時間軸線
+        const lineHeight = pointCount * itemSpacing
+        const mainLine = new fabric.Rect({
+          left: startX + 52,
+          top: startY + 12,
+          width: 2,
+          height: lineHeight,
+          fill: '#c9aa7c',
+          opacity: 0.4,
+          selectable: true,
+        }) as fabric.Rect & FabricObjectWithData
+        mainLine.data = { timelineId, role: 'line', orientation: 'vertical', pointCount }
+        allElements.push(mainLine)
 
-      for (let i = 0; i < pointCount; i++) {
-        const itemY = startY + i * itemSpacing
+        for (let i = 0; i < pointCount; i++) {
+          const itemY = startY + i * itemSpacing
 
-        // 時間文字
-        const timeText = new fabric.IText(`${8 + i * 2}:00`, {
+          // 時間文字
+          const timeText = new fabric.IText(`${8 + i * 2}:00`, {
+            left: startX,
+            top: itemY,
+            fontSize: 11,
+            fontFamily: 'Noto Sans TC',
+            fill: '#c9aa7c',
+            textAlign: 'right',
+            width: 45,
+          }) as fabric.IText & FabricObjectWithData
+          timeText.data = { timelineId, role: 'time', index: i }
+          allElements.push(timeText)
+
+          // 圓點
+          const dot = new fabric.Circle({
+            left: startX + 50,
+            top: itemY + 5,
+            radius: 4,
+            fill: '#c9aa7c',
+            originX: 'center',
+            originY: 'center',
+          }) as fabric.Circle & FabricObjectWithData
+          dot.data = { timelineId, role: 'dot', index: i }
+          allElements.push(dot)
+
+          // 活動文字
+          const activityText = new fabric.IText(`活動 ${i + 1}`, {
+            left: startX + 64,
+            top: itemY,
+            fontSize: 11,
+            fontFamily: 'Noto Sans TC',
+            fill: '#3a3633',
+            width: 150,
+          }) as fabric.IText & FabricObjectWithData
+          activityText.data = { timelineId, role: 'activity', index: i }
+          allElements.push(activityText)
+        }
+      } else {
+        // 水平時間軸
+        const lineWidth = pointCount * 80
+        const mainLine = new fabric.Rect({
           left: startX,
-          top: itemY,
-          fontSize: 11,
-          fontFamily: 'Noto Sans TC',
-          fill: '#c9aa7c',
-          textAlign: 'right',
-          width: 45,
-        }) as fabric.IText & FabricObjectWithData
-        timeText.data = { timelineId, role: 'time', index: i }
-        allElements.push(timeText)
-
-        // 圓點
-        const dot = new fabric.Circle({
-          left: startX + 50,
-          top: itemY + 5,
-          radius: 4,
-          fill: '#c9aa7c',
-          originX: 'center',
-          originY: 'center',
-        }) as fabric.Circle & FabricObjectWithData
-        dot.data = { timelineId, role: 'dot', index: i }
-        allElements.push(dot)
-
-        // 活動文字
-        const activityText = new fabric.IText(`活動 ${i + 1}`, {
-          left: startX + 64,
-          top: itemY,
-          fontSize: 11,
-          fontFamily: 'Noto Sans TC',
-          fill: '#3a3633',
-          width: 150,
-        }) as fabric.IText & FabricObjectWithData
-        activityText.data = { timelineId, role: 'activity', index: i }
-        allElements.push(activityText)
-      }
-    } else {
-      // 水平時間軸
-      const lineWidth = pointCount * 80
-      const mainLine = new fabric.Rect({
-        left: startX,
-        top: startY + 50,
-        width: lineWidth,
-        height: 2,
-        fill: '#c9aa7c',
-        opacity: 0.4,
-        selectable: true,
-      }) as fabric.Rect & FabricObjectWithData
-      mainLine.data = { timelineId, role: 'line', orientation: 'horizontal', pointCount }
-      allElements.push(mainLine)
-
-      for (let i = 0; i < pointCount; i++) {
-        const itemX = startX + 40 + i * 80
-
-        // 時間文字
-        const timeText = new fabric.IText(`${8 + i * 2}:00`, {
-          left: itemX,
-          top: startY + 20,
-          fontSize: 11,
-          fontFamily: 'Noto Sans TC',
-          fill: '#c9aa7c',
-          originX: 'center',
-        }) as fabric.IText & FabricObjectWithData
-        timeText.data = { timelineId, role: 'time', index: i }
-        allElements.push(timeText)
-
-        // 圓點
-        const dot = new fabric.Circle({
-          left: itemX,
           top: startY + 50,
-          radius: 4,
+          width: lineWidth,
+          height: 2,
           fill: '#c9aa7c',
-          originX: 'center',
-          originY: 'center',
-        }) as fabric.Circle & FabricObjectWithData
-        dot.data = { timelineId, role: 'dot', index: i }
-        allElements.push(dot)
+          opacity: 0.4,
+          selectable: true,
+        }) as fabric.Rect & FabricObjectWithData
+        mainLine.data = { timelineId, role: 'line', orientation: 'horizontal', pointCount }
+        allElements.push(mainLine)
 
-        // 活動文字
-        const activityText = new fabric.IText(`活動 ${i + 1}`, {
-          left: itemX,
-          top: startY + 70,
-          fontSize: 11,
-          fontFamily: 'Noto Sans TC',
-          fill: '#3a3633',
-          originX: 'center',
-        }) as fabric.IText & FabricObjectWithData
-        activityText.data = { timelineId, role: 'activity', index: i }
-        allElements.push(activityText)
+        for (let i = 0; i < pointCount; i++) {
+          const itemX = startX + 40 + i * 80
+
+          // 時間文字
+          const timeText = new fabric.IText(`${8 + i * 2}:00`, {
+            left: itemX,
+            top: startY + 20,
+            fontSize: 11,
+            fontFamily: 'Noto Sans TC',
+            fill: '#c9aa7c',
+            originX: 'center',
+          }) as fabric.IText & FabricObjectWithData
+          timeText.data = { timelineId, role: 'time', index: i }
+          allElements.push(timeText)
+
+          // 圓點
+          const dot = new fabric.Circle({
+            left: itemX,
+            top: startY + 50,
+            radius: 4,
+            fill: '#c9aa7c',
+            originX: 'center',
+            originY: 'center',
+          }) as fabric.Circle & FabricObjectWithData
+          dot.data = { timelineId, role: 'dot', index: i }
+          allElements.push(dot)
+
+          // 活動文字
+          const activityText = new fabric.IText(`活動 ${i + 1}`, {
+            left: itemX,
+            top: startY + 70,
+            fontSize: 11,
+            fontFamily: 'Noto Sans TC',
+            fill: '#3a3633',
+            originX: 'center',
+          }) as fabric.IText & FabricObjectWithData
+          activityText.data = { timelineId, role: 'activity', index: i }
+          allElements.push(activityText)
+        }
       }
-    }
 
-    allElements.forEach(el => canvas.add(el))
+      allElements.forEach(el => canvas.add(el))
 
-    const selection = new fabric.ActiveSelection(allElements, { canvas })
-    canvas.setActiveObject(selection)
-    canvas.renderAll()
-  }, [getCanvas])
+      const selection = new fabric.ActiveSelection(allElements, { canvas })
+      canvas.setActiveObject(selection)
+      canvas.renderAll()
+    },
+    [getCanvas]
+  )
 
   // ============================================
   // Add Timeline Point

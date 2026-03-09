@@ -20,41 +20,159 @@ import { CUSTOMER_PASSPORT_UPLOAD_LABELS as CPL } from '../constants/labels'
 
 // 常用簡體→繁體對照表（人名常用字）
 const SIMPLIFIED_TO_TRADITIONAL: Record<string, string> = {
-  '陈': '陳', '张': '張', '刘': '劉', '杨': '楊', '赵': '趙',
-  '黄': '黃', '周': '週', '吴': '吳', '郑': '鄭', '王': '王',
-  '李': '李', '林': '林', '罗': '羅', '梁': '梁', '宋': '宋',
-  '郭': '郭', '何': '何', '马': '馬', '胡': '胡', '朱': '朱',
-  '高': '高', '徐': '徐', '孙': '孫', '萧': '蕭', '谢': '謝',
-  '韩': '韓', '唐': '唐', '冯': '馮', '于': '于', '董': '董',
-  '叶': '葉', '程': '程', '蔡': '蔡', '彭': '彭', '潘': '潘',
-  '袁': '袁', '田': '田', '余': '余', '丁': '丁', '沈': '沈',
-  '钱': '錢', '姜': '姜', '戴': '戴', '魏': '魏', '曹': '曹',
-  '崔': '崔', '邵': '邵', '侯': '侯', '石': '石', '邓': '鄧',
-  '龙': '龍', '贾': '賈', '薛': '薛', '夏': '夏', '贺': '賀',
-  '顾': '顧', '毛': '毛', '郝': '郝', '龚': '龔', '邱': '邱',
-  '骆': '駱', '熊': '熊', '向': '向', '陆': '陸', '乔': '喬',
-  '苏': '蘇', '范': '范', '方': '方', '任': '任', '鲁': '魯',
-  '韦': '韋', '姚': '姚', '廖': '廖', '邹': '鄒', '汪': '汪',
-  '连': '連', '傅': '傅', '尹': '尹', '钟': '鍾', '卢': '盧',
-  '丰': '豐', '华': '華', '兰': '蘭', '关': '關', '蒋': '蔣',
-  '万': '萬', '东': '東', '欧': '歐', '阳': '陽', '闻': '聞',
-  '严': '嚴', '纪': '紀', '齐': '齊', '庄': '莊', '岳': '岳',
-  '宛': '宛', '屏': '屏', '国': '國', '伟': '偉', '强': '強',
-  '军': '軍', '明': '明', '辉': '輝', '杰': '傑', '飞': '飛',
-  '涛': '濤', '鹏': '鵬', '浩': '浩', '亮': '亮', '峰': '峰',
-  '义': '義', '龄': '齡', '娟': '娟', '丽': '麗', '艳': '艷',
-  '红': '紅', '敏': '敏', '静': '靜', '婷': '婷', '颖': '穎',
-  '玲': '玲', '娜': '娜', '雪': '雪', '梅': '梅', '莲': '蓮',
-  '兴': '興', '发': '發', '达': '達', '业': '業', '荣': '榮',
-  '贵': '貴', '财': '財', '禄': '祿', '寿': '壽', '福': '福',
-  '礼': '禮', '爱': '愛', '勤': '勤', '俭': '儉', '忠': '忠',
-  '孝': '孝', '诚': '誠', '信': '信', '仁': '仁',
+  陈: '陳',
+  张: '張',
+  刘: '劉',
+  杨: '楊',
+  赵: '趙',
+  黄: '黃',
+  周: '週',
+  吴: '吳',
+  郑: '鄭',
+  王: '王',
+  李: '李',
+  林: '林',
+  罗: '羅',
+  梁: '梁',
+  宋: '宋',
+  郭: '郭',
+  何: '何',
+  马: '馬',
+  胡: '胡',
+  朱: '朱',
+  高: '高',
+  徐: '徐',
+  孙: '孫',
+  萧: '蕭',
+  谢: '謝',
+  韩: '韓',
+  唐: '唐',
+  冯: '馮',
+  于: '于',
+  董: '董',
+  叶: '葉',
+  程: '程',
+  蔡: '蔡',
+  彭: '彭',
+  潘: '潘',
+  袁: '袁',
+  田: '田',
+  余: '余',
+  丁: '丁',
+  沈: '沈',
+  钱: '錢',
+  姜: '姜',
+  戴: '戴',
+  魏: '魏',
+  曹: '曹',
+  崔: '崔',
+  邵: '邵',
+  侯: '侯',
+  石: '石',
+  邓: '鄧',
+  龙: '龍',
+  贾: '賈',
+  薛: '薛',
+  夏: '夏',
+  贺: '賀',
+  顾: '顧',
+  毛: '毛',
+  郝: '郝',
+  龚: '龔',
+  邱: '邱',
+  骆: '駱',
+  熊: '熊',
+  向: '向',
+  陆: '陸',
+  乔: '喬',
+  苏: '蘇',
+  范: '范',
+  方: '方',
+  任: '任',
+  鲁: '魯',
+  韦: '韋',
+  姚: '姚',
+  廖: '廖',
+  邹: '鄒',
+  汪: '汪',
+  连: '連',
+  傅: '傅',
+  尹: '尹',
+  钟: '鍾',
+  卢: '盧',
+  丰: '豐',
+  华: '華',
+  兰: '蘭',
+  关: '關',
+  蒋: '蔣',
+  万: '萬',
+  东: '東',
+  欧: '歐',
+  阳: '陽',
+  闻: '聞',
+  严: '嚴',
+  纪: '紀',
+  齐: '齊',
+  庄: '莊',
+  岳: '岳',
+  宛: '宛',
+  屏: '屏',
+  国: '國',
+  伟: '偉',
+  强: '強',
+  军: '軍',
+  明: '明',
+  辉: '輝',
+  杰: '傑',
+  飞: '飛',
+  涛: '濤',
+  鹏: '鵬',
+  浩: '浩',
+  亮: '亮',
+  峰: '峰',
+  义: '義',
+  龄: '齡',
+  娟: '娟',
+  丽: '麗',
+  艳: '艷',
+  红: '紅',
+  敏: '敏',
+  静: '靜',
+  婷: '婷',
+  颖: '穎',
+  玲: '玲',
+  娜: '娜',
+  雪: '雪',
+  梅: '梅',
+  莲: '蓮',
+  兴: '興',
+  发: '發',
+  达: '達',
+  业: '業',
+  荣: '榮',
+  贵: '貴',
+  财: '財',
+  禄: '祿',
+  寿: '壽',
+  福: '福',
+  礼: '禮',
+  爱: '愛',
+  勤: '勤',
+  俭: '儉',
+  忠: '忠',
+  孝: '孝',
+  诚: '誠',
+  信: '信',
+  仁: '仁',
 }
 
 // 簡體轉繁體
 function toTraditional(text: string | null | undefined): string {
   if (!text) return ''
-  return text.split('').map(char => SIMPLIFIED_TO_TRADITIONAL[char] || char).join('')
+  return text
+    .split('')
+    .map(char => SIMPLIFIED_TO_TRADITIONAL[char] || char)
+    .join('')
 }
 
 interface UsePassportUploadOptions {
@@ -75,8 +193,8 @@ interface OcrProcessedItem {
   matchReason?: string
   chineseName?: string
   normalizedGender: 'M' | 'F' | null
-  hasRealDifference?: boolean  // 是否有真正的資料差異
-  differences?: string[]       // 差異欄位列表
+  hasRealDifference?: boolean // 是否有真正的資料差異
+  differences?: string[] // 差異欄位列表
 }
 
 export function usePassportUpload(options: UsePassportUploadOptions) {
@@ -90,7 +208,10 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
     logger.log('📁 handlePassportFileChange triggered', e.target.files)
     const newFiles = e.target.files
     if (newFiles && newFiles.length > 0) {
-      logger.log('📁 Adding files:', Array.from(newFiles).map(f => f.name))
+      logger.log(
+        '📁 Adding files:',
+        Array.from(newFiles).map(f => f.name)
+      )
       setFiles(prev => [...prev, ...Array.from(newFiles)])
     }
   }, [])
@@ -114,7 +235,10 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
     setIsDragging(false)
 
     const droppedFiles = Array.from(e.dataTransfer.files)
-    logger.log('📥 Files dropped:', droppedFiles.map(f => f.name))
+    logger.log(
+      '📥 Files dropped:',
+      droppedFiles.map(f => f.name)
+    )
 
     if (droppedFiles.length > 0) {
       setFiles(prev => [...prev, ...droppedFiles])
@@ -146,8 +270,8 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
 
       await page.render({ canvasContext: context, viewport }).promise
 
-      const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((b) => resolve(b!), 'image/jpeg', 0.9)
+      const blob = await new Promise<Blob>(resolve => {
+        canvas.toBlob(b => resolve(b!), 'image/jpeg', 0.9)
       })
 
       const fileName = pdfFile.name.replace('.pdf', `_page${i}.jpg`)
@@ -163,7 +287,7 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
       reader.readAsDataURL(file)
-      reader.onload = (e) => {
+      reader.onload = e => {
         const img = new Image()
         img.src = e.target?.result as string
         img.onload = () => {
@@ -189,7 +313,7 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
           ctx?.drawImage(img, 0, 0, width, height)
 
           canvas.toBlob(
-            async (blob) => {
+            async blob => {
               if (blob) {
                 const compressedFile = new File([blob], file.name, {
                   type: 'image/jpeg',
@@ -290,7 +414,11 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
             const nationalId = ocrData.national_id
             const birthDate = ocrData.birth_date
             // 轉換簡體為繁體（移除括號和警告符號）
-            const rawName = ocrData.name?.replace(/[()（）]/g, '').replace(/⚠️/g, '').split('/')[0]?.trim()
+            const rawName = ocrData.name
+              ?.replace(/[()（）]/g, '')
+              .replace(/⚠️/g, '')
+              .split('/')[0]
+              ?.trim()
             const chineseName = toTraditional(rawName)
 
             // 檢查本次批次內重複
@@ -316,8 +444,8 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
                 existingCustomer = sameBirthday[0]
                 matchReason = CPL.MATCH_BIRTHDAY(birthDate)
               } else if (sameBirthday.length > 1 && chineseName) {
-                existingCustomer = sameBirthday.find(c =>
-                  c.name?.includes(chineseName) || chineseName.includes(c.name || '')
+                existingCustomer = sameBirthday.find(
+                  c => c.name?.includes(chineseName) || chineseName.includes(c.name || '')
                 )
                 if (existingCustomer) matchReason = CPL.MATCH_BIRTHDAY_NAME
               }
@@ -361,8 +489,9 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
             // 詳見: /fixes/passport-url-fix.md
             const { data: urlData, error: urlError } = await supabase.storage
               .from('passport-images')
-              .createSignedUrl(storageFileName, 3600 * 24 * 365 * 10)  // 10 years
-            if (urlError || !urlData?.signedUrl) throw urlError || new Error('Failed to create signed URL')
+              .createSignedUrl(storageFileName, 3600 * 24 * 365 * 10) // 10 years
+            if (urlError || !urlData?.signedUrl)
+              throw urlError || new Error('Failed to create signed URL')
 
             // 檢查與現有資料的差異
             const differences: string[] = []
@@ -371,17 +500,35 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
             if (existingCustomer) {
               // 比較護照號碼
               if (passportNumber && existingCustomer.passport_number !== passportNumber) {
-                differences.push(CPL.INFO_PASSPORT(`${existingCustomer.passport_number || '無'} → ${passportNumber}`))
+                differences.push(
+                  CPL.INFO_PASSPORT(
+                    `${existingCustomer.passport_number || '無'} → ${passportNumber}`
+                  )
+                )
                 hasRealDifference = true
               }
               // 比較護照效期
-              if (ocrData.passport_expiry && existingCustomer.passport_expiry !== ocrData.passport_expiry) {
-                differences.push(CPL.INFO_EXPIRY(`${existingCustomer.passport_expiry || '無'} → ${ocrData.passport_expiry}`))
+              if (
+                ocrData.passport_expiry &&
+                existingCustomer.passport_expiry !== ocrData.passport_expiry
+              ) {
+                differences.push(
+                  CPL.INFO_EXPIRY(
+                    `${existingCustomer.passport_expiry || '無'} → ${ocrData.passport_expiry}`
+                  )
+                )
                 hasRealDifference = true
               }
               // 比較護照拼音
-              if (ocrData.passport_name && existingCustomer.passport_name !== ocrData.passport_name) {
-                differences.push(CPL.INFO_PINYIN(`${existingCustomer.passport_name || '無'} → ${ocrData.passport_name}`))
+              if (
+                ocrData.passport_name &&
+                existingCustomer.passport_name !== ocrData.passport_name
+              ) {
+                differences.push(
+                  CPL.INFO_PINYIN(
+                    `${existingCustomer.passport_name || '無'} → ${ocrData.passport_name}`
+                  )
+                )
                 hasRealDifference = true
               }
               // 比較身分證（如果現有的為空才算更新）
@@ -397,7 +544,9 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
               // 比較性別（如果現有的為空才算更新）
               const normalizedGenderValue = normalizeGender(gender)
               if (normalizedGenderValue && !existingCustomer.gender) {
-                differences.push(CPL.INFO_GENDER_NEW(normalizedGenderValue === 'M' ? CPL.MALE : CPL.FEMALE))
+                differences.push(
+                  CPL.INFO_GENDER_NEW(normalizedGenderValue === 'M' ? CPL.MALE : CPL.FEMALE)
+                )
                 hasRealDifference = true
               }
             }
@@ -441,7 +590,9 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
 
       // 有差異的項目才需要確認
       if (needConfirmItems.length > 0) {
-        const matchListHtml = needConfirmItems.map((item, idx) => `
+        const matchListHtml = needConfirmItems
+          .map(
+            (item, idx) => `
           <div style="display: flex; gap: 12px; padding: 12px; background: ${idx % 2 === 0 ? '#f9fafb' : '#fff'}; border-radius: 6px; margin-bottom: 8px;">
             <img src="${item.imageUrl}" style="width: 80px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #e5e7eb;" />
             <div style="flex: 1; font-size: 12px;">
@@ -453,7 +604,9 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
               </div>
             </div>
           </div>
-        `).join('')
+        `
+          )
+          .join('')
 
         const confirmHtml = `
           <div style="max-height: 300px; overflow-y: auto; margin-top: 12px;">
@@ -617,7 +770,10 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
       }
     } catch (error) {
       logger.error('批次上傳失敗:', error)
-      await alert(CPL.BATCH_FAILED_PREFIX + (error instanceof Error ? error.message : CPL.UNKNOWN_ERROR), 'error')
+      await alert(
+        CPL.BATCH_FAILED_PREFIX + (error instanceof Error ? error.message : CPL.UNKNOWN_ERROR),
+        'error'
+      )
     } finally {
       setIsUploading(false)
     }

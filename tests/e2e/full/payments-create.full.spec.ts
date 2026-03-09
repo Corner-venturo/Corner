@@ -61,20 +61,29 @@ test.describe('收款管理 - 創建流程測試', () => {
 
       console.log(`共有 ${tourCount} 個團體可選`)
 
-      for (let tourIndex = 0; tourIndex < Math.min(5, tourCount) && !foundTourWithOrder; tourIndex++) {
+      for (
+        let tourIndex = 0;
+        tourIndex < Math.min(5, tourCount) && !foundTourWithOrder;
+        tourIndex++
+      ) {
         // 第一次已經打開了，之後需要重新打開並顯示所有選項
         if (tourIndex > 0) {
           // 找到 Combobox 的 input
-          const comboboxInput = dialog.locator('[data-slot="input"], input[role="combobox"], input').first()
+          const comboboxInput = dialog
+            .locator('[data-slot="input"], input[role="combobox"], input')
+            .first()
 
           // 先清除輸入框內容，這樣才能顯示所有選項（Combobox 會根據輸入過濾）
           await comboboxInput.click()
           await page.waitForTimeout(200)
-          await comboboxInput.fill('')  // 清空輸入讓所有選項顯示
+          await comboboxInput.fill('') // 清空輸入讓所有選項顯示
           await page.waitForTimeout(500)
 
           // 確認 listbox 已打開且有多個選項
-          const listboxVisible = await page.locator('[role="listbox"]').isVisible({ timeout: 2000 }).catch(() => false)
+          const listboxVisible = await page
+            .locator('[role="listbox"]')
+            .isVisible({ timeout: 2000 })
+            .catch(() => false)
           if (!listboxVisible) {
             console.log(`listbox 未開啟，再次點擊觸發`)
             await comboboxInput.click()
@@ -100,15 +109,25 @@ test.describe('收款管理 - 創建流程測試', () => {
           await page.waitForTimeout(300)
 
           // 方法1: 檢查是否有「沒有訂單」的禁用按鈕
-          const noOrderButton = dialog.locator('button').filter({ hasText: /沒有訂單|此團體沒有訂單/ }).first()
-          const hasNoOrderMessage = await noOrderButton.isVisible({ timeout: 1000 }).catch(() => false)
+          const noOrderButton = dialog
+            .locator('button')
+            .filter({ hasText: /沒有訂單|此團體沒有訂單/ })
+            .first()
+          const hasNoOrderMessage = await noOrderButton
+            .isVisible({ timeout: 1000 })
+            .catch(() => false)
 
           if (hasNoOrderMessage) {
             console.log(`團 ${tourIndex + 1} 沒有訂單，嘗試下一個`)
           } else {
             // 方法2: 檢查是否有訂單選擇的 combobox
-            const orderCombobox = dialog.locator('[role="combobox"]').filter({ has: page.locator('text=/O[0-9]+/') }).first()
-            const hasOrderCombobox = await orderCombobox.isVisible({ timeout: 1000 }).catch(() => false)
+            const orderCombobox = dialog
+              .locator('[role="combobox"]')
+              .filter({ has: page.locator('text=/O[0-9]+/') })
+              .first()
+            const hasOrderCombobox = await orderCombobox
+              .isVisible({ timeout: 1000 })
+              .catch(() => false)
 
             if (hasOrderCombobox) {
               const orderText = await orderCombobox.textContent()
@@ -116,7 +135,11 @@ test.describe('收款管理 - 創建流程測試', () => {
               foundTourWithOrder = true
             } else {
               // 嘗試找任何訂單相關的 combobox
-              const anyOrderArea = dialog.locator('text=訂單').locator('..').locator('[role="combobox"]').first()
+              const anyOrderArea = dialog
+                .locator('text=訂單')
+                .locator('..')
+                .locator('[role="combobox"]')
+                .first()
               if (await anyOrderArea.isVisible({ timeout: 500 }).catch(() => false)) {
                 const orderText = await anyOrderArea.textContent()
                 if (orderText && !orderText.includes('請選擇') && !orderText.includes('沒有訂單')) {
@@ -144,7 +167,11 @@ test.describe('收款管理 - 創建流程測試', () => {
       // 2. 檢查訂單選擇狀態
       // 訂單可能已經自動選擇（當只有一個訂單時）
       // 訂單選擇器是 combobox，不是 button
-      const orderCombobox = dialog.locator('text=訂單').locator('..').locator('[role="combobox"]').first()
+      const orderCombobox = dialog
+        .locator('text=訂單')
+        .locator('..')
+        .locator('[role="combobox"]')
+        .first()
       const orderComboboxText = await orderCombobox.textContent().catch(() => '')
       console.log('訂單選擇器當前值:', orderComboboxText)
 
@@ -186,7 +213,10 @@ test.describe('收款管理 - 創建流程測試', () => {
       }
 
       // 5. 提交表單
-      const submitButton = dialog.locator('button').filter({ hasText: /新增收款單/ }).first()
+      const submitButton = dialog
+        .locator('button')
+        .filter({ hasText: /新增收款單/ })
+        .first()
 
       if (await submitButton.isVisible()) {
         // 檢查按鈕是否啟用
@@ -205,7 +235,10 @@ test.describe('收款管理 - 創建流程測試', () => {
             // 如果對話框沒關閉，檢查是否有錯誤訊息
             const dialogStillVisible = await dialog.isVisible()
             if (dialogStillVisible) {
-              const errorToast = await page.locator('[data-sonner-toast]').textContent().catch(() => '')
+              const errorToast = await page
+                .locator('[data-sonner-toast]')
+                .textContent()
+                .catch(() => '')
               console.log('收款單創建結果：對話框仍開啟，toast 訊息:', errorToast)
             }
           }
@@ -252,7 +285,10 @@ test.describe('收款管理 - 創建流程測試', () => {
         await page.waitForTimeout(500)
 
         // 檢查訂單選擇器狀態改變
-        const orderSelect = dialog.locator('button').filter({ hasText: /訂單|選擇訂單/ }).first()
+        const orderSelect = dialog
+          .locator('button')
+          .filter({ hasText: /訂單|選擇訂單/ })
+          .first()
         const orderText = await orderSelect.textContent()
 
         // 選擇團體後，訂單選擇器應該：
@@ -276,7 +312,10 @@ test.describe('收款管理 - 創建流程測試', () => {
       await page.waitForTimeout(500)
 
       // 訂單選擇器應該顯示「請先選擇團體」且禁用
-      const orderSelect = dialog.locator('button').filter({ hasText: /請先選擇團體/ }).first()
+      const orderSelect = dialog
+        .locator('button')
+        .filter({ hasText: /請先選擇團體/ })
+        .first()
 
       if (await orderSelect.isVisible()) {
         const isDisabled = await orderSelect.isDisabled()
@@ -321,7 +360,10 @@ test.describe('收款管理 - 創建流程測試', () => {
       }
 
       // 選擇訂單
-      const orderSelect3 = dialog.locator('button').filter({ hasText: /訂單|選擇訂單/ }).first()
+      const orderSelect3 = dialog
+        .locator('button')
+        .filter({ hasText: /訂單|選擇訂單/ })
+        .first()
       if (await orderSelect3.isEnabled({ timeout: 3000 }).catch(() => false)) {
         await orderSelect3.click()
         await page.waitForTimeout(300)
@@ -337,7 +379,10 @@ test.describe('收款管理 - 創建流程測試', () => {
       }
 
       // 金額預設為 0，檢查提交按鈕狀態
-      const submitButton = dialog.locator('button').filter({ hasText: /新增收款單/ }).first()
+      const submitButton = dialog
+        .locator('button')
+        .filter({ hasText: /新增收款單/ })
+        .first()
 
       if (await submitButton.isVisible()) {
         // 金額為 0 時，可能顯示「總金額 NT$ 0」
@@ -350,7 +395,10 @@ test.describe('收款管理 - 創建流程測試', () => {
           await page.waitForTimeout(500)
 
           // 檢查是否有錯誤提示
-          const hasError = await page.locator('[data-sonner-toast]').isVisible().catch(() => false)
+          const hasError = await page
+            .locator('[data-sonner-toast]')
+            .isVisible()
+            .catch(() => false)
           console.log('是否顯示錯誤 toast：', hasError)
         }
       }
@@ -374,7 +422,10 @@ test.describe('收款管理 - 創建流程測試', () => {
       await page.waitForTimeout(500)
 
       // 找到收款方式選擇器（在表格第一列）
-      const receiptTypeSelect = dialog.locator('button').filter({ hasText: /匯款|現金|刷卡|支票/ }).first()
+      const receiptTypeSelect = dialog
+        .locator('button')
+        .filter({ hasText: /匯款|現金|刷卡|支票/ })
+        .first()
 
       if (await receiptTypeSelect.isVisible()) {
         console.log('找到收款方式選擇器')
@@ -415,12 +466,19 @@ test.describe('收款管理 - 創建流程測試', () => {
       const expectedHeaders = ['收款方式', '交易日期', '付款資訊', '備註', '金額']
 
       for (const header of expectedHeaders) {
-        const hasHeader = await dialog.locator(`text=${header}`).first().isVisible().catch(() => false)
+        const hasHeader = await dialog
+          .locator(`text=${header}`)
+          .first()
+          .isVisible()
+          .catch(() => false)
         console.log(`欄位「${header}」：${hasHeader ? '存在' : '不存在'}`)
       }
 
       // 檢查「新增項目」按鈕
-      const addItemButton = dialog.locator('button, text').filter({ hasText: /新增項目/ }).first()
+      const addItemButton = dialog
+        .locator('button, text')
+        .filter({ hasText: /新增項目/ })
+        .first()
       const hasAddItem = await addItemButton.isVisible().catch(() => false)
       console.log('新增項目按鈕：', hasAddItem ? '存在' : '不存在')
 

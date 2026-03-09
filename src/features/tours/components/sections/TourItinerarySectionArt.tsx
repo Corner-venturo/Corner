@@ -84,7 +84,9 @@ export function TourItinerarySectionArt({
             <div
               key={`day-${index}`}
               id={`day-${index + 1}`}
-              ref={el => { dayRefs.current[index] = el as HTMLDivElement | null }}
+              ref={el => {
+                dayRefs.current[index] = el as HTMLDivElement | null
+              }}
             >
               {isMobile ? (
                 <MobileDaySection

@@ -34,7 +34,7 @@ import {
 interface UsePassportUploadParams {
   orderId: string | undefined
   workspaceId: string
-  onSuccess: () => Promise<void>  // 上傳成功後的回呼（通常是重新載入成員）
+  onSuccess: () => Promise<void> // 上傳成功後的回呼（通常是重新載入成員）
 }
 
 /** 護照資料（用於衝突 Dialog） */
@@ -80,7 +80,9 @@ export function usePassportUpload({
   const [isUploading, setIsUploading] = useState(false)
   const [conflictDialogOpen, setConflictDialogOpen] = useState(false)
   const [conflicts, setConflicts] = useState<ActiveOrderConflict[]>([])
-  const [conflictPassportData, setConflictPassportData] = useState<PassportDataForConflict | null>(null)
+  const [conflictPassportData, setConflictPassportData] = useState<PassportDataForConflict | null>(
+    null
+  )
 
   // 使用子模組
   const fileModule = usePassportFiles()
@@ -111,10 +113,10 @@ export function usePassportUpload({
       let duplicateCount = 0
       let matchedCustomerCount = 0
       let newCustomerCount = 0
-      let updatedCount = 0  // 新增：更新現有成員的計數
+      let updatedCount = 0 // 新增：更新現有成員的計數
       const failedItems: string[] = []
       const duplicateItems: string[] = []
-      const updatedItems: string[] = []  // 新增：更新的成員列表
+      const updatedItems: string[] = [] // 新增：更新的成員列表
 
       // 載入現有成員（包含 id）
       const { data: existingMembers } = await supabase
@@ -128,10 +130,7 @@ export function usePassportUpload({
 
         if (item.success && item.customer) {
           // 檢查重複
-          const duplicateCheck = ocrModule.checkDuplicate(
-            item.customer,
-            existingMembers || []
-          )
+          const duplicateCheck = ocrModule.checkDuplicate(item.customer, existingMembers || [])
 
           // 完全重複 → 跳過
           if (duplicateCheck.isDuplicate) {
@@ -154,7 +153,8 @@ export function usePassportUpload({
 
             if (updateResult.success) {
               updatedCount++
-              const displayName = item.customer.name || duplicateCheck.matchedMember.chinese_name || item.fileName
+              const displayName =
+                item.customer.name || duplicateCheck.matchedMember.chinese_name || item.fileName
               updatedItems.push(displayName)
             } else {
               failedItems.push(PASSPORT_UPLOAD_LABELS.UPDATE_FAILED(item.fileName))
@@ -215,10 +215,16 @@ export function usePassportUpload({
           const custId = member.customer_id as string
           const pData: PassportDataForConflict = {
             passport_number: item.customer.passport_number || null,
-            passport_name: item.customer.passport_romanization || item.customer.english_name || null,
+            passport_name:
+              item.customer.passport_romanization || item.customer.english_name || null,
             passport_expiry: item.customer.passport_expiry || null,
             birth_date: item.customer.birth_date || null,
-            gender: item.customer.sex === COMP_ORDERS_LABELS.男 ? 'M' : item.customer.sex === COMP_ORDERS_LABELS.女 ? 'F' : null,
+            gender:
+              item.customer.sex === COMP_ORDERS_LABELS.男
+                ? 'M'
+                : item.customer.sex === COMP_ORDERS_LABELS.女
+                  ? 'F'
+                  : null,
             national_id: item.customer.national_id || null,
           }
 
@@ -283,7 +289,8 @@ export function usePassportUpload({
 
       // 重算團人數（批次上傳後）
       if (orderId && successCount > 0) {
-        const { recalculateParticipants } = await import('@/features/tours/services/tour-stats.service')
+        const { recalculateParticipants } =
+          await import('@/features/tours/services/tour-stats.service')
         const { data: order } = await supabase
           .from('orders')
           .select('tour_id')
@@ -297,19 +304,15 @@ export function usePassportUpload({
       }
     } catch (error) {
       logger.error(COMP_ORDERS_LABELS.批次上傳失敗, error)
-      void alert(COMP_ORDERS_LABELS.批次上傳失敗_2 + (error instanceof Error ? error.message : COMP_ORDERS_LABELS.未知錯誤), 'error')
+      void alert(
+        COMP_ORDERS_LABELS.批次上傳失敗_2 +
+          (error instanceof Error ? error.message : COMP_ORDERS_LABELS.未知錯誤),
+        'error'
+      )
     } finally {
       setIsUploading(false)
     }
-  }, [
-    fileModule,
-    ocrModule,
-    validationModule,
-    isUploading,
-    orderId,
-    workspaceId,
-    onSuccess,
-  ])
+  }, [fileModule, ocrModule, validationModule, isUploading, orderId, workspaceId, onSuccess])
 
   return {
     processedFiles: fileModule.processedFiles,

@@ -127,12 +127,7 @@ export function BirthdayListDialog({ open, onClose, initialMonth }: BirthdayList
 
         {/* 月份切換 */}
         <div className="flex items-center justify-between py-2 border-b border-border">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handlePrevMonth}
-            className="h-8 w-8 p-0"
-          >
+          <Button variant="ghost" size="sm" onClick={handlePrevMonth} className="h-8 w-8 p-0">
             <ChevronLeft size={18} />
           </Button>
 
@@ -140,22 +135,12 @@ export function BirthdayListDialog({ open, onClose, initialMonth }: BirthdayList
             <span className="font-semibold text-morandi-primary">
               {getMonthLabel(currentMonth)}
             </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleToday}
-              className="h-6 px-2 text-xs"
-            >
+            <Button variant="outline" size="sm" onClick={handleToday} className="h-6 px-2 text-xs">
               {CALENDAR_LABELS.THIS_MONTH}
             </Button>
           </div>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleNextMonth}
-            className="h-8 w-8 p-0"
-          >
+          <Button variant="ghost" size="sm" onClick={handleNextMonth} className="h-8 w-8 p-0">
             <ChevronRight size={18} />
           </Button>
         </div>
@@ -163,9 +148,7 @@ export function BirthdayListDialog({ open, onClose, initialMonth }: BirthdayList
         {/* 生日名單 */}
         <div className="max-h-[400px] overflow-y-auto">
           {loading ? (
-            <div className="py-8 text-center text-morandi-secondary">
-              {CALENDAR_LABELS.LOADING}
-            </div>
+            <div className="py-8 text-center text-morandi-secondary">{CALENDAR_LABELS.LOADING}</div>
           ) : birthdays.length === 0 ? (
             <div className="py-8 text-center text-morandi-secondary">
               {CALENDAR_LABELS.NO_BIRTHDAY_THIS_MONTH}
@@ -179,9 +162,7 @@ export function BirthdayListDialog({ open, onClose, initialMonth }: BirthdayList
                 >
                   {/* 日期 */}
                   <div className="w-12 text-center">
-                    <div className="text-lg font-bold text-morandi-gold">
-                      {person.day}
-                    </div>
+                    <div className="text-lg font-bold text-morandi-gold">{person.day}</div>
                     <div className="text-xs text-morandi-secondary">
                       {formatBirthday(person.birth_date)}
                     </div>
@@ -206,7 +187,9 @@ export function BirthdayListDialog({ open, onClose, initialMonth }: BirthdayList
         {/* 統計 */}
         {!loading && birthdays.length > 0 && (
           <div className="pt-2 border-t border-border text-sm text-morandi-secondary text-center">
-            {CALENDAR_LABELS.MONTHLY_BIRTHDAY_COUNT_PREFIX}{birthdays.length}{CALENDAR_LABELS.MONTHLY_BIRTHDAY_COUNT_SUFFIX}
+            {CALENDAR_LABELS.MONTHLY_BIRTHDAY_COUNT_PREFIX}
+            {birthdays.length}
+            {CALENDAR_LABELS.MONTHLY_BIRTHDAY_COUNT_SUFFIX}
           </div>
         )}
       </DialogContent>

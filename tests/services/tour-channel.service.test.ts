@@ -33,7 +33,10 @@ vi.mock('@/lib/utils/logger', () => ({
 }))
 
 // Import after mocking
-import { createTourChannel, addMembersToTourChannel } from '@/features/tours/services/tour-channel.service'
+import {
+  createTourChannel,
+  addMembersToTourChannel,
+} from '@/features/tours/services/tour-channel.service'
 import type { Tour } from '@/types/tour.types'
 
 describe('TourChannelService', () => {
@@ -114,9 +117,7 @@ describe('TourChannelService', () => {
 
   describe('addMembersToTourChannel', () => {
     it('should return error when channel not found', async () => {
-      mockFromImplementation.mockReturnValue(
-        createMockChain({ data: null, error: null })
-      )
+      mockFromImplementation.mockReturnValue(createMockChain({ data: null, error: null }))
 
       const result = await addMembersToTourChannel('tour-1', ['emp-1'])
 

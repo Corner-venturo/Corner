@@ -172,7 +172,11 @@ interface Subscription {
 
 class StoreEventManager {
   private handlers: Map<StoreEventType, Set<EventHandler<StoreEventType>>> = new Map()
-  private eventHistory: Array<{ type: StoreEventType; payload: BaseEventPayload; timestamp: number }> = []
+  private eventHistory: Array<{
+    type: StoreEventType
+    payload: BaseEventPayload
+    timestamp: number
+  }> = []
   private maxHistorySize = 100
 
   // 防止重複事件的 debounce 機制
@@ -182,12 +186,24 @@ class StoreEventManager {
   constructor() {
     // 初始化所有事件類型的 handler set
     const eventTypes: StoreEventType[] = [
-      'TOUR_CREATED', 'TOUR_UPDATED', 'TOUR_DELETED',
-      'ORDER_CREATED', 'ORDER_UPDATED', 'ORDER_DELETED',
-      'MEMBER_CREATED', 'MEMBER_UPDATED', 'MEMBER_DELETED',
-      'ITINERARY_CREATED', 'ITINERARY_UPDATED', 'ITINERARY_DELETED',
-      'PAYMENT_REQUEST_CREATED', 'PAYMENT_REQUEST_UPDATED', 'PAYMENT_REQUEST_DELETED',
-      'RECEIPT_ORDER_CREATED', 'RECEIPT_ORDER_UPDATED', 'RECEIPT_ORDER_DELETED',
+      'TOUR_CREATED',
+      'TOUR_UPDATED',
+      'TOUR_DELETED',
+      'ORDER_CREATED',
+      'ORDER_UPDATED',
+      'ORDER_DELETED',
+      'MEMBER_CREATED',
+      'MEMBER_UPDATED',
+      'MEMBER_DELETED',
+      'ITINERARY_CREATED',
+      'ITINERARY_UPDATED',
+      'ITINERARY_DELETED',
+      'PAYMENT_REQUEST_CREATED',
+      'PAYMENT_REQUEST_UPDATED',
+      'PAYMENT_REQUEST_DELETED',
+      'RECEIPT_ORDER_CREATED',
+      'RECEIPT_ORDER_UPDATED',
+      'RECEIPT_ORDER_DELETED',
     ]
     eventTypes.forEach(type => this.handlers.set(type, new Set()))
   }
@@ -207,7 +223,7 @@ class StoreEventManager {
       ignoreSources?: StoreSource[]
     }
   ): Subscription {
-    const wrappedHandler: EventHandler<T> = (payload) => {
+    const wrappedHandler: EventHandler<T> = payload => {
       // 檢查是否應該忽略此來源
       if (options?.ignoreSources?.includes(payload.source)) {
         logger.log(`[StoreEvents] 忽略來自 ${payload.source} 的 ${eventType} 事件`)
@@ -227,7 +243,7 @@ class StoreEventManager {
         if (handlers) {
           handlers.delete(wrappedHandler as EventHandler<StoreEventType>)
         }
-      }
+      },
     }
   }
 
@@ -236,7 +252,10 @@ class StoreEventManager {
    * @param eventType 事件類型
    * @param payload 事件資料
    */
-  emit<T extends StoreEventType>(eventType: T, payload: Omit<StoreEventPayloadMap[T], 'timestamp'>): void {
+  emit<T extends StoreEventType>(
+    eventType: T,
+    payload: Omit<StoreEventPayloadMap[T], 'timestamp'>
+  ): void {
     const fullPayload = {
       ...payload,
       timestamp: Date.now(),
@@ -263,7 +282,10 @@ class StoreEventManager {
   /**
    * 立即發送事件（跳過 debounce）
    */
-  emitImmediate<T extends StoreEventType>(eventType: T, payload: Omit<StoreEventPayloadMap[T], 'timestamp'>): void {
+  emitImmediate<T extends StoreEventType>(
+    eventType: T,
+    payload: Omit<StoreEventPayloadMap[T], 'timestamp'>
+  ): void {
     const fullPayload = {
       ...payload,
       timestamp: Date.now(),
@@ -280,7 +302,10 @@ class StoreEventManager {
     this.executeEmit(eventType, fullPayload)
   }
 
-  private executeEmit<T extends StoreEventType>(eventType: T, payload: StoreEventPayloadMap[T]): void {
+  private executeEmit<T extends StoreEventType>(
+    eventType: T,
+    payload: StoreEventPayloadMap[T]
+  ): void {
     logger.log(`[StoreEvents] 發送事件: ${eventType}`, payload)
 
     // 記錄事件歷史
@@ -311,7 +336,7 @@ class StoreEventManager {
   private getEventKey(eventType: StoreEventType, payload: Record<string, unknown>): string {
     // 根據事件類型生成唯一 key
     const idField = this.getIdField(eventType)
-    const id = payload[idField] as string || 'unknown'
+    const id = (payload[idField] as string) || 'unknown'
     return `${eventType}:${id}`
   }
 
@@ -328,7 +353,11 @@ class StoreEventManager {
   /**
    * 取得事件歷史（用於除錯）
    */
-  getEventHistory(): ReadonlyArray<{ type: StoreEventType; payload: BaseEventPayload; timestamp: number }> {
+  getEventHistory(): ReadonlyArray<{
+    type: StoreEventType
+    payload: BaseEventPayload
+    timestamp: number
+  }> {
     return [...this.eventHistory]
   }
 
@@ -389,11 +418,23 @@ export interface StoreSyncConfig {
   /** 當 Order 刪除時 */
   onOrderDeleted?: (orderId: string, tourId: string | undefined, payload: OrderEventPayload) => void
   /** 當 Member 建立時 */
-  onMemberCreated?: (memberId: string, orderId: string | undefined, payload: MemberEventPayload) => void
+  onMemberCreated?: (
+    memberId: string,
+    orderId: string | undefined,
+    payload: MemberEventPayload
+  ) => void
   /** 當 Member 更新時 */
-  onMemberUpdated?: (memberId: string, orderId: string | undefined, payload: MemberEventPayload) => void
+  onMemberUpdated?: (
+    memberId: string,
+    orderId: string | undefined,
+    payload: MemberEventPayload
+  ) => void
   /** 當 Member 刪除時 */
-  onMemberDeleted?: (memberId: string, orderId: string | undefined, payload: MemberEventPayload) => void
+  onMemberDeleted?: (
+    memberId: string,
+    orderId: string | undefined,
+    payload: MemberEventPayload
+  ) => void
   /** 要忽略的事件來源 */
   ignoreSources?: StoreSource[]
 }
@@ -405,69 +446,105 @@ export function setupStoreSyncListeners(config: StoreSyncConfig): () => void {
   // Tour 事件
   if (config.onTourCreated) {
     subscriptions.push(
-      storeEvents.on('TOUR_CREATED', (payload) => {
-        config.onTourCreated!(payload.tourId, payload)
-      }, { ignoreSources })
+      storeEvents.on(
+        'TOUR_CREATED',
+        payload => {
+          config.onTourCreated!(payload.tourId, payload)
+        },
+        { ignoreSources }
+      )
     )
   }
   if (config.onTourUpdated) {
     subscriptions.push(
-      storeEvents.on('TOUR_UPDATED', (payload) => {
-        config.onTourUpdated!(payload.tourId, payload)
-      }, { ignoreSources })
+      storeEvents.on(
+        'TOUR_UPDATED',
+        payload => {
+          config.onTourUpdated!(payload.tourId, payload)
+        },
+        { ignoreSources }
+      )
     )
   }
   if (config.onTourDeleted) {
     subscriptions.push(
-      storeEvents.on('TOUR_DELETED', (payload) => {
-        config.onTourDeleted!(payload.tourId, payload)
-      }, { ignoreSources })
+      storeEvents.on(
+        'TOUR_DELETED',
+        payload => {
+          config.onTourDeleted!(payload.tourId, payload)
+        },
+        { ignoreSources }
+      )
     )
   }
 
   // Order 事件
   if (config.onOrderCreated) {
     subscriptions.push(
-      storeEvents.on('ORDER_CREATED', (payload) => {
-        config.onOrderCreated!(payload.orderId, payload.tourId, payload)
-      }, { ignoreSources })
+      storeEvents.on(
+        'ORDER_CREATED',
+        payload => {
+          config.onOrderCreated!(payload.orderId, payload.tourId, payload)
+        },
+        { ignoreSources }
+      )
     )
   }
   if (config.onOrderUpdated) {
     subscriptions.push(
-      storeEvents.on('ORDER_UPDATED', (payload) => {
-        config.onOrderUpdated!(payload.orderId, payload.tourId, payload)
-      }, { ignoreSources })
+      storeEvents.on(
+        'ORDER_UPDATED',
+        payload => {
+          config.onOrderUpdated!(payload.orderId, payload.tourId, payload)
+        },
+        { ignoreSources }
+      )
     )
   }
   if (config.onOrderDeleted) {
     subscriptions.push(
-      storeEvents.on('ORDER_DELETED', (payload) => {
-        config.onOrderDeleted!(payload.orderId, payload.tourId, payload)
-      }, { ignoreSources })
+      storeEvents.on(
+        'ORDER_DELETED',
+        payload => {
+          config.onOrderDeleted!(payload.orderId, payload.tourId, payload)
+        },
+        { ignoreSources }
+      )
     )
   }
 
   // Member 事件
   if (config.onMemberCreated) {
     subscriptions.push(
-      storeEvents.on('MEMBER_CREATED', (payload) => {
-        config.onMemberCreated!(payload.memberId, payload.orderId, payload)
-      }, { ignoreSources })
+      storeEvents.on(
+        'MEMBER_CREATED',
+        payload => {
+          config.onMemberCreated!(payload.memberId, payload.orderId, payload)
+        },
+        { ignoreSources }
+      )
     )
   }
   if (config.onMemberUpdated) {
     subscriptions.push(
-      storeEvents.on('MEMBER_UPDATED', (payload) => {
-        config.onMemberUpdated!(payload.memberId, payload.orderId, payload)
-      }, { ignoreSources })
+      storeEvents.on(
+        'MEMBER_UPDATED',
+        payload => {
+          config.onMemberUpdated!(payload.memberId, payload.orderId, payload)
+        },
+        { ignoreSources }
+      )
     )
   }
   if (config.onMemberDeleted) {
     subscriptions.push(
-      storeEvents.on('MEMBER_DELETED', (payload) => {
-        config.onMemberDeleted!(payload.memberId, payload.orderId, payload)
-      }, { ignoreSources })
+      storeEvents.on(
+        'MEMBER_DELETED',
+        payload => {
+          config.onMemberDeleted!(payload.memberId, payload.orderId, payload)
+        },
+        { ignoreSources }
+      )
     )
   }
 

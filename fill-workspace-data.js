@@ -17,16 +17,18 @@ async function executeSQL(sql, description = 'SQL') {
       path: `/v1/projects/${PROJECT_REF}/database/query`,
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${SUPABASE_ACCESS_TOKEN}`,
-        'Content-Type': 'application/json'
-      }
+        Authorization: `Bearer ${SUPABASE_ACCESS_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
     }
 
     const postData = JSON.stringify({ query: sql })
 
-    const req = https.request(options, (res) => {
+    const req = https.request(options, res => {
       let data = ''
-      res.on('data', (chunk) => { data += chunk })
+      res.on('data', chunk => {
+        data += chunk
+      })
       res.on('end', () => {
         if (res.statusCode === 200 || res.statusCode === 201) {
           console.log(`✅ ${description}`)
@@ -46,9 +48,7 @@ async function executeSQL(sql, description = 'SQL') {
 async function main() {
   console.log('🔄 填充 _migrations 記錄...\n')
 
-  const migrations = [
-    '20251119085637_add_updated_by_to_todos.sql'
-  ]
+  const migrations = ['20251119085637_add_updated_by_to_todos.sql']
 
   for (const migration of migrations) {
     try {

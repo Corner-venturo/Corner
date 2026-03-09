@@ -57,7 +57,9 @@ export function usePendingColumns({ selectedRequests, onSelectRequest }: UsePend
         key: 'request_number',
         label: DISBURSEMENT_LABELS.請款單號,
         sortable: true,
-        render: (value: unknown) => <div className="font-medium text-morandi-primary">{value as string}</div>,
+        render: (value: unknown) => (
+          <div className="font-medium text-morandi-primary">{value as string}</div>
+        ),
       },
       {
         key: 'code',
@@ -70,7 +72,9 @@ export function usePendingColumns({ selectedRequests, onSelectRequest }: UsePend
         label: DISBURSEMENT_LABELS.團體名稱,
         sortable: true,
         render: (value: unknown) => (
-          <div className="text-sm text-morandi-secondary truncate max-w-[200px]">{value as string}</div>
+          <div className="text-sm text-morandi-secondary truncate max-w-[200px]">
+            {value as string}
+          </div>
         ),
       },
       {
@@ -89,7 +93,12 @@ export function usePendingColumns({ selectedRequests, onSelectRequest }: UsePend
         key: 'status',
         label: DISBURSEMENT_LABELS.狀態,
         render: (value: unknown) => (
-          <Badge className={cn('text-white', PAYMENT_REQUEST_STATUS_COLORS[value as keyof typeof PAYMENT_REQUEST_STATUS_COLORS])}>
+          <Badge
+            className={cn(
+              'text-white',
+              PAYMENT_REQUEST_STATUS_COLORS[value as keyof typeof PAYMENT_REQUEST_STATUS_COLORS]
+            )}
+          >
             {PAYMENT_REQUEST_STATUS_LABELS[value as keyof typeof PAYMENT_REQUEST_STATUS_LABELS]}
           </Badge>
         ),
@@ -111,7 +120,9 @@ export function useCurrentOrderColumns({ currentOrder, onRemove }: UseCurrentOrd
         key: 'request_number',
         label: DISBURSEMENT_LABELS.請款單號,
         sortable: true,
-        render: (value: unknown) => <div className="font-medium text-morandi-primary">{value as string}</div>,
+        render: (value: unknown) => (
+          <div className="font-medium text-morandi-primary">{value as string}</div>
+        ),
       },
       {
         key: 'code',
@@ -124,7 +135,9 @@ export function useCurrentOrderColumns({ currentOrder, onRemove }: UseCurrentOrd
         label: DISBURSEMENT_LABELS.團體名稱,
         sortable: true,
         render: (value: unknown) => (
-          <div className="text-sm text-morandi-secondary truncate max-w-[200px]">{value as string}</div>
+          <div className="text-sm text-morandi-secondary truncate max-w-[200px]">
+            {value as string}
+          </div>
         ),
       },
       {
@@ -177,7 +190,9 @@ export function useHistoryColumns({ onPrintPDF, getEmployeeName }: UseHistoryCol
         key: 'order_number',
         label: DISBURSEMENT_LABELS.出納單號,
         sortable: true,
-        render: (value: unknown) => <div className="font-medium text-morandi-primary">{value as string}</div>,
+        render: (value: unknown) => (
+          <div className="font-medium text-morandi-primary">{value as string}</div>
+        ),
       },
       {
         key: 'disbursement_date',
@@ -194,7 +209,12 @@ export function useHistoryColumns({ onPrintPDF, getEmployeeName }: UseHistoryCol
       {
         key: 'payment_request_ids',
         label: DISBURSEMENT_LABELS.請款單數,
-        render: (value: unknown) => <div className="text-center">{(value as string[]).length}{DISBURSEMENT_LABELS.筆}</div>,
+        render: (value: unknown) => (
+          <div className="text-center">
+            {(value as string[]).length}
+            {DISBURSEMENT_LABELS.筆}
+          </div>
+        ),
       },
       {
         key: 'status',
@@ -221,7 +241,9 @@ export function useHistoryColumns({ onPrintPDF, getEmployeeName }: UseHistoryCol
         label: DISBURSEMENT_LABELS.建立人員,
         width: '100px',
         render: (value: unknown) => (
-          <TextCell text={getEmployeeName ? getEmployeeName(value as string) : String(value || '-')} />
+          <TextCell
+            text={getEmployeeName ? getEmployeeName(value as string) : String(value || '-')}
+          />
         ),
       },
       {

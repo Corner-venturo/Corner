@@ -106,7 +106,12 @@ export const DESIGN_TYPES: DesignType[] = [
 
 interface DesignTypeSelectorProps {
   onSelect: (type: DesignType) => void
-  onBrochureStart: (type: DesignType, tourId: string, itineraryId: string | null, styleId: string) => void
+  onBrochureStart: (
+    type: DesignType,
+    tourId: string,
+    itineraryId: string | null,
+    styleId: string
+  ) => void
   sidebarWidth: string
   workspaceId: string | undefined
   preselectedTourId?: string | null
@@ -153,7 +158,7 @@ export function DesignTypeSelector({
       setLoadingTours(false)
     }
 
-    fetchTours().catch((err) => logger.error('[fetchTours]', err))
+    fetchTours().catch(err => logger.error('[fetchTours]', err))
   }, [workspaceId, isBrochureType])
 
   // 載入行程列表
@@ -176,7 +181,7 @@ export function DesignTypeSelector({
       setLoadingItineraries(false)
     }
 
-    fetchItineraries().catch((err) => logger.error('[fetchItineraries]', err))
+    fetchItineraries().catch(err => logger.error('[fetchItineraries]', err))
   }, [selectedTourId, preselectedTourId, isBrochureType])
 
   const handleDesignTypeChange = (value: string) => {
@@ -206,8 +211,16 @@ export function DesignTypeSelector({
 
   const categoryOptions = [
     { value: 'print', label: '印刷品', items: DESIGN_TYPES.filter(t => t.category === 'print') },
-    { value: 'social', label: '社群媒體', items: DESIGN_TYPES.filter(t => t.category === 'social') },
-    { value: 'banner', label: '廣告橫幅', items: DESIGN_TYPES.filter(t => t.category === 'banner') },
+    {
+      value: 'social',
+      label: '社群媒體',
+      items: DESIGN_TYPES.filter(t => t.category === 'social'),
+    },
+    {
+      value: 'banner',
+      label: '廣告橫幅',
+      items: DESIGN_TYPES.filter(t => t.category === 'banner'),
+    },
   ]
 
   const styleOptions = [
@@ -230,7 +243,9 @@ export function DesignTypeSelector({
       {/* Content */}
       <div className="p-8 max-w-2xl mx-auto">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-morandi-primary mb-2">{DESIGNER_LABELS.ADD_4567}</h2>
+          <h2 className="text-2xl font-bold text-morandi-primary mb-2">
+            {DESIGNER_LABELS.ADD_4567}
+          </h2>
           <p className="text-morandi-secondary">{DESIGNER_LABELS.SELECT_3465}</p>
         </div>
 
@@ -246,12 +261,12 @@ export function DesignTypeSelector({
                   <SelectValue placeholder={DESIGNER_LABELS.PLEASE_SELECT_8119} />
                 </SelectTrigger>
                 <SelectContent>
-                  {categoryOptions.map((category) => (
+                  {categoryOptions.map(category => (
                     <div key={category.value}>
                       <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary">
                         {category.label}
                       </div>
-                      {category.items.map((type) => (
+                      {category.items.map(type => (
                         <SelectItem key={type.id} value={type.id}>
                           {type.name} - {type.description}
                         </SelectItem>
@@ -274,9 +289,11 @@ export function DesignTypeSelector({
                       <Combobox
                         value={selectedTourId}
                         onChange={handleTourChange}
-                        options={tours.map((tour) => ({
+                        options={tours.map(tour => ({
                           value: tour.id,
-                          label: tour.code ? `${tour.code} - ${tour.name || ''}` : tour.name || '(無名稱)',
+                          label: tour.code
+                            ? `${tour.code} - ${tour.name || ''}`
+                            : tour.name || '(無名稱)',
                         }))}
                         placeholder={loadingTours ? '載入中...' : '搜尋或選擇旅遊團'}
                         emptyMessage="找不到符合的旅遊團"
@@ -293,7 +310,7 @@ export function DesignTypeSelector({
                       <Combobox
                         value={selectedItineraryId}
                         onChange={setSelectedItineraryId}
-                        options={itineraries.map((itinerary) => ({
+                        options={itineraries.map(itinerary => ({
                           value: itinerary.id,
                           label: itinerary.title || '(無名稱)',
                         }))}
@@ -316,7 +333,11 @@ export function DesignTypeSelector({
                 )}
 
                 {/* 模板風格 */}
-                <div className={cn(showTourSelector ? 'pt-4 border-t border-border' : 'pt-4 border-t border-border')}>
+                <div
+                  className={cn(
+                    showTourSelector ? 'pt-4 border-t border-border' : 'pt-4 border-t border-border'
+                  )}
+                >
                   <label className="text-sm font-medium text-morandi-primary mb-2 block">
                     {DESIGNER_LABELS.LABEL_7216}
                   </label>
@@ -325,7 +346,7 @@ export function DesignTypeSelector({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {styleOptions.map((style) => (
+                      {styleOptions.map(style => (
                         <SelectItem key={style.id} value={style.id}>
                           {style.name} - {style.description}
                         </SelectItem>

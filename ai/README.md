@@ -1,7 +1,7 @@
 # /ai — AI 協作文件
 
 > 讓任何 AI（OpenClaw、Claude Code、Codex）第一次碰 codebase 就知道在幹嘛。
-> 
+>
 > **所有 AI 在開始工作前，必須先讀這個資料夾。**
 
 ---
@@ -29,9 +29,11 @@
 ## 🔄 工作流程
 
 ### Step 1: William + Yuzuki 討論
+
 - 定義任務 → 寫入 `tasks/CURRENT_TASK.md`
 
 ### Step 2: Coding Agent 讀
+
 1. `maps/SYSTEM_MAP.md` — 知道系統長什麼樣
 2. `maps/ROUTES_MAP.md` — 知道頁面在哪
 3. `maps/DB_SCHEMA.md` — 知道資料表結構
@@ -39,10 +41,12 @@
 5. `tasks/CURRENT_TASK.md` — 知道要做什麼
 
 ### Step 3: Coding Agent 產出
+
 - 改 code
 - 寫 `reports/OPENCLAW_REPORT.md`
 
 ### Step 4: Review
+
 - William 或 Yuzuki 看 report，決定是否 merge
 
 ---

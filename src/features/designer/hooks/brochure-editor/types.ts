@@ -56,8 +56,14 @@ export interface UseCanvasHistoryReturn {
   saveCurrentPageHistory: () => void
   loadPageHistory: (pageId: string) => void
   initPageHistory: (pageId: string) => void
-  undo: (canvas: fabric.Canvas | null, applyControlStyles: (canvas: fabric.Canvas) => void) => Promise<void>
-  redo: (canvas: fabric.Canvas | null, applyControlStyles: (canvas: fabric.Canvas) => void) => Promise<void>
+  undo: (
+    canvas: fabric.Canvas | null,
+    applyControlStyles: (canvas: fabric.Canvas) => void
+  ) => Promise<void>
+  redo: (
+    canvas: fabric.Canvas | null,
+    applyControlStyles: (canvas: fabric.Canvas) => void
+  ) => Promise<void>
   isUndoRedoRef: React.RefObject<boolean>
   clearPendingTimeout: () => void
 }
@@ -95,11 +101,25 @@ export interface UseCanvasIOOptions {
 }
 
 export interface UseCanvasIOReturn {
-  loadCanvasData: (canvas: fabric.Canvas | null, data: Record<string, unknown>, applyControlStyles: (c: fabric.Canvas) => void) => Promise<void>
-  loadCanvasElements: (canvas: fabric.Canvas | null, elements: import('@/features/designer/components/types').CanvasElement[]) => Promise<void>
-  loadCanvasPage: (canvas: fabric.Canvas | null, page: import('@/features/designer/components/types').CanvasPage, applyControlStyles: (c: fabric.Canvas) => void) => Promise<void>
+  loadCanvasData: (
+    canvas: fabric.Canvas | null,
+    data: Record<string, unknown>,
+    applyControlStyles: (c: fabric.Canvas) => void
+  ) => Promise<void>
+  loadCanvasElements: (
+    canvas: fabric.Canvas | null,
+    elements: import('@/features/designer/components/types').CanvasElement[]
+  ) => Promise<void>
+  loadCanvasPage: (
+    canvas: fabric.Canvas | null,
+    page: import('@/features/designer/components/types').CanvasPage,
+    applyControlStyles: (c: fabric.Canvas) => void
+  ) => Promise<void>
   exportCanvasData: (canvas: fabric.Canvas | null) => Record<string, unknown>
-  exportThumbnail: (canvas: fabric.Canvas | null, options?: { quality?: number; multiplier?: number }) => string
+  exportThumbnail: (
+    canvas: fabric.Canvas | null,
+    options?: { quality?: number; multiplier?: number }
+  ) => string
 }
 
 // ============================================

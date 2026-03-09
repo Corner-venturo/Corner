@@ -24,7 +24,10 @@ interface MobileActivityCarouselProps {
  * - 小卡片水平滑動，露出下一張
  * - 點擊開啟懸浮視窗檢視完整內容
  */
-export function MobileActivityCarousel({ activities, className = '' }: MobileActivityCarouselProps) {
+export function MobileActivityCarousel({
+  activities,
+  className = '',
+}: MobileActivityCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [showHint, setShowHint] = useState(true)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
@@ -124,7 +127,9 @@ export function MobileActivityCarousel({ activities, className = '' }: MobileAct
                       className="w-full h-full flex items-center justify-center"
                       style={{ backgroundColor: morandiColors.background.cream }}
                     >
-                      <span className="text-morandi-secondary text-xs">{TOUR_PREVIEW_LABELS.LABEL_4245}</span>
+                      <span className="text-morandi-secondary text-xs">
+                        {TOUR_PREVIEW_LABELS.LABEL_4245}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -167,7 +172,7 @@ export function MobileActivityCarousel({ activities, className = '' }: MobileAct
       </div>
 
       {/* 懸浮視窗 Modal - 使用標準 Dialog 組件 */}
-      <Dialog open={selectedIndex !== null} onOpenChange={(open) => !open && setSelectedIndex(null)}>
+      <Dialog open={selectedIndex !== null} onOpenChange={open => !open && setSelectedIndex(null)}>
         <DialogContent level={1} className="max-w-[85vw] sm:max-w-md p-0 overflow-hidden gap-0">
           <AnimatePresence mode="wait">
             {selectedIndex !== null && (
@@ -187,73 +192,76 @@ export function MobileActivityCarousel({ activities, className = '' }: MobileAct
                 </div>
 
                 {/* 圖片 - 有圖片才顯示 */}
-                {activities[selectedIndex]?.image && activities[selectedIndex].image!.trim() !== '' && (
-                  <div className="relative w-full aspect-[3/2] max-h-[40vh]">
-                    <Image
-                      src={activities[selectedIndex].image!}
-                      alt={activities[selectedIndex].title}
-                      fill
-                      className="object-cover"
-                      sizes="90vw"
-                      unoptimized={activities[selectedIndex].image!.startsWith('data:')}
-                    />
+                {activities[selectedIndex]?.image &&
+                  activities[selectedIndex].image!.trim() !== '' && (
+                    <div className="relative w-full aspect-[3/2] max-h-[40vh]">
+                      <Image
+                        src={activities[selectedIndex].image!}
+                        alt={activities[selectedIndex].title}
+                        fill
+                        className="object-cover"
+                        sizes="90vw"
+                        unoptimized={activities[selectedIndex].image!.startsWith('data:')}
+                      />
 
-                    {/* 左右切換按鈕 - 更柔和的設計，放在圖片兩側邊緣 */}
-                    {activities.length > 1 && (
-                      <>
-                        {selectedIndex > 0 && (
-                          <button
-                            onClick={goToPrev}
-                            className="absolute left-0 top-1/2 -translate-y-1/2 p-3 bg-black/20 hover:bg-black/40 text-white transition-all duration-200"
-                            style={{
-                              background: 'linear-gradient(90deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 100%)',
-                              borderRadius: '0 8px 8px 0'
-                            }}
-                          >
-                            <ChevronLeft size={20} />
-                          </button>
-                        )}
-                        {selectedIndex < activities.length - 1 && (
-                          <button
-                            onClick={goToNext}
-                            className="absolute right-0 top-1/2 -translate-y-1/2 p-3 bg-black/20 hover:bg-black/40 text-white transition-all duration-200"
-                            style={{
-                              background: 'linear-gradient(270deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 100%)',
-                              borderRadius: '8px 0 0 8px'
-                            }}
-                          >
-                            <ChevronRight size={20} />
-                          </button>
-                        )}
-                      </>
-                    )}
+                      {/* 左右切換按鈕 - 更柔和的設計，放在圖片兩側邊緣 */}
+                      {activities.length > 1 && (
+                        <>
+                          {selectedIndex > 0 && (
+                            <button
+                              onClick={goToPrev}
+                              className="absolute left-0 top-1/2 -translate-y-1/2 p-3 bg-black/20 hover:bg-black/40 text-white transition-all duration-200"
+                              style={{
+                                background:
+                                  'linear-gradient(90deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 100%)',
+                                borderRadius: '0 8px 8px 0',
+                              }}
+                            >
+                              <ChevronLeft size={20} />
+                            </button>
+                          )}
+                          {selectedIndex < activities.length - 1 && (
+                            <button
+                              onClick={goToNext}
+                              className="absolute right-0 top-1/2 -translate-y-1/2 p-3 bg-black/20 hover:bg-black/40 text-white transition-all duration-200"
+                              style={{
+                                background:
+                                  'linear-gradient(270deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 100%)',
+                                borderRadius: '8px 0 0 8px',
+                              }}
+                            >
+                              <ChevronRight size={20} />
+                            </button>
+                          )}
+                        </>
+                      )}
 
-                    {/* 分頁指示器 - 放在圖片底部 */}
-                    {activities.length > 1 && (
-                      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-                        {activities.map((_, index) => (
-                          <button
-                            key={index}
-                            onClick={() => setSelectedIndex(index)}
-                            className={`h-2 rounded-full transition-all shadow ${
-                              index === selectedIndex ? 'w-5 bg-card' : 'w-2 bg-card/60'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
+                      {/* 分頁指示器 - 放在圖片底部 */}
+                      {activities.length > 1 && (
+                        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                          {activities.map((_, index) => (
+                            <button
+                              key={index}
+                              onClick={() => setSelectedIndex(index)}
+                              className={`h-2 rounded-full transition-all shadow ${
+                                index === selectedIndex ? 'w-5 bg-card' : 'w-2 bg-card/60'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                 {/* 內容區 - 支援觸控滑動關閉 */}
                 <div
                   className="px-5 py-6 max-h-[35vh] overflow-y-auto flex flex-col items-center text-center"
-                  onTouchStart={(e) => {
+                  onTouchStart={e => {
                     const touch = e.touches[0]
                     // 記錄初始觸摸位置
                     e.currentTarget.dataset.startY = touch.clientY.toString()
                   }}
-                  onTouchMove={(e) => {
+                  onTouchMove={e => {
                     const target = e.currentTarget
                     const startY = parseInt(target.dataset.startY || '0')
                     const currentY = e.touches[0].clientY

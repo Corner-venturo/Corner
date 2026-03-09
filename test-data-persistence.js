@@ -29,7 +29,7 @@ async function testDataPersistence() {
     'disbursement_orders',
     'suppliers',
     'visas',
-    'customers'
+    'customers',
   ]
 
   try {
@@ -112,8 +112,10 @@ async function testDataPersistence() {
 // ============================================
 // 執行測試
 // ============================================
-testDataPersistence().then(() => {
-  console.log('✅ 測試完成')
-}).catch(error => {
-  console.error('❌ 測試失敗:', error)
-})
+testDataPersistence()
+  .then(() => {
+    console.log('✅ 測試完成')
+  })
+  .catch(error => {
+    console.error('❌ 測試失敗:', error)
+  })

@@ -80,32 +80,68 @@ function calculateGatherTime(departureTime: string): { hour: string; minute: str
 function getTerminalByAirline(airline: string): string {
   // 第一航廈的航空公司
   const terminal1Airlines = [
-    '國泰航空', 'CX', 'Cathay',
-    '港龍航空', 'KA',
-    '菲律賓航空', 'PR',
-    '越南航空', 'VN',
-    '馬來西亞航空', 'MH',
-    '新加坡航空', 'SQ',
-    '泰國航空', 'TG',
-    '韓亞航空', 'OZ',
-    '大韓航空', 'KE',
-    '日本航空', 'JL', 'JAL',
-    '全日空', 'NH', 'ANA',
-    '阿聯酋航空', 'EK',
-    '土耳其航空', 'TK',
-    '荷蘭皇家航空', 'KL',
+    '國泰航空',
+    'CX',
+    'Cathay',
+    '港龍航空',
+    'KA',
+    '菲律賓航空',
+    'PR',
+    '越南航空',
+    'VN',
+    '馬來西亞航空',
+    'MH',
+    '新加坡航空',
+    'SQ',
+    '泰國航空',
+    'TG',
+    '韓亞航空',
+    'OZ',
+    '大韓航空',
+    'KE',
+    '日本航空',
+    'JL',
+    'JAL',
+    '全日空',
+    'NH',
+    'ANA',
+    '阿聯酋航空',
+    'EK',
+    '土耳其航空',
+    'TK',
+    '荷蘭皇家航空',
+    'KL',
   ]
 
   // 第二航廈的航空公司
   const terminal2Airlines = [
-    '中華航空', 'CI', 'China Airlines', '華航',
-    '長榮航空', 'BR', 'EVA', 'EVA Air',
-    '星宇航空', 'JX', 'Starlux',
-    '台灣虎航', 'IT', 'Tigerair',
-    '樂桃航空', 'MM', 'Peach',
-    '捷星航空', 'GK', 'Jetstar',
-    '酷航', 'TR', 'Scoot',
-    '亞洲航空', 'AK', 'D7', 'AirAsia',
+    '中華航空',
+    'CI',
+    'China Airlines',
+    '華航',
+    '長榮航空',
+    'BR',
+    'EVA',
+    'EVA Air',
+    '星宇航空',
+    'JX',
+    'Starlux',
+    '台灣虎航',
+    'IT',
+    'Tigerair',
+    '樂桃航空',
+    'MM',
+    'Peach',
+    '捷星航空',
+    'GK',
+    'Jetstar',
+    '酷航',
+    'TR',
+    'Scoot',
+    '亞洲航空',
+    'AK',
+    'D7',
+    'AirAsia',
   ]
 
   const airlineUpper = airline.toUpperCase()
@@ -185,7 +221,9 @@ export function prepareContractData(
       }
     } else {
       // 沒有設定集合時間，從航班資訊計算（起飛前3小時）
-      const outboundFlight = Array.isArray(itinerary.outbound_flight) ? itinerary.outbound_flight[0] : itinerary.outbound_flight
+      const outboundFlight = Array.isArray(itinerary.outbound_flight)
+        ? itinerary.outbound_flight[0]
+        : itinerary.outbound_flight
       if (outboundFlight?.departureTime) {
         const gatherTime = calculateGatherTime(outboundFlight.departureTime)
         gatherHour = gatherTime.hour

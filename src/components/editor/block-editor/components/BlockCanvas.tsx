@@ -5,7 +5,6 @@
  * 渲染所有區塊並處理選取和操作
  */
 
-
 import { useCallback } from 'react'
 import { BlockWrapper } from './BlockWrapper'
 import type { AnyBlock, BlockType, BlockDataMap } from '../types'
@@ -64,17 +63,11 @@ export function BlockCanvas({
     switch (block.meta.type) {
       case 'COVER':
         return (
-          <CoverBlockEditor
-            data={block.data as BlockDataMap['COVER']}
-            onChange={updateHandler}
-          />
+          <CoverBlockEditor data={block.data as BlockDataMap['COVER']} onChange={updateHandler} />
         )
       case 'FLIGHT':
         return (
-          <FlightBlockEditor
-            data={block.data as BlockDataMap['FLIGHT']}
-            onChange={updateHandler}
-          />
+          <FlightBlockEditor data={block.data as BlockDataMap['FLIGHT']} onChange={updateHandler} />
         )
       case 'FEATURES':
         return (
@@ -99,10 +92,7 @@ export function BlockCanvas({
         )
       case 'HOTELS':
         return (
-          <HotelsBlockEditor
-            data={block.data as BlockDataMap['HOTELS']}
-            onChange={updateHandler}
-          />
+          <HotelsBlockEditor data={block.data as BlockDataMap['HOTELS']} onChange={updateHandler} />
         )
       case 'DAILY_ITINERARY':
         return (
@@ -127,10 +117,7 @@ export function BlockCanvas({
         )
       case 'FAQS':
         return (
-          <FAQsBlockEditor
-            data={block.data as BlockDataMap['FAQS']}
-            onChange={updateHandler}
-          />
+          <FAQsBlockEditor data={block.data as BlockDataMap['FAQS']} onChange={updateHandler} />
         )
       case 'NOTICES':
         return (
@@ -147,7 +134,9 @@ export function BlockCanvas({
           />
         )
       default:
-        return <div className="text-sm text-morandi-secondary">{BLOCK_EDITOR_LABELS.LABEL_6612}</div>
+        return (
+          <div className="text-sm text-morandi-secondary">{BLOCK_EDITOR_LABELS.LABEL_6612}</div>
+        )
     }
   }
 

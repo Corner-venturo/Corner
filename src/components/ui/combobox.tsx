@@ -108,7 +108,12 @@ export function Combobox<T = unknown>({
   const [searchValue, setSearchValue] = React.useState('')
   const [highlightedIndex, setHighlightedIndex] = React.useState(-1)
   const [isCreating, setIsCreating] = React.useState(false)
-  const [dropdownPosition, setDropdownPosition] = React.useState({ top: 0, left: 0, width: 0, maxHeight: 256 })
+  const [dropdownPosition, setDropdownPosition] = React.useState({
+    top: 0,
+    left: 0,
+    width: 0,
+    maxHeight: 256,
+  })
   const inputRef = React.useRef<HTMLInputElement>(null)
   const containerRef = React.useRef<HTMLDivElement>(null)
   const dropdownRef = React.useRef<HTMLDivElement>(null)
@@ -219,14 +224,21 @@ export function Combobox<T = unknown>({
         e.preventDefault()
         if (highlightedIndex >= 0 && highlightedIndex < filteredOptions.length) {
           handleOptionSelect(filteredOptions[highlightedIndex])
-        } else if (onCreate && searchValue.trim() && !isCreating && !options.some(o => o.label === searchValue.trim())) {
+        } else if (
+          onCreate &&
+          searchValue.trim() &&
+          !isCreating &&
+          !options.some(o => o.label === searchValue.trim())
+        ) {
           setIsCreating(true)
-          onCreate(searchValue.trim()).then(newId => {
-            if (newId) {
-              onChange(newId)
-              setIsOpen(false)
-            }
-          }).finally(() => setIsCreating(false))
+          onCreate(searchValue.trim())
+            .then(newId => {
+              if (newId) {
+                onChange(newId)
+                setIsOpen(false)
+              }
+            })
+            .finally(() => setIsCreating(false))
         }
         break
       case 'Escape':
@@ -291,7 +303,6 @@ export function Combobox<T = unknown>({
           : Math.min(dropdownMaxHeight, spaceBelow - 8),
       })
     }
-   
   }, [isOpen])
 
   // 預設選項渲染
@@ -350,94 +361,105 @@ export function Combobox<T = unknown>({
       </div>
 
       {/* 下拉選單 */}
-      {isOpen && !disabled && (() => {
-        const dropdownContent = (
-          <div
-            ref={dropdownRef}
-            role="listbox"
-            className={cn(
-              'bg-card border border-border rounded-lg shadow-lg overflow-hidden',
-              disablePortal ? 'absolute left-0 right-0 top-full mt-1 z-50' : 'fixed z-[10010]'
-            )}
-            style={disablePortal ? { maxHeight } : {
-              top: dropdownPosition.top,
-              left: dropdownPosition.left,
-              width: dropdownPosition.width,
-              maxHeight: dropdownPosition.maxHeight,
-              pointerEvents: 'auto',
-            }}
-            onMouseDown={e => e.stopPropagation()}
-            onPointerDown={e => e.stopPropagation()}
-            onClick={e => e.stopPropagation()}
-          >
+      {isOpen &&
+        !disabled &&
+        (() => {
+          const dropdownContent = (
             <div
-              className="overflow-y-auto overscroll-contain"
-              style={{
-                maxHeight: disablePortal ? maxHeight : dropdownPosition.maxHeight,
-                WebkitOverflowScrolling: 'touch',
-                touchAction: 'pan-y',
-              }}
-            >
-              {filteredOptions.length > 0 ? (
-                filteredOptions.map((option, index) => (
-                  <button
-                    key={`${option.value}-${index}`}
-                    ref={el => { optionRefs.current[index] = el }}
-                    type="button"
-                    onClick={() => handleOptionSelect(option)}
-                    disabled={option.disabled}
-                    className={cn(
-                      'w-full px-3 py-2 text-left text-sm transition-colors touch-manipulation',
-                      'hover:bg-morandi-container/30 focus:bg-morandi-container/30 focus:outline-none',
-                      highlightedIndex === index && 'bg-morandi-container/50',
-                      option.value === value && 'bg-morandi-gold/10 font-medium',
-                      option.disabled && 'opacity-50 cursor-not-allowed'
-                    )}
-                  >
-                    {renderOption ? renderOption(option) : defaultRenderOption(option)}
-                  </button>
-                ))
-              ) : (
-                <div className="px-3 py-6 text-center text-sm text-morandi-secondary">
-                  {emptyMessage}
-                </div>
+              ref={dropdownRef}
+              role="listbox"
+              className={cn(
+                'bg-card border border-border rounded-lg shadow-lg overflow-hidden',
+                disablePortal ? 'absolute left-0 right-0 top-full mt-1 z-50' : 'fixed z-[10010]'
               )}
-              {onCreate && searchValue.trim() && !options.some(o => o.label === searchValue.trim()) && (
-                <button
-                  type="button"
-                  disabled={isCreating}
-                  onClick={async () => {
-                    if (isCreating) return
-                    setIsCreating(true)
-                    try {
-                      const newId = await onCreate(searchValue.trim())
-                      if (newId) {
-                        onChange(newId)
-                        setIsOpen(false)
-                      }
-                    } finally {
-                      setIsCreating(false)
+              style={
+                disablePortal
+                  ? { maxHeight }
+                  : {
+                      top: dropdownPosition.top,
+                      left: dropdownPosition.left,
+                      width: dropdownPosition.width,
+                      maxHeight: dropdownPosition.maxHeight,
+                      pointerEvents: 'auto',
                     }
-                  }}
-                  className={cn(
-                    'w-full px-3 py-2 text-left text-sm text-morandi-gold hover:bg-morandi-gold/10 border-t border-border transition-colors',
-                    isCreating && 'opacity-50 cursor-wait'
+              }
+              onMouseDown={e => e.stopPropagation()}
+              onPointerDown={e => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
+            >
+              <div
+                className="overflow-y-auto overscroll-contain"
+                style={{
+                  maxHeight: disablePortal ? maxHeight : dropdownPosition.maxHeight,
+                  WebkitOverflowScrolling: 'touch',
+                  touchAction: 'pan-y',
+                }}
+              >
+                {filteredOptions.length > 0 ? (
+                  filteredOptions.map((option, index) => (
+                    <button
+                      key={`${option.value}-${index}`}
+                      ref={el => {
+                        optionRefs.current[index] = el
+                      }}
+                      type="button"
+                      onClick={() => handleOptionSelect(option)}
+                      disabled={option.disabled}
+                      className={cn(
+                        'w-full px-3 py-2 text-left text-sm transition-colors touch-manipulation',
+                        'hover:bg-morandi-container/30 focus:bg-morandi-container/30 focus:outline-none',
+                        highlightedIndex === index && 'bg-morandi-container/50',
+                        option.value === value && 'bg-morandi-gold/10 font-medium',
+                        option.disabled && 'opacity-50 cursor-not-allowed'
+                      )}
+                    >
+                      {renderOption ? renderOption(option) : defaultRenderOption(option)}
+                    </button>
+                  ))
+                ) : (
+                  <div className="px-3 py-6 text-center text-sm text-morandi-secondary">
+                    {emptyMessage}
+                  </div>
+                )}
+                {onCreate &&
+                  searchValue.trim() &&
+                  !options.some(o => o.label === searchValue.trim()) && (
+                    <button
+                      type="button"
+                      disabled={isCreating}
+                      onClick={async () => {
+                        if (isCreating) return
+                        setIsCreating(true)
+                        try {
+                          const newId = await onCreate(searchValue.trim())
+                          if (newId) {
+                            onChange(newId)
+                            setIsOpen(false)
+                          }
+                        } finally {
+                          setIsCreating(false)
+                        }
+                      }}
+                      className={cn(
+                        'w-full px-3 py-2 text-left text-sm text-morandi-gold hover:bg-morandi-gold/10 border-t border-border transition-colors',
+                        isCreating && 'opacity-50 cursor-wait'
+                      )}
+                    >
+                      {isCreating ? '建立中...' : createLabel || `+ 新增「${searchValue.trim()}」`}
+                    </button>
                   )}
-                >
-                  {isCreating ? '建立中...' : (createLabel || `+ 新增「${searchValue.trim()}」`)}
-                </button>
-              )}
+              </div>
             </div>
-          </div>
-        )
+          )
 
-        // 使用 Portal 或直接渲染
-        if (disablePortal) {
-          return dropdownContent
-        }
-        return typeof document !== 'undefined' ? createPortal(dropdownContent, document.body) : null
-      })()}
+          // 使用 Portal 或直接渲染
+          if (disablePortal) {
+            return dropdownContent
+          }
+          return typeof document !== 'undefined'
+            ? createPortal(dropdownContent, document.body)
+            : null
+        })()}
     </div>
   )
 }
-

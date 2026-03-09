@@ -59,7 +59,9 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
             }}
           />
 
-          <div className={`relative p-8 lg:p-12 min-h-[500px] flex ${isMobile ? 'flex-col' : 'flex-row'} items-center justify-center gap-8`}>
+          <div
+            className={`relative p-8 lg:p-12 min-h-[500px] flex ${isMobile ? 'flex-col' : 'flex-row'} items-center justify-center gap-8`}
+          >
             {/* Leader Info 標籤 */}
             <motion.div
               initial={{ opacity: 0, rotate: -10 }}
@@ -67,7 +69,10 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
               viewport={{ once: true }}
               className="bg-card px-4 py-2 border border-[var(--morandi-primary)] shadow-sm absolute top-6 left-6 z-10"
             >
-              <span className="text-xl text-red-600" style={{ fontFamily: "'Permanent Marker', cursive" }}>
+              <span
+                className="text-xl text-red-600"
+                style={{ fontFamily: "'Permanent Marker', cursive" }}
+              >
                 Leader Info
               </span>
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-black" />
@@ -94,7 +99,8 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
 
               <div className="h-48 bg-morandi-container border border-[var(--morandi-primary)] mb-2 overflow-hidden">
                 {data.leader?.photo ? (
-                  <img src={data.leader.photo}
+                  <img
+                    src={data.leader.photo}
                     alt={data.leader?.name || '領隊'}
                     className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all"
                   />
@@ -108,13 +114,19 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
               <div className="text-center" style={{ fontFamily: "'Gloria Hallelujah', cursive" }}>
                 <div className="text-xl">{data.leader?.name || TOURS_LABELS.LEADER_NAME_TBD}</div>
               </div>
-              <div className="text-center text-xs text-morandi-secondary" style={{ fontFamily: "'Space Mono', monospace" }}>
+              <div
+                className="text-center text-xs text-morandi-secondary"
+                style={{ fontFamily: "'Space Mono', monospace" }}
+              >
                 {data.leader?.title || 'YOUR GUIDE'}
               </div>
 
               {/* 聯絡資訊 */}
               {(data.leader?.domesticPhone || data.leader?.lineId) && (
-                <div className="mt-4 pt-3 border-t border-border text-xs space-y-1" style={{ fontFamily: "'Space Mono', monospace" }}>
+                <div
+                  className="mt-4 pt-3 border-t border-border text-xs space-y-1"
+                  style={{ fontFamily: "'Space Mono', monospace" }}
+                >
                   {data.leader?.domesticPhone && (
                     <div className="flex items-center gap-2 text-morandi-secondary">
                       <span>📞</span> {data.leader.domesticPhone}
@@ -141,7 +153,10 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
               {/* 圖釘 */}
               <div className="absolute -top-3 right-1/2 translate-x-1/2 w-4 h-4 rounded-full bg-blue-500 border border-[var(--morandi-primary)] shadow-sm z-40" />
 
-              <h4 className="font-bold text-lg mb-2" style={{ fontFamily: "'Noto Serif TC', serif" }}>
+              <h4
+                className="font-bold text-lg mb-2"
+                style={{ fontFamily: "'Noto Serif TC', serif" }}
+              >
                 Meeting Point
               </h4>
               <div className="w-full h-px bg-black/20 mb-3" />
@@ -152,13 +167,19 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
                   </svg>
                 </div>
-                <div className="text-xs leading-relaxed" style={{ fontFamily: "'Space Mono', monospace" }}>
+                <div
+                  className="text-xs leading-relaxed"
+                  style={{ fontFamily: "'Space Mono', monospace" }}
+                >
                   <strong>{data.meetingInfo?.location || TOURS_LABELS.MEETING_POINT_TBD}</strong>
                 </div>
               </div>
 
               <div className="bg-card border border-[var(--morandi-primary)] p-2 text-center">
-                <span className="block font-bold text-xs" style={{ fontFamily: "'Space Mono', monospace" }}>
+                <span
+                  className="block font-bold text-xs"
+                  style={{ fontFamily: "'Space Mono', monospace" }}
+                >
                   {data.meetingInfo?.date || 'DATE TBD'}
                 </span>
                 <span className="text-xl" style={{ fontFamily: "'Cinzel', serif" }}>

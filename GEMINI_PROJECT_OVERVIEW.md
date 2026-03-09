@@ -22,8 +22,8 @@
 
 1.  **混合式 Supabase 客戶端 (Hybrid Supabase Client):**
     - 系統同時使用了兩種 Supabase 客戶端實例：
-        - 一個是現代的、支援伺服器端渲染 (SSR) 的客戶端 (`createBrowserClient`)。
-        - 另一個是舊版的單例客戶端 (`createClient`)，主要由 Zustand stores 用於狀態管理，這是一個關鍵的架構決策，需要特別注意。
+      - 一個是現代的、支援伺服器端渲染 (SSR) 的客戶端 (`createBrowserClient`)。
+      - 另一個是舊版的單例客戶端 (`createClient`)，主要由 Zustand stores 用於狀態管理，這是一個關鍵的架構決策，需要特別注意。
 
 2.  **Next.js Server Actions:**
     - 專案啟用了 Next.js 15 的 Server Actions，用於處理伺服器端的資料變更和操作，簡化了 API 的撰寫。

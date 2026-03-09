@@ -5,7 +5,8 @@
 const { createClient } = require('@supabase/supabase-js')
 
 const supabaseUrl = 'https://pfqvdacxowpgfamuvnsn.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE'
+const supabaseKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE'
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
@@ -19,7 +20,7 @@ const CORE_TABLES = [
   'calendar_events',
   'todos',
   'channels',
-  'messages'
+  'messages',
 ]
 
 async function verifyDataVisibility() {
@@ -88,7 +89,6 @@ async function verifyDataVisibility() {
       } else {
         console.log(`  ✅ ${table}: ${total} 筆資料都有 workspace_id`)
       }
-
     } catch (error) {
       console.log(`  ❌ ${table}: 檢查失敗 - ${error.message}`)
     }

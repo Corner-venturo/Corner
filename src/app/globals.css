@@ -32,16 +32,16 @@
   --morandi-muted: #b8b2aa;
 
   /* 語義顏色系統 (替代硬編碼的 blue/red/green/amber) */
-  --status-info: #8ba4b4;         /* 資訊 - 柔和藍灰 */
-  --status-info-bg: #f0f4f6;      /* 資訊背景 */
-  --status-success: #9fa68f;      /* 成功 - 莫蘭迪綠 */
-  --status-success-bg: #f4f6f2;   /* 成功背景 */
-  --status-warning: #d4a574;      /* 警告 - 柔和橙金 */
-  --status-warning-bg: #faf6f0;   /* 警告背景 */
-  --status-danger: #c08374;       /* 危險 - 莫蘭迪紅 */
-  --status-danger-bg: #faf4f2;    /* 危險背景 */
-  --status-neutral: #8b8680;      /* 中性 - 莫蘭迪次要色 */
-  --status-neutral-bg: #f6f5f3;   /* 中性背景 */
+  --status-info: #8ba4b4; /* 資訊 - 柔和藍灰 */
+  --status-info-bg: #f0f4f6; /* 資訊背景 */
+  --status-success: #9fa68f; /* 成功 - 莫蘭迪綠 */
+  --status-success-bg: #f4f6f2; /* 成功背景 */
+  --status-warning: #d4a574; /* 警告 - 柔和橙金 */
+  --status-warning-bg: #faf6f0; /* 警告背景 */
+  --status-danger: #c08374; /* 危險 - 莫蘭迪紅 */
+  --status-danger-bg: #faf4f2; /* 危險背景 */
+  --status-neutral: #8b8680; /* 中性 - 莫蘭迪次要色 */
+  --status-neutral-bg: #f6f5f3; /* 中性背景 */
 
   /* 背景色 */
   --background: #f6f4f1;
@@ -115,15 +115,15 @@
   --input-placeholder: #72767d;
 
   /* 語義顏色系統（深色主題） */
-  --status-info: #5865f2;           /* 資訊 - Discord 紫藍 */
+  --status-info: #5865f2; /* 資訊 - Discord 紫藍 */
   --status-info-bg: rgba(88, 101, 242, 0.15);
-  --status-success: #3ba55d;        /* 成功 - 綠色 */
+  --status-success: #3ba55d; /* 成功 - 綠色 */
   --status-success-bg: rgba(59, 165, 93, 0.15);
-  --status-warning: #faa61a;        /* 警告 - 橙色 */
+  --status-warning: #faa61a; /* 警告 - 橙色 */
   --status-warning-bg: rgba(250, 166, 26, 0.15);
-  --status-danger: #ed4245;         /* 危險 - 紅色 */
+  --status-danger: #ed4245; /* 危險 - 紅色 */
   --status-danger-bg: rgba(237, 66, 69, 0.15);
-  --status-neutral: #72767d;        /* 中性 - 灰色 */
+  --status-neutral: #72767d; /* 中性 - 灰色 */
   --status-neutral-bg: rgba(114, 118, 125, 0.15);
 
   /* Shadcn 標準變數（按鈕等組件使用） */
@@ -150,67 +150,67 @@
    ============================================ */
 [data-theme='nordic'] {
   /* 主色系 - 北歐簡約 */
-  --morandi-primary: #36454F;      /* 主色灰藍 */
-  --morandi-secondary: #6B7B86;    /* 次要灰藍 */
-  --morandi-gold: #3C5A47;         /* 強調色 - 深綠 */
+  --morandi-primary: #36454f; /* 主色灰藍 */
+  --morandi-secondary: #6b7b86; /* 次要灰藍 */
+  --morandi-gold: #3c5a47; /* 強調色 - 深綠 */
   --morandi-gold-rgb: 60, 90, 71;
-  --morandi-gold-hover: #2D4536;   /* hover 深綠 */
-  --morandi-green: #3C5A47;        /* 成功色 */
+  --morandi-gold-hover: #2d4536; /* hover 深綠 */
+  --morandi-green: #3c5a47; /* 成功色 */
   --morandi-green-rgb: 60, 90, 71;
-  --morandi-red: #C06F60;          /* 錯誤色 - 柔和紅 */
-  --morandi-container: #F0EDE9;    /* 容器背景 */
-  --morandi-muted: #9BA5AB;        /* 淡化文字 */
+  --morandi-red: #c06f60; /* 錯誤色 - 柔和紅 */
+  --morandi-container: #f0ede9; /* 容器背景 */
+  --morandi-muted: #9ba5ab; /* 淡化文字 */
 
   /* 語義顏色系統 (北歐風格) */
-  --status-info: #5A7B8C;          /* 資訊 - 柔和藍灰 */
-  --status-info-bg: #EEF3F5;       /* 資訊背景 */
-  --status-success: #3C5A47;       /* 成功 - 深綠 */
-  --status-success-bg: #ECF1ED;    /* 成功背景 */
-  --status-warning: #C9A961;       /* 警告 - 柔和金 */
-  --status-warning-bg: #F9F5EC;    /* 警告背景 */
-  --status-danger: #C06F60;        /* 危險 - 柔和紅 */
-  --status-danger-bg: #F9F0EE;     /* 危險背景 */
-  --status-neutral: #6B7B86;       /* 中性 - 灰藍 */
-  --status-neutral-bg: #F2F4F5;    /* 中性背景 */
+  --status-info: #5a7b8c; /* 資訊 - 柔和藍灰 */
+  --status-info-bg: #eef3f5; /* 資訊背景 */
+  --status-success: #3c5a47; /* 成功 - 深綠 */
+  --status-success-bg: #ecf1ed; /* 成功背景 */
+  --status-warning: #c9a961; /* 警告 - 柔和金 */
+  --status-warning-bg: #f9f5ec; /* 警告背景 */
+  --status-danger: #c06f60; /* 危險 - 柔和紅 */
+  --status-danger-bg: #f9f0ee; /* 危險背景 */
+  --status-neutral: #6b7b86; /* 中性 - 灰藍 */
+  --status-neutral-bg: #f2f4f5; /* 中性背景 */
 
   /* 背景色 */
-  --background: #F8F8F8;           /* 清淨白背景 */
-  --card: #FFFFFF;                 /* 卡片白 */
-  --border: #E3D9C6;               /* 沙質米色邊框 */
-  --popover: #FFFFFF;
-  --popover-foreground: #36454F;
-  --accent: #E9ECE9;               /* 淡綠背景 */
-  --accent-foreground: #36454F;
+  --background: #f8f8f8; /* 清淨白背景 */
+  --card: #ffffff; /* 卡片白 */
+  --border: #e3d9c6; /* 沙質米色邊框 */
+  --popover: #ffffff;
+  --popover-foreground: #36454f;
+  --accent: #e9ece9; /* 淡綠背景 */
+  --accent-foreground: #36454f;
 
   /* 設定對應變數 */
   --foreground: var(--morandi-primary);
   --card-foreground: var(--morandi-primary);
-  --border-muted: #EDE9E3;
+  --border-muted: #ede9e3;
 
   /* 表單元素專用變數 */
-  --input-border: #E3D9C6;
-  --input-border-hover: #3C5A47;
-  --input-border-focus: #3C5A47;
-  --input-bg: #FFFFFF;
-  --input-text: #36454F;
-  --input-placeholder: #9BA5AB;
+  --input-border: #e3d9c6;
+  --input-border-hover: #3c5a47;
+  --input-border-focus: #3c5a47;
+  --input-bg: #ffffff;
+  --input-text: #36454f;
+  --input-placeholder: #9ba5ab;
 
   /* Shadcn 標準變數（按鈕等組件使用） */
-  --primary: #3C5A47;
-  --primary-foreground: #FFFFFF;
-  --secondary: #E9ECE9;
-  --secondary-foreground: #36454F;
-  --destructive: #C06F60;
-  --destructive-foreground: #FFFFFF;
-  --muted: #F0EDE9;
-  --muted-foreground: #6B7B86;
-  --ring: #3C5A47;
-  --input: #E3D9C6;
+  --primary: #3c5a47;
+  --primary-foreground: #ffffff;
+  --secondary: #e9ece9;
+  --secondary-foreground: #36454f;
+  --destructive: #c06f60;
+  --destructive-foreground: #ffffff;
+  --muted: #f0ede9;
+  --muted-foreground: #6b7b86;
+  --ring: #3c5a47;
+  --input: #e3d9c6;
 }
 
 /* 北歐主題的純色背景 */
 [data-theme='nordic'] body {
-  background: #F8F8F8;
+  background: #f8f8f8;
   min-height: 100vh;
 }
 
@@ -219,25 +219,25 @@
   box-shadow:
     0 1px 3px 0 rgba(54, 69, 79, 0.08),
     0 1px 2px 0 rgba(54, 69, 79, 0.04);
-  border-color: #E3D9C6;
+  border-color: #e3d9c6;
 }
 
 [data-theme='nordic'] .morandi-card:hover {
   box-shadow:
     0 4px 6px -1px rgba(54, 69, 79, 0.1),
     0 2px 4px -1px rgba(54, 69, 79, 0.06);
-  border-color: #3C5A47;
+  border-color: #3c5a47;
 }
 
 /* 北歐主題的主要按鈕 - 深綠實心 */
 [data-theme='nordic'] .btn-morandi-primary {
-  background: #36454F;
+  background: #36454f;
   color: white;
   box-shadow: 0 2px 8px rgba(54, 69, 79, 0.2);
 }
 
 [data-theme='nordic'] .btn-morandi-primary:hover {
-  background: #2A363D;
+  background: #2a363d;
   box-shadow: 0 4px 12px rgba(54, 69, 79, 0.25);
   transform: scale(1.02);
 }
@@ -250,13 +250,13 @@
 /* 北歐主題的次要按鈕 - 清爽邊框 */
 [data-theme='nordic'] .btn-morandi-secondary {
   background: rgba(255, 255, 255, 0.9);
-  color: #3C5A47;
+  color: #3c5a47;
   border-color: rgba(60, 90, 71, 0.3);
 }
 
 [data-theme='nordic'] .btn-morandi-secondary:hover {
   background: rgba(255, 255, 255, 1);
-  border-color: #3C5A47;
+  border-color: #3c5a47;
   transform: scale(1.02);
   box-shadow: 0 2px 8px rgba(60, 90, 71, 0.1);
 }
@@ -268,11 +268,11 @@
 /* 北歐主題的圖標按鈕 */
 [data-theme='nordic'] .btn-icon-morandi {
   background: rgba(60, 90, 71, 0.08);
-  color: #3C5A47;
+  color: #3c5a47;
 }
 
 [data-theme='nordic'] .btn-icon-morandi:hover {
-  background: #3C5A47;
+  background: #3c5a47;
   color: white;
   box-shadow: 0 4px 8px rgba(60, 90, 71, 0.25);
 }
@@ -288,7 +288,7 @@
 }
 
 [data-theme='nordic'] .menu-item-morandi.active::after {
-  background: linear-gradient(to bottom, #3C5A47, #2D4536);
+  background: linear-gradient(to bottom, #3c5a47, #2d4536);
 }
 
 /* 北歐主題的卡片 - 細邊框 */
@@ -306,7 +306,7 @@
 [data-theme='nordic'] .input-morandi {
   background: rgba(255, 255, 255, 0.95);
   border-color: rgba(227, 217, 198, 0.6);
-  color: #36454F;
+  color: #36454f;
 }
 
 [data-theme='nordic'] .input-morandi::placeholder {
@@ -314,15 +314,15 @@
 }
 
 [data-theme='nordic'] .input-morandi:focus {
-  background: #FFFFFF;
-  border-color: #3C5A47;
+  background: #ffffff;
+  border-color: #3c5a47;
   box-shadow: 0 0 0 3px rgba(60, 90, 71, 0.12);
 }
 
 /* 北歐主題的徽章 */
 [data-theme='nordic'] .badge-morandi {
   background: rgba(60, 90, 71, 0.1);
-  color: #3C5A47;
+  color: #3c5a47;
   border-color: rgba(60, 90, 71, 0.2);
 }
 
@@ -345,7 +345,7 @@
 
 /* 北歐主題的工具提示 */
 [data-theme='nordic'] .tooltip-morandi {
-  background: linear-gradient(135deg, #36454F, #445560);
+  background: linear-gradient(135deg, #36454f, #445560);
   border-color: rgba(60, 90, 71, 0.3);
 }
 
@@ -360,7 +360,7 @@
   --color-morandi-gold: oklch(0.45 0.08 160);
 
   /* 北歐風格：細線條、更淺的分隔 */
-  --nordic-line-color: #DDD8D0;
+  --nordic-line-color: #ddd8d0;
   --nordic-line-light: rgba(221, 216, 208, 0.5);
 }
 
@@ -370,56 +370,56 @@
 
 /* 側邊欄容器 - 更淺的背景 */
 [data-theme='nordic'] .bg-morandi-container {
-  background-color: #F5F3F0 !important;
+  background-color: #f5f3f0 !important;
 }
 
 /* 側邊欄右邊框 - 改為細線條 */
-[data-theme='nordic'] [class*="border-r-2"][class*="border-morandi-gold"] {
+[data-theme='nordic'] [class*='border-r-2'][class*='border-morandi-gold'] {
   border-right-width: 1px !important;
   border-right-color: var(--nordic-line-color) !important;
 }
 
 /* Logo 背景色 - 深綠 */
-[data-theme='nordic'] [class*="bg-morandi-gold"]:not([class*="bg-morandi-gold/"]) {
-  background: #3C5A47 !important;
+[data-theme='nordic'] [class*='bg-morandi-gold']:not([class*='bg-morandi-gold/']) {
+  background: #3c5a47 !important;
   background-image: none !important;
 }
 
 /* Active 狀態左邊框 */
-[data-theme='nordic'] [class*="border-morandi-gold"]:not([class*="border-morandi-gold/"]) {
-  border-color: #3C5A47 !important;
+[data-theme='nordic'] [class*='border-morandi-gold']:not([class*='border-morandi-gold/']) {
+  border-color: #3c5a47 !important;
 }
 
 /* 透明度變體 - hover 背景 */
-[data-theme='nordic'] [class*="hover:bg-morandi-gold"]:hover {
+[data-theme='nordic'] [class*='hover:bg-morandi-gold']:hover {
   background-color: rgba(60, 90, 71, 0.08) !important;
 }
 
 /* 透明度變體 - active 背景 */
-[data-theme='nordic'] [class*="bg-morandi-gold/10"] {
+[data-theme='nordic'] [class*='bg-morandi-gold/10'] {
   background-color: rgba(60, 90, 71, 0.1) !important;
 }
 
-[data-theme='nordic'] [class*="bg-morandi-gold/5"] {
+[data-theme='nordic'] [class*='bg-morandi-gold/5'] {
   background-color: rgba(60, 90, 71, 0.05) !important;
 }
 
 /* 邊框透明度變體 */
-[data-theme='nordic'] [class*="border-morandi-gold/20"] {
+[data-theme='nordic'] [class*='border-morandi-gold/20'] {
   border-color: var(--nordic-line-light) !important;
 }
 
-[data-theme='nordic'] [class*="border-morandi-gold/30"] {
+[data-theme='nordic'] [class*='border-morandi-gold/30'] {
   border-color: rgba(60, 90, 71, 0.2) !important;
 }
 
-[data-theme='nordic'] [class*="border-morandi-gold/50"] {
+[data-theme='nordic'] [class*='border-morandi-gold/50'] {
   border-color: rgba(60, 90, 71, 0.35) !important;
 }
 
 /* 文字顏色 */
-[data-theme='nordic'] [class*="text-morandi-gold"] {
-  color: #3C5A47 !important;
+[data-theme='nordic'] [class*='text-morandi-gold'] {
+  color: #3c5a47 !important;
 }
 
 /* ============================================
@@ -428,18 +428,18 @@
 
 /* 覆蓋金色漸層按鈕 - 改為實心深綠 */
 [data-theme='nordic'] .btn-gradient-primary {
-  background: #3C5A47 !important;
+  background: #3c5a47 !important;
   box-shadow: 0 2px 8px rgba(60, 90, 71, 0.15);
 }
 
 [data-theme='nordic'] .btn-gradient-primary:hover {
-  background: #2D4536 !important;
+  background: #2d4536 !important;
   box-shadow: 0 4px 12px rgba(60, 90, 71, 0.2);
 }
 
 /* 覆蓋圖標按鈕漸層 */
 [data-theme='nordic'] .btn-icon-morandi:hover {
-  background: #3C5A47 !important;
+  background: #3c5a47 !important;
 }
 
 /* ============================================
@@ -447,39 +447,79 @@
    ============================================ */
 
 /* 覆蓋 morandi-gold 漸層起點 */
-[data-theme='nordic'] [class*="from-morandi-gold/10"] { --tw-gradient-from: rgba(60, 90, 71, 0.1) !important; }
-[data-theme='nordic'] [class*="from-morandi-gold/20"] { --tw-gradient-from: rgba(60, 90, 71, 0.2) !important; }
-[data-theme='nordic'] [class*="from-morandi-gold/30"] { --tw-gradient-from: rgba(60, 90, 71, 0.3) !important; }
-[data-theme='nordic'] [class*="from-morandi-gold/40"] { --tw-gradient-from: rgba(60, 90, 71, 0.4) !important; }
-[data-theme='nordic'] [class*="from-morandi-gold/50"] { --tw-gradient-from: rgba(60, 90, 71, 0.5) !important; }
-[data-theme='nordic'] [class*="from-morandi-gold/70"] { --tw-gradient-from: rgba(60, 90, 71, 0.7) !important; }
-[data-theme='nordic'] [class*="from-morandi-gold/80"] { --tw-gradient-from: rgba(60, 90, 71, 0.8) !important; }
-
-/* 覆蓋 morandi-gold 漸層終點 */
-[data-theme='nordic'] [class*="to-morandi-gold/5"] { --tw-gradient-to: rgba(60, 90, 71, 0.05) !important; }
-[data-theme='nordic'] [class*="to-morandi-gold/10"] { --tw-gradient-to: rgba(60, 90, 71, 0.1) !important; }
-[data-theme='nordic'] [class*="to-morandi-gold/20"] { --tw-gradient-to: rgba(60, 90, 71, 0.2) !important; }
-[data-theme='nordic'] [class*="to-morandi-gold/70"] { --tw-gradient-to: rgba(60, 90, 71, 0.7) !important; }
-
-/* 覆蓋 morandi-gold 漸層中間點 */
-[data-theme='nordic'] [class*="via-morandi-gold/80"] { --tw-gradient-via: rgba(60, 90, 71, 0.8) !important; }
-[data-theme='nordic'] [class*="via-morandi-gold"] { --tw-gradient-via: rgba(60, 90, 71, 0.6) !important; }
-
-/* Dashboard Widget 卡片漸層覆蓋 */
-[data-theme='nordic'] [class*="bg-gradient-to-br"][class*="morandi-gold"] {
-  background-image: linear-gradient(to bottom right, rgba(60, 90, 71, 0.05), transparent, rgba(60, 90, 71, 0.03)) !important;
+[data-theme='nordic'] [class*='from-morandi-gold/10'] {
+  --tw-gradient-from: rgba(60, 90, 71, 0.1) !important;
+}
+[data-theme='nordic'] [class*='from-morandi-gold/20'] {
+  --tw-gradient-from: rgba(60, 90, 71, 0.2) !important;
+}
+[data-theme='nordic'] [class*='from-morandi-gold/30'] {
+  --tw-gradient-from: rgba(60, 90, 71, 0.3) !important;
+}
+[data-theme='nordic'] [class*='from-morandi-gold/40'] {
+  --tw-gradient-from: rgba(60, 90, 71, 0.4) !important;
+}
+[data-theme='nordic'] [class*='from-morandi-gold/50'] {
+  --tw-gradient-from: rgba(60, 90, 71, 0.5) !important;
+}
+[data-theme='nordic'] [class*='from-morandi-gold/70'] {
+  --tw-gradient-from: rgba(60, 90, 71, 0.7) !important;
+}
+[data-theme='nordic'] [class*='from-morandi-gold/80'] {
+  --tw-gradient-from: rgba(60, 90, 71, 0.8) !important;
 }
 
-[data-theme='nordic'] [class*="bg-gradient-to-b"][class*="morandi-gold"] {
-  background-image: linear-gradient(to bottom, #3C5A47, rgba(60, 90, 71, 0.8), rgba(60, 90, 71, 0.7)) !important;
+/* 覆蓋 morandi-gold 漸層終點 */
+[data-theme='nordic'] [class*='to-morandi-gold/5'] {
+  --tw-gradient-to: rgba(60, 90, 71, 0.05) !important;
+}
+[data-theme='nordic'] [class*='to-morandi-gold/10'] {
+  --tw-gradient-to: rgba(60, 90, 71, 0.1) !important;
+}
+[data-theme='nordic'] [class*='to-morandi-gold/20'] {
+  --tw-gradient-to: rgba(60, 90, 71, 0.2) !important;
+}
+[data-theme='nordic'] [class*='to-morandi-gold/70'] {
+  --tw-gradient-to: rgba(60, 90, 71, 0.7) !important;
+}
+
+/* 覆蓋 morandi-gold 漸層中間點 */
+[data-theme='nordic'] [class*='via-morandi-gold/80'] {
+  --tw-gradient-via: rgba(60, 90, 71, 0.8) !important;
+}
+[data-theme='nordic'] [class*='via-morandi-gold'] {
+  --tw-gradient-via: rgba(60, 90, 71, 0.6) !important;
+}
+
+/* Dashboard Widget 卡片漸層覆蓋 */
+[data-theme='nordic'] [class*='bg-gradient-to-br'][class*='morandi-gold'] {
+  background-image: linear-gradient(
+    to bottom right,
+    rgba(60, 90, 71, 0.05),
+    transparent,
+    rgba(60, 90, 71, 0.03)
+  ) !important;
+}
+
+[data-theme='nordic'] [class*='bg-gradient-to-b'][class*='morandi-gold'] {
+  background-image: linear-gradient(
+    to bottom,
+    #3c5a47,
+    rgba(60, 90, 71, 0.8),
+    rgba(60, 90, 71, 0.7)
+  ) !important;
 }
 
 /* 覆蓋 morandi-red 漸層（用於 manifestation widget） */
-[data-theme='nordic'] [class*="from-morandi-red/10"] { --tw-gradient-from: rgba(192, 111, 96, 0.1) !important; }
-[data-theme='nordic'] [class*="from-morandi-red/30"] { --tw-gradient-from: rgba(192, 111, 96, 0.3) !important; }
+[data-theme='nordic'] [class*='from-morandi-red/10'] {
+  --tw-gradient-from: rgba(192, 111, 96, 0.1) !important;
+}
+[data-theme='nordic'] [class*='from-morandi-red/30'] {
+  --tw-gradient-from: rgba(192, 111, 96, 0.3) !important;
+}
 
 /* Hover 狀態的邊框顏色 */
-[data-theme='nordic'] [class*="hover:border-morandi-gold"]:hover {
+[data-theme='nordic'] [class*='hover:border-morandi-gold']:hover {
   border-color: rgba(60, 90, 71, 0.4) !important;
 }
 
@@ -518,40 +558,40 @@
    ============================================ */
 
 /* Shadcn Input 組件 */
-[data-theme='nordic'] [data-slot="input"],
+[data-theme='nordic'] [data-slot='input'],
 [data-theme='nordic'] .peer {
-  background-color: #FFFFFF;
-  border-color: #E3D9C6;
+  background-color: #ffffff;
+  border-color: #e3d9c6;
   border-radius: 8px;
 }
 
-[data-theme='nordic'] [data-slot="input"]:focus,
+[data-theme='nordic'] [data-slot='input']:focus,
 [data-theme='nordic'] .peer:focus {
-  border-color: #3C5A47;
+  border-color: #3c5a47;
   box-shadow: 0 0 0 3px rgba(60, 90, 71, 0.1);
 }
 
 /* Select 下拉選單 */
-[data-theme='nordic'] [role="combobox"],
-[data-theme='nordic'] [data-slot="select-trigger"] {
-  background-color: #FFFFFF;
-  border-color: #E3D9C6;
+[data-theme='nordic'] [role='combobox'],
+[data-theme='nordic'] [data-slot='select-trigger'] {
+  background-color: #ffffff;
+  border-color: #e3d9c6;
   border-radius: 8px;
 }
 
-[data-theme='nordic'] [role="combobox"]:focus,
-[data-theme='nordic'] [data-slot="select-trigger"]:focus {
-  border-color: #3C5A47;
+[data-theme='nordic'] [role='combobox']:focus,
+[data-theme='nordic'] [data-slot='select-trigger']:focus {
+  border-color: #3c5a47;
 }
 
 /* Textarea */
 [data-theme='nordic'] textarea {
-  background-color: #FFFFFF;
-  border-color: #E3D9C6;
+  background-color: #ffffff;
+  border-color: #e3d9c6;
 }
 
 [data-theme='nordic'] textarea:focus {
-  border-color: #3C5A47;
+  border-color: #3c5a47;
   box-shadow: 0 0 0 3px rgba(60, 90, 71, 0.1);
 }
 
@@ -561,13 +601,13 @@
 
 /* 北歐風格：使用更淺、更細緻的線條 */
 [data-theme='nordic'] {
-  --border: #E8E4DE;
+  --border: #e8e4de;
 }
 
 /* 所有邊框使用淺灰沙色 */
 [data-theme='nordic'] .border-border,
-[data-theme='nordic'] [class*="border-border"] {
-  border-color: #E8E4DE !important;
+[data-theme='nordic'] [class*='border-border'] {
+  border-color: #e8e4de !important;
 }
 
 /* 分隔線 */
@@ -575,25 +615,25 @@
   background: linear-gradient(
     to right,
     transparent 0.75rem,
-    #E8E4DE 0.75rem,
-    #E8E4DE calc(100% - 0.75rem),
+    #e8e4de 0.75rem,
+    #e8e4de calc(100% - 0.75rem),
     transparent calc(100% - 0.75rem)
   );
 }
 
 /* 表格邊框 */
 [data-theme='nordic'] .table-divider::after {
-  background-color: #E8E4DE;
+  background-color: #e8e4de;
 }
 
 /* 側邊欄底部分隔線 */
 [data-theme='nordic'] .border-b {
-  border-bottom-color: #E8E4DE !important;
+  border-bottom-color: #e8e4de !important;
 }
 
 /* 左邊框指示器陰影 - 使用深綠色 */
 [data-theme='nordic'] .border-l-3,
-[data-theme='nordic'] [class*="border-l-3"] {
+[data-theme='nordic'] [class*='border-l-3'] {
   box-shadow: -2px 0 4px rgba(60, 90, 71, 0.12);
 }
 
@@ -602,33 +642,33 @@
 }
 
 /* Ring/Focus 樣式 */
-[data-theme='nordic'] [class*="ring-morandi-gold"] {
+[data-theme='nordic'] [class*='ring-morandi-gold'] {
   --tw-ring-color: rgba(60, 90, 71, 0.3) !important;
 }
 
-[data-theme='nordic'] [class*="focus:ring-morandi-gold"]:focus {
+[data-theme='nordic'] [class*='focus:ring-morandi-gold']:focus {
   --tw-ring-color: rgba(60, 90, 71, 0.25) !important;
 }
 
 /* 陰影顏色覆蓋 */
-[data-theme='nordic'] [class*="shadow-morandi-gold"] {
+[data-theme='nordic'] [class*='shadow-morandi-gold'] {
   --tw-shadow-color: rgba(60, 90, 71, 0.15) !important;
 }
 
 /* Checkbox/Radio 強調色 */
-[data-theme='nordic'] input[type="checkbox"]:checked,
-[data-theme='nordic'] input[type="radio"]:checked {
-  background-color: #3C5A47 !important;
-  border-color: #3C5A47 !important;
+[data-theme='nordic'] input[type='checkbox']:checked,
+[data-theme='nordic'] input[type='radio']:checked {
+  background-color: #3c5a47 !important;
+  border-color: #3c5a47 !important;
 }
 
-[data-theme='nordic'] input[type="checkbox"],
-[data-theme='nordic'] input[type="radio"] {
-  border-color: #D0CCC5 !important;
+[data-theme='nordic'] input[type='checkbox'],
+[data-theme='nordic'] input[type='radio'] {
+  border-color: #d0ccc5 !important;
 }
 
-[data-theme='nordic'] input[type="checkbox"]:focus,
-[data-theme='nordic'] input[type="radio"]:focus {
+[data-theme='nordic'] input[type='checkbox']:focus,
+[data-theme='nordic'] input[type='radio']:focus {
   --tw-ring-color: rgba(60, 90, 71, 0.2) !important;
 }
 
@@ -637,28 +677,34 @@
    ============================================ */
 
 /* Manifestation Widget - 顯化曲線條 */
-[data-theme='nordic'] [class*="bg-gradient-to-b"][class*="from-morandi-gold"][class*="via-morandi-gold"][class*="to-morandi-gold"] {
-  background-image: linear-gradient(to bottom, #3C5A47, rgba(60, 90, 71, 0.7), rgba(60, 90, 71, 0.5)) !important;
+[data-theme='nordic']
+  [class*='bg-gradient-to-b'][class*='from-morandi-gold'][class*='via-morandi-gold'][class*='to-morandi-gold'] {
+  background-image: linear-gradient(
+    to bottom,
+    #3c5a47,
+    rgba(60, 90, 71, 0.7),
+    rgba(60, 90, 71, 0.5)
+  ) !important;
 }
 
 /* 連續天數徽章 */
-[data-theme='nordic'] [class*="bg-morandi-gold/10"][class*="text-morandi-gold"] {
+[data-theme='nordic'] [class*='bg-morandi-gold/10'][class*='text-morandi-gold'] {
   background-color: rgba(60, 90, 71, 0.1) !important;
-  color: #3C5A47 !important;
+  color: #3c5a47 !important;
 }
 
 /* Widget 陰影顏色 */
-[data-theme='nordic'] [class*="shadow-morandi-gold/30"] {
+[data-theme='nordic'] [class*='shadow-morandi-gold/30'] {
   --tw-shadow-color: rgba(60, 90, 71, 0.3) !important;
 }
 
 /* Widget 邊框 - 選中狀態 */
-[data-theme='nordic'] [class*="border-morandi-gold/90"] {
+[data-theme='nordic'] [class*='border-morandi-gold/90'] {
   border-color: rgba(60, 90, 71, 0.9) !important;
 }
 
 /* Scale 效果維持 */
-[data-theme='nordic'] [class*="scale-105"][class*="morandi-gold"] {
+[data-theme='nordic'] [class*='scale-105'][class*='morandi-gold'] {
   transform: scale(1.05);
 }
 
@@ -668,8 +714,8 @@
 
 /* 表格 header */
 [data-theme='nordic'] thead th {
-  background-color: #F5F3F0;
-  color: #36454F;
+  background-color: #f5f3f0;
+  color: #36454f;
   font-weight: 500;
 }
 
@@ -679,7 +725,7 @@
 }
 
 /* 表格選中行 */
-[data-theme='nordic'] tbody tr[data-state="selected"] {
+[data-theme='nordic'] tbody tr[data-state='selected'] {
   background-color: rgba(60, 90, 71, 0.08);
 }
 
@@ -687,9 +733,9 @@
    北歐主題 - Dialog/Modal 樣式
    ============================================ */
 
-[data-theme='nordic'] [role="dialog"] {
+[data-theme='nordic'] [role='dialog'] {
   border-radius: 16px;
-  border-color: #E3D9C6;
+  border-color: #e3d9c6;
 }
 
 /* ============================================
@@ -698,21 +744,21 @@
 
 [data-theme='nordic'] [data-radix-popper-content-wrapper] > div {
   border-radius: 10px;
-  border-color: #E3D9C6;
+  border-color: #e3d9c6;
   box-shadow: 0 4px 16px rgba(54, 69, 79, 0.1);
 }
 
 /* 下拉選項 hover */
-[data-theme='nordic'] [role="option"]:hover,
-[data-theme='nordic'] [role="menuitem"]:hover {
+[data-theme='nordic'] [role='option']:hover,
+[data-theme='nordic'] [role='menuitem']:hover {
   background-color: rgba(60, 90, 71, 0.06);
 }
 
 /* 選中的選項 */
-[data-theme='nordic'] [role="option"][data-state="checked"],
-[data-theme='nordic'] [role="option"][aria-selected="true"] {
+[data-theme='nordic'] [role='option'][data-state='checked'],
+[data-theme='nordic'] [role='option'][aria-selected='true'] {
   background-color: rgba(60, 90, 71, 0.1);
-  color: #3C5A47;
+  color: #3c5a47;
 }
 
 /* ============================================
@@ -720,12 +766,12 @@
    ============================================ */
 
 [data-theme='nordic'] .rdp-day_selected {
-  background-color: #3C5A47 !important;
+  background-color: #3c5a47 !important;
   color: white !important;
 }
 
 [data-theme='nordic'] .rdp-day_today {
-  border-color: #3C5A47;
+  border-color: #3c5a47;
 }
 
 [data-theme='nordic'] .rdp-day:hover:not(.rdp-day_selected) {
@@ -736,30 +782,30 @@
    北歐主題 - Switch/Toggle 樣式
    ============================================ */
 
-[data-theme='nordic'] [role="switch"][data-state="checked"] {
-  background-color: #3C5A47;
+[data-theme='nordic'] [role='switch'][data-state='checked'] {
+  background-color: #3c5a47;
 }
 
 /* ============================================
    北歐主題 - Progress/Slider 樣式
    ============================================ */
 
-[data-theme='nordic'] [role="progressbar"] > div,
-[data-theme='nordic'] [role="slider"] [data-orientation] > span {
-  background-color: #3C5A47;
+[data-theme='nordic'] [role='progressbar'] > div,
+[data-theme='nordic'] [role='slider'] [data-orientation] > span {
+  background-color: #3c5a47;
 }
 
 /* ============================================
    北歐主題 - Tab 樣式
    ============================================ */
 
-[data-theme='nordic'] [role="tab"][data-state="active"] {
-  color: #3C5A47;
-  border-color: #3C5A47;
+[data-theme='nordic'] [role='tab'][data-state='active'] {
+  color: #3c5a47;
+  border-color: #3c5a47;
 }
 
-[data-theme='nordic'] [role="tab"]:hover {
-  color: #3C5A47;
+[data-theme='nordic'] [role='tab']:hover {
+  color: #3c5a47;
 }
 
 /* 深色主題的卡片陰影調整 */
@@ -1458,9 +1504,9 @@ input.input-no-focus:focus-visible {
 .input-no-focus input,
 .input-no-focus input:focus,
 .input-no-focus input:focus-visible,
-[class*="input-no-focus"] input,
-[class*="input-no-focus"] input:focus,
-[class*="input-no-focus"] input:focus-visible {
+[class*='input-no-focus'] input,
+[class*='input-no-focus'] input:focus,
+[class*='input-no-focus'] input:focus-visible {
   outline: none !important;
   border: none !important;
   border-color: transparent !important;
@@ -1561,7 +1607,8 @@ input[type='number'] {
   }
 
   /* 重置基本樣式 */
-  html, body {
+  html,
+  body {
     margin: 0 !important;
     padding: 0 !important;
     background: white !important;
@@ -1573,7 +1620,9 @@ input[type='number'] {
   }
 
   /* 主內容區滿版 */
-  main, [role="main"], .main-content {
+  main,
+  [role='main'],
+  .main-content {
     position: static !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -1594,13 +1643,16 @@ input[type='number'] {
 
   /* 隱藏工具列和不需要的元素 */
   .space-y-4 > div:first-child:not(#print-content),
-  [class*="breadcrumb"],
-  [class*="Breadcrumb"] {
+  [class*='breadcrumb'],
+  [class*='Breadcrumb'] {
     display: none !important;
   }
 
   /* 移除所有容器的間距 - 滿版 */
-  html, body, main, div {
+  html,
+  body,
+  main,
+  div {
     margin: 0 !important;
     padding: 0 !important;
   }
@@ -1631,7 +1683,7 @@ input[type='number'] {
     print-color-adjust: exact !important;
     box-sizing: border-box !important;
     z-index: 999999 !important;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   }
 
   #disbursement-print-container * {

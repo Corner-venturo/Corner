@@ -1,6 +1,6 @@
 /**
  * API Route Zod Schemas
- * 
+ *
  * 集中管理 API 輸入驗證 schema，確保前後端一致
  */
 
@@ -58,10 +58,14 @@ export const issueInvoiceSchema = z.object({
   buyerInfo: buyerInfoSchema,
   items: z.array(invoiceItemSchema).min(1, '至少需要一個品項'),
   order_id: z.string().optional(),
-  orders: z.array(z.object({
-    order_id: z.string(),
-    amount: z.number(),
-  })).optional(),
+  orders: z
+    .array(
+      z.object({
+        order_id: z.string(),
+        amount: z.number(),
+      })
+    )
+    .optional(),
   tour_id: z.string().min(1, '缺少團別 ID'),
   created_by: z.string().nullish(),
   workspace_id: z.string().nullish(),
@@ -128,13 +132,17 @@ export const generateItinerarySchema = z.object({
   countryId: z.string().optional(),
   destination: z.string().optional(),
   days: z.number().int().positive().optional(),
-  outboundFlight: z.object({
-    arrivalTime: z.string().optional(),
-  }).optional(),
+  outboundFlight: z
+    .object({
+      arrivalTime: z.string().optional(),
+    })
+    .optional(),
   arrivalTime: z.string().optional(),
-  returnFlight: z.object({
-    departureTime: z.string().optional(),
-  }).optional(),
+  returnFlight: z
+    .object({
+      departureTime: z.string().optional(),
+    })
+    .optional(),
   departureTime: z.string().optional(),
   preferences: z.record(z.string(), z.unknown()).optional(),
 })
@@ -143,22 +151,28 @@ export const generateItinerarySchema = z.object({
 // 會計過帳
 // ==========================================
 
-export const postCustomerReceiptSchema = z.object({
-  receipt_id: z.string().min(1, '缺少收款單 ID'),
-  amount: z.number().positive('金額必須大於 0'),
-  payment_method: z.string().min(1, '缺少付款方式'),
-}).passthrough()
+export const postCustomerReceiptSchema = z
+  .object({
+    receipt_id: z.string().min(1, '缺少收款單 ID'),
+    amount: z.number().positive('金額必須大於 0'),
+    payment_method: z.string().min(1, '缺少付款方式'),
+  })
+  .passthrough()
 
-export const postGroupSettlementSchema = z.object({
-  tour_id: z.string().min(1, '缺少團別 ID'),
-  bank_account_id: z.string().min(1, '缺少銀行帳戶 ID'),
-}).passthrough()
+export const postGroupSettlementSchema = z
+  .object({
+    tour_id: z.string().min(1, '缺少團別 ID'),
+    bank_account_id: z.string().min(1, '缺少銀行帳戶 ID'),
+  })
+  .passthrough()
 
-export const postSupplierPaymentSchema = z.object({
-  payout_id: z.string().min(1, '缺少出納單 ID'),
-  amount: z.number().positive('金額必須大於 0'),
-  bank_account_id: z.string().min(1, '缺少銀行帳戶 ID'),
-}).passthrough()
+export const postSupplierPaymentSchema = z
+  .object({
+    payout_id: z.string().min(1, '缺少出納單 ID'),
+    amount: z.number().positive('金額必須大於 0'),
+    bank_account_id: z.string().min(1, '缺少銀行帳戶 ID'),
+  })
+  .passthrough()
 
 // ==========================================
 // 報價確認
@@ -238,13 +252,17 @@ export const validateLoginSchema = z.object({
 export const issueAllowanceSchema = z.object({
   invoiceId: z.string().min(1, '缺少發票 ID'),
   allowanceAmount: z.number().positive('折讓金額必須大於 0'),
-  allowanceItems: z.array(z.object({
-    item_name: z.string(),
-    item_count: z.number(),
-    item_unit: z.string(),
-    item_price: z.number(),
-    itemAmt: z.number(),
-  })).min(1, '至少需要一個折讓項目'),
+  allowanceItems: z
+    .array(
+      z.object({
+        item_name: z.string(),
+        item_count: z.number(),
+        item_unit: z.string(),
+        item_price: z.number(),
+        itemAmt: z.number(),
+      })
+    )
+    .min(1, '至少需要一個折讓項目'),
   operatedBy: z.string().optional(),
 })
 
@@ -364,14 +382,16 @@ export const suggestAttractionSchema = z.object({
   city: z.string().optional(),
   country: z.string().optional(),
   category: z.string().optional(),
-  existingData: z.object({
-    latitude: z.number().optional(),
-    longitude: z.number().optional(),
-    duration_minutes: z.number().optional(),
-    ticket_price: z.string().optional(),
-    opening_hours: z.string().optional(),
-    description: z.string().optional(),
-  }).optional(),
+  existingData: z
+    .object({
+      latitude: z.number().optional(),
+      longitude: z.number().optional(),
+      duration_minutes: z.number().optional(),
+      ticket_price: z.string().optional(),
+      opening_hours: z.string().optional(),
+      description: z.string().optional(),
+    })
+    .optional(),
 })
 
 // ==========================================
@@ -413,12 +433,14 @@ export const ticketStatusPatchSchema = z.object({
 // 錯誤日誌
 // ==========================================
 
-export const logErrorSchema = z.object({
-  message: z.string().optional(),
-  stack: z.string().optional(),
-  componentStack: z.string().optional(),
-  url: z.string().optional(),
-}).passthrough()
+export const logErrorSchema = z
+  .object({
+    message: z.string().optional(),
+    stack: z.string().optional(),
+    componentStack: z.string().optional(),
+    url: z.string().optional(),
+  })
+  .passthrough()
 
 // ==========================================
 // 檔案上傳（query params for DELETE）

@@ -12,12 +12,14 @@
 #### 1. 檢查腳本已創建並測試
 
 **`scripts/check-file-size.sh`**
+
 - ✅ 檢查組件 (最大 300 行)
 - ✅ 檢查 Hook (最大 200 行)
 - ✅ 檢查工具函數 (最大 150 行)
 - ✅ 檢查類型定義 (最大 500 行)
 
 **掃描結果**:
+
 ```bash
 🚫 發現 127 個文件超過行數限制！
 📊 總共檢查了 566 個文件
@@ -31,12 +33,14 @@
 ```
 
 **`scripts/check-any-usage.sh`**
+
 - ✅ 檢查 `: any` 模式
 - ✅ 檢查 `as any` 模式
 - ✅ 檢查 `any[]` 模式
 - ✅ 檢查 `Array<any>` 模式
 
 **掃描結果**:
+
 ```bash
 🚫 發現 194 處使用 any 類型！
 
@@ -80,6 +84,7 @@
 ```
 
 **使用方式**:
+
 ```bash
 # 檢查文件大小
 npm run audit:file-size
@@ -96,14 +101,16 @@ npm run audit:code-quality
 #### 4. ESLint 嚴格規則已確認
 
 **`.eslintrc.json`**
+
 ```json
 {
-  "@typescript-eslint/no-explicit-any": "error",  // ✅ 禁止 any
+  "@typescript-eslint/no-explicit-any": "error", // ✅ 禁止 any
   "@typescript-eslint/no-non-null-assertion": "error"
 }
 ```
 
 **`.eslintrc.extreme.json`** (超嚴格模式可選)
+
 ```json
 {
   "max-depth": ["warn", 4],
@@ -119,12 +126,14 @@ npm run audit:code-quality
 #### 1. `src/types/pnr.types.ts` ✅
 
 **修正前**:
+
 ```typescript
 special_requests: any[] | null;  // 實際為 EnhancedSSR[]
 other_info: any[] | null;        // 實際為 EnhancedOSI[]
 ```
 
 **修正後**:
+
 ```typescript
 import type { EnhancedSSR, EnhancedOSI } from '@/lib/pnr-parser'
 
@@ -139,6 +148,7 @@ other_info: EnhancedOSI[] | null;
 #### 2. `src/hooks/createCloudHook.ts` ✅
 
 **修正前**:
+
 ```typescript
 export function createCloudHook<T>(
   tableName: string,  // ❌ 任意字串
@@ -149,6 +159,7 @@ export function createCloudHook<T>(
 ```
 
 **修正後**:
+
 ```typescript
 import type { Database } from '@/lib/supabase/types'
 
@@ -264,6 +275,7 @@ export function createCloudHook<T>(
 #### 1. `src/lib/supabase/types.ts` (7,280 行)
 
 **拆分方案**:
+
 ```
 src/lib/supabase/types/
 ├── index.ts
@@ -299,12 +311,14 @@ src/lib/supabase/types/
 **剩餘**: 185 處需要修正
 
 **高頻文件**:
+
 - `src/app/(main)/customers/page.tsx` (5 處)
 - `src/app/(main)/quotes/[id]/page.tsx` (4 處)
 - `src/features/quotes/hooks/useQuoteActions.ts` (7 處)
 - `src/features/tours/components/ToursPage.tsx` (7 處)
 
 **處理策略**:
+
 1. 簡單替換（有明確類型註釋）- 估計 50 處
 2. 需要定義新接口 - 估計 80 處
 3. 複雜泛型重構 - 估計 55 處
@@ -315,22 +329,22 @@ src/lib/supabase/types/
 
 ### 改善進度
 
-| 指標 | 初始值 | 當前值 | 改善幅度 | 目標值 |
-|------|--------|--------|----------|--------|
-| `any` 類型使用 | 194 處 | **185 處** | ↓ 5% | 0 處 |
-| 超大文件 (>300行) | 127 個 | 127 個 | - | 0 個 |
-| 超大文件 (>1000行) | 6 個 | 6 個 | - | 0 個 |
-| Pre-commit 檢查 | ❌ | **✅ 啟用** | ✅ | ✅ |
-| ESLint 嚴格模式 | ✅ | ✅ | - | ✅ |
+| 指標               | 初始值 | 當前值      | 改善幅度 | 目標值 |
+| ------------------ | ------ | ----------- | -------- | ------ |
+| `any` 類型使用     | 194 處 | **185 處**  | ↓ 5%     | 0 處   |
+| 超大文件 (>300行)  | 127 個 | 127 個      | -        | 0 個   |
+| 超大文件 (>1000行) | 6 個   | 6 個        | -        | 0 個   |
+| Pre-commit 檢查    | ❌     | **✅ 啟用** | ✅       | ✅     |
+| ESLint 嚴格模式    | ✅     | ✅          | -        | ✅     |
 
 ### Customers Page 專項追蹤
 
-| 指標 | 初始值 | 當前進度 | 目標值 |
-|------|--------|----------|--------|
-| 主文件行數 | 2,110 行 | 進行中 | ~150 行 |
-| 已提取 Hook | 0 個 | **1 個** | 5 個 |
-| 已提取組件 | 0 個 | 0 個 | 8 個 |
-| 文件結構 | 單一文件 | 1 Hook + 計劃 | 15+ 文件 |
+| 指標        | 初始值   | 當前進度      | 目標值   |
+| ----------- | -------- | ------------- | -------- |
+| 主文件行數  | 2,110 行 | 進行中        | ~150 行  |
+| 已提取 Hook | 0 個     | **1 個**      | 5 個     |
+| 已提取組件  | 0 個     | 0 個          | 8 個     |
+| 文件結構    | 單一文件 | 1 Hook + 計劃 | 15+ 文件 |
 
 ---
 
@@ -341,11 +355,13 @@ src/lib/supabase/types/
 ### 選項 A: 繼續 Customers Page 重構 ⭐ 推薦
 
 **優點**:
+
 - 已有明確計劃和第一個 Hook
 - 立即看到大幅改善（2,110 行 → 150 行）
 - 建立重構模式供其他文件參考
 
 **下一步**:
+
 1. 提取剩餘 4 個 Hooks (~2 小時)
 2. 提取 8 個組件 (~3 小時)
 3. 重構主頁面 (~1 小時)
@@ -357,11 +373,13 @@ src/lib/supabase/types/
 ### 選項 B: 快速修正高頻 any 使用
 
 **優點**:
+
 - 快速見效
 - 降低違規數量
 - 為 pre-commit hook 鋪路
 
 **下一步**:
+
 1. 修正 `customers/page.tsx` 的 5 處 any
 2. 修正 `quotes/` 相關的 11 處 any
 3. 修正 `tours/` 相關的 7 處 any
@@ -373,11 +391,13 @@ src/lib/supabase/types/
 ### 選項 C: 拆分 types.ts (7,280 行)
 
 **優點**:
+
 - 解決最大的單一違規
 - 改善 TypeScript 編譯速度
 - 提升開發體驗
 
 **下一步**:
+
 1. 分析類型結構
 2. 按模組拆分成 15-20 個文件
 3. 更新所有引用
@@ -389,11 +409,13 @@ src/lib/supabase/types/
 ### 選項 D: 建立測試以確保重構安全
 
 **優點**:
+
 - 提供重構信心
 - 防止功能遺失
 - 長期代碼品質保障
 
 **下一步**:
+
 1. 為 useCustomerSearch 寫測試
 2. 為其他 Hooks 寫測試
 3. 整合測試到 CI/CD
@@ -409,6 +431,7 @@ src/lib/supabase/types/
 **繼續完成 Customers Page 重構（選項 A）**
 
 **理由**:
+
 1. ✅ 已經開始（完成 1/5 Hooks）
 2. ✅ 有完整計劃和文檔
 3. ✅ 效果最顯著（-93% 行數）
@@ -419,12 +442,14 @@ src/lib/supabase/types/
    - 代碼複雜度過高
 
 **完成後收益**:
+
 - 主文件從 2,110 行 → 150 行
 - 15 個小型、可測試、可維護的文件
 - 為其他大型組件樹立範例
 - 顯著改善開發體驗
 
 **您想要**:
+
 - A) 繼續 Customers Page 重構？
 - B) 快速修正 any 類型？
 - C) 拆分 types.ts？

@@ -53,7 +53,9 @@ export default function TenantsPage() {
       try {
         const newStatus = !workspace.is_active
         await updateWorkspace(workspace.id, { is_active: newStatus })
-        toast.success(newStatus ? LABELS.TOAST_TOGGLE_SUCCESS_ACTIVE : LABELS.TOAST_TOGGLE_SUCCESS_INACTIVE)
+        toast.success(
+          newStatus ? LABELS.TOAST_TOGGLE_SUCCESS_ACTIVE : LABELS.TOAST_TOGGLE_SUCCESS_INACTIVE
+        )
       } catch (error) {
         logger.error('Failed to toggle workspace status:', error)
         toast.error(LABELS.TOAST_TOGGLE_FAILED)
@@ -68,13 +70,13 @@ export default function TenantsPage() {
         key: 'name',
         label: LABELS.COL_NAME,
         sortable: true,
-        render: (value) => <span className="font-medium">{String(value || '')}</span>,
+        render: value => <span className="font-medium">{String(value || '')}</span>,
       },
       {
         key: 'code',
         label: LABELS.COL_CODE,
         sortable: true,
-        render: (value) => (
+        render: value => (
           <span className="font-mono text-sm text-morandi-primary">{String(value || '')}</span>
         ),
       },
@@ -82,7 +84,7 @@ export default function TenantsPage() {
         key: 'type',
         label: LABELS.COL_TYPE,
         sortable: true,
-        render: (value) => (
+        render: value => (
           <span className="text-sm">
             {WORKSPACE_TYPE_MAP[String(value || '')] || LABELS.TYPE_UNKNOWN}
           </span>
@@ -92,8 +94,11 @@ export default function TenantsPage() {
         key: 'employee_count',
         label: LABELS.COL_EMPLOYEE_COUNT,
         sortable: true,
-        render: (value) => (
-          <span className="text-sm">{String(value || 0)}{LABELS.EMPLOYEE_COUNT_SUFFIX}</span>
+        render: value => (
+          <span className="text-sm">
+            {String(value || 0)}
+            {LABELS.EMPLOYEE_COUNT_SUFFIX}
+          </span>
         ),
       },
       {
@@ -133,7 +138,7 @@ export default function TenantsPage() {
             icon: Building2,
             label: workspace.is_active ? LABELS.STATUS_INACTIVE : LABELS.STATUS_ACTIVE,
             onClick: () => handleToggleActive(workspace),
-            variant: workspace.is_active ? 'warning' as const : undefined,
+            variant: workspace.is_active ? ('warning' as const) : undefined,
           },
         ]}
       />
@@ -168,7 +173,12 @@ export default function TenantsPage() {
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
             </svg>
             {LABELS.ADD_TENANT}
           </Button>

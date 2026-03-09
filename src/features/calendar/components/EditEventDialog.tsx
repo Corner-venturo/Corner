@@ -5,7 +5,13 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Save, X } from 'lucide-react'
 import { DatePicker } from '@/components/ui/date-picker'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { EditEventDialogState } from '../types'
 import { CALENDAR_LABELS } from '../constants/labels'
 
@@ -19,7 +25,7 @@ interface EditEventDialogProps {
 // 全形轉半形
 const toHalfWidth = (str: string): string => {
   return str
-    .replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
+    .replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xfee0))
     .replace(/[－]/g, '-')
     .replace(/[～]/g, '~')
     .replace(/[：]/g, ':')
@@ -73,7 +79,6 @@ export function EditEventDialog({
   onSubmit,
   onClose,
 }: EditEventDialogProps) {
-
   return (
     <Dialog open={dialog.open} onOpenChange={open => !open && onClose()}>
       <DialogContent level={1} className="max-w-md">
@@ -92,19 +97,23 @@ export function EditEventDialog({
         >
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{CALENDAR_LABELS.START_DATE}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {CALENDAR_LABELS.START_DATE}
+              </label>
               <DatePicker
                 value={dialog.startDate}
-                onChange={(date) => onDialogChange({ ...dialog, startDate: date })}
+                onChange={date => onDialogChange({ ...dialog, startDate: date })}
                 placeholder={CALENDAR_LABELS.PLACEHOLDER_SELECT_DATE}
                 className="mt-1"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{CALENDAR_LABELS.END_DATE_OPTIONAL_2}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {CALENDAR_LABELS.END_DATE_OPTIONAL_2}
+              </label>
               <DatePicker
                 value={dialog.endDate}
-                onChange={(date) => onDialogChange({ ...dialog, endDate: date })}
+                onChange={date => onDialogChange({ ...dialog, endDate: date })}
                 placeholder={CALENDAR_LABELS.PLACEHOLDER_SELECT_DATE}
                 className="mt-1"
               />
@@ -112,7 +121,9 @@ export function EditEventDialog({
           </div>
 
           <div>
-            <label className="text-sm font-medium text-morandi-primary">{CALENDAR_LABELS.TITLE_LABEL}</label>
+            <label className="text-sm font-medium text-morandi-primary">
+              {CALENDAR_LABELS.TITLE_LABEL}
+            </label>
             <Input
               value={dialog.title}
               onChange={e => onDialogChange({ ...dialog, title: e.target.value })}
@@ -123,7 +134,9 @@ export function EditEventDialog({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{CALENDAR_LABELS.EVENT_TYPE}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {CALENDAR_LABELS.EVENT_TYPE}
+              </label>
               <Select
                 value={dialog.visibility}
                 onValueChange={(value: 'personal' | 'company') =>
@@ -144,7 +157,9 @@ export function EditEventDialog({
             </div>
 
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{CALENDAR_LABELS.START_TIME_OPTIONAL_2}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {CALENDAR_LABELS.START_TIME_OPTIONAL_2}
+              </label>
               <Input
                 value={dialog.startTime}
                 onChange={e => onDialogChange({ ...dialog, startTime: e.target.value })}
@@ -153,7 +168,7 @@ export function EditEventDialog({
                   onDialogChange({
                     ...dialog,
                     startTime: start,
-                    endTime: end || dialog.endTime
+                    endTime: end || dialog.endTime,
                   })
                 }}
                 placeholder={CALENDAR_LABELS.PLACEHOLDER_TIME_RANGE}
@@ -165,11 +180,15 @@ export function EditEventDialog({
           {/* 結束時間 - 有開始時間才顯示 */}
           {dialog.startTime && (
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{CALENDAR_LABELS.END_TIME_OPTIONAL}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {CALENDAR_LABELS.END_TIME_OPTIONAL}
+              </label>
               <Input
                 value={dialog.endTime}
                 onChange={e => onDialogChange({ ...dialog, endTime: e.target.value })}
-                onBlur={e => onDialogChange({ ...dialog, endTime: formatSingleTime(e.target.value) })}
+                onBlur={e =>
+                  onDialogChange({ ...dialog, endTime: formatSingleTime(e.target.value) })
+                }
                 placeholder={CALENDAR_LABELS.PLACEHOLDER_END_TIME}
                 className="mt-1"
               />
@@ -177,7 +196,9 @@ export function EditEventDialog({
           )}
 
           <div>
-            <label className="text-sm font-medium text-morandi-primary">{CALENDAR_LABELS.DESCRIPTION_OPTIONAL_2}</label>
+            <label className="text-sm font-medium text-morandi-primary">
+              {CALENDAR_LABELS.DESCRIPTION_OPTIONAL_2}
+            </label>
             <Input
               value={dialog.description}
               onChange={e => onDialogChange({ ...dialog, description: e.target.value })}

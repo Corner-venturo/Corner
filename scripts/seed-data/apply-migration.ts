@@ -14,7 +14,7 @@ async function apply() {
   const testData = {
     iata_code: 'NRT',
     is_favorite: true,
-    usage_count: 1
+    usage_count: 1,
   }
 
   const { error } = await supabase
@@ -46,12 +46,9 @@ UPDATE ref_airports SET is_favorite = true WHERE iata_code IN (
 
   // 標記所有常用機場
   const favCodes = ['KMQ', 'KIX', 'HKG', 'NRT', 'FUK', 'SFO', 'DAD', 'PUS', 'HRB', 'HND', 'XMN']
-  
+
   for (const code of favCodes) {
-    await supabase
-      .from('ref_airports')
-      .update({ is_favorite: true })
-      .eq('iata_code', code)
+    await supabase.from('ref_airports').update({ is_favorite: true }).eq('iata_code', code)
   }
 
   // 驗證

@@ -3,7 +3,6 @@
  * QuickQuoteItemsTable - 收費明細表
  */
 
-
 import React from 'react'
 import { QuickQuoteItem } from '@/types/quote.types'
 import { MORANDI_COLORS, TABLE_STYLES } from '../shared/print-styles'
@@ -22,7 +21,10 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
         </h3>
       </div>
 
-      <table className="w-full mb-6 text-sm" style={{ ...TABLE_STYLES, tableLayout: 'fixed', maxWidth: '100%' }}>
+      <table
+        className="w-full mb-6 text-sm"
+        style={{ ...TABLE_STYLES, tableLayout: 'fixed', maxWidth: '100%' }}
+      >
         <thead>
           <tr style={{ backgroundColor: MORANDI_COLORS.lightBrown }}>
             <th
@@ -92,7 +94,8 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
               <td
                 className="px-2 py-1"
                 style={{
-                  borderBottom: index === items.length - 1 ? 'none' : `1px solid ${MORANDI_COLORS.border}`,
+                  borderBottom:
+                    index === items.length - 1 ? 'none' : `1px solid ${MORANDI_COLORS.border}`,
                   color: MORANDI_COLORS.gray,
                   wordBreak: 'break-word',
                   overflow: 'hidden',
@@ -103,7 +106,8 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
               <td
                 className="px-2 py-1 text-center"
                 style={{
-                  borderBottom: index === items.length - 1 ? 'none' : `1px solid ${MORANDI_COLORS.border}`,
+                  borderBottom:
+                    index === items.length - 1 ? 'none' : `1px solid ${MORANDI_COLORS.border}`,
                   borderLeft: `1px solid ${MORANDI_COLORS.border}`,
                   color: MORANDI_COLORS.gray,
                 }}
@@ -113,7 +117,8 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
               <td
                 className="px-2 py-1 text-right"
                 style={{
-                  borderBottom: index === items.length - 1 ? 'none' : `1px solid ${MORANDI_COLORS.border}`,
+                  borderBottom:
+                    index === items.length - 1 ? 'none' : `1px solid ${MORANDI_COLORS.border}`,
                   borderLeft: `1px solid ${MORANDI_COLORS.border}`,
                   color: MORANDI_COLORS.gray,
                 }}
@@ -125,7 +130,8 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
               <td
                 className="px-2 py-1 text-right"
                 style={{
-                  borderBottom: index === items.length - 1 ? 'none' : `1px solid ${MORANDI_COLORS.border}`,
+                  borderBottom:
+                    index === items.length - 1 ? 'none' : `1px solid ${MORANDI_COLORS.border}`,
                   borderLeft: `1px solid ${MORANDI_COLORS.border}`,
                   color: MORANDI_COLORS.brown,
                   fontWeight: 600,
@@ -136,7 +142,8 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
               <td
                 className="px-2 py-1"
                 style={{
-                  borderBottom: index === items.length - 1 ? 'none' : `1px solid ${MORANDI_COLORS.border}`,
+                  borderBottom:
+                    index === items.length - 1 ? 'none' : `1px solid ${MORANDI_COLORS.border}`,
                   borderLeft: `1px solid ${MORANDI_COLORS.border}`,
                   color: MORANDI_COLORS.gray,
                   wordBreak: 'break-word',

@@ -3,7 +3,6 @@
  * FleetDriverList - 司機列表
  */
 
-
 import React from 'react'
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'
 import { Badge } from '@/components/ui/badge'
@@ -21,7 +20,10 @@ interface FleetDriverListProps {
   onDelete?: (item: FleetDriver) => void
 }
 
-const STATUS_CONFIG: Record<DriverStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const STATUS_CONFIG: Record<
+  DriverStatus,
+  { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   active: { label: '在職', variant: 'default' },
   inactive: { label: '離職', variant: 'secondary' },
   suspended: { label: '停權', variant: 'destructive' },
@@ -74,15 +76,13 @@ export const FleetDriverList: React.FC<FleetDriverListProps> = ({
       key: 'license_expiry_date',
       label: '駕照到期',
       sortable: true,
-      render: (value) => {
+      render: value => {
         if (!value) return <span className="text-morandi-muted">-</span>
         const days = getDaysUntilDue(value as string)
         const colorClass = getDueStatusColor(days)
         return (
           <div className="flex items-center gap-1">
-            {days !== null && days <= 30 && (
-              <AlertTriangle size={14} className={colorClass} />
-            )}
+            {days !== null && days <= 30 && <AlertTriangle size={14} className={colorClass} />}
             <span className={colorClass}>{formatDate(value as string)}</span>
           </div>
         )
@@ -92,15 +92,13 @@ export const FleetDriverList: React.FC<FleetDriverListProps> = ({
       key: 'professional_license_expiry',
       label: '職業駕照到期',
       sortable: true,
-      render: (value) => {
+      render: value => {
         if (!value) return <span className="text-morandi-muted">-</span>
         const days = getDaysUntilDue(value as string)
         const colorClass = getDueStatusColor(days)
         return (
           <div className="flex items-center gap-1">
-            {days !== null && days <= 30 && (
-              <AlertTriangle size={14} className={colorClass} />
-            )}
+            {days !== null && days <= 30 && <AlertTriangle size={14} className={colorClass} />}
             <span className={colorClass}>{formatDate(value as string)}</span>
           </div>
         )
@@ -110,15 +108,13 @@ export const FleetDriverList: React.FC<FleetDriverListProps> = ({
       key: 'health_check_expiry',
       label: '體檢到期',
       sortable: true,
-      render: (value) => {
+      render: value => {
         if (!value) return <span className="text-morandi-muted">-</span>
         const days = getDaysUntilDue(value as string)
         const colorClass = getDueStatusColor(days)
         return (
           <div className="flex items-center gap-1">
-            {days !== null && days <= 30 && (
-              <AlertTriangle size={14} className={colorClass} />
-            )}
+            {days !== null && days <= 30 && <AlertTriangle size={14} className={colorClass} />}
             <span className={colorClass}>{formatDate(value as string)}</span>
           </div>
         )

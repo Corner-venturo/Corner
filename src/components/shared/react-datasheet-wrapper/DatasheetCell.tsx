@@ -3,7 +3,13 @@
 import React from 'react'
 import { X, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { CellData, DataSheetColumn } from './types'
 import { CORE_FIELD_KEYS, PROTECTED_FIELD_KEYS, ERROR_MESSAGES } from './constants'
 import { REACT_DATASHEET_WRAPPER_LABELS } from './constants/labels'
@@ -50,7 +56,9 @@ export function DatasheetCell({
     if (!column) return null
 
     const isCoreField = CORE_FIELD_KEYS.includes(column.key as (typeof CORE_FIELD_KEYS)[number])
-    const isCustomField = !PROTECTED_FIELD_KEYS.includes(column.key as (typeof PROTECTED_FIELD_KEYS)[number])
+    const isCustomField = !PROTECTED_FIELD_KEYS.includes(
+      column.key as (typeof PROTECTED_FIELD_KEYS)[number]
+    )
     const canHide = !isCoreField
 
     return (
@@ -59,7 +67,9 @@ export function DatasheetCell({
         onMouseEnter={() => {}}
         onMouseLeave={() => {}}
       >
-        <span className="text-xs font-medium text-morandi-secondary">{cell.value as React.ReactNode}</span>
+        <span className="text-xs font-medium text-morandi-secondary">
+          {cell.value as React.ReactNode}
+        </span>
 
         {/* Column resize handle */}
         {enableColumnResize && hoveredColumn === col && (
@@ -109,7 +119,9 @@ export function DatasheetCell({
 
   // Error display
   if (cell.displayValue === ERROR_MESSAGES.FORMULA_ERROR) {
-    return <span className="text-status-danger text-xs">{ERROR_MESSAGES.FORMULA_ERROR_DISPLAY}</span>
+    return (
+      <span className="text-status-danger text-xs">{ERROR_MESSAGES.FORMULA_ERROR_DISPLAY}</span>
+    )
   }
 
   // Special handling for room assignment
@@ -124,7 +136,7 @@ export function DatasheetCell({
         ? memberAssignedRoom
           ? `no-bed-${memberAssignedRoom}`
           : 'no-bed'
-        : (memberAssignedRoom || '__none__')
+        : memberAssignedRoom || '__none__'
 
       return (
         <Select
@@ -133,38 +145,38 @@ export function DatasheetCell({
             // Handler should be passed as prop if needed
           }}
         >
-          <SelectTrigger
-            className="w-full h-8 text-xs"
-            onClick={e => e.stopPropagation()}
-          >
+          <SelectTrigger className="w-full h-8 text-xs" onClick={e => e.stopPropagation()}>
             <SelectValue placeholder={REACT_DATASHEET_WRAPPER_LABELS.LABEL_322} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__none__">{REACT_DATASHEET_WRAPPER_LABELS.LABEL_322}</SelectItem>
             <SelectItem value="no-bed">{REACT_DATASHEET_WRAPPER_LABELS.LABEL_9228}</SelectItem>
-            {roomOptions.filter(roomOption => {
-              const usage = getRoomUsage
-                ? getRoomUsage(roomOption.value)
-                : { bedCount: 0, noBedCount: 0, totalCount: 0, capacity: roomOption.capacity }
-              const isFull = isRoomFull ? isRoomFull(roomOption.value, memberId) : false
-              const isCurrentRoom = memberAssignedRoom === roomOption.value && !isChildNoBed
-              return !isFull || isCurrentRoom
-            }).map(roomOption => {
-              const usage = getRoomUsage
-                ? getRoomUsage(roomOption.value)
-                : { bedCount: 0, noBedCount: 0, totalCount: 0, capacity: roomOption.capacity }
-              return (
-                <SelectItem key={roomOption.value} value={roomOption.value}>
-                  {roomOption.value} ({usage.bedCount}/{usage.capacity}床
-                  {usage.noBedCount > 0 ? ` +${usage.noBedCount}不佔床` : ''})
+            {roomOptions
+              .filter(roomOption => {
+                const usage = getRoomUsage
+                  ? getRoomUsage(roomOption.value)
+                  : { bedCount: 0, noBedCount: 0, totalCount: 0, capacity: roomOption.capacity }
+                const isFull = isRoomFull ? isRoomFull(roomOption.value, memberId) : false
+                const isCurrentRoom = memberAssignedRoom === roomOption.value && !isChildNoBed
+                return !isFull || isCurrentRoom
+              })
+              .map(roomOption => {
+                const usage = getRoomUsage
+                  ? getRoomUsage(roomOption.value)
+                  : { bedCount: 0, noBedCount: 0, totalCount: 0, capacity: roomOption.capacity }
+                return (
+                  <SelectItem key={roomOption.value} value={roomOption.value}>
+                    {roomOption.value} ({usage.bedCount}/{usage.capacity}床
+                    {usage.noBedCount > 0 ? ` +${usage.noBedCount}不佔床` : ''})
+                  </SelectItem>
+                )
+              })}
+            {isChildNoBed &&
+              roomOptions.map(roomOption => (
+                <SelectItem key={`no-bed-${roomOption.value}`} value={`no-bed-${roomOption.value}`}>
+                  不佔床 - {roomOption.value}
                 </SelectItem>
-              )
-            })}
-            {isChildNoBed && roomOptions.map(roomOption => (
-              <SelectItem key={`no-bed-${roomOption.value}`} value={`no-bed-${roomOption.value}`}>
-                不佔床 - {roomOption.value}
-              </SelectItem>
-            ))}
+              ))}
           </SelectContent>
         </Select>
       )
@@ -173,7 +185,9 @@ export function DatasheetCell({
 
   // Formula result display
   if (cell.displayValue !== cell.value) {
-    return <span className="text-morandi-primary text-xs">{cell.displayValue as React.ReactNode}</span>
+    return (
+      <span className="text-morandi-primary text-xs">{cell.displayValue as React.ReactNode}</span>
+    )
   }
 
   // Default cell display

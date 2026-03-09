@@ -34,14 +34,20 @@ const fetchRates = async (): Promise<TransportationRate[]> => {
 
 export default function TransportationRatesPage() {
   const { user } = useAuthStore()
-  const { data: rates = [], isLoading: loading, mutate } = useSWR('transportation_rates', fetchRates)
+  const {
+    data: rates = [],
+    isLoading: loading,
+    mutate,
+  } = useSWR('transportation_rates', fetchRates)
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false)
   const [isAddingNewCountry, setIsAddingNewCountry] = useState(false)
   const [newCountryName, setNewCountryName] = useState('')
 
-  const handleRefresh = useCallback(() => { void mutate() }, [mutate])
+  const handleRefresh = useCallback(() => {
+    void mutate()
+  }, [mutate])
 
   // 打開國家詳細表格
   const handleOpenCountry = (countryName: string, editMode: boolean) => {
@@ -77,20 +83,19 @@ export default function TransportationRatesPage() {
       breadcrumb={[
         { label: TRANSPORTATION_RATES_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
         { label: TRANSPORTATION_RATES_LABELS.BREADCRUMB_DATABASE, href: '/database' },
-        { label: TRANSPORTATION_RATES_LABELS.BREADCRUMB_RATES, href: '/database/transportation-rates' },
+        {
+          label: TRANSPORTATION_RATES_LABELS.BREADCRUMB_RATES,
+          href: '/database/transportation-rates',
+        },
       ]}
       headerActions={
-        <Button
-          onClick={() => setIsAddingNewCountry(true)}
-          className="gap-2"
-          size="sm"
-        >
+        <Button onClick={() => setIsAddingNewCountry(true)} className="gap-2" size="sm">
           <Plus size={16} />
           {TRANSPORTATION_RATES_LABELS.ADD_COUNTRY}
         </Button>
       }
     >
-        <CountryList rates={rates} loading={loading} onOpenCountry={handleOpenCountry} />
+      <CountryList rates={rates} loading={loading} onOpenCountry={handleOpenCountry} />
 
       {/* 新增國家 Dialog */}
       <Dialog open={isAddingNewCountry} onOpenChange={setIsAddingNewCountry}>
@@ -106,8 +111,8 @@ export default function TransportationRatesPage() {
               <Input
                 placeholder={TRANSPORTATION_RATES_LABELS.COUNTRY_NAME_PLACEHOLDER}
                 value={newCountryName}
-                onChange={(e) => setNewCountryName(e.target.value)}
-                onKeyDown={(e) => {
+                onChange={e => setNewCountryName(e.target.value)}
+                onKeyDown={e => {
                   if (e.key === 'Enter') {
                     handleAddNewCountry()
                   }

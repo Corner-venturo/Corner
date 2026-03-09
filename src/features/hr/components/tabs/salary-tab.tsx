@@ -22,7 +22,9 @@ export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
 
     useImperativeHandle(ref, () => ({
       handleSave: async () => {
-        await update(employee.id, { monthly_salary: monthlySalary } as Partial<Employee & { monthly_salary: number }>)
+        await update(employee.id, { monthly_salary: monthlySalary } as Partial<
+          Employee & { monthly_salary: number }
+        >)
       },
     }))
 
@@ -48,7 +50,10 @@ export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
                 />
               </>
             ) : (
-              <CurrencyCell amount={monthlySalary} className="text-3xl font-bold text-morandi-primary" />
+              <CurrencyCell
+                amount={monthlySalary}
+                className="text-3xl font-bold text-morandi-primary"
+              />
             )}
           </div>
           <p className="text-xs text-morandi-secondary mt-2">{HR_LABELS.LABEL_3358}</p>
@@ -57,18 +62,29 @@ export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
         {/* 目前薪資資訊（舊系統 salary_info）*/}
         {(baseSalary > 0 || allowances.length > 0) && (
           <div className="bg-morandi-container/10 rounded-lg p-4">
-            <h4 className="font-medium text-morandi-primary mb-3 text-sm">{HR_LABELS.LABEL_6093}</h4>
+            <h4 className="font-medium text-morandi-primary mb-3 text-sm">
+              {HR_LABELS.LABEL_6093}
+            </h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-center">
-                <CurrencyCell amount={baseSalary} className="text-xl font-bold text-morandi-primary" />
+                <CurrencyCell
+                  amount={baseSalary}
+                  className="text-xl font-bold text-morandi-primary"
+                />
                 <p className="text-xs text-morandi-muted">{HR_LABELS.LABEL_786}</p>
               </div>
               <div className="text-center">
-                <CurrencyCell amount={totalAllowances} className="text-xl font-bold text-morandi-gold" />
+                <CurrencyCell
+                  amount={totalAllowances}
+                  className="text-xl font-bold text-morandi-gold"
+                />
                 <p className="text-xs text-morandi-muted">{HR_LABELS.LABEL_295}</p>
               </div>
               <div className="text-center">
-                <CurrencyCell amount={baseSalary + totalAllowances} className="text-xl font-bold text-status-success" />
+                <CurrencyCell
+                  amount={baseSalary + totalAllowances}
+                  className="text-xl font-bold text-status-success"
+                />
                 <p className="text-xs text-morandi-muted">{HR_LABELS.TOTAL_2192}</p>
               </div>
             </div>
@@ -108,11 +124,18 @@ export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
                 className="flex justify-between items-center p-3 bg-card rounded border"
               >
                 <div>
-                  <CurrencyCell amount={record.base_salary} className="font-medium text-morandi-primary" />
+                  <CurrencyCell
+                    amount={record.base_salary}
+                    className="font-medium text-morandi-primary"
+                  />
                   <p className="text-sm text-morandi-muted">{record.reason}</p>
                 </div>
                 <div className="text-right">
-                  <DateCell date={record.effective_date} showIcon={false} className="text-sm text-morandi-secondary" />
+                  <DateCell
+                    date={record.effective_date}
+                    showIcon={false}
+                    className="text-sm text-morandi-secondary"
+                  />
                 </div>
               </div>
             ))}

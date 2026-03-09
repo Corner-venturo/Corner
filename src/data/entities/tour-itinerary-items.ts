@@ -17,7 +17,8 @@ export const tourItineraryItemEntity = createEntityHook<TourItineraryItem>('tour
     orderBy: { column: 'day_number', ascending: true },
   },
   slim: {
-    select: 'id,tour_id,itinerary_id,day_number,sort_order,category,sub_category,title,service_date,quote_status,confirmation_status,leader_status,request_status',
+    select:
+      'id,tour_id,itinerary_id,day_number,sort_order,category,sub_category,title,service_date,quote_status,confirmation_status,leader_status,request_status',
   },
   detail: { select: '*' },
   cache: CACHE_PRESETS.high,

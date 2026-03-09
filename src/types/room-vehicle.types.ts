@@ -140,7 +140,7 @@ export const ROOM_TYPES = [
   { value: 'suite', label: '套房' },
 ] as const
 
-export type RoomTypeValue = typeof ROOM_TYPES[number]['value']
+export type RoomTypeValue = (typeof ROOM_TYPES)[number]['value']
 
 // ============================================
 // 車型常量
@@ -154,4 +154,4 @@ export const VEHICLE_TYPES = [
   { value: 'car', label: '轎車 (4人)', capacity: 4 },
 ] as const
 
-export type VehicleTypeValue = typeof VEHICLE_TYPES[number]['value']
+export type VehicleTypeValue = (typeof VEHICLE_TYPES)[number]['value']

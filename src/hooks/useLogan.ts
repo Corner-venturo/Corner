@@ -94,29 +94,36 @@ export function useLogan() {
   }, [])
 
   // 教導 Logan
-  const teach = useCallback(async (title: string, content: string, options?: {
-    type?: 'knowledge' | 'procedure' | 'preference'
-    tags?: string[]
-    importance?: number
-  }) => {
-    try {
-      const response = await fetch('/api/logan/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'teach',
-          title,
-          content,
-          ...options,
-        }),
-      })
+  const teach = useCallback(
+    async (
+      title: string,
+      content: string,
+      options?: {
+        type?: 'knowledge' | 'procedure' | 'preference'
+        tags?: string[]
+        importance?: number
+      }
+    ) => {
+      try {
+        const response = await fetch('/api/logan/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'teach',
+            title,
+            content,
+            ...options,
+          }),
+        })
 
-      const data = await response.json()
-      return data
-    } catch (error) {
-      return { success: false, error: '網路錯誤' }
-    }
-  }, [])
+        const data = await response.json()
+        return data
+      } catch (error) {
+        return { success: false, error: '網路錯誤' }
+      }
+    },
+    []
+  )
 
   // 清除對話
   const clearMessages = useCallback(() => {

@@ -4,7 +4,6 @@
  * 包含：護照號碼、護照效期
  */
 
-
 import React from 'react'
 import { cn } from '@/lib/utils'
 import { formatPassportExpiryWithStatus } from '@/lib/utils/passport-expiry'
@@ -33,7 +32,6 @@ export function MemberPassportInfo({
   onUpdateField,
   onKeyDown,
 }: MemberPassportInfoProps) {
-
   // 預設欄位顯示設定（訂金/尾款/應付金額 預設關閉）
   const cv = columnVisibility || {
     passport_name: true,
@@ -71,7 +69,12 @@ export function MemberPassportInfo({
     <>
       {/* 護照號碼 */}
       {cv.passport_number && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-card" : "bg-muted")}>
+        <td
+          className={cn(
+            'border border-morandi-gold/20 px-2 py-1',
+            isEditMode ? 'bg-card' : 'bg-muted'
+          )}
+        >
           {isEditMode ? (
             <input
               type="text"
@@ -90,7 +93,12 @@ export function MemberPassportInfo({
 
       {/* 護照效期 */}
       {cv.passport_expiry && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-card" : "bg-muted")}>
+        <td
+          className={cn(
+            'border border-morandi-gold/20 px-2 py-1',
+            isEditMode ? 'bg-card' : 'bg-muted'
+          )}
+        >
           {isEditMode ? (
             <input
               type="text"
@@ -103,7 +111,10 @@ export function MemberPassportInfo({
             />
           ) : (
             (() => {
-              const expiryInfo = formatPassportExpiryWithStatus(member.passport_expiry, departureDate)
+              const expiryInfo = formatPassportExpiryWithStatus(
+                member.passport_expiry,
+                departureDate
+              )
               if (expiryInfo.statusLabel) {
                 // 計算護照至少要有效到的日期（出發日 + 6個月）
                 const getRequiredDate = () => {
@@ -113,27 +124,22 @@ export function MemberPassportInfo({
                   return `${d.getMonth() + 1}/${d.getDate()}`
                 }
                 // 詳細說明
-                const detailLabel = expiryInfo.statusLabel === COMP_ORDERS_LABELS.效期不足
-                  ? MEMBER_DATA_LABELS.PASSPORT_REQUIRED_DATE(getRequiredDate())
-                  : COMP_ORDERS_LABELS.護照已過期
+                const detailLabel =
+                  expiryInfo.statusLabel === COMP_ORDERS_LABELS.效期不足
+                    ? MEMBER_DATA_LABELS.PASSPORT_REQUIRED_DATE(getRequiredDate())
+                    : COMP_ORDERS_LABELS.護照已過期
                 return (
                   <Tooltip>
                     <TooltipTrigger>
-                      <span className={cn("text-xs cursor-help", expiryInfo.className)}>
+                      <span className={cn('text-xs cursor-help', expiryInfo.className)}>
                         {expiryInfo.text}
                       </span>
                     </TooltipTrigger>
-                    <TooltipContent side="top">
-                      {detailLabel}
-                    </TooltipContent>
+                    <TooltipContent side="top">{detailLabel}</TooltipContent>
                   </Tooltip>
                 )
               }
-              return (
-                <span className={cn("text-xs", expiryInfo.className)}>
-                  {expiryInfo.text}
-                </span>
-              )
+              return <span className={cn('text-xs', expiryInfo.className)}>{expiryInfo.text}</span>
             })()
           )}
         </td>

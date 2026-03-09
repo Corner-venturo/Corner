@@ -1,7 +1,10 @@
 'use client'
 
 import React from 'react'
-import { ProposalDialog, type CreateProposalWithPackageData } from '@/features/proposals/components/ProposalDialog'
+import {
+  ProposalDialog,
+  type CreateProposalWithPackageData,
+} from '@/features/proposals/components/ProposalDialog'
 import { ProposalDetailDialog } from '@/features/proposals/components/ProposalDetailDialog'
 import { ArchiveProposalDialog } from '@/features/proposals/components/ArchiveProposalDialog'
 import type { Proposal, UpdateProposalData } from '@/types/proposal.types'
@@ -63,7 +66,7 @@ export function ProposalDialogsWrapper({
       {/* 提案詳細對話框 */}
       <ProposalDetailDialog
         open={proposalDetailDialogOpen}
-        onOpenChange={(open) => {
+        onOpenChange={open => {
           setProposalDetailDialogOpen(open)
           // 關閉時清除選擇和自動開版本標記
           if (!open) {
@@ -79,7 +82,7 @@ export function ProposalDialogsWrapper({
       {/* 編輯提案對話框 */}
       <ProposalDialog
         open={proposalEditDialogOpen}
-        onOpenChange={(open) => {
+        onOpenChange={open => {
           setProposalEditDialogOpen(open)
           if (!open) setSelectedProposal(null)
         }}
@@ -91,7 +94,7 @@ export function ProposalDialogsWrapper({
       {/* 封存提案對話框 */}
       <ArchiveProposalDialog
         open={proposalArchiveDialogOpen}
-        onOpenChange={(open) => {
+        onOpenChange={open => {
           setProposalArchiveDialogOpen(open)
           if (!open) setSelectedProposal(null)
         }}

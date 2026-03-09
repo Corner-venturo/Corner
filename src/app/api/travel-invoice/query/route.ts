@@ -28,9 +28,7 @@ export async function GET(request: NextRequest) {
 
     const supabase = getSupabaseAdminClient()
 
-    let query = supabase
-      .from('travel_invoices')
-      .select('*', { count: 'exact' })
+    let query = supabase.from('travel_invoices').select('*', { count: 'exact' })
 
     // 單筆查詢
     if (id) {
@@ -59,7 +57,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('查詢發票失敗:', error)
-    captureException(error, { module: 'travel-invoice.query' })
+      captureException(error, { module: 'travel-invoice.query' })
       return ApiError.database('查詢失敗')
     }
 

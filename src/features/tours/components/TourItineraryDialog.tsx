@@ -5,7 +5,6 @@
  * 統一入口：直接開啟 PackageItineraryDialog（與提案版本一致）
  */
 
-
 import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import type { Tour } from '@/stores/types'
 import type { ProposalPackage, Proposal } from '@/types/proposal.types'
@@ -24,29 +23,28 @@ interface TourItineraryDialogProps {
   tour: Tour
 }
 
-export function TourItineraryDialog({
-  isOpen,
-  onClose,
-  tour,
-}: TourItineraryDialogProps) {
+export function TourItineraryDialog({ isOpen, onClose, tour }: TourItineraryDialogProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [tourProposalPackage, setTourProposalPackage] = useState<ProposalPackage | null>(null)
 
   // 為 PackageItineraryDialog 建立模擬 Proposal 物件（使用 Tour 資料）
-  const fakeProposal = useMemo((): Proposal => ({
-    id: tour.id,
-    code: tour.code || '',
-    title: tour.name,
-    status: 'converted' as const,
-    destination: tour.location || null,
-    country_id: tour.country_id || null,
-    main_city_id: tour.main_city_id || null,
-    expected_start_date: tour.departure_date || null,
-    expected_end_date: tour.return_date || null,
-    created_at: tour.created_at || new Date().toISOString(),
-    updated_at: tour.updated_at || new Date().toISOString(),
-    workspace_id: tour.workspace_id || '',
-  }), [tour])
+  const fakeProposal = useMemo(
+    (): Proposal => ({
+      id: tour.id,
+      code: tour.code || '',
+      title: tour.name,
+      status: 'converted' as const,
+      destination: tour.location || null,
+      country_id: tour.country_id || null,
+      main_city_id: tour.main_city_id || null,
+      expected_start_date: tour.departure_date || null,
+      expected_end_date: tour.return_date || null,
+      created_at: tour.created_at || new Date().toISOString(),
+      updated_at: tour.updated_at || new Date().toISOString(),
+      workspace_id: tour.workspace_id || '',
+    }),
+    [tour]
+  )
 
   // 為旅遊團建立或取得 proposal_package
   const getOrCreatePackageForTour = useCallback(async (): Promise<ProposalPackage | null> => {

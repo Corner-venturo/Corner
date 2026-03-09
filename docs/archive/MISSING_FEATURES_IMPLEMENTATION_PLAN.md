@@ -9,48 +9,56 @@
 ## 📋 功能清單總覽
 
 ### Phase 1: PDF 生成功能 (優先級 P1) - 2 天
+
 - [ ] 1.1 出納單 PDF 生成
 - [ ] 1.2 收款單 PDF 生成
 - [ ] 1.3 請款單 PDF 生成
 - [ ] 1.4 PDF 工具函數庫
 
 ### Phase 2: Excel 匯出功能 (優先級 P1) - 1 天
+
 - [ ] 2.1 收款單 Excel 匯出
 - [ ] 2.2 請款單 Excel 匯出
 - [ ] 2.3 出納單 Excel 匯出
 - [ ] 2.4 Excel 工具函數庫
 
 ### Phase 3: 批量操作功能 (優先級 P1) - 2 天
+
 - [ ] 3.1 批量創建收款單
 - [ ] 3.2 Excel 匯入收款單
 - [ ] 3.3 Excel 匯入請款單
 - [ ] 3.4 批量確認功能
 
 ### Phase 4: 利潤計算系統 (優先級 P1) - 2-3 天
+
 - [ ] 4.1 出納單計算邏輯 (按供應商分組)
 - [ ] 4.2 團體利潤計算 Hook
 - [ ] 4.3 利潤分析頁面 (ProfitTab)
 - [ ] 4.4 利潤表格組件
 
 ### Phase 5: 獎金設定功能 (優先級 P2) - 1-2 天
+
 - [ ] 5.1 獎金設定資料結構
 - [ ] 5.2 獎金設定 Store
 - [ ] 5.3 獎金設定頁面 (BonusSettingTab)
 - [ ] 5.4 獎金 PDF 生成
 
 ### Phase 6: 請款單功能增強 (優先級 P2) - 1-2 天
+
 - [ ] 6.1 請款項目類型標準化
 - [ ] 6.2 請款單詳情頁面
 - [ ] 6.3 請款單搜尋對話框
 - [ ] 6.4 依團號查詢 API
 
 ### Phase 7: 搜尋與查詢功能 (優先級 P2) - 1 天
+
 - [ ] 7.1 整合收款單進階搜尋
 - [ ] 7.2 整合請款單進階搜尋
 - [ ] 7.3 依訂單查詢收款單
 - [ ] 7.4 依團號查詢請款單
 
 ### Phase 8: 其他優化功能 (優先級 P3) - 1-2 天
+
 - [ ] 8.1 使用者字典 Hook
 - [ ] 8.2 供應商字典 Hook
 - [ ] 8.3 供應商歷史記錄
@@ -65,6 +73,7 @@
 **檔案**: `/src/lib/pdf/disbursement-pdf.ts`
 
 **需求**:
+
 - 生成出納單 PDF
 - 包含：出納單號、日期、請款單列表、總金額
 - 按供應商分組顯示
@@ -73,6 +82,7 @@
 **參考舊系統**: `BillPdf.tsx`
 
 **技術方案**:
+
 ```typescript
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
@@ -103,12 +113,12 @@ export const generateDisbursementPDF = async (order: DisbursementOrder) => {
       req.tour_code,
       req.supplier_name,
       formatCurrency(req.total_amount),
-      req.notes || '-'
+      req.notes || '-',
     ]),
     foot: [['', '', '', `總計: ${formatCurrency(order.total_amount)}`, '']],
     theme: 'grid',
     headStyles: { fillColor: [66, 139, 202] },
-    footStyles: { fillColor: [240, 240, 240], fontStyle: 'bold' }
+    footStyles: { fillColor: [240, 240, 240], fontStyle: 'bold' },
   })
 
   // 5. 下載
@@ -123,10 +133,12 @@ export const generateDisbursementPDF = async (order: DisbursementOrder) => {
 **檔案**: `/src/lib/pdf/receipt-pdf.ts`
 
 **需求**:
+
 - 生成收款單 PDF
 - 包含：收款單號、訂單號、收款資訊、LinkPay 記錄
 
 **技術方案**:
+
 ```typescript
 export const generateReceiptPDF = async (receipt: Receipt) => {
   const doc = new jsPDF()
@@ -148,6 +160,7 @@ export const generateReceiptPDF = async (receipt: Receipt) => {
 **檔案**: `/src/lib/pdf/payment-request-pdf.ts`
 
 **需求**:
+
 - 生成請款單 PDF
 - 包含：請款單號、團號、供應商、項目明細
 
@@ -160,10 +173,12 @@ export const generateReceiptPDF = async (receipt: Receipt) => {
 **檔案**: `/src/lib/excel/receipt-excel.ts`
 
 **需求**:
+
 - 匯出收款單列表為 Excel
 - 包含欄位：收款編號、訂單編號、收款日期、收款金額、實收金額、收款類型、狀態、經手人、備註
 
 **技術方案**:
+
 ```typescript
 import * as XLSX from 'xlsx'
 
@@ -177,7 +192,7 @@ export const exportReceiptsToExcel = (receipts: Receipt[]) => {
     收款方式: getReceiptTypeName(r.receipt_type),
     狀態: getReceiptStatusName(r.status),
     經手人: r.handler_name || '-',
-    備註: r.notes || '-'
+    備註: r.notes || '-',
   }))
 
   const worksheet = XLSX.utils.json_to_sheet(data)
@@ -198,11 +213,13 @@ export const exportReceiptsToExcel = (receipts: Receipt[]) => {
 **檔案**: `/src/app/finance/payments/components/BatchCreateReceiptDialog.tsx`
 
 **需求**:
+
 - 一次建立多筆收款單
 - 支援多行輸入
 - 每行包含：訂單編號、收款金額、收款方式、收款日期
 
 **UI 設計**:
+
 ```typescript
 interface BatchReceiptItem {
   order_id: string
@@ -252,6 +269,7 @@ export function BatchCreateReceiptDialog() {
 **檔案**: `/src/hooks/useDisbursementCalculation.ts`
 
 **需求**:
+
 - 按供應商分組請款單
 - 計算每組總金額
 - 處理客戶退款/外幣請款
@@ -293,6 +311,7 @@ export const useDisbursementCalculation = (requestIds: string[]) => {
 **檔案**: `/src/hooks/useTourProfitCalculation.ts`
 
 **需求**:
+
 - 計算公式：收入 - 支出 - 獎金 = 利潤
 - 收入：所有收款單的實收金額
 - 支出：所有請款單的總金額
@@ -303,12 +322,8 @@ export const useTourProfitCalculation = (tourId: string) => {
   const receipts = useReceiptStore(state =>
     state.items.filter(r => r.tour_id === tourId && r.status === 1)
   )
-  const requests = usePaymentRequestStore(state =>
-    state.items.filter(r => r.tour_id === tourId)
-  )
-  const bonusSettings = useBonusSettingStore(state =>
-    state.items.filter(b => b.tour_id === tourId)
-  )
+  const requests = usePaymentRequestStore(state => state.items.filter(r => r.tour_id === tourId))
+  const bonusSettings = useBonusSettingStore(state => state.items.filter(b => b.tour_id === tourId))
 
   // 收入
   const revenue = useMemo(() => {
@@ -324,7 +339,7 @@ export const useTourProfitCalculation = (tourId: string) => {
   const bonuses = useMemo(() => {
     return bonusSettings.map(setting => {
       if (setting.bonus_type === 'percent') {
-        return revenue * setting.bonus / 100
+        return (revenue * setting.bonus) / 100
       } else {
         return setting.bonus
       }
@@ -345,7 +360,7 @@ export const useTourProfitCalculation = (tourId: string) => {
     profit,
     receipts,
     requests,
-    bonusSettings
+    bonusSettings,
   }
 }
 ```
@@ -360,19 +375,19 @@ export const useTourProfitCalculation = (tourId: string) => {
 
 ```typescript
 export interface BonusSetting extends SyncableEntity {
-  tour_id: string              // 團號
-  bonus_type_code: number      // 獎金類型（稅金、OP獎金等）
-  bonus: number                // 獎金金額
-  calculation_type: 'percent' | 'dollar'  // 計算方式
-  employee_id?: string         // 員工 ID（可選）
+  tour_id: string // 團號
+  bonus_type_code: number // 獎金類型（稅金、OP獎金等）
+  bonus: number // 獎金金額
+  calculation_type: 'percent' | 'dollar' // 計算方式
+  employee_id?: string // 員工 ID（可選）
 }
 
 export enum BonusTypeCode {
-  TAX = 0,           // 稅金
-  OP_BONUS = 1,      // OP 獎金
-  SALES_BONUS = 2,   // 業務獎金
-  GUIDE_BONUS = 3,   // 導遊獎金
-  OTHER = 999        // 其他
+  TAX = 0, // 稅金
+  OP_BONUS = 1, // OP 獎金
+  SALES_BONUS = 2, // 業務獎金
+  GUIDE_BONUS = 3, // 導遊獎金
+  OTHER = 999, // 其他
 }
 ```
 
@@ -386,19 +401,19 @@ export enum BonusTypeCode {
 
 ```typescript
 export enum PaymentRequestItemType {
-  HOTEL = 0,        // 飯店
-  TRANSPORT = 1,    // 交通
-  MEAL = 2,         // 餐飲
-  ACTIVITY = 3,     // 活動
+  HOTEL = 0, // 飯店
+  TRANSPORT = 1, // 交通
+  MEAL = 2, // 餐飲
+  ACTIVITY = 3, // 活動
   TOUR_PAYMENT = 4, // 出團款
-  TOUR_RETURN = 5,  // 回團款
-  OTHER = 6,        // 其他
-  INSURANCE = 7,    // 保險
-  BONUS = 8,        // 獎金
-  REFUND = 9,       // 退預收款
-  B2B = 10,         // 同業
-  ESIM = 11,        // 網卡
-  EMPLOYEE = 999    // 員工
+  TOUR_RETURN = 5, // 回團款
+  OTHER = 6, // 其他
+  INSURANCE = 7, // 保險
+  BONUS = 8, // 獎金
+  REFUND = 9, // 退預收款
+  B2B = 10, // 同業
+  ESIM = 11, // 網卡
+  EMPLOYEE = 999, // 員工
 }
 
 export const getPaymentRequestItemTypeName = (type: PaymentRequestItemType): string => {
@@ -415,7 +430,7 @@ export const getPaymentRequestItemTypeName = (type: PaymentRequestItemType): str
     [PaymentRequestItemType.REFUND]: '退預收款',
     [PaymentRequestItemType.B2B]: '同業',
     [PaymentRequestItemType.ESIM]: '網卡',
-    [PaymentRequestItemType.EMPLOYEE]: '員工'
+    [PaymentRequestItemType.EMPLOYEE]: '員工',
   }
   return names[type] || '未知'
 }
@@ -426,6 +441,7 @@ export const getPaymentRequestItemTypeName = (type: PaymentRequestItemType): str
 ## 📅 實作時程表
 
 ### Week 1 (Day 1-5)
+
 - Day 1: Phase 1.1-1.2 (出納單、收款單 PDF)
 - Day 2: Phase 1.3-1.4 (請款單 PDF、PDF 工具庫)
 - Day 3: Phase 2 (Excel 匯出功能)
@@ -433,6 +449,7 @@ export const getPaymentRequestItemTypeName = (type: PaymentRequestItemType): str
 - Day 5: Phase 3.3-3.4 (批量確認)
 
 ### Week 2 (Day 6-10)
+
 - Day 6: Phase 4.1 (出納單計算邏輯)
 - Day 7: Phase 4.2-4.3 (團體利潤計算、利潤頁面)
 - Day 8: Phase 5 (獎金設定功能)
@@ -440,6 +457,7 @@ export const getPaymentRequestItemTypeName = (type: PaymentRequestItemType): str
 - Day 10: Phase 7 (搜尋與查詢功能)
 
 ### Week 3 (Day 11-12)
+
 - Day 11: Phase 8 (其他優化功能)
 - Day 12: 整合測試、文檔更新
 
@@ -463,6 +481,7 @@ npm install xlsx
 ## ✅ 完成檢查清單
 
 ### PDF 生成
+
 - [ ] 出納單 PDF 可正常生成
 - [ ] 收款單 PDF 可正常生成
 - [ ] 請款單 PDF 可正常生成
@@ -470,24 +489,28 @@ npm install xlsx
 - [ ] 表格自動換頁
 
 ### Excel 匯出
+
 - [ ] 收款單列表可匯出
 - [ ] 請款單列表可匯出
 - [ ] 匯出檔案格式正確
 - [ ] 欄位名稱正確
 
 ### 批量操作
+
 - [ ] 可批量創建收款單
 - [ ] 可批量創建請款單
 - [ ] Excel 匯入功能正常
 - [ ] 錯誤處理完善
 
 ### 利潤計算
+
 - [ ] 出納單按供應商分組正確
 - [ ] 團體利潤計算正確
 - [ ] 利潤頁面顯示正常
 - [ ] 獎金計算正確
 
 ### 請款單增強
+
 - [ ] 項目類型標準化完成
 - [ ] 詳情頁面功能完整
 - [ ] 搜尋功能正常

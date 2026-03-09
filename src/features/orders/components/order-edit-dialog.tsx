@@ -1,7 +1,13 @@
 'use client'
 
 import React, { useState, useMemo, useEffect } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, type DialogLevel } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  type DialogLevel,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Combobox } from '@/components/ui/combobox'
@@ -23,12 +29,7 @@ interface OrderEditDialogProps {
   level?: DialogLevel
 }
 
-export function OrderEditDialog({
-  open,
-  onOpenChange,
-  order,
-  level = 2,
-}: OrderEditDialogProps) {
+export function OrderEditDialog({ open, onOpenChange, order, level = 2 }: OrderEditDialogProps) {
   const { items: employees } = useEmployeesSlim()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
@@ -62,7 +63,8 @@ export function OrderEditDialog({
       const notDeleted = !empWithSync._deleted
       const isActive = emp.status === 'active'
       // 排除機器人
-      const notBot = emp.employee_number !== 'BOT001' && emp.id !== '00000000-0000-0000-0000-000000000001'
+      const notBot =
+        emp.employee_number !== 'BOT001' && emp.id !== '00000000-0000-0000-0000-000000000001'
       return notDeleted && isActive && notBot
     })
 
@@ -80,7 +82,8 @@ export function OrderEditDialog({
       const notDeleted = !empWithSync._deleted
       const isActive = emp.status === 'active'
       // 排除機器人
-      const notBot = emp.employee_number !== 'BOT001' && emp.id !== '00000000-0000-0000-0000-000000000001'
+      const notBot =
+        emp.employee_number !== 'BOT001' && emp.id !== '00000000-0000-0000-0000-000000000001'
       return notDeleted && isActive && notBot
     })
 
@@ -115,9 +118,7 @@ export function OrderEditDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent level={level} className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>
-            編輯訂單 {order?.order_number}
-          </DialogTitle>
+          <DialogTitle>編輯訂單 {order?.order_number}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -130,7 +131,9 @@ export function OrderEditDialog({
 
           {/* 聯絡人 */}
           <div>
-            <label className="text-sm font-medium text-morandi-primary">{COMP_ORDERS_LABELS.LABEL_7009}</label>
+            <label className="text-sm font-medium text-morandi-primary">
+              {COMP_ORDERS_LABELS.LABEL_7009}
+            </label>
             <Input
               value={formData.contact_person}
               onChange={e => setFormData(prev => ({ ...prev, contact_person: e.target.value }))}
@@ -165,7 +168,9 @@ export function OrderEditDialog({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{COMP_ORDERS_LABELS.LABEL_7412}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {COMP_ORDERS_LABELS.LABEL_7412}
+              </label>
               <Combobox
                 options={assistants.map(emp => ({
                   value: emp.display_name || emp.english_name,

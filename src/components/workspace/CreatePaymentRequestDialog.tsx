@@ -92,9 +92,12 @@ export function CreatePaymentRequestDialog({
         amount: totalAmount,
         supplier_name: supplier,
         status: 'pending',
-        notes: itemsArray.map((item, i) =>
-          `${i + 1}. ${item.name} - ${item.description} (NT$ ${item.amount.toLocaleString()})`
-        ).join('\n'),
+        notes: itemsArray
+          .map(
+            (item, i) =>
+              `${i + 1}. ${item.name} - ${item.description} (NT$ ${item.amount.toLocaleString()})`
+          )
+          .join('\n'),
       })
 
       // 更新代墊項目狀態
@@ -128,7 +131,9 @@ export function CreatePaymentRequestDialog({
         <div className="space-y-4">
           {/* 代墊項目資訊 */}
           <div className="bg-morandi-container/5 rounded-lg p-3 border border-morandi-gold/20">
-            <div className="text-sm font-medium text-morandi-secondary mb-2">{COMP_WORKSPACE_LABELS.LABEL_4228}</div>
+            <div className="text-sm font-medium text-morandi-secondary mb-2">
+              {COMP_WORKSPACE_LABELS.LABEL_4228}
+            </div>
             <div className="space-y-1">
               {itemsArray.map((item, index) => (
                 <div key={item.id} className="flex items-center justify-between text-sm">
@@ -140,8 +145,13 @@ export function CreatePaymentRequestDialog({
               ))}
             </div>
             <div className="flex items-center justify-between mt-2 pt-2 border-t border-morandi-gold/20">
-              <span className="text-sm font-medium text-morandi-secondary">{COMP_WORKSPACE_LABELS.TOTAL_3424}</span>
-              <CurrencyCell amount={totalAmount} className="text-lg font-semibold text-morandi-primary" />
+              <span className="text-sm font-medium text-morandi-secondary">
+                {COMP_WORKSPACE_LABELS.TOTAL_3424}
+              </span>
+              <CurrencyCell
+                amount={totalAmount}
+                className="text-lg font-semibold text-morandi-primary"
+              />
             </div>
           </div>
 
@@ -164,22 +174,18 @@ export function CreatePaymentRequestDialog({
 
           {/* 類別 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-2">{COMP_WORKSPACE_LABELS.LABEL_2946}</label>
-            <Input
-              type="text"
-              value={category}
-              onChange={e => setCategory(e.target.value)}
-            />
+            <label className="block text-sm font-medium text-morandi-primary mb-2">
+              {COMP_WORKSPACE_LABELS.LABEL_2946}
+            </label>
+            <Input type="text" value={category} onChange={e => setCategory(e.target.value)} />
           </div>
 
           {/* 供應商 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-2">{COMP_WORKSPACE_LABELS.LABEL_561}</label>
-            <Input
-              type="text"
-              value={supplier}
-              onChange={e => setSupplier(e.target.value)}
-            />
+            <label className="block text-sm font-medium text-morandi-primary mb-2">
+              {COMP_WORKSPACE_LABELS.LABEL_561}
+            </label>
+            <Input type="text" value={supplier} onChange={e => setSupplier(e.target.value)} />
           </div>
 
           {/* 請款日期 */}
@@ -187,10 +193,7 @@ export function CreatePaymentRequestDialog({
             <label className="block text-sm font-medium text-morandi-primary mb-2">
               {COMP_WORKSPACE_LABELS.LABEL_8173}
             </label>
-            <DatePicker
-              value={requestDate}
-              onChange={date => setRequestDate(date)}
-            />
+            <DatePicker value={requestDate} onChange={date => setRequestDate(date)} />
           </div>
         </div>
 

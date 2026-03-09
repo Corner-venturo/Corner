@@ -38,7 +38,11 @@ interface ActivitiesSectionProps {
   updateDailyItinerary: (index: number, field: string, value: unknown) => void
   onOpenAttractionSelector: (dayIndex: number) => void
   handleActivityImageUpload: (dayIndex: number, actIndex: number, file: File) => void
-  handleExternalImageUpload?: (dayIndex: number, actIndex: number, imageUrl: string) => Promise<void>
+  handleExternalImageUpload?: (
+    dayIndex: number,
+    actIndex: number,
+    imageUrl: string
+  ) => Promise<void>
   uploadingActivityImage: { dayIndex: number; actIndex: number } | null
   activityDragOver: { dayIndex: number; actIndex: number } | null
   setActivityDragOver: (value: { dayIndex: number; actIndex: number } | null) => void
@@ -90,7 +94,8 @@ export function ActivitiesSection({
     })
   }, [activity_count])
 
-  const all_activities_collapsed = collapsed_activities.size === activity_count && activity_count > 0
+  const all_activities_collapsed =
+    collapsed_activities.size === activity_count && activity_count > 0
   const all_activities_expanded = collapsed_activities.size === 0
 
   const toggle_activity_collapse = (act_index: number) => {
@@ -182,7 +187,9 @@ export function ActivitiesSection({
     <div className="space-y-2">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_2716}</label>
+          <label className="text-sm font-medium text-morandi-primary">
+            {COMP_EDITOR_LABELS.LABEL_2716}
+          </label>
           {/* 視圖切換按鈕 */}
           <div className="flex items-center bg-morandi-container/50 rounded-lg p-0.5">
             <button
@@ -211,7 +218,9 @@ export function ActivitiesSection({
             </button>
           </div>
           <span className="text-xs text-morandi-secondary">
-            {viewMode === 'grid' ? COMP_EDITOR_LABELS.拖曳調整順序 : COMP_EDITOR_LABELS.拖曳_可調整順序}
+            {viewMode === 'grid'
+              ? COMP_EDITOR_LABELS.拖曳調整順序
+              : COMP_EDITOR_LABELS.拖曳_可調整順序}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -253,20 +262,12 @@ export function ActivitiesSection({
           >
             {COMP_EDITOR_LABELS.SELECT_1031}
           </Button>
-          <Button
-            onClick={() => addActivity(dayIndex)}
-            size="xs"
-            variant="secondary"
-          >
+          <Button onClick={() => addActivity(dayIndex)} size="xs" variant="secondary">
             + 手動新增
           </Button>
         </div>
       </div>
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext
           items={day.activities?.map((_, i) => `activity-${dayIndex}-${i}`) || []}
           strategy={viewMode === 'grid' ? rectSortingStrategy : verticalListSortingStrategy}
@@ -287,8 +288,11 @@ export function ActivitiesSection({
             /* 列表編輯模式 */
             <div className="space-y-2">
               {day.activities?.map((activity: Activity, actIndex: number) => {
-                const isActivityUploading = uploadingActivityImage?.dayIndex === dayIndex && uploadingActivityImage?.actIndex === actIndex
-                const isActivityDragOver = activityDragOver?.dayIndex === dayIndex && activityDragOver?.actIndex === actIndex
+                const isActivityUploading =
+                  uploadingActivityImage?.dayIndex === dayIndex &&
+                  uploadingActivityImage?.actIndex === actIndex
+                const isActivityDragOver =
+                  activityDragOver?.dayIndex === dayIndex && activityDragOver?.actIndex === actIndex
 
                 return (
                   <SortableActivityItem

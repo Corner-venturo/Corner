@@ -79,7 +79,9 @@ export const useWidgetsStore = () => {
       try {
         if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
           // 取得頻道的 workspace_id
-          const channel = useChannelStore.getState().items.find((c: { id: string }) => c.id === channelId)
+          const channel = useChannelStore
+            .getState()
+            .items.find((c: { id: string }) => c.id === channelId)
           const workspaceId = channel?.workspace_id
 
           const { error: listError } = await supabase.from('advance_lists').insert({

@@ -229,10 +229,7 @@ function generateDayDescription(activities: DailyActivity[], timeSlot: DailyTime
  * 生成推薦事項
  */
 function generateRecommendations(activities: DailyActivity[]): string[] {
-  const recommendations: string[] = [
-    '建議穿著舒適的步行鞋',
-    '攜帶防曬用品和水',
-  ]
+  const recommendations: string[] = ['建議穿著舒適的步行鞋', '攜帶防曬用品和水']
 
   if (activities.some(a => a.icon === '🛍️')) {
     recommendations.push('準備足夠現金以便購物')
@@ -347,9 +344,7 @@ export async function generateItinerary(
   // 4. 按城市分組景點
   const attractionsByCity = new Map<string, AttractionWithDistance[]>()
   for (const cityId of involvedCityIds) {
-    let cityAttractions = attractions.filter(
-      a => a.city_id === cityId && a.is_active
-    )
+    let cityAttractions = attractions.filter(a => a.city_id === cityId && a.is_active)
 
     // 根據風格篩選和排序
     cityAttractions = filterAndSortByStyle(cityAttractions, request.style)

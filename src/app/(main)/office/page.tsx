@@ -33,12 +33,7 @@ export default function OfficePage() {
   const router = useRouter()
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false)
 
-  const {
-    documents,
-    isLoading,
-    fetchDocuments,
-    deleteDocument,
-  } = useOfficeDocument()
+  const { documents, isLoading, fetchDocuments, deleteDocument } = useOfficeDocument()
 
   // 載入文件列表
   useEffect(() => {
@@ -69,9 +64,7 @@ export default function OfficePage() {
       label: '類型',
       width: '60px',
       render: (_: unknown, row: OfficeDocument) => (
-        <div className="flex items-center justify-center">
-          {getDocTypeIcon(row.type)}
-        </div>
+        <div className="flex items-center justify-center">{getDocTypeIcon(row.type)}</div>
       ),
     },
     {
@@ -98,9 +91,7 @@ export default function OfficePage() {
       key: 'updated_at',
       label: '更新時間',
       width: '180px',
-      render: (_: unknown, row: OfficeDocument) => (
-        <DateCell date={row.updated_at} format="long" />
-      ),
+      render: (_: unknown, row: OfficeDocument) => <DateCell date={row.updated_at} format="long" />,
     },
     {
       key: 'actions',
@@ -138,10 +129,7 @@ export default function OfficePage() {
         }
       />
 
-      <NewDocumentDialog
-        open={isNewDialogOpen}
-        onOpenChange={setIsNewDialogOpen}
-      />
+      <NewDocumentDialog open={isNewDialogOpen} onOpenChange={setIsNewDialogOpen} />
     </>
   )
 }

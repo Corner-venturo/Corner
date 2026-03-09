@@ -9,6 +9,7 @@
 ## 🎯 專案基本資訊
 
 ### 專案概述
+
 ```
 專案名稱: Venturo ERP (旅遊團管理系統)
 工作目錄: /Users/williamchien/Projects/venturo-erp
@@ -18,6 +19,7 @@
 ```
 
 ### 核心原則
+
 - **問題 → 只回答**，不執行操作
 - **等待指令**：「執行」「修正」「開始」才動作
 - **簡潔回應**：問什麼答什麼
@@ -27,6 +29,7 @@
 ## 📁 專案架構
 
 ### 核心目錄結構
+
 ```
 src/
 ├── app/          (51 頁面) - Next.js 路由
@@ -40,6 +43,7 @@ src/
 ```
 
 ### 架構模式
+
 - **Hybrid Feature-Based + Layer-Based**
 - 功能模組獨立 (features/)
 - 共享基礎層 (components/, hooks/, stores/)
@@ -49,21 +53,24 @@ src/
 ## 🔧 開發規範
 
 ### 組件創建規則
+
 ```tsx
 // ✅ 正確：使用 Phase 1/2 的可重用組件
-import { ListPageLayout } from '@/components/layout/list-page-layout';
-import { DateCell, StatusCell, ActionCell } from '@/components/table-cells';
+import { ListPageLayout } from '@/components/layout/list-page-layout'
+import { DateCell, StatusCell, ActionCell } from '@/components/table-cells'
 
 // ❌ 錯誤：不要重複寫 ResponsiveHeader + EnhancedTable
 ```
 
 ### 命名規範
+
 - **組件**: PascalCase (`ChannelChat.tsx`)
 - **Hooks**: camelCase (`useUserStore.ts`)
 - **工具**: kebab-case (`format-date.ts`)
 - **型別**: kebab-case + `.types.ts`
 
 ### 型別安全
+
 - **禁止**: `as any`
 - **盡量避免**: `as unknown`
 - **使用**: 正確的 TypeScript 型別定義
@@ -73,6 +80,7 @@ import { DateCell, StatusCell, ActionCell } from '@/components/table-cells';
 ## 📋 常用指令
 
 ### 開發
+
 ```bash
 cd /Users/williamchien/Projects/venturo-erp
 npm run dev          # 啟動開發伺服器 (port 3000)
@@ -82,6 +90,7 @@ npm run type-check   # TypeScript 類型檢查
 ```
 
 ### 資料庫 (詳見 SUPABASE_GUIDE.md)
+
 ```bash
 npm run db:types     # 更新 TypeScript 類型
 npm run db:push      # 推送 migration 到資料庫
@@ -89,6 +98,7 @@ npm run db:pull      # 下載目前資料庫結構
 ```
 
 ### 檢查架構
+
 ```bash
 ls -la src/components/     # 查看組件
 ls -la src/features/       # 查看功能模組
@@ -100,6 +110,7 @@ find . -name "*-store.ts"  # 查找所有 stores
 ## ✅ 已完成的優化
 
 ### Phase 1-2: 可重用組件系統
+
 - ✅ ListPageLayout 組件
 - ✅ Table Cell 組件庫 (8 個組件)
 - ✅ useListPageState Hook
@@ -107,6 +118,7 @@ find . -name "*-store.ts"  # 查找所有 stores
 - **總計減少**: 215 行代碼 (-24%)
 
 ### Phase 3-4: 純雲端架構遷移 (2026-01)
+
 - ✅ 移除 IndexedDB 離線快取
 - ✅ Supabase Auth 整合
 - ✅ RLS 資料隔離（Workspace 層級）
@@ -115,6 +127,7 @@ find . -name "*-store.ts"  # 查找所有 stores
 - ✅ SWR 快取層
 
 **關鍵改進**:
+
 - 🔄 單一資料來源：Supabase 為唯一 Source of Truth
 - ⚡ 即時更新：透過 SWR revalidation
 - 🔒 資料隔離：RLS 確保 Workspace 資料安全
@@ -125,17 +138,20 @@ find . -name "*-store.ts"  # 查找所有 stores
 ## 🎯 工作檢查清單
 
 ### 開始任何工作前
+
 - [ ] 確認當前工作目錄正確
 - [ ] 檢查 port 3000 是否已佔用
 - [ ] 了解要修改的功能範圍
 
 ### 修改代碼前
+
 - [ ] 是否使用了可重用組件？
 - [ ] 型別定義是否完整？
 - [ ] 是否避免 `as any`？
 - [ ] 是否符合命名規範？
 
 ### 提交前檢查
+
 - [ ] `npm run build` 通過
 - [ ] 沒有新增 console.log
 - [ ] 沒有未使用的 imports
@@ -146,6 +162,7 @@ find . -name "*-store.ts"  # 查找所有 stores
 ## 🔍 快速參考
 
 ### 主要文檔位置
+
 ```
 docs/
 ├── DEVELOPMENT_GUIDE.md         - 開發指南（本檔案）
@@ -158,6 +175,7 @@ docs/
 ```
 
 ### 關鍵檔案
+
 ```
 # 狀態管理
 src/stores/core/create-store.ts            - Store 工廠函數（純雲端）
@@ -186,12 +204,14 @@ src/lib/supabase/types.ts                  - Supabase 自動生成類型
 ## 🚨 已知問題與限制
 
 ### 需要改善的項目
+
 1. **23 個超大檔案** (>500 行) - 需拆分
 2. **重複的 Store Factory** - `create-store.ts` 應刪除
 3. **188 個型別繞過** - `as any`/`as unknown` 過多
 4. **Workspace Store Facade** - 耦合 5 個 stores
 
 ### 架構改善需求
+
 - Service Layer 太薄 (只有 5 個，需 12-15 個)
 - API Layer 不完整 (只有 4 個 routes)
 - 測試覆蓋率 ~0%

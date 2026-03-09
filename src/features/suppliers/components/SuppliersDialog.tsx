@@ -3,7 +3,6 @@
  * SuppliersDialog - 供應商對話框（僅基本資訊）
  */
 
-
 import React from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'

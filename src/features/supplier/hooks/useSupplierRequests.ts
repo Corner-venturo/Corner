@@ -35,14 +35,15 @@ export function useSupplierRequests() {
     return data || []
   }
 
-  const { data: requests = [], error, isLoading, mutate } = useSWR(
-    workspaceId ? ['supplier-requests', workspaceId] : null,
-    fetcher,
-    {
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
-    }
-  )
+  const {
+    data: requests = [],
+    error,
+    isLoading,
+    mutate,
+  } = useSWR(workspaceId ? ['supplier-requests', workspaceId] : null, fetcher, {
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
+  })
 
   // 計算統計
   const pendingCount = requests.filter(r => r.response_status === 'pending').length

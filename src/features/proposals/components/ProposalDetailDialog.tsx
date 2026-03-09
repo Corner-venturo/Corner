@@ -4,7 +4,6 @@
  * 用於在旅遊團頁面顯示提案詳情
  */
 
-
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
@@ -65,7 +64,9 @@ export function ProposalDetailDialog({
     return allPackages.filter(p => p.proposal_id === proposal.id)
   }, [allPackages, proposal])
 
-  const canAddVersion = proposal ? proposal.status !== 'converted' && proposal.status !== 'archived' : false
+  const canAddVersion = proposal
+    ? proposal.status !== 'converted' && proposal.status !== 'archived'
+    : false
 
   const handlePackagesChange = useCallback(() => {
     refreshPackages()
@@ -92,48 +93,51 @@ export function ProposalDetailDialog({
     <>
       {/* 主對話框：使用 level={1} */}
       <Dialog open={open} onOpenChange={onOpenChange}>
-          <DialogContent level={1} className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-6">
-            <VisuallyHidden>
-              <DialogTitle>{PROPOSAL_LABELS.detailDialog.title(proposal.code)}</DialogTitle>
-            </VisuallyHidden>
-            {/* 標題區 - pr-8 為關閉按鈕留空間 */}
-            <div className="flex items-center justify-between pr-8 pb-4 border-b border-border">
-              <div className="flex items-center gap-3">
-                <span className="text-morandi-gold font-mono text-lg">{proposal.code}</span>
-                <span className="text-morandi-primary font-medium">{proposal.title || PROPOSAL_LABELS.detailDialog.unnamed}</span>
-                <span
-                  className={`px-2 py-0.5 rounded text-xs ${STATUS_COLORS[proposal.status]}`}
-                >
-                  {STATUS_LABELS[proposal.status]}
-                </span>
-              </div>
-              {canAddVersion && (
-                <Button
-                  size="sm"
-                  className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-                  onClick={() => setShowAddDialog(true)}
-                >
-                  <Plus size={14} />
-                  {PROPOSAL_LABELS.detailDialog.addVersion}
-                </Button>
-              )}
+        <DialogContent
+          level={1}
+          className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-6"
+        >
+          <VisuallyHidden>
+            <DialogTitle>{PROPOSAL_LABELS.detailDialog.title(proposal.code)}</DialogTitle>
+          </VisuallyHidden>
+          {/* 標題區 - pr-8 為關閉按鈕留空間 */}
+          <div className="flex items-center justify-between pr-8 pb-4 border-b border-border">
+            <div className="flex items-center gap-3">
+              <span className="text-morandi-gold font-mono text-lg">{proposal.code}</span>
+              <span className="text-morandi-primary font-medium">
+                {proposal.title || PROPOSAL_LABELS.detailDialog.unnamed}
+              </span>
+              <span className={`px-2 py-0.5 rounded text-xs ${STATUS_COLORS[proposal.status]}`}>
+                {STATUS_LABELS[proposal.status]}
+              </span>
             </div>
+            {canAddVersion && (
+              <Button
+                size="sm"
+                className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                onClick={() => setShowAddDialog(true)}
+              >
+                <Plus size={14} />
+                {PROPOSAL_LABELS.detailDialog.addVersion}
+              </Button>
+            )}
+          </div>
 
-            {/* 套件列表 */}
-            <div className="flex-1 overflow-auto">
-              <PackageListPanel
-                proposal={proposal}
-                packages={packages}
-                onPackagesChange={handlePackagesChange}
-                showAddDialog={showAddDialog}
-                onShowAddDialogChange={setShowAddDialog}
-                onChildDialogChange={setPackageListChildDialogOpen}
-                onOpenItineraryDialog={handleOpenItineraryDialog}
-                onNavigateAway={() => onOpenChange(false)}
-              />
-            </div>
-          </DialogContent>
-        </Dialog>
+          {/* 套件列表 */}
+          <div className="flex-1 overflow-auto">
+            <PackageListPanel
+              proposal={proposal}
+              packages={packages}
+              onPackagesChange={handlePackagesChange}
+              showAddDialog={showAddDialog}
+              onShowAddDialogChange={setShowAddDialog}
+              onChildDialogChange={setPackageListChildDialogOpen}
+              onOpenItineraryDialog={handleOpenItineraryDialog}
+              onNavigateAway={() => onOpenChange(false)}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* 行程表對話框（level={2}） */}
       {itineraryPackage && (

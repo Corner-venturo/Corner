@@ -105,9 +105,8 @@ function writeToConsole(entry: LogEntry): void {
   if (isDevelopment) {
     // 開發環境：格式化輸出
     const prefix = `[${entry.level.toUpperCase()}]`
-    const contextStr = Object.keys(entry.context || {}).length > 0
-      ? ` ${JSON.stringify(entry.context)}`
-      : ''
+    const contextStr =
+      Object.keys(entry.context || {}).length > 0 ? ` ${JSON.stringify(entry.context)}` : ''
 
     if (entry.data) {
       consoleMethod(prefix, entry.message, entry.data, contextStr)
@@ -197,12 +196,7 @@ function isLogContext(arg: unknown): arg is LogContext {
 /**
  * 核心日誌函數
  */
-function logMessage(
-  level: LogLevel,
-  message: string,
-  data?: unknown,
-  context?: LogContext
-): void {
+function logMessage(level: LogLevel, message: string, data?: unknown, context?: LogContext): void {
   if (!shouldLog(level)) return
 
   const entry = createLogEntry(level, message, data, context)
@@ -264,16 +258,11 @@ export const logger = {
    */
   child: (childContext: LogContext) => {
     return {
-      debug: (message: string, data?: unknown) =>
-        logMessage('debug', message, data, childContext),
-      info: (message: string, data?: unknown) =>
-        logMessage('info', message, data, childContext),
-      log: (message: string, data?: unknown) =>
-        logMessage('info', message, data, childContext),
-      warn: (message: string, data?: unknown) =>
-        logMessage('warn', message, data, childContext),
-      error: (message: string, data?: unknown) =>
-        logMessage('error', message, data, childContext),
+      debug: (message: string, data?: unknown) => logMessage('debug', message, data, childContext),
+      info: (message: string, data?: unknown) => logMessage('info', message, data, childContext),
+      log: (message: string, data?: unknown) => logMessage('info', message, data, childContext),
+      warn: (message: string, data?: unknown) => logMessage('warn', message, data, childContext),
+      error: (message: string, data?: unknown) => logMessage('error', message, data, childContext),
     }
   },
 

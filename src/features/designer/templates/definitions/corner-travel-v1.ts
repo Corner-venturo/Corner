@@ -8,7 +8,12 @@
  * - 清晰的資訊層次
  */
 import type { PageTemplate, TemplateData } from './types'
-import type { CanvasElement, TextElement, ShapeElement, ImageElement } from '@/features/designer/components/types'
+import type {
+  CanvasElement,
+  TextElement,
+  ShapeElement,
+  ImageElement,
+} from '@/features/designer/components/types'
 
 // A5 尺寸（設計尺寸，96 DPI）
 const A5_WIDTH = 559
@@ -470,7 +475,9 @@ export const cornerTravelV1TocLeft: PageTemplate = {
         meals.breakfast ? `早餐 ${meals.breakfast}` : '',
         meals.lunch ? `午餐 ${meals.lunch}` : '',
         meals.dinner ? `晚餐 ${meals.dinner}` : '',
-      ].filter(Boolean).join('　')
+      ]
+        .filter(Boolean)
+        .join('　')
 
       if (mealText) {
         const mealInfo: TextElement = {

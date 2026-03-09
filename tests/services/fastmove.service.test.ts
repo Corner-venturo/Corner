@@ -81,15 +81,15 @@ describe('FastMoveService', () => {
         statusText: 'Internal Server Error',
       })
 
-      await expect(fastMoveService.getProducts())
-        .rejects.toThrow('FastMove API Error: Internal Server Error')
+      await expect(fastMoveService.getProducts()).rejects.toThrow(
+        'FastMove API Error: Internal Server Error'
+      )
     })
 
     it('should throw error on network failure', async () => {
       mockFetch.mockRejectedValueOnce(new Error('Network Error'))
 
-      await expect(fastMoveService.getProducts())
-        .rejects.toThrow('Network Error')
+      await expect(fastMoveService.getProducts()).rejects.toThrow('Network Error')
     })
   })
 
@@ -129,8 +129,9 @@ describe('FastMoveService', () => {
         statusText: 'Bad Request',
       })
 
-      await expect(fastMoveService.createOrder(orderRequest))
-        .rejects.toThrow('FastMove API Error: Bad Request')
+      await expect(fastMoveService.createOrder(orderRequest)).rejects.toThrow(
+        'FastMove API Error: Bad Request'
+      )
     })
   })
 
@@ -160,15 +161,15 @@ describe('FastMoveService', () => {
         statusText: 'Not Found',
       })
 
-      await expect(fastMoveService.getOrderStatus('invalid-id'))
-        .rejects.toThrow('FastMove API Error: Not Found')
+      await expect(fastMoveService.getOrderStatus('invalid-id')).rejects.toThrow(
+        'FastMove API Error: Not Found'
+      )
     })
 
     it('should throw error on network failure', async () => {
       mockFetch.mockRejectedValueOnce(new Error('Connection Timeout'))
 
-      await expect(fastMoveService.getOrderStatus('order-1'))
-        .rejects.toThrow('Connection Timeout')
+      await expect(fastMoveService.getOrderStatus('order-1')).rejects.toThrow('Connection Timeout')
     })
   })
 })

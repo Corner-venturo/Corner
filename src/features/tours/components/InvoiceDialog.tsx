@@ -9,7 +9,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { FileText, Plus, Trash2, X } from 'lucide-react'
 import { TravelInvoiceItem, BuyerInfo } from '@/stores/travel-invoice-store'
 import { CurrencyCell } from '@/components/table-cells'
@@ -77,7 +83,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
               <Label>{INVOICE_LABELS.ISSUE_DATE}</Label>
               <DatePicker
                 value={invoiceDate}
-                onChange={(date) => onInvoiceDateChange(date)}
+                onChange={date => onInvoiceDateChange(date)}
                 placeholder={COMP_TOURS_LABELS.選擇日期}
               />
             </div>
@@ -148,7 +154,9 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
                 <Label>{INVOICE_LABELS.BUYER_NAME}</Label>
                 <Input
                   value={invoiceBuyer.buyerName}
-                  onChange={e => onInvoiceBuyerChange({ ...invoiceBuyer, buyerName: e.target.value })}
+                  onChange={e =>
+                    onInvoiceBuyerChange({ ...invoiceBuyer, buyerName: e.target.value })
+                  }
                   placeholder={COMP_TOURS_LABELS.請輸入買受人名稱}
                 />
               </div>
@@ -156,7 +164,9 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
                 <Label>{INVOICE_LABELS.TAX_ID}</Label>
                 <Input
                   value={invoiceBuyer.buyerUBN || ''}
-                  onChange={e => onInvoiceBuyerChange({ ...invoiceBuyer, buyerUBN: e.target.value })}
+                  onChange={e =>
+                    onInvoiceBuyerChange({ ...invoiceBuyer, buyerUBN: e.target.value })
+                  }
                   placeholder={COMP_TOURS_LABELS._8_碼數字}
                 />
               </div>
@@ -165,7 +175,9 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
                 <Input
                   type="email"
                   value={invoiceBuyer.buyerEmail || ''}
-                  onChange={e => onInvoiceBuyerChange({ ...invoiceBuyer, buyerEmail: e.target.value })}
+                  onChange={e =>
+                    onInvoiceBuyerChange({ ...invoiceBuyer, buyerEmail: e.target.value })
+                  }
                   placeholder={COMP_TOURS_LABELS.用於寄送電子收據}
                 />
               </div>
@@ -173,7 +185,9 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
                 <Label>{INVOICE_LABELS.LABEL_5607}</Label>
                 <Input
                   value={invoiceBuyer.buyerMobile || ''}
-                  onChange={e => onInvoiceBuyerChange({ ...invoiceBuyer, buyerMobile: e.target.value })}
+                  onChange={e =>
+                    onInvoiceBuyerChange({ ...invoiceBuyer, buyerMobile: e.target.value })
+                  }
                   placeholder="09xxxxxxxx"
                 />
               </div>
@@ -207,7 +221,9 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
                       type="number"
                       min="1"
                       value={item.item_count}
-                      onChange={e => onUpdateInvoiceItem(index, 'item_count', parseInt(e.target.value) || 1)}
+                      onChange={e =>
+                        onUpdateInvoiceItem(index, 'item_count', parseInt(e.target.value) || 1)
+                      }
                       className="h-8 text-center"
                     />
                   </div>
@@ -216,7 +232,9 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
                       type="number"
                       min="0"
                       value={item.item_price || ''}
-                      onChange={e => onUpdateInvoiceItem(index, 'item_price', parseFloat(e.target.value) || 0)}
+                      onChange={e =>
+                        onUpdateInvoiceItem(index, 'item_price', parseFloat(e.target.value) || 0)
+                      }
                       placeholder="0"
                       className="h-8 text-right"
                     />
@@ -285,17 +303,19 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
           </div>
 
           {/* 超開提醒 */}
-          {invoiceOrderId && (() => {
-            const order = tourOrders.find(o => o.id === invoiceOrderId)
-            if (order && invoiceTotal > (order.paid_amount ?? 0)) {
-              return (
-                <div className="p-3 bg-status-warning-bg border border-status-warning/30 rounded-md text-sm text-status-warning flex items-center gap-1 flex-wrap">
-                  ⚠️ 發票金額超過已收款金額！已收款：<CurrencyCell amount={order.paid_amount ?? 0} />
-                </div>
-              )
-            }
-            return null
-          })()}
+          {invoiceOrderId &&
+            (() => {
+              const order = tourOrders.find(o => o.id === invoiceOrderId)
+              if (order && invoiceTotal > (order.paid_amount ?? 0)) {
+                return (
+                  <div className="p-3 bg-status-warning-bg border border-status-warning/30 rounded-md text-sm text-status-warning flex items-center gap-1 flex-wrap">
+                    ⚠️ 發票金額超過已收款金額！已收款：
+                    <CurrencyCell amount={order.paid_amount ?? 0} />
+                  </div>
+                )
+              }
+              return null
+            })()}
 
           {/* 按鈕 */}
           <div className="flex justify-center gap-4 pt-2">
@@ -307,11 +327,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
               <X size={16} />
               {INVOICE_LABELS.CANCEL}
             </Button>
-            <Button
-              onClick={onIssueInvoice}
-              disabled={isInvoiceLoading}
-              className="min-w-[100px]"
-            >
+            <Button onClick={onIssueInvoice} disabled={isInvoiceLoading} className="min-w-[100px]">
               {isInvoiceLoading ? COMP_TOURS_LABELS.開立中 : COMP_TOURS_LABELS.開立發票}
             </Button>
           </div>

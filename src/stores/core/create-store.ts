@@ -37,13 +37,13 @@ function generateUUID(): string {
   // Fallback: 使用 crypto.getRandomValues
   if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
     return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, c =>
-      (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
+      (+c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))).toString(16)
     )
   }
   // 最後手段：Math.random（不推薦，但能用）
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-    const r = Math.random() * 16 | 0
-    const v = c === 'x' ? r : (r & 0x3 | 0x8)
+    const r = (Math.random() * 16) | 0
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
     return v.toString(16)
   })
 }
@@ -216,7 +216,9 @@ export function createStore<T extends BaseEntity>(
 
           // 如果是網路錯誤且還有重試機會，等待後重試
           if (isNetworkError && !isLastAttempt) {
-            logger.warn(`[${tableName}] 網路錯誤，${RETRY_DELAY}ms 後重試 (${attempt}/${MAX_RETRIES})`)
+            logger.warn(
+              `[${tableName}] 網路錯誤，${RETRY_DELAY}ms 後重試 (${attempt}/${MAX_RETRIES})`
+            )
             await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * attempt))
             continue
           }
@@ -242,10 +244,7 @@ export function createStore<T extends BaseEntity>(
       try {
         set({ loading: true, error: null })
 
-        const { data, error } = await dynamicFrom(tableName)
-          .select('*')
-          .eq('id', id)
-          .single()
+        const { data, error } = await dynamicFrom(tableName).select('*').eq('id', id).single()
 
         if (error) throw error
 
@@ -284,7 +283,8 @@ export function createStore<T extends BaseEntity>(
 
         // 只有啟用 workspaceScoped 的表才自動注入 workspace_id
         if (config.workspaceScoped) {
-          const workspace_id = (data as Record<string, unknown>).workspace_id || getCurrentWorkspaceId()
+          const workspace_id =
+            (data as Record<string, unknown>).workspace_id || getCurrentWorkspaceId()
           if (workspace_id) {
             insertData.workspace_id = workspace_id
           } else {
@@ -345,7 +345,8 @@ export function createStore<T extends BaseEntity>(
           // 檢查是否為 unique constraint 錯誤（code 重複）
           const errorCode = (error as { code?: string })?.code
           const errorMessage = (error as { message?: string })?.message || ''
-          const isUniqueViolation = errorCode === '23505' ||
+          const isUniqueViolation =
+            errorCode === '23505' ||
             errorMessage.includes('duplicate key') ||
             errorMessage.includes('unique constraint') ||
             errorMessage.includes('violates unique constraint')
@@ -369,7 +370,13 @@ export function createStore<T extends BaseEntity>(
         if (error instanceof Error) {
           errorMessage = error.message
         } else if (error && typeof error === 'object') {
-          const err = error as { message?: string; error?: string; details?: string; code?: string; hint?: string }
+          const err = error as {
+            message?: string
+            error?: string
+            details?: string
+            code?: string
+            hint?: string
+          }
           if (err.message) {
             errorMessage = err.message
           } else if (err.details) {
@@ -445,9 +452,7 @@ export function createStore<T extends BaseEntity>(
       try {
         set({ loading: true, error: null })
 
-        const { error } = await dynamicFrom(tableName)
-          .delete()
-          .eq('id', id)
+        const { error } = await dynamicFrom(tableName).delete().eq('id', id)
 
         if (error) throw error
 
@@ -477,9 +482,7 @@ export function createStore<T extends BaseEntity>(
 
     // 批次刪除
     deleteMany: async (ids: string[]) => {
-      const { error } = await dynamicFrom(tableName)
-        .delete()
-        .in('id', ids)
+      const { error } = await dynamicFrom(tableName).delete().in('id', ids)
 
       if (error) throw error
 
@@ -534,44 +537,40 @@ export function createStore<T extends BaseEntity>(
       logger.log(`[${tableName}] 建立 Realtime 訂閱...`)
       subscription = supabase
         .channel(`public:${tableName}`)
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: tableName },
-          (payload) => {
-            logger.log(`[${tableName}] Realtime event:`, payload)
-            const { eventType, new: newRecord, old: oldRecord } = payload
+        .on('postgres_changes', { event: '*', schema: 'public', table: tableName }, payload => {
+          logger.log(`[${tableName}] Realtime event:`, payload)
+          const { eventType, new: newRecord, old: oldRecord } = payload
 
-            const { workspaceId: currentWorkspaceId } = getCurrentUserContext()
+          const { workspaceId: currentWorkspaceId } = getCurrentUserContext()
 
-            switch (eventType) {
-              case 'INSERT': {
-                const inserted = newRecord as T
-                // 🔒 Workspace 隔離
-                if (config.workspaceScoped && inserted.workspace_id !== currentWorkspaceId) return
-                set(state => ({ items: [inserted, ...state.items] }))
-                break
-              }
-              case 'UPDATE': {
-                const updated = newRecord as T
-                // 🔒 Workspace 隔離
-                if (config.workspaceScoped && updated.workspace_id !== currentWorkspaceId) return
-                set(state => ({
-                  items: state.items.map(item => (item.id === updated.id ? updated : item)),
-                }))
-                break
-              }
-              case 'DELETE': {
-                const deleted = oldRecord as Partial<T>
-                // 刪除操作，我們只需要 id
-                if (!deleted.id) return
-                set(state => ({
-                  items: state.items.filter(item => item.id !== deleted.id),
-                }))
-                break
-              }
+          switch (eventType) {
+            case 'INSERT': {
+              const inserted = newRecord as T
+              // 🔒 Workspace 隔離
+              if (config.workspaceScoped && inserted.workspace_id !== currentWorkspaceId) return
+              set(state => ({ items: [inserted, ...state.items] }))
+              break
+            }
+            case 'UPDATE': {
+              const updated = newRecord as T
+              // 🔒 Workspace 隔離
+              if (config.workspaceScoped && updated.workspace_id !== currentWorkspaceId) return
+              set(state => ({
+                items: state.items.map(item => (item.id === updated.id ? updated : item)),
+              }))
+              break
+            }
+            case 'DELETE': {
+              const deleted = oldRecord as Partial<T>
+              // 刪除操作，我們只需要 id
+              if (!deleted.id) return
+              set(state => ({
+                items: state.items.filter(item => item.id !== deleted.id),
+              }))
+              break
             }
           }
-        )
+        })
         .subscribe((status, err) => {
           if (status === 'SUBSCRIBED') {
             logger.log(`✅ [${tableName}] Realtime 訂閱成功！`)

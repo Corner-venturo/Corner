@@ -9,7 +9,6 @@
  * - 支援團體模式額外欄位
  */
 
-
 import React, { useState, useCallback, useMemo } from 'react'
 import { Check, GripVertical } from 'lucide-react'
 import { useSortable } from '@dnd-kit/sortable'
@@ -18,7 +17,12 @@ import { cn } from '@/lib/utils'
 import type { OrderMember, CustomCostField } from '../types/order-member.types'
 import type { ColumnVisibility } from './OrderMembersExpandable'
 import type { MemberSurcharges } from '../types/member-surcharge.types'
-import { MemberBasicInfo, MemberPassportInfo, MemberActions, MemberSurchargeCell } from './member-row'
+import {
+  MemberBasicInfo,
+  MemberPassportInfo,
+  MemberActions,
+  MemberSurchargeCell,
+} from './member-row'
 
 import type { HotelColumn, RoomOption, RoomMemberInfo } from '../hooks/useRoomVehicleAssignments'
 import { RoomAssignmentCell } from './member-row/RoomAssignmentCell'
@@ -36,14 +40,14 @@ interface MemberRowProps {
   departureDate: string | null
   roomAssignment?: string
   vehicleAssignment?: string
-  roomRowSpan?: number  // 分房欄位合併行數（0 表示被上方合併，不渲染）
-  vehicleRowSpan?: number  // 分車欄位合併行數
-  hotelColumns?: HotelColumn[]  // 飯店欄位列表
-  roomAssignmentsByHotel?: Record<string, Record<string, string>>  // 按飯店分組的分房
-  roomIdByHotelMember?: Record<string, Record<string, string>>  // hotelName -> memberId -> roomId
-  roomMembersByHotelRoom?: Record<string, Record<string, RoomMemberInfo[]>>  // hotelName -> roomId -> 成員列表
-  roomOptionsByHotel?: Record<string, RoomOption[]>  // 每個飯店的房間選項
-  roomRowSpansByHotel?: Record<string, Record<string, number>>  // 按飯店的合併行數: hotelId -> memberId -> rowSpan
+  roomRowSpan?: number // 分房欄位合併行數（0 表示被上方合併，不渲染）
+  vehicleRowSpan?: number // 分車欄位合併行數
+  hotelColumns?: HotelColumn[] // 飯店欄位列表
+  roomAssignmentsByHotel?: Record<string, Record<string, string>> // 按飯店分組的分房
+  roomIdByHotelMember?: Record<string, Record<string, string>> // hotelName -> memberId -> roomId
+  roomMembersByHotelRoom?: Record<string, Record<string, RoomMemberInfo[]>> // hotelName -> roomId -> 成員列表
+  roomOptionsByHotel?: Record<string, RoomOption[]> // 每個飯店的房間選項
+  roomRowSpansByHotel?: Record<string, Record<string, number>> // 按飯店的合併行數: hotelId -> memberId -> rowSpan
   pnrValue?: string
   customCostFields: CustomCostField[]
   mode: 'order' | 'tour'
@@ -54,14 +58,19 @@ interface MemberRowProps {
   onPreview: (member: OrderMember) => void
   onPnrChange: (memberId: string, value: string) => void
   onCustomCostChange: (fieldId: string, memberId: string, value: string) => void
-  onSurchargeChange?: (memberId: string, surcharges: MemberSurcharges) => void  // 附加費用變更
+  onSurchargeChange?: (memberId: string, surcharges: MemberSurcharges) => void // 附加費用變更
   onKeyDown: (e: React.KeyboardEvent, memberIndex: number, field: string) => void
   onNameSearch?: (memberId: string, value: string) => void
   onIdNumberSearch?: (memberId: string, value: string, memberIndex: number) => void
-  onRoomAssign?: (memberId: string, hotelName: string, roomId: string | null, memberBirthDate?: string | null) => void
-  onRemoveMemberFromRoom?: (memberId: string, hotelName: string) => void  // 移除單一成員（不影響室友）
+  onRoomAssign?: (
+    memberId: string,
+    hotelName: string,
+    roomId: string | null,
+    memberBirthDate?: string | null
+  ) => void
+  onRemoveMemberFromRoom?: (memberId: string, hotelName: string) => void // 移除單一成員（不影響室友）
   onSetAsLeader?: (memberId: string) => void
-  onAddFamily?: (customerId: string) => void  // 家人快速加入
+  onAddFamily?: (customerId: string) => void // 家人快速加入
 }
 
 export function MemberRow({
@@ -106,14 +115,9 @@ export function MemberRow({
   const [isComposing, setIsComposing] = useState(false)
 
   // 拖曳排序功能
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: member.id })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: member.id,
+  })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -139,19 +143,22 @@ export function MemberRow({
     balance: false,
     remarks: true,
     pnr: false,
-    ticket_number: true,  // 預設顯示機票號碼
+    ticket_number: true, // 預設顯示機票號碼
     ticketing_deadline: false,
-    flight_cost: false,   // 機票金額預設關閉
-    room: true,   // 分房欄位
-    vehicle: true,  // 分車欄位
-    surcharges: false,  // 附加費用預設關閉
+    flight_cost: false, // 機票金額預設關閉
+    room: true, // 分房欄位
+    vehicle: true, // 分車欄位
+    surcharges: false, // 附加費用預設關閉
   }
 
   // 處理數字輸入
-  const handleNumberInput = useCallback((field: keyof OrderMember, value: string) => {
-    const num = parseInt(value.replace(/\D/g, ''), 10)
-    onUpdateField(member.id, field, isNaN(num) ? null : num)
-  }, [member.id, onUpdateField])
+  const handleNumberInput = useCallback(
+    (field: keyof OrderMember, value: string) => {
+      const num = parseInt(value.replace(/\D/g, ''), 10)
+      onUpdateField(member.id, field, isNaN(num) ? null : num)
+    },
+    [member.id, onUpdateField]
+  )
 
   // 解析附加費用數據
   const memberSurcharges = useMemo(() => {
@@ -172,7 +179,10 @@ export function MemberRow({
         {...attributes}
         {...listeners}
       >
-        <GripVertical size={14} className="text-morandi-secondary/50 hover:text-morandi-secondary" />
+        <GripVertical
+          size={14}
+          className="text-morandi-secondary/50 hover:text-morandi-secondary"
+        />
       </td>
 
       {/* 基本資訊欄位 */}
@@ -203,7 +213,12 @@ export function MemberRow({
 
       {/* 飲食禁忌 */}
       {cv.special_meal && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-card" : "bg-status-warning-bg")}>
+        <td
+          className={cn(
+            'border border-morandi-gold/20 px-2 py-1',
+            isEditMode ? 'bg-card' : 'bg-status-warning-bg'
+          )}
+        >
           {isEditMode ? (
             <input
               type="text"
@@ -263,7 +278,12 @@ export function MemberRow({
 
       {/* 備註 */}
       {cv.remarks && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-card" : "bg-muted")}>
+        <td
+          className={cn(
+            'border border-morandi-gold/20 px-2 py-1',
+            isEditMode ? 'bg-card' : 'bg-muted'
+          )}
+        >
           {isEditMode ? (
             <input
               type="text"
@@ -289,37 +309,42 @@ export function MemberRow({
       )}
 
       {/* 團體模式：分房欄位（按飯店分欄位） */}
-      {mode === 'tour' && showRoomColumn && hotelColumns.length > 0 && hotelColumns.map(hotel => {
-        const hotelSpans = roomRowSpansByHotel[hotel.id] || {}
-        const hotelRoomSpan = hotelSpans[member.id]
-        if (hotelRoomSpan === 0) return null  // 被合併，不渲染
-        const assignment = roomAssignmentsByHotel[hotel.id]?.[member.id]
-        const currentRoomId = roomIdByHotelMember[hotel.id]?.[member.id] || ''
-        const options = roomOptionsByHotel[hotel.id] || []
-        const roomMembers = currentRoomId ? (roomMembersByHotelRoom[hotel.id]?.[currentRoomId] || []) : []
+      {mode === 'tour' &&
+        showRoomColumn &&
+        hotelColumns.length > 0 &&
+        hotelColumns.map(hotel => {
+          const hotelSpans = roomRowSpansByHotel[hotel.id] || {}
+          const hotelRoomSpan = hotelSpans[member.id]
+          if (hotelRoomSpan === 0) return null // 被合併，不渲染
+          const assignment = roomAssignmentsByHotel[hotel.id]?.[member.id]
+          const currentRoomId = roomIdByHotelMember[hotel.id]?.[member.id] || ''
+          const options = roomOptionsByHotel[hotel.id] || []
+          const roomMembers = currentRoomId
+            ? roomMembersByHotelRoom[hotel.id]?.[currentRoomId] || []
+            : []
 
-        return (
-          <RoomAssignmentCell
-            key={hotel.id}
-            memberId={member.id}
-            memberName={member.chinese_name || member.passport_name || ''}
-            memberBirthDate={member.birth_date}
-            hotelId={hotel.id}
-            hotelName={hotel.id}
-            currentRoomId={currentRoomId}
-            currentRoomLabel={assignment || ''}
-            roomOptions={options}
-            roomMembers={roomMembers}
-            rowSpan={hotelRoomSpan && hotelRoomSpan > 1 ? hotelRoomSpan : undefined}
-            onAssign={onRoomAssign || (() => {})}
-            onRemoveMember={onRemoveMemberFromRoom}
-            departureDate={departureDate}
-          />
-        )
-      })}
+          return (
+            <RoomAssignmentCell
+              key={hotel.id}
+              memberId={member.id}
+              memberName={member.chinese_name || member.passport_name || ''}
+              memberBirthDate={member.birth_date}
+              hotelId={hotel.id}
+              hotelName={hotel.id}
+              currentRoomId={currentRoomId}
+              currentRoomLabel={assignment || ''}
+              roomOptions={options}
+              roomMembers={roomMembers}
+              rowSpan={hotelRoomSpan && hotelRoomSpan > 1 ? hotelRoomSpan : undefined}
+              onAssign={onRoomAssign || (() => {})}
+              onRemoveMember={onRemoveMemberFromRoom}
+              departureDate={departureDate}
+            />
+          )
+        })}
       {/* 單欄位模式（沒有飯店欄位資訊時的後備） */}
       {mode === 'tour' && showRoomColumn && hotelColumns.length === 0 && roomRowSpan !== 0 && (
-        <td 
+        <td
           className="border border-morandi-gold/20 px-2 py-1 bg-emerald-50/50 text-xs align-middle"
           rowSpan={roomRowSpan && roomRowSpan > 1 ? roomRowSpan : undefined}
         >
@@ -329,7 +354,7 @@ export function MemberRow({
 
       {/* 團體模式：分車欄位（支援合併儲存格） */}
       {mode === 'tour' && showVehicleColumn && vehicleRowSpan !== 0 && (
-        <td 
+        <td
           className="border border-morandi-gold/20 px-2 py-1 bg-amber-50/50 text-xs align-middle"
           rowSpan={vehicleRowSpan && vehicleRowSpan > 1 ? vehicleRowSpan : undefined}
         >
@@ -345,7 +370,7 @@ export function MemberRow({
             value={pnrValue || ''}
             onChange={e => onPnrChange(member.id, e.target.value)}
             className="bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
-                      />
+          />
         </td>
       )}
 
@@ -357,7 +382,7 @@ export function MemberRow({
             value={member.ticket_number || ''}
             onChange={e => onUpdateField(member.id, 'ticket_number', e.target.value)}
             className="bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
-                      />
+          />
         </td>
       )}
 
@@ -399,19 +424,17 @@ export function MemberRow({
       )}
 
       {/* 團體模式：自訂費用欄位 */}
-      {mode === 'tour' && customCostFields.map(field => (
-        <td
-          key={field.id}
-          className="border border-morandi-gold/20 px-2 py-1 bg-emerald-50/50"
-        >
-          <input
-            type="text"
-            value={field.values[member.id] || ''}
-            onChange={e => onCustomCostChange(field.id, member.id, e.target.value)}
-            className="bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
-                      />
-        </td>
-      ))}
+      {mode === 'tour' &&
+        customCostFields.map(field => (
+          <td key={field.id} className="border border-morandi-gold/20 px-2 py-1 bg-emerald-50/50">
+            <input
+              type="text"
+              value={field.values[member.id] || ''}
+              onChange={e => onCustomCostChange(field.id, member.id, e.target.value)}
+              className="bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
+            />
+          </td>
+        ))}
 
       {/* 操作按鈕 */}
       <MemberActions

@@ -19,10 +19,8 @@ export const COMPANY_LABELS = {
   DELETE_CANCEL: '取消',
   DELETE_WITH_CONTACTS: (count: number, contactInfo: string, companyName: string) =>
     `此企業有 ${count} 位關聯的聯絡人（${contactInfo}），刪除企業將同時刪除這些聯絡人。\n\n確定要刪除企業「${companyName}」嗎？`,
-  DELETE_SIMPLE: (companyName: string) =>
-    `確定要刪除企業「${companyName}」嗎？`,
-  CONTACTS_OVERFLOW: (names: string, count: number) =>
-    `${names}... 等 ${count} 位聯絡人`,
+  DELETE_SIMPLE: (companyName: string) => `確定要刪除企業「${companyName}」嗎？`,
+  CONTACTS_OVERFLOW: (names: string, count: number) => `${names}... 等 ${count} 位聯絡人`,
 
   // CompanyDetailDialog
   DETAIL_BASIC_INFO: '基本資訊',

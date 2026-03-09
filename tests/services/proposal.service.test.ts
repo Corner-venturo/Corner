@@ -14,9 +14,7 @@ function createMockChain(resolveValue: { data: unknown; error: unknown }, isDele
   }
   // For delete operations, eq() returns the result directly (no .single())
   // For other operations, eq() returns this for chaining
-  chain.eq = isDelete
-    ? vi.fn().mockResolvedValue(resolveValue)
-    : vi.fn().mockReturnThis()
+  chain.eq = isDelete ? vi.fn().mockResolvedValue(resolveValue) : vi.fn().mockReturnThis()
   return chain
 }
 
@@ -105,8 +103,9 @@ describe('ProposalService', () => {
         return createMockChain({ data: null, error: { message: '資料庫錯誤' } })
       })
 
-      await expect(createProposal(mockProposalData, 'workspace-1', 'user-1'))
-        .rejects.toThrow('建立提案失敗: 資料庫錯誤')
+      await expect(createProposal(mockProposalData, 'workspace-1', 'user-1')).rejects.toThrow(
+        '建立提案失敗: 資料庫錯誤'
+      )
     })
   })
 
@@ -140,8 +139,9 @@ describe('ProposalService', () => {
         createMockChain({ data: null, error: { message: '更新失敗' } })
       )
 
-      await expect(updateProposal('proposal-1', { title: '新標題' }, 'user-1'))
-        .rejects.toThrow('更新提案失敗: 更新失敗')
+      await expect(updateProposal('proposal-1', { title: '新標題' }, 'user-1')).rejects.toThrow(
+        '更新提案失敗: 更新失敗'
+      )
     })
   })
 
@@ -170,8 +170,9 @@ describe('ProposalService', () => {
         createMockChain({ data: null, error: { message: '封存失敗' } })
       )
 
-      await expect(archiveProposal('proposal-1', 'other', 'user-1'))
-        .rejects.toThrow('封存提案失敗: 封存失敗')
+      await expect(archiveProposal('proposal-1', 'other', 'user-1')).rejects.toThrow(
+        '封存提案失敗: 封存失敗'
+      )
     })
   })
 
@@ -187,9 +188,7 @@ describe('ProposalService', () => {
         packages: [{ id: 'pkg-1', version_name: '方案A' } as ProposalPackage],
       }
 
-      mockFromImplementation.mockReturnValue(
-        createMockChain({ data: mockProposal, error: null })
-      )
+      mockFromImplementation.mockReturnValue(createMockChain({ data: mockProposal, error: null }))
 
       const result = await getProposalWithPackages('proposal-1')
 
@@ -253,8 +252,9 @@ describe('ProposalService', () => {
         return createMockChain({ data: null, error: { message: '建立失敗' } })
       })
 
-      await expect(createPackage(mockPackageData, 'user-1'))
-        .rejects.toThrow('建立套件失敗: 建立失敗')
+      await expect(createPackage(mockPackageData, 'user-1')).rejects.toThrow(
+        '建立套件失敗: 建立失敗'
+      )
     })
   })
 
@@ -287,8 +287,9 @@ describe('ProposalService', () => {
         createMockChain({ data: null, error: { message: '更新失敗' } })
       )
 
-      await expect(updatePackage('pkg-1', { version_name: '新名稱' }, 'user-1'))
-        .rejects.toThrow('更新套件失敗: 更新失敗')
+      await expect(updatePackage('pkg-1', { version_name: '新名稱' }, 'user-1')).rejects.toThrow(
+        '更新套件失敗: 更新失敗'
+      )
     })
   })
 
@@ -298,9 +299,7 @@ describe('ProposalService', () => {
   describe('deletePackage', () => {
     it('should delete package and related data', async () => {
       // All delete operations succeed (use isDelete=true for delete chains)
-      mockFromImplementation.mockReturnValue(
-        createMockChain({ data: null, error: null }, true)
-      )
+      mockFromImplementation.mockReturnValue(createMockChain({ data: null, error: null }, true))
 
       await expect(deletePackage('pkg-1')).resolves.not.toThrow()
     })
@@ -317,8 +316,7 @@ describe('ProposalService', () => {
         return createMockChain({ data: null, error: { message: '刪除失敗' } }, true)
       })
 
-      await expect(deletePackage('pkg-1'))
-        .rejects.toThrow('刪除套件失敗: 刪除失敗')
+      await expect(deletePackage('pkg-1')).rejects.toThrow('刪除套件失敗: 刪除失敗')
     })
   })
 })

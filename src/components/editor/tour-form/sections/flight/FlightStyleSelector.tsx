@@ -32,7 +32,9 @@ export function FlightStyleSelector({
       <div className="bg-gradient-to-r from-muted to-morandi-container/50 p-4 rounded-lg border border-border">
         <div className="flex items-center gap-2 mb-3">
           <Plane className="w-4 h-4 text-morandi-secondary" />
-          <span className="text-sm font-medium text-morandi-primary">{FLIGHT_LABELS.LABEL_1803}</span>
+          <span className="text-sm font-medium text-morandi-primary">
+            {FLIGHT_LABELS.LABEL_1803}
+          </span>
         </div>
         <div className="flex items-center justify-center py-6">
           <Loader2 className="w-5 h-5 animate-spin text-morandi-gold" />
@@ -49,7 +51,7 @@ export function FlightStyleSelector({
         <span className="text-sm font-medium text-morandi-primary">{FLIGHT_LABELS.LABEL_1803}</span>
       </div>
       <div className="grid grid-cols-3 gap-2">
-        {options.map((option) => {
+        {options.map(option => {
           const isSelected = selectedValue === option.value
           return (
             <button
@@ -66,7 +68,8 @@ export function FlightStyleSelector({
               {/* 預覽圖（如果有） */}
               {option.previewImage && (
                 <div className="w-full h-12 mb-2 rounded overflow-hidden bg-morandi-container">
-                  <img src={option.previewImage}
+                  <img
+                    src={option.previewImage}
                     alt={option.label}
                     className="w-full h-full object-cover"
                   />
@@ -77,13 +80,17 @@ export function FlightStyleSelector({
                   <Check className="w-3.5 h-3.5 text-morandi-gold" />
                 </div>
               )}
-              <span className={cn(
-                'text-xs font-bold',
-                isSelected ? 'text-morandi-gold' : 'text-morandi-primary'
-              )}>
+              <span
+                className={cn(
+                  'text-xs font-bold',
+                  isSelected ? 'text-morandi-gold' : 'text-morandi-primary'
+                )}
+              >
                 {option.label}
               </span>
-              <span className="text-[10px] text-morandi-secondary mt-0.5">{option.description}</span>
+              <span className="text-[10px] text-morandi-secondary mt-0.5">
+                {option.description}
+              </span>
             </button>
           )
         })}

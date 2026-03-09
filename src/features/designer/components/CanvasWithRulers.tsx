@@ -111,7 +111,7 @@ function Ruler({
       const pxPerMm = dpi / 25.4
       const lengthMm = length / pxPerMm
       const majorTickMm = 10 // 每 10mm 一個主刻度
-      const minorTickMm = 5  // 每 5mm 一個次刻度
+      const minorTickMm = 5 // 每 5mm 一個次刻度
 
       for (let mm = 0; mm <= lengthMm; mm += minorTickMm) {
         const px = mm * pxPerMm
@@ -194,11 +194,7 @@ function Ruler({
         'cursor-crosshair',
         orientation === 'horizontal' ? 'absolute top-0' : 'absolute left-0'
       )}
-      style={
-        orientation === 'horizontal'
-          ? { left: RULER_OFFSET }
-          : { top: RULER_OFFSET }
-      }
+      style={orientation === 'horizontal' ? { left: RULER_OFFSET } : { top: RULER_OFFSET }}
       onMouseDown={onDragStart}
       title={DESIGNER_LABELS.LABEL_9426}
     />
@@ -249,9 +245,11 @@ function GuideLine({
       document.removeEventListener('mouseup', handleMouseUp)
 
       // 如果拖到尺規區域外（負值或超出畫布），刪除參考線
-      if (guide.position < -RULER_OFFSET / zoom ||
-          (guide.type === 'horizontal' && guide.position > canvasHeight + RULER_OFFSET / zoom) ||
-          (guide.type === 'vertical' && guide.position > canvasWidth + RULER_OFFSET / zoom)) {
+      if (
+        guide.position < -RULER_OFFSET / zoom ||
+        (guide.type === 'horizontal' && guide.position > canvasHeight + RULER_OFFSET / zoom) ||
+        (guide.type === 'vertical' && guide.position > canvasWidth + RULER_OFFSET / zoom)
+      ) {
         onDelete(guide.id)
       }
     }
@@ -402,63 +400,71 @@ export function CanvasWithRulers({
 }: CanvasWithRulersProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [guides, setGuides] = useState<Guide[]>([])
-  const [isDraggingNewGuide, setIsDraggingNewGuide] = useState<'horizontal' | 'vertical' | null>(null)
+  const [isDraggingNewGuide, setIsDraggingNewGuide] = useState<'horizontal' | 'vertical' | null>(
+    null
+  )
   const [tempGuidePosition, setTempGuidePosition] = useState<number | null>(null)
 
   // 從尺規開始拖曳
-  const handleRulerDragStart = useCallback((orientation: 'horizontal' | 'vertical') => (e: React.MouseEvent) => {
-    e.preventDefault()
-    setIsDraggingNewGuide(orientation)
+  const handleRulerDragStart = useCallback(
+    (orientation: 'horizontal' | 'vertical') => (e: React.MouseEvent) => {
+      e.preventDefault()
+      setIsDraggingNewGuide(orientation)
 
-    const container = containerRef.current
-    if (!container) return
+      const container = containerRef.current
+      if (!container) return
 
-    const rect = container.getBoundingClientRect()
-    const startPos = orientation === 'horizontal'
-      ? (e.clientY - rect.top - RULER_OFFSET) / zoom
-      : (e.clientX - rect.left - RULER_OFFSET) / zoom
+      const rect = container.getBoundingClientRect()
+      const startPos =
+        orientation === 'horizontal'
+          ? (e.clientY - rect.top - RULER_OFFSET) / zoom
+          : (e.clientX - rect.left - RULER_OFFSET) / zoom
 
-    setTempGuidePosition(startPos)
+      setTempGuidePosition(startPos)
 
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      const newPos = orientation === 'horizontal'
-        ? (moveEvent.clientY - rect.top - RULER_OFFSET) / zoom
-        : (moveEvent.clientX - rect.left - RULER_OFFSET) / zoom
-      setTempGuidePosition(newPos)
-    }
-
-    const handleMouseUp = (upEvent: MouseEvent) => {
-      const finalPos = orientation === 'horizontal'
-        ? (upEvent.clientY - rect.top - RULER_OFFSET) / zoom
-        : (upEvent.clientX - rect.left - RULER_OFFSET) / zoom
-
-      // 只有在畫布範圍內才創建參考線
-      if (finalPos >= 0 &&
-          ((orientation === 'horizontal' && finalPos <= canvasHeight) ||
-           (orientation === 'vertical' && finalPos <= canvasWidth))) {
-        const newGuide: Guide = {
-          id: `guide-${Date.now()}`,
-          type: orientation,
-          position: finalPos,
-        }
-        setGuides(prev => [...prev, newGuide])
+      const handleMouseMove = (moveEvent: MouseEvent) => {
+        const newPos =
+          orientation === 'horizontal'
+            ? (moveEvent.clientY - rect.top - RULER_OFFSET) / zoom
+            : (moveEvent.clientX - rect.left - RULER_OFFSET) / zoom
+        setTempGuidePosition(newPos)
       }
 
-      setIsDraggingNewGuide(null)
-      setTempGuidePosition(null)
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseup', handleMouseUp)
-    }
+      const handleMouseUp = (upEvent: MouseEvent) => {
+        const finalPos =
+          orientation === 'horizontal'
+            ? (upEvent.clientY - rect.top - RULER_OFFSET) / zoom
+            : (upEvent.clientX - rect.left - RULER_OFFSET) / zoom
 
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('mouseup', handleMouseUp)
-  }, [zoom, canvasWidth, canvasHeight])
+        // 只有在畫布範圍內才創建參考線
+        if (
+          finalPos >= 0 &&
+          ((orientation === 'horizontal' && finalPos <= canvasHeight) ||
+            (orientation === 'vertical' && finalPos <= canvasWidth))
+        ) {
+          const newGuide: Guide = {
+            id: `guide-${Date.now()}`,
+            type: orientation,
+            position: finalPos,
+          }
+          setGuides(prev => [...prev, newGuide])
+        }
+
+        setIsDraggingNewGuide(null)
+        setTempGuidePosition(null)
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('mouseup', handleMouseUp)
+      }
+
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+    },
+    [zoom, canvasWidth, canvasHeight]
+  )
 
   // 移動已存在的參考線
   const handleGuideDrag = useCallback((id: string, newPosition: number) => {
-    setGuides(prev => prev.map(g =>
-      g.id === id ? { ...g, position: newPosition } : g
-    ))
+    setGuides(prev => prev.map(g => (g.id === id ? { ...g, position: newPosition } : g)))
   }, [])
 
   // 刪除參考線
@@ -470,7 +476,9 @@ export function CanvasWithRulers({
   useEffect(() => {
     if (!canvas) return
 
-    const handleObjectMoving = (e: fabric.BasicTransformEvent & { target: fabric.FabricObject }) => {
+    const handleObjectMoving = (
+      e: fabric.BasicTransformEvent & { target: fabric.FabricObject }
+    ) => {
       const movingObj = e.target
       if (!movingObj) return
 

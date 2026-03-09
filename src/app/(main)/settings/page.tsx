@@ -60,7 +60,8 @@ export default function SettingsPage() {
   }
 
   // 判斷是否有系統設定權限（super_admin、admin 或 settings 權限）
-  const hasSettingsAccess = user?.permissions?.includes('super_admin') ||
+  const hasSettingsAccess =
+    user?.permissions?.includes('super_admin') ||
     user?.permissions?.includes('admin') ||
     user?.permissions?.includes('settings')
 
@@ -104,101 +105,105 @@ export default function SettingsPage() {
         </div>
       }
     >
-        <div className="max-w-4xl mx-auto space-y-8 p-6">
-          {/* 首次設定提示 */}
-          {isSetupMode && (
-            <div className="bg-gradient-to-r from-morandi-gold/10 to-morandi-gold/5 border border-morandi-gold/30 rounded-xl p-6 mb-6">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-morandi-gold/20 rounded-full flex items-center justify-center">
-                  <AlertCircle className="w-6 h-6 text-morandi-gold" />
+      <div className="max-w-4xl mx-auto space-y-8 p-6">
+        {/* 首次設定提示 */}
+        {isSetupMode && (
+          <div className="bg-gradient-to-r from-morandi-gold/10 to-morandi-gold/5 border border-morandi-gold/30 rounded-xl p-6 mb-6">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 w-12 h-12 bg-morandi-gold/20 rounded-full flex items-center justify-center">
+                <AlertCircle className="w-6 h-6 text-morandi-gold" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-morandi-primary mb-2">
+                  {LABELS.WELCOME_TITLE}
+                </h3>
+                <p className="text-sm text-morandi-secondary mb-4">{LABELS.FIRST_LOGIN_DESC}</p>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 bg-card/60 rounded-lg">
+                    <div className="w-8 h-8 bg-morandi-gold/20 rounded-full flex items-center justify-center">
+                      <Lock className="w-4 h-4 text-morandi-gold" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-morandi-primary">
+                        {LABELS.CHANGE_PASSWORD_TITLE}
+                      </p>
+                      <p className="text-xs text-morandi-secondary">
+                        {LABELS.CHANGE_PASSWORD_DESC}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-card/60 rounded-lg">
+                    <div className="w-8 h-8 bg-morandi-gold/20 rounded-full flex items-center justify-center">
+                      <Camera className="w-4 h-4 text-morandi-gold" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-morandi-primary">
+                        {LABELS.UPLOAD_AVATAR_TITLE}
+                      </p>
+                      <p className="text-xs text-morandi-secondary">{LABELS.UPLOAD_AVATAR_DESC}</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-morandi-primary mb-2">
-                    {LABELS.WELCOME_TITLE}
-                  </h3>
-                  <p className="text-sm text-morandi-secondary mb-4">
-                    {LABELS.FIRST_LOGIN_DESC}
-                  </p>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3 bg-card/60 rounded-lg">
-                      <div className="w-8 h-8 bg-morandi-gold/20 rounded-full flex items-center justify-center">
-                        <Lock className="w-4 h-4 text-morandi-gold" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-morandi-primary">{LABELS.CHANGE_PASSWORD_TITLE}</p>
-                        <p className="text-xs text-morandi-secondary">{LABELS.CHANGE_PASSWORD_DESC}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 bg-card/60 rounded-lg">
-                      <div className="w-8 h-8 bg-morandi-gold/20 rounded-full flex items-center justify-center">
-                        <Camera className="w-4 h-4 text-morandi-gold" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-morandi-primary">{LABELS.UPLOAD_AVATAR_TITLE}</p>
-                        <p className="text-xs text-morandi-secondary">{LABELS.UPLOAD_AVATAR_DESC}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-4 flex justify-end">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleDismissSetup}
-                      className="text-morandi-secondary hover:text-morandi-primary"
-                    >
-                      {LABELS.SKIP_LATER}
-                    </Button>
-                  </div>
+                <div className="mt-4 flex justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleDismissSetup}
+                    className="text-morandi-secondary hover:text-morandi-primary"
+                  >
+                    {LABELS.SKIP_LATER}
+                  </Button>
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* ===== 一般使用者可見 ===== */}
+        {/* ===== 一般使用者可見 ===== */}
 
-          {/* 帳號安全設定 */}
-          <AccountSettings
-            user={user}
-            showPasswordSection={showPasswordSection}
-            setShowPasswordSection={setShowPasswordSection}
-            passwordData={passwordData}
-            setPasswordData={setPasswordData}
-            showPassword={showPassword}
-            setShowPassword={setShowPassword}
-            passwordUpdateLoading={passwordUpdateLoading}
-            setPasswordUpdateLoading={setPasswordUpdateLoading}
-          />
+        {/* 帳號安全設定 */}
+        <AccountSettings
+          user={user}
+          showPasswordSection={showPasswordSection}
+          setShowPasswordSection={setShowPasswordSection}
+          passwordData={passwordData}
+          setPasswordData={setPasswordData}
+          showPassword={showPassword}
+          setShowPassword={setShowPassword}
+          passwordUpdateLoading={passwordUpdateLoading}
+          setPasswordUpdateLoading={setPasswordUpdateLoading}
+        />
 
-          {/* ===== 以下僅有設定權限者可見 ===== */}
-          {hasSettingsAccess && (
-            <>
-              {/* 藍新金流設定 */}
-              <NewebPaySettings />
+        {/* ===== 以下僅有設定權限者可見 ===== */}
+        {hasSettingsAccess && (
+          <>
+            {/* 藍新金流設定 */}
+            <NewebPaySettings />
 
-              {/* 開發者工具 */}
-              <DevToolsSettings />
+            {/* 開發者工具 */}
+            <DevToolsSettings />
 
-              {/* 權限管理 */}
-              <PermissionManagementSettings />
+            {/* 權限管理 */}
+            <PermissionManagementSettings />
 
-              {/* 模組管理 */}
-              <ModuleManagementSettings />
+            {/* 模組管理 */}
+            <ModuleManagementSettings />
 
-              {/* 工作空間切換 */}
-              <WorkspaceSwitcher />
+            {/* 工作空間切換 */}
+            <WorkspaceSwitcher />
 
-              {/* 系統維護 */}
-              <SystemSettings
-                cacheInfo={cacheInfo}
-                clearingCache={clearingCache}
-                setClearingCache={setClearingCache}
-              />
+            {/* 系統維護 */}
+            <SystemSettings
+              cacheInfo={cacheInfo}
+              clearingCache={clearingCache}
+              setClearingCache={setClearingCache}
+            />
 
-              {/* 其他設定 */}
-              <OtherSettings />
-            </>
-          )}
-        </div>
+            {/* 其他設定 */}
+            <OtherSettings />
+          </>
+        )}
+      </div>
     </ContentPageLayout>
   )
 }

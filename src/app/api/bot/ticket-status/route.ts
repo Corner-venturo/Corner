@@ -33,7 +33,7 @@ interface OrderStats {
   order_code: string
   contact_person: string
   sales_person: string | null
-  assistant: string | null  // OP (助理)
+  assistant: string | null // OP (助理)
   ticketed: number
   needs_ticketing: number
   no_record: number
@@ -57,7 +57,9 @@ interface TourStats {
 }
 
 // 統計成員狀態
-function categorizeMember(member: MemberTicketStatus): 'ticketed' | 'needs_ticketing' | 'no_record' | 'self_arranged' {
+function categorizeMember(
+  member: MemberTicketStatus
+): 'ticketed' | 'needs_ticketing' | 'no_record' | 'self_arranged' {
   if (member.flight_self_arranged) return 'self_arranged'
   if (member.ticket_number) return 'ticketed'
   if (member.pnr) return 'needs_ticketing'
@@ -98,9 +100,7 @@ function formatNotificationMessage(tours: TourStats[]): string {
       if (order.needs_ticketing === 0 && order.no_record === 0) continue
 
       const orderDlDate = parseLocalDate(order.earliest_deadline)
-      const orderDl = orderDlDate
-        ? `(DL:${format(orderDlDate, 'MM/dd', { locale: zhTW })})`
-        : ''
+      const orderDl = orderDlDate ? `(DL:${format(orderDlDate, 'MM/dd', { locale: zhTW })})` : ''
 
       body += `\n   ┌─ ${order.order_code} ${order.contact_person}\n`
 
@@ -114,7 +114,8 @@ function formatNotificationMessage(tours: TourStats[]): string {
           .map(m => m.chinese_name || '未知')
           .slice(0, 3)
         const moreCount = order.needs_ticketing - needsTicketingNames.length
-        const namesStr = needsTicketingNames.join('、') + (moreCount > 0 ? `...等${order.needs_ticketing}位` : '')
+        const namesStr =
+          needsTicketingNames.join('、') + (moreCount > 0 ? `...等${order.needs_ticketing}位` : '')
         body += `   │  ⚠️ ${order.needs_ticketing}位待開票${orderDl}：${namesStr}\n`
       }
 
@@ -124,7 +125,8 @@ function formatNotificationMessage(tours: TourStats[]): string {
           .map(m => m.chinese_name || '未知')
           .slice(0, 3)
         const moreCount = order.no_record - noRecordNames.length
-        const namesStr = noRecordNames.join('、') + (moreCount > 0 ? `...等${order.no_record}位` : '')
+        const namesStr =
+          noRecordNames.join('、') + (moreCount > 0 ? `...等${order.no_record}位` : '')
         body += `   │  ❓ ${order.no_record}位無紀錄：${namesStr}\n`
       }
 
@@ -197,7 +199,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: '無需檢查的團',
-        data: { tours: [], summary: { total_needs_ticketing: 0, total_no_record: 0 } }
+        data: { tours: [], summary: { total_needs_ticketing: 0, total_no_record: 0 } },
       })
     }
 
@@ -219,7 +221,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: '無訂單',
-        data: { tours: [], summary: { total_needs_ticketing: 0, total_no_record: 0 } }
+        data: { tours: [], summary: { total_needs_ticketing: 0, total_no_record: 0 } },
       })
     }
 
@@ -227,7 +229,9 @@ export async function GET(request: NextRequest) {
 
     const { data: members, error: membersError } = await supabase
       .from('order_members')
-      .select('id, order_id, chinese_name, pnr, ticket_number, ticketing_deadline, flight_self_arranged')
+      .select(
+        'id, order_id, chinese_name, pnr, ticket_number, ticketing_deadline, flight_self_arranged'
+      )
       .in('order_id', orderIds)
 
     if (membersError) {
@@ -264,7 +268,10 @@ export async function GET(request: NextRequest) {
           const category = categorizeMember(member)
           stats[category]++
 
-          if (member.ticketing_deadline && (category === 'needs_ticketing' || category === 'no_record')) {
+          if (
+            member.ticketing_deadline &&
+            (category === 'needs_ticketing' || category === 'no_record')
+          ) {
             if (!earliestDeadline || member.ticketing_deadline < earliestDeadline) {
               earliestDeadline = member.ticketing_deadline
             }
@@ -296,9 +303,7 @@ export async function GET(request: NextRequest) {
       const allDeadlines = orderStatsArray
         .map(o => o.earliest_deadline)
         .filter((d): d is string => d !== null)
-      const earliestTourDeadline = allDeadlines.length > 0
-        ? allDeadlines.sort()[0]
-        : null
+      const earliestTourDeadline = allDeadlines.length > 0 ? allDeadlines.sort()[0] : null
 
       return {
         tour_id: tour.id,
@@ -333,9 +338,8 @@ export async function GET(request: NextRequest) {
         tours: toursNeedingAttention,
         summary,
         message: formatNotificationMessage(tourStats),
-      }
+      },
     })
-
   } catch (error) {
     logger.error('開票狀態查詢錯誤:', error)
     return ApiError.internal('伺服器錯誤')
@@ -374,7 +378,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: '無需發送通知',
-        data: { sent: false, summary }
+        data: { sent: false, summary },
       })
     }
 
@@ -397,7 +401,11 @@ export async function POST(request: NextRequest) {
         departure_date: tour.departure_date,
         earliest_deadline: tour.earliest_deadline,
         stats: {
-          total: tour.total_ticketed + tour.total_needs_ticketing + tour.total_no_record + tour.total_self_arranged,
+          total:
+            tour.total_ticketed +
+            tour.total_needs_ticketing +
+            tour.total_no_record +
+            tour.total_self_arranged,
           ticketed: tour.total_ticketed,
           needs_ticketing: tour.total_needs_ticketing,
           no_record: tour.total_no_record,
@@ -419,35 +427,36 @@ export async function POST(request: NextRequest) {
         })),
       }))
 
-      const { error: msgError } = await supabase
-        .from('messages')
-        .insert({
-          channel_id,
-          content: message, // 純文字 fallback
-          created_by: SYSTEM_BOT_ID, // 使用 created_by 而非 author_id
-          author: { id: SYSTEM_BOT_ID, display_name: '系統機器人', type: 'bot' }, // JSON 格式，需用 display_name
-          workspace_id: channelWorkspaceId, // 繼承頻道的 workspace_id
-          metadata: {
-            message_type: 'ticket_status_card',
-            tours: cardTours,
-            summary: {
-              total: summary.total_tours,
-              ticketed: 0,
-              needs_ticketing: summary.total_needs_ticketing,
-              no_record: summary.total_no_record,
-              self_arranged: summary.total_self_arranged,
-            },
-            generated_at: new Date().toISOString(),
+      const { error: msgError } = await supabase.from('messages').insert({
+        channel_id,
+        content: message, // 純文字 fallback
+        created_by: SYSTEM_BOT_ID, // 使用 created_by 而非 author_id
+        author: { id: SYSTEM_BOT_ID, display_name: '系統機器人', type: 'bot' }, // JSON 格式，需用 display_name
+        workspace_id: channelWorkspaceId, // 繼承頻道的 workspace_id
+        metadata: {
+          message_type: 'ticket_status_card',
+          tours: cardTours,
+          summary: {
+            total: summary.total_tours,
+            ticketed: 0,
+            needs_ticketing: summary.total_needs_ticketing,
+            no_record: summary.total_no_record,
+            self_arranged: summary.total_self_arranged,
           },
-        })
+          generated_at: new Date().toISOString(),
+        },
+      })
 
       if (msgError) {
         logger.error('發送開票狀態通知失敗:', msgError)
-        return NextResponse.json({
-          success: false,
-          message: '發送通知失敗',
-          error: msgError.message || JSON.stringify(msgError)
-        }, { status: 500 })
+        return NextResponse.json(
+          {
+            success: false,
+            message: '發送通知失敗',
+            error: msgError.message || JSON.stringify(msgError),
+          },
+          { status: 500 }
+        )
       }
 
       logger.info('開票狀態訊息已發送到頻道', { channel_id, workspace_id: channelWorkspaceId })
@@ -496,18 +505,23 @@ export async function POST(request: NextRequest) {
         }
 
         // 過濾出該業務負責的訂單
-        const relevantTours = (tours as TourStats[]).map(tour => ({
-          ...tour,
-          orders: tour.orders.filter(o => o.sales_person === salesName)
-        })).filter(t => t.orders.length > 0)
+        const relevantTours = (tours as TourStats[])
+          .map(tour => ({
+            ...tour,
+            orders: tour.orders.filter(o => o.sales_person === salesName),
+          }))
+          .filter(t => t.orders.length > 0)
 
         // 計算總數
-        const totalStats = relevantTours.reduce((acc, t) => ({
-          ticketed: acc.ticketed + t.total_ticketed,
-          needs_ticketing: acc.needs_ticketing + t.total_needs_ticketing,
-          no_record: acc.no_record + t.total_no_record,
-          self_arranged: acc.self_arranged + t.total_self_arranged,
-        }), { ticketed: 0, needs_ticketing: 0, no_record: 0, self_arranged: 0 })
+        const totalStats = relevantTours.reduce(
+          (acc, t) => ({
+            ticketed: acc.ticketed + t.total_ticketed,
+            needs_ticketing: acc.needs_ticketing + t.total_needs_ticketing,
+            no_record: acc.no_record + t.total_no_record,
+            self_arranged: acc.self_arranged + t.total_self_arranged,
+          }),
+          { ticketed: 0, needs_ticketing: 0, no_record: 0, self_arranged: 0 }
+        )
 
         // 簡短摘要（fallback 顯示）
         const summaryMessage = `🎫 開票狀態提醒：${relevantTours.length} 個團需要處理`
@@ -516,7 +530,10 @@ export async function POST(request: NextRequest) {
         try {
           await fetch(`${request.nextUrl.origin}/api/bot-notification`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', ...(process.env.BOT_API_SECRET && { 'x-bot-secret': process.env.BOT_API_SECRET }) },
+            headers: {
+              'Content-Type': 'application/json',
+              ...(process.env.BOT_API_SECRET && { 'x-bot-secret': process.env.BOT_API_SECRET }),
+            },
             body: JSON.stringify({
               recipient_id: salesId,
               message: summaryMessage,
@@ -531,7 +548,11 @@ export async function POST(request: NextRequest) {
                   departure_date: t.departure_date,
                   earliest_deadline: t.earliest_deadline,
                   stats: {
-                    total: t.total_ticketed + t.total_needs_ticketing + t.total_no_record + t.total_self_arranged,
+                    total:
+                      t.total_ticketed +
+                      t.total_needs_ticketing +
+                      t.total_no_record +
+                      t.total_self_arranged,
                     ticketed: t.total_ticketed,
                     needs_ticketing: t.total_needs_ticketing,
                     no_record: t.total_no_record,
@@ -577,18 +598,23 @@ export async function POST(request: NextRequest) {
         }
 
         // 過濾出該助理負責的訂單
-        const relevantTours = (tours as TourStats[]).map(tour => ({
-          ...tour,
-          orders: tour.orders.filter(o => o.assistant === assistantName)
-        })).filter(t => t.orders.length > 0)
+        const relevantTours = (tours as TourStats[])
+          .map(tour => ({
+            ...tour,
+            orders: tour.orders.filter(o => o.assistant === assistantName),
+          }))
+          .filter(t => t.orders.length > 0)
 
         // 計算總數
-        const totalStats = relevantTours.reduce((acc, t) => ({
-          ticketed: acc.ticketed + t.total_ticketed,
-          needs_ticketing: acc.needs_ticketing + t.total_needs_ticketing,
-          no_record: acc.no_record + t.total_no_record,
-          self_arranged: acc.self_arranged + t.total_self_arranged,
-        }), { ticketed: 0, needs_ticketing: 0, no_record: 0, self_arranged: 0 })
+        const totalStats = relevantTours.reduce(
+          (acc, t) => ({
+            ticketed: acc.ticketed + t.total_ticketed,
+            needs_ticketing: acc.needs_ticketing + t.total_needs_ticketing,
+            no_record: acc.no_record + t.total_no_record,
+            self_arranged: acc.self_arranged + t.total_self_arranged,
+          }),
+          { ticketed: 0, needs_ticketing: 0, no_record: 0, self_arranged: 0 }
+        )
 
         // 簡短摘要（fallback 顯示）
         const summaryMessage = `🎫 開票狀態提醒：${relevantTours.length} 個團需要處理`
@@ -597,7 +623,10 @@ export async function POST(request: NextRequest) {
         try {
           await fetch(`${request.nextUrl.origin}/api/bot-notification`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', ...(process.env.BOT_API_SECRET && { 'x-bot-secret': process.env.BOT_API_SECRET }) },
+            headers: {
+              'Content-Type': 'application/json',
+              ...(process.env.BOT_API_SECRET && { 'x-bot-secret': process.env.BOT_API_SECRET }),
+            },
             body: JSON.stringify({
               recipient_id: assistantId,
               message: summaryMessage,
@@ -612,7 +641,11 @@ export async function POST(request: NextRequest) {
                   departure_date: t.departure_date,
                   earliest_deadline: t.earliest_deadline,
                   stats: {
-                    total: t.total_ticketed + t.total_needs_ticketing + t.total_no_record + t.total_self_arranged,
+                    total:
+                      t.total_ticketed +
+                      t.total_needs_ticketing +
+                      t.total_no_record +
+                      t.total_self_arranged,
                     ticketed: t.total_ticketed,
                     needs_ticketing: t.total_needs_ticketing,
                     no_record: t.total_no_record,
@@ -650,9 +683,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: '通知已發送',
-      data: { sent: true, summary }
+      data: { sent: true, summary },
     })
-
   } catch (error) {
     logger.error('開票狀態通知錯誤:', error)
     return ApiError.internal('伺服器錯誤')
@@ -688,7 +720,6 @@ export async function PATCH(request: NextRequest) {
     }
 
     return successResponse({ message: '已更新' })
-
   } catch (error) {
     logger.error('更新機票自理狀態錯誤:', error)
     return ApiError.internal('伺服器錯誤')

@@ -135,7 +135,9 @@ export default function QuoteConfirmPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-morandi-gold/10 mb-4">
             <Building2 className="w-8 h-8 text-morandi-gold" />
           </div>
-          <h1 className="text-2xl font-semibold text-morandi-primary">{QUOTE_CONFIRM_PAGE_LABELS.PAGE_TITLE}</h1>
+          <h1 className="text-2xl font-semibold text-morandi-primary">
+            {QUOTE_CONFIRM_PAGE_LABELS.PAGE_TITLE}
+          </h1>
         </div>
 
         {/* 主要卡片 */}
@@ -154,7 +156,9 @@ export default function QuoteConfirmPage() {
               <div className="w-16 h-16 rounded-full bg-morandi-red/10 flex items-center justify-center mb-4">
                 <AlertCircle className="w-8 h-8 text-morandi-red" />
               </div>
-              <h2 className="text-lg font-medium text-morandi-primary mb-2">{QUOTE_CONFIRM_PAGE_LABELS.LOAD_ERROR_TITLE}</h2>
+              <h2 className="text-lg font-medium text-morandi-primary mb-2">
+                {QUOTE_CONFIRM_PAGE_LABELS.LOAD_ERROR_TITLE}
+              </h2>
               <p className="text-morandi-secondary text-center">{error}</p>
               <p className="text-sm text-morandi-muted mt-4">
                 {QUOTE_CONFIRM_PAGE_LABELS.LOAD_ERROR_CONTACT}
@@ -168,7 +172,9 @@ export default function QuoteConfirmPage() {
               <div className="w-16 h-16 rounded-full bg-morandi-green/10 flex items-center justify-center mb-4">
                 <CheckCircle2 className="w-8 h-8 text-morandi-green" />
               </div>
-              <h2 className="text-lg font-medium text-morandi-primary mb-2">{QUOTE_CONFIRM_PAGE_LABELS.ALREADY_CONFIRMED_TITLE}</h2>
+              <h2 className="text-lg font-medium text-morandi-primary mb-2">
+                {QUOTE_CONFIRM_PAGE_LABELS.ALREADY_CONFIRMED_TITLE}
+              </h2>
               <p className="text-morandi-secondary text-center">
                 {QUOTE_CONFIRM_PAGE_LABELS.ALREADY_CONFIRMED_MESSAGE}
               </p>
@@ -182,12 +188,16 @@ export default function QuoteConfirmPage() {
               <div className="bg-morandi-container/30 rounded-lg p-4 mb-6">
                 <div className="flex justify-between items-start mb-3">
                   <div>
-                    <p className="text-sm text-morandi-secondary">{QUOTE_CONFIRM_PAGE_LABELS.QUOTE_NUMBER}</p>
+                    <p className="text-sm text-morandi-secondary">
+                      {QUOTE_CONFIRM_PAGE_LABELS.QUOTE_NUMBER}
+                    </p>
                     <p className="font-medium text-morandi-primary">{quote.code}</p>
                   </div>
                   {quote.total_amount && (
                     <div className="text-right">
-                      <p className="text-sm text-morandi-secondary">{QUOTE_CONFIRM_PAGE_LABELS.TOTAL_AMOUNT}</p>
+                      <p className="text-sm text-morandi-secondary">
+                        {QUOTE_CONFIRM_PAGE_LABELS.TOTAL_AMOUNT}
+                      </p>
                       <p className="font-semibold text-morandi-gold text-lg">
                         {formatCurrency(quote.total_amount)}
                       </p>
@@ -202,26 +212,40 @@ export default function QuoteConfirmPage() {
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   {quote.destination && (
                     <div>
-                      <span className="text-morandi-secondary">{QUOTE_CONFIRM_PAGE_LABELS.DESTINATION_LABEL}</span>
+                      <span className="text-morandi-secondary">
+                        {QUOTE_CONFIRM_PAGE_LABELS.DESTINATION_LABEL}
+                      </span>
                       <span className="text-morandi-primary">{quote.destination}</span>
                     </div>
                   )}
                   {quote.days && (
                     <div>
-                      <span className="text-morandi-secondary">{QUOTE_CONFIRM_PAGE_LABELS.DAYS_LABEL}</span>
-                      <span className="text-morandi-primary">{quote.days}{QUOTE_CONFIRM_PAGE_LABELS.DAYS_SUFFIX}</span>
+                      <span className="text-morandi-secondary">
+                        {QUOTE_CONFIRM_PAGE_LABELS.DAYS_LABEL}
+                      </span>
+                      <span className="text-morandi-primary">
+                        {quote.days}
+                        {QUOTE_CONFIRM_PAGE_LABELS.DAYS_SUFFIX}
+                      </span>
                     </div>
                   )}
                   {quote.start_date && (
                     <div>
-                      <span className="text-morandi-secondary">{QUOTE_CONFIRM_PAGE_LABELS.DEPARTURE_LABEL}</span>
+                      <span className="text-morandi-secondary">
+                        {QUOTE_CONFIRM_PAGE_LABELS.DEPARTURE_LABEL}
+                      </span>
                       <span className="text-morandi-primary">{formatDate(quote.start_date)}</span>
                     </div>
                   )}
                   {quote.number_of_people && (
                     <div>
-                      <span className="text-morandi-secondary">{QUOTE_CONFIRM_PAGE_LABELS.PEOPLE_COUNT_LABEL}</span>
-                      <span className="text-morandi-primary">{quote.number_of_people}{QUOTE_CONFIRM_PAGE_LABELS.PEOPLE_SUFFIX}</span>
+                      <span className="text-morandi-secondary">
+                        {QUOTE_CONFIRM_PAGE_LABELS.PEOPLE_COUNT_LABEL}
+                      </span>
+                      <span className="text-morandi-primary">
+                        {quote.number_of_people}
+                        {QUOTE_CONFIRM_PAGE_LABELS.PEOPLE_SUFFIX}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -231,12 +255,15 @@ export default function QuoteConfirmPage() {
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="name" className="text-morandi-primary">
-                    {QUOTE_CONFIRM_PAGE_LABELS.CONFIRM_NAME_LABEL} <span className="text-morandi-red">{QUOTE_CONFIRM_PAGE_LABELS.CONFIRM_NAME_REQUIRED}</span>
+                    {QUOTE_CONFIRM_PAGE_LABELS.CONFIRM_NAME_LABEL}{' '}
+                    <span className="text-morandi-red">
+                      {QUOTE_CONFIRM_PAGE_LABELS.CONFIRM_NAME_REQUIRED}
+                    </span>
                   </Label>
                   <Input
                     id="name"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={e => setName(e.target.value)}
                     placeholder={QUOTE_CONFIRM_PAGE_LABELS.NAME_PLACEHOLDER}
                     className="mt-1"
                   />
@@ -250,7 +277,7 @@ export default function QuoteConfirmPage() {
                     id="email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={e => setEmail(e.target.value)}
                     placeholder={QUOTE_CONFIRM_PAGE_LABELS.EMAIL_PLACEHOLDER}
                     className="mt-1"
                   />
@@ -264,7 +291,7 @@ export default function QuoteConfirmPage() {
                     id="phone"
                     type="tel"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={e => setPhone(e.target.value)}
                     placeholder={QUOTE_CONFIRM_PAGE_LABELS.PHONE_PLACEHOLDER}
                     className="mt-1"
                   />
@@ -277,7 +304,7 @@ export default function QuoteConfirmPage() {
                   <Textarea
                     id="notes"
                     value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
+                    onChange={e => setNotes(e.target.value)}
                     placeholder={QUOTE_CONFIRM_PAGE_LABELS.NOTES_PLACEHOLDER}
                     className="mt-1"
                     rows={3}
@@ -321,13 +348,16 @@ export default function QuoteConfirmPage() {
               <div className="w-16 h-16 rounded-full bg-morandi-green/10 flex items-center justify-center mb-4">
                 <CheckCircle2 className="w-8 h-8 text-morandi-green" />
               </div>
-              <h2 className="text-lg font-medium text-morandi-primary mb-2">{QUOTE_CONFIRM_PAGE_LABELS.SUCCESS_TITLE}</h2>
+              <h2 className="text-lg font-medium text-morandi-primary mb-2">
+                {QUOTE_CONFIRM_PAGE_LABELS.SUCCESS_TITLE}
+              </h2>
               <p className="text-morandi-secondary text-center">
                 {QUOTE_CONFIRM_PAGE_LABELS.SUCCESS_MESSAGE}
               </p>
               {quote && (
                 <p className="text-sm text-morandi-muted mt-4">
-                  {QUOTE_CONFIRM_PAGE_LABELS.QUOTE_NUMBER_PREFIX}{quote.code}
+                  {QUOTE_CONFIRM_PAGE_LABELS.QUOTE_NUMBER_PREFIX}
+                  {quote.code}
                 </p>
               )}
             </div>
@@ -336,7 +366,10 @@ export default function QuoteConfirmPage() {
 
         {/* 版權資訊 */}
         <p className="text-center text-xs text-morandi-muted mt-6">
-          {QUOTE_CONFIRM_PAGE_LABELS.COPYRIGHT.replace('{year}', new Date().getFullYear().toString())}
+          {QUOTE_CONFIRM_PAGE_LABELS.COPYRIGHT.replace(
+            '{year}',
+            new Date().getFullYear().toString()
+          )}
         </p>
       </div>
     </div>

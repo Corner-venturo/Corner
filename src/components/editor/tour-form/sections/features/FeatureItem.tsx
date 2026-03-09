@@ -63,7 +63,7 @@ export function FeatureItem({
 
   return (
     <div
-      onDragOver={(e) => onFeatureDragOver(e, index)}
+      onDragOver={e => onFeatureDragOver(e, index)}
       onDrop={() => onFeatureDrop(index)}
       className={`p-4 border-2 rounded-lg space-y-3 transition-all ${
         isDraggingFeature
@@ -85,7 +85,9 @@ export function FeatureItem({
           >
             <GripVertical size={18} />
           </div>
-          <span className="text-sm font-medium text-morandi-secondary">{COMP_EDITOR_LABELS.特色} {index + 1}</span>
+          <span className="text-sm font-medium text-morandi-secondary">
+            {COMP_EDITOR_LABELS.特色} {index + 1}
+          </span>
         </div>
         <button
           onClick={() => onRemoveFeature(index)}
@@ -98,7 +100,9 @@ export function FeatureItem({
       {/* 標籤文字 + 顏色 */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_1694}</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">
+            {COMP_EDITOR_LABELS.LABEL_1694}
+          </label>
           <input
             type="text"
             value={feature.tag || ''}
@@ -108,7 +112,9 @@ export function FeatureItem({
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5949}</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">
+            {COMP_EDITOR_LABELS.LABEL_5949}
+          </label>
           <div className="flex gap-1.5 items-center h-[42px]">
             {TAG_COLOR_OPTIONS.map(color => (
               <button
@@ -130,7 +136,9 @@ export function FeatureItem({
 
       {/* 標題 */}
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.TITLE}</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">
+          {COMP_EDITOR_LABELS.TITLE}
+        </label>
         <input
           type="text"
           value={feature.title}
@@ -142,7 +150,9 @@ export function FeatureItem({
 
       {/* 描述 */}
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_3951}</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">
+          {COMP_EDITOR_LABELS.LABEL_3951}
+        </label>
         <input
           type="text"
           value={feature.description}
@@ -160,16 +170,19 @@ export function FeatureItem({
         <div className="flex flex-wrap gap-2">
           {/* 已上傳的圖片 */}
           {images.map((imageUrl, imgIndex) => {
-            const isUploading = uploadingImage?.featureIndex === index && uploadingImage?.imageIndex === imgIndex
-            const isDragging = draggedImage?.featureIndex === index && draggedImage?.imageIndex === imgIndex
-            const isDragOver = dragOverImage?.featureIndex === index && dragOverImage?.imageIndex === imgIndex
+            const isUploading =
+              uploadingImage?.featureIndex === index && uploadingImage?.imageIndex === imgIndex
+            const isDragging =
+              draggedImage?.featureIndex === index && draggedImage?.imageIndex === imgIndex
+            const isDragOver =
+              dragOverImage?.featureIndex === index && dragOverImage?.imageIndex === imgIndex
 
             return (
               <div
                 key={imgIndex}
                 draggable={!isUploading}
                 onDragStart={() => onImageDragStart(index, imgIndex)}
-                onDragOver={(e) => onImageDragOver(e, index, imgIndex)}
+                onDragOver={e => onImageDragOver(e, index, imgIndex)}
                 onDrop={() => onImageDrop(index, imgIndex)}
                 onDragEnd={onImageDragEnd}
                 className={`relative w-16 h-16 rounded-lg overflow-hidden cursor-move group transition-all ${
@@ -182,19 +195,23 @@ export function FeatureItem({
                   </div>
                 ) : (
                   <>
-                    <img src={imageUrl}
+                    <img
+                      src={imageUrl}
                       alt={`特色圖片 ${imgIndex + 1}`}
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-                      <GripVertical size={16} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <GripVertical
+                        size={16}
+                        className="text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                      />
                     </div>
                     <span className="absolute bottom-0.5 left-0.5 bg-black/60 text-white text-[10px] px-1 rounded">
                       {imgIndex + 1}
                     </span>
                     <button
                       type="button"
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation()
                         onRemoveImage(index, imgIndex)
                       }}
@@ -213,7 +230,10 @@ export function FeatureItem({
           {images.length < 4 && (
             <div
               className="relative w-16 h-16 rounded-lg border-2 border-dashed border-morandi-container bg-morandi-container/20 hover:border-morandi-gold/50 overflow-hidden transition-colors"
-              onDragOver={e => { e.preventDefault(); e.stopPropagation() }}
+              onDragOver={e => {
+                e.preventDefault()
+                e.stopPropagation()
+              }}
               onDrop={e => {
                 e.preventDefault()
                 e.stopPropagation()
@@ -232,7 +252,8 @@ export function FeatureItem({
               }}
             >
               <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer hover:bg-morandi-container/30 transition-colors">
-                {uploadingImage?.featureIndex === index && uploadingImage?.imageIndex >= images.length ? (
+                {uploadingImage?.featureIndex === index &&
+                uploadingImage?.imageIndex >= images.length ? (
                   <Loader2 size={16} className="text-morandi-secondary animate-spin" />
                 ) : (
                   <Plus size={20} className="text-morandi-secondary/50" />
@@ -241,7 +262,9 @@ export function FeatureItem({
                   type="file"
                   accept="image/*"
                   multiple
-                  ref={el => { fileInputRefs.current[`feature-${index}-new`] = el }}
+                  ref={el => {
+                    fileInputRefs.current[`feature-${index}-new`] = el
+                  }}
                   onChange={e => {
                     const files = e.target.files
                     if (files && files.length > 0) {

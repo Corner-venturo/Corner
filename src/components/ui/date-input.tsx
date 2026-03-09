@@ -153,15 +153,12 @@ export function DateInput({
   }
 
   // 轉換為 Date 物件供 Calendar 使用
-  const dateValue = value && value.match(/^\d{4}-\d{2}-\d{2}$/)
-    ? parse(value, 'yyyy-MM-dd', new Date())
-    : undefined
-  const minDate = min && min.match(/^\d{4}-\d{2}-\d{2}$/)
-    ? parse(min, 'yyyy-MM-dd', new Date())
-    : undefined
-  const maxDate = max && max.match(/^\d{4}-\d{2}-\d{2}$/)
-    ? parse(max, 'yyyy-MM-dd', new Date())
-    : undefined
+  const dateValue =
+    value && value.match(/^\d{4}-\d{2}-\d{2}$/) ? parse(value, 'yyyy-MM-dd', new Date()) : undefined
+  const minDate =
+    min && min.match(/^\d{4}-\d{2}-\d{2}$/) ? parse(min, 'yyyy-MM-dd', new Date()) : undefined
+  const maxDate =
+    max && max.match(/^\d{4}-\d{2}-\d{2}$/) ? parse(max, 'yyyy-MM-dd', new Date()) : undefined
 
   // 從日曆選擇日期
   const handleCalendarSelect = (date: Date | undefined) => {
@@ -252,12 +249,10 @@ export function DateInput({
           <Calendar
             mode="single"
             selected={dateValue && isValid(dateValue) ? dateValue : undefined}
-            onSelect={handleCalendarSelect as (date: Date | { from: Date; to?: Date } | undefined) => void}
-            disabled={
-              minDate || maxDate
-                ? { before: minDate, after: maxDate }
-                : undefined
+            onSelect={
+              handleCalendarSelect as (date: Date | { from: Date; to?: Date } | undefined) => void
             }
+            disabled={minDate || maxDate ? { before: minDate, after: maxDate } : undefined}
             defaultMonth={dateValue && isValid(dateValue) ? dateValue : undefined}
           />
         </PopoverContent>

@@ -28,9 +28,7 @@ export default function PermissionsManagementPage() {
           <Shield className="w-8 h-8 text-morandi-gold" />
           {LABELS.CROSS_WORKSPACE_PERMISSIONS}
         </h1>
-        <p className="text-muted-foreground mt-2">
-          {LABELS.PERMISSIONS_MANAGEMENT_DESC}
-        </p>
+        <p className="text-muted-foreground mt-2">{LABELS.PERMISSIONS_MANAGEMENT_DESC}</p>
       </div>
 
       {/* Notice Card */}
@@ -57,16 +55,25 @@ export default function PermissionsManagementPage() {
           <div>
             <p className="font-medium mb-2">{LABELS.EXISTING_PERMISSIONS}</p>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              <li><strong>Supabase Auth</strong> - {LABELS.AUTH_LOGIN}</li>
-              <li><strong>employees.permissions</strong> - {LABELS.FUNCTION_PERMISSIONS}</li>
-              <li><strong>employees.workspace_id</strong> - {LABELS.DATA_ISOLATION}</li>
-              <li><strong>user.roles</strong> - {LABELS.ROLE_LABELS}</li>
+              <li>
+                <strong>Supabase Auth</strong> - {LABELS.AUTH_LOGIN}
+              </li>
+              <li>
+                <strong>employees.permissions</strong> - {LABELS.FUNCTION_PERMISSIONS}
+              </li>
+              <li>
+                <strong>employees.workspace_id</strong> - {LABELS.DATA_ISOLATION}
+              </li>
+              <li>
+                <strong>user.roles</strong> - {LABELS.ROLE_LABELS}
+              </li>
             </ul>
           </div>
 
           <div className="pt-4 border-t">
             <p className="text-xs text-muted-foreground">
-              {LABELS.REFERENCE_DOC}<code className="text-morandi-gold">{LABELS.RLS_SPEC_DOC}</code>
+              {LABELS.REFERENCE_DOC}
+              <code className="text-morandi-gold">{LABELS.RLS_SPEC_DOC}</code>
             </p>
           </div>
         </CardContent>

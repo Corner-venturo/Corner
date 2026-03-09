@@ -67,7 +67,8 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
       const notDeleted = !empWithSync._deleted
       const isActive = emp.status === 'active'
       // 排除機器人
-      const notBot = emp.employee_number !== 'BOT001' && emp.id !== '00000000-0000-0000-0000-000000000001'
+      const notBot =
+        emp.employee_number !== 'BOT001' && emp.id !== '00000000-0000-0000-0000-000000000001'
       return notDeleted && isActive && notBot
     })
 
@@ -85,7 +86,8 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
       const notDeleted = !empWithSync._deleted
       const isActive = emp.status === 'active'
       // 排除機器人
-      const notBot = emp.employee_number !== 'BOT001' && emp.id !== '00000000-0000-0000-0000-000000000001'
+      const notBot =
+        emp.employee_number !== 'BOT001' && emp.id !== '00000000-0000-0000-0000-000000000001'
       return notDeleted && isActive && notBot
     })
 
@@ -112,7 +114,9 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
       {/* 選擇旅遊團（如果沒有預設 tour_id） */}
       {!tourId && (
         <div>
-          <label className="text-sm font-medium text-morandi-primary">{COMP_ORDERS_LABELS.SELECT_448}</label>
+          <label className="text-sm font-medium text-morandi-primary">
+            {COMP_ORDERS_LABELS.SELECT_448}
+          </label>
           <Combobox
             options={tours.map(tour => ({
               value: tour.id,
@@ -131,7 +135,9 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
 
       {/* 聯絡人 */}
       <div>
-        <label className="text-sm font-medium text-morandi-primary">{COMP_ORDERS_LABELS.LABEL_7009}</label>
+        <label className="text-sm font-medium text-morandi-primary">
+          {COMP_ORDERS_LABELS.LABEL_7009}
+        </label>
         <Input
           value={formData.contact_person || ''}
           onChange={e => updateFormData?.({ ...formData, contact_person: e.target.value })}
@@ -147,9 +153,7 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
           <label className="text-sm font-medium text-morandi-primary">
             {COMP_ORDERS_LABELS.LABEL_8362}
             {/* 如果有填聯絡人，業務為必填 */}
-            {formData.contact_person?.trim() && (
-              <span className="text-morandi-red ml-1">*</span>
-            )}
+            {formData.contact_person?.trim() && <span className="text-morandi-red ml-1">*</span>}
           </label>
           <Combobox
             options={salesPersons.map(emp => ({
@@ -167,7 +171,9 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-morandi-primary">{COMP_ORDERS_LABELS.LABEL_7412}</label>
+          <label className="text-sm font-medium text-morandi-primary">
+            {COMP_ORDERS_LABELS.LABEL_7412}
+          </label>
           <Combobox
             options={assistants.map(emp => ({
               value: emp.display_name || emp.english_name,
@@ -184,7 +190,6 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
           />
         </div>
       </div>
-
 
       {/* 按鈕（只在獨立模式顯示） */}
       {!isEmbedded && (

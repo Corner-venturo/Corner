@@ -6,11 +6,7 @@ import React from 'react'
 import { Button } from '@/components/ui/button'
 import { InputIME } from '@/components/ui/input-ime'
 import { StarRating } from '@/components/ui/star-rating'
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Check, Calendar, Eye } from 'lucide-react'
 import { TodoExpandedViewProps } from './types'
@@ -19,7 +15,12 @@ import { NotesSection } from './NotesSection'
 import { AssignmentSection } from './AssignmentSection'
 import { QuickActionsSection, QuickActionContent } from './QuickActionsSection'
 import { useAuthStore } from '@/stores/auth-store'
-import { DIALOG_LABELS, COMMON_LABELS, PLACEHOLDER_LABELS, BUTTON_LABELS } from '@/features/todos/constants/labels'
+import {
+  DIALOG_LABELS,
+  COMMON_LABELS,
+  PLACEHOLDER_LABELS,
+  BUTTON_LABELS,
+} from '@/features/todos/constants/labels'
 
 export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewProps) {
   const { activeTab, setActiveTab } = useTodoExpandedView()
@@ -39,8 +40,11 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
   const readOnlyUpdate = () => {}
 
   return (
-    <Dialog open={!!todo} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent level={1} className="w-full max-w-[95vw] sm:max-w-[600px] max-h-[95vh] sm:max-h-[85vh] flex flex-col p-0 gap-0">
+    <Dialog open={!!todo} onOpenChange={open => !open && onClose()}>
+      <DialogContent
+        level={1}
+        className="w-full max-w-[95vw] sm:max-w-[600px] max-h-[95vh] sm:max-h-[85vh] flex flex-col p-0 gap-0"
+      >
         <VisuallyHidden>
           <DialogTitle>{todo.title || DIALOG_LABELS.todoDetails}</DialogTitle>
         </VisuallyHidden>
@@ -78,7 +82,11 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
                   <span className="text-xs text-morandi-secondary">{COMMON_LABELS.priority}:</span>
                   <StarRating
                     value={todo.priority}
-                    onChange={canEdit ? (value => onUpdate({ priority: value as 1 | 2 | 3 | 4 | 5 })) : undefined}
+                    onChange={
+                      canEdit
+                        ? value => onUpdate({ priority: value as 1 | 2 | 3 | 4 | 5 })
+                        : undefined
+                    }
                     size="sm"
                     disabled={!canEdit}
                   />
@@ -87,7 +95,11 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
             </div>
 
             {/* 基本資訊 */}
-            <AssignmentSection todo={todo} onUpdate={canEdit ? onUpdate : readOnlyUpdate} readOnly={!canEdit} />
+            <AssignmentSection
+              todo={todo}
+              onUpdate={canEdit ? onUpdate : readOnlyUpdate}
+              readOnly={!canEdit}
+            />
 
             {/* 備註區 - 即使唯讀也可以留言 */}
             <NotesSection todo={todo} onUpdate={onUpdate} />

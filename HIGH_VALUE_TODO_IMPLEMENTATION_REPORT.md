@@ -30,10 +30,10 @@
 ```typescript
 // 分類管理
 fetchCategories: () => Promise<void>
-addCategory: (
-  category: Omit<TransactionCategory, 'id' | 'created_at'>
-) => Promise<TransactionCategory | null>
-updateCategory: (id: string, category: Partial<TransactionCategory>) => Promise<TransactionCategory | null>
+addCategory: (category: Omit<TransactionCategory, 'id' | 'created_at'>) =>
+  Promise<TransactionCategory | null>
+updateCategory: (id: string, category: Partial<TransactionCategory>) =>
+  Promise<TransactionCategory | null>
 deleteCategory: (id: string) => Promise<boolean>
 ```
 
@@ -83,6 +83,7 @@ deleteCategory: async id => {
 **檔案**: `/Users/william/Projects/venturo-new/src/features/accounting/services/accounting.service.ts`
 
 **修改前**:
+
 ```typescript
 update: async (id: string, data: Partial<TransactionCategory>) => {
   // TODO: Implement updateCategory in accounting-store
@@ -95,6 +96,7 @@ delete: async (id: string) => {
 ```
 
 **修改後**:
+
 ```typescript
 update: async (id: string, data: Partial<TransactionCategory>) => {
   await store.updateCategory(id, data)
@@ -265,6 +267,7 @@ import { useTourStore } from '@/stores'
 #### 修改團號生成邏輯
 
 **修改前**:
+
 ```typescript
 const tourCode = generateTourCode(
   workspaceCode,
@@ -275,6 +278,7 @@ const tourCode = generateTourCode(
 ```
 
 **修改後**:
+
 ```typescript
 // 獲取現有的 tours 來避免編號衝突
 const existingTours = useTourStore.getState().items
@@ -314,14 +318,14 @@ return `${datePrefix}${nextSequence}`
 
 ## 4. 修改檔案清單
 
-| 檔案 | 修改類型 | 行數變化 |
-|------|---------|---------|
-| `src/stores/accounting-store.ts` | 新增方法 | +45 |
-| `src/features/accounting/services/accounting.service.ts` | 移除 TODO | -4 |
-| `src/features/attractions/components/tabs/PremiumExperiencesTab.tsx` | 新增編輯功能 | +130 |
-| `src/features/attractions/components/tabs/MichelinRestaurantsTab.tsx` | 新增編輯功能 | +130 |
-| `src/features/attractions/components/tabs/AttractionsTab.tsx` | 整合編輯功能 | +75 |
-| `src/features/quotes/hooks/useQuoteActions.ts` | 修復編號衝突 | +5 |
+| 檔案                                                                  | 修改類型     | 行數變化 |
+| --------------------------------------------------------------------- | ------------ | -------- |
+| `src/stores/accounting-store.ts`                                      | 新增方法     | +45      |
+| `src/features/accounting/services/accounting.service.ts`              | 移除 TODO    | -4       |
+| `src/features/attractions/components/tabs/PremiumExperiencesTab.tsx`  | 新增編輯功能 | +130     |
+| `src/features/attractions/components/tabs/MichelinRestaurantsTab.tsx` | 新增編輯功能 | +130     |
+| `src/features/attractions/components/tabs/AttractionsTab.tsx`         | 整合編輯功能 | +75      |
+| `src/features/quotes/hooks/useQuoteActions.ts`                        | 修復編號衝突 | +5       |
 
 **總計**: 6 個檔案，新增約 381 行程式碼，移除 8 個 TODO 註解
 
@@ -373,12 +377,14 @@ await accountingStore.deleteCategory('user-category-id') // 應該成功
 ### 問題 1: 景點編輯對話框不存在
 
 **解決方案**:
+
 - Premium Experiences 和 Michelin Restaurants：直接在 Tab 內實作簡易編輯對話框
 - Attractions：使用現有的 `AttractionsDialog` 組件並整合 `useAttractionsDialog` hook
 
 ### 問題 2: 型別不匹配
 
 **解決方案**:
+
 - 在 `accounting-store.ts` 中正確定義 `updateCategory` 和 `deleteCategory` 的型別簽名
 - 使用 `Partial<TransactionCategory>` 允許部分更新
 

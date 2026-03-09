@@ -61,10 +61,7 @@ export async function recalculateExpenseStats(tour_id: string): Promise<void> {
         throw itemsError
       }
 
-      total_cost = (items_data || []).reduce(
-        (sum, item) => sum + (item.subtotal || 0),
-        0
-      )
+      total_cost = (items_data || []).reduce((sum, item) => sum + (item.subtotal || 0), 0)
     }
 
     // 3. 查 tours.total_revenue

@@ -22,12 +22,7 @@ export function useToursForm({ state, openDialog }: UseToursFormParams): UseTour
 
   const navigationProcessedRef = useRef(false)
 
-  const {
-    setNewTour,
-    setAvailableCities,
-    setNewOrder,
-    setFormError,
-  } = state
+  const { setNewTour, setAvailableCities, setNewOrder, setFormError } = state
 
   const handleOpenCreateDialog = useCallback(
     async (fromQuoteId?: string) => {

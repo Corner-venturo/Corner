@@ -65,14 +65,21 @@ export async function POST(request: NextRequest) {
       .like('code', `${city_code}%`)
 
     // 使用共用的編號生成器（workspaceCode 參數已棄用，傳空字串）
-    const tourCode = generateTourCode('', city_code, pkgData.start_date || departure_date, existingTours || [])
+    const tourCode = generateTourCode(
+      '',
+      city_code,
+      pkgData.start_date || departure_date,
+      existingTours || []
+    )
 
     // 4. 建立 Tour
     const daysCount = pkgData.days || 1
     const depDate = new Date(pkgData.start_date || departure_date)
     const returnDateValue =
       pkgData.end_date ||
-      new Date(depDate.getTime() + (daysCount - 1) * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+      new Date(depDate.getTime() + (daysCount - 1) * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0]
 
     const tourData = {
       id: crypto.randomUUID(),

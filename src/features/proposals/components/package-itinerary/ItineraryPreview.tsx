@@ -3,19 +3,17 @@
  * ItineraryPreview - 簡易行程表預覽
  */
 
-
 import { Eye, Edit2, Printer } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import type { FlightInfo } from '@/types/flight.types'
 import type { PreviewDayData } from './types'
-import { BROCHURE_PREVIEW_DIALOG_LABELS } from '../../constants/labels';
-import { IMPORT_MEALS_DIALOG_LABELS, PRINTABLE_QUICK_QUOTE_LABELS, QUOTES_PAGE_LABELS } from '@/constants/labels';
+import { BROCHURE_PREVIEW_DIALOG_LABELS } from '../../constants/labels'
+import {
+  IMPORT_MEALS_DIALOG_LABELS,
+  PRINTABLE_QUICK_QUOTE_LABELS,
+  QUOTES_PAGE_LABELS,
+} from '@/constants/labels'
 
 interface ItineraryPreviewProps {
   isOpen: boolean
@@ -54,9 +52,7 @@ export function ItineraryPreview({
             <DialogTitle className="flex items-center gap-2">
               <Eye className="w-5 h-5 text-morandi-gold" />
               {BROCHURE_PREVIEW_DIALOG_LABELS.簡易行程表}
-              <span className="text-sm font-normal text-morandi-secondary">
-                - {title}
-              </span>
+              <span className="text-sm font-normal text-morandi-secondary">- {title}</span>
             </DialogTitle>
             <div className="flex items-center gap-2">
               <Button
@@ -96,16 +92,24 @@ export function ItineraryPreview({
               {/* 基本資訊 */}
               <div className="mt-4 grid grid-cols-3 gap-4 text-sm">
                 <div className="flex gap-2">
-                  <span className="text-morandi-secondary">{BROCHURE_PREVIEW_DIALOG_LABELS.目的地標籤}</span>
+                  <span className="text-morandi-secondary">
+                    {BROCHURE_PREVIEW_DIALOG_LABELS.目的地標籤}
+                  </span>
                   <span className="font-medium">{destination || '-'}</span>
                 </div>
                 <div className="flex gap-2">
-                  <span className="text-morandi-secondary">{BROCHURE_PREVIEW_DIALOG_LABELS.出發日期標籤}</span>
+                  <span className="text-morandi-secondary">
+                    {BROCHURE_PREVIEW_DIALOG_LABELS.出發日期標籤}
+                  </span>
                   <span className="font-medium">{startDate || '-'}</span>
                 </div>
                 <div className="flex gap-2">
-                  <span className="text-morandi-secondary">{BROCHURE_PREVIEW_DIALOG_LABELS.行程天數標籤}</span>
-                  <span className="font-medium">{dailyData.length} {BROCHURE_PREVIEW_DIALOG_LABELS.天}</span>
+                  <span className="text-morandi-secondary">
+                    {BROCHURE_PREVIEW_DIALOG_LABELS.行程天數標籤}
+                  </span>
+                  <span className="font-medium">
+                    {dailyData.length} {BROCHURE_PREVIEW_DIALOG_LABELS.天}
+                  </span>
                 </div>
               </div>
 
@@ -114,22 +118,28 @@ export function ItineraryPreview({
                 <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
                   {outboundFlight && (
                     <div className="flex gap-2">
-                      <span className="text-morandi-secondary">{BROCHURE_PREVIEW_DIALOG_LABELS.去程航班}</span>
+                      <span className="text-morandi-secondary">
+                        {BROCHURE_PREVIEW_DIALOG_LABELS.去程航班}
+                      </span>
                       <span className="font-medium">
                         {outboundFlight.airline} {outboundFlight.flightNumber}
                         <span className="text-morandi-secondary ml-1">
-                          ({outboundFlight.departureAirport} {outboundFlight.departureTime} → {outboundFlight.arrivalAirport} {outboundFlight.arrivalTime})
+                          ({outboundFlight.departureAirport} {outboundFlight.departureTime} →{' '}
+                          {outboundFlight.arrivalAirport} {outboundFlight.arrivalTime})
                         </span>
                       </span>
                     </div>
                   )}
                   {returnFlight && (
                     <div className="flex gap-2">
-                      <span className="text-morandi-secondary">{BROCHURE_PREVIEW_DIALOG_LABELS.回程航班}</span>
+                      <span className="text-morandi-secondary">
+                        {BROCHURE_PREVIEW_DIALOG_LABELS.回程航班}
+                      </span>
                       <span className="font-medium">
                         {returnFlight.airline} {returnFlight.flightNumber}
                         <span className="text-morandi-secondary ml-1">
-                          ({returnFlight.departureAirport} {returnFlight.departureTime} → {returnFlight.arrivalAirport} {returnFlight.arrivalTime})
+                          ({returnFlight.departureAirport} {returnFlight.departureTime} →{' '}
+                          {returnFlight.arrivalAirport} {returnFlight.arrivalTime})
                         </span>
                       </span>
                     </div>
@@ -142,17 +152,32 @@ export function ItineraryPreview({
             <table className="w-full border-collapse text-sm">
               <thead>
                 <tr className="bg-morandi-gold text-white">
-                  <th className="border border-morandi-gold/50 px-3 py-2 text-left w-20">{BROCHURE_PREVIEW_DIALOG_LABELS.日期}</th>
-                  <th className="border border-morandi-gold/50 px-3 py-2 text-left">{BROCHURE_PREVIEW_DIALOG_LABELS.行程內容}</th>
-                  <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">{IMPORT_MEALS_DIALOG_LABELS.早餐}</th>
-                  <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">{IMPORT_MEALS_DIALOG_LABELS.午餐}</th>
-                  <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">{IMPORT_MEALS_DIALOG_LABELS.晚餐}</th>
-                  <th className="border border-morandi-gold/50 px-3 py-2 text-left w-32">{BROCHURE_PREVIEW_DIALOG_LABELS.住宿}</th>
+                  <th className="border border-morandi-gold/50 px-3 py-2 text-left w-20">
+                    {BROCHURE_PREVIEW_DIALOG_LABELS.日期}
+                  </th>
+                  <th className="border border-morandi-gold/50 px-3 py-2 text-left">
+                    {BROCHURE_PREVIEW_DIALOG_LABELS.行程內容}
+                  </th>
+                  <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">
+                    {IMPORT_MEALS_DIALOG_LABELS.早餐}
+                  </th>
+                  <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">
+                    {IMPORT_MEALS_DIALOG_LABELS.午餐}
+                  </th>
+                  <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">
+                    {IMPORT_MEALS_DIALOG_LABELS.晚餐}
+                  </th>
+                  <th className="border border-morandi-gold/50 px-3 py-2 text-left w-32">
+                    {BROCHURE_PREVIEW_DIALOG_LABELS.住宿}
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {dailyData.map((day, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-card' : 'bg-morandi-container/20'}>
+                  <tr
+                    key={index}
+                    className={index % 2 === 0 ? 'bg-card' : 'bg-morandi-container/20'}
+                  >
                     <td className="border border-morandi-container px-3 py-2">
                       <div className="font-semibold text-morandi-gold">{day.dayLabel}</div>
                       <div className="text-xs text-morandi-secondary">{day.date}</div>
@@ -179,7 +204,10 @@ export function ItineraryPreview({
 
             {/* 頁尾 */}
             <div className="mt-6 pt-4 border-t border-morandi-container text-xs text-morandi-secondary text-center">
-              <p>{BROCHURE_PREVIEW_DIALOG_LABELS.本行程表由} {companyName} {BROCHURE_PREVIEW_DIALOG_LABELS.提供}</p>
+              <p>
+                {BROCHURE_PREVIEW_DIALOG_LABELS.本行程表由} {companyName}{' '}
+                {BROCHURE_PREVIEW_DIALOG_LABELS.提供}
+              </p>
             </div>
           </div>
         </div>
@@ -207,17 +235,10 @@ export function ItineraryPreviewContent({
         <DialogTitle className="flex items-center gap-2">
           <Eye className="w-5 h-5 text-morandi-gold" />
           {BROCHURE_PREVIEW_DIALOG_LABELS.簡易行程表}
-          <span className="text-sm font-normal text-morandi-secondary">
-            - {title}
-          </span>
+          <span className="text-sm font-normal text-morandi-secondary">- {title}</span>
         </DialogTitle>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onEdit}
-            className="h-7 text-[11px] gap-1"
-          >
+          <Button variant="outline" size="sm" onClick={onEdit} className="h-7 text-[11px] gap-1">
             <Edit2 size={12} />
             {BROCHURE_PREVIEW_DIALOG_LABELS.編輯}
           </Button>
@@ -249,16 +270,24 @@ export function ItineraryPreviewContent({
           {/* 基本資訊 */}
           <div className="mt-4 grid grid-cols-3 gap-4 text-sm">
             <div className="flex gap-2">
-              <span className="text-morandi-secondary">{BROCHURE_PREVIEW_DIALOG_LABELS.目的地標籤}</span>
+              <span className="text-morandi-secondary">
+                {BROCHURE_PREVIEW_DIALOG_LABELS.目的地標籤}
+              </span>
               <span className="font-medium">{destination || '-'}</span>
             </div>
             <div className="flex gap-2">
-              <span className="text-morandi-secondary">{BROCHURE_PREVIEW_DIALOG_LABELS.出發日期標籤}</span>
+              <span className="text-morandi-secondary">
+                {BROCHURE_PREVIEW_DIALOG_LABELS.出發日期標籤}
+              </span>
               <span className="font-medium">{startDate || '-'}</span>
             </div>
             <div className="flex gap-2">
-              <span className="text-morandi-secondary">{BROCHURE_PREVIEW_DIALOG_LABELS.行程天數標籤}</span>
-              <span className="font-medium">{dailyData.length} {BROCHURE_PREVIEW_DIALOG_LABELS.天}</span>
+              <span className="text-morandi-secondary">
+                {BROCHURE_PREVIEW_DIALOG_LABELS.行程天數標籤}
+              </span>
+              <span className="font-medium">
+                {dailyData.length} {BROCHURE_PREVIEW_DIALOG_LABELS.天}
+              </span>
             </div>
           </div>
 
@@ -267,22 +296,28 @@ export function ItineraryPreviewContent({
             <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
               {outboundFlight && (
                 <div className="flex gap-2">
-                  <span className="text-morandi-secondary">{BROCHURE_PREVIEW_DIALOG_LABELS.去程航班}</span>
+                  <span className="text-morandi-secondary">
+                    {BROCHURE_PREVIEW_DIALOG_LABELS.去程航班}
+                  </span>
                   <span className="font-medium">
                     {outboundFlight.airline} {outboundFlight.flightNumber}
                     <span className="text-morandi-secondary ml-1">
-                      ({outboundFlight.departureAirport} {outboundFlight.departureTime} → {outboundFlight.arrivalAirport} {outboundFlight.arrivalTime})
+                      ({outboundFlight.departureAirport} {outboundFlight.departureTime} →{' '}
+                      {outboundFlight.arrivalAirport} {outboundFlight.arrivalTime})
                     </span>
                   </span>
                 </div>
               )}
               {returnFlight && (
                 <div className="flex gap-2">
-                  <span className="text-morandi-secondary">{BROCHURE_PREVIEW_DIALOG_LABELS.回程航班}</span>
+                  <span className="text-morandi-secondary">
+                    {BROCHURE_PREVIEW_DIALOG_LABELS.回程航班}
+                  </span>
                   <span className="font-medium">
                     {returnFlight.airline} {returnFlight.flightNumber}
                     <span className="text-morandi-secondary ml-1">
-                      ({returnFlight.departureAirport} {returnFlight.departureTime} → {returnFlight.arrivalAirport} {returnFlight.arrivalTime})
+                      ({returnFlight.departureAirport} {returnFlight.departureTime} →{' '}
+                      {returnFlight.arrivalAirport} {returnFlight.arrivalTime})
                     </span>
                   </span>
                 </div>
@@ -295,12 +330,24 @@ export function ItineraryPreviewContent({
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="bg-morandi-gold text-white">
-              <th className="border border-morandi-gold/50 px-3 py-2 text-left w-20">{BROCHURE_PREVIEW_DIALOG_LABELS.日期}</th>
-              <th className="border border-morandi-gold/50 px-3 py-2 text-left">{BROCHURE_PREVIEW_DIALOG_LABELS.行程內容}</th>
-              <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">{IMPORT_MEALS_DIALOG_LABELS.早餐}</th>
-              <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">{IMPORT_MEALS_DIALOG_LABELS.午餐}</th>
-              <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">{IMPORT_MEALS_DIALOG_LABELS.晚餐}</th>
-              <th className="border border-morandi-gold/50 px-3 py-2 text-left w-32">{BROCHURE_PREVIEW_DIALOG_LABELS.住宿}</th>
+              <th className="border border-morandi-gold/50 px-3 py-2 text-left w-20">
+                {BROCHURE_PREVIEW_DIALOG_LABELS.日期}
+              </th>
+              <th className="border border-morandi-gold/50 px-3 py-2 text-left">
+                {BROCHURE_PREVIEW_DIALOG_LABELS.行程內容}
+              </th>
+              <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">
+                {IMPORT_MEALS_DIALOG_LABELS.早餐}
+              </th>
+              <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">
+                {IMPORT_MEALS_DIALOG_LABELS.午餐}
+              </th>
+              <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">
+                {IMPORT_MEALS_DIALOG_LABELS.晚餐}
+              </th>
+              <th className="border border-morandi-gold/50 px-3 py-2 text-left w-32">
+                {BROCHURE_PREVIEW_DIALOG_LABELS.住宿}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -332,7 +379,10 @@ export function ItineraryPreviewContent({
 
         {/* 頁尾 */}
         <div className="mt-6 pt-4 border-t border-morandi-container text-xs text-morandi-secondary text-center">
-          <p>{BROCHURE_PREVIEW_DIALOG_LABELS.本行程表由} {companyName} {BROCHURE_PREVIEW_DIALOG_LABELS.提供}</p>
+          <p>
+            {BROCHURE_PREVIEW_DIALOG_LABELS.本行程表由} {companyName}{' '}
+            {BROCHURE_PREVIEW_DIALOG_LABELS.提供}
+          </p>
         </div>
       </div>
     </div>

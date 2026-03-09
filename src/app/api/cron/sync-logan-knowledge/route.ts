@@ -40,10 +40,7 @@ export async function GET(_request: NextRequest) {
     const yesterday = subDays(new Date(), 1).toISOString()
 
     // 取得第一個 workspace（用於寫入記憶）
-    const { data: workspaces } = await supabase
-      .from('workspaces')
-      .select('id')
-      .limit(1)
+    const { data: workspaces } = await supabase.from('workspaces').select('id').limit(1)
 
     if (!workspaces?.length) {
       return ApiError.internal('找不到 workspace')
@@ -64,12 +61,14 @@ export async function GET(_request: NextRequest) {
     // 1. 查詢新增的景點
     const { data: newAttractions } = await supabase
       .from('attractions')
-      .select(`
+      .select(
+        `
         id, name, english_name, description, category, address,
         ticket_price, duration_minutes, notes,
         cities(name),
         countries(name)
-      `)
+      `
+      )
       .gte('created_at', yesterday)
       .eq('is_active', true)
 
@@ -94,13 +93,15 @@ export async function GET(_request: NextRequest) {
     // 2. 查詢新增的餐廳
     const { data: newRestaurants } = await supabase
       .from('restaurants')
-      .select(`
+      .select(
+        `
         id, name, english_name, description, category, cuisine_type,
         price_range, avg_price_lunch, avg_price_dinner,
         specialties, address, max_group_size,
         cities(name),
         countries(name)
-      `)
+      `
+      )
       .gte('created_at', yesterday)
       .eq('is_active', true)
 
@@ -125,14 +126,16 @@ export async function GET(_request: NextRequest) {
     // 3. 查詢新增的米其林餐廳
     const { data: newMichelin } = await supabase
       .from('michelin_restaurants')
-      .select(`
+      .select(
+        `
         id, name, english_name, description, cuisine_type,
         michelin_stars, bib_gourmand, green_star,
         price_range, avg_price_lunch, avg_price_dinner,
         signature_dishes, address, max_group_size,
         cities(name),
         countries(name)
-      `)
+      `
+      )
       .gte('created_at', yesterday)
       .eq('is_active', true)
 
@@ -156,9 +159,7 @@ export async function GET(_request: NextRequest) {
 
     // 4. 寫入 ai_memories
     if (memoriesInserted.length > 0) {
-      const { error: insertError } = await supabase
-        .from('ai_memories')
-        .insert(memoriesInserted)
+      const { error: insertError } = await supabase.from('ai_memories').insert(memoriesInserted)
 
       if (insertError) {
         logger.error('寫入 ai_memories 失敗:', insertError)
@@ -186,7 +187,6 @@ export async function GET(_request: NextRequest) {
       message: `已同步 ${result.total} 筆新知識給 Logan`,
       ...result,
     })
-
   } catch (error) {
     logger.error('Logan 知識同步錯誤:', error)
 
@@ -309,7 +309,8 @@ function formatMichelinContent(
   if (restaurant.price_range) parts.push(`價位：${restaurant.price_range}`)
   if (restaurant.avg_price_lunch) parts.push(`午餐約 ${restaurant.avg_price_lunch} 元`)
   if (restaurant.avg_price_dinner) parts.push(`晚餐約 ${restaurant.avg_price_dinner} 元`)
-  if (restaurant.signature_dishes?.length) parts.push(`招牌菜：${restaurant.signature_dishes.join('、')}`)
+  if (restaurant.signature_dishes?.length)
+    parts.push(`招牌菜：${restaurant.signature_dishes.join('、')}`)
   if (restaurant.max_group_size) parts.push(`可容納團體：${restaurant.max_group_size} 人`)
   if (restaurant.address) parts.push(`地址：${restaurant.address}`)
   if (restaurant.description) parts.push(`簡介：${restaurant.description}`)

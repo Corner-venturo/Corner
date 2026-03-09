@@ -74,7 +74,7 @@ export function useLeaveTypes() {
         .from('leave_types')
         .select('*')
         .limit(500)
-        
+
         .order('code', { ascending: true })
 
       if (queryError) throw queryError
@@ -92,16 +92,15 @@ export function useLeaveTypes() {
   /**
    * 新增假別類型
    */
-  const createLeaveType = useCallback(async (input: LeaveTypeInput): Promise<boolean> => {
-    if (!user) return false
+  const createLeaveType = useCallback(
+    async (input: LeaveTypeInput): Promise<boolean> => {
+      if (!user) return false
 
-    setLoading(true)
-    setError(null)
+      setLoading(true)
+      setError(null)
 
-    try {
-      const { error: insertError } = await supabase
-        .from('leave_types')
-        .insert({
+      try {
+        const { error: insertError } = await supabase.from('leave_types').insert({
           workspace_id: getRequiredWorkspaceId(),
           name: input.name,
           code: input.code,
@@ -111,82 +110,85 @@ export function useLeaveTypes() {
           is_active: input.is_active ?? true,
         })
 
-      if (insertError) throw insertError
+        if (insertError) throw insertError
 
-      await fetchLeaveTypes()
-      return true
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '新增假別類型失敗'
-      setError(message)
-      logger.error('新增假別類型失敗:', err)
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }, [user, fetchLeaveTypes])
+        await fetchLeaveTypes()
+        return true
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '新增假別類型失敗'
+        setError(message)
+        logger.error('新增假別類型失敗:', err)
+        return false
+      } finally {
+        setLoading(false)
+      }
+    },
+    [user, fetchLeaveTypes]
+  )
 
   /**
    * 更新假別類型
    */
-  const updateLeaveType = useCallback(async (id: string, input: Partial<LeaveTypeInput>): Promise<boolean> => {
-    if (!user) return false
+  const updateLeaveType = useCallback(
+    async (id: string, input: Partial<LeaveTypeInput>): Promise<boolean> => {
+      if (!user) return false
 
-    setLoading(true)
-    setError(null)
+      setLoading(true)
+      setError(null)
 
-    try {
-      const { error: updateError } = await supabase
-        .from('leave_types')
-        .update({
-          ...input,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', id)
-        
+      try {
+        const { error: updateError } = await supabase
+          .from('leave_types')
+          .update({
+            ...input,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', id)
 
-      if (updateError) throw updateError
+        if (updateError) throw updateError
 
-      await fetchLeaveTypes()
-      return true
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '更新假別類型失敗'
-      setError(message)
-      logger.error('更新假別類型失敗:', err)
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }, [user, fetchLeaveTypes])
+        await fetchLeaveTypes()
+        return true
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '更新假別類型失敗'
+        setError(message)
+        logger.error('更新假別類型失敗:', err)
+        return false
+      } finally {
+        setLoading(false)
+      }
+    },
+    [user, fetchLeaveTypes]
+  )
 
   /**
    * 刪除假別類型
    */
-  const deleteLeaveType = useCallback(async (id: string): Promise<boolean> => {
-    if (!user) return false
+  const deleteLeaveType = useCallback(
+    async (id: string): Promise<boolean> => {
+      if (!user) return false
 
-    setLoading(true)
-    setError(null)
+      setLoading(true)
+      setError(null)
 
-    try {
-      const { error: deleteError } = await supabase
-        .from('leave_types')
-        .delete()
-        .eq('id', id)
-        
+      try {
+        const { error: deleteError } = await supabase.from('leave_types').delete().eq('id', id)
 
-      if (deleteError) throw deleteError
+        if (deleteError) throw deleteError
 
-      await fetchLeaveTypes()
-      return true
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '刪除假別類型失敗'
-      setError(message)
-      logger.error('刪除假別類型失敗:', err)
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }, [user, fetchLeaveTypes])
+        await fetchLeaveTypes()
+        return true
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '刪除假別類型失敗'
+        setError(message)
+        logger.error('刪除假別類型失敗:', err)
+        return false
+      } finally {
+        setLoading(false)
+      }
+    },
+    [user, fetchLeaveTypes]
+  )
 
   /**
    * 初始化預設假別
@@ -208,9 +210,7 @@ export function useLeaveTypes() {
         is_active: true,
       }))
 
-      const { error: insertError } = await supabase
-        .from('leave_types')
-        .insert(insertData)
+      const { error: insertError } = await supabase.from('leave_types').insert(insertData)
 
       if (insertError) throw insertError
 

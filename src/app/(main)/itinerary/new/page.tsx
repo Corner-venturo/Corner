@@ -48,7 +48,6 @@ function NewItineraryPageContent() {
 
   const { items: itineraries } = useItineraries()
 
-
   // 載入資料
   useItineraryDataLoader({
     setTourData,
@@ -66,9 +65,9 @@ function NewItineraryPageContent() {
 
       if (index === -1) {
         // 切回主版本
-        const itinerary = itineraries.find((i) => i.id === currentItineraryId)
+        const itinerary = itineraries.find(i => i.id === currentItineraryId)
         if (itinerary) {
-          setTourData((prev) => ({
+          setTourData(prev => ({
             ...prev,
             dailyItinerary: itinerary.daily_itinerary || [],
             features: itinerary.features || [],
@@ -79,7 +78,7 @@ function NewItineraryPageContent() {
         }
       } else if (versionData) {
         // 切換到特定版本
-        setTourData((prev) => ({
+        setTourData(prev => ({
           ...prev,
           dailyItinerary: versionData.daily_itinerary || [],
           features: versionData.features || [],
@@ -100,7 +99,8 @@ function NewItineraryPageContent() {
     tagline: '精選行程',
     taglineEn: 'EXPLORE THE WORLD',
     title: '越南峴港經典五日',
-    subtitle: '峴港的晨曦喚醒沉睡的古城，海風捎來遠方的故事\n在黃牆老屋與法式城堡之間，找到屬於自己的越式慢時光',
+    subtitle:
+      '峴港的晨曦喚醒沉睡的古城，海風捎來遠方的故事\n在黃牆老屋與法式城堡之間，找到屬於自己的越式慢時光',
     price: '35,500',
     priceNote: '8人包團',
     country: '越南',
@@ -126,7 +126,8 @@ function NewItineraryPageContent() {
       },
       {
         day: 'D4',
-        route: '晨喚 > 巴拿山（登山纜車、黃金佛手橋、法式莊園、奇幻樂園）> 飯店休憩 > 山茶夜市（自由前往）',
+        route:
+          '晨喚 > 巴拿山（登山纜車、黃金佛手橋、法式莊園、奇幻樂園）> 飯店休憩 > 山茶夜市（自由前往）',
         meals: { breakfast: '飯店用餐', lunch: '園區自助餐', dinner: 'All Seasons 四季餐廳' },
         accommodation: '峴港M飯店 M Hotel Danang 或 同級',
       },
@@ -166,7 +167,8 @@ function NewItineraryPageContent() {
         name: '會安古鎮',
         nameEn: 'Hoi An Ancient Town',
         tags: ['特色景點', '必訪景點'],
-        description: '會安古鎮是越南世界文化遺產，黃牆古厝與絲綢燈籠交織，夜晚倒映河面如夢似幻，是體驗越南古典韻味的絕佳去處。',
+        description:
+          '會安古鎮是越南世界文化遺產，黃牆古厝與絲綢燈籠交織，夜晚倒映河面如夢似幻，是體驗越南古典韻味的絕佳去處。',
       },
     ],
     sights: [
@@ -210,27 +212,29 @@ function NewItineraryPageContent() {
         }
         contentClassName="flex-1 overflow-hidden"
       >
-          <div className="h-full flex">
-            <div className="w-1/2 bg-morandi-container/30 border-r border-morandi-container flex flex-col print:hidden">
-              <div className="h-14 bg-morandi-green/90 text-white px-6 flex items-center border-b border-morandi-container">
-                <h2 className="text-lg font-semibold">{EDITOR_LABELS.EDIT_FORM}</h2>
-              </div>
-              <div className="flex-1 overflow-y-auto bg-card">
-                <PrintItineraryForm data={printData} onChange={setPrintData} />
-              </div>
+        <div className="h-full flex">
+          <div className="w-1/2 bg-morandi-container/30 border-r border-morandi-container flex flex-col print:hidden">
+            <div className="h-14 bg-morandi-green/90 text-white px-6 flex items-center border-b border-morandi-container">
+              <h2 className="text-lg font-semibold">{EDITOR_LABELS.EDIT_FORM}</h2>
             </div>
-
-            <div className="w-1/2 bg-muted flex flex-col print:w-full">
-              <div className="h-14 bg-card border-b px-6 flex items-center justify-between print:hidden">
-                <h2 className="text-lg font-semibold text-morandi-primary">{EDITOR_LABELS.PRINT_PREVIEW}</h2>
-                <div className="text-sm text-morandi-secondary">{EDITOR_LABELS.A4_SIZE}</div>
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-8 print:p-0">
-                <PrintItineraryPreview data={printData} />
-              </div>
+            <div className="flex-1 overflow-y-auto bg-card">
+              <PrintItineraryForm data={printData} onChange={setPrintData} />
             </div>
           </div>
+
+          <div className="w-1/2 bg-muted flex flex-col print:w-full">
+            <div className="h-14 bg-card border-b px-6 flex items-center justify-between print:hidden">
+              <h2 className="text-lg font-semibold text-morandi-primary">
+                {EDITOR_LABELS.PRINT_PREVIEW}
+              </h2>
+              <div className="text-sm text-morandi-secondary">{EDITOR_LABELS.A4_SIZE}</div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-8 print:p-0">
+              <PrintItineraryPreview data={printData} />
+            </div>
+          </div>
+        </div>
       </ContentPageLayout>
     )
   }
@@ -243,14 +247,18 @@ function NewItineraryPageContent() {
         itineraryId={currentItineraryId}
         currentVersionIndex={currentVersionIndex}
         onVersionChange={handleVersionChange}
-        onVersionRecordsChange={(versionRecords) => {
-          setTourData((prev) => ({ ...prev, version_records: versionRecords }))
+        onVersionRecordsChange={versionRecords => {
+          setTourData(prev => ({ ...prev, version_records: versionRecords }))
         }}
         onBack={() => router.back()}
       />
 
       {currentItineraryId && (
-        <EditingWarningBanner resourceType="itinerary" resourceId={currentItineraryId} resourceName={EDITOR_LABELS.THIS_ITINERARY} />
+        <EditingWarningBanner
+          resourceType="itinerary"
+          resourceId={currentItineraryId}
+          resourceName={EDITOR_LABELS.THIS_ITINERARY}
+        />
       )}
 
       {/* 交接唯讀提示 */}
@@ -273,9 +281,11 @@ function NewItineraryPageContent() {
             quoteTierPricings={quoteTierPricings}
             hasLinkedQuote={hasLinkedQuote}
             className={isHandedOff ? 'pointer-events-none opacity-60' : ''}
-            onChange={(newData) => {
+            onChange={newData => {
               if (isHandedOff) return // 已交接，禁止編輯
-              logger.log('[Page] ItineraryEditor onChange 收到:', { coverImage: newData.coverImage })
+              logger.log('[Page] ItineraryEditor onChange 收到:', {
+                coverImage: newData.coverImage,
+              })
               setTourData(newData)
               setIsDirty(true)
             }}
@@ -284,7 +294,6 @@ function NewItineraryPageContent() {
           <ItineraryPreview tourData={tourData} />
         </div>
       </div>
-
     </div>
   )
 }

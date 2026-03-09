@@ -46,9 +46,7 @@ describe('請款完整流程', () => {
 
   describe('建立請款 → recalculateExpenseStats → 驗證團成本', () => {
     it('單筆請款 → 團成本更新', () => {
-      const requests = [
-        { id: 'pr1', status: 'pending', deleted_at: null },
-      ]
+      const requests = [{ id: 'pr1', status: 'pending', deleted_at: null }]
       const items = [
         { request_id: 'pr1', subtotal: 25000 },
         { request_id: 'pr1', subtotal: 15000 },
@@ -96,12 +94,8 @@ describe('請款完整流程', () => {
     })
 
     it('刪除所有請款 → 成本歸零', () => {
-      const requests = [
-        { id: 'pr1', status: 'approved', deleted_at: '2026-01-01T00:00:00Z' },
-      ]
-      const items = [
-        { request_id: 'pr1', subtotal: 50000 },
-      ]
+      const requests = [{ id: 'pr1', status: 'approved', deleted_at: '2026-01-01T00:00:00Z' }]
+      const items = [{ request_id: 'pr1', subtotal: 50000 }]
 
       const totalCost = calculateTourCost(requests, items)
       expect(totalCost).toBe(0)
@@ -117,24 +111,16 @@ describe('請款完整流程', () => {
 
   describe('請款狀態變更 → 統計正確', () => {
     it('draft 狀態不計入成本', () => {
-      const requests = [
-        { id: 'pr1', status: 'draft', deleted_at: null },
-      ]
-      const items = [
-        { request_id: 'pr1', subtotal: 50000 },
-      ]
+      const requests = [{ id: 'pr1', status: 'draft', deleted_at: null }]
+      const items = [{ request_id: 'pr1', subtotal: 50000 }]
 
       const totalCost = calculateTourCost(requests, items)
       expect(totalCost).toBe(0)
     })
 
     it('rejected 狀態不計入成本', () => {
-      const requests = [
-        { id: 'pr1', status: 'rejected', deleted_at: null },
-      ]
-      const items = [
-        { request_id: 'pr1', subtotal: 50000 },
-      ]
+      const requests = [{ id: 'pr1', status: 'rejected', deleted_at: null }]
+      const items = [{ request_id: 'pr1', subtotal: 50000 }]
 
       const totalCost = calculateTourCost(requests, items)
       expect(totalCost).toBe(0)

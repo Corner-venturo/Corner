@@ -11,7 +11,7 @@ export interface AuthPayload {
 // 注意：瀏覽器環境不支援 Node.js crypto，這裡改用簡單的 base64 編碼（jose 用於 middleware）
 export function generateToken(payload: AuthPayload, _rememberMe: boolean = false): string {
   // 統一 30 天 — 登入後不應該頻繁要求重新登入
-  const expirationMs = 30 * 24 * 60 * 60 * 1000  // 30 天
+  const expirationMs = 30 * 24 * 60 * 60 * 1000 // 30 天
 
   // 在瀏覽器環境使用 base64 編碼
   return btoa(

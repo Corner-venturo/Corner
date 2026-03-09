@@ -19,7 +19,7 @@ export const ADD_MANUAL_REQUEST_DIALOG_LABELS = {
   間數: '間數',
   數量: '數量',
   其他需求說明: '其他需求說明...',
-};
+}
 
 export const BROCHURE_PREVIEW_DIALOG_LABELS = {
   行程表: '行程表',
@@ -40,7 +40,7 @@ export const BROCHURE_PREVIEW_DIALOG_LABELS = {
   LABEL_1347: '早餐',
   LABEL_8515: '午餐',
   LABEL_8227: '晚餐',
-};
+}
 
 export const ITINERARY_DIALOG_LABELS = {
   預設: '預設',
@@ -112,7 +112,7 @@ export const ITINERARY_DIALOG_LABELS = {
   TIME: '時間',
   LABEL_7032: '活動內容',
   ADD_2139: '點擊「新增活動」加入景點',
-};
+}
 
 export const PACKAGE_ITINERARY_DIALOG_LABELS = {
   旅行社: '旅行社',
@@ -137,7 +137,7 @@ export const PACKAGE_ITINERARY_DIALOG_LABELS = {
   LABEL_4513: '出發日期',
   LABEL_2731: '回程日期',
   LABEL_6621: '另存新版本',
-};
+}
 
 export const PACKAGE_LIST_PANEL_LABELS = {
   自理: '自理',
@@ -148,7 +148,7 @@ export const PACKAGE_LIST_PANEL_LABELS = {
   活動: '活動',
   其他: '其他',
   領隊導遊: '領隊導遊',
-};
+}
 
 export const TOUR_REQUEST_FORM_DIALOG_LABELS = {
   日期: '日期',
@@ -203,7 +203,7 @@ export const TOUR_REQUEST_FORM_DIALOG_LABELS = {
   PLEASE_SELECT_4482: '此航班有多個航段，請選擇：',
   CANCEL: '取消',
   LABEL_2327: '回程航班',
-};
+}
 
 export const AI_GENERATE_DIALOG_LABELS = {
   未設定: '未設定',
@@ -217,7 +217,7 @@ export const AI_GENERATE_DIALOG_LABELS = {
   CANCEL: '取消',
   GENERATING_7316: '生成中...',
   GENERATING_9221: '生成行程',
-};
+}
 
 export const DAILY_SCHEDULE_EDITOR_LABELS = {
   抵達目的地: '抵達目的地',
@@ -227,12 +227,12 @@ export const DAILY_SCHEDULE_EDITOR_LABELS = {
   敬請自理: '敬請自理',
   住宿飯店: '住宿飯店',
   續住: '續住',
-};
+}
 
 export const FLIGHT_SECTION_LABELS = {
   航班號碼_如_BR108: '航班號碼 (如 BR108)',
   航班號碼_如_BR107: '航班號碼 (如 BR107)',
-};
+}
 
 export const VERSION_DROPDOWN_LABELS = {
   主版本: '主版本',
@@ -240,9 +240,7 @@ export const VERSION_DROPDOWN_LABELS = {
   版本歷史: (count: number) => `版本歷史 (${count})`,
   當前: '當前',
   版本: (v: number) => `版本 ${v}`,
-};
-
-
+}
 
 export const PROPOSAL_FORM_LABELS = {
   COMPANY: '公司：',

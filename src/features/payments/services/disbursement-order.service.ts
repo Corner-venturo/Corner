@@ -2,10 +2,7 @@ import { formatDate } from '@/lib/utils/format-date'
 import { BaseService, StoreOperations } from '@/core/services/base.service'
 import { DisbursementOrder, PaymentRequest } from '@/stores/types'
 import { supabase } from '@/lib/supabase/client'
-import {
-  invalidateDisbursementOrders,
-  invalidatePaymentRequests,
-} from '@/data'
+import { invalidateDisbursementOrders, invalidatePaymentRequests } from '@/data'
 import { ValidationError } from '@/core/errors/app-errors'
 import { logger } from '@/lib/utils/logger'
 import { PAYMENTS_LABELS } from '../constants/labels'
@@ -33,18 +30,12 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
         return data as unknown as DisbursementOrder
       },
       update: async (id: string, data: Partial<DisbursementOrder>) => {
-        const { error } = await supabase
-          .from('disbursement_orders')
-          .update(data)
-          .eq('id', id)
+        const { error } = await supabase.from('disbursement_orders').update(data).eq('id', id)
         if (error) throw new Error(error.message)
         await invalidateDisbursementOrders()
       },
       delete: async (id: string) => {
-        const { error } = await supabase
-          .from('disbursement_orders')
-          .delete()
-          .eq('id', id)
+        const { error } = await supabase.from('disbursement_orders').delete().eq('id', id)
         if (error) throw new Error(error.message)
         await invalidateDisbursementOrders()
       },
@@ -121,7 +112,6 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
     }
     return data as unknown as DisbursementOrder | null
   }
-
 
   /**
    * 使用請款單創建出納單
@@ -222,7 +212,9 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       } catch (rollbackError) {
         logger.error(`回滾出納單 ${orderId} 狀態失敗:`, rollbackError)
       }
-      throw new Error(`確認出納單失敗，已回滾: ${error instanceof Error ? error.message : String(error)}`)
+      throw new Error(
+        `確認出納單失敗，已回滾: ${error instanceof Error ? error.message : String(error)}`
+      )
     }
   }
 
@@ -354,7 +346,6 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
     if (error) throw new Error(error.message)
     return (data || []) as unknown as DisbursementOrder[]
   }
-
 
   /**
    * 取得已確認出納單（非同步）

@@ -19,19 +19,50 @@ export const mealCard: DesignComponent = {
 
     // 背景
     elements.push({
-      id: `comp-ml-bg-${ts}`, type: 'shape', name: '餐食背景', variant: 'rectangle',
-      x, y, width, height: 70,
-      zIndex: 0, rotation: 0, opacity: 1, locked: false, visible: true,
-      fill: p.background, stroke: 'transparent', strokeWidth: 0, cornerRadius: 6,
+      id: `comp-ml-bg-${ts}`,
+      type: 'shape',
+      name: '餐食背景',
+      variant: 'rectangle',
+      x,
+      y,
+      width,
+      height: 70,
+      zIndex: 0,
+      rotation: 0,
+      opacity: 1,
+      locked: false,
+      visible: true,
+      fill: p.background,
+      stroke: 'transparent',
+      strokeWidth: 0,
+      cornerRadius: 6,
     } as ShapeElement)
 
     // 標題
     elements.push({
-      id: `comp-ml-title-${ts}`, type: 'text', name: '餐食標題',
-      x: x + 12, y: y + 8, width: 100, height: 16,
-      zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
+      id: `comp-ml-title-${ts}`,
+      type: 'text',
+      name: '餐食標題',
+      x: x + 12,
+      y: y + 8,
+      width: 100,
+      height: 16,
+      zIndex: 1,
+      rotation: 0,
+      opacity: 1,
+      locked: false,
+      visible: true,
       content: '🍽 餐食安排',
-      style: { fontFamily: p.fontFamily, fontSize: 12, fontWeight: '600', fontStyle: 'normal', color: p.accent, textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
+      style: {
+        fontFamily: p.fontFamily,
+        fontSize: 12,
+        fontWeight: '600',
+        fontStyle: 'normal',
+        color: p.accent,
+        textAlign: 'left',
+        lineHeight: 1,
+        letterSpacing: 0.5,
+      },
     } as TextElement)
 
     // 三餐
@@ -44,11 +75,29 @@ export const mealCard: DesignComponent = {
 
     meals.forEach((meal, i) => {
       elements.push({
-        id: `comp-ml-meal-${i}-${ts}`, type: 'text', name: meal.label,
-        x: x + 12 + i * (mealWidth + 12), y: y + 32, width: mealWidth, height: 28,
-        zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
+        id: `comp-ml-meal-${i}-${ts}`,
+        type: 'text',
+        name: meal.label,
+        x: x + 12 + i * (mealWidth + 12),
+        y: y + 32,
+        width: mealWidth,
+        height: 28,
+        zIndex: 1,
+        rotation: 0,
+        opacity: 1,
+        locked: false,
+        visible: true,
         content: `${meal.label}｜${meal.value}`,
-        style: { fontFamily: p.fontFamily, fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: p.primary, textAlign: 'left', lineHeight: 1.4, letterSpacing: 0.3 },
+        style: {
+          fontFamily: p.fontFamily,
+          fontSize: 10,
+          fontWeight: '400',
+          fontStyle: 'normal',
+          color: p.primary,
+          textAlign: 'left',
+          lineHeight: 1.4,
+          letterSpacing: 0.3,
+        },
       } as TextElement)
     })
 

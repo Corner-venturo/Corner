@@ -20,12 +20,13 @@ class TourService extends BaseService<Tour & BaseEntity> {
     const store = useTourStore.getState()
     return {
       getAll: () => store.items as (Tour & BaseEntity)[],
-      getById: (id: string) => store.items.find(t => t.id === id) as (Tour & BaseEntity) | undefined,
+      getById: (id: string) =>
+        store.items.find(t => t.id === id) as (Tour & BaseEntity) | undefined,
       add: async (tour: Tour & BaseEntity) => {
         // Store.create 內部會處理類型轉換，這裡使用 unknown 轉換避免類型差異
         const result = await store.create(tour as unknown as Parameters<typeof store.create>[0])
         await invalidateTours()
-        return result as Tour & BaseEntity | undefined
+        return result as (Tour & BaseEntity) | undefined
       },
       update: async (id: string, data: Partial<Tour & BaseEntity>) => {
         // Store.update 內部會處理類型轉換，這裡使用 unknown 轉換避免類型差異
@@ -173,10 +174,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
   }
 
   // 更新團體狀態
-  async updateTourStatus(
-    tour_id: string,
-    newStatus: Tour['status']
-  ): Promise<Tour> {
+  async updateTourStatus(tour_id: string, newStatus: Tour['status']): Promise<Tour> {
     const tour = await this.getById(tour_id)
     if (!tour) {
       throw new Error('Tour not found')
@@ -195,26 +193,37 @@ class TourService extends BaseService<Tour & BaseEntity> {
     //    (解鎖回提案)
     const ALLOWED_STATUS_TRANSITIONS: Record<string, string[]> = {
       // 英文狀態值（新規範）
-      'proposed': ['draft', 'cancelled'],
-      'draft': ['published', 'cancelled'],
-      'published': ['departed', 'cancelled', 'draft'],
-      'departed': ['completed'],
-      'completed': ['archived'],
-      'cancelled': ['draft'],
-      'archived': [],
+      proposed: ['draft', 'cancelled'],
+      draft: ['published', 'cancelled'],
+      published: ['departed', 'cancelled', 'draft'],
+      departed: ['completed'],
+      completed: ['archived'],
+      cancelled: ['draft'],
+      archived: [],
       // 相容舊中文狀態值
-      [TOUR_SERVICE_LABELS.STATUS_PROPOSAL]: [TOUR_SERVICE_LABELS.STATUS_ACTIVE, TOUR_SERVICE_LABELS.STATUS_CANCELLED, 'draft', 'cancelled'],
-      [TOUR_SERVICE_LABELS.STATUS_ACTIVE]: [TOUR_SERVICE_LABELS.STATUS_CLOSED, TOUR_SERVICE_LABELS.STATUS_CANCELLED, TOUR_SERVICE_LABELS.STATUS_PROPOSAL, 'completed', 'cancelled'],
+      [TOUR_SERVICE_LABELS.STATUS_PROPOSAL]: [
+        TOUR_SERVICE_LABELS.STATUS_ACTIVE,
+        TOUR_SERVICE_LABELS.STATUS_CANCELLED,
+        'draft',
+        'cancelled',
+      ],
+      [TOUR_SERVICE_LABELS.STATUS_ACTIVE]: [
+        TOUR_SERVICE_LABELS.STATUS_CLOSED,
+        TOUR_SERVICE_LABELS.STATUS_CANCELLED,
+        TOUR_SERVICE_LABELS.STATUS_PROPOSAL,
+        'completed',
+        'cancelled',
+      ],
       [TOUR_SERVICE_LABELS.STATUS_CLOSED]: [],
       [TOUR_SERVICE_LABELS.STATUS_CANCELLED]: [],
-    };
+    }
 
-    const allowedTransitions = ALLOWED_STATUS_TRANSITIONS[currentStatus || ''] || [];
+    const allowedTransitions = ALLOWED_STATUS_TRANSITIONS[currentStatus || ''] || []
     if (!newStatus || !allowedTransitions.includes(newStatus)) {
       throw new ValidationError(
         'status',
         TOUR_SERVICE_LABELS.INVALID_STATUS_TRANSITION(currentStatus || '', newStatus || '')
-      );
+      )
     }
 
     const result = await this.update(tour_id, {
@@ -224,7 +233,10 @@ class TourService extends BaseService<Tour & BaseEntity> {
     })
 
     // 當旅遊團結案或取消時，自動封存相關頻道
-    if (newStatus === TOUR_SERVICE_LABELS.STATUS_CLOSED || newStatus === TOUR_SERVICE_LABELS.STATUS_CANCELLED) {
+    if (
+      newStatus === TOUR_SERVICE_LABELS.STATUS_CLOSED ||
+      newStatus === TOUR_SERVICE_LABELS.STATUS_CANCELLED
+    ) {
       await this.archiveTourChannel(tour_id)
     }
 
@@ -281,7 +293,10 @@ class TourService extends BaseService<Tour & BaseEntity> {
       }
     } catch (error) {
       // Supabase 查詢失敗，繼續嘗試本地 Store
-      logger.warn(`[TourService] getOrCreate${type.prefix}Tour Supabase 查詢失敗，使用備用邏輯:`, error)
+      logger.warn(
+        `[TourService] getOrCreate${type.prefix}Tour Supabase 查詢失敗，使用備用邏輯:`,
+        error
+      )
     }
 
     // 檢查本地 Store 是否有（未刪除的）
@@ -323,7 +338,11 @@ class TourService extends BaseService<Tour & BaseEntity> {
    */
   async getOrCreateVisaTour(year?: number): Promise<Tour> {
     return this.getOrCreateSpecialTour(
-      { prefix: 'VISA', name: TOUR_SERVICE_LABELS.VISA_TOUR_NAME, location: TOUR_SERVICE_LABELS.VISA_TOUR_LOCATION },
+      {
+        prefix: 'VISA',
+        name: TOUR_SERVICE_LABELS.VISA_TOUR_NAME,
+        location: TOUR_SERVICE_LABELS.VISA_TOUR_LOCATION,
+      },
       year
     )
   }
@@ -335,7 +354,11 @@ class TourService extends BaseService<Tour & BaseEntity> {
    */
   async getOrCreateEsimTour(year?: number): Promise<Tour> {
     return this.getOrCreateSpecialTour(
-      { prefix: 'ESIM', name: TOUR_SERVICE_LABELS.ESIM_TOUR_NAME, location: TOUR_SERVICE_LABELS.ESIM_TOUR_LOCATION },
+      {
+        prefix: 'ESIM',
+        name: TOUR_SERVICE_LABELS.ESIM_TOUR_NAME,
+        location: TOUR_SERVICE_LABELS.ESIM_TOUR_LOCATION,
+      },
       year
     )
   }
@@ -351,7 +374,6 @@ class TourService extends BaseService<Tour & BaseEntity> {
       data: allTours.data.filter(tour => tour.status !== TOUR_SERVICE_LABELS.STATUS_SPECIAL),
     }
   }
-
 }
 
 export const tourService = new TourService()

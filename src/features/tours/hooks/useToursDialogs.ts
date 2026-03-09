@@ -41,7 +41,10 @@ export interface UseToursDialogsReturn {
   archiveDialogTour: Tour | null
   openArchiveDialog: (tour: Tour) => void
   closeArchiveDialog: () => void
-  confirmArchive: (reason: ArchiveReason, onArchive: (tour: Tour, reason: ArchiveReason) => void) => void
+  confirmArchive: (
+    reason: ArchiveReason,
+    onArchive: (tour: Tour, reason: ArchiveReason) => void
+  ) => void
 
   // Confirmation Wizard
   confirmWizardTour: Tour | null

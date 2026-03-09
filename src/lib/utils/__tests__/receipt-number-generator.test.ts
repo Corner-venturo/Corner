@@ -13,26 +13,17 @@ describe('receipt-number-generator', () => {
     })
 
     it('increments from existing receipts', () => {
-      const existing = [
-        { receipt_number: 'CNX250128A-R01' },
-        { receipt_number: 'CNX250128A-R02' },
-      ]
+      const existing = [{ receipt_number: 'CNX250128A-R01' }, { receipt_number: 'CNX250128A-R02' }]
       expect(generateReceiptNumber('CNX250128A', existing)).toBe('CNX250128A-R03')
     })
 
     it('handles gaps in numbering', () => {
-      const existing = [
-        { receipt_number: 'CNX250128A-R01' },
-        { receipt_number: 'CNX250128A-R05' },
-      ]
+      const existing = [{ receipt_number: 'CNX250128A-R01' }, { receipt_number: 'CNX250128A-R05' }]
       expect(generateReceiptNumber('CNX250128A', existing)).toBe('CNX250128A-R06')
     })
 
     it('ignores receipts from other tours', () => {
-      const existing = [
-        { receipt_number: 'TYO250201B-R03' },
-        { receipt_number: 'CNX250128A-R01' },
-      ]
+      const existing = [{ receipt_number: 'TYO250201B-R03' }, { receipt_number: 'CNX250128A-R01' }]
       expect(generateReceiptNumber('CNX250128A', existing)).toBe('CNX250128A-R02')
     })
 

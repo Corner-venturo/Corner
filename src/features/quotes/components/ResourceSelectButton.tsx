@@ -7,17 +7,12 @@ import { CostItem, CostItemResourceType } from '../types'
 import { RestaurantSelector, CombinedRestaurant } from '@/components/editor/RestaurantSelector'
 import { HotelSelector } from '@/components/editor/hotel-selector'
 import { AttractionSelector } from '@/components/editor/attraction-selector'
-import { RESOURCE_SELECT_BUTTON_LABELS } from '../constants/labels';
+import { RESOURCE_SELECT_BUTTON_LABELS } from '../constants/labels'
 
 interface ResourceSelectButtonProps {
   categoryId: string
   item: CostItem
-  onUpdateItem: (
-    categoryId: string,
-    itemId: string,
-    field: keyof CostItem,
-    value: unknown
-  ) => void
+  onUpdateItem: (categoryId: string, itemId: string, field: keyof CostItem, value: unknown) => void
   disabled?: boolean
 }
 
@@ -66,22 +61,28 @@ export const ResourceSelectButton: React.FC<ResourceSelectButtonProps> = ({
     onUpdateItem(categoryId, item.id, 'resource_id', restaurant.id)
 
     // 更新 GPS 資訊（從 CombinedRestaurant 取得）
-    if (restaurant.latitude) onUpdateItem(categoryId, item.id, 'resource_latitude', restaurant.latitude)
-    if (restaurant.longitude) onUpdateItem(categoryId, item.id, 'resource_longitude', restaurant.longitude)
-    if (restaurant.address) onUpdateItem(categoryId, item.id, 'resource_address', restaurant.address)
+    if (restaurant.latitude)
+      onUpdateItem(categoryId, item.id, 'resource_latitude', restaurant.latitude)
+    if (restaurant.longitude)
+      onUpdateItem(categoryId, item.id, 'resource_longitude', restaurant.longitude)
+    if (restaurant.address)
+      onUpdateItem(categoryId, item.id, 'resource_address', restaurant.address)
     if (restaurant.phone) onUpdateItem(categoryId, item.id, 'resource_phone', restaurant.phone)
-    if (restaurant.google_maps_url) onUpdateItem(categoryId, item.id, 'resource_google_maps_url', restaurant.google_maps_url)
+    if (restaurant.google_maps_url)
+      onUpdateItem(categoryId, item.id, 'resource_google_maps_url', restaurant.google_maps_url)
   }
 
   // 處理飯店選擇
-  const handleHotelSelect = (hotels: Array<{
-    id: string
-    name: string
-    latitude?: number | null
-    longitude?: number | null
-    address?: string | null
-    google_maps_url?: string | null
-  }>) => {
+  const handleHotelSelect = (
+    hotels: Array<{
+      id: string
+      name: string
+      latitude?: number | null
+      longitude?: number | null
+      address?: string | null
+      google_maps_url?: string | null
+    }>
+  ) => {
     if (hotels.length === 0) return
 
     const hotel = hotels[0]
@@ -94,19 +95,22 @@ export const ResourceSelectButton: React.FC<ResourceSelectButtonProps> = ({
     if (hotel.latitude) onUpdateItem(categoryId, item.id, 'resource_latitude', hotel.latitude)
     if (hotel.longitude) onUpdateItem(categoryId, item.id, 'resource_longitude', hotel.longitude)
     if (hotel.address) onUpdateItem(categoryId, item.id, 'resource_address', hotel.address)
-    if (hotel.google_maps_url) onUpdateItem(categoryId, item.id, 'resource_google_maps_url', hotel.google_maps_url)
+    if (hotel.google_maps_url)
+      onUpdateItem(categoryId, item.id, 'resource_google_maps_url', hotel.google_maps_url)
   }
 
   // 處理景點選擇
-  const handleAttractionSelect = (attractions: Array<{
-    id: string
-    name: string
-    latitude?: number | null
-    longitude?: number | null
-    address?: string | null
-    google_maps_url?: string | null
-    phone?: string | null
-  }>) => {
+  const handleAttractionSelect = (
+    attractions: Array<{
+      id: string
+      name: string
+      latitude?: number | null
+      longitude?: number | null
+      address?: string | null
+      google_maps_url?: string | null
+      phone?: string | null
+    }>
+  ) => {
     if (attractions.length === 0) return
 
     const attraction = attractions[0]
@@ -116,11 +120,15 @@ export const ResourceSelectButton: React.FC<ResourceSelectButtonProps> = ({
     onUpdateItem(categoryId, item.id, 'resource_id', attraction.id)
 
     // 更新 GPS 資訊
-    if (attraction.latitude) onUpdateItem(categoryId, item.id, 'resource_latitude', attraction.latitude)
-    if (attraction.longitude) onUpdateItem(categoryId, item.id, 'resource_longitude', attraction.longitude)
-    if (attraction.address) onUpdateItem(categoryId, item.id, 'resource_address', attraction.address)
+    if (attraction.latitude)
+      onUpdateItem(categoryId, item.id, 'resource_latitude', attraction.latitude)
+    if (attraction.longitude)
+      onUpdateItem(categoryId, item.id, 'resource_longitude', attraction.longitude)
+    if (attraction.address)
+      onUpdateItem(categoryId, item.id, 'resource_address', attraction.address)
     if (attraction.phone) onUpdateItem(categoryId, item.id, 'resource_phone', attraction.phone)
-    if (attraction.google_maps_url) onUpdateItem(categoryId, item.id, 'resource_google_maps_url', attraction.google_maps_url)
+    if (attraction.google_maps_url)
+      onUpdateItem(categoryId, item.id, 'resource_google_maps_url', attraction.google_maps_url)
   }
 
   // 按鈕顏色根據資源類型

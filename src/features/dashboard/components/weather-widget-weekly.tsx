@@ -6,7 +6,13 @@ import { useState, useEffect } from 'react'
 import { Cloud, MapPin, Loader2, AlertCircle, Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DatePicker } from '@/components/ui/date-picker'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { DASHBOARD_LABELS } from './constants/labels'
 
 interface DailyWeather {
@@ -290,7 +296,7 @@ export function WeatherWidgetWeekly() {
                 </label>
                 <DatePicker
                   value={startDate}
-                  onChange={(date) => handleDateChange(date)}
+                  onChange={date => handleDateChange(date)}
                   minDate={new Date()}
                   maxDate={maxDate}
                   placeholder={DASHBOARD_LABELS.SELECT_5234}

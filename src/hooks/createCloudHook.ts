@@ -36,7 +36,7 @@ function getCurrentUserContext(): { workspaceId: string | null; userRole: UserRo
       const user = parsed?.state?.user
       // roles 是陣列，優先檢查 super_admin
       const roles = user?.roles as UserRole[] | undefined
-      const userRole = roles?.includes('super_admin') ? 'super_admin' : (roles?.[0] || null)
+      const userRole = roles?.includes('super_admin') ? 'super_admin' : roles?.[0] || null
       return {
         workspaceId: user?.workspace_id || null,
         userRole,
@@ -195,9 +195,7 @@ export function createCloudHook<T extends BaseEntity>(
   // Supabase fetcher
   async function fetcher(): Promise<T[]> {
     // tableName 已被限制為有效的表格名稱
-    let query = supabase.from(tableName).select(
-      options?.select || '*'
-    )
+    let query = supabase.from(tableName).select(options?.select || '*')
 
     // 🔒 Workspace 隔離：根據當前使用者過濾資料
     if (isWorkspaceScoped) {
@@ -222,9 +220,10 @@ export function createCloudHook<T extends BaseEntity>(
     const { data, error } = await query
 
     if (error) {
-      const errorMessage = typeof error === 'object' && error !== null
-        ? (error as { message?: string }).message || JSON.stringify(error)
-        : String(error)
+      const errorMessage =
+        typeof error === 'object' && error !== null
+          ? (error as { message?: string }).message || JSON.stringify(error)
+          : String(error)
       logger.error(`[${tableName}] Supabase error:`, error)
       throw new Error(errorMessage)
     }
@@ -234,7 +233,12 @@ export function createCloudHook<T extends BaseEntity>(
 
   // 回傳 Hook 函數
   return function useCloudData(): CloudHookReturn<T> {
-    const { data: items = [], error, isLoading, isValidating } = useSWR<T[]>(
+    const {
+      data: items = [],
+      error,
+      isLoading,
+      isValidating,
+    } = useSWR<T[]>(
       SWR_KEY,
       fetcher,
       swrOptions // 使用分層快取策略
@@ -303,7 +307,11 @@ export function createCloudHook<T extends BaseEntity>(
         } as T
 
         // 樂觀更新：使用 functional update 避免 stale closure 問題
-        mutate(SWR_KEY, (currentItems: T[] | undefined) => [...(currentItems || []), newItem], false)
+        mutate(
+          SWR_KEY,
+          (currentItems: T[] | undefined) => [...(currentItems || []), newItem],
+          false
+        )
 
         try {
           const { error } = await supabase.from(tableName).insert(newItem)
@@ -317,7 +325,8 @@ export function createCloudHook<T extends BaseEntity>(
           // 檢查是否為 unique constraint 錯誤（code 重複）
           const errorCode = (error as { code?: string })?.code
           const errorMessage = (error as { message?: string })?.message || ''
-          const isUniqueViolation = errorCode === '23505' ||
+          const isUniqueViolation =
+            errorCode === '23505' ||
             errorMessage.includes('duplicate key') ||
             errorMessage.includes('unique constraint') ||
             errorMessage.includes('violates unique constraint')
@@ -353,12 +362,14 @@ export function createCloudHook<T extends BaseEntity>(
       // 樂觀更新：使用 functional update 避免 stale closure 問題
       mutate(
         SWR_KEY,
-        (currentItems: T[] | undefined) => (currentItems || []).map(item => (item.id === id ? { ...item, ...updatedData } : item)),
+        (currentItems: T[] | undefined) =>
+          (currentItems || []).map(item => (item.id === id ? { ...item, ...updatedData } : item)),
         false
       )
 
       try {
-        const { error } = await supabase.from(tableName)
+        const { error } = await supabase
+          .from(tableName)
           .update(updatedData as Record<string, unknown>)
           .eq('id', id)
         if (error) throw error
@@ -380,9 +391,7 @@ export function createCloudHook<T extends BaseEntity>(
       )
 
       try {
-        const { error } = await supabase.from(tableName)
-          .delete()
-          .eq('id', id)
+        const { error } = await supabase.from(tableName).delete().eq('id', id)
         if (error) throw error
 
         mutate(SWR_KEY)

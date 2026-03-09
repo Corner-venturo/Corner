@@ -39,10 +39,7 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
   const isMobile = viewMode === 'mobile'
 
   return (
-    <header
-      className="relative w-full"
-      style={{ backgroundColor: LUXURY.background }}
-    >
+    <header className="relative w-full" style={{ backgroundColor: LUXURY.background }}>
       {/* 微妙的背景圖案 */}
       <div
         className="absolute inset-0 opacity-30"
@@ -51,12 +48,14 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
         }}
       />
 
-      <div className={`relative max-w-7xl mx-auto ${isMobile ? 'px-4 py-8' : 'px-8 py-16 lg:py-24'}`}>
-        <div className={`grid ${isMobile ? 'grid-cols-1 gap-8' : 'lg:grid-cols-12 gap-12'} items-center`}>
-
+      <div
+        className={`relative max-w-7xl mx-auto ${isMobile ? 'px-4 py-8' : 'px-8 py-16 lg:py-24'}`}
+      >
+        <div
+          className={`grid ${isMobile ? 'grid-cols-1 gap-8' : 'lg:grid-cols-12 gap-12'} items-center`}
+        >
           {/* 左側：文字內容 */}
           <div className={`${isMobile ? '' : 'lg:col-span-5'} space-y-6 relative z-10`}>
-
             {/* 標籤 */}
             <div
               className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-card border shadow-sm"
@@ -70,7 +69,7 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
                 className="text-xs font-medium tracking-widest uppercase"
                 style={{
                   color: LUXURY.secondary,
-                  fontFamily: "'Noto Serif TC', serif"
+                  fontFamily: "'Noto Serif TC', serif",
                 }}
               >
                 {data.tourCode || 'Signature Collection'}
@@ -84,7 +83,7 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
                 className={`font-medium leading-tight ${isMobile ? 'text-4xl' : 'text-5xl lg:text-7xl'}`}
                 style={{
                   color: LUXURY.text,
-                  fontFamily: "'Noto Serif TC', serif"
+                  fontFamily: "'Noto Serif TC', serif",
                 }}
               >
                 <span className="relative inline-block">
@@ -102,7 +101,7 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
                   className={`font-medium ${isMobile ? 'text-2xl' : 'text-3xl lg:text-4xl'}`}
                   style={{
                     color: LUXURY.primary,
-                    fontFamily: "'Noto Serif TC', serif"
+                    fontFamily: "'Noto Serif TC', serif",
                   }}
                 >
                   <RichText html={data.subtitle} />
@@ -121,28 +120,30 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
                   className={`leading-relaxed font-light max-w-md ${isMobile ? 'text-base' : 'text-lg'}`}
                   style={{
                     color: LUXURY.muted,
-                    fontFamily: "'Noto Sans TC', sans-serif"
+                    fontFamily: "'Noto Sans TC', sans-serif",
                   }}
                 >
                   <RichText html={data.description} />
                 </p>
               </div>
             )}
-
           </div>
 
           {/* 右側：主視覺圖片 */}
           <div className={`${isMobile ? '' : 'lg:col-span-7'} relative`}>
             <div className="relative h-[400px] lg:h-[600px] rounded-2xl overflow-hidden shadow-lg">
               {data.coverImage ? (
-                <img src={data.coverImage}
+                <img
+                  src={data.coverImage}
                   alt={data.title}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
               ) : (
                 <div
                   className="absolute inset-0 w-full h-full"
-                  style={{ background: `linear-gradient(135deg, ${LUXURY.primary}33, ${LUXURY.secondary}44, ${LUXURY.background})` }}
+                  style={{
+                    background: `linear-gradient(135deg, ${LUXURY.primary}33, ${LUXURY.secondary}44, ${LUXURY.background})`,
+                  }}
                 />
               )}
               {/* 漸層遮罩 */}
@@ -166,7 +167,7 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
                   className="text-xl font-medium"
                   style={{
                     color: LUXURY.text,
-                    fontFamily: "'Noto Serif TC', serif"
+                    fontFamily: "'Noto Serif TC', serif",
                   }}
                 >
                   {data.departureDate || 'Coming Soon'}

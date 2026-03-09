@@ -60,11 +60,16 @@ const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 export function useTravelerMode(tourId: string | null) {
   const [mode, setMode] = useState<ChatMode>('internal')
-  const [activeConversationType, setActiveConversationType] = useState<TravelerConversationType>('tour_announcement')
+  const [activeConversationType, setActiveConversationType] =
+    useState<TravelerConversationType>('tour_announcement')
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null)
 
   // 取得所有團對話列表
-  const { data: conversationsData, error: conversationsError, mutate: refreshConversations } = useSWR(
+  const {
+    data: conversationsData,
+    error: conversationsError,
+    mutate: refreshConversations,
+  } = useSWR(
     mode === 'traveler' ? '/api/traveler-chat' : null,
     fetcher,
     { refreshInterval: 30000 } // 30 秒輪詢
@@ -85,9 +90,10 @@ export function useTravelerMode(tourId: string | null) {
   // 根據選擇的類型確定當前對話 ID
   useEffect(() => {
     if (mode === 'traveler' && tourId) {
-      const targetConv = activeConversationType === 'tour_announcement'
-        ? announcementConversation
-        : supportConversation
+      const targetConv =
+        activeConversationType === 'tour_announcement'
+          ? announcementConversation
+          : supportConversation
       setSelectedConversationId(targetConv?.id || null)
     } else {
       setSelectedConversationId(null)
@@ -95,78 +101,89 @@ export function useTravelerMode(tourId: string | null) {
   }, [mode, tourId, activeConversationType, announcementConversation, supportConversation])
 
   // 取得選中對話的訊息
-  const { data: conversationData, error: messagesError, mutate: refreshMessages } = useSWR<ConversationData>(
+  const {
+    data: conversationData,
+    error: messagesError,
+    mutate: refreshMessages,
+  } = useSWR<ConversationData>(
     selectedConversationId ? `/api/traveler-chat/${selectedConversationId}` : null,
     fetcher,
     { refreshInterval: 5000 } // 5 秒輪詢訊息
   )
 
   // 發送訊息
-  const sendMessage = useCallback(async (content: string) => {
-    if (!selectedConversationId) {
-      logger.error('No conversation selected')
-      return { success: false, error: 'No conversation selected' }
-    }
-
-    try {
-      const response = await fetch('/api/traveler-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'send_message',
-          conversationId: selectedConversationId,
-          content,
-          type: 'text',
-        }),
-      })
-
-      const result = await response.json()
-
-      if (result.success) {
-        // 刷新訊息列表
-        refreshMessages()
-        return { success: true }
-      } else {
-        return { success: false, error: result.error }
+  const sendMessage = useCallback(
+    async (content: string) => {
+      if (!selectedConversationId) {
+        logger.error('No conversation selected')
+        return { success: false, error: 'No conversation selected' }
       }
-    } catch (error) {
-      logger.error('Error sending traveler message:', error)
-      return { success: false, error: 'Failed to send message' }
-    }
-  }, [selectedConversationId, refreshMessages])
+
+      try {
+        const response = await fetch('/api/traveler-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'send_message',
+            conversationId: selectedConversationId,
+            content,
+            type: 'text',
+          }),
+        })
+
+        const result = await response.json()
+
+        if (result.success) {
+          // 刷新訊息列表
+          refreshMessages()
+          return { success: true }
+        } else {
+          return { success: false, error: result.error }
+        }
+      } catch (error) {
+        logger.error('Error sending traveler message:', error)
+        return { success: false, error: 'Failed to send message' }
+      }
+    },
+    [selectedConversationId, refreshMessages]
+  )
 
   // 開啟/關閉團對話
-  const toggleConversation = useCallback(async (isOpen: boolean) => {
-    if (!tourId) return { success: false, error: 'No tour selected' }
+  const toggleConversation = useCallback(
+    async (isOpen: boolean) => {
+      if (!tourId) return { success: false, error: 'No tour selected' }
 
-    try {
-      const response = await fetch('/api/traveler-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'toggle',
-          tourId,
-          isOpen,
-          sendWelcome: true,
-        }),
-      })
+      try {
+        const response = await fetch('/api/traveler-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'toggle',
+            tourId,
+            isOpen,
+            sendWelcome: true,
+          }),
+        })
 
-      const result = await response.json()
+        const result = await response.json()
 
-      if (result.success) {
-        refreshConversations()
-        return { success: true }
-      } else {
-        return { success: false, error: result.error }
+        if (result.success) {
+          refreshConversations()
+          return { success: true }
+        } else {
+          return { success: false, error: result.error }
+        }
+      } catch (error) {
+        logger.error('Error toggling conversation:', error)
+        return { success: false, error: 'Failed to toggle conversation' }
       }
-    } catch (error) {
-      logger.error('Error toggling conversation:', error)
-      return { success: false, error: 'Failed to toggle conversation' }
-    }
-  }, [tourId, refreshConversations])
+    },
+    [tourId, refreshConversations]
+  )
 
   // 計算未讀數
-  const totalUnreadCount = (announcementConversation?.unread_count || 0) + (supportConversation?.unread_count || 0)
+  const totalUnreadCount =
+    (announcementConversation?.unread_count || 0) + (supportConversation?.unread_count || 0)
 
   return {
     // 模式狀態

@@ -125,7 +125,9 @@ export const TableHeader = React.memo(function TableHeader({
         {/* Actions column */}
         {actions && (
           <th className="text-left py-2.5 px-4 text-xs relative" style={{ width: actionsWidth }}>
-            <span className="font-medium text-morandi-secondary">{ENHANCED_TABLE_LABELS.ACTIONS}</span>
+            <span className="font-medium text-morandi-secondary">
+              {ENHANCED_TABLE_LABELS.ACTIONS}
+            </span>
           </th>
         )}
       </tr>
@@ -148,7 +150,10 @@ export const TableHeader = React.memo(function TableHeader({
                       <SelectValue placeholder={`選擇${column.label}...`} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="__all__">{ENHANCED_TABLE_LABELS.ALL}{column.label}</SelectItem>
+                      <SelectItem value="__all__">
+                        {ENHANCED_TABLE_LABELS.ALL}
+                        {column.label}
+                      </SelectItem>
                       {column.filterOptions?.map(option => (
                         <SelectItem key={option.value} value={option.value}>
                           {option.label}

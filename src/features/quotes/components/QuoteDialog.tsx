@@ -3,7 +3,6 @@
  * QuoteDialog - Form dialog for adding/editing quotes
  */
 
-
 import React from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -18,7 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import type { Tour } from '@/types/tour.types'
-import { QUOTE_DIALOG_LABELS } from '../constants/labels';
+import { QUOTE_DIALOG_LABELS } from '../constants/labels'
 
 interface QuoteDialogProps {
   open: boolean
@@ -78,7 +77,9 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* 選擇是否關聯旅遊團 */}
           <div>
-            <label className="text-sm font-medium text-morandi-primary">{QUOTE_DIALOG_LABELS.LABEL_333}</label>
+            <label className="text-sm font-medium text-morandi-primary">
+              {QUOTE_DIALOG_LABELS.LABEL_333}
+            </label>
             <Combobox
               options={[
                 { value: '', label: QUOTE_DIALOG_LABELS.獨立報價單_無旅遊團 },
@@ -107,7 +108,10 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
                     if (tour.departure_date && tour.return_date) {
                       const startDate = new Date(tour.departure_date)
                       const endDate = new Date(tour.return_date)
-                      const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
+                      const totalDays =
+                        Math.ceil(
+                          (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+                        ) + 1
                       accommodationDays = Math.max(0, totalDays - 1)
                     }
                     setFormField('accommodation_days', accommodationDays)
@@ -118,14 +122,14 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
               emptyMessage={QUOTE_DIALOG_LABELS.找不到旅遊團}
               className="mt-1"
             />
-            <p className="text-xs text-morandi-secondary mt-1">
-              {QUOTE_DIALOG_LABELS.SELECT_6732}
-            </p>
+            <p className="text-xs text-morandi-secondary mt-1">{QUOTE_DIALOG_LABELS.SELECT_6732}</p>
           </div>
 
           {/* 團體名稱 */}
           <div>
-            <label className="text-sm font-medium text-morandi-primary">{QUOTE_DIALOG_LABELS.LABEL_7457}</label>
+            <label className="text-sm font-medium text-morandi-primary">
+              {QUOTE_DIALOG_LABELS.LABEL_7457}
+            </label>
             <Input
               value={formData.name}
               onChange={e => setFormField('name', e.target.value)}
@@ -136,9 +140,12 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
 
           {/* 人數 */}
           <div>
-            <label className="text-sm font-medium text-morandi-primary">{QUOTE_DIALOG_LABELS.LABEL_6764}</label>
+            <label className="text-sm font-medium text-morandi-primary">
+              {QUOTE_DIALOG_LABELS.LABEL_6764}
+            </label>
             <Input
-              type="text" inputMode="decimal"
+              type="text"
+              inputMode="decimal"
               value={formData.group_size}
               onChange={e => {
                 const value = e.target.value
@@ -152,7 +159,9 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
 
           {/* 狀態 */}
           <div>
-            <label className="text-sm font-medium text-morandi-primary">{QUOTE_DIALOG_LABELS.STATUS}</label>
+            <label className="text-sm font-medium text-morandi-primary">
+              {QUOTE_DIALOG_LABELS.STATUS}
+            </label>
             <Select value={formData.status} onValueChange={value => setFormField('status', value)}>
               <SelectTrigger className="mt-1">
                 <SelectValue />
@@ -181,14 +190,18 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
 
             {formData.is_pinned && (
               <div>
-                <label className="text-sm font-medium text-morandi-primary">{QUOTE_DIALOG_LABELS.LABEL_9029}</label>
+                <label className="text-sm font-medium text-morandi-primary">
+                  {QUOTE_DIALOG_LABELS.LABEL_9029}
+                </label>
                 <Input
                   value={formData.code}
                   onChange={e => setFormField('code', e.target.value)}
                   placeholder={QUOTE_DIALOG_LABELS.例如_JP_BASIC_EU_LUXURY}
                   className="mt-1"
                 />
-                <p className="text-xs text-morandi-secondary mt-1">{QUOTE_DIALOG_LABELS.GENERATING_4057}</p>
+                <p className="text-xs text-morandi-secondary mt-1">
+                  {QUOTE_DIALOG_LABELS.GENERATING_4057}
+                </p>
               </div>
             )}
           </div>

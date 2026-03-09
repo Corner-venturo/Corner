@@ -1,7 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronDown, ChevronUp, Plane, Users, Check, AlertTriangle, HelpCircle, Calendar } from 'lucide-react'
+import {
+  ChevronDown,
+  ChevronUp,
+  Plane,
+  Users,
+  Check,
+  AlertTriangle,
+  HelpCircle,
+  Calendar,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
@@ -129,7 +138,10 @@ function TourCard({ tour }: { tour: TourData }) {
           </div>
           <div className="flex items-center gap-2 text-xs text-morandi-secondary">
             <Calendar size={12} />
-            <span>{formatDateDisplay(tour.departure_date)}{COMP_WORKSPACE_LABELS.DEPARTURE_SUFFIX}</span>
+            <span>
+              {formatDateDisplay(tour.departure_date)}
+              {COMP_WORKSPACE_LABELS.DEPARTURE_SUFFIX}
+            </span>
           </div>
         </div>
 
@@ -137,7 +149,10 @@ function TourCard({ tour }: { tour: TourData }) {
         <div className="flex items-center gap-3 mt-2 text-sm">
           <div className="flex items-center gap-1">
             <Users size={14} className="text-morandi-secondary" />
-            <span className="text-morandi-primary font-medium">{stats.total}{COMP_WORKSPACE_LABELS.PERSON_SUFFIX}</span>
+            <span className="text-morandi-primary font-medium">
+              {stats.total}
+              {COMP_WORKSPACE_LABELS.PERSON_SUFFIX}
+            </span>
           </div>
           {stats.ticketed > 0 && (
             <div className="flex items-center gap-1 text-morandi-green">
@@ -160,7 +175,9 @@ function TourCard({ tour }: { tour: TourData }) {
           {tour.earliest_deadline && (
             <div className="flex items-center gap-1 text-morandi-secondary ml-auto">
               <span className="text-xs">DL:</span>
-              <span className="font-medium text-morandi-primary">{formatDateDisplay(tour.earliest_deadline)}</span>
+              <span className="font-medium text-morandi-primary">
+                {formatDateDisplay(tour.earliest_deadline)}
+              </span>
             </div>
           )}
         </div>
@@ -192,7 +209,10 @@ function TourCard({ tour }: { tour: TourData }) {
             <div>
               <div className="flex items-center gap-1.5 text-xs font-medium text-amber-600 mb-1">
                 <AlertTriangle size={12} />
-                <span>{COMP_WORKSPACE_LABELS.LABEL_8022}{groupedMembers.needs_ticketing.length})</span>
+                <span>
+                  {COMP_WORKSPACE_LABELS.LABEL_8022}
+                  {groupedMembers.needs_ticketing.length})
+                </span>
               </div>
               <div className="flex flex-wrap gap-1">
                 {groupedMembers.needs_ticketing.map(m => (
@@ -213,7 +233,10 @@ function TourCard({ tour }: { tour: TourData }) {
             <div>
               <div className="flex items-center gap-1.5 text-xs font-medium text-morandi-red mb-1">
                 <HelpCircle size={12} />
-                <span>{COMP_WORKSPACE_LABELS.LABEL_2393}{groupedMembers.no_record.length})</span>
+                <span>
+                  {COMP_WORKSPACE_LABELS.LABEL_2393}
+                  {groupedMembers.no_record.length})
+                </span>
               </div>
               <div className="flex flex-wrap gap-1">
                 {groupedMembers.no_record.map(m => (
@@ -233,7 +256,10 @@ function TourCard({ tour }: { tour: TourData }) {
             <div>
               <div className="flex items-center gap-1.5 text-xs font-medium text-morandi-green mb-1">
                 <Check size={12} />
-                <span>{COMP_WORKSPACE_LABELS.LABEL_3751}{groupedMembers.ticketed.length})</span>
+                <span>
+                  {COMP_WORKSPACE_LABELS.LABEL_3751}
+                  {groupedMembers.ticketed.length})
+                </span>
               </div>
               <div className="flex flex-wrap gap-1">
                 {groupedMembers.ticketed.map(m => (
@@ -253,7 +279,10 @@ function TourCard({ tour }: { tour: TourData }) {
             <div>
               <div className="flex items-center gap-1.5 text-xs font-medium text-morandi-secondary mb-1">
                 <Plane size={12} />
-                <span>{COMP_WORKSPACE_LABELS.LABEL_8616}{groupedMembers.self_arranged.length})</span>
+                <span>
+                  {COMP_WORKSPACE_LABELS.LABEL_8616}
+                  {groupedMembers.self_arranged.length})
+                </span>
               </div>
               <div className="flex flex-wrap gap-1">
                 {groupedMembers.self_arranged.map(m => (
@@ -277,9 +306,7 @@ function TourCard({ tour }: { tour: TourData }) {
 export function TicketStatusCard({ tours, summary, generatedAt }: TicketStatusCardProps) {
   if (!tours || tours.length === 0) {
     return (
-      <div className="text-sm text-morandi-secondary">
-        {COMP_WORKSPACE_LABELS.PROCESSING_3053}
-      </div>
+      <div className="text-sm text-morandi-secondary">{COMP_WORKSPACE_LABELS.PROCESSING_3053}</div>
     )
   }
 
@@ -306,12 +333,18 @@ export function TicketStatusCard({ tours, summary, generatedAt }: TicketStatusCa
       {/* 總計 */}
       {tours.length > 1 && (
         <div className="flex items-center gap-3 text-xs text-morandi-secondary pt-1 border-t border-morandi-container/30">
-          <span>{COMP_WORKSPACE_LABELS.LABEL_5332} {tours.length} 個團</span>
+          <span>
+            {COMP_WORKSPACE_LABELS.LABEL_5332} {tours.length} 個團
+          </span>
           {summary.needs_ticketing > 0 && (
-            <span className="text-amber-600">{summary.needs_ticketing} {COMP_WORKSPACE_LABELS.待開票}</span>
+            <span className="text-amber-600">
+              {summary.needs_ticketing} {COMP_WORKSPACE_LABELS.待開票}
+            </span>
           )}
           {summary.no_record > 0 && (
-            <span className="text-morandi-red">{summary.no_record} {COMP_WORKSPACE_LABELS.無紀錄}</span>
+            <span className="text-morandi-red">
+              {summary.no_record} {COMP_WORKSPACE_LABELS.無紀錄}
+            </span>
           )}
         </div>
       )}

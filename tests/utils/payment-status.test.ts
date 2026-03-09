@@ -5,10 +5,7 @@ function calculatePaymentStatus(
   orderTotalAmount: number,
   confirmedReceipts: { actual_amount: number | null }[]
 ): { totalPaid: number; status: 'unpaid' | 'partial' | 'paid'; remaining: number } {
-  const totalPaid = confirmedReceipts.reduce(
-    (sum, r) => sum + (r.actual_amount || 0),
-    0
-  )
+  const totalPaid = confirmedReceipts.reduce((sum, r) => sum + (r.actual_amount || 0), 0)
 
   let status: 'unpaid' | 'partial' | 'paid' = 'unpaid'
   if (totalPaid >= orderTotalAmount && orderTotalAmount > 0) {
@@ -34,10 +31,7 @@ describe('payment status logic', () => {
   })
 
   it('should be paid when fully paid', () => {
-    const result = calculatePaymentStatus(10000, [
-      { actual_amount: 5000 },
-      { actual_amount: 5000 },
-    ])
+    const result = calculatePaymentStatus(10000, [{ actual_amount: 5000 }, { actual_amount: 5000 }])
     expect(result.status).toBe('paid')
     expect(result.remaining).toBe(0)
   })
@@ -49,10 +43,7 @@ describe('payment status logic', () => {
   })
 
   it('should handle null actual_amount', () => {
-    const result = calculatePaymentStatus(10000, [
-      { actual_amount: 5000 },
-      { actual_amount: null },
-    ])
+    const result = calculatePaymentStatus(10000, [{ actual_amount: 5000 }, { actual_amount: null }])
     expect(result.status).toBe('partial')
     expect(result.totalPaid).toBe(5000)
   })

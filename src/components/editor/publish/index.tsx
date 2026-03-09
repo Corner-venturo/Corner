@@ -36,7 +36,12 @@ interface PublishButtonProps {
   onVersionRecordsChange?: (versionRecords: ItineraryVersionRecord[]) => void
 }
 
-export function PublishButton({ data, currentVersionIndex, onVersionChange, onVersionRecordsChange }: PublishButtonProps) {
+export function PublishButton({
+  data,
+  currentVersionIndex,
+  onVersionChange,
+  onVersionRecordsChange,
+}: PublishButtonProps) {
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [showSaveAsNewDialog, setShowSaveAsNewDialog] = useState(false)
   const [hoveredVersionIndex, setHoveredVersionIndex] = useState<number | null>(null)
@@ -100,7 +105,11 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
       }
     } catch (error) {
       logger.error(COMP_EDITOR_LABELS.刪除版本失敗, error)
-      await alert(COMP_EDITOR_LABELS.刪除版本失敗_2 + (error instanceof Error ? error.message : COMP_EDITOR_LABELS.未知錯誤), 'error')
+      await alert(
+        COMP_EDITOR_LABELS.刪除版本失敗_2 +
+          (error instanceof Error ? error.message : COMP_EDITOR_LABELS.未知錯誤),
+        'error'
+      )
     }
   }
 
@@ -140,7 +149,9 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
                 <FilePlus size={14} className="text-morandi-secondary" />
                 <div className="flex flex-col">
                   <span className="font-medium">{COMP_EDITOR_LABELS.另存新版本}</span>
-                  <span className="text-xs text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_1615}</span>
+                  <span className="text-xs text-morandi-secondary">
+                    {COMP_EDITOR_LABELS.LABEL_1615}
+                  </span>
                 </div>
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -153,7 +164,9 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
                 <Files size={14} className="text-morandi-secondary" />
                 <div className="flex flex-col">
                   <span className="font-medium">{COMP_EDITOR_LABELS.另存新檔}</span>
-                  <span className="text-xs text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_578}</span>
+                  <span className="text-xs text-morandi-secondary">
+                    {COMP_EDITOR_LABELS.LABEL_578}
+                  </span>
                 </div>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -179,7 +192,8 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
               </div>
               {versionRecords.map((record, index) => {
                 const isMainVersion = index === 0
-                const isCurrentVersion = (isMainVersion && currentVersionIndex === -1) || currentVersionIndex === index
+                const isCurrentVersion =
+                  (isMainVersion && currentVersionIndex === -1) || currentVersionIndex === index
                 return (
                   <DropdownMenuItem
                     key={record.id}
@@ -190,22 +204,30 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
                   >
                     <div className="flex flex-col flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">{stripHtml(record.note) || `版本 ${record.version}`}</span>
+                        <span className="font-medium">
+                          {stripHtml(record.note) || `版本 ${record.version}`}
+                        </span>
                         {isMainVersion && (
-                          <span className="text-[10px] text-morandi-secondary bg-morandi-container px-1.5 py-0.5 rounded">{COMP_EDITOR_LABELS.LABEL_1858}</span>
+                          <span className="text-[10px] text-morandi-secondary bg-morandi-container px-1.5 py-0.5 rounded">
+                            {COMP_EDITOR_LABELS.LABEL_1858}
+                          </span>
                         )}
                       </div>
                       <span className="text-xs text-morandi-secondary">
-                        {record.created_at ? new Date(record.created_at).toLocaleString('zh-TW') : ''}
+                        {record.created_at
+                          ? new Date(record.created_at).toLocaleString('zh-TW')
+                          : ''}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       {isCurrentVersion && (
-                        <div className="text-xs bg-morandi-gold text-white px-2 py-0.5 rounded">{COMP_EDITOR_LABELS.LABEL_6211}</div>
+                        <div className="text-xs bg-morandi-gold text-white px-2 py-0.5 rounded">
+                          {COMP_EDITOR_LABELS.LABEL_6211}
+                        </div>
                       )}
                       {hoveredVersionIndex === index && !isMainVersion && (
                         <button
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation()
                             handleDeleteVersion(index)
                           }}
@@ -229,7 +251,9 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
         )}
 
         {/* 4. 連結按鈕 */}
-        {isEditMode && <PublishPreview shareUrl={shareUrl} copied={copied} onCopy={copyShareLink} />}
+        {isEditMode && (
+          <PublishPreview shareUrl={shareUrl} copied={copied} onCopy={copyShareLink} />
+        )}
       </div>
 
       {/* 另存新版本 Dialog */}

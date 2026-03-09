@@ -13,10 +13,19 @@ interface HotelSectionProps {
 
 export function HotelSection({ data, updateField }: HotelSectionProps) {
   const hotels = data.hotels || []
-  const [uploadingImage, setUploadingImage] = useState<{ hotelIndex: number; imageIndex: number } | null>(null)
+  const [uploadingImage, setUploadingImage] = useState<{
+    hotelIndex: number
+    imageIndex: number
+  } | null>(null)
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
-  const [draggedImage, setDraggedImage] = useState<{ hotelIndex: number; imageIndex: number } | null>(null)
-  const [dragOverImage, setDragOverImage] = useState<{ hotelIndex: number; imageIndex: number } | null>(null)
+  const [draggedImage, setDraggedImage] = useState<{
+    hotelIndex: number
+    imageIndex: number
+  } | null>(null)
+  const [dragOverImage, setDragOverImage] = useState<{
+    hotelIndex: number
+    imageIndex: number
+  } | null>(null)
 
   const addHotel = () => {
     updateField('hotels', [
@@ -83,9 +92,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
         return
       }
 
-      const { data: urlData } = supabase.storage
-        .from('workspace-files')
-        .getPublicUrl(filePath)
+      const { data: urlData } = supabase.storage.from('workspace-files').getPublicUrl(filePath)
 
       const hotel = hotels[hotelIndex]
       const currentImages = [...getHotelImages(hotel)]
@@ -145,9 +152,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
             return
           }
 
-          const { data: urlData } = supabase.storage
-            .from('workspace-files')
-            .getPublicUrl(filePath)
+          const { data: urlData } = supabase.storage.from('workspace-files').getPublicUrl(filePath)
 
           uploadedUrls[idx] = urlData.publicUrl
         })
@@ -159,7 +164,10 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
       }
 
       if (successfulUrls.length < imageFiles.length) {
-        void alert(`${successfulUrls.length} 張圖片上傳成功，${imageFiles.length - successfulUrls.length} 張失敗`, 'warning')
+        void alert(
+          `${successfulUrls.length} 張圖片上傳成功，${imageFiles.length - successfulUrls.length} 張失敗`,
+          'warning'
+        )
       }
     } catch (error) {
       logger.error(COMP_EDITOR_LABELS.批量上傳錯誤, error)
@@ -280,7 +288,9 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
               </button>
 
               <div className="pr-8">
-                <h4 className="font-bold text-morandi-secondary mb-3">{COMP_EDITOR_LABELS.飯店} {hotelIndex + 1}</h4>
+                <h4 className="font-bold text-morandi-secondary mb-3">
+                  {COMP_EDITOR_LABELS.飯店} {hotelIndex + 1}
+                </h4>
 
                 <div className="space-y-3">
                   <div>
@@ -326,12 +336,14 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
                           onDrop={() => handleImageDrop(hotelIndex, imageIndex)}
                           onDragEnd={handleImageDragEnd}
                           className={`relative aspect-square rounded-lg overflow-hidden border-2 cursor-move group ${
-                            dragOverImage?.hotelIndex === hotelIndex && dragOverImage?.imageIndex === imageIndex
+                            dragOverImage?.hotelIndex === hotelIndex &&
+                            dragOverImage?.imageIndex === imageIndex
                               ? 'border-morandi-gold'
                               : 'border-morandi-container'
                           }`}
                         >
-                          <img src={imageUrl}
+                          <img
+                            src={imageUrl}
                             alt={`${hotel.name || COMP_EDITOR_LABELS.飯店} 圖片 ${imageIndex + 1}`}
                             className="w-full h-full object-cover"
                           />
@@ -376,7 +388,9 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
                           ) : (
                             <>
                               <Plus size={20} className="text-morandi-secondary mb-1" />
-                              <span className="text-xs text-morandi-secondary">{COMP_EDITOR_LABELS.新增}</span>
+                              <span className="text-xs text-morandi-secondary">
+                                {COMP_EDITOR_LABELS.新增}
+                              </span>
                             </>
                           )}
                         </div>

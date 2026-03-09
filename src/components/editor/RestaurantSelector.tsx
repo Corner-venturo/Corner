@@ -96,7 +96,7 @@ interface RestaurantSelectorProps {
   onClose: () => void
   tourCountryName?: string
   onSelect: (restaurants: CombinedRestaurant[]) => void
-  includeMichelin?: boolean  // 是否包含米其林餐廳
+  includeMichelin?: boolean // 是否包含米其林餐廳
 }
 
 export function RestaurantSelector({
@@ -159,7 +159,10 @@ export function RestaurantSelector({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleCancel}>
-      <DialogContent level={1} className="w-[800px] h-[700px] max-w-[90vw] max-h-[85vh] flex flex-col p-0 gap-0">
+      <DialogContent
+        level={1}
+        className="w-[800px] h-[700px] max-w-[90vw] max-h-[85vh] flex flex-col p-0 gap-0"
+      >
         <DialogHeader className="px-6 py-4 border-b bg-gradient-to-r from-rose-50 to-transparent">
           <DialogTitle className="flex items-center gap-2 text-lg">
             <UtensilsCrossed className="text-rose-500" size={22} />

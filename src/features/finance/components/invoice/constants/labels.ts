@@ -41,7 +41,8 @@ export const INVOICE_LABELS = {
   ERROR: '錯誤',
   ENTER_BUYER_NAME: '請輸入買受人名稱',
   FILL_PRODUCT_INFO: '請完整填寫商品資訊',
-  AMOUNT_EXCEED_CONFIRM: (invoiceAmount: string, paidAmount: string) => `發票金額 NT$ ${invoiceAmount} 超過已收款金額 NT$ ${paidAmount}，確定要開立嗎？`,
+  AMOUNT_EXCEED_CONFIRM: (invoiceAmount: string, paidAmount: string) =>
+    `發票金額 NT$ ${invoiceAmount} 超過已收款金額 NT$ ${paidAmount}，確定要開立嗎？`,
   AMOUNT_EXCEED_TITLE: '金額超開提醒',
   SCHEDULED_MESSAGE: (date: string) => `已預約於 ${date} 開立`,
   ISSUE_SUCCESS: '開立成功',

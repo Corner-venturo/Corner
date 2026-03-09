@@ -3,16 +3,7 @@
 import React from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
-import {
-  Calendar,
-  FileCheck,
-  MapPin,
-  BarChart3,
-  Archive,
-  Star,
-  Plus,
-  Plane,
-} from 'lucide-react'
+import { Calendar, FileCheck, MapPin, BarChart3, Archive, Star, Plus, Plane } from 'lucide-react'
 import { TOUR_FILTERS } from '../constants'
 
 interface TourFiltersProps {

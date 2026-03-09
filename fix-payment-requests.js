@@ -30,17 +30,17 @@ async function executeSQL() {
       path: `/v1/projects/${PROJECT_REF}/database/query`,
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${SUPABASE_ACCESS_TOKEN}`,
-        'Content-Type': 'application/json'
-      }
+        Authorization: `Bearer ${SUPABASE_ACCESS_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
     }
 
     const postData = JSON.stringify({ query: SQL })
 
-    const req = https.request(options, (res) => {
+    const req = https.request(options, res => {
       let data = ''
 
-      res.on('data', (chunk) => {
+      res.on('data', chunk => {
         data += chunk
       })
 
@@ -59,7 +59,7 @@ async function executeSQL() {
       })
     })
 
-    req.on('error', (error) => {
+    req.on('error', error => {
       console.error('❌ 請求錯誤:', error)
       reject(error)
     })

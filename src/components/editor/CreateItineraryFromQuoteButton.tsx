@@ -122,14 +122,17 @@ export const CreateItineraryFromQuoteButton: React.FC<CreateItineraryFromQuoteBu
 
     // 跳轉到行程表編輯頁面
     router.push(`/itinerary/new?${params.toString()}`)
-  }, [quote, accommodationDays, router, extractMealsFromCategories, extractHotelsFromCategories, extractActivitiesFromCategories])
+  }, [
+    quote,
+    accommodationDays,
+    router,
+    extractMealsFromCategories,
+    extractHotelsFromCategories,
+    extractActivitiesFromCategories,
+  ])
 
   return (
-    <Button
-      onClick={handleCreateItinerary}
-      variant="outline"
-      className="h-8 px-3 text-sm"
-    >
+    <Button onClick={handleCreateItinerary} variant="outline" className="h-8 px-3 text-sm">
       <FileText size={14} className="mr-1.5" />
       {COMP_EDITOR_LABELS.LABEL_6273}
     </Button>

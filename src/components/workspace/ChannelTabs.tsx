@@ -173,7 +173,9 @@ export function ChannelTabs({ channel, children, headerActions }: ChannelTabsPro
           <div
             className={cn(
               'absolute inset-0 flex flex-col transition-opacity duration-150',
-              activeTab !== 'chat' ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+              activeTab !== 'chat'
+                ? 'opacity-100 pointer-events-auto'
+                : 'opacity-0 pointer-events-none'
             )}
           >
             <CanvasEditor

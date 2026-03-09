@@ -16,23 +16,30 @@ _目前沒有報告。_
 # Result
 
 ## Task
+
 [執行了什麼任務]
 
 ## Root Cause
+
 [問題的根本原因]
 
 ## Files Read
+
 [讀了哪些檔案]
 
 ## Files Changed
+
 [改了哪些檔案]
 
 ## Changes
+
 [做了什麼改動]
 
 ## Risks
+
 [可能的風險或副作用]
 
 ## Next Suggestion
+
 [建議下一步]
 ```

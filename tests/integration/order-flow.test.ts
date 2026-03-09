@@ -21,9 +21,7 @@ vi.mock('@/lib/utils/logger', () => ({
 }))
 
 // 核心計算邏輯（提取自 order-stats.service 和 tour-stats.service）
-function calculateOrderTotal(
-  members: Array<{ total_payable: number }>
-): number {
+function calculateOrderTotal(members: Array<{ total_payable: number }>): number {
   return members.reduce((sum, m) => sum + (m.total_payable || 0), 0)
 }
 
@@ -104,25 +102,16 @@ describe('訂單完整流程', () => {
 
   describe('改成員金額 → 訂單 total_amount 更新', () => {
     it('修改金額 → total_amount 重算', () => {
-      const membersBefore = [
-        { total_payable: 25000 },
-        { total_payable: 25000 },
-      ]
+      const membersBefore = [{ total_payable: 25000 }, { total_payable: 25000 }]
       expect(calculateOrderTotal(membersBefore)).toBe(50000)
 
       // 改第二位金額
-      const membersAfter = [
-        { total_payable: 25000 },
-        { total_payable: 35000 },
-      ]
+      const membersAfter = [{ total_payable: 25000 }, { total_payable: 35000 }]
       expect(calculateOrderTotal(membersAfter)).toBe(60000)
     })
 
     it('金額改為 0 → 正確處理', () => {
-      const members = [
-        { total_payable: 25000 },
-        { total_payable: 0 },
-      ]
+      const members = [{ total_payable: 25000 }, { total_payable: 0 }]
       expect(calculateOrderTotal(members)).toBe(25000)
     })
 
@@ -135,10 +124,7 @@ describe('訂單完整流程', () => {
 
   describe('刪成員 → 訂單金額和團人數都扣回', () => {
     it('刪除成員 → total_amount 減少', () => {
-      const membersBefore = [
-        { total_payable: 25000 },
-        { total_payable: 30000 },
-      ]
+      const membersBefore = [{ total_payable: 25000 }, { total_payable: 30000 }]
       // 刪除第二位
       const membersAfter = [{ total_payable: 25000 }]
 
@@ -165,9 +151,7 @@ describe('訂單完整流程', () => {
         { order_id: 'o1', total_payable: 25000 },
         { order_id: 'o1', total_payable: 30000 },
       ]
-      const membersAfter = [
-        { order_id: 'o1', total_payable: 25000 },
-      ]
+      const membersAfter = [{ order_id: 'o1', total_payable: 25000 }]
 
       expect(calculateParticipants(orders, membersBefore)).toBe(2)
       expect(calculateParticipants(orders, membersAfter)).toBe(1)
@@ -208,10 +192,7 @@ describe('訂單完整流程', () => {
 
   describe('邊界情況', () => {
     it('null/undefined total_payable → 視為 0', () => {
-      const members = [
-        { total_payable: 25000 },
-        { total_payable: 0 },
-      ]
+      const members = [{ total_payable: 25000 }, { total_payable: 0 }]
       expect(calculateOrderTotal(members)).toBe(25000)
     })
 

@@ -49,7 +49,7 @@ export default function FinancePage() {
     return receipts
       .filter(r => r.status === '0')
       .reduce((sum, r) => sum + (r.receipt_amount || 0), 0)
-  }, [receipts]) 
+  }, [receipts])
 
   const transactionColumns: TableColumn<Transaction>[] = useMemo(
     () => [
@@ -100,9 +100,7 @@ export default function FinancePage() {
         key: 'date',
         label: FINANCE_PAGE_LABELS.COL_DATE,
         sortable: true,
-        render: (_value, transaction) => (
-          <DateCell date={transaction.date} showIcon={false} />
-        ),
+        render: (_value, transaction) => <DateCell date={transaction.date} showIcon={false} />,
       },
     ],
     []
@@ -137,12 +135,12 @@ export default function FinancePage() {
       bgColor: 'bg-morandi-primary/10',
     },
   ]
-  
-  const totalPages = Math.ceil(transactionsCount / transactionsPageSize);
+
+  const totalPages = Math.ceil(transactionsCount / transactionsPageSize)
 
   if (isLoading && transactions.length === 0) {
     return (
-       <div className="h-full flex flex-col items-center justify-center">
+      <div className="h-full flex flex-col items-center justify-center">
         <Loader2 className="w-12 h-12 animate-spin text-morandi-gold" />
         <p className="mt-4 text-morandi-secondary">{FINANCE_PAGE_LABELS.LOADING_DATA}</p>
       </div>
@@ -150,110 +148,130 @@ export default function FinancePage() {
   }
 
   return (
-    <ContentPageLayout title={FINANCE_PAGE_LABELS.MANAGE_8421} contentClassName="flex-1 overflow-auto p-6">
-        <div className="space-y-6">
-                    {/* 財務總覽 - Enhanced UI */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                      <Card className="p-4 bg-morandi-green/10 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm text-morandi-secondary mb-1">{FINANCE_PAGE_LABELS.TOTAL_INCOME}</p>
-                            <div className="text-2xl font-bold">
-                              <CurrencyCell amount={totalReceivable} variant="income" />
-                            </div>
-                          </div>
-                          <TrendingUp size={24} className="text-morandi-green" />
-                        </div>
-                      </Card>
-          
-                      <Card className="p-4 bg-morandi-red/10 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm text-morandi-secondary mb-1">{FINANCE_PAGE_LABELS.TOTAL_EXPENSE}</p>
-                            <div className="text-2xl font-bold">
-                              <CurrencyCell amount={totalPayable} variant="expense" />
-                            </div>
-                          </div>
-                          <TrendingDown size={24} className="text-morandi-red" />
-                        </div>
-                      </Card>
-          
-                      <Card className="p-4 bg-morandi-primary/10 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm text-morandi-secondary mb-1">{FINANCE_PAGE_LABELS.NET_PROFIT}</p>
-                            <div className="text-2xl font-bold">
-                              <CurrencyCell amount={netProfit} variant={netProfit >= 0 ? 'default' : 'expense'} />
-                            </div>
-                          </div>
-                          <DollarSign size={24} className={'text-morandi-primary'} />
-                        </div>
-                      </Card>
-          
-                      <Card className="p-4 bg-morandi-gold/10 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm text-morandi-secondary mb-1">{FINANCE_PAGE_LABELS.PENDING_ITEMS}</p>
-                            <div className="text-2xl font-bold text-morandi-gold">
-                              <CurrencyCell amount={pendingPayments} />
-                            </div>
-                          </div>
-                          <AlertTriangle size={24} className="text-morandi-gold" />
-                        </div>
-                      </Card>
-                    </div>
+    <ContentPageLayout
+      title={FINANCE_PAGE_LABELS.MANAGE_8421}
+      contentClassName="flex-1 overflow-auto p-6"
+    >
+      <div className="space-y-6">
+        {/* 財務總覽 - Enhanced UI */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <Card className="p-4 bg-morandi-green/10 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-morandi-secondary mb-1">
+                  {FINANCE_PAGE_LABELS.TOTAL_INCOME}
+                </p>
+                <div className="text-2xl font-bold">
+                  <CurrencyCell amount={totalReceivable} variant="income" />
+                </div>
+              </div>
+              <TrendingUp size={24} className="text-morandi-green" />
+            </div>
+          </Card>
 
-          {/* 功能模組 - Restored */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {financeModules.map((module, index) => (
-              <Link key={index} href={module.href}>
-                <Card className="p-6 border border-border hover:shadow-lg transition-shadow cursor-pointer">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center mb-3">
-                        <div className={`p-2 rounded-lg ${module.bgColor} mr-3`}>
-                          <module.icon size={24} className={module.color} />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-morandi-primary">{module.title}</h4>
-                          <p className="text-sm text-morandi-secondary">{module.description}</p>
-                        </div>
+          <Card className="p-4 bg-morandi-red/10 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-morandi-secondary mb-1">
+                  {FINANCE_PAGE_LABELS.TOTAL_EXPENSE}
+                </p>
+                <div className="text-2xl font-bold">
+                  <CurrencyCell amount={totalPayable} variant="expense" />
+                </div>
+              </div>
+              <TrendingDown size={24} className="text-morandi-red" />
+            </div>
+          </Card>
+
+          <Card className="p-4 bg-morandi-primary/10 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-morandi-secondary mb-1">
+                  {FINANCE_PAGE_LABELS.NET_PROFIT}
+                </p>
+                <div className="text-2xl font-bold">
+                  <CurrencyCell
+                    amount={netProfit}
+                    variant={netProfit >= 0 ? 'default' : 'expense'}
+                  />
+                </div>
+              </div>
+              <DollarSign size={24} className={'text-morandi-primary'} />
+            </div>
+          </Card>
+
+          <Card className="p-4 bg-morandi-gold/10 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-morandi-secondary mb-1">
+                  {FINANCE_PAGE_LABELS.PENDING_ITEMS}
+                </p>
+                <div className="text-2xl font-bold text-morandi-gold">
+                  <CurrencyCell amount={pendingPayments} />
+                </div>
+              </div>
+              <AlertTriangle size={24} className="text-morandi-gold" />
+            </div>
+          </Card>
+        </div>
+
+        {/* 功能模組 - Restored */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {financeModules.map((module, index) => (
+            <Link key={index} href={module.href}>
+              <Card className="p-6 border border-border hover:shadow-lg transition-shadow cursor-pointer">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center mb-3">
+                      <div className={`p-2 rounded-lg ${module.bgColor} mr-3`}>
+                        <module.icon size={24} className={module.color} />
                       </div>
-                      <div className="text-sm text-morandi-secondary">{module.stats}</div>
+                      <div>
+                        <h4 className="font-semibold text-morandi-primary">{module.title}</h4>
+                        <p className="text-sm text-morandi-secondary">{module.description}</p>
+                      </div>
                     </div>
+                    <div className="text-sm text-morandi-secondary">{module.stats}</div>
                   </div>
-                </Card>
-              </Link>
-            ))}
-          </div>
+                </div>
+              </Card>
+            </Link>
+          ))}
+        </div>
 
-          {/* 交易紀錄 */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-morandi-primary">{FINANCE_PAGE_LABELS.TRANSACTION_RECORDS}</h3>
-            <EnhancedTable columns={transactionColumns as TableColumn[]} data={transactions} />
-            
-            {/* Pagination Controls */}
-            <div className="flex items-center justify-between pt-4">
-              <div className="text-sm text-morandi-secondary">
-                {FINANCE_PAGE_LABELS.PAGINATION_SUMMARY(transactionsCount, transactionsPage, totalPages)}
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => fetchTransactions(transactionsPage - 1)}
-                  disabled={transactionsPage <= 1 || isLoading}
-                >
-                  {FINANCE_PAGE_LABELS.LABEL_5163}
-                </Button>
-                <Button
-                  onClick={() => fetchTransactions(transactionsPage + 1)}
-                  disabled={transactionsPage >= totalPages || isLoading}
-                >
-                  {FINANCE_PAGE_LABELS.LABEL_9383}
-                </Button>
-              </div>
+        {/* 交易紀錄 */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-morandi-primary">
+            {FINANCE_PAGE_LABELS.TRANSACTION_RECORDS}
+          </h3>
+          <EnhancedTable columns={transactionColumns as TableColumn[]} data={transactions} />
+
+          {/* Pagination Controls */}
+          <div className="flex items-center justify-between pt-4">
+            <div className="text-sm text-morandi-secondary">
+              {FINANCE_PAGE_LABELS.PAGINATION_SUMMARY(
+                transactionsCount,
+                transactionsPage,
+                totalPages
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => fetchTransactions(transactionsPage - 1)}
+                disabled={transactionsPage <= 1 || isLoading}
+              >
+                {FINANCE_PAGE_LABELS.LABEL_5163}
+              </Button>
+              <Button
+                onClick={() => fetchTransactions(transactionsPage + 1)}
+                disabled={transactionsPage >= totalPages || isLoading}
+              >
+                {FINANCE_PAGE_LABELS.LABEL_9383}
+              </Button>
             </div>
           </div>
         </div>
+      </div>
     </ContentPageLayout>
   )
 }

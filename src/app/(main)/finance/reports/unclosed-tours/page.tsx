@@ -15,7 +15,10 @@ import { Card } from '@/components/ui/card'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { CurrencyCell, DateCell } from '@/components/table-cells'
 import { AlertCircle, Calendar, TrendingUp, TrendingDown, Loader2 } from 'lucide-react'
-import { useUnclosedTours, UnclosedTourData } from '@/features/finance/reports/hooks/useUnclosedTours'
+import {
+  useUnclosedTours,
+  UnclosedTourData,
+} from '@/features/finance/reports/hooks/useUnclosedTours'
 import { UNCLOSED_TOURS_LABELS } from '../../constants/labels'
 
 // 統計卡片
@@ -79,17 +82,13 @@ export default function UnclosedToursReportPage() {
       key: 'code',
       label: UNCLOSED_TOURS_LABELS.COL_TOUR_CODE,
       width: '120',
-      render: value => (
-        <span className="font-mono text-sm font-medium">{String(value || '')}</span>
-      ),
+      render: value => <span className="font-mono text-sm font-medium">{String(value || '')}</span>,
     },
     {
       key: 'name',
       label: UNCLOSED_TOURS_LABELS.COL_TOUR_NAME,
       width: '180',
-      render: value => (
-        <span className="text-sm truncate">{String(value || '-')}</span>
-      ),
+      render: value => <span className="text-sm truncate">{String(value || '-')}</span>,
     },
     {
       key: 'return_date',
@@ -113,7 +112,8 @@ export default function UnclosedToursReportPage() {
           <span
             className={`font-medium ${days > 14 ? 'text-morandi-red' : days > 7 ? 'text-morandi-gold' : 'text-morandi-secondary'}`}
           >
-            {days}{UNCLOSED_TOURS_LABELS.DAYS_SUFFIX}
+            {days}
+            {UNCLOSED_TOURS_LABELS.DAYS_SUFFIX}
           </span>
         )
       },
@@ -122,17 +122,13 @@ export default function UnclosedToursReportPage() {
       key: 'total_revenue',
       label: UNCLOSED_TOURS_LABELS.COL_TOTAL_REVENUE,
       width: '120',
-      render: value => (
-        <CurrencyCell amount={Number(value) || 0} variant="income" />
-      ),
+      render: value => <CurrencyCell amount={Number(value) || 0} variant="income" />,
     },
     {
       key: 'total_cost',
       label: UNCLOSED_TOURS_LABELS.COL_TOTAL_COST,
       width: '120',
-      render: value => (
-        <CurrencyCell amount={Number(value) || 0} variant="expense" />
-      ),
+      render: value => <CurrencyCell amount={Number(value) || 0} variant="expense" />,
     },
     {
       key: 'profit',
@@ -172,7 +168,6 @@ export default function UnclosedToursReportPage() {
       ]}
       className="space-y-6"
     >
-
       {/* 說明 */}
       <ContentContainer>
         <div className="flex items-start gap-3 p-4 bg-morandi-gold/5 border border-morandi-gold/20 rounded-lg">

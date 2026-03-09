@@ -4,7 +4,16 @@ import { getTodayString } from '@/lib/utils/format-date'
 
 import React, { useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
-import { FileText, Clock, CheckCircle, XCircle, AlertCircle, RotateCcw, Info, Upload } from 'lucide-react'
+import {
+  FileText,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  RotateCcw,
+  Info,
+  Upload,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { logger } from '@/lib/utils/logger'
@@ -22,7 +31,10 @@ import { SubmitVisaDialog } from './SubmitVisaDialog'
 import { ReturnDocumentsDialog } from './ReturnDocumentsDialog'
 import { BatchPickupDialog } from './BatchPickupDialog'
 import { CustomerMatchDialog, AddCustomerFormDialog } from './CustomerMatchDialog'
-import { BatchPickupDialog as SimpleBatchPickupDialog, BatchRejectDialog } from './BatchOperationDialogs'
+import {
+  BatchPickupDialog as SimpleBatchPickupDialog,
+  BatchRejectDialog,
+} from './BatchOperationDialogs'
 import type { Visa } from '@/stores/types'
 import { VISAS_LABELS } from './constants/labels'
 
@@ -50,12 +62,19 @@ export default function VisasPage() {
       const { invalidateVisas } = await import('@/data')
       await invalidateVisas()
     }
-    loadData().catch((err) => logger.error('[loadData]', err))
+    loadData().catch(err => logger.error('[loadData]', err))
   }, [])
 
   // 篩選管理
-  const { activeTab, setActiveTab, selectedRows, setSelectedRows, filteredVisas, buttonAvailability, canSelectVisa } =
-    useVisasFilters(visas)
+  const {
+    activeTab,
+    setActiveTab,
+    selectedRows,
+    setSelectedRows,
+    filteredVisas,
+    buttonAvailability,
+    canSelectVisa,
+  } = useVisasFilters(visas)
 
   // 對話框管理
   const {
@@ -175,11 +194,14 @@ export default function VisasPage() {
       }
 
       // 批次建立簽證
-      const applicantMap = new Map<string, {
-        visaTypes: string[]
-        totalFee: number
-        totalCost: number
-      }>()
+      const applicantMap = new Map<
+        string,
+        {
+          visaTypes: string[]
+          totalFee: number
+          totalCost: number
+        }
+      >()
 
       for (const applicant of applicants) {
         if (!applicant.name) continue
@@ -231,15 +253,13 @@ export default function VisasPage() {
         const remarks = data.visaTypes.join('、')
 
         try {
-          const { error } = await supabase
-            .from('order_members')
-            .insert({
-              order_id: targetOrder.id,
-              chinese_name: name,
-              member_type: 'adult',
-              remarks,
-              workspace_id: user.workspace_id,
-            })
+          const { error } = await supabase.from('order_members').insert({
+            order_id: targetOrder.id,
+            chinese_name: name,
+            member_type: 'adult',
+            remarks,
+            workspace_id: user.workspace_id,
+          })
 
           if (error) throw error
           logger.log(`✅ 成員建立成功: ${name}`)
@@ -290,134 +310,136 @@ export default function VisasPage() {
         { label: '簽證管理', href: '/visas' },
       ]}
       headerActions={
-          <div className="flex items-center gap-3">
-            {canManageVisas && selectedRows.length > 0 ? (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-morandi-secondary bg-morandi-container/50 px-3 py-1.5 rounded-full">
-                  已選 <span className="font-semibold text-morandi-primary">{selectedRows.length}</span> {VISAS_LABELS.LABEL_2269}
-                </span>
+        <div className="flex items-center gap-3">
+          {canManageVisas && selectedRows.length > 0 ? (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-morandi-secondary bg-morandi-container/50 px-3 py-1.5 rounded-full">
+                已選{' '}
+                <span className="font-semibold text-morandi-primary">{selectedRows.length}</span>{' '}
+                {VISAS_LABELS.LABEL_2269}
+              </span>
 
-                <div className="flex items-center bg-morandi-container/30 rounded-lg p-1 gap-1">
-                  <button
-                    onClick={() => batchOps.setIsSubmitDialogOpen(true)}
-                    disabled={!buttonAvailability.submit}
-                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                      buttonAvailability.submit
-                        ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white'
-                        : 'bg-morandi-container text-morandi-secondary/50 cursor-not-allowed'
-                    }`}
-                    title={VISAS_LABELS.LABEL_6162}
-                  >
-                    {VISAS_LABELS.LABEL_7044}
-                  </button>
-                  <button
-                    onClick={() => {
-                      batchOps.setPickupDate(getTodayString())
-                      batchOps.setIsPickupDialogOpen(true)
-                    }}
-                    disabled={!buttonAvailability.pickup}
-                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                      buttonAvailability.pickup
-                        ? 'bg-morandi-green hover:bg-morandi-green/90 text-white'
-                        : 'bg-morandi-container text-morandi-secondary/50 cursor-not-allowed'
-                    }`}
-                    title={VISAS_LABELS.LABEL_9841}
-                  >
-                    {VISAS_LABELS.LABEL_8304}
-                  </button>
-                  <button
-                    onClick={() => setIsReturnDialogOpen(true)}
-                    disabled={!buttonAvailability.return}
-                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                      buttonAvailability.return
-                        ? 'bg-morandi-primary hover:bg-morandi-primary/90 text-white'
-                        : 'bg-morandi-container text-morandi-secondary/50 cursor-not-allowed'
-                    }`}
-                    title={VISAS_LABELS.LABEL_9271}
-                  >
-                    {VISAS_LABELS.LABEL_3853}
-                  </button>
-                  <button
-                    onClick={() => {
-                      batchOps.setRejectDate(getTodayString())
-                      batchOps.setIsRejectDialogOpen(true)
-                    }}
-                    disabled={!buttonAvailability.reject}
-                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                      buttonAvailability.reject
-                        ? 'bg-morandi-red hover:bg-morandi-red/90 text-white'
-                        : 'bg-morandi-container text-morandi-secondary/50 cursor-not-allowed'
-                    }`}
-                    title={VISAS_LABELS.LABEL_2198}
-                  >
-                    {VISAS_LABELS.LABEL_3434}
-                  </button>
-                </div>
-
+              <div className="flex items-center bg-morandi-container/30 rounded-lg p-1 gap-1">
                 <button
-                  onClick={() => setSelectedRows([])}
-                  className="text-sm text-morandi-secondary hover:text-morandi-primary transition-colors"
+                  onClick={() => batchOps.setIsSubmitDialogOpen(true)}
+                  disabled={!buttonAvailability.submit}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                    buttonAvailability.submit
+                      ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white'
+                      : 'bg-morandi-container text-morandi-secondary/50 cursor-not-allowed'
+                  }`}
+                  title={VISAS_LABELS.LABEL_6162}
                 >
-                  {VISAS_LABELS.CANCEL}
+                  {VISAS_LABELS.LABEL_7044}
+                </button>
+                <button
+                  onClick={() => {
+                    batchOps.setPickupDate(getTodayString())
+                    batchOps.setIsPickupDialogOpen(true)
+                  }}
+                  disabled={!buttonAvailability.pickup}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                    buttonAvailability.pickup
+                      ? 'bg-morandi-green hover:bg-morandi-green/90 text-white'
+                      : 'bg-morandi-container text-morandi-secondary/50 cursor-not-allowed'
+                  }`}
+                  title={VISAS_LABELS.LABEL_9841}
+                >
+                  {VISAS_LABELS.LABEL_8304}
+                </button>
+                <button
+                  onClick={() => setIsReturnDialogOpen(true)}
+                  disabled={!buttonAvailability.return}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                    buttonAvailability.return
+                      ? 'bg-morandi-primary hover:bg-morandi-primary/90 text-white'
+                      : 'bg-morandi-container text-morandi-secondary/50 cursor-not-allowed'
+                  }`}
+                  title={VISAS_LABELS.LABEL_9271}
+                >
+                  {VISAS_LABELS.LABEL_3853}
+                </button>
+                <button
+                  onClick={() => {
+                    batchOps.setRejectDate(getTodayString())
+                    batchOps.setIsRejectDialogOpen(true)
+                  }}
+                  disabled={!buttonAvailability.reject}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                    buttonAvailability.reject
+                      ? 'bg-morandi-red hover:bg-morandi-red/90 text-white'
+                      : 'bg-morandi-container text-morandi-secondary/50 cursor-not-allowed'
+                  }`}
+                  title={VISAS_LABELS.LABEL_2198}
+                >
+                  {VISAS_LABELS.LABEL_3434}
                 </button>
               </div>
-            ) : (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsInfoDialogOpen(true)}
-                  className="flex items-center gap-2"
-                >
-                  <Info size={16} />
-                  {VISAS_LABELS.LABEL_967}
-                </Button>
-                {canManageVisas && (
-                  <>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsBatchPickupDialogOpen(true)}
-                      className="flex items-center gap-2"
-                    >
-                      <Upload size={16} />
-                      {VISAS_LABELS.LABEL_6480}
-                    </Button>
-                    <Button
-                      onClick={async () => {
-                        await fetchTours() // 按需載入 tours
-                        setIsDialogOpen(true)
-                      }}
-                      className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-                    >
-                      {VISAS_LABELS.ADD_2407}
-                    </Button>
-                  </>
-                )}
-              </>
-            )}
-          </div>
-        }
-        tabs={[
-          { value: 'all', label: '全部', icon: FileText },
-          { value: 'pending', label: '待送件', icon: Clock },
-          { value: 'submitted', label: '已送件', icon: AlertCircle },
-          { value: 'collected', label: '已取件', icon: CheckCircle },
-          { value: 'rejected', label: '退件', icon: XCircle },
-          { value: 'returned', label: '已歸還', icon: RotateCcw },
-        ]}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
+
+              <button
+                onClick={() => setSelectedRows([])}
+                className="text-sm text-morandi-secondary hover:text-morandi-primary transition-colors"
+              >
+                {VISAS_LABELS.CANCEL}
+              </button>
+            </div>
+          ) : (
+            <>
+              <Button
+                variant="outline"
+                onClick={() => setIsInfoDialogOpen(true)}
+                className="flex items-center gap-2"
+              >
+                <Info size={16} />
+                {VISAS_LABELS.LABEL_967}
+              </Button>
+              {canManageVisas && (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsBatchPickupDialogOpen(true)}
+                    className="flex items-center gap-2"
+                  >
+                    <Upload size={16} />
+                    {VISAS_LABELS.LABEL_6480}
+                  </Button>
+                  <Button
+                    onClick={async () => {
+                      await fetchTours() // 按需載入 tours
+                      setIsDialogOpen(true)
+                    }}
+                    className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                  >
+                    {VISAS_LABELS.ADD_2407}
+                  </Button>
+                </>
+              )}
+            </>
+          )}
+        </div>
+      }
+      tabs={[
+        { value: 'all', label: '全部', icon: FileText },
+        { value: 'pending', label: '待送件', icon: Clock },
+        { value: 'submitted', label: '已送件', icon: AlertCircle },
+        { value: 'collected', label: '已取件', icon: CheckCircle },
+        { value: 'rejected', label: '退件', icon: XCircle },
+        { value: 'returned', label: '已歸還', icon: RotateCcw },
+      ]}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
     >
-        <VisasList
-          filteredVisas={filteredVisas}
-          canManageVisas={canManageVisas}
-          selectedRows={selectedRows}
-          onSelectionChange={setSelectedRows}
-          onDelete={deleteVisa}
-          onUpdateStatus={(id, status) => updateVisa(id, { status })}
-          onEdit={(visa) => {
-            loadVisaForEdit(visa) // 編輯不需要載入 tours
-          }}
-        />
+      <VisasList
+        filteredVisas={filteredVisas}
+        canManageVisas={canManageVisas}
+        selectedRows={selectedRows}
+        onSelectionChange={setSelectedRows}
+        onDelete={deleteVisa}
+        onUpdateStatus={(id, status) => updateVisa(id, { status })}
+        onEdit={visa => {
+          loadVisaForEdit(visa) // 編輯不需要載入 tours
+        }}
+      />
 
       {/* 簽證資訊對話框 */}
       <VisasInfoDialog open={isInfoDialogOpen} onClose={() => setIsInfoDialogOpen(false)} />
@@ -521,7 +543,7 @@ export default function VisasPage() {
         open={isBatchPickupDialogOpen}
         onClose={() => setIsBatchPickupDialogOpen(false)}
         pendingVisas={visas.filter(v => v.status === 'submitted')}
-        onComplete={(updatedVisaIds) => {
+        onComplete={updatedVisaIds => {
           toast.success(`已完成 ${updatedVisaIds.length} 筆下件`)
         }}
         updateVisa={updateVisa}

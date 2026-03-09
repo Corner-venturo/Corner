@@ -18,18 +18,23 @@ export function MemberInfoCard({ open, member, onClose }: MemberInfoCardProps) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent level={1} className="max-w-3xl max-h-[90vh] overflow-hidden [&>button:last-child]:hidden">
+      <DialogContent
+        level={1}
+        className="max-w-3xl max-h-[90vh] overflow-hidden [&>button:last-child]:hidden"
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ImageIcon size={20} />
-            {member.name || member.chinese_name}{MEMBERS_LABELS.的護照}
+            {member.name || member.chinese_name}
+            {MEMBERS_LABELS.的護照}
           </DialogTitle>
         </DialogHeader>
 
         <div className="relative">
           <Button
             variant="ghost"
-            size="icon" aria-label="Close"
+            size="icon"
+            aria-label="Close"
             className="absolute right-2 top-2 z-10 bg-card/80 hover:bg-card"
             onClick={onClose}
           >
@@ -37,7 +42,8 @@ export function MemberInfoCard({ open, member, onClose }: MemberInfoCardProps) {
           </Button>
           {member.passport_image_url ? (
             <div className="relative w-full max-h-[70vh] overflow-auto">
-              <img src={member.passport_image_url}
+              <img
+                src={member.passport_image_url}
                 alt={`${member.name || member.chinese_name}${MEMBERS_LABELS.的護照}`}
                 className="w-full h-auto object-contain rounded-lg"
               />
@@ -76,8 +82,8 @@ export function MemberInfoCard({ open, member, onClose }: MemberInfoCardProps) {
               {member.gender === 'M'
                 ? MEMBERS_LABELS.男
                 : member.gender === 'F'
-                ? MEMBERS_LABELS.女
-                : '-'}
+                  ? MEMBERS_LABELS.女
+                  : '-'}
             </span>
           </div>
         </div>

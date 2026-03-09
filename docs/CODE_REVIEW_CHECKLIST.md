@@ -18,24 +18,25 @@
 
 ### A. 資料取得與空值處理
 
-| 檢查項目 | 問題模式 | 正確做法 |
-|---------|---------|---------|
-| ❌ 用預設值掩蓋問題 | `value \|\| 'TP'` | 拋出錯誤或顯示提示 |
-| ❌ 空 catch 區塊 | `catch (e) {}` | `catch (e) { logger.error(...) }` |
-| ❌ 背景 .then() 不等待 | `fetchData().then(...)` | `await fetchData()` |
-| ❌ 假設資料已載入 | 直接使用 store.items | 先檢查 `items.length > 0` |
+| 檢查項目               | 問題模式                | 正確做法                          |
+| ---------------------- | ----------------------- | --------------------------------- |
+| ❌ 用預設值掩蓋問題    | `value \|\| 'TP'`       | 拋出錯誤或顯示提示                |
+| ❌ 空 catch 區塊       | `catch (e) {}`          | `catch (e) { logger.error(...) }` |
+| ❌ 背景 .then() 不等待 | `fetchData().then(...)` | `await fetchData()`               |
+| ❌ 假設資料已載入      | 直接使用 store.items    | 先檢查 `items.length > 0`         |
 
 ### B. 型別安全
 
-| 檢查項目 | 問題數量 | 說明 |
-|---------|---------|------|
-| `as any` 使用 | 20+ 處 | 應該定義正確的型別 |
-| `as unknown` 使用 | 10+ 處 | 應該使用型別守衛 |
-| 可選鏈 `?.` 隱藏 bug | 15+ 處 | 應該先驗證資料存在 |
+| 檢查項目             | 問題數量 | 說明               |
+| -------------------- | -------- | ------------------ |
+| `as any` 使用        | 20+ 處   | 應該定義正確的型別 |
+| `as unknown` 使用    | 10+ 處   | 應該使用型別守衛   |
+| 可選鏈 `?.` 隱藏 bug | 15+ 處   | 應該先驗證資料存在 |
 
 ### C. Store 依賴關係
 
 **必須按順序載入的 Stores:**
+
 ```
 1. authStore (登入時)
    └── 包含 workspace_id, workspace_code
@@ -45,6 +46,7 @@
 ```
 
 **問題檔案清單:**
+
 - `src/stores/auth-store.ts:87, 207` - `as any` 需要移除
 - `src/stores/core/create-store.ts:126, 149, 191` - 多處型別斷言
 - `src/features/tours/services/tour.service.ts:239, 314` - 空 catch
@@ -88,11 +90,14 @@ try {
 ```typescript
 // ❌ 錯誤：不等待結果，後續代碼可能在資料載入前執行
 if (store.items.length === 0) {
-  store.fetchAll().then(() => {
-    // 更新快取...
-  }).catch(() => {})
+  store
+    .fetchAll()
+    .then(() => {
+      // 更新快取...
+    })
+    .catch(() => {})
 }
-return null  // 立即返回，資料可能還沒載入
+return null // 立即返回，資料可能還沒載入
 
 // ✅ 正確：等待資料載入完成
 if (store.items.length === 0) {
@@ -106,7 +111,7 @@ const items = store.items
 ```typescript
 // ❌ 錯誤：假設 workspaces 已載入
 const workspace = workspaces.find(w => w.id === id)
-return workspace.code  // 可能是 undefined
+return workspace.code // 可能是 undefined
 
 // ✅ 正確：先檢查資料存在
 if (!workspaces || workspaces.length === 0) {
@@ -124,17 +129,20 @@ return workspace.code
 ## 四、新功能開發前檢查清單
 
 ### 開發前
+
 - [ ] 這個功能需要哪些資料？
 - [ ] 這些資料在使用時一定已經載入了嗎？
 - [ ] 如果資料不存在，應該怎麼處理？
 
 ### 開發中
+
 - [ ] 有沒有用 `as any` 繞過型別檢查？
 - [ ] 有沒有用預設值（如 `|| 'TP'`）掩蓋問題？
 - [ ] 所有 catch 區塊都有記錄錯誤嗎？
 - [ ] 非同步操作有正確等待嗎？
 
 ### 開發後
+
 - [ ] 測試：登入後立即使用這個功能
 - [ ] 測試：重新整理頁面後使用這個功能
 - [ ] 測試：不同 workspace 的使用者使用這個功能
@@ -145,29 +153,32 @@ return workspace.code
 
 以下檔案有較多的型別斷言或錯誤處理問題，修改時需特別注意：
 
-| 檔案 | 問題數量 | 主要問題 |
-|------|---------|---------|
-| `src/stores/auth-store.ts` | 5+ | `as any`、錯誤處理 |
-| `src/stores/core/create-store.ts` | 10+ | 大量 `as any` |
-| `src/features/tours/services/tour.service.ts` | 5+ | 空 catch、型別斷言 |
-| `src/features/tours/components/ToursPage.tsx` | 6+ | 資料類型斷言 |
-| `src/lib/workspace-helpers.ts` | 3+ | 背景載入邏輯 |
+| 檔案                                          | 問題數量 | 主要問題           |
+| --------------------------------------------- | -------- | ------------------ |
+| `src/stores/auth-store.ts`                    | 5+       | `as any`、錯誤處理 |
+| `src/stores/core/create-store.ts`             | 10+      | 大量 `as any`      |
+| `src/features/tours/services/tour.service.ts` | 5+       | 空 catch、型別斷言 |
+| `src/features/tours/components/ToursPage.tsx` | 6+       | 資料類型斷言       |
+| `src/lib/workspace-helpers.ts`                | 3+       | 背景載入邏輯       |
 
 ---
 
 ## 六、建議的修復優先順序
 
 ### Phase 1: 立即修復 (影響資料正確性)
+
 1. ✅ workspace_code 登入時取得
 2. ⬜ auth-store.ts 的 `as any` 移除
 3. ⬜ 空 catch 區塊添加錯誤記錄
 
 ### Phase 2: 短期改善 (1-2 週)
+
 1. ⬜ 統一非同步資料載入模式
 2. ⬜ 建立 Store 初始化順序文檔
 3. ⬜ 改進錯誤邊界
 
 ### Phase 3: 長期改善 (1-2 月)
+
 1. ⬜ 逐步移除所有 `as any`
 2. ⬜ 添加關鍵流程的單元測試
 3. ⬜ 啟用 TypeScript strict mode

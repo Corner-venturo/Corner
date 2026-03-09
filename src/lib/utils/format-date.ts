@@ -100,7 +100,20 @@ export function formatMonthShort(date: string | Date | null | undefined): string
     const d = typeof date === 'string' ? new Date(date) : date
     if (isNaN(d.getTime())) return ''
 
-    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+    const months = [
+      'JAN',
+      'FEB',
+      'MAR',
+      'APR',
+      'MAY',
+      'JUN',
+      'JUL',
+      'AUG',
+      'SEP',
+      'OCT',
+      'NOV',
+      'DEC',
+    ]
     return months[d.getMonth()]
   } catch {
     return ''
@@ -285,7 +298,20 @@ export function formatDateMonthDayEN(date: string | Date | null | undefined): st
     const d = typeof date === 'string' ? new Date(date) : date
     if (isNaN(d.getTime())) return ''
 
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ]
     return `${months[d.getMonth()]} ${d.getDate()}`
   } catch {
     return ''
@@ -468,7 +494,20 @@ export function formatDateShort(date: string | Date | null | undefined): string 
     if (typeof date === 'string') {
       const mmddMatch = date.match(/^(\d{1,2})\/(\d{1,2})$/)
       if (mmddMatch) {
-        const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+        const months = [
+          'JAN',
+          'FEB',
+          'MAR',
+          'APR',
+          'MAY',
+          'JUN',
+          'JUL',
+          'AUG',
+          'SEP',
+          'OCT',
+          'NOV',
+          'DEC',
+        ]
         const month = parseInt(mmddMatch[1], 10) - 1
         const day = parseInt(mmddMatch[2], 10)
         if (month >= 0 && month < 12) return `${months[month]} ${day}`

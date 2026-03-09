@@ -4,7 +4,6 @@
  * 包含建立第一個管理員帳號
  */
 
-
 import { useState, useCallback } from 'react'
 import {
   Dialog,
@@ -52,7 +51,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
   })
 
   const handleFieldChange = useCallback((field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    setFormData(prev => ({ ...prev, [field]: value }))
   }, [])
 
   const resetForm = useCallback(() => {
@@ -207,7 +206,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
                 <Label required>{WORKSPACES_LABELS.LABEL_20}</Label>
                 <Input
                   value={formData.name}
-                  onChange={(e) => handleFieldChange('name', e.target.value)}
+                  onChange={e => handleFieldChange('name', e.target.value)}
                   placeholder={WORKSPACES_LABELS.例_角落旅遊_台北}
                 />
               </div>
@@ -216,7 +215,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
                 <Label required>{WORKSPACES_LABELS.LABEL_3535}</Label>
                 <Input
                   value={formData.code}
-                  onChange={(e) => handleFieldChange('code', e.target.value.toLowerCase())}
+                  onChange={e => handleFieldChange('code', e.target.value.toLowerCase())}
                   placeholder={WORKSPACES_LABELS.例_corner_小寫}
                 />
                 <p className="text-xs text-morandi-secondary">{WORKSPACES_LABELS.LABEL_8377}</p>
@@ -227,7 +226,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
               <Label required>{WORKSPACES_LABELS.LABEL_3932}</Label>
               <Select
                 value={formData.type}
-                onValueChange={(value) => handleFieldChange('type', value)}
+                onValueChange={value => handleFieldChange('type', value)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -247,7 +246,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
                 <Label>{WORKSPACES_LABELS.LABEL_5013}</Label>
                 <Input
                   value={formData.employee_number_prefix}
-                  onChange={(e) => handleFieldChange('employee_number_prefix', e.target.value)}
+                  onChange={e => handleFieldChange('employee_number_prefix', e.target.value)}
                   placeholder="E"
                   className="uppercase"
                   maxLength={5}
@@ -261,7 +260,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
                 <Label>{WORKSPACES_LABELS.LABEL_9036}</Label>
                 <Input
                   value={formData.default_password}
-                  onChange={(e) => handleFieldChange('default_password', e.target.value)}
+                  onChange={e => handleFieldChange('default_password', e.target.value)}
                   placeholder="1234"
                 />
                 <p className="text-xs text-morandi-secondary">{WORKSPACES_LABELS.LABEL_9086}</p>
@@ -280,7 +279,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
                 <Label required>{WORKSPACES_LABELS.MANAGE_9048}</Label>
                 <Input
                   value={formData.admin_name}
-                  onChange={(e) => handleFieldChange('admin_name', e.target.value)}
+                  onChange={e => handleFieldChange('admin_name', e.target.value)}
                   placeholder={WORKSPACES_LABELS.例_王大明}
                 />
               </div>
@@ -289,7 +288,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
                 <Label required>{WORKSPACES_LABELS.LABEL_2161}</Label>
                 <Input
                   value={formData.admin_employee_number}
-                  onChange={(e) => handleFieldChange('admin_employee_number', e.target.value)}
+                  onChange={e => handleFieldChange('admin_employee_number', e.target.value)}
                   placeholder={WORKSPACES_LABELS.例_E001}
                   className="uppercase"
                 />
@@ -301,7 +300,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
               <Input
                 type="password"
                 value={formData.admin_password}
-                onChange={(e) => handleFieldChange('admin_password', e.target.value)}
+                onChange={e => handleFieldChange('admin_password', e.target.value)}
                 placeholder={WORKSPACES_LABELS.請設定密碼}
               />
             </div>
@@ -318,11 +317,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
             disabled={isSubmitting}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
-            {isSubmitting ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <Save size={16} />
-            )}
+            {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
             建立公司
           </Button>
         </div>

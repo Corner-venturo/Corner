@@ -42,10 +42,12 @@ export async function getChannelMessages({
 
   const { data, error } = await supabase
     .from('messages')
-    .select(`
+    .select(
+      `
       *,
       author:employees ( id, display_name )
-    `)
+    `
+    )
     .eq('channel_id', channelId)
     .order('created_at', { ascending: false })
     .limit(limit)
@@ -87,7 +89,9 @@ export async function getChannelMessagesSimple({
 /**
  * 取得作者資訊
  */
-export async function getMessageAuthor(authorId: string): Promise<{ id: string; display_name: string } | null> {
+export async function getMessageAuthor(
+  authorId: string
+): Promise<{ id: string; display_name: string } | null> {
   const supabase = createSupabaseBrowserClient()
 
   const { data, error } = await supabase

@@ -49,7 +49,8 @@ export const TableBody = React.memo(function TableBody({
   // 載入狀態：顯示骨架屏
   if (loading) {
     const skeletonRows = 5 // 預設顯示 5 行骨架
-    const totalColumns = columns.length + (selection ? 1 : 0) + (expandable ? 1 : 0) + (actions ? 1 : 0)
+    const totalColumns =
+      columns.length + (selection ? 1 : 0) + (expandable ? 1 : 0) + (actions ? 1 : 0)
 
     return (
       <tbody>
@@ -68,7 +69,9 @@ export const TableBody = React.memo(function TableBody({
               >
                 <div
                   className="h-4 bg-morandi-container/50 rounded animate-pulse"
-                  style={{ width: colIndex === 0 ? '60%' : colIndex === columns.length - 1 ? '40%' : '80%' }}
+                  style={{
+                    width: colIndex === 0 ? '60%' : colIndex === columns.length - 1 ? '40%' : '80%',
+                  }}
                 />
               </td>
             ))}
@@ -192,7 +195,9 @@ export const TableBody = React.memo(function TableBody({
               {/* Actions column - 固定 50% 寬度 */}
               {actions && (
                 <td className="py-3 px-4" style={{ width: '50%' }}>
-                  <div onClick={(e: React.MouseEvent) => e.stopPropagation()}>{actions(row, actualRowIndex)}</div>
+                  <div onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                    {actions(row, actualRowIndex)}
+                  </div>
                 </td>
               )}
             </tr>

@@ -3,6 +3,7 @@
 ## 機場資料 (ref_airports)
 
 ### 資料來源
+
 - [OpenFlights](https://openflights.org/data.html) - 全球 7000+ 機場
 - 常用機場中文名稱手動維護（約 80 個）
 
@@ -19,18 +20,18 @@ npx tsx scripts/seed-data/seed-airports.ts
 
 ### 資料欄位
 
-| 欄位 | 說明 | 範例 |
-|-----|------|------|
-| iata_code | IATA 機場代碼 (PK) | NRT |
-| icao_code | ICAO 機場代碼 | RJAA |
-| english_name | 英文名稱 | Narita International Airport |
-| name_zh | 中文名稱 | 成田國際機場 |
-| city_name_en | 城市英文名 | Tokyo |
-| city_name_zh | 城市中文名 | 東京 |
-| country_code | 國家代碼 (ISO) | JP |
-| latitude | 緯度 | 35.7647 |
-| longitude | 經度 | 140.3864 |
-| timezone | 時區 | Asia/Tokyo |
+| 欄位         | 說明               | 範例                         |
+| ------------ | ------------------ | ---------------------------- |
+| iata_code    | IATA 機場代碼 (PK) | NRT                          |
+| icao_code    | ICAO 機場代碼      | RJAA                         |
+| english_name | 英文名稱           | Narita International Airport |
+| name_zh      | 中文名稱           | 成田國際機場                 |
+| city_name_en | 城市英文名         | Tokyo                        |
+| city_name_zh | 城市中文名         | 東京                         |
+| country_code | 國家代碼 (ISO)     | JP                           |
+| latitude     | 緯度               | 35.7647                      |
+| longitude    | 經度               | 140.3864                     |
+| timezone     | 時區               | Asia/Tokyo                   |
 
 ### 常用機場清單
 

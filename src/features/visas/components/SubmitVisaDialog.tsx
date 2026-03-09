@@ -155,7 +155,7 @@ export function SubmitVisaDialog({
             <label className="text-sm font-medium text-morandi-primary">{L.label_date}</label>
             <DatePicker
               value={submitDate}
-              onChange={(date) => setSubmitDate(date)}
+              onChange={date => setSubmitDate(date)}
               className="mt-1"
               placeholder={L.placeholder_date}
             />
@@ -199,13 +199,15 @@ export function SubmitVisaDialog({
                     </span>
                     {historyCost && (
                       <span className="text-xs text-morandi-green flex items-center gap-1">
-                        {L.history_cost} <CurrencyCell amount={historyCost.cost} className="text-xs text-morandi-green" />
+                        {L.history_cost}{' '}
+                        <CurrencyCell
+                          amount={historyCost.cost}
+                          className="text-xs text-morandi-green"
+                        />
                       </span>
                     )}
                     {vendor && !historyCost && (
-                      <span className="text-xs text-morandi-gold">
-                        {L.new_cost_record}
-                      </span>
+                      <span className="text-xs text-morandi-gold">{L.new_cost_record}</span>
                     )}
                   </div>
 
@@ -234,7 +236,10 @@ export function SubmitVisaDialog({
         {/* 總計 */}
         <div className="border-t border-border pt-3 flex justify-between items-center">
           <span className="text-sm text-morandi-secondary">{L.total_cost}</span>
-          <CurrencyCell amount={Object.values(costs).reduce((sum, c) => sum + c, 0)} className="text-lg font-semibold text-morandi-primary" />
+          <CurrencyCell
+            amount={Object.values(costs).reduce((sum, c) => sum + c, 0)}
+            className="text-lg font-semibold text-morandi-primary"
+          />
         </div>
       </div>
     </FormDialog>

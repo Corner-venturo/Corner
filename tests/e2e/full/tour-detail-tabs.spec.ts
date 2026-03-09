@@ -66,7 +66,10 @@ test.describe.serial('旅遊團詳情分頁測試', () => {
 
     // 檢查是否有新增按鈕
     const addButton = dialog.locator('button').filter({ hasText: '新增' })
-    const hasAddButton = await addButton.first().isVisible().catch(() => false)
+    const hasAddButton = await addButton
+      .first()
+      .isVisible()
+      .catch(() => false)
 
     if (hasAddButton) {
       console.log('✅ 團員名單分頁 - 找到新增按鈕')
@@ -92,11 +95,17 @@ test.describe.serial('旅遊團詳情分頁測試', () => {
 
     // 檢查是否有訂單內容
     const ordersContent = dialog.locator('text=訂單')
-    const hasContent = await ordersContent.first().isVisible().catch(() => false)
+    const hasContent = await ordersContent
+      .first()
+      .isVisible()
+      .catch(() => false)
 
     // 檢查是否有新增訂單按鈕
     const addOrderButton = dialog.locator('button').filter({ hasText: /新增.*訂單|新增/ })
-    const hasAddButton = await addOrderButton.first().isVisible().catch(() => false)
+    const hasAddButton = await addOrderButton
+      .first()
+      .isVisible()
+      .catch(() => false)
 
     if (hasAddButton) {
       console.log('✅ 訂單管理分頁 - 找到新增訂單按鈕')
@@ -128,7 +137,10 @@ test.describe.serial('旅遊團詳情分頁測試', () => {
 
     for (const item of checkItems) {
       const element = dialog.locator(item.selector)
-      const isVisible = await element.first().isVisible().catch(() => false)
+      const isVisible = await element
+        .first()
+        .isVisible()
+        .catch(() => false)
       if (isVisible) {
         console.log(`✅ 總覽分頁 - ${item.name} 顯示正常`)
       }
@@ -155,9 +167,22 @@ test.describe.serial('旅遊團詳情分頁測試', () => {
     await expect(dialog).toBeVisible()
 
     // 團確單分頁內容會顯示（可能是行程表或提示訊息）
-    const hasContent = await dialog.locator('text=行程表').first().isVisible().catch(() => false) ||
-                       await dialog.locator('text=尚未').first().isVisible().catch(() => false) ||
-                       await dialog.locator('text=團確').first().isVisible().catch(() => false)
+    const hasContent =
+      (await dialog
+        .locator('text=行程表')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await dialog
+        .locator('text=尚未')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await dialog
+        .locator('text=團確')
+        .first()
+        .isVisible()
+        .catch(() => false))
 
     console.log(`✅ 團確單分頁 - 顯示正常 (有內容: ${hasContent})`)
 

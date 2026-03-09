@@ -670,12 +670,16 @@ export const japaneseStyleV1Memo: PageTemplate = {
 
   generateElements(data: TemplateData): CanvasElement[] {
     // 檢查是否有自訂的備忘錄內容（新增頁面時選擇的項目）
-    const customMemoContent = (data as { memoPageContent?: {
-      items?: MemoItem[]
-      seasons?: SeasonInfo[]
-      infoItems?: MemoInfoItem[]
-      isWeatherPage?: boolean
-    } }).memoPageContent
+    const customMemoContent = (
+      data as {
+        memoPageContent?: {
+          items?: MemoItem[]
+          seasons?: SeasonInfo[]
+          infoItems?: MemoInfoItem[]
+          isWeatherPage?: boolean
+        }
+      }
+    ).memoPageContent
 
     const memoSettings = data.memoSettings
 

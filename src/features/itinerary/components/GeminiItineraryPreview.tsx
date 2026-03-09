@@ -1,7 +1,19 @@
 'use client'
 
 import React, { useState } from 'react'
-import { MapPin, Plane, Calendar, Utensils, Hotel, Coffee, Sun, Moon, ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
+import {
+  MapPin,
+  Plane,
+  Calendar,
+  Utensils,
+  Hotel,
+  Coffee,
+  Sun,
+  Moon,
+  ChevronDown,
+  ChevronUp,
+  Sparkles,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ITINERARY_LABELS } from './constants/labels'
 import { sanitizeCss } from '@/lib/utils/sanitize'
@@ -20,8 +32,24 @@ interface DailyScheduleItem {
 
 interface FlightOption {
   airline: string
-  outbound: { code: string; from: string; fromCode: string; time: string; to: string; toCode: string; arrivalTime: string }
-  return: { code: string; from: string; fromCode: string; time: string; to: string; toCode: string; arrivalTime: string }
+  outbound: {
+    code: string
+    from: string
+    fromCode: string
+    time: string
+    to: string
+    toCode: string
+    arrivalTime: string
+  }
+  return: {
+    code: string
+    from: string
+    fromCode: string
+    time: string
+    to: string
+    toCode: string
+    arrivalTime: string
+  }
 }
 
 interface HighlightSpot {
@@ -75,12 +103,15 @@ function HighlightCard({ spot, totalCount }: { spot: HighlightSpot; totalCount: 
       )}
     >
       {/* Image Container */}
-      <div className={cn(
-        'relative overflow-hidden',
-        totalCount === 1 ? 'h-64 md:h-72 md:w-1/2' : 'h-48'
-      )}>
+      <div
+        className={cn(
+          'relative overflow-hidden',
+          totalCount === 1 ? 'h-64 md:h-72 md:w-1/2' : 'h-48'
+        )}
+      >
         {spot.imageUrl ? (
-          <img src={spot.imageUrl}
+          <img
+            src={spot.imageUrl}
             alt={spot.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
           />
@@ -96,7 +127,10 @@ function HighlightCard({ spot, totalCount }: { spot: HighlightSpot; totalCount: 
         {spot.tags && spot.tags.length > 0 && (
           <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
             {spot.tags.slice(0, 2).map((tag, i) => (
-              <span key={i} className="bg-[#c9aa7c] text-[#3a3633] text-[10px] font-bold px-2.5 py-1 rounded-full">
+              <span
+                key={i}
+                className="bg-[#c9aa7c] text-[#3a3633] text-[10px] font-bold px-2.5 py-1 rounded-full"
+              >
                 {tag}
               </span>
             ))}
@@ -105,20 +139,24 @@ function HighlightCard({ spot, totalCount }: { spot: HighlightSpot; totalCount: 
       </div>
 
       {/* Content */}
-      <div className={cn(
-        'p-5',
-        totalCount === 1 && 'md:w-1/2 md:flex md:flex-col md:justify-center md:p-6'
-      )}>
+      <div
+        className={cn(
+          'p-5',
+          totalCount === 1 && 'md:w-1/2 md:flex md:flex-col md:justify-center md:p-6'
+        )}
+      >
         <h3 className="font-bold text-[#3a3633] text-lg mb-1 group-hover:text-[#c9aa7c] transition-colors">
           {spot.name || '景點名稱'}
         </h3>
         {spot.nameEn && (
           <p className="text-[10px] text-[#b8b2aa] mb-3 tracking-wider uppercase">{spot.nameEn}</p>
         )}
-        <p className={cn(
-          'text-sm text-[#6b6660] leading-relaxed',
-          totalCount === 1 ? 'line-clamp-5' : 'line-clamp-2'
-        )}>
+        <p
+          className={cn(
+            'text-sm text-[#6b6660] leading-relaxed',
+            totalCount === 1 ? 'line-clamp-5' : 'line-clamp-2'
+          )}
+        >
           {spot.description || '精彩景點等待探索'}
         </p>
       </div>
@@ -185,16 +223,20 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
           style={{
             backgroundImage: safeData.coverImage
               ? `url('${safeData.coverImage}')`
-              : 'linear-gradient(135deg, #667a6e 0%, #8b9d83 50%, #c9aa7c 100%)'
+              : 'linear-gradient(135deg, #667a6e 0%, #8b9d83 50%, #c9aa7c 100%)',
           }}
         />
         {/* Elegant Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#3a3633]/90 via-[#3a3633]/40 to-transparent" />
 
         {/* Subtle Pattern Overlay */}
-        <div className="absolute inset-0 opacity-10" style={{
-          backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'
-        }} />
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
+          }}
+        />
 
         {/* Content */}
         <div className="relative h-full flex flex-col justify-end p-8 md:p-12 text-white max-w-5xl mx-auto">
@@ -227,19 +269,25 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
             {safeData.country && (
               <div className="flex items-center gap-2 bg-card/10 backdrop-blur-sm px-4 py-2 rounded-full">
                 <MapPin size={16} className="text-[#c9aa7c]" />
-                <span>{safeData.country} · {safeData.city}</span>
+                <span>
+                  {safeData.country} · {safeData.city}
+                </span>
               </div>
             )}
             {days > 0 && (
               <div className="flex items-center gap-2 bg-card/10 backdrop-blur-sm px-4 py-2 rounded-full">
                 <Calendar size={16} className="text-[#c9aa7c]" />
-                <span>{days} 天 {Math.max(0, days - 1)} 夜</span>
+                <span>
+                  {days} 天 {Math.max(0, days - 1)} 夜
+                </span>
               </div>
             )}
             {safeData.price && (
               <div className="flex items-center gap-2 bg-[#c9aa7c] text-[#3a3633] px-5 py-2 rounded-full font-bold">
                 <span>NT$ {safeData.price}</span>
-                <span className="font-normal text-[#3a3633]/70 text-xs">{safeData.priceNote || '起'}</span>
+                <span className="font-normal text-[#3a3633]/70 text-xs">
+                  {safeData.priceNote || '起'}
+                </span>
               </div>
             )}
           </div>
@@ -252,8 +300,12 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
           <div className="max-w-5xl mx-auto">
             {/* Section Header */}
             <div className="text-center mb-12">
-              <p className="text-xs text-[#c9aa7c] tracking-[0.3em] mb-2 font-medium uppercase">Highlights</p>
-              <h2 className="text-2xl md:text-3xl font-bold text-[#3a3633]">{ITINERARY_LABELS.LABEL_3969}</h2>
+              <p className="text-xs text-[#c9aa7c] tracking-[0.3em] mb-2 font-medium uppercase">
+                Highlights
+              </p>
+              <h2 className="text-2xl md:text-3xl font-bold text-[#3a3633]">
+                {ITINERARY_LABELS.LABEL_3969}
+              </h2>
               <div className="w-16 h-1 bg-gradient-to-r from-transparent via-[#c9aa7c] to-transparent mx-auto mt-4" />
             </div>
 
@@ -303,8 +355,12 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
           <div className="max-w-5xl mx-auto">
             {/* Section Header */}
             <div className="text-center mb-12">
-              <p className="text-xs text-[#9fa68f] tracking-[0.3em] mb-2 font-medium uppercase">Itinerary</p>
-              <h2 className="text-2xl md:text-3xl font-bold text-[#3a3633]">{ITINERARY_LABELS.LABEL_2780}</h2>
+              <p className="text-xs text-[#9fa68f] tracking-[0.3em] mb-2 font-medium uppercase">
+                Itinerary
+              </p>
+              <h2 className="text-2xl md:text-3xl font-bold text-[#3a3633]">
+                {ITINERARY_LABELS.LABEL_2780}
+              </h2>
               <div className="w-16 h-1 bg-gradient-to-r from-transparent via-[#9fa68f] to-transparent mx-auto mt-4" />
             </div>
 
@@ -320,15 +376,14 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
                   const dayNumber = day.day.replace(/\D/g, '') || String(index + 1)
 
                   return (
-                    <div
-                      key={index}
-                      className="relative pl-[72px] md:pl-[80px]"
-                    >
+                    <div key={index} className="relative pl-[72px] md:pl-[80px]">
                       {/* Day Badge */}
                       <div className="absolute left-0 top-0">
                         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#c9aa7c] to-[#b8996b] flex items-center justify-center text-white shadow-md">
                           <div className="text-center leading-none">
-                            <div className="text-[7px] font-semibold tracking-wider opacity-90">DAY</div>
+                            <div className="text-[7px] font-semibold tracking-wider opacity-90">
+                              DAY
+                            </div>
                             <div className="text-base font-bold">{dayNumber}</div>
                           </div>
                         </div>
@@ -350,7 +405,9 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
                             <div className="bg-[#FAFAF8] rounded-xl p-4">
                               <div className="flex items-center gap-2 text-[#c9aa7c] mb-3">
                                 <Utensils size={16} />
-                                <span className="font-bold text-sm">{ITINERARY_LABELS.LABEL_9126}</span>
+                                <span className="font-bold text-sm">
+                                  {ITINERARY_LABELS.LABEL_9126}
+                                </span>
                               </div>
                               <div className="space-y-2.5">
                                 <div className="flex items-center justify-between text-sm">
@@ -358,21 +415,27 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
                                     <Coffee size={14} className="text-[#c9aa7c]/60" />
                                     {ITINERARY_LABELS.LABEL_1347}
                                   </span>
-                                  <span className="text-[#3a3633] font-medium">{day.meals.breakfast || '-'}</span>
+                                  <span className="text-[#3a3633] font-medium">
+                                    {day.meals.breakfast || '-'}
+                                  </span>
                                 </div>
                                 <div className="flex items-center justify-between text-sm">
                                   <span className="flex items-center gap-2 text-[#8b8680]">
                                     <Sun size={14} className="text-[#c9aa7c]/60" />
                                     {ITINERARY_LABELS.LABEL_8515}
                                   </span>
-                                  <span className="text-[#3a3633] font-medium">{day.meals.lunch || '-'}</span>
+                                  <span className="text-[#3a3633] font-medium">
+                                    {day.meals.lunch || '-'}
+                                  </span>
                                 </div>
                                 <div className="flex items-center justify-between text-sm">
                                   <span className="flex items-center gap-2 text-[#8b8680]">
                                     <Moon size={14} className="text-[#c9aa7c]/60" />
                                     {ITINERARY_LABELS.LABEL_8227}
                                   </span>
-                                  <span className="text-[#3a3633] font-medium">{day.meals.dinner || '-'}</span>
+                                  <span className="text-[#3a3633] font-medium">
+                                    {day.meals.dinner || '-'}
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -381,7 +444,9 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
                             <div className="bg-[#FAFAF8] rounded-xl p-4">
                               <div className="flex items-center gap-2 text-[#9fa68f] mb-3">
                                 <Hotel size={16} />
-                                <span className="font-bold text-sm">{ITINERARY_LABELS.LABEL_9617}</span>
+                                <span className="font-bold text-sm">
+                                  {ITINERARY_LABELS.LABEL_9617}
+                                </span>
                               </div>
                               <p className="text-[#3a3633] text-sm font-medium leading-relaxed">
                                 {day.accommodation || '溫暖的家'}
@@ -405,8 +470,12 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
           <div className="max-w-5xl mx-auto">
             {/* Section Header */}
             <div className="text-center mb-12">
-              <p className="text-xs text-[#c08374] tracking-[0.3em] mb-2 font-medium uppercase">Attractions</p>
-              <h2 className="text-2xl md:text-3xl font-bold text-[#3a3633]">{ITINERARY_LABELS.LABEL_4014}</h2>
+              <p className="text-xs text-[#c08374] tracking-[0.3em] mb-2 font-medium uppercase">
+                Attractions
+              </p>
+              <h2 className="text-2xl md:text-3xl font-bold text-[#3a3633]">
+                {ITINERARY_LABELS.LABEL_4014}
+              </h2>
               <div className="w-16 h-1 bg-gradient-to-r from-transparent via-[#c08374] to-transparent mx-auto mt-4" />
             </div>
 
@@ -431,7 +500,8 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
                     {/* Image - 晴日風格大圖 */}
                     <div className="md:w-2/5 h-64 md:h-auto relative overflow-hidden flex-shrink-0">
                       {sight.imageUrl ? (
-                        <img src={sight.imageUrl}
+                        <img
+                          src={sight.imageUrl}
                           alt={sight.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                         />
@@ -456,10 +526,12 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
 
                       {/* Description with expand/collapse */}
                       <div className="relative">
-                        <p className={cn(
-                          'text-[#6b6660] leading-relaxed text-sm md:text-base transition-all duration-300',
-                          !isExpanded && isLongDescription && 'line-clamp-3'
-                        )}>
+                        <p
+                          className={cn(
+                            'text-[#6b6660] leading-relaxed text-sm md:text-base transition-all duration-300',
+                            !isExpanded && isLongDescription && 'line-clamp-3'
+                          )}
+                        >
                           {sight.description || '等待探索這個美麗的地方...'}
                         </p>
 
@@ -508,15 +580,22 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
           <div className="max-w-5xl mx-auto">
             {/* Section Header */}
             <div className="text-center mb-12">
-              <p className="text-xs text-[#8b8680] tracking-[0.3em] mb-2 font-medium uppercase">Flight Info</p>
-              <h2 className="text-2xl md:text-3xl font-bold text-[#3a3633]">{ITINERARY_LABELS.LABEL_5074}</h2>
+              <p className="text-xs text-[#8b8680] tracking-[0.3em] mb-2 font-medium uppercase">
+                Flight Info
+              </p>
+              <h2 className="text-2xl md:text-3xl font-bold text-[#3a3633]">
+                {ITINERARY_LABELS.LABEL_5074}
+              </h2>
               <div className="w-16 h-1 bg-gradient-to-r from-transparent via-[#8b8680] to-transparent mx-auto mt-4" />
             </div>
 
             {/* Flight Cards */}
             <div className="space-y-6">
               {safeData.flightOptions.map((flight, index) => (
-                <div key={index} className="bg-card rounded-2xl overflow-hidden border border-[#e8e5e0] shadow-sm">
+                <div
+                  key={index}
+                  className="bg-card rounded-2xl overflow-hidden border border-[#e8e5e0] shadow-sm"
+                >
                   {/* Airline Header */}
                   <div className="px-6 py-4 bg-gradient-to-r from-[#3a3633] to-[#4a4643] flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-[#c9aa7c] flex items-center justify-center">
@@ -533,12 +612,18 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
                         <div className="flex items-center gap-2 text-[#c9aa7c] font-bold text-sm mb-5">
                           <Plane size={14} />
                           {ITINERARY_LABELS.LABEL_7790}
-                          <span className="ml-auto text-[#8b8680] font-normal">{flight.outbound.code}</span>
+                          <span className="ml-auto text-[#8b8680] font-normal">
+                            {flight.outbound.code}
+                          </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <div className="text-center">
-                            <div className="text-3xl font-bold text-[#3a3633]">{flight.outbound.time || '--:--'}</div>
-                            <div className="text-sm text-[#c9aa7c] font-bold mt-1">{flight.outbound.fromCode || 'TPE'}</div>
+                            <div className="text-3xl font-bold text-[#3a3633]">
+                              {flight.outbound.time || '--:--'}
+                            </div>
+                            <div className="text-sm text-[#c9aa7c] font-bold mt-1">
+                              {flight.outbound.fromCode || 'TPE'}
+                            </div>
                             <div className="text-xs text-[#8b8680]">{flight.outbound.from}</div>
                           </div>
                           <div className="flex-1 mx-6 flex flex-col items-center gap-2">
@@ -551,8 +636,12 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
                             </div>
                           </div>
                           <div className="text-center">
-                            <div className="text-3xl font-bold text-[#3a3633]">{flight.outbound.arrivalTime || '--:--'}</div>
-                            <div className="text-sm text-[#c9aa7c] font-bold mt-1">{flight.outbound.toCode || '---'}</div>
+                            <div className="text-3xl font-bold text-[#3a3633]">
+                              {flight.outbound.arrivalTime || '--:--'}
+                            </div>
+                            <div className="text-sm text-[#c9aa7c] font-bold mt-1">
+                              {flight.outbound.toCode || '---'}
+                            </div>
                             <div className="text-xs text-[#8b8680]">{flight.outbound.to}</div>
                           </div>
                         </div>
@@ -563,12 +652,18 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
                         <div className="flex items-center gap-2 text-[#9fa68f] font-bold text-sm mb-5">
                           <Plane size={14} className="rotate-180" />
                           {ITINERARY_LABELS.LABEL_2327}
-                          <span className="ml-auto text-[#8b8680] font-normal">{flight.return.code}</span>
+                          <span className="ml-auto text-[#8b8680] font-normal">
+                            {flight.return.code}
+                          </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <div className="text-center">
-                            <div className="text-3xl font-bold text-[#3a3633]">{flight.return.time || '--:--'}</div>
-                            <div className="text-sm text-[#9fa68f] font-bold mt-1">{flight.return.fromCode || '---'}</div>
+                            <div className="text-3xl font-bold text-[#3a3633]">
+                              {flight.return.time || '--:--'}
+                            </div>
+                            <div className="text-sm text-[#9fa68f] font-bold mt-1">
+                              {flight.return.fromCode || '---'}
+                            </div>
                             <div className="text-xs text-[#8b8680]">{flight.return.from}</div>
                           </div>
                           <div className="flex-1 mx-6 flex flex-col items-center gap-2">
@@ -581,8 +676,12 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
                             </div>
                           </div>
                           <div className="text-center">
-                            <div className="text-3xl font-bold text-[#3a3633]">{flight.return.arrivalTime || '--:--'}</div>
-                            <div className="text-sm text-[#9fa68f] font-bold mt-1">{flight.return.toCode || 'TPE'}</div>
+                            <div className="text-3xl font-bold text-[#3a3633]">
+                              {flight.return.arrivalTime || '--:--'}
+                            </div>
+                            <div className="text-sm text-[#9fa68f] font-bold mt-1">
+                              {flight.return.toCode || 'TPE'}
+                            </div>
                             <div className="text-xs text-[#8b8680]">{flight.return.to}</div>
                           </div>
                         </div>
@@ -602,13 +701,9 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
           <div className="mb-4">
             <span className="text-[#c9aa7c] font-bold text-lg tracking-[0.2em]">CORNER TRAVEL</span>
           </div>
-          <p className="text-white/50 text-sm mb-2">
-            {ITINERARY_LABELS.LABEL_9031}
-          </p>
+          <p className="text-white/50 text-sm mb-2">{ITINERARY_LABELS.LABEL_9031}</p>
           <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-[#c9aa7c]/50 to-transparent mx-auto mt-6 mb-6" />
-          <p className="text-white/30 text-xs">
-            {ITINERARY_LABELS.LABEL_5599}
-          </p>
+          <p className="text-white/30 text-xs">{ITINERARY_LABELS.LABEL_5599}</p>
         </div>
       </footer>
     </div>

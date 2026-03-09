@@ -21,7 +21,12 @@ import { logger } from '@/lib/utils/logger'
 
 // 拆分模組
 import { AdjustmentSlider } from './AdjustmentSlider'
-import { applyAdjustmentsToImage, applyTransformToImage, cropImage, uploadBase64ToStorage } from './image-utils'
+import {
+  applyAdjustmentsToImage,
+  applyTransformToImage,
+  cropImage,
+  uploadBase64ToStorage,
+} from './image-utils'
 import {
   type ImageAdjustments,
   type ImageEditorSettings,
@@ -122,8 +127,10 @@ export function ImageEditor({
         setTransformedSrc(transformed)
       }
     }
-    applyTransform().catch((err) => logger.error('[applyTransform]', err))
-    return () => { cancelled = true }
+    applyTransform().catch(err => logger.error('[applyTransform]', err))
+    return () => {
+      cancelled = true
+    }
   }, [imageSrc, settings.rotation, settings.flipH])
 
   // 色彩調整預覽（debounce）- 使用已變換的圖片作為來源
@@ -143,7 +150,7 @@ export function ImageEditor({
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault()
     const delta = e.deltaY > 0 ? -0.1 : 0.1
-    setSettings((prev) => ({
+    setSettings(prev => ({
       ...prev,
       scale: Math.max(0.5, Math.min(3, prev.scale + delta)),
     }))
@@ -178,7 +185,7 @@ export function ImageEditor({
       // 縮放越大，移動感覺越快
       const moveMultiplier = settings.scale
 
-      setSettings((prev) => ({
+      setSettings(prev => ({
         ...prev,
         x: Math.max(0, Math.min(100, dragStartRef.current.posX - percentX * moveMultiplier)),
         y: Math.max(0, Math.min(100, dragStartRef.current.posY - percentY * moveMultiplier)),
@@ -204,7 +211,7 @@ export function ImageEditor({
 
   // ============ 調整滑軌 ============
   const handleAdjustmentChange = useCallback((key: keyof ImageAdjustments, value: number) => {
-    setSettings((prev) => ({
+    setSettings(prev => ({
       ...prev,
       adjustments: {
         ...prev.adjustments,
@@ -214,7 +221,7 @@ export function ImageEditor({
   }, [])
 
   const handleResetAdjustments = useCallback(() => {
-    setSettings((prev) => ({
+    setSettings(prev => ({
       ...prev,
       adjustments: { ...DEFAULT_ADJUSTMENTS },
     }))
@@ -222,28 +229,28 @@ export function ImageEditor({
 
   // ============ 旋轉/翻轉 ============
   const handleRotateLeft = useCallback(() => {
-    setSettings((prev) => ({
+    setSettings(prev => ({
       ...prev,
       rotation: (prev.rotation - 90 + 360) % 360,
     }))
   }, [])
 
   const handleRotateRight = useCallback(() => {
-    setSettings((prev) => ({
+    setSettings(prev => ({
       ...prev,
       rotation: (prev.rotation + 90) % 360,
     }))
   }, [])
 
   const handleFlipH = useCallback(() => {
-    setSettings((prev) => ({
+    setSettings(prev => ({
       ...prev,
       flipH: !prev.flipH,
     }))
   }, [])
 
   const handleResetTransform = useCallback(() => {
-    setSettings((prev) => ({
+    setSettings(prev => ({
       ...prev,
       rotation: 0,
       flipH: false,
@@ -324,7 +331,7 @@ export function ImageEditor({
   )
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Dialog open={open} onOpenChange={isOpen => !isOpen && onClose()}>
       <DialogContent level={3} className="max-w-4xl max-h-[90vh] flex flex-col p-0 gap-0">
         <DialogHeader className="px-6 py-4 border-b border-border">
           <DialogTitle>{t('title')}</DialogTitle>
@@ -343,7 +350,8 @@ export function ImageEditor({
               onWheel={handleWheel}
               onMouseDown={handleMouseDown}
             >
-              <img src={previewSrc}
+              <img
+                src={previewSrc}
                 alt={tCommon('preview')}
                 className="w-full h-full object-cover pointer-events-none"
                 style={{
@@ -414,7 +422,11 @@ export function ImageEditor({
                     {t('flipHorizontal')}
                   </button>
                 </div>
-                {(settings.rotation !== 0 || settings.flipH || settings.scale !== 1 || settings.x !== 50 || settings.y !== 50) && (
+                {(settings.rotation !== 0 ||
+                  settings.flipH ||
+                  settings.scale !== 1 ||
+                  settings.x !== 50 ||
+                  settings.y !== 50) && (
                   <Button
                     type="button"
                     variant="outline"
@@ -437,22 +449,22 @@ export function ImageEditor({
                 <AdjustmentSlider
                   label={t('exposure')}
                   value={settings.adjustments.exposure}
-                  onChange={(v) => handleAdjustmentChange('exposure', v)}
+                  onChange={v => handleAdjustmentChange('exposure', v)}
                 />
                 <AdjustmentSlider
                   label={t('contrast')}
                   value={settings.adjustments.contrast}
-                  onChange={(v) => handleAdjustmentChange('contrast', v)}
+                  onChange={v => handleAdjustmentChange('contrast', v)}
                 />
                 <AdjustmentSlider
                   label={t('highlights')}
                   value={settings.adjustments.highlights}
-                  onChange={(v) => handleAdjustmentChange('highlights', v)}
+                  onChange={v => handleAdjustmentChange('highlights', v)}
                 />
                 <AdjustmentSlider
                   label={t('shadows')}
                   value={settings.adjustments.shadows}
-                  onChange={(v) => handleAdjustmentChange('shadows', v)}
+                  onChange={v => handleAdjustmentChange('shadows', v)}
                 />
               </div>
 
@@ -463,17 +475,17 @@ export function ImageEditor({
                 <AdjustmentSlider
                   label={t('saturation')}
                   value={settings.adjustments.saturation}
-                  onChange={(v) => handleAdjustmentChange('saturation', v)}
+                  onChange={v => handleAdjustmentChange('saturation', v)}
                 />
                 <AdjustmentSlider
                   label={t('temperature')}
                   value={settings.adjustments.temperature}
-                  onChange={(v) => handleAdjustmentChange('temperature', v)}
+                  onChange={v => handleAdjustmentChange('temperature', v)}
                 />
                 <AdjustmentSlider
                   label={t('tint')}
                   value={settings.adjustments.tint}
-                  onChange={(v) => handleAdjustmentChange('tint', v)}
+                  onChange={v => handleAdjustmentChange('tint', v)}
                 />
               </div>
 
@@ -484,13 +496,13 @@ export function ImageEditor({
                 <AdjustmentSlider
                   label={t('clarity')}
                   value={settings.adjustments.clarity}
-                  onChange={(v) => handleAdjustmentChange('clarity', v)}
+                  onChange={v => handleAdjustmentChange('clarity', v)}
                 />
                 <AdjustmentSlider
                   label={t('vignette')}
                   value={settings.adjustments.vignette}
                   min={0}
-                  onChange={(v) => handleAdjustmentChange('vignette', v)}
+                  onChange={v => handleAdjustmentChange('vignette', v)}
                 />
               </div>
 
@@ -565,11 +577,7 @@ export function ImageEditor({
               disabled={isProcessing}
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1.5"
             >
-              {isProcessing ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : (
-                <Crop size={14} />
-              )}
+              {isProcessing ? <Loader2 size={14} className="animate-spin" /> : <Crop size={14} />}
               {t('cropAndSave')}
             </Button>
           )}
@@ -578,4 +586,3 @@ export function ImageEditor({
     </Dialog>
   )
 }
-

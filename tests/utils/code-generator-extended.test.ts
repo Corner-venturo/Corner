@@ -57,4 +57,3 @@ describe('generateCompanyPaymentRequestCode', () => {
     expect(generateCompanyPaymentRequestCode('ENT', '2025-01-15', existing)).toBe('ENT-202501-001')
   })
 })
-

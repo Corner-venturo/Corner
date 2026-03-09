@@ -15,13 +15,7 @@ interface PnrFormProps {
   onParse: () => void
 }
 
-export function PnrForm({
-  rawPNR,
-  isParsing,
-  validation,
-  onRawPNRChange,
-  onParse,
-}: PnrFormProps) {
+export function PnrForm({ rawPNR, isParsing, validation, onRawPNRChange, onParse }: PnrFormProps) {
   return (
     <div className="space-y-4">
       {/* 電報輸入 */}
@@ -29,7 +23,9 @@ export function PnrForm({
         <label className="block text-xs font-medium text-morandi-primary mb-1">
           Amadeus 電報內容
           {validation && (
-            <span className={`ml-2 ${validation.isValid ? 'text-morandi-success' : validation.errors.length > 0 ? 'text-morandi-alert' : 'text-morandi-gold'}`}>
+            <span
+              className={`ml-2 ${validation.isValid ? 'text-morandi-success' : validation.errors.length > 0 ? 'text-morandi-alert' : 'text-morandi-gold'}`}
+            >
               {validation.isValid ? (
                 <span className="inline-flex items-center gap-1">
                   <CheckCircle2 size={12} />
@@ -64,8 +60,8 @@ AP TPE 02-2712-8888`}
               ? validation.isValid
                 ? 'border-morandi-success/50 focus:border-morandi-success'
                 : validation.errors.length > 0
-                ? 'border-morandi-alert/50 focus:border-morandi-alert'
-                : 'border-morandi-gold/50 focus:border-morandi-gold'
+                  ? 'border-morandi-alert/50 focus:border-morandi-alert'
+                  : 'border-morandi-gold/50 focus:border-morandi-gold'
               : ''
           }`}
           value={rawPNR}
@@ -73,28 +69,31 @@ AP TPE 02-2712-8888`}
         />
 
         {/* 即時驗證提示 */}
-        {validation && (validation.errors.length > 0 || validation.warnings.length > 0 || validation.suggestions.length > 0) && (
-          <div className="mt-2 space-y-1">
-            {validation.errors.map((error, idx) => (
-              <div key={idx} className="flex items-center gap-1 text-xs text-morandi-alert">
-                <XCircle size={10} />
-                {error}
-              </div>
-            ))}
-            {validation.warnings.map((warning, idx) => (
-              <div key={idx} className="flex items-center gap-1 text-xs text-morandi-gold">
-                <AlertTriangle size={10} />
-                {warning}
-              </div>
-            ))}
-            {validation.suggestions.map((suggestion, idx) => (
-              <div key={idx} className="flex items-center gap-1 text-xs text-morandi-secondary">
-                <Info size={10} />
-                {suggestion}
-              </div>
-            ))}
-          </div>
-        )}
+        {validation &&
+          (validation.errors.length > 0 ||
+            validation.warnings.length > 0 ||
+            validation.suggestions.length > 0) && (
+            <div className="mt-2 space-y-1">
+              {validation.errors.map((error, idx) => (
+                <div key={idx} className="flex items-center gap-1 text-xs text-morandi-alert">
+                  <XCircle size={10} />
+                  {error}
+                </div>
+              ))}
+              {validation.warnings.map((warning, idx) => (
+                <div key={idx} className="flex items-center gap-1 text-xs text-morandi-gold">
+                  <AlertTriangle size={10} />
+                  {warning}
+                </div>
+              ))}
+              {validation.suggestions.map((suggestion, idx) => (
+                <div key={idx} className="flex items-center gap-1 text-xs text-morandi-secondary">
+                  <Info size={10} />
+                  {suggestion}
+                </div>
+              ))}
+            </div>
+          )}
       </div>
 
       {/* 解析按鈕 */}

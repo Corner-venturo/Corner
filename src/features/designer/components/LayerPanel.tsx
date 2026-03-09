@@ -196,7 +196,9 @@ export function LayerPanel({
       {/* 標題 */}
       <div className="p-3 border-b border-border flex items-center gap-2">
         <Layers size={16} className="text-morandi-gold" />
-        <span className="text-sm font-medium text-morandi-primary">{DESIGNER_LABELS.LABEL_5431}</span>
+        <span className="text-sm font-medium text-morandi-primary">
+          {DESIGNER_LABELS.LABEL_5431}
+        </span>
         <span className="text-xs text-morandi-secondary ml-auto">{layers.length}</span>
       </div>
 
@@ -234,7 +236,7 @@ export function LayerPanel({
           </div>
         ) : (
           <div className="p-1">
-            {layers.map((layer) => {
+            {layers.map(layer => {
               const Icon = getTypeIcon(layer.type)
               const isSelected = selectedObjectIds.includes(layer.id)
 
@@ -254,15 +256,13 @@ export function LayerPanel({
                   <Icon size={14} className="text-morandi-secondary shrink-0" />
 
                   {/* 名稱 */}
-                  <span className="flex-1 text-xs truncate text-morandi-primary">
-                    {layer.name}
-                  </span>
+                  <span className="flex-1 text-xs truncate text-morandi-primary">{layer.name}</span>
 
                   {/* 操作按鈕 */}
                   <div className="flex gap-0.5">
                     <button
                       className="p-1 hover:bg-morandi-container rounded"
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation()
                         toggleVisibility(layer)
                       }}
@@ -276,7 +276,7 @@ export function LayerPanel({
                     </button>
                     <button
                       className="p-1 hover:bg-morandi-container rounded"
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation()
                         toggleLock(layer)
                       }}

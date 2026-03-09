@@ -167,8 +167,10 @@ class SafeMathParser {
 
     // 解析數字
     let numStr = ''
-    while (this.pos < this.expr.length &&
-           (this.expr[this.pos] >= '0' && this.expr[this.pos] <= '9' || this.expr[this.pos] === '.')) {
+    while (
+      this.pos < this.expr.length &&
+      ((this.expr[this.pos] >= '0' && this.expr[this.pos] <= '9') || this.expr[this.pos] === '.')
+    ) {
       numStr += this.expr[this.pos]
       this.pos++
     }

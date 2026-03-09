@@ -12,21 +12,23 @@
 
 #### 路由頁面
 
-| 路由 | 檔案 | 功能 |
-|------|------|------|
-| `/finance/vouchers` | `src/app/finance/vouchers/page.tsx` | 傳票列表（支援篩選、搜尋） |
-| `/finance/vouchers/[id]` | `src/app/finance/vouchers/[id]/page.tsx` | 傳票詳情（顯示分錄、過帳、作廢） |
-| `/finance/vouchers/new` | `src/app/finance/vouchers/new/page.tsx` | 手工傳票（分錄輸入、借貸平衡檢查） |
+| 路由                     | 檔案                                     | 功能                               |
+| ------------------------ | ---------------------------------------- | ---------------------------------- |
+| `/finance/vouchers`      | `src/app/finance/vouchers/page.tsx`      | 傳票列表（支援篩選、搜尋）         |
+| `/finance/vouchers/[id]` | `src/app/finance/vouchers/[id]/page.tsx` | 傳票詳情（顯示分錄、過帳、作廢）   |
+| `/finance/vouchers/new`  | `src/app/finance/vouchers/new/page.tsx`  | 手工傳票（分錄輸入、借貸平衡檢查） |
 
 #### 功能特性
 
 **傳票列表頁面**:
+
 - ✅ 月份篩選
 - ✅ 狀態篩選（草稿/已過帳/已作廢）
 - ✅ 傳票統計
 - ✅ 權限檢查（未啟用會計模組顯示提示）
 
 **傳票詳情頁面**:
+
 - ✅ 完整分錄明細
 - ✅ 借貸平衡檢查
 - ✅ 過帳功能
@@ -35,6 +37,7 @@
 - ✅ 列印功能（預留）
 
 **新增傳票頁面**:
+
 - ✅ 會計科目選擇器
 - ✅ 分錄動態新增/刪除
 - ✅ 借貸自動互斥（填借方清空貸方，反之亦然）
@@ -50,6 +53,7 @@
 **位置**: `src/app/finance/payments/hooks/usePaymentData.ts`
 
 **邏輯**:
+
 ```typescript
 收款單建立
   ↓
@@ -61,6 +65,7 @@
 ```
 
 **特性**:
+
 - ✅ 會計模組權限檢查
 - ✅ 錯誤不阻斷收款流程
 - ✅ 自動記錄 Log
@@ -70,10 +75,12 @@
 **位置**: `src/features/payments/services/payment-request.service.ts`
 
 **新增方法**:
+
 - `markAsPaid()` - 付款確認並產生傳票
 - `cancelPayment()` - 取消付款（提示手動作廢傳票）
 
 **邏輯**:
+
 ```typescript
 請款單標記為已付款
   ↓
@@ -83,6 +90,7 @@
 ```
 
 **使用方式**:
+
 ```typescript
 import { paymentRequestService } from '@/features/payments/services/payment-request.service'
 import { useAccountingModule } from '@/hooks/use-accounting-module'
@@ -101,10 +109,12 @@ await paymentRequestService.markAsPaid(requestId, {
 #### ③ 結團流程串聯
 
 **位置**:
+
 - `src/services/tour-closing.service.ts` - 結團邏輯
 - `src/components/tours/TourClosingDialog.tsx` - 結團對話框
 
 **邏輯**:
+
 ```typescript
 計算總收入（訂單已收款）
   ↓
@@ -118,6 +128,7 @@ await paymentRequestService.markAsPaid(requestId, {
 ```
 
 **結團對話框功能**:
+
 - ✅ 即時預覽財務摘要（收入、成本、毛利）
 - ✅ 成本明細展示（6 大類別）
 - ✅ 會計傳票產生提示
@@ -125,10 +136,11 @@ await paymentRequestService.markAsPaid(requestId, {
 - ✅ 結團成功後導向傳票頁面
 
 **使用方式**:
+
 ```tsx
 import { TourClosingDialog } from '@/components/tours/TourClosingDialog'
 
-<TourClosingDialog
+;<TourClosingDialog
   open={isClosingDialogOpen}
   onOpenChange={setIsClosingDialogOpen}
   tourId={tour.id}
@@ -151,6 +163,7 @@ import { TourClosingDialog } from '@/components/tours/TourClosingDialog'
 **檔案**: `src/services/voucher-auto-generator.ts`
 
 **提供函數**:
+
 - `generateVoucherFromPayment()` - 收款 → 傳票
 - `generateVoucherFromPaymentRequest()` - 付款 → 傳票
 - `generateVouchersFromTourClosing()` - 結團 → 兩張傳票
@@ -160,6 +173,7 @@ import { TourClosingDialog } from '@/components/tours/TourClosingDialog'
 **檔案**: `src/services/tour-closing.service.ts`
 
 **提供函數**:
+
 - `closeTour()` - 結團處理
 - `reopenTour()` - 取消結團
 
@@ -168,6 +182,7 @@ import { TourClosingDialog } from '@/components/tours/TourClosingDialog'
 **檔案**: `src/hooks/use-accounting-module.ts`
 
 **使用方式**:
+
 ```typescript
 const { hasAccounting, isExpired, loading } = useAccountingModule()
 
@@ -243,15 +258,15 @@ if (isExpired) {
 
 #### 最終結果
 
-| 科目 | 餘額 |
-|------|------|
-| 現金 | +$30,000 |
+| 科目     | 餘額                                 |
+| -------- | ------------------------------------ |
+| 現金     | +$30,000                             |
 | 銀行存款 | +$25,000 ($70k - $40k - $20k + $15k) |
-| 預收團費 | $0 ($100k 收 - $100k 轉) |
-| 預付團費 | $0 ($75k 付 - $75k 轉) |
-| 團費收入 | +$100,000 |
-| 旅遊成本 | +$75,000 |
-| **毛利** | **$25,000** |
+| 預收團費 | $0 ($100k 收 - $100k 轉)             |
+| 預付團費 | $0 ($75k 付 - $75k 轉)               |
+| 團費收入 | +$100,000                            |
+| 旅遊成本 | +$75,000                             |
+| **毛利** | **$25,000**                          |
 
 ---
 
@@ -399,15 +414,15 @@ const [isClosingDialogOpen, setIsClosingDialogOpen] = useState(false)
 
 ## 📊 技術統計
 
-| 指標 | 數量 |
-|------|------|
-| 新增前端頁面 | 3 個 |
-| 新增服務檔案 | 2 個 |
-| 新增組件 | 1 個 |
-| 修改檔案 | 2 個 |
-| 總程式碼行數 | ~2,000 行 |
-| 串聯業務流程 | 3 個（收款、付款、結團） |
-| 自動產生傳票類型 | 3 種 |
+| 指標             | 數量                     |
+| ---------------- | ------------------------ |
+| 新增前端頁面     | 3 個                     |
+| 新增服務檔案     | 2 個                     |
+| 新增組件         | 1 個                     |
+| 修改檔案         | 2 個                     |
+| 總程式碼行數     | ~2,000 行                |
+| 串聯業務流程     | 3 個（收款、付款、結團） |
+| 自動產生傳票類型 | 3 種                     |
 
 ---
 
@@ -416,6 +431,7 @@ const [isClosingDialogOpen, setIsClosingDialogOpen] = useState(false)
 ### 為什麼用「預收團費」和「預付團費」？
 
 **傳統錯誤做法**：
+
 ```
 收款時：借：銀行，貸：團費收入 ❌
 付款時：借：旅遊成本，貸：銀行 ❌
@@ -424,6 +440,7 @@ const [isClosingDialogOpen, setIsClosingDialogOpen] = useState(false)
 **問題**：收入和成本認列時間不一致（違反會計配比原則）
 
 **正確做法**：
+
 ```
 收款時：借：銀行，貸：預收團費（負債） ✅
 付款時：借：預付團費（資產），貸：銀行 ✅
@@ -437,6 +454,7 @@ const [isClosingDialogOpen, setIsClosingDialogOpen] = useState(false)
 ### 為什麼結團需要兩張傳票？
 
 一張傳票只能記錄一組借貸關係。結團時需要：
+
 - **轉收入**：預收 → 收入
 - **轉成本**：預付 → 成本
 

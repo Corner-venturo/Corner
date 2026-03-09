@@ -9,6 +9,7 @@
 ## 📊 問題現狀
 
 ### Supabase Dashboard 錯誤
+
 - **錯誤數量**: 107 個
 - **錯誤類型**: Policy Exists RLS Disabled
 - **受影響表格**:
@@ -23,6 +24,7 @@
   - 以及其他多個表格
 
 ### 問題根源
+
 某些表格的 RLS 被意外啟用，但沒有對應的 policies，導致 Supabase 報告錯誤。
 
 ---
@@ -30,6 +32,7 @@
 ## ✅ 已完成的工作
 
 ### 1. 安裝並配置 Supabase CLI
+
 ```bash
 # 安裝位置
 ~/.local/bin/supabase
@@ -49,13 +52,16 @@ Region: Singapore
 ### 2. 更新規範文件
 
 #### `.claude/CLAUDE.md`
+
 **變更內容**:
+
 - ❌ 移除：「user_preferences 需要啟用 RLS」的例外規則
 - ✅ 更新：明確說明「**所有表格都禁用 RLS**」
 - ✅ 簡化：權限控制架構（4 層，移除 RLS 層）
 - ✅ 更新：新建表格的標準模板
 
 **更新前的架構**（5 層）:
+
 ```
 Layer 1: Supabase Auth
 Layer 2: RLS (敏感個人資料表)  ← 已移除
@@ -65,6 +71,7 @@ Layer 5: user.roles
 ```
 
 **更新後的架構**（4 層）:
+
 ```
 Layer 1: Supabase Auth
 Layer 2: employees.permissions
@@ -73,7 +80,9 @@ Layer 4: user.roles
 ```
 
 #### `RLS_REMOVAL_SUMMARY.md`
+
 **新增內容**:
+
 - 2025-12-11 更新記錄
 - 問題發現與原因分析
 - 解決方案說明
@@ -84,11 +93,13 @@ Layer 4: user.roles
 **檔案**: `supabase/migrations/20251211000000_disable_all_remaining_rls.sql`
 
 **功能**:
+
 1. 禁用所有表格的 RLS（60+ 表格）
 2. 刪除所有殘留的 RLS policies
 3. 執行驗證並輸出結果報告
 
 **預期結果**:
+
 ```sql
 ✅ RLS Cleanup Complete!
 📊 Results:
@@ -200,6 +211,7 @@ if (user.permissions.includes('super_admin')) {
 ## 🎉 結論
 
 規範衝突已解決！現在：
+
 - ✅ 規範明確：所有表格禁用 RLS
 - ✅ 修復腳本已準備
 - ✅ CLI 工具已安裝

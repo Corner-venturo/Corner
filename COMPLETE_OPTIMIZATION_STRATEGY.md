@@ -10,13 +10,16 @@
 ## 🎯 執行摘要
 
 ### 當前狀態
+
 - **系統規模**：86,068 行代碼，249 張表，51 個頁面
 - **業務階段**：產品化階段，正在爭取第一個外部客戶
 - **資料規模**：287 客戶、2 團、2 訂單（**最佳優化時機**）
 - **技術債等級**：中等（6.75/10），但有**多個結構性問題**
 
 ### 核心問題
+
 不是「text vs uuid」，而是：
+
 1. **資料完整性缺失**：162 個 Foreign Keys 缺失（34%）
 2. **架構耦合問題**：Service Layer 薄弱，邏輯散落
 3. **生命週期管理缺失**：資料狀態轉換無約束
@@ -87,15 +90,13 @@
 // components/OrderForm.tsx
 const handleSubmit = async () => {
   // ❌ UI 組件直接操作資料庫
-  const { data, error } = await supabase
-    .from('orders')
-    .insert({
-      tour_id: tourId,
-      customer_id: customerId,
-      total_amount: calculateTotal(), // ❌ 計算邏輯在 UI
-      status: 'pending'
-    })
-  
+  const { data, error } = await supabase.from('orders').insert({
+    tour_id: tourId,
+    customer_id: customerId,
+    total_amount: calculateTotal(), // ❌ 計算邏輯在 UI
+    status: 'pending',
+  })
+
   // ❌ 沒有驗證訂單是否可建立（團已滿？客戶重複？）
   // ❌ 沒有觸發會計事件
   // ❌ 沒有發送通知
@@ -110,23 +111,23 @@ class OrderService {
   async createOrder(params: CreateOrderParams) {
     // 1. 業務驗證
     await this.validateOrderCreation(params)
-    
+
     // 2. 計算金額
     const pricing = await this.calculatePricing(params)
-    
+
     // 3. 建立訂單（透過 API）
     const order = await apiClient.post('/api/orders', {
       ...params,
-      ...pricing
+      ...pricing,
     })
-    
+
     // 4. 觸發後續流程
     await AccountingService.recordOrderCreated(order)
     await NotificationService.notifyCustomer(order)
-    
+
     return order
   }
-  
+
   private async validateOrderCreation(params) {
     // - 檢查團是否還有名額
     // - 檢查客戶是否已報名
@@ -141,7 +142,7 @@ const handleSubmit = async () => {
   await OrderService.createOrder({
     tour_id: tourId,
     customer_id: customerId,
-    quote_id: quoteId
+    quote_id: quoteId,
   })
 }
 ```
@@ -170,35 +171,35 @@ const handleSubmit = async () => {
 class TourLifecycleService {
   // 定義合法的狀態轉換
   private transitions = {
-    'proposal': ['confirmed'],
-    'confirmed': ['ongoing', 'cancelled'],
-    'ongoing': ['pending_closure'],
-    'pending_closure': ['closed'],
-    'closed': ['archived'],
+    proposal: ['confirmed'],
+    confirmed: ['ongoing', 'cancelled'],
+    ongoing: ['pending_closure'],
+    pending_closure: ['closed'],
+    closed: ['archived'],
     // 'closed' 不能回到 'proposal' ← 強制約束
   }
-  
+
   async transition(tourId: string, toStatus: TourStatus) {
     const tour = await this.getTour(tourId)
-    
+
     // 1. 驗證是否可轉換
     if (!this.canTransition(tour.status, toStatus)) {
       throw new InvalidStateTransitionError()
     }
-    
+
     // 2. 執行前置檢查
     await this.validateTransition(tour, toStatus)
-    
+
     // 3. 執行轉換
     await this.updateStatus(tourId, toStatus)
-    
+
     // 4. 觸發連動
     await this.triggerSideEffects(tour, toStatus)
-    
+
     // 5. 記錄歷史
     await this.logTransition(tour, toStatus)
   }
-  
+
   private async triggerSideEffects(tour, newStatus) {
     switch (newStatus) {
       case 'closed':
@@ -242,7 +243,7 @@ class TourLifecycleService {
 
 ```sql
 -- 查詢最慢的 10 個 queries
-SELECT 
+SELECT
   query,
   mean_exec_time,
   calls
@@ -251,7 +252,7 @@ ORDER BY mean_exec_time DESC
 LIMIT 10;
 
 -- 缺失索引檢測
-SELECT 
+SELECT
   schemaname,
   tablename,
   attname
@@ -259,7 +260,7 @@ FROM pg_stats
 WHERE schemaname = 'public'
   AND n_distinct > 100  -- 高基數欄位
   AND attname NOT IN (
-    SELECT column_name 
+    SELECT column_name
     FROM information_schema.constraint_column_usage
   );
 ```
@@ -291,26 +292,18 @@ CREATE INDEX idx_orders_created_workspace ON orders(created_at, workspace_id);
 const tours = await supabase.from('tours').select('*')
 for (const tour of tours) {
   // 每個 tour 查一次 orders（假設 100 團 = 101 次查詢）
-  const orders = await supabase
-    .from('orders')
-    .select('*')
-    .eq('tour_id', tour.id)
+  const orders = await supabase.from('orders').select('*').eq('tour_id', tour.id)
 }
 
 // ✅ 正確做法
-const tours = await supabase
-  .from('tours')
-  .select(`
+const tours = await supabase.from('tours').select(`
     *,
     orders(*)
   `)
-  
+
 // 或使用 JOIN + 批次載入
 const tourIds = tours.map(t => t.id)
-const orders = await supabase
-  .from('orders')
-  .select('*')
-  .in('tour_id', tourIds)
+const orders = await supabase.from('orders').select('*').in('tour_id', tourIds)
 ```
 
 #### 快取策略
@@ -319,26 +312,26 @@ const orders = await supabase
 // services/TourService.ts
 class TourService {
   private cache = new Map()
-  
+
   async getTour(id: string) {
     // 1. 檢查記憶體快取
     if (this.cache.has(id)) {
       return this.cache.get(id)
     }
-    
+
     // 2. 檢查 IndexedDB
     const cached = await localDB.get('tours', id)
     if (cached && !this.isStale(cached)) {
       return cached
     }
-    
+
     // 3. 從 Supabase 取得
     const tour = await supabase.from('tours').select('*').eq('id', id).single()
-    
+
     // 4. 寫入快取
     this.cache.set(id, tour)
     await localDB.put('tours', tour)
-    
+
     return tour
   }
 }
@@ -371,25 +364,24 @@ export async function POST(request: Request) {
   try {
     // 1. 驗證 JWT
     const user = await authenticate(request)
-    
+
     // 2. 驗證權限
     if (!hasPermission(user, 'tours:create')) {
       return forbidden()
     }
-    
+
     // 3. 解析 + 驗證輸入
     const body = await request.json()
     const validated = CreateTourSchema.parse(body)
-    
+
     // 4. 呼叫 Service Layer
     const tour = await TourService.createTour(validated)
-    
+
     // 5. 記錄日誌
     await logger.info('Tour created', { tourId: tour.id, userId: user.id })
-    
+
     // 6. 回傳結果
     return success(tour)
-    
   } catch (error) {
     // 7. 統一錯誤處理
     return handleError(error)
@@ -403,34 +395,28 @@ export async function POST(request: Request) {
 // repositories/TourRepository.ts
 class TourRepository {
   async findById(id: string): Promise<Tour | null> {
-    const { data } = await supabase
-      .from('tours')
-      .select('*')
-      .eq('id', id)
-      .single()
-    
+    const { data } = await supabase.from('tours').select('*').eq('id', id).single()
+
     return data ? this.mapToEntity(data) : null
   }
-  
+
   async findByWorkspace(workspaceId: string, filters: TourFilters) {
-    let query = supabase
-      .from('tours')
-      .select('*')
-      .eq('workspace_id', workspaceId)
-    
+    let query = supabase.from('tours').select('*').eq('workspace_id', workspaceId)
+
     if (filters.status) {
       query = query.eq('status', filters.status)
     }
-    
+
     if (filters.dateRange) {
-      query = query.gte('start_date', filters.dateRange.from)
-                   .lte('start_date', filters.dateRange.to)
+      query = query
+        .gte('start_date', filters.dateRange.from)
+        .lte('start_date', filters.dateRange.to)
     }
-    
+
     const { data } = await query
     return data.map(d => this.mapToEntity(d))
   }
-  
+
   private mapToEntity(raw: any): Tour {
     // 資料轉換邏輯集中管理
     return {
@@ -495,7 +481,7 @@ class TourRepository {
   ❌ 需處理 10 個 views
   ❌ 需轉換 91 個外鍵欄位
   ❌ 風險高（復雜度高）
-  
+
 預估時間：2-3 小時
 成功率：70%（可能遇到未知依賴）
 ```
@@ -512,7 +498,7 @@ class TourRepository {
 缺點：
   ❌ 無格式驗證（可能存入非 UUID）
   ❌ 效能略差（可忽略）
-  
+
 預估時間：30 分鐘
 成功率：95%
 ```
@@ -524,7 +510,7 @@ class TourRepository {
   1. 外鍵欄位統一為 text
   2. 加入 162 個 Foreign Keys
   3. 加入 CHECK 約束驗證 UUID 格式
-  
+
 階段 2（產品化後）：
   等系統穩定、資料量大時，再評估是否需要轉 UUID
 
@@ -539,8 +525,8 @@ class TourRepository {
 
 ```sql
 -- 即使用 text，也能保證格式
-ALTER TABLE orders 
-ADD CONSTRAINT orders_customer_id_uuid_format 
+ALTER TABLE orders
+ADD CONSTRAINT orders_customer_id_uuid_format
 CHECK (customer_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
 
 -- 這樣：
@@ -564,15 +550,15 @@ CHECK (customer_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
   [ ] 加入 P0 Foreign Keys（12 個）
   [ ] 加入 P1 Foreign Keys（50 個）
   [ ] 加入 P2 Foreign Keys（100 個）
-  
+
   時間：1 天
   風險：低
-  
+
 1.2 索引優化
   [ ] 分析慢查詢
   [ ] 建立核心索引（20-30 個）
   [ ] 驗證效能提升
-  
+
   時間：0.5 天
   風險：低
 
@@ -580,7 +566,7 @@ CHECK (customer_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
   [ ] 檢測孤兒記錄
   [ ] 修復或刪除
   [ ] 驗證資料一致性
-  
+
   時間：0.5 天
   風險：低
 ```
@@ -603,10 +589,10 @@ CHECK (customer_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
   [ ] TodoService
   [ ] AccountingService
   [ ] NotificationService
-  
+
   時間：12-15 小時
   優先級：高
-  
+
 2.2 API Layer 建立
   [ ] /api/tours（CRUD + 狀態轉換）
   [ ] /api/orders
@@ -620,7 +606,7 @@ CHECK (customer_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
   [ ] 統一驗證中介層
   [ ] 統一錯誤處理
   [ ] API 文檔（OpenAPI）
-  
+
   時間：8-10 小時
   優先級：高
 
@@ -629,7 +615,7 @@ CHECK (customer_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
   [ ] OrderRepository
   [ ] PaymentRepository
   [ ] 其他 Repositories
-  
+
   時間：6-8 小時
   優先級：中
 ```
@@ -644,7 +630,7 @@ CHECK (customer_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
   [ ] OrderLifecycleService
   [ ] PaymentLifecycleService
   [ ] QuoteLifecycleService
-  
+
   時間：8-10 小時
   優先級：高
 
@@ -652,7 +638,7 @@ CHECK (customer_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
   [ ] 建立 audit_logs 表
   [ ] 記錄所有狀態變更
   [ ] 記錄所有重要操作
-  
+
   時間：4-6 小時
   優先級：中
 
@@ -660,7 +646,7 @@ CHECK (customer_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
   [ ] 出團後鎖定旅客資料
   [ ] 結案後鎖定財務資料
   [ ] 封存機制
-  
+
   時間：3-5 小時
   優先級：中
 ```
@@ -674,21 +660,21 @@ CHECK (customer_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
   [ ] 消除 N+1 queries
   [ ] 實作 DataLoader pattern
   [ ] 批次載入優化
-  
+
   時間：6-8 小時
-  
+
 4.2 快取策略
   [ ] Service Layer 快取
   [ ] API Layer 快取
   [ ] CDN 快取設定
-  
+
   時間：5-7 小時
 
 4.3 前端優化
   [ ] Component Memoization（30-50 個組件）
   [ ] Store Selectors
   [ ] List Virtualization
-  
+
   時間：10-15 小時
 ```
 
@@ -701,20 +687,20 @@ CHECK (customer_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
   [ ] Services 測試（60% 覆蓋率）
   [ ] Repositories 測試
   [ ] Utils 測試
-  
+
   時間：15-20 小時
-  
+
 5.2 整合測試
   [ ] API 端點測試
   [ ] 業務流程測試
   [ ] 狀態轉換測試
-  
+
   時間：10-15 小時
 
 5.3 E2E 測試
   [ ] 關鍵業務流程
   [ ] 主要使用者路徑
-  
+
   時間：8-10 小時
 ```
 
@@ -779,7 +765,7 @@ CHECK (customer_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
      - 分批執行
      - 驗證每一步
      - 準備 rollback 腳本
-   
+
 2. Service Layer 重構（階段 2）
    風險：破壞現有功能
    應對：
@@ -794,10 +780,10 @@ CHECK (customer_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
 ```
 1. API Layer 建立
    影響：新增功能，不影響現有
-   
+
 2. 測試撰寫
    影響：只是新增，無破壞性
-   
+
 3. 效能優化
    影響：改善效能，向下相容
 ```
@@ -827,7 +813,7 @@ CHECK (customer_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
   - Sentry（錯誤監控）
   - Datadog / New Relic（效能監控）
   - Playwright（E2E 測試）
-  
+
 預算：約 USD 200/月
 ```
 
@@ -838,19 +824,14 @@ CHECK (customer_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
 ### 核心建議
 
 **立即執行（本週）：**
+
 1. ✅ **資料完整性修復**（方案 C：text + Foreign Keys + CHECK 約束）
 2. ✅ **索引優化**（20-30 個核心索引）
 3. ✅ **護照上傳邏輯修復**（1 年 → 動態生成）
 
-**短期目標（1 個月）：**
-4. ✅ **Service Layer 建立**（12 個核心 services）
-5. ✅ **API Layer 建立**（15 個端點）
-6. ✅ **Repository Pattern**（資料存取抽象）
+**短期目標（1 個月）：** 4. ✅ **Service Layer 建立**（12 個核心 services）5. ✅ **API Layer 建立**（15 個端點）6. ✅ **Repository Pattern**（資料存取抽象）
 
-**中期目標（2-3 個月）：**
-7. ✅ **生命週期管理**（狀態機 + 審計追蹤）
-8. ✅ **效能優化**（查詢優化 + 快取）
-9. ✅ **測試覆蓋率**（60% Services, 80% APIs）
+**中期目標（2-3 個月）：** 7. ✅ **生命週期管理**（狀態機 + 審計追蹤）8. ✅ **效能優化**（查詢優化 + 快取）9. ✅ **測試覆蓋率**（60% Services, 80% APIs）
 
 ### 為什麼不立即改 UUID？
 
@@ -872,15 +853,18 @@ CHECK (customer_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
 **不是「做不做優化」，而是「優化什麼」。**
 
 技術債有兩種：
+
 1. **結構性債務**（Service Layer 缺失、FK 缺失）← 現在修
 2. **細節性債務**（text vs uuid、檔案太大）← 可以等
 
 **當前階段（產品化）最重要的是：**
+
 - ✅ 系統穩定（資料完整性）
 - ✅ 架構清晰（Service/API Layer）
 - ✅ 可擴展（新功能開發快速）
 
 **不重要的是：**
+
 - ❌ 技術細節的極致完美
 - ❌ 過度工程化
 - ❌ 為了「正確」犧牲「速度」
@@ -888,6 +872,7 @@ CHECK (customer_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
 ---
 
 **這份策略的核心思想：**
+
 > 先建立堅實的地基（資料完整性 + 架構分層），  
 > 再蓋摩天大樓（UUID、極致效能、100% 測試）。
 

@@ -24,12 +24,7 @@ export const PriceInputRow: React.FC<PriceInputRowProps> = ({
 }) => {
   return (
     <tr className="border-b border-morandi-container/60">
-      <td
-        className={cn(
-          'py-2 px-3 text-xs font-medium text-morandi-primary',
-          indented && 'pl-6'
-        )}
-      >
+      <td className={cn('py-2 px-3 text-xs font-medium text-morandi-primary', indented && 'pl-6')}>
         {label}
       </td>
       <td className="py-2 px-2 text-center text-xs text-morandi-primary">

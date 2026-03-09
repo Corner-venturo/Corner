@@ -17,7 +17,7 @@ import { QuoteConfirmationSection } from './QuoteConfirmationSection'
 import type { QuoteConfirmationStatus } from '@/types/quote.types'
 import type { Quote as StoreQuote } from '@/stores/types'
 import { Tour } from '@/types/tour.types'
-import { QUOTE_DIALOG_LABELS, QUOTE_HEADER_LABELS } from '../constants/labels';
+import { QUOTE_DIALOG_LABELS, QUOTE_HEADER_LABELS } from '../constants/labels'
 
 // 使用 CostCategory 而非 QuoteCategory，因為編輯器使用 CostCategory
 type QuoteWithCategories = Omit<StoreQuote, 'categories'> & {
@@ -102,7 +102,9 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
   })
 
   // 檢查是否有聯絡資訊
-  const hasContactInfo = contactInfo && (contactInfo.contact_person || contactInfo.contact_phone || contactInfo.contact_address)
+  const hasContactInfo =
+    contactInfo &&
+    (contactInfo.contact_person || contactInfo.contact_phone || contactInfo.contact_address)
 
   // 打開對話框時載入現有資料
   const handleOpenContactDialog = () => {
@@ -211,7 +213,9 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
               className="h-8 px-2.5 text-sm gap-1"
             >
               <Download size={14} />
-              {importingFromItinerary ? QUOTE_HEADER_LABELS.IMPORTING : QUOTE_HEADER_LABELS.IMPORT_FROM_ITINERARY}
+              {importingFromItinerary
+                ? QUOTE_HEADER_LABELS.IMPORTING
+                : QUOTE_HEADER_LABELS.IMPORT_FROM_ITINERARY}
             </Button>
           )}
 
@@ -259,7 +263,9 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
               <input
                 type="text"
                 value={tempContactInfo.contact_person}
-                onChange={e => setTempContactInfo(prev => ({ ...prev, contact_person: e.target.value }))}
+                onChange={e =>
+                  setTempContactInfo(prev => ({ ...prev, contact_person: e.target.value }))
+                }
                 placeholder={QUOTE_HEADER_LABELS.請輸入聯絡人姓名}
                 className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
               />
@@ -272,7 +278,9 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
               <input
                 type="text"
                 value={tempContactInfo.contact_phone}
-                onChange={e => setTempContactInfo(prev => ({ ...prev, contact_phone: e.target.value }))}
+                onChange={e =>
+                  setTempContactInfo(prev => ({ ...prev, contact_phone: e.target.value }))
+                }
                 placeholder={QUOTE_HEADER_LABELS.請輸入聯絡電話}
                 className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
               />
@@ -285,7 +293,9 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
               <input
                 type="text"
                 value={tempContactInfo.contact_address}
-                onChange={e => setTempContactInfo(prev => ({ ...prev, contact_address: e.target.value }))}
+                onChange={e =>
+                  setTempContactInfo(prev => ({ ...prev, contact_address: e.target.value }))
+                }
                 placeholder={QUOTE_HEADER_LABELS.請輸入通訊地址}
                 className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
               />
@@ -297,18 +307,24 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
           </div>
 
           <DialogFooter>
-            <Button variant="outline" className="gap-2" onClick={() => setIsContactDialogOpen(false)}>
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => setIsContactDialogOpen(false)}
+            >
               <X size={16} />
               {QUOTE_HEADER_LABELS.CANCEL}
             </Button>
-            <Button onClick={handleSaveContactInfo} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+            <Button
+              onClick={handleSaveContactInfo}
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
+            >
               <Save size={16} />
               {QUOTE_HEADER_LABELS.SAVE}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
     </>
   )
 }

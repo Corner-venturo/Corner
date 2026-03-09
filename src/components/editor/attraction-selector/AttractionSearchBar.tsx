@@ -3,7 +3,13 @@
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Search, PenLine, Plus } from 'lucide-react'
 import type { Country as FullCountry, City as FullCity } from '@/stores/region-store'
 import { COMP_EDITOR_LABELS } from '../constants/labels'
@@ -88,16 +94,13 @@ export function AttractionSearchBar({
           className={`rounded-lg h-9 gap-1 ${showManualInput ? 'bg-morandi-gold/10 border-morandi-gold/30' : ''}`}
         >
           <PenLine size={14} />
-{COMP_EDITOR_LABELS.手動}
+          {COMP_EDITOR_LABELS.手動}
         </Button>
       </div>
 
       {/* 搜尋框 */}
       <div className="relative">
-        <Search
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-muted"
-          size={16}
-        />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-muted" size={16} />
         <Input
           value={searchQuery}
           onChange={e => onSearchChange(e.target.value)}

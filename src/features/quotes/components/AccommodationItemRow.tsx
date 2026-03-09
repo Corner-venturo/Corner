@@ -2,14 +2,14 @@ import React from 'react'
 import { CostItem } from '../types'
 import { CalcInput } from '@/components/ui/calc-input'
 import { cn } from '@/lib/utils'
-import { ACCOMMODATION_ITEM_ROW_LABELS } from '../constants/labels';
+import { ACCOMMODATION_ITEM_ROW_LABELS } from '../constants/labels'
 
 interface AccommodationItemRowProps {
   item: CostItem
   categoryId: string
   day: number
   roomIndex: number
-  prevDayHotelName?: string  // 前一天的飯店名稱（用於續住顯示）
+  prevDayHotelName?: string // 前一天的飯店名稱（用於續住顯示）
   isReadOnly?: boolean
   handleUpdateItem: (
     categoryId: string,
@@ -34,16 +34,18 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
 }) => {
   // 簡潔輸入框樣式（右側多留空間避免被 table-divider 遮到）
   const inputClass = 'input-no-focus w-full pl-1 pr-3 py-1 text-sm bg-transparent'
-  
+
   // 是否為續住（只有第一個房型才顯示續住選項）
   const isSameAsPrevious = item.is_same_as_previous || false
   const canShowSameAsPrevious = roomIndex === 0 && day > 1 && prevDayHotelName
 
   return (
-    <tr className={cn(
-      "border-b border-morandi-container/60 hover:bg-morandi-container/5 transition-colors",
-      isSameAsPrevious && "bg-morandi-gold/5"
-    )}>
+    <tr
+      className={cn(
+        'border-b border-morandi-container/60 hover:bg-morandi-container/5 transition-colors',
+        isSameAsPrevious && 'bg-morandi-gold/5'
+      )}
+    >
       {/* 分類欄：第一個房型顯示天數 + 續住選項 */}
       <td className="py-3 px-4 text-sm text-morandi-primary text-center table-divider">
         {roomIndex === 0 ? (
@@ -66,13 +68,18 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
               </label>
             )}
           </div>
-        ) : ''}
+        ) : (
+          ''
+        )}
       </td>
 
       {/* 項目欄：房型名稱（續住時顯示提示） */}
       <td className="py-3 px-4 text-sm text-morandi-primary text-center table-divider">
         {isSameAsPrevious ? (
-          <span className="text-morandi-secondary italic">{ACCOMMODATION_ITEM_ROW_LABELS.LABEL_1440}{prevDayHotelName})</span>
+          <span className="text-morandi-secondary italic">
+            {ACCOMMODATION_ITEM_ROW_LABELS.LABEL_1440}
+            {prevDayHotelName})
+          </span>
         ) : (
           <input
             type="text"
@@ -121,7 +128,7 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
         <div className="flex items-center justify-between">
           <input
             type="text"
-            value={isSameAsPrevious ? ACCOMMODATION_ITEM_ROW_LABELS.續住 : (item.note || '')}
+            value={isSameAsPrevious ? ACCOMMODATION_ITEM_ROW_LABELS.續住 : item.note || ''}
             onChange={e => handleUpdateItem(categoryId, item.id, 'note', e.target.value)}
             className={`${inputClass} flex-1`}
             placeholder={ACCOMMODATION_ITEM_ROW_LABELS.備註}

@@ -62,13 +62,30 @@ interface FileSystemStoreState {
   fetchFolderById: (id: string) => Promise<Folder | null>
 
   // 資料夾操作
-  createFolder: (data: { name: string; parentId?: string; tourId?: string }) => Promise<Folder | null>
+  createFolder: (data: {
+    name: string
+    parentId?: string
+    tourId?: string
+  }) => Promise<Folder | null>
   renameFolder: (id: string, name: string) => Promise<boolean>
   deleteFolder: (id: string) => Promise<boolean>
 
   // 檔案操作
-  uploadFile: (file: File, options?: { folder_id?: string; folderId?: string; tour_id?: string; tourId?: string; category?: FileCategory; description?: string }) => Promise<VenturoFile | null>
-  uploadFiles: (files: File[], options?: { folderId?: string; tourId?: string }) => Promise<VenturoFile[]>
+  uploadFile: (
+    file: File,
+    options?: {
+      folder_id?: string
+      folderId?: string
+      tour_id?: string
+      tourId?: string
+      category?: FileCategory
+      description?: string
+    }
+  ) => Promise<VenturoFile | null>
+  uploadFiles: (
+    files: File[],
+    options?: { folderId?: string; tourId?: string }
+  ) => Promise<VenturoFile[]>
   deleteFile: (id: string) => Promise<boolean>
   deleteFiles: (ids: string[]) => Promise<boolean>
   moveFile: (fileId: string, targetFolderId: string | null) => Promise<boolean>
@@ -209,7 +226,9 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
 
           let query = supabase
             .from('files')
-            .select('*, folder:folders(id, name, path), tour:tours(id, code, name)', { count: 'exact' })
+            .select('*, folder:folders(id, name, path), tour:tours(id, code, name)', {
+              count: 'exact',
+            })
             .eq('is_deleted', false)
 
           if (workspaceId) {
@@ -241,7 +260,9 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
             query = query.eq('is_starred', filter.is_starred)
           }
           if (filter.search) {
-            query = query.or(`filename.ilike.%${filter.search}%,description.ilike.%${filter.search}%`)
+            query = query.or(
+              `filename.ilike.%${filter.search}%,description.ilike.%${filter.search}%`
+            )
           }
 
           // 排序
@@ -285,7 +306,7 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
       // ========================================================================
       // 資料夾操作
       // ========================================================================
-      createFolder: async (data) => {
+      createFolder: async data => {
         try {
           const supabase = createSupabaseBrowserClient()
 
@@ -302,7 +323,9 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
           }
 
           // 取得當前用戶的 workspace
-          const { data: { user } } = await supabase.auth.getUser()
+          const {
+            data: { user },
+          } = await supabase.auth.getUser()
           if (!user) throw new Error('未登入')
 
           // workspace_members 表尚未加入 Supabase 型別定義
@@ -353,7 +376,7 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
           if (error) throw error
 
           set(state => ({
-            folders: state.folders.map(f => f.id === id ? { ...f, name } : f),
+            folders: state.folders.map(f => (f.id === id ? { ...f, name } : f)),
           }))
 
           return true
@@ -363,7 +386,7 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
         }
       },
 
-      deleteFolder: async (id) => {
+      deleteFolder: async id => {
         try {
           const supabase = createSupabaseBrowserClient()
           const { error } = await supabase
@@ -424,7 +447,11 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
           return result.file as VenturoFile
         } catch (error) {
           logger.error('[FileSystemStore] uploadFile error:', error)
-          set({ uploading: false, uploadProgress: 0, error: error instanceof Error ? error.message : '上傳失敗' })
+          set({
+            uploading: false,
+            uploadProgress: 0,
+            error: error instanceof Error ? error.message : '上傳失敗',
+          })
           throw error // 重新拋出讓上傳對話框處理
         }
       },
@@ -445,7 +472,7 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
       // ========================================================================
       // 檔案操作
       // ========================================================================
-      deleteFile: async (id) => {
+      deleteFile: async id => {
         try {
           const supabase = createSupabaseBrowserClient()
           // 軟刪除
@@ -468,7 +495,7 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
         }
       },
 
-      deleteFiles: async (ids) => {
+      deleteFiles: async ids => {
         try {
           const supabase = createSupabaseBrowserClient()
           const { error } = await supabase
@@ -537,15 +564,12 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
       renameFile: async (id, filename) => {
         try {
           const supabase = createSupabaseBrowserClient()
-          const { error } = await supabase
-            .from('files')
-            .update({ filename })
-            .eq('id', id)
+          const { error } = await supabase.from('files').update({ filename }).eq('id', id)
 
           if (error) throw error
 
           set(state => ({
-            files: state.files.map(f => f.id === id ? { ...f, filename } : f),
+            files: state.files.map(f => (f.id === id ? { ...f, filename } : f)),
           }))
 
           return true
@@ -555,7 +579,7 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
         }
       },
 
-      toggleFileStar: async (id) => {
+      toggleFileStar: async id => {
         const file = get().files.find(f => f.id === id)
         if (!file) return
 
@@ -569,7 +593,7 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
           if (error) throw error
 
           set(state => ({
-            files: state.files.map(f => f.id === id ? { ...f, is_starred: !f.is_starred } : f),
+            files: state.files.map(f => (f.id === id ? { ...f, is_starred: !f.is_starred } : f)),
           }))
         } catch (error) {
           logger.error('[FileSystemStore] toggleFileStar error:', error)
@@ -579,15 +603,12 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
       updateFileCategory: async (id, category) => {
         try {
           const supabase = createSupabaseBrowserClient()
-          const { error } = await supabase
-            .from('files')
-            .update({ category })
-            .eq('id', id)
+          const { error } = await supabase.from('files').update({ category }).eq('id', id)
 
           if (error) throw error
 
           set(state => ({
-            files: state.files.map(f => f.id === id ? { ...f, category } : f),
+            files: state.files.map(f => (f.id === id ? { ...f, category } : f)),
           }))
 
           return true
@@ -600,12 +621,12 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
       // ========================================================================
       // 導航
       // ========================================================================
-      setCurrentFolder: (folderId) => {
+      setCurrentFolder: folderId => {
         const folder = folderId ? get().folders.find(f => f.id === folderId) || null : null
         set({ currentFolderId: folderId, currentFolder: folder })
       },
 
-      navigateToFolder: async (folderId) => {
+      navigateToFolder: async folderId => {
         set({ currentFolderId: folderId })
 
         if (folderId) {
@@ -648,11 +669,11 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
         }
       },
 
-      selectFiles: (ids) => {
+      selectFiles: ids => {
         set({ selectedFileIds: new Set(ids), selectedFile: null })
       },
 
-      toggleFileSelection: (id) => {
+      toggleFileSelection: id => {
         const { selectedFileIds } = get()
         const newSet = new Set(selectedFileIds)
         if (newSet.has(id)) {
@@ -672,7 +693,7 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
         set({ selectedFileIds: new Set(ids) })
       },
 
-      selectFolder: (folderId) => {
+      selectFolder: folderId => {
         const folder = folderId ? get().folders.find(f => f.id === folderId) || null : null
         set({
           selectedFolderId: folderId,
@@ -682,7 +703,7 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
         get().fetchFiles(folderId || undefined)
       },
 
-      toggleFolderExpanded: (folderId) => {
+      toggleFolderExpanded: folderId => {
         set(state => {
           const updateNode = (nodes: FolderTreeNode[]): FolderTreeNode[] => {
             return nodes.map(node => {
@@ -702,19 +723,20 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
       // ========================================================================
       // 篩選與顯示
       // ========================================================================
-      setFilter: (newFilter) => {
+      setFilter: newFilter => {
         set(state => ({ filter: { ...state.filter, ...newFilter } }))
         get().fetchFiles()
       },
 
-      setViewMode: (mode) => {
+      setViewMode: mode => {
         set({ viewMode: mode })
       },
 
       setSort: (sortBy, sortOrder) => {
         set(state => ({
           sortBy,
-          sortOrder: sortOrder || (state.sortBy === sortBy && state.sortOrder === 'asc' ? 'desc' : 'asc'),
+          sortOrder:
+            sortOrder || (state.sortBy === sortBy && state.sortOrder === 'asc' ? 'desc' : 'asc'),
         }))
         get().fetchFiles()
       },
@@ -722,7 +744,7 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
       // ========================================================================
       // 工具
       // ========================================================================
-      buildFolderTree: (folders) => {
+      buildFolderTree: folders => {
         const map = new Map<string, FolderTreeNode>()
         const roots: FolderTreeNode[] = []
 
@@ -751,7 +773,7 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
         return roots
       },
 
-      getFolderPath: (folderId) => {
+      getFolderPath: folderId => {
         const { folders } = get()
         const path: Folder[] = []
 
@@ -767,18 +789,18 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
       // ========================================================================
       // 對話框控制
       // ========================================================================
-      setUploadDialogOpen: (open) => {
+      setUploadDialogOpen: open => {
         set({ uploadDialogOpen: open })
       },
 
-      setCreateFolderDialogOpen: (open) => {
+      setCreateFolderDialogOpen: open => {
         set({ createFolderDialogOpen: open })
       },
 
       // ========================================================================
       // 下載
       // ========================================================================
-      downloadFile: async (id) => {
+      downloadFile: async id => {
         try {
           const response = await fetch(`/api/files/${id}/download`)
           if (!response.ok) {

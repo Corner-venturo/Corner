@@ -45,7 +45,8 @@ function ImageCarousel({ images, hotelName }: { images: string[]; hotelName: str
   if (images.length === 1) {
     return (
       <div className="aspect-[4/3] w-full overflow-hidden">
-        <img src={images[0]}
+        <img
+          src={images[0]}
           alt={hotelName}
           className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
         />
@@ -55,7 +56,8 @@ function ImageCarousel({ images, hotelName }: { images: string[]; hotelName: str
 
   return (
     <div className="relative aspect-[4/3] w-full overflow-hidden group">
-      <img src={images[currentIndex]}
+      <img
+        src={images[currentIndex]}
         alt={`${hotelName} ${currentIndex + 1}`}
         className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
       />
@@ -116,8 +118,14 @@ export function TourHotelsSectionArt({ data, viewMode }: TourHotelsSectionArtPro
     <section className="py-24 relative overflow-hidden" style={{ backgroundColor: colors.paper }}>
       {/* 背景裝飾線條 */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-px h-full" style={{ backgroundColor: `${colors.ink}08` }} />
-        <div className="absolute top-0 right-1/4 w-px h-full" style={{ backgroundColor: `${colors.ink}08` }} />
+        <div
+          className="absolute top-0 left-1/4 w-px h-full"
+          style={{ backgroundColor: `${colors.ink}08` }}
+        />
+        <div
+          className="absolute top-0 right-1/4 w-px h-full"
+          style={{ backgroundColor: `${colors.ink}08` }}
+        />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
@@ -161,15 +169,17 @@ export function TourHotelsSectionArt({ data, viewMode }: TourHotelsSectionArtPro
         </motion.div>
 
         {/* 飯店卡片網格 */}
-        <div className={`grid ${
-          isMobile
-            ? 'grid-cols-1 gap-8'
-            : hotels.length === 1
-              ? 'grid-cols-1 max-w-2xl mx-auto gap-8'
-              : hotels.length === 2
-                ? 'md:grid-cols-2 max-w-4xl mx-auto gap-8'
-                : 'md:grid-cols-2 lg:grid-cols-3 gap-8'
-        }`}>
+        <div
+          className={`grid ${
+            isMobile
+              ? 'grid-cols-1 gap-8'
+              : hotels.length === 1
+                ? 'grid-cols-1 max-w-2xl mx-auto gap-8'
+                : hotels.length === 2
+                  ? 'md:grid-cols-2 max-w-4xl mx-auto gap-8'
+                  : 'md:grid-cols-2 lg:grid-cols-3 gap-8'
+          }`}
+        >
           {hotels.map((hotel, index) => {
             const images = getHotelImages(hotel)
 

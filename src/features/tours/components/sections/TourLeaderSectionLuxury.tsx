@@ -44,11 +44,12 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
       const month = date.getMonth()
       const day = date.getDate()
       const dayOfWeek = date.getDay()
-      if (isNaN(year) || isNaN(month) || isNaN(day) || isNaN(dayOfWeek)) return { date: '待定', weekday: '' }
+      if (isNaN(year) || isNaN(month) || isNaN(day) || isNaN(dayOfWeek))
+        return { date: '待定', weekday: '' }
       const weekdays = ['日', '一', '二', '三', '四', '五', '六']
       return {
         date: `${year}.${(month + 1).toString().padStart(2, '0')}.${day.toString().padStart(2, '0')}`,
-        weekday: `(${weekdays[dayOfWeek]})`
+        weekday: `(${weekdays[dayOfWeek]})`,
       }
     } catch {
       return { date: '待定', weekday: '' }
@@ -75,7 +76,7 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
             style={{
               color: LUXURY.secondary,
               fontFamily: "'Noto Serif TC', serif",
-              fontSize: isMobile ? '1rem' : '1.125rem'
+              fontSize: isMobile ? '1rem' : '1.125rem',
             }}
           >
             Travel Essentials
@@ -84,7 +85,7 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
             className={`font-bold ${isMobile ? 'text-2xl' : 'text-3xl'}`}
             style={{
               color: LUXURY.text,
-              fontFamily: "'Noto Serif TC', serif"
+              fontFamily: "'Noto Serif TC', serif",
             }}
           >
             {TOURS_LABELS.LABEL_7562}
@@ -108,7 +109,8 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
 
               {/* 頭像 */}
               {leader?.photo ? (
-                <img src={leader.photo}
+                <img
+                  src={leader.photo}
                   alt={leader?.name || 'Tour Leader'}
                   className="w-20 h-20 rounded-full object-cover flex-shrink-0 border-2 shadow-sm relative z-10"
                   style={{ borderColor: LUXURY.surface }}
@@ -118,7 +120,7 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
                   className="w-20 h-20 rounded-full flex items-center justify-center flex-shrink-0 border-2 shadow-sm relative z-10"
                   style={{
                     backgroundColor: '#f5f5f5',
-                    borderColor: LUXURY.surface
+                    borderColor: LUXURY.surface,
                   }}
                 >
                   <User className="w-8 h-8" style={{ color: LUXURY.muted }} />
@@ -137,7 +139,7 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
                   className={`font-bold mb-1 ${isMobile ? 'text-xl' : 'text-2xl'}`}
                   style={{
                     color: LUXURY.text,
-                    fontFamily: "'Noto Serif TC', serif"
+                    fontFamily: "'Noto Serif TC', serif",
                   }}
                 >
                   {leader?.name || '待定'}
@@ -168,7 +170,10 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
                         className="flex items-center gap-2 text-xs"
                         style={{ color: LUXURY.muted }}
                       >
-                        <span>{TOURS_LABELS.LABEL_5167}{leader.overseasPhone}</span>
+                        <span>
+                          {TOURS_LABELS.LABEL_5167}
+                          {leader.overseasPhone}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -203,7 +208,8 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
                   {/* 集合點資訊 - 支援 meetingPoints 陣列或 meetingInfo 單一物件 */}
                   {(() => {
                     // 優先使用 meetingPoints，其次是 meetingInfo
-                    const primaryLocation = meetingPoints[0]?.location || meetingInfo?.location || '待定'
+                    const primaryLocation =
+                      meetingPoints[0]?.location || meetingInfo?.location || '待定'
                     const primaryTime = meetingPoints[0]?.time || meetingInfo?.time || '待定'
 
                     return (
@@ -212,7 +218,7 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
                           className={`font-bold mb-4 ${isMobile ? 'text-lg' : 'text-xl'}`}
                           style={{
                             color: LUXURY.text,
-                            fontFamily: "'Noto Serif TC', serif"
+                            fontFamily: "'Noto Serif TC', serif",
                           }}
                         >
                           {primaryLocation}
@@ -222,10 +228,7 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
                           {/* 日期 */}
                           <div className="flex items-center gap-3">
                             <Calendar size={16} style={{ color: LUXURY.muted }} />
-                            <span
-                              className="text-sm font-medium"
-                              style={{ color: LUXURY.text }}
-                            >
+                            <span className="text-sm font-medium" style={{ color: LUXURY.text }}>
                               {formattedDate} {weekday}
                             </span>
                           </div>
@@ -233,10 +236,7 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
                           {/* 時間 */}
                           <div className="flex items-center gap-3">
                             <Clock size={16} style={{ color: LUXURY.muted }} />
-                            <span
-                              className="text-sm font-medium"
-                              style={{ color: LUXURY.text }}
-                            >
+                            <span className="text-sm font-medium" style={{ color: LUXURY.text }}>
                               {primaryTime}
                             </span>
                           </div>
@@ -244,10 +244,7 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
                           {/* 地點 */}
                           <div className="flex items-center gap-3">
                             <MapPin size={16} style={{ color: LUXURY.muted }} />
-                            <span
-                              className="text-sm font-medium"
-                              style={{ color: LUXURY.text }}
-                            >
+                            <span className="text-sm font-medium" style={{ color: LUXURY.text }}>
                               {primaryLocation}
                             </span>
                           </div>

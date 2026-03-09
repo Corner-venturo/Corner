@@ -27,10 +27,7 @@ export type {
 } from '@/components/editor/tour-form/types'
 
 // 從 stores 匯出共用類型
-export type {
-  LeaderInfo,
-  HotelInfo,
-} from '@/stores/types/tour.types'
+export type { LeaderInfo, HotelInfo } from '@/stores/types/tour.types'
 
 import type {
   FlightInfo,

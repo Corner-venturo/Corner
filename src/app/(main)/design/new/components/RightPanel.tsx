@@ -4,7 +4,6 @@
  * 包含元素屬性和模板數據兩個 Tab
  */
 
-
 import * as fabric from 'fabric'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PropertiesPanel } from '@/features/designer/components/PropertiesPanel'
@@ -46,10 +45,17 @@ export function RightPanel({
 }: RightPanelProps) {
   return (
     <div className="w-64 h-full bg-white border-l border-border flex flex-col">
-      <Tabs defaultValue={selectedObject ? 'properties' : 'template'} className="flex-1 min-h-0 flex flex-col">
+      <Tabs
+        defaultValue={selectedObject ? 'properties' : 'template'}
+        className="flex-1 min-h-0 flex flex-col"
+      >
         <TabsList className="grid grid-cols-2 mx-2 mt-2">
-          <TabsTrigger value="properties" className="text-xs">{DESIGNER_LABELS.TAB_PROPERTIES}</TabsTrigger>
-          <TabsTrigger value="template" className="text-xs">{DESIGNER_LABELS.TAB_TEMPLATE_DATA}</TabsTrigger>
+          <TabsTrigger value="properties" className="text-xs">
+            {DESIGNER_LABELS.TAB_PROPERTIES}
+          </TabsTrigger>
+          <TabsTrigger value="template" className="text-xs">
+            {DESIGNER_LABELS.TAB_TEMPLATE_DATA}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="properties" className="flex-1 min-h-0 overflow-hidden m-0">

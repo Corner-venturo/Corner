@@ -5,12 +5,7 @@ import React from 'react'
 import { I18nProviderClient } from '@/lib/i18n/client'
 import { defaultLocale } from '@/lib/i18n'
 
-
-export default function MainRouteGroupLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function MainRouteGroupLayout({ children }: { children: React.ReactNode }) {
   return (
     <I18nProviderClient locale={defaultLocale}>
       <MainLayout>{children}</MainLayout>

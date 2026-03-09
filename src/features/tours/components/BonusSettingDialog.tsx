@@ -1,16 +1,32 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Combobox } from '@/components/ui/combobox'
 import { BonusSettingType, BonusCalculationType } from '@/types/bonus.types'
 import type { TourBonusSetting } from '@/types/bonus.types'
 import { useEmployeesSlim } from '@/data'
-import { BONUS_TYPE_LABELS, BONUS_CALCULATION_LABELS, BONUS_TAB_LABELS } from '../constants/bonus-labels'
+import {
+  BONUS_TYPE_LABELS,
+  BONUS_CALCULATION_LABELS,
+  BONUS_TAB_LABELS,
+} from '../constants/bonus-labels'
 
 interface BonusSettingDialogProps {
   open: boolean
@@ -24,10 +40,17 @@ interface BonusSettingDialogProps {
   initial?: TourBonusSetting | null
 }
 
-export function BonusSettingDialog({ open, onOpenChange, onSave, initial }: BonusSettingDialogProps) {
+export function BonusSettingDialog({
+  open,
+  onOpenChange,
+  onSave,
+  initial,
+}: BonusSettingDialogProps) {
   const [type, setType] = useState<BonusSettingType>(initial?.type ?? BonusSettingType.PROFIT_TAX)
   const [bonus, setBonus] = useState<string>(initial ? String(initial.bonus) : '0')
-  const [bonusType, setBonusType] = useState<BonusCalculationType>(initial?.bonus_type ?? BonusCalculationType.PERCENT)
+  const [bonusType, setBonusType] = useState<BonusCalculationType>(
+    initial?.bonus_type ?? BonusCalculationType.PERCENT
+  )
   const [employeeId, setEmployeeId] = useState<string | null>(initial?.employee_id ?? null)
 
   const { items: employees } = useEmployeesSlim()
@@ -74,13 +97,18 @@ export function BonusSettingDialog({ open, onOpenChange, onSave, initial }: Bonu
           {/* 類型選擇 */}
           <div className="space-y-1.5">
             <Label>{BONUS_TAB_LABELS.type}</Label>
-            <Select value={String(type)} onValueChange={v => setType(Number(v) as BonusSettingType)}>
+            <Select
+              value={String(type)}
+              onValueChange={v => setType(Number(v) as BonusSettingType)}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {Object.entries(BONUS_TYPE_LABELS).map(([k, v]) => (
-                  <SelectItem key={k} value={k}>{v}</SelectItem>
+                  <SelectItem key={k} value={k}>
+                    {v}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -101,13 +129,18 @@ export function BonusSettingDialog({ open, onOpenChange, onSave, initial }: Bonu
           {/* 計算方式 */}
           <div className="space-y-1.5">
             <Label>{BONUS_TAB_LABELS.calculation_type}</Label>
-            <Select value={String(bonusType)} onValueChange={v => setBonusType(Number(v) as BonusCalculationType)}>
+            <Select
+              value={String(bonusType)}
+              onValueChange={v => setBonusType(Number(v) as BonusCalculationType)}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {Object.entries(BONUS_CALCULATION_LABELS).map(([k, v]) => (
-                  <SelectItem key={k} value={k}>{v}</SelectItem>
+                  <SelectItem key={k} value={k}>
+                    {v}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -131,9 +164,7 @@ export function BonusSettingDialog({ open, onOpenChange, onSave, initial }: Bonu
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {BONUS_TAB_LABELS.CANCEL}
           </Button>
-          <Button onClick={handleSave}>
-            {BONUS_TAB_LABELS.SAVE}
-          </Button>
+          <Button onClick={handleSave}>{BONUS_TAB_LABELS.SAVE}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

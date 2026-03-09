@@ -47,34 +47,21 @@ export function NotFoundState({
   }
 
   return (
-    <div
-      className={cn(
-        'flex flex-col items-center justify-center min-h-[400px] p-8',
-        className
-      )}
-    >
+    <div className={cn('flex flex-col items-center justify-center min-h-[400px] p-8', className)}>
       {/* 404 圖示 */}
       <div className="flex items-center justify-center w-20 h-20 rounded-full bg-morandi-container/50 mb-6">
         {icon || <FileX className="w-10 h-10 text-morandi-secondary" />}
       </div>
 
       {/* 標題 */}
-      <h2 className="text-xl font-semibold text-morandi-primary mb-2">
-        {title}
-      </h2>
+      <h2 className="text-xl font-semibold text-morandi-primary mb-2">{title}</h2>
 
       {/* 描述 */}
-      <p className="text-morandi-secondary text-center max-w-md mb-6">
-        {description}
-      </p>
+      <p className="text-morandi-secondary text-center max-w-md mb-6">{description}</p>
 
       {/* 返回按鈕 */}
       {showBackButton && (
-        <Button
-          variant="outline"
-          onClick={handleBack}
-          className="gap-2"
-        >
+        <Button variant="outline" onClick={handleBack} className="gap-2">
           <ArrowLeft size={16} />
           {backButtonLabel}
         </Button>

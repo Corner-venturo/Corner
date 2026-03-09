@@ -35,7 +35,11 @@ interface UseOrderMembersReturn {
   loadMembers: () => Promise<void>
   addMembers: (count: number) => Promise<void>
   deleteMember: (memberId: string) => Promise<boolean>
-  updateMember: (memberId: string, field: keyof OrderMember, value: string | number | null) => Promise<void>
+  updateMember: (
+    memberId: string,
+    field: keyof OrderMember,
+    value: string | number | null
+  ) => Promise<void>
   updateMemberData: (memberId: string, data: Partial<OrderMember>) => Promise<void>
   setPnrValue: (memberId: string, value: string) => void
   setCustomCostFields: React.Dispatch<React.SetStateAction<CustomCostField[]>>
@@ -90,7 +94,10 @@ export function useOrderMembers({
       const { data: assignments } = await supabase
         .from('tour_room_assignments')
         .select('order_member_id, room_id')
-        .in('room_id', rooms.map(r => r.id))
+        .in(
+          'room_id',
+          rooms.map(r => r.id)
+        )
 
       if (assignments) {
         const map: Record<string, string> = {}
@@ -121,14 +128,18 @@ export function useOrderMembers({
       const { data: assignments } = await supabase
         .from('tour_vehicle_assignments')
         .select('order_member_id, vehicle_id')
-        .in('vehicle_id', vehicles.map(v => v.id))
+        .in(
+          'vehicle_id',
+          vehicles.map(v => v.id)
+        )
 
       if (assignments) {
         const map: Record<string, string> = {}
         assignments.forEach(a => {
           const vehicle = vehicles.find(v => v.id === a.vehicle_id)
           if (vehicle) {
-            map[a.order_member_id] = vehicle.vehicle_name || vehicle.vehicle_type || COMP_ORDERS_LABELS.已分車
+            map[a.order_member_id] =
+              vehicle.vehicle_name || vehicle.vehicle_type || COMP_ORDERS_LABELS.已分車
           }
         })
         setVehicleAssignments(map)
@@ -176,7 +187,7 @@ export function useOrderMembers({
           if (membersError) throw membersError
           membersData = (allMembersData || []).map(m => ({
             ...m,
-            order_code: orderCodeMap[m.order_id] || ''
+            order_code: orderCodeMap[m.order_id] || '',
           }))
         }
       } else {
@@ -197,9 +208,7 @@ export function useOrderMembers({
       }
 
       // 取得關聯顧客的驗證狀態
-      const customerIds = membersData
-        .map(m => m.customer_id)
-        .filter((id): id is string => !!id)
+      const customerIds = membersData.map(m => m.customer_id).filter((id): id is string => !!id)
 
       if (customerIds.length > 0) {
         const { data: customersData } = await supabase
@@ -208,14 +217,12 @@ export function useOrderMembers({
           .in('id', customerIds)
 
         if (customersData) {
-          const statusMap = new Map(
-            customersData.map(c => [c.id, c.verification_status])
-          )
+          const statusMap = new Map(customersData.map(c => [c.id, c.verification_status]))
           membersData = membersData.map(m => ({
             ...m,
             customer_verification_status: m.customer_id
               ? statusMap.get(m.customer_id) || null
-              : null
+              : null,
           }))
         }
       }
@@ -229,136 +236,128 @@ export function useOrderMembers({
   }, [orderId, tourId, mode])
 
   // 新增成員
-  const addMembers = useCallback(async (count: number) => {
-    if (!orderId) return
+  const addMembers = useCallback(
+    async (count: number) => {
+      if (!orderId) return
 
-    try {
-      const newMembers = Array.from({ length: count }, () => ({
-        order_id: orderId,
-        workspace_id: workspaceId,
-        member_type: 'adult' as const,
-        identity: COMP_ORDERS_LABELS.大人,
-      }))
+      try {
+        const newMembers = Array.from({ length: count }, () => ({
+          order_id: orderId,
+          workspace_id: workspaceId,
+          member_type: 'adult' as const,
+          identity: COMP_ORDERS_LABELS.大人,
+        }))
 
-      const { data, error } = await supabase
-        .from('order_members')
-        .insert(newMembers)
-        .select()
+        const { data, error } = await supabase.from('order_members').insert(newMembers).select()
 
-      if (error) throw error
+        if (error) throw error
 
-      if (data) {
-        setMembers(prev => [...prev, ...data])
+        if (data) {
+          setMembers(prev => [...prev, ...data])
+        }
+
+        // 重算團人數
+        if (tourId) {
+          recalculateParticipants(tourId).catch(err => {
+            logger.error('重算團人數失敗:', err)
+          })
+        }
+      } catch (error) {
+        logger.error(COMP_ORDERS_LABELS.新增成員失敗, error)
+        throw error
       }
-
-      // 重算團人數
-      if (tourId) {
-        recalculateParticipants(tourId).catch(err => {
-          logger.error('重算團人數失敗:', err)
-        })
-      }
-    } catch (error) {
-      logger.error(COMP_ORDERS_LABELS.新增成員失敗, error)
-      throw error
-    }
-  }, [orderId, workspaceId, tourId])
+    },
+    [orderId, workspaceId, tourId]
+  )
 
   // 刪除成員
-  const deleteMember = useCallback(async (memberId: string): Promise<boolean> => {
-    const confirmed = await confirm(COMP_ORDERS_LABELS.確定要刪除此成員嗎, {
-      confirmText: COMP_ORDERS_LABELS.刪除,
-      cancelText: COMP_ORDERS_LABELS.取消,
-    })
+  const deleteMember = useCallback(
+    async (memberId: string): Promise<boolean> => {
+      const confirmed = await confirm(COMP_ORDERS_LABELS.確定要刪除此成員嗎, {
+        confirmText: COMP_ORDERS_LABELS.刪除,
+        cancelText: COMP_ORDERS_LABELS.取消,
+      })
 
-    if (!confirmed) return false
+      if (!confirmed) return false
 
-    try {
-      const { error } = await supabase
-        .from('order_members')
-        .delete()
-        .eq('id', memberId)
+      try {
+        const { error } = await supabase.from('order_members').delete().eq('id', memberId)
 
-      if (error) throw error
+        if (error) throw error
 
-      setMembers(prev => prev.filter(m => m.id !== memberId))
+        setMembers(prev => prev.filter(m => m.id !== memberId))
 
-      // 重算團人數
-      if (tourId) {
-        recalculateParticipants(tourId).catch(err => {
-          logger.error('重算團人數失敗:', err)
-        })
+        // 重算團人數
+        if (tourId) {
+          recalculateParticipants(tourId).catch(err => {
+            logger.error('重算團人數失敗:', err)
+          })
+        }
+
+        return true
+      } catch (error) {
+        logger.error(COMP_ORDERS_LABELS.刪除成員失敗, error)
+        return false
       }
-
-      return true
-    } catch (error) {
-      logger.error(COMP_ORDERS_LABELS.刪除成員失敗, error)
-      return false
-    }
-  }, [tourId])
+    },
+    [tourId]
+  )
 
   // 更新成員單一欄位
-  const updateMember = useCallback(async (
-    memberId: string,
-    field: keyof OrderMember,
-    value: string | number | null
-  ) => {
-    try {
-      const { error } = await supabase
-        .from('order_members')
-        .update({ [field]: value })
-        .eq('id', memberId)
+  const updateMember = useCallback(
+    async (memberId: string, field: keyof OrderMember, value: string | number | null) => {
+      try {
+        const { error } = await supabase
+          .from('order_members')
+          .update({ [field]: value })
+          .eq('id', memberId)
 
-      if (error) throw error
+        if (error) throw error
 
-      setMembers(prev => prev.map(m =>
-        m.id === memberId ? { ...m, [field]: value } : m
-      ))
+        setMembers(prev => prev.map(m => (m.id === memberId ? { ...m, [field]: value } : m)))
 
-      // 如果修改了金額欄位，重算訂單金額
-      if (field === 'total_payable' || field === 'selling_price') {
-        const member = members.find(m => m.id === memberId)
-        if (member?.order_id) {
-          recalculateOrderAmount(member.order_id).catch(err => {
-            logger.error('重算訂單金額失敗:', err)
-          })
+        // 如果修改了金額欄位，重算訂單金額
+        if (field === 'total_payable' || field === 'selling_price') {
+          const member = members.find(m => m.id === memberId)
+          if (member?.order_id) {
+            recalculateOrderAmount(member.order_id).catch(err => {
+              logger.error('重算訂單金額失敗:', err)
+            })
+          }
         }
+      } catch (error) {
+        logger.error(COMP_ORDERS_LABELS.更新成員失敗, error)
       }
-    } catch (error) {
-      logger.error(COMP_ORDERS_LABELS.更新成員失敗, error)
-    }
-  }, [members])
+    },
+    [members]
+  )
 
   // 更新成員多個欄位
-  const updateMemberData = useCallback(async (
-    memberId: string,
-    data: Partial<OrderMember>
-  ) => {
-    try {
-      const { error } = await supabase
-        .from('order_members')
-        .update(data)
-        .eq('id', memberId)
+  const updateMemberData = useCallback(
+    async (memberId: string, data: Partial<OrderMember>) => {
+      try {
+        const { error } = await supabase.from('order_members').update(data).eq('id', memberId)
 
-      if (error) throw error
+        if (error) throw error
 
-      setMembers(prev => prev.map(m =>
-        m.id === memberId ? { ...m, ...data } : m
-      ))
+        setMembers(prev => prev.map(m => (m.id === memberId ? { ...m, ...data } : m)))
 
-      // 如果修改了金額欄位，重算訂單金額
-      if ('total_payable' in data || 'selling_price' in data) {
-        const member = members.find(m => m.id === memberId)
-        if (member?.order_id) {
-          recalculateOrderAmount(member.order_id).catch(err => {
-            logger.error('重算訂單金額失敗:', err)
-          })
+        // 如果修改了金額欄位，重算訂單金額
+        if ('total_payable' in data || 'selling_price' in data) {
+          const member = members.find(m => m.id === memberId)
+          if (member?.order_id) {
+            recalculateOrderAmount(member.order_id).catch(err => {
+              logger.error('重算訂單金額失敗:', err)
+            })
+          }
         }
+      } catch (error) {
+        logger.error(COMP_ORDERS_LABELS.更新成員失敗, error)
+        throw error
       }
-    } catch (error) {
-      logger.error(COMP_ORDERS_LABELS.更新成員失敗, error)
-      throw error
-    }
-  }, [members])
+    },
+    [members]
+  )
 
   // 設定 PNR 值
   const setPnrValue = useCallback((memberId: string, value: string) => {

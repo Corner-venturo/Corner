@@ -97,7 +97,7 @@ function open_db(): Promise<IDBDatabase> {
 export async function get_cache<T = unknown>(key: string): Promise<CacheEntry<T> | null> {
   try {
     const db = await open_db()
-    return new Promise<CacheEntry<T> | null>((resolve) => {
+    return new Promise<CacheEntry<T> | null>(resolve => {
       const tx = db.transaction(_config.store_name, 'readonly')
       const store = tx.objectStore(_config.store_name)
       const request = store.get(key)
@@ -147,7 +147,7 @@ export async function set_cache<T = unknown>(key: string, data: T): Promise<void
       version: _config.cache_version,
     }
 
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(resolve => {
       const tx = db.transaction(_config.store_name, 'readwrite')
       const store = tx.objectStore(_config.store_name)
       store.put(entry)
@@ -169,7 +169,7 @@ export async function set_cache<T = unknown>(key: string, data: T): Promise<void
 export async function clear_cache(): Promise<void> {
   try {
     const db = await open_db()
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(resolve => {
       const tx = db.transaction(_config.store_name, 'readwrite')
       const store = tx.objectStore(_config.store_name)
       store.clear()
@@ -191,7 +191,7 @@ export async function clear_expired(): Promise<number> {
     const now = Date.now()
     let removed = 0
 
-    return new Promise<number>((resolve) => {
+    return new Promise<number>(resolve => {
       const tx = db.transaction(_config.store_name, 'readwrite')
       const store = tx.objectStore(_config.store_name)
       const request = store.openCursor()
@@ -228,7 +228,7 @@ export async function clear_expired(): Promise<number> {
 export async function invalidate_cache_pattern(prefix: string): Promise<void> {
   try {
     const db = await open_db()
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(resolve => {
       const tx = db.transaction(_config.store_name, 'readwrite')
       const store = tx.objectStore(_config.store_name)
       const request = store.openCursor()

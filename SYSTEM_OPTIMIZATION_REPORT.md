@@ -12,13 +12,13 @@
 
 ### 優化前後對比
 
-| 指標 | 優化前 | 優化後 | 改善 |
-|------|--------|--------|------|
-| **建置狀態** | ❌ 失敗 | ✅ 成功 | +100% |
-| **npm 依賴** | 638 個套件 | 604 個套件 | -34 個 |
-| **console 使用** | 875 個 | 594 個 (僅 scripts/) | -281 個 |
-| **建置時間** | N/A (失敗) | 10.1 秒 | ✅ 穩定 |
-| **型別安全** | 40 個 as any | 40 個 (已識別) | 已記錄 |
+| 指標             | 優化前       | 優化後               | 改善    |
+| ---------------- | ------------ | -------------------- | ------- |
+| **建置狀態**     | ❌ 失敗      | ✅ 成功              | +100%   |
+| **npm 依賴**     | 638 個套件   | 604 個套件           | -34 個  |
+| **console 使用** | 875 個       | 594 個 (僅 scripts/) | -281 個 |
+| **建置時間**     | N/A (失敗)   | 10.1 秒              | ✅ 穩定 |
+| **型別安全**     | 40 個 as any | 40 個 (已識別)       | 已記錄  |
 
 ---
 
@@ -27,14 +27,17 @@
 ### 1. 🔴 修正建置錯誤（Critical - 阻斷部署）
 
 **問題描述**：
+
 - 4 個檔案使用錯誤的 import 路徑 `@/lib/supabase-client`
 - API Route 在建置時因缺少環境變數而失敗
 
 **解決方案**：
+
 - 統一修正為正確路徑 `@/lib/supabase/client`
 - 修改 `sync-password/route.ts` 使用延遲初始化模式
 
 **修正檔案**：
+
 ```
 src/components/tours/tour-close-dialog.tsx:9
 src/app/reports/tour-closing/page.tsx:7
@@ -50,26 +53,20 @@ src/app/api/auth/sync-password/route.ts:10-24
 ### 2. 🔴 清理未使用的 npm 依賴（High Priority）
 
 **移除的依賴**：
+
 ```json
 {
-  "dependencies": [
-    "@handsontable/react",
-    "handsontable",
-    "buffer",
-    "react-day-picker"
-  ],
-  "devDependencies": [
-    "@types/better-sqlite3",
-    "@types/file-saver",
-    "eslint-plugin-react"
-  ]
+  "dependencies": ["@handsontable/react", "handsontable", "buffer", "react-day-picker"],
+  "devDependencies": ["@types/better-sqlite3", "@types/file-saver", "eslint-plugin-react"]
 }
 ```
 
 **保留的必要依賴**：
+
 - `@tailwindcss/postcss` - 建置時需要（depcheck 誤報）
 
 **結果**：
+
 - 移除 30 個套件
 - node_modules/ 縮小約 15%
 - 建置時間維持穩定
@@ -79,11 +76,13 @@ src/app/api/auth/sync-password/route.ts:10-24
 ### 3. 🔴 移除 console.log 改用 logger（High Priority）
 
 **統計數據**：
+
 - 處理檔案：93 個
 - 替換次數：281 個
 - 排除檔案：4 個（錯誤處理頁面和 logger 本身）
 
 **自動化腳本**：
+
 ```javascript
 // scripts/replace-console-with-logger.mjs
 - 自動替換 console.log/error/warn/info → logger
@@ -92,6 +91,7 @@ src/app/api/auth/sync-password/route.ts:10-24
 ```
 
 **排除的檔案**：
+
 ```
 src/components/ErrorLogger.tsx      // 本身就是 logger
 src/app/global-error.tsx             // 錯誤處理頁面
@@ -100,6 +100,7 @@ src/app/api/log-error/route.ts       // API 錯誤日誌
 ```
 
 **結果**:
+
 - ✅ 商業環境下不會洩漏 debug 訊息
 - ✅ 開發環境仍可正常 debug
 - ✅ SSR 安全（不會在 server 端執行 console）
@@ -119,6 +120,7 @@ src/app/api/log-error/route.ts       // API 錯誤日誌
 | `src/lib/db/schemas.ts` | 772 | Schema 定義 | ⏭️ 跳過 |
 
 **結論**：
+
 - ✅ 核心業務邏輯已使用 custom hooks 模組化（ToursPage）
 - ⏭️ 列印組件和自動生成檔案不適合拆分
 - 📌 建議：未來新增功能時優先使用 hooks 模式
@@ -130,9 +132,10 @@ src/app/api/log-error/route.ts       // API 錯誤日誌
 **識別的 as any 用途**（40 個）：
 
 #### 類別 1: Quote 類型判斷（16 個）
+
 ```typescript
 // 問題：Quote 型別缺少 quote_type 欄位
-(quote as any).quote_type === 'quick'
+;(quote as any).quote_type === 'quick'
 
 // 建議：擴展 Quote 型別
 interface Quote extends BaseEntity {
@@ -142,9 +145,10 @@ interface Quote extends BaseEntity {
 ```
 
 #### 類別 2: Employee 薪資（8 個）
+
 ```typescript
 // 問題：Employee 型別缺少 monthly_salary
-(employee as any).monthly_salary
+;(employee as any).monthly_salary
 
 // 建議：擴展 Employee 型別
 interface Employee extends BaseEntity {
@@ -154,22 +158,25 @@ interface Employee extends BaseEntity {
 ```
 
 #### 類別 3: jsPDF autoTable（5 個）
+
 ```typescript
 // 問題：jsPDF 型別定義不完整
-(pdf as any).lastAutoTable.finalY
+;(pdf as any).lastAutoTable.finalY
 
 // 解決：使用 @types/jspdf-autotable
 ```
 
 #### 類別 4: Calendar 選擇（3 個）
+
 ```typescript
 // 問題：react-day-picker 型別過於寬鬆
-(selected as any).from
+;(selected as any).from
 
 // 建議：使用 DateRange 型別
 ```
 
 **結論**：
+
 - ✅ 已識別所有 40 個使用位置
 - 📌 大多可透過型別定義擴展解決
 - 🔮 未來優化：逐步補充缺失的型別定義
@@ -212,11 +219,11 @@ Route (app)                                    Size      First Load JS
 
 ### 低優先級項目（不影響商業化）
 
-| 項目 | 數量 | 影響 | 建議處理時機 |
-|------|------|------|-------------|
-| **補充型別定義** | 40 個 | 開發體驗 | 下個 Sprint |
-| **拆分列印組件** | 2 個 | 可讀性 | 需求變更時 |
-| **清理 scripts/** | 104 個 | 維護性 | 閒暇時間 |
+| 項目              | 數量   | 影響     | 建議處理時機 |
+| ----------------- | ------ | -------- | ------------ |
+| **補充型別定義**  | 40 個  | 開發體驗 | 下個 Sprint  |
+| **拆分列印組件**  | 2 個   | 可讀性   | 需求變更時   |
+| **清理 scripts/** | 104 個 | 維護性   | 閒暇時間     |
 
 ---
 
@@ -224,14 +231,14 @@ Route (app)                                    Size      First Load JS
 
 ### 商業化就緒度檢查
 
-| 檢查項目 | 狀態 | 備註 |
-|---------|------|------|
-| ✅ 建置成功 | 通過 | 可部署 |
-| ✅ 無阻斷性錯誤 | 通過 | 所有 critical 問題已修復 |
-| ✅ 依賴管理 | 通過 | 無未使用依賴 |
-| ✅ 日誌系統 | 通過 | 已使用 logger |
-| ✅ 型別安全 | 良好 | 40 個已知 as any（已記錄） |
-| ⚠️ 測試覆蓋率 | 低 | ~0%（未來改善） |
+| 檢查項目        | 狀態 | 備註                       |
+| --------------- | ---- | -------------------------- |
+| ✅ 建置成功     | 通過 | 可部署                     |
+| ✅ 無阻斷性錯誤 | 通過 | 所有 critical 問題已修復   |
+| ✅ 依賴管理     | 通過 | 無未使用依賴               |
+| ✅ 日誌系統     | 通過 | 已使用 logger              |
+| ✅ 型別安全     | 良好 | 40 個已知 as any（已記錄） |
+| ⚠️ 測試覆蓋率   | 低   | ~0%（未來改善）            |
 
 ### 整體評級
 
@@ -251,6 +258,7 @@ Route (app)                                    Size      First Load JS
 ### 環境變數檢查清單
 
 **必要環境變數** (.env.production):
+
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
@@ -281,16 +289,19 @@ node -e "console.log(process.env.NEXT_PUBLIC_SUPABASE_URL)"
 **2025-01-17 - 系統優化**
 
 ### Added
+
 - ✅ Logger 系統整合（281 個替換）
 - ✅ 建置錯誤修正（5 個檔案）
 - ✅ 依賴清理（移除 30 個套件）
 - ✅ 自動化腳本 `replace-console-with-logger.mjs`
 
 ### Changed
+
 - 🔄 Supabase client import 路徑統一
 - 🔄 API Route 延遲初始化模式
 
 ### Removed
+
 - ❌ 未使用的 npm 依賴（30 個套件）
 - ❌ 281 個 console.log 呼叫
 

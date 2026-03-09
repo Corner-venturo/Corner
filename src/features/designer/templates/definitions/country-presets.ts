@@ -22,7 +22,8 @@ const japanMemoSettings: MemoSettings = {
       icon: 'volume_off',
       title: '電車内では静かに',
       titleZh: '電車保持安靜',
-      content: '搭乘電車時請保持安靜，將手機設為靜音模式。避免通話或大聲喧嘩，這是日本通勤的基本禮儀。',
+      content:
+        '搭乘電車時請保持安靜，將手機設為靜音模式。避免通話或大聲喧嘩，這是日本通勤的基本禮儀。',
       enabled: false,
     },
     {
@@ -49,7 +50,8 @@ const japanMemoSettings: MemoSettings = {
       icon: 'photo_camera',
       title: '撮影のマナー',
       titleZh: '攝影禮儀',
-      content: '在私人道路、神社禁止區域，或面對藝妓、舞妓時，請勿未經允許隨意拍照，請保持尊重的距離。',
+      content:
+        '在私人道路、神社禁止區域，或面對藝妓、舞妓時，請勿未經允許隨意拍照，請保持尊重的距離。',
       enabled: false,
     },
     // 航空/行李類
@@ -68,7 +70,8 @@ const japanMemoSettings: MemoSettings = {
       icon: 'water_drop',
       title: '液体の持ち込み',
       titleZh: '隨身液體限制',
-      content: '搭乘國際線，隨身攜帶之液體、膠狀及噴霧類物品，每瓶不可超過 100ml，且需全部裝入一個 1 公升以下可重複密封的透明塑膠袋中。',
+      content:
+        '搭乘國際線，隨身攜帶之液體、膠狀及噴霧類物品，每瓶不可超過 100ml，且需全部裝入一個 1 公升以下可重複密封的透明塑膠袋中。',
       enabled: false,
     },
     {
@@ -104,7 +107,8 @@ const japanMemoSettings: MemoSettings = {
       icon: 'block',
       title: '禁止品',
       titleZh: '違禁品',
-      content: '肉類製品（含肉乾、肉鬆）、新鮮蔬果、植物種子等嚴禁攜帶入境日本，違者將面臨高額罰款。',
+      content:
+        '肉類製品（含肉乾、肉鬆）、新鮮蔬果、植物種子等嚴禁攜帶入境日本，違者將面臨高額罰款。',
       enabled: false,
     },
     {
@@ -203,7 +207,8 @@ const thailandMemoSettings: MemoSettings = {
       icon: 'front_hand',
       title: 'ไหว้ (合十禮)',
       titleZh: '合十禮儀',
-      content: '泰式問候「Wai」：雙手合十於胸前，微微低頭。對長輩、僧侶需將手舉至更高位置以示尊敬。',
+      content:
+        '泰式問候「Wai」：雙手合十於胸前，微微低頭。對長輩、僧侶需將手舉至更高位置以示尊敬。',
       enabled: false,
     },
     {
@@ -320,7 +325,8 @@ const koreaMemoSettings: MemoSettings = {
       icon: 'elderly',
       title: '어른 공경',
       titleZh: '尊敬長輩',
-      content: '韓國非常重視輩分，見面時晚輩需先鞠躬問候。用餐時需等長輩先動筷，飲酒時側身避開長輩。',
+      content:
+        '韓國非常重視輩分，見面時晚輩需先鞠躬問候。用餐時需等長輩先動筷，飲酒時側身避開長輩。',
       enabled: false,
     },
     {
@@ -591,7 +597,8 @@ const chinaMemoSettings: MemoSettings = {
       icon: 'badge',
       title: '台胞證',
       titleZh: '台胞證必備',
-      content: '入境中國大陸必須持有效「台灣居民來往大陸通行證」（台胞證）。請確認效期至少 6 個月以上，並檢查是否需要加簽。',
+      content:
+        '入境中國大陸必須持有效「台灣居民來往大陸通行證」（台胞證）。請確認效期至少 6 個月以上，並檢查是否需要加簽。',
       enabled: false,
     },
     {
@@ -600,7 +607,8 @@ const chinaMemoSettings: MemoSettings = {
       icon: 'event_available',
       title: '效期確認',
       titleZh: '台胞證效期',
-      content: '台胞證有效期為 5 年。出發前請務必確認效期充足，過期需重新辦理（約需 7-10 個工作天）。',
+      content:
+        '台胞證有效期為 5 年。出發前請務必確認效期充足，過期需重新辦理（約需 7-10 個工作天）。',
       enabled: false,
     },
     // 禮儀類
@@ -628,7 +636,8 @@ const chinaMemoSettings: MemoSettings = {
       icon: 'smartphone',
       title: '行動支付',
       titleZh: '支付方式',
-      content: '中國以微信支付、支付寶為主，現金使用較少。建議準備少量人民幣現金備用。部分商店可能不收現金。',
+      content:
+        '中國以微信支付、支付寶為主，現金使用較少。建議準備少量人民幣現金備用。部分商店可能不收現金。',
       enabled: false,
     },
     {
@@ -637,7 +646,8 @@ const chinaMemoSettings: MemoSettings = {
       icon: 'vpn_lock',
       title: '網路限制',
       titleZh: 'VPN 與網路',
-      content: 'Google、Facebook、LINE、YouTube 等在中國無法使用。建議出發前下載 VPN，或使用漫遊/國際 SIM 卡。',
+      content:
+        'Google、Facebook、LINE、YouTube 等在中國無法使用。建議出發前下載 VPN，或使用漫遊/國際 SIM 卡。',
       enabled: false,
     },
     // 航空/行李類
@@ -665,7 +675,8 @@ const chinaMemoSettings: MemoSettings = {
       icon: 'battery_alert',
       title: '鋰電池',
       titleZh: '鋰電池規定',
-      content: '行動電源、鋰電池「嚴禁託運」，必須隨身攜帶上機。行動電源需標示容量，超過 20000mAh 可能被拒。',
+      content:
+        '行動電源、鋰電池「嚴禁託運」，必須隨身攜帶上機。行動電源需標示容量，超過 20000mAh 可能被拒。',
       enabled: false,
     },
     {
@@ -747,7 +758,8 @@ const hongKongMemoSettings: MemoSettings = {
       icon: 'badge',
       title: '入境證件',
       titleZh: '港簽或台胞證',
-      content: '台灣旅客入境香港需持有效「台灣居民預辦入境登記」（港簽，網路免費申請）或有效「台胞證」擇一。',
+      content:
+        '台灣旅客入境香港需持有效「台灣居民預辦入境登記」（港簽，網路免費申請）或有效「台胞證」擇一。',
       enabled: false,
     },
     {
@@ -756,7 +768,8 @@ const hongKongMemoSettings: MemoSettings = {
       icon: 'computer',
       title: '港簽申請',
       titleZh: '網上快證',
-      content: '港簽可於出發前 24 小時至 2 個月內在網上免費申請，效期 2 個月、可入境 2 次、每次停留 30 天。',
+      content:
+        '港簽可於出發前 24 小時至 2 個月內在網上免費申請，效期 2 個月、可入境 2 次、每次停留 30 天。',
       enabled: false,
     },
     {
@@ -765,7 +778,8 @@ const hongKongMemoSettings: MemoSettings = {
       icon: 'event_available',
       title: '效期確認',
       titleZh: '證件效期',
-      content: '請確認護照效期至少 6 個月以上。港簽列印後請妥善保管，入境時需出示。台胞證效期也需 6 個月以上。',
+      content:
+        '請確認護照效期至少 6 個月以上。港簽列印後請妥善保管，入境時需出示。台胞證效期也需 6 個月以上。',
       enabled: false,
     },
     // 禮儀類
@@ -1079,8 +1093,16 @@ export function getCountryCodeFromName(countryNameOrCode: string): CountryCode {
   if (input.includes('韓國') || input.includes('韩国') || input.includes('korea')) return 'KR'
   if (input.includes('越南') || input.includes('vietnam')) return 'VN'
   // 香港要放在中國前面，避免「中國香港」被匹配到中國
-  if (input.includes('香港') || input.includes('hong kong') || input.includes('hongkong')) return 'HK'
-  if (input.includes('中國') || input.includes('中国') || input.includes('china') || input.includes('大陸') || input.includes('大陆')) return 'CN'
+  if (input.includes('香港') || input.includes('hong kong') || input.includes('hongkong'))
+    return 'HK'
+  if (
+    input.includes('中國') ||
+    input.includes('中国') ||
+    input.includes('china') ||
+    input.includes('大陸') ||
+    input.includes('大陆')
+  )
+    return 'CN'
   if (input.includes('台灣') || input.includes('台湾') || input.includes('taiwan')) return 'TW'
   if (input.includes('關島') || input.includes('关岛') || input.includes('guam')) return 'GU'
 
@@ -1091,9 +1113,9 @@ export function getCountryCodeFromName(countryNameOrCode: string): CountryCode {
  * 計算啟用的項目需要幾頁（每頁 4 個項目）
  */
 export function calculateMemoPageCount(settings: MemoSettings): number {
-  const enabledItems = settings.items.filter((item) => item.enabled)
-  const enabledSeasons = settings.seasons?.filter((s) => s.enabled) || []
-  const enabledInfoItems = settings.infoItems?.filter((i) => i.enabled) || []
+  const enabledItems = settings.items.filter(item => item.enabled)
+  const enabledSeasons = settings.seasons?.filter(s => s.enabled) || []
+  const enabledInfoItems = settings.infoItems?.filter(i => i.enabled) || []
 
   // 禮儀+航空項目：每頁 7 個
   const itemPages = Math.ceil(enabledItems.length / 7)
@@ -1111,9 +1133,9 @@ export function getMemoItemsForPage(
   settings: MemoSettings,
   pageIndex: number
 ): { items: MemoItem[]; isWeatherPage: boolean } {
-  const enabledItems = settings.items.filter((item) => item.enabled)
-  const enabledSeasons = settings.seasons?.filter((s) => s.enabled) || []
-  const enabledInfoItems = settings.infoItems?.filter((i) => i.enabled) || []
+  const enabledItems = settings.items.filter(item => item.enabled)
+  const enabledSeasons = settings.seasons?.filter(s => s.enabled) || []
+  const enabledInfoItems = settings.infoItems?.filter(i => i.enabled) || []
 
   const itemPages = Math.ceil(enabledItems.length / 7)
 

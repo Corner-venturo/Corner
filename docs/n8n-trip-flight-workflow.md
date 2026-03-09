@@ -7,6 +7,7 @@
 **執行頻率**: 每 6 小時（00:00, 06:00, 12:00, 18:00）
 
 **技術棧**:
+
 - Gmail API (搜尋+下載郵件)
 - Python 腳本 (PDF 解析)
 - Google Sheets API (寫入訂單)
@@ -65,6 +66,7 @@
 **節點類型**: Schedule Trigger
 
 **設定**:
+
 ```json
 {
   "mode": "cron",
@@ -84,6 +86,7 @@
 **操作**: Search Messages
 
 **設定**:
+
 ```json
 {
   "resource": "message",
@@ -95,6 +98,7 @@
 ```
 
 **說明**:
+
 - 只搜尋未讀郵件，避免重複處理
 - 限制 50 封，避免一次處理太多
 
@@ -105,6 +109,7 @@
 **節點類型**: Split In Batches
 
 **設定**:
+
 ```json
 {
   "batchSize": 1,
@@ -123,6 +128,7 @@
 **操作**: Get Attachment
 
 **設定**:
+
 ```json
 {
   "resource": "message",
@@ -143,6 +149,7 @@
 **節點類型**: Execute Command
 
 **設定**:
+
 ```json
 {
   "command": "python3",
@@ -168,6 +175,7 @@
 **操作**: Append Row
 
 **設定**:
+
 ```json
 {
   "resource": "sheet",
@@ -193,7 +201,8 @@
 }
 ```
 
-**說明**: 
+**說明**:
+
 - Spreadsheet ID 從設定檔讀取
 - 多航段訂單：每個航段寫一行，或只寫第一航段
 
@@ -206,6 +215,7 @@
 **操作**: Send Message
 
 **設定**:
+
 ```json
 {
   "resource": "message",
@@ -225,6 +235,7 @@
 **操作**: Update Message
 
 **設定**:
+
 ```json
 {
   "resource": "message",
@@ -283,9 +294,7 @@
       "departure_date": "2026-01-25",
       "departure_time": "12:50",
       "airline": "捷星日本航空",
-      "passengers": [
-        {"name": "LIN/CHUNGTSO", "cabin": "經濟艙", "pnr": "TRYPQA"}
-      ]
+      "passengers": [{ "name": "LIN/CHUNGTSO", "cabin": "經濟艙", "pnr": "TRYPQA" }]
     }
   ]
 }
@@ -293,9 +302,9 @@
 
 ### 輸出（Google Sheets 寫入）
 
-| order_no | route | flight_no | pnr | departure_date | departure_time | airline | passengers | ticket_no | status | sync_time |
-|----------|-------|-----------|-----|----------------|----------------|---------|------------|-----------|--------|-----------|
-| 1658108575539696 | 台北 - 東京 | GK014 | TRYPQA | 2026-01-25 | 12:50 | 捷星日本航空 | LIN/CHUNGTSO | | 已確認 | 2026-03-07T02:30:00Z |
+| order_no         | route       | flight_no | pnr    | departure_date | departure_time | airline      | passengers   | ticket_no | status | sync_time            |
+| ---------------- | ----------- | --------- | ------ | -------------- | -------------- | ------------ | ------------ | --------- | ------ | -------------------- |
+| 1658108575539696 | 台北 - 東京 | GK014     | TRYPQA | 2026-01-25     | 12:50          | 捷星日本航空 | LIN/CHUNGTSO |           | 已確認 | 2026-03-07T02:30:00Z |
 
 ---
 
@@ -305,7 +314,8 @@
 
 **原因**: 郵件中沒有「行程單.pdf」附件
 
-**處理**: 
+**處理**:
+
 - 記錄到錯誤 log
 - 發送 Telegram 通知
 - 標記郵件為已讀（但不寫入 Sheet）
@@ -315,6 +325,7 @@
 **原因**: PDF 格式變更、異常資料
 
 **處理**:
+
 - 捕捉 Python 腳本的 stderr
 - 發送 Telegram 通知（包含錯誤訊息）
 - 保留郵件為未讀（下次重試）
@@ -324,6 +335,7 @@
 **原因**: API quota 超限、網路問題
 
 **處理**:
+
 - 重試 3 次（間隔 5 秒）
 - 失敗後發送 Telegram 通知
 - 將解析結果暫存到本地檔案
@@ -333,6 +345,7 @@
 **原因**: 每日 API 請求上限（通常 1,000,000 次）
 
 **處理**:
+
 - 減少搜尋頻率（改為每 12 小時）
 - 限制 maxResults 到 20
 - 發送 Telegram 通知
@@ -381,6 +394,7 @@ python3 scripts/test-n8n-workflow.py --email-count 3
 ```
 
 **驗證**:
+
 - 3 封郵件全部處理完成
 - Google Sheet 新增 3 行（或更多，如果有多航段）
 - 無錯誤通知
@@ -472,6 +486,7 @@ npm install -g n8n
 ### 1. 多航段優化
 
 目前只寫入第一航段，未來可改為：
+
 - 每個航段寫一行，加上 `segment_index` 欄位
 - 或使用 JSON 欄位儲存完整 segments 資料
 
@@ -533,4 +548,5 @@ if __name__ == '__main__':
 **建立日期**: 2026-03-07  
 **維護者**: Yuzuki 🌙  
 **更新記錄**:
+
 - 2026-03-07: 初版，完整設計文件

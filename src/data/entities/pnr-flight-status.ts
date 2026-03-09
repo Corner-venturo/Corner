@@ -23,17 +23,20 @@ export interface PnrFlightStatusHistory {
   updated_at?: string
 }
 
-export const pnrFlightStatusHistoryEntity = createEntityHook<PnrFlightStatusHistory>('pnr_flight_status_history', {
-  list: {
-    select: '*',
-    orderBy: { column: 'recorded_at', ascending: false },
-  },
-  slim: {
-    select: 'id,pnr_id,flight_number,status,recorded_at',
-  },
-  detail: { select: '*' },
-  cache: CACHE_PRESETS.high,
-})
+export const pnrFlightStatusHistoryEntity = createEntityHook<PnrFlightStatusHistory>(
+  'pnr_flight_status_history',
+  {
+    list: {
+      select: '*',
+      orderBy: { column: 'recorded_at', ascending: false },
+    },
+    slim: {
+      select: 'id,pnr_id,flight_number,status,recorded_at',
+    },
+    detail: { select: '*' },
+    cache: CACHE_PRESETS.high,
+  }
+)
 
 export const usePnrFlightStatusHistory = pnrFlightStatusHistoryEntity.useList
 export const usePnrFlightStatusHistorySlim = pnrFlightStatusHistoryEntity.useListSlim

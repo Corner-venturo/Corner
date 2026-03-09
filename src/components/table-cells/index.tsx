@@ -18,7 +18,19 @@ import { TABLE_CELLS_LABELS } from './constants/labels'
 
 // ========== 類型定義 ==========
 
-type StatusType = 'payment' | 'disbursement' | 'todo' | 'invoice' | 'tour' | 'order' | 'visa' | 'voucher' | 'esim' | 'receipt' | 'quote' | 'tour_request'
+type StatusType =
+  | 'payment'
+  | 'disbursement'
+  | 'todo'
+  | 'invoice'
+  | 'tour'
+  | 'order'
+  | 'visa'
+  | 'voucher'
+  | 'esim'
+  | 'receipt'
+  | 'quote'
+  | 'tour_request'
 
 export interface DateCellProps {
   date?: string | Date | null
@@ -147,7 +159,11 @@ export function DateCell({
 
   const dateObj = new Date(date)
   if (isNaN(dateObj.getTime())) {
-    return <span className={cn('text-sm text-morandi-red', className)}>{TABLE_CELLS_LABELS.LABEL_5349}</span>
+    return (
+      <span className={cn('text-sm text-morandi-red', className)}>
+        {TABLE_CELLS_LABELS.LABEL_5349}
+      </span>
+    )
   }
 
   return (
@@ -272,7 +288,11 @@ export function DateRangeCell({
       <div className="text-morandi-primary">
         {formatDate(startDate, format)} ~ {formatDate(endDate, format)}
       </div>
-      {showDuration && <div className="text-xs text-morandi-secondary">{TABLE_CELLS_LABELS.LABEL_5332} {duration} 天</div>}
+      {showDuration && (
+        <div className="text-xs text-morandi-secondary">
+          {TABLE_CELLS_LABELS.LABEL_5332} {duration} 天
+        </div>
+      )}
     </div>
   )
 }
@@ -409,7 +429,13 @@ export function AvatarCell({ name, imageUrl, subtitle, className }: AvatarCellPr
     <div className={cn('flex items-center gap-2', className)}>
       <div className="flex-shrink-0 w-8 h-8 rounded-full bg-morandi-gold/20 flex items-center justify-center">
         {imageUrl ? (
-          <Image src={imageUrl} alt={name || ''} width={32} height={32} className="w-full h-full rounded-full object-cover" />
+          <Image
+            src={imageUrl}
+            alt={name || ''}
+            width={32}
+            height={32}
+            className="w-full h-full rounded-full object-cover"
+          />
         ) : (
           <span className="text-sm font-medium text-morandi-gold">{initial}</span>
         )}

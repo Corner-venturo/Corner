@@ -98,10 +98,7 @@ export interface CompressImageOptions {
  * // 壓縮一般圖片
  * const image = await compressImage(file, { maxDimension: 1200, targetSize: 800 * 1024 })
  */
-export async function compressImage(
-  file: File,
-  options: CompressImageOptions = {}
-): Promise<File> {
+export async function compressImage(file: File, options: CompressImageOptions = {}): Promise<File> {
   const {
     maxDimension = 800,
     targetSize = 500 * 1024, // 500KB
@@ -120,7 +117,7 @@ export async function compressImage(
     const reader = new FileReader()
     reader.readAsDataURL(file)
 
-    reader.onload = (e) => {
+    reader.onload = e => {
       const img = new Image()
       img.src = e.target?.result as string
 
@@ -154,14 +151,19 @@ export async function compressImage(
         // 遞迴壓縮函數
         const tryCompress = (currentQuality: number) => {
           canvas.toBlob(
-            (blob) => {
+            blob => {
               if (!blob) {
                 reject(new Error('圖片壓縮失敗'))
                 return
               }
 
               // 取得副檔名
-              const ext = outputFormat === 'image/jpeg' ? 'jpg' : outputFormat === 'image/png' ? 'png' : 'webp'
+              const ext =
+                outputFormat === 'image/jpeg'
+                  ? 'jpg'
+                  : outputFormat === 'image/png'
+                    ? 'png'
+                    : 'webp'
               const baseName = file.name.replace(/\.[^/.]+$/, '')
               const newFileName = `${baseName}.${ext}`
 

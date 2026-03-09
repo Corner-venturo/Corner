@@ -49,10 +49,7 @@ function parseDayTitleForAttractions(title: string): string[] {
   ]
 
   // 「包含」就排除的關鍵字（通常是連接詞）
-  const partialExcludePatterns = [
-    /飯店入住/,
-    /酒店入住/,
-  ]
+  const partialExcludePatterns = [/飯店入住/, /酒店入住/]
 
   return parts
     .map(p => p.trim())
@@ -92,7 +89,7 @@ export function useAttractionSearch({
         .order('name')
       setCountries(data || [])
     }
-    loadCountries().catch((err) => logger.error('[loadCountries]', err))
+    loadCountries().catch(err => logger.error('[loadCountries]', err))
   }, [isOpen])
 
   // 打開對話框時自動選擇行程的國家
@@ -205,41 +202,43 @@ export function useAttractionSearch({
 
         if (error) throw error
 
-        const formatted = (data || []).map((item: {
-          id: string
-          name: string
-          english_name: string | null
-          category: string | null
-          description: string | null
-          thumbnail: string | null
-          images: string[] | null
-          country_id: string
-          region_id: string | null
-          city_id: string | null
-          latitude: number | null
-          longitude: number | null
-          address: string | null
-          cities: { name: string } | null
-        }): AttractionWithCity => ({
-          id: item.id,
-          name: item.name,
-          english_name: item.english_name ?? undefined,
-          category: item.category ?? undefined,
-          description: item.description ?? undefined,
-          thumbnail: item.thumbnail ?? undefined,
-          images: item.images ?? undefined,
-          country_id: item.country_id,
-          region_id: item.region_id ?? undefined,
-          city_id: item.city_id ?? undefined,
-          latitude: item.latitude ?? undefined,
-          longitude: item.longitude ?? undefined,
-          address: item.address ?? undefined,
-          city_name: item.cities?.name || '',
-          is_active: true,
-          display_order: 0,
-          created_at: '',
-          updated_at: '',
-        }))
+        const formatted = (data || []).map(
+          (item: {
+            id: string
+            name: string
+            english_name: string | null
+            category: string | null
+            description: string | null
+            thumbnail: string | null
+            images: string[] | null
+            country_id: string
+            region_id: string | null
+            city_id: string | null
+            latitude: number | null
+            longitude: number | null
+            address: string | null
+            cities: { name: string } | null
+          }): AttractionWithCity => ({
+            id: item.id,
+            name: item.name,
+            english_name: item.english_name ?? undefined,
+            category: item.category ?? undefined,
+            description: item.description ?? undefined,
+            thumbnail: item.thumbnail ?? undefined,
+            images: item.images ?? undefined,
+            country_id: item.country_id,
+            region_id: item.region_id ?? undefined,
+            city_id: item.city_id ?? undefined,
+            latitude: item.latitude ?? undefined,
+            longitude: item.longitude ?? undefined,
+            address: item.address ?? undefined,
+            city_name: item.cities?.name || '',
+            is_active: true,
+            display_order: 0,
+            created_at: '',
+            updated_at: '',
+          })
+        )
 
         setAttractions(formatted)
       } catch (error) {
@@ -267,9 +266,11 @@ export function useAttractionSearch({
       const matches = attractions.filter(a => {
         const nameLower = a.name.toLowerCase()
         // 完全匹配優先，其次包含
-        return nameLower === keywordLower ||
-               nameLower.includes(keywordLower) ||
-               keywordLower.includes(nameLower)
+        return (
+          nameLower === keywordLower ||
+          nameLower.includes(keywordLower) ||
+          keywordLower.includes(nameLower)
+        )
       })
 
       for (const match of matches) {

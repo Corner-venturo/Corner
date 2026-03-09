@@ -5,6 +5,7 @@
 **目的**: 自動從 William Gmail 抓取 Trip.com 機票訂單郵件，解析 PDF，寫入 Google Sheet
 
 **組件**:
+
 1. Gmail API (搜尋+下載郵件)
 2. Python Parser (PDF 解析)
 3. Google Sheets API (寫入訂單)
@@ -102,6 +103,7 @@ python3 scripts/create-trip-sheet.py
 ```
 
 **輸出範例**:
+
 ```
 ✅ Google Sheet 已建立
    ID: 1A2B3C4D5E6F...
@@ -124,6 +126,7 @@ python3 scripts/test-trip-sync.py
 ```
 
 **預期輸出**:
+
 ```
 ✅ Google Sheet 已建立
 ✅ Access token 已取得
@@ -215,6 +218,7 @@ n8n start
 #### 7.2 設定 Credentials
 
 確認所有節點都已連接正確的 credentials:
+
 - Gmail 節點 → Gmail OAuth2
 - Google Sheets 節點 → Google Sheets OAuth2
 - Telegram 節點 → Telegram Bot
@@ -266,6 +270,7 @@ n8n start
 等待第一次 Cron 觸發（下一個 00:00, 06:00, 12:00, 或 18:00）
 
 檢查：
+
 1. n8n Executions 頁面有新的執行記錄
 2. Google Sheet 有新訂單
 3. 沒有錯誤通知
@@ -298,6 +303,7 @@ n8n start
 **原因**: OAuth token 過期或權限不足
 
 **解決**:
+
 ```bash
 # 重新認證
 python3 scripts/google-auth-init.py
@@ -308,6 +314,7 @@ python3 scripts/google-auth-init.py
 **原因**: PDF 格式變更
 
 **解決**:
+
 1. 取得失敗的郵件 ID
 2. 手動測試：
    ```bash
@@ -320,6 +327,7 @@ python3 scripts/google-auth-init.py
 **原因**: Spreadsheet ID 錯誤或權限不足
 
 **解決**:
+
 1. 確認 Spreadsheet ID 正確
 2. 確認服務帳號有寫入權限
 3. 手動分享 Sheet 給服務帳號 email
@@ -329,6 +337,7 @@ python3 scripts/google-auth-init.py
 **原因**: Cron 排程錯誤或 workflow 未啟用
 
 **解決**:
+
 1. 確認 workflow 狀態為 Active（綠色）
 2. 檢查 Cron 表達式：`0 */6 * * *`
 3. 查看 n8n log:
@@ -401,6 +410,7 @@ python3 scripts/google-auth-init.py
 ### C. 支援
 
 如有問題，請檢查：
+
 1. n8n execution log
 2. Python 腳本輸出（`--message-id` 模式）
 3. Telegram 錯誤通知

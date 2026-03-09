@@ -40,7 +40,7 @@ function saveRecentSearch(query: string) {
   if (typeof window === 'undefined' || !query.trim()) return
   try {
     const recent = getRecentSearches()
-    const filtered = recent.filter((s) => s !== query)
+    const filtered = recent.filter(s => s !== query)
     const updated = [query, ...filtered].slice(0, 5)
     localStorage.setItem('venturo_recent_searches', JSON.stringify(updated))
   } catch {
@@ -100,7 +100,7 @@ export function GlobalSearch({ autoFocus, onResultClick, className }: GlobalSear
 
       // 格式化團結果
       if (toursRes.data) {
-        toursRes.data.forEach((tour) => {
+        toursRes.data.forEach(tour => {
           searchResults.push({
             type: 'tour',
             id: tour.id,
@@ -112,7 +112,7 @@ export function GlobalSearch({ autoFocus, onResultClick, className }: GlobalSear
 
       // 格式化成員結果
       if (membersRes.data) {
-        membersRes.data.forEach((member) => {
+        membersRes.data.forEach(member => {
           searchResults.push({
             type: 'member',
             id: member.id,
@@ -180,7 +180,7 @@ export function GlobalSearch({ autoFocus, onResultClick, className }: GlobalSear
           ref={inputRef}
           type="text"
           value={query}
-          onChange={(e) => {
+          onChange={e => {
             setQuery(e.target.value)
             setShowResults(true)
           }}
@@ -215,14 +215,14 @@ export function GlobalSearch({ autoFocus, onResultClick, className }: GlobalSear
           {!isLoading && query && results.length > 0 && (
             <div className="space-y-1">
               {/* 團結果 */}
-              {results.filter((r) => r.type === 'tour').length > 0 && (
+              {results.filter(r => r.type === 'tour').length > 0 && (
                 <div className="mb-3">
                   <div className="text-xs font-medium text-morandi-secondary px-1 mb-1">
-                    旅遊團 ({results.filter((r) => r.type === 'tour').length})
+                    旅遊團 ({results.filter(r => r.type === 'tour').length})
                   </div>
                   {results
-                    .filter((r) => r.type === 'tour')
-                    .map((result) => (
+                    .filter(r => r.type === 'tour')
+                    .map(result => (
                       <button
                         key={result.id}
                         onClick={() => handleResultClick(result)}
@@ -246,14 +246,14 @@ export function GlobalSearch({ autoFocus, onResultClick, className }: GlobalSear
               )}
 
               {/* 成員結果 */}
-              {results.filter((r) => r.type === 'member').length > 0 && (
+              {results.filter(r => r.type === 'member').length > 0 && (
                 <div>
                   <div className="text-xs font-medium text-morandi-secondary px-1 mb-1">
-                    成員 ({results.filter((r) => r.type === 'member').length})
+                    成員 ({results.filter(r => r.type === 'member').length})
                   </div>
                   {results
-                    .filter((r) => r.type === 'member')
-                    .map((result) => (
+                    .filter(r => r.type === 'member')
+                    .map(result => (
                       <button
                         key={result.id}
                         onClick={() => handleResultClick(result)}
@@ -288,7 +288,9 @@ export function GlobalSearch({ autoFocus, onResultClick, className }: GlobalSear
           {/* 最近搜尋 (當沒有輸入時顯示) */}
           {!query && recentSearches.length > 0 && (
             <div>
-              <div className="text-xs font-medium text-morandi-secondary px-1 mb-2">{MOBILE_LABELS.SEARCH_483}</div>
+              <div className="text-xs font-medium text-morandi-secondary px-1 mb-2">
+                {MOBILE_LABELS.SEARCH_483}
+              </div>
               <div className="flex flex-wrap gap-2">
                 {recentSearches.map((search, index) => (
                   <button
@@ -309,4 +311,3 @@ export function GlobalSearch({ autoFocus, onResultClick, className }: GlobalSear
     </div>
   )
 }
-

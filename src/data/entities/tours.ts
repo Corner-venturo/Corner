@@ -21,14 +21,16 @@ import type { Tour } from '@/stores/types'
 
 export const tourEntity = createEntityHook<Tour>('tours', {
   list: {
-    select: 'id,code,name,departure_date,return_date,status,location,current_participants,max_participants,price,profit,total_cost,total_revenue,archived,is_active,contract_status,contract_completed,contract_template,contract_archived_date,controller_id,country_id,main_city_id,itinerary_id,quote_id,proposal_id,proposal_package_id,converted_from_proposal,locked_at,locked_by,locked_itinerary_id,locked_itinerary_version,locked_quote_id,locked_quote_version,last_unlocked_at,last_unlocked_by,closing_date,closing_status,closed_by,enable_checkin,workspace_id,created_at,created_by,updated_at,updated_by',
+    select:
+      'id,code,name,departure_date,return_date,status,location,current_participants,max_participants,price,profit,total_cost,total_revenue,archived,is_active,contract_status,contract_completed,contract_template,contract_archived_date,controller_id,country_id,main_city_id,itinerary_id,quote_id,proposal_id,proposal_package_id,converted_from_proposal,locked_at,locked_by,locked_itinerary_id,locked_itinerary_version,locked_quote_id,locked_quote_version,last_unlocked_at,last_unlocked_by,closing_date,closing_status,closed_by,enable_checkin,workspace_id,created_at,created_by,updated_at,updated_by',
     orderBy: {
       column: 'departure_date',
       ascending: false,
     },
   },
   slim: {
-    select: 'id,code,name,departure_date,return_date,status,location,current_participants,max_participants,archived,workspace_id,country_id,main_city_id,created_at,updated_at,locked_at,locked_itinerary_id,itinerary_id,quote_id,proposal_package_id,contract_template,contract_completed,contract_archived_date',
+    select:
+      'id,code,name,departure_date,return_date,status,location,current_participants,max_participants,archived,workspace_id,country_id,main_city_id,created_at,updated_at,locked_at,locked_itinerary_id,itinerary_id,quote_id,proposal_package_id,contract_template,contract_completed,contract_archived_date',
   },
   detail: {
     select: '*',
@@ -42,7 +44,7 @@ export const tourEntity = createEntityHook<Tour>('tours', {
 
 interface DateRange {
   start: string // YYYY-MM-DD
-  end: string   // YYYY-MM-DD
+  end: string // YYYY-MM-DD
 }
 
 /**
@@ -55,13 +57,14 @@ export function useToursForCalendar(dateRange: DateRange | null): ListResult<Tou
   const hasHydrated = useAuthStore(state => state._hasHydrated)
 
   const isReady = hasHydrated && isAuthenticated && !!user?.id
-  const userRole = (user?.roles?.includes('super_admin') ? 'super_admin' : user?.roles?.[0]) as UserRole | null
+  const userRole = (
+    user?.roles?.includes('super_admin') ? 'super_admin' : user?.roles?.[0]
+  ) as UserRole | null
   const workspaceId = user?.workspace_id
 
   // SWR key 包含日期範圍
-  const swrKey = isReady && dateRange
-    ? `entity:tours:calendar:${dateRange.start}:${dateRange.end}`
-    : null
+  const swrKey =
+    isReady && dateRange ? `entity:tours:calendar:${dateRange.start}:${dateRange.end}` : null
 
   const { data, error, isLoading, mutate } = useSWR<Tour[]>(
     swrKey,
@@ -69,7 +72,8 @@ export function useToursForCalendar(dateRange: DateRange | null): ListResult<Tou
       if (!dateRange) return []
 
       // 選擇精簡欄位（行事曆只需要這些）
-      const selectFields = 'id,code,name,departure_date,return_date,status,location,current_participants,max_participants,archived'
+      const selectFields =
+        'id,code,name,departure_date,return_date,status,location,current_participants,max_participants,archived'
 
       let query = supabase
         .from('tours')
@@ -77,7 +81,9 @@ export function useToursForCalendar(dateRange: DateRange | null): ListResult<Tou
         // 日期範圍過濾：團出發日在範圍結束前，且回程日在範圍開始後（或尚未設定回程日）
         // 這樣可以正確選取所有與日期範圍重疊的團
         .lte('departure_date', dateRange.end)
-        .or(`return_date.gte.${dateRange.start},return_date.is.null,departure_date.gte.${dateRange.start}`)
+        .or(
+          `return_date.gte.${dateRange.start},return_date.is.null,departure_date.gte.${dateRange.start}`
+        )
         .order('departure_date', { ascending: false })
 
       // 套用 workspace 過濾（非 super_admin）
@@ -104,7 +110,9 @@ export function useToursForCalendar(dateRange: DateRange | null): ListResult<Tou
     items: data || [],
     loading: !hasHydrated || isLoading,
     error: error?.message || null,
-    refresh: async () => { await mutate() },
+    refresh: async () => {
+      await mutate()
+    },
   }
 }
 

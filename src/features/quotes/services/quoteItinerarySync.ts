@@ -85,11 +85,11 @@ export async function syncHotelsFromQuoteToItinerary(
 
       // 檢查是否為續住
       const isSameAsPrevious = hotelItem.is_same_as_previous || false
-      
+
       // 檢查是否需要更新
-      const needsUpdate = 
+      const needsUpdate =
         (hotelItem.name && day.accommodation !== hotelItem.name) ||
-        (day.isSameAccommodation !== isSameAsPrevious)
+        day.isSameAccommodation !== isSameAsPrevious
 
       if (needsUpdate) {
         updated = true
@@ -202,12 +202,12 @@ export async function syncHotelsFromItineraryToQuote(
       if (item.day && item.day > 0 && item.day <= dailyItinerary.length) {
         const dayItinerary = dailyItinerary[item.day - 1]
         const isSameAsPrevious = Boolean(dayItinerary.isSameAccommodation)
-        
+
         // 檢查是否需要更新（名稱或續住標記）
-        const needsUpdate = 
+        const needsUpdate =
           (dayItinerary.accommodation && item.name !== dayItinerary.accommodation) ||
-          (Boolean(item.is_same_as_previous) !== isSameAsPrevious)
-        
+          Boolean(item.is_same_as_previous) !== isSameAsPrevious
+
         if (needsUpdate) {
           updated = true
           return {

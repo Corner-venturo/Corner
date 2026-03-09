@@ -3,15 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import {
-  ArrowLeft,
-  User,
-  CreditCard,
-  Plane,
-  Building,
-  FileText,
-  DollarSign,
-} from 'lucide-react'
+import { ArrowLeft, User, CreditCard, Plane, Building, FileText, DollarSign } from 'lucide-react'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
@@ -123,10 +115,7 @@ export default function MemberDetailPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
         <p className="text-morandi-secondary">{ID_LABELS.NOT_FOUND_5568}</p>
-        <button
-          onClick={() => router.back()}
-          className="text-morandi-gold"
-        >
+        <button onClick={() => router.back()} className="text-morandi-gold">
           {ID_LABELS.BACK}
         </button>
       </div>
@@ -149,10 +138,7 @@ export default function MemberDetailPage() {
               {member.chinese_name || member.passport_name || '未命名'}
             </h1>
             {member.tour && (
-              <Link
-                href={`/m/tours/${member.tour.id}`}
-                className="text-sm text-morandi-gold"
-              >
+              <Link href={`/m/tours/${member.tour.id}`} className="text-sm text-morandi-gold">
                 {member.tour.code}
               </Link>
             )}
@@ -186,7 +172,11 @@ export default function MemberDetailPage() {
             {ID_LABELS.LABEL_2477}
           </h2>
           <div className="grid grid-cols-2 gap-3 text-sm">
-            <InfoItem label={ID_LABELS.LABEL_5147} value={member.passport_number} className="col-span-2" />
+            <InfoItem
+              label={ID_LABELS.LABEL_5147}
+              value={member.passport_number}
+              className="col-span-2"
+            />
             <InfoItem label={ID_LABELS.LABEL_4167} value={member.passport_expiry} isDate />
             <InfoItem label="PNR" value={member.pnr} />
           </div>
@@ -204,11 +194,10 @@ export default function MemberDetailPage() {
               className="block p-3 bg-morandi-container/30 rounded-lg hover:bg-morandi-container/50 transition-colors"
             >
               <div className="font-medium text-morandi-primary">{member.tour.code}</div>
-              <div className="text-sm text-morandi-secondary mt-1">
-                {member.tour.name}
-              </div>
+              <div className="text-sm text-morandi-secondary mt-1">{member.tour.name}</div>
               <div className="flex items-center gap-1 text-sm text-morandi-secondary mt-1">
-                <DateCell date={member.tour.departure_date} showIcon={false} /> - <DateCell date={member.tour.return_date} showIcon={false} />
+                <DateCell date={member.tour.departure_date} showIcon={false} /> -{' '}
+                <DateCell date={member.tour.return_date} showIcon={false} />
               </div>
             </Link>
           </section>
@@ -226,7 +215,8 @@ export default function MemberDetailPage() {
                 <div className="p-3 bg-morandi-container/30 rounded-lg">
                   <div className="font-medium text-morandi-primary">{member.hotel_1_name}</div>
                   <div className="flex items-center gap-1 text-sm text-morandi-secondary mt-1">
-                    <DateCell date={member.hotel_1_checkin} showIcon={false} /> - <DateCell date={member.hotel_1_checkout} showIcon={false} />
+                    <DateCell date={member.hotel_1_checkin} showIcon={false} /> -{' '}
+                    <DateCell date={member.hotel_1_checkout} showIcon={false} />
                   </div>
                 </div>
               )}
@@ -234,7 +224,8 @@ export default function MemberDetailPage() {
                 <div className="p-3 bg-morandi-container/30 rounded-lg">
                   <div className="font-medium text-morandi-primary">{member.hotel_2_name}</div>
                   <div className="flex items-center gap-1 text-sm text-morandi-secondary mt-1">
-                    <DateCell date={member.hotel_2_checkin} showIcon={false} /> - <DateCell date={member.hotel_2_checkout} showIcon={false} />
+                    <DateCell date={member.hotel_2_checkin} showIcon={false} /> -{' '}
+                    <DateCell date={member.hotel_2_checkout} showIcon={false} />
                   </div>
                 </div>
               )}
@@ -252,7 +243,11 @@ export default function MemberDetailPage() {
             <div className="flex justify-between py-2 border-b border-border/50">
               <span className="text-morandi-secondary">{ID_LABELS.LABEL_561}</span>
               <span className="font-medium text-morandi-primary">
-                {member.selling_price !== null ? <CurrencyCell amount={member.selling_price} /> : '-'}
+                {member.selling_price !== null ? (
+                  <CurrencyCell amount={member.selling_price} />
+                ) : (
+                  '-'
+                )}
               </span>
             </div>
             <div className="flex justify-between py-2 border-b border-border/50">
@@ -260,18 +255,35 @@ export default function MemberDetailPage() {
                 訂金 {member.deposit_receipt_no && `(${member.deposit_receipt_no})`}
               </span>
               <span className="font-medium text-green-600">
-                {member.deposit_amount !== null ? <CurrencyCell amount={member.deposit_amount} variant="income" /> : '-'}
+                {member.deposit_amount !== null ? (
+                  <CurrencyCell amount={member.deposit_amount} variant="income" />
+                ) : (
+                  '-'
+                )}
               </span>
             </div>
             <div className="flex justify-between py-2">
               <span className="text-morandi-secondary">
                 尾款 {member.balance_receipt_no && `(${member.balance_receipt_no})`}
               </span>
-              <span className={cn(
-                'font-medium',
-                member.balance_amount && member.balance_amount > 0 ? 'text-orange-600' : 'text-green-600'
-              )}>
-                {member.balance_amount !== null ? <CurrencyCell amount={member.balance_amount} variant={member.balance_amount && member.balance_amount > 0 ? 'expense' : 'income'} /> : '-'}
+              <span
+                className={cn(
+                  'font-medium',
+                  member.balance_amount && member.balance_amount > 0
+                    ? 'text-orange-600'
+                    : 'text-green-600'
+                )}
+              >
+                {member.balance_amount !== null ? (
+                  <CurrencyCell
+                    amount={member.balance_amount}
+                    variant={
+                      member.balance_amount && member.balance_amount > 0 ? 'expense' : 'income'
+                    }
+                  />
+                ) : (
+                  '-'
+                )}
               </span>
             </div>
           </div>
@@ -321,11 +333,7 @@ function InfoItem({
     <div className={className}>
       <div className="text-morandi-secondary text-xs mb-0.5">{label}</div>
       <div className="text-morandi-primary">
-        {isDate && value ? (
-          <DateCell date={String(value)} showIcon={false} />
-        ) : (
-          value || '-'
-        )}
+        {isDate && value ? <DateCell date={String(value)} showIcon={false} /> : value || '-'}
       </div>
     </div>
   )

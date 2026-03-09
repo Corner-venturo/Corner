@@ -5,7 +5,11 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { SectionTitle } from './SectionTitle'
 import { TourHotelsSectionArt } from './TourHotelsSectionArt'
 import { TourHotelsSectionCollage } from './TourHotelsSectionCollage'
-import type { TourPageData, CoverStyleType, HotelInfo } from '@/features/tours/types/tour-display.types'
+import type {
+  TourPageData,
+  CoverStyleType,
+  HotelInfo,
+} from '@/features/tours/types/tour-display.types'
 import { TOURS_LABELS } from './constants/labels'
 
 interface TourHotelsSectionProps {
@@ -13,7 +17,6 @@ interface TourHotelsSectionProps {
   viewMode: 'desktop' | 'mobile'
   coverStyle?: CoverStyleType
 }
-
 
 // 取得飯店圖片（相容新舊版）
 function getHotelImages(hotel: HotelInfo): string[] {
@@ -89,7 +92,11 @@ function ImageCarousel({ images, hotelName }: { images: string[]; hotelName: str
   )
 }
 
-export function TourHotelsSection({ data, viewMode, coverStyle = 'original' }: TourHotelsSectionProps) {
+export function TourHotelsSection({
+  data,
+  viewMode,
+  coverStyle = 'original',
+}: TourHotelsSectionProps) {
   const hotels = data.hotels || []
 
   if (!data.showHotels && hotels.length === 0) {
@@ -126,14 +133,12 @@ export function TourHotelsSection({ data, viewMode, coverStyle = 'original' }: T
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <SectionTitle
-            title={TOURS_LABELS.LABEL_8140}
-            coverStyle={coverStyle}
-            className="mb-12"
-          />
+          <SectionTitle title={TOURS_LABELS.LABEL_8140} coverStyle={coverStyle} className="mb-12" />
         </motion.div>
 
-        <div className={`grid ${getGridClass()} gap-8 mx-auto ${hotels.length === 1 ? 'justify-center' : ''}`}>
+        <div
+          className={`grid ${getGridClass()} gap-8 mx-auto ${hotels.length === 1 ? 'justify-center' : ''}`}
+        >
           {hotels.map((hotel, index) => {
             const images = getHotelImages(hotel)
 

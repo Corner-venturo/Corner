@@ -25,7 +25,7 @@ function getImageUrl(image: string | DailyImage): string {
 
 // 工具函數：取得圖片 position
 function getImagePosition(image: string | DailyImage): string {
-  return typeof image === 'string' ? 'center' : (image.position || 'center')
+  return typeof image === 'string' ? 'center' : image.position || 'center'
 }
 
 export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyImageCarouselProps) {
@@ -34,11 +34,12 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
   const [currentIndex, setCurrentIndex] = useState(0)
 
   // 過濾掉空值和無效的圖片
-  const validImages = images?.filter(img => {
-    if (!img) return false
-    if (typeof img === 'string') return img.trim() !== ''
-    return img.url && img.url.trim() !== ''
-  }) || []
+  const validImages =
+    images?.filter(img => {
+      if (!img) return false
+      if (typeof img === 'string') return img.trim() !== ''
+      return img.url && img.url.trim() !== ''
+    }) || []
 
   const showControls = validImages.length > 1
 
@@ -59,7 +60,7 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
 
     container.scrollTo({
       left: scrollPosition,
-      behavior: 'smooth'
+      behavior: 'smooth',
     })
     setCurrentIndex(nextIndex)
   }
@@ -101,13 +102,14 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
         <div className="relative mb-6 sm:mb-8 mt-4 sm:mt-6">
           <div
             className={cn(
-              "overflow-hidden rounded-[20px] sm:rounded-[28px] border border-white/60 bg-card shadow-lg ring-1 ring-morandi-border/20",
-              allTourImages.length >= 4 && "cursor-pointer"
+              'overflow-hidden rounded-[20px] sm:rounded-[28px] border border-white/60 bg-card shadow-lg ring-1 ring-morandi-border/20',
+              allTourImages.length >= 4 && 'cursor-pointer'
             )}
             onClick={handleImageClick}
           >
             <div className="relative aspect-[16/9] w-full">
-              <img src={getImageUrl(validImages[0])}
+              <img
+                src={getImageUrl(validImages[0])}
                 alt={`${title}${TOURS_LABELS.IMAGE_ALT_SUFFIX}1`}
                 className="h-full w-full object-cover"
                 style={{ objectPosition: getImagePosition(validImages[0]) }}
@@ -124,10 +126,7 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
         </div>
 
         {showPhotoWall && (
-          <ThreeDPhotoWall
-            images={allTourImages}
-            onClose={() => setShowPhotoWall(false)}
-          />
+          <ThreeDPhotoWall images={allTourImages} onClose={() => setShowPhotoWall(false)} />
         )}
       </>
     )
@@ -143,7 +142,7 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
           className="overflow-x-auto scrollbar-hide"
           style={{
             scrollBehavior: 'smooth',
-            scrollSnapType: 'x mandatory'
+            scrollSnapType: 'x mandatory',
           }}
         >
           <div className="flex gap-2 sm:gap-3">
@@ -152,19 +151,20 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
                 key={`${getImageUrl(image)}-${index}`}
                 data-card
                 className={cn(
-                  "flex-shrink-0 overflow-hidden rounded-[16px] sm:rounded-[20px] border border-white/60 bg-card shadow-lg ring-1 ring-morandi-border/20 transition-all duration-300",
-                  allTourImages.length >= 4 && "cursor-pointer",
-                  index === currentIndex ? "scale-100 opacity-100" : "scale-[0.98] opacity-80"
+                  'flex-shrink-0 overflow-hidden rounded-[16px] sm:rounded-[20px] border border-white/60 bg-card shadow-lg ring-1 ring-morandi-border/20 transition-all duration-300',
+                  allTourImages.length >= 4 && 'cursor-pointer',
+                  index === currentIndex ? 'scale-100 opacity-100' : 'scale-[0.98] opacity-80'
                 )}
                 style={{
                   width: 'calc(100% - 24px)',
                   maxWidth: '500px',
-                  scrollSnapAlign: 'start'
+                  scrollSnapAlign: 'start',
                 }}
                 onClick={handleImageClick}
               >
                 <div className="relative aspect-[16/9] w-full">
-                  <img src={getImageUrl(image)}
+                  <img
+                    src={getImageUrl(image)}
                     alt={`${title}${TOURS_LABELS.IMAGE_ALT_SUFFIX}${index + 1}`}
                     className="h-full w-full object-cover"
                     style={{ objectPosition: getImagePosition(image) }}
@@ -187,7 +187,7 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
           <>
             <button
               type="button"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation()
                 scrollToIndex(currentIndex - 1)
               }}
@@ -198,7 +198,7 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
             </button>
             <button
               type="button"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation()
                 scrollToIndex(currentIndex + 1)
               }}
@@ -217,7 +217,7 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
               <button
                 key={index}
                 type="button"
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation()
                   scrollToIndex(index)
                 }}
@@ -234,10 +234,7 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
 
       {/* 3D 照片牆 */}
       {showPhotoWall && (
-        <ThreeDPhotoWall
-          images={allTourImages}
-          onClose={() => setShowPhotoWall(false)}
-        />
+        <ThreeDPhotoWall images={allTourImages} onClose={() => setShowPhotoWall(false)} />
       )}
     </>
   )

@@ -40,11 +40,11 @@ import { DESIGNER_LABELS } from './constants/labels'
 
 // 目錄項目類型
 export interface TocItem {
-  pageId: string       // 對應的頁面 ID
-  displayName: string  // 顯示名稱（空則用頁面名稱）
-  icon: string         // 圖標 ID
-  enabled: boolean     // 是否顯示在目錄
-  pageNumber: number   // 頁碼（自動計算）
+  pageId: string // 對應的頁面 ID
+  displayName: string // 顯示名稱（空則用頁面名稱）
+  icon: string // 圖標 ID
+  enabled: boolean // 是否顯示在目錄
+  pageNumber: number // 頁碼（自動計算）
 }
 
 // 簡易頁面資訊（給目錄編輯用）
@@ -55,7 +55,11 @@ export interface SimplePage {
 }
 
 // 目錄圖標選項
-const TOC_ICON_OPTIONS: { value: string; label: string; Icon: React.ComponentType<{ size?: number; className?: string }> }[] = [
+const TOC_ICON_OPTIONS: {
+  value: string
+  label: string
+  Icon: React.ComponentType<{ size?: number; className?: string }>
+}[] = [
   { value: 'plane', label: '飛機', Icon: Plane },
   { value: 'calendar', label: '行程', Icon: Calendar },
   { value: 'hotel', label: '飯店', Icon: Hotel },
@@ -88,7 +92,7 @@ export function TocEditor({
 
   // 過濾掉封面和目錄本身
   const availablePages = pages.filter(
-    (p) => p.templateKey !== 'cover' && p.templateKey !== 'toc' && p.templateKey !== 'blank'
+    p => p.templateKey !== 'cover' && p.templateKey !== 'toc' && p.templateKey !== 'blank'
   )
 
   // 根據頁面類型自動選擇預設圖標
@@ -114,9 +118,9 @@ export function TocEditor({
 
   // 初始化 TOC 項目（如果還沒有）
   const initializeTocItems = () => {
-    const newTocItems: TocItem[] = availablePages.map((page) => {
+    const newTocItems: TocItem[] = availablePages.map(page => {
       // 尋找現有項目
-      const existingItem = tocItems.find((item) => item.pageId === page.id)
+      const existingItem = tocItems.find(item => item.pageId === page.id)
       if (existingItem) {
         // 更新頁碼（使用新的頁碼計算邏輯）
         const pageNumber = calculatePageNumberForToc(page.id, pages)
@@ -143,15 +147,8 @@ export function TocEditor({
   if (tocItems.length === 0) {
     return (
       <div className="space-y-3">
-        <p className="text-xs text-morandi-secondary">
-          {DESIGNER_LABELS.SETTINGS_7690}
-        </p>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={initializeTocItems}
-          className="w-full gap-2"
-        >
+        <p className="text-xs text-morandi-secondary">{DESIGNER_LABELS.SETTINGS_7690}</p>
+        <Button variant="outline" size="sm" onClick={initializeTocItems} className="w-full gap-2">
           <RefreshCw size={14} />
           {DESIGNER_LABELS.LOADING_5110}
         </Button>
@@ -161,7 +158,7 @@ export function TocEditor({
 
   // 更新單一項目
   const updateTocItem = (pageId: string, field: keyof TocItem, value: unknown) => {
-    const newTocItems = tocItems.map((item) => {
+    const newTocItems = tocItems.map(item => {
       if (item.pageId !== pageId) return item
       return { ...item, [field]: value }
     })
@@ -173,7 +170,7 @@ export function TocEditor({
 
   // 切換啟用狀態
   const toggleEnabled = (pageId: string) => {
-    const item = tocItems.find((i) => i.pageId === pageId)
+    const item = tocItems.find(i => i.pageId === pageId)
     if (item) {
       updateTocItem(pageId, 'enabled', !item.enabled)
     }
@@ -194,7 +191,7 @@ export function TocEditor({
 
   // 刷新頁碼（使用新的頁碼計算邏輯）
   const refreshPageNumbers = () => {
-    const newTocItems = tocItems.map((item) => {
+    const newTocItems = tocItems.map(item => {
       const pageNumber = calculatePageNumberForToc(item.pageId, pages)
       return { ...item, pageNumber }
     })
@@ -205,12 +202,15 @@ export function TocEditor({
   }
 
   // 統計啟用的項目數
-  const enabledCount = tocItems.filter((i) => i.enabled).length
+  const enabledCount = tocItems.filter(i => i.enabled).length
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <Label className="text-xs">{DESIGNER_LABELS.LABEL_5681}{enabledCount})</Label>
+        <Label className="text-xs">
+          {DESIGNER_LABELS.LABEL_5681}
+          {enabledCount})
+        </Label>
         <Button
           variant="ghost"
           size="sm"
@@ -225,20 +225,20 @@ export function TocEditor({
 
       <div className="space-y-1.5">
         {tocItems.map((item, idx) => {
-          const page = pages.find((p) => p.id === item.pageId)
+          const page = pages.find(p => p.id === item.pageId)
           if (!page) return null
 
-          const iconOption = TOC_ICON_OPTIONS.find((o) => o.value === item.icon)
+          const iconOption = TOC_ICON_OPTIONS.find(o => o.value === item.icon)
           const IconComponent = iconOption?.Icon || Calendar
 
           return (
             <div
               key={item.pageId}
               draggable
-              onDragStart={(e) => dragHandlers.onDragStart(e, idx)}
-              onDragOver={(e) => dragHandlers.onDragOver(e, idx)}
+              onDragStart={e => dragHandlers.onDragStart(e, idx)}
+              onDragOver={e => dragHandlers.onDragOver(e, idx)}
               onDragLeave={dragHandlers.onDragLeave}
-              onDrop={(e) => dragHandlers.onDrop(e, idx)}
+              onDrop={e => dragHandlers.onDrop(e, idx)}
               onDragEnd={dragHandlers.onDragEnd}
               className={cn(
                 'p-2 rounded border border-border/50 bg-morandi-container/10 transition-all',
@@ -263,13 +263,13 @@ export function TocEditor({
                 {/* 圖標選擇 */}
                 <Select
                   value={item.icon}
-                  onValueChange={(v) => updateTocItem(item.pageId, 'icon', v)}
+                  onValueChange={v => updateTocItem(item.pageId, 'icon', v)}
                 >
                   <SelectTrigger className="h-7 w-9 p-0 justify-center shrink-0">
                     <IconComponent size={14} className="text-morandi-gold" />
                   </SelectTrigger>
                   <SelectContent>
-                    {TOC_ICON_OPTIONS.map((opt) => (
+                    {TOC_ICON_OPTIONS.map(opt => (
                       <SelectItem key={opt.value} value={opt.value}>
                         <div className="flex items-center gap-2">
                           <opt.Icon size={14} />
@@ -283,7 +283,7 @@ export function TocEditor({
                 {/* 名稱 */}
                 <Input
                   value={item.displayName}
-                  onChange={(e) => updateTocItem(item.pageId, 'displayName', e.target.value)}
+                  onChange={e => updateTocItem(item.pageId, 'displayName', e.target.value)}
                   placeholder={page.name}
                   className="flex-1 h-7 text-xs"
                 />

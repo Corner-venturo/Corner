@@ -75,7 +75,7 @@ export function VirtualizedTable<T extends RowData = RowData>({
       >
         {/* Header */}
         <div className="flex border-b border-border bg-morandi-container/50">
-          {columns.map((column) => (
+          {columns.map(column => (
             <div
               key={String(column.key)}
               className={cn(
@@ -90,7 +90,10 @@ export function VirtualizedTable<T extends RowData = RowData>({
             </div>
           ))}
           {actions && (
-            <div className="py-3 px-4 text-sm font-semibold text-morandi-primary" style={{ width: '100px' }}>
+            <div
+              className="py-3 px-4 text-sm font-semibold text-morandi-primary"
+              style={{ width: '100px' }}
+            >
               {ENHANCED_TABLE_LABELS.ACTIONS}
             </div>
           )}
@@ -129,7 +132,7 @@ export function VirtualizedTable<T extends RowData = RowData>({
     >
       {/* Fixed Header */}
       <div className="flex border-b border-border bg-morandi-container/50 shrink-0">
-        {columns.map((column) => (
+        {columns.map(column => (
           <div
             key={String(column.key)}
             className={cn(
@@ -144,18 +147,17 @@ export function VirtualizedTable<T extends RowData = RowData>({
           </div>
         ))}
         {actions && (
-          <div className="py-3 px-4 text-sm font-semibold text-morandi-primary" style={{ width: '100px' }}>
+          <div
+            className="py-3 px-4 text-sm font-semibold text-morandi-primary"
+            style={{ width: '100px' }}
+          >
             {ENHANCED_TABLE_LABELS.ACTIONS}
           </div>
         )}
       </div>
 
       {/* Virtualized Body */}
-      <div
-        ref={parentRef}
-        className="overflow-auto flex-1"
-        style={{ height: containerHeight }}
-      >
+      <div ref={parentRef} className="overflow-auto flex-1" style={{ height: containerHeight }}>
         <div
           style={{
             height: `${totalSize}px`,
@@ -163,7 +165,7 @@ export function VirtualizedTable<T extends RowData = RowData>({
             position: 'relative',
           }}
         >
-          {virtualItems.map((virtualRow) => {
+          {virtualItems.map(virtualRow => {
             const row = data[virtualRow.index] as T
             const rowIndex = virtualRow.index
 
@@ -190,7 +192,7 @@ export function VirtualizedTable<T extends RowData = RowData>({
                 onDoubleClick={() => onRowDoubleClick?.(row, rowIndex)}
               >
                 {/* Data columns */}
-                {columns.map((column) => (
+                {columns.map(column => (
                   <div
                     key={String(column.key)}
                     className={cn(
@@ -212,7 +214,7 @@ export function VirtualizedTable<T extends RowData = RowData>({
                   <div
                     className="py-3 px-4 flex items-center"
                     style={{ width: '100px' }}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={e => e.stopPropagation()}
                   >
                     {actions(row, rowIndex)}
                   </div>

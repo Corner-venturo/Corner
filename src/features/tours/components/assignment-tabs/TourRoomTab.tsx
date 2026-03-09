@@ -11,7 +11,13 @@ import { createTourRoom, deleteTourRoom } from '@/data/entities/tour-rooms'
 import { useAuthStore } from '@/stores'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Plus, Trash2, X, Bed } from 'lucide-react'
@@ -142,10 +148,10 @@ export function TourRoomTab({ tourId, tour, members, tourNights }: TourRoomTabPr
               key={nightNum}
               onClick={() => setSelectedNight(nightNum)}
               className={cn(
-                "px-3 py-1.5 rounded-md text-sm transition-all border",
+                'px-3 py-1.5 rounded-md text-sm transition-all border',
                 selectedNight === nightNum
-                  ? "border-morandi-gold bg-morandi-gold/10 text-morandi-gold"
-                  : "border-border text-morandi-secondary hover:border-morandi-gold"
+                  ? 'border-morandi-gold bg-morandi-gold/10 text-morandi-gold'
+                  : 'border-border text-morandi-secondary hover:border-morandi-gold'
               )}
             >
               第{nightNum}晚 ({nightRooms.length}房)
@@ -177,15 +183,16 @@ export function TourRoomTab({ tourId, tour, members, tourNights }: TourRoomTabPr
               共 {currentNightRooms.length} 間房，容量 {totalCapacity} 人，已分配 {totalAssigned} 人
             </div>
             {currentNightRooms.map((room, index) => {
-              const roomTypeLabel = ROOM_TYPES.find(t => t.value === room.room_type)?.label || room.room_type
+              const roomTypeLabel =
+                ROOM_TYPES.find(t => t.value === room.room_type)?.label || room.room_type
               return (
                 <div
                   key={room.id}
                   className={cn(
-                    "flex items-center justify-between p-3 rounded-lg border",
+                    'flex items-center justify-between p-3 rounded-lg border',
                     room.is_full
-                      ? "border-morandi-green bg-morandi-green/5"
-                      : "border-border bg-card"
+                      ? 'border-morandi-green bg-morandi-green/5'
+                      : 'border-border bg-card'
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -193,16 +200,16 @@ export function TourRoomTab({ tourId, tour, members, tourNights }: TourRoomTabPr
                       {roomTypeLabel} {index + 1}
                     </span>
                     {room.hotel_name && (
-                      <span className="text-xs text-morandi-muted">
-                        {room.hotel_name}
-                      </span>
+                      <span className="text-xs text-morandi-muted">{room.hotel_name}</span>
                     )}
-                    <span className={cn(
-                      "text-xs px-2 py-0.5 rounded-full",
-                      room.is_full
-                        ? "bg-morandi-green/10 text-morandi-green"
-                        : "bg-morandi-container text-morandi-secondary"
-                    )}>
+                    <span
+                      className={cn(
+                        'text-xs px-2 py-0.5 rounded-full',
+                        room.is_full
+                          ? 'bg-morandi-green/10 text-morandi-green'
+                          : 'bg-morandi-container text-morandi-secondary'
+                      )}
+                    >
                       {room.assigned_count}/{room.capacity} 人
                     </span>
                   </div>
@@ -240,7 +247,7 @@ export function TourRoomTab({ tourId, tour, members, tourNights }: TourRoomTabPr
                     setNewRoom({
                       ...newRoom,
                       room_type: value,
-                      capacity: ROOM_CAPACITY[value] || 2
+                      capacity: ROOM_CAPACITY[value] || 2,
                     })
                   }}
                 >
@@ -249,7 +256,9 @@ export function TourRoomTab({ tourId, tour, members, tourNights }: TourRoomTabPr
                   </SelectTrigger>
                   <SelectContent>
                     {ROOM_TYPES.map(type => (
-                      <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -261,7 +270,9 @@ export function TourRoomTab({ tourId, tour, members, tourNights }: TourRoomTabPr
                   min={1}
                   max={6}
                   value={newRoom.capacity}
-                  onChange={e => setNewRoom({ ...newRoom, capacity: parseInt(e.target.value) || 2 })}
+                  onChange={e =>
+                    setNewRoom({ ...newRoom, capacity: parseInt(e.target.value) || 2 })
+                  }
                 />
               </div>
             </div>

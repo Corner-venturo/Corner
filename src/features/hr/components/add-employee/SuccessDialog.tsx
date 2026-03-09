@@ -76,7 +76,9 @@ export function SuccessDialog({
                 <div className="bg-card rounded-lg p-4 border border-border">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <p className="text-xs text-morandi-muted mb-1.5">{COMP_HR_LABELS.LABEL_LOGIN_EMAIL}</p>
+                      <p className="text-xs text-morandi-muted mb-1.5">
+                        {COMP_HR_LABELS.LABEL_LOGIN_EMAIL}
+                      </p>
                       <p className="font-mono text-base font-semibold text-morandi-primary">
                         {createdEmployee.email}
                       </p>

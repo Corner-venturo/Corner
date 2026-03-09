@@ -111,7 +111,16 @@ export function EditableRatesTable({
     let value: string | number | boolean = editValue
 
     // 型別轉換
-    if (['cost_vnd', 'price_twd', 'kkday_selling_price', 'kkday_cost', 'kkday_profit', 'price'].includes(field)) {
+    if (
+      [
+        'cost_vnd',
+        'price_twd',
+        'kkday_selling_price',
+        'kkday_cost',
+        'kkday_profit',
+        'price',
+      ].includes(field)
+    ) {
       value = parseFloat(editValue) || 0
     } else if (field === 'is_backup') {
       value = editValue === 'true'
@@ -123,8 +132,14 @@ export function EditableRatesTable({
     if (field === 'kkday_selling_price' || field === 'kkday_cost') {
       const rate = rates.find(r => r.id === rowId)
       if (rate) {
-        const selling = field === 'kkday_selling_price' ? (typeof value === 'number' ? value : 0) : (rate.kkday_selling_price || 0)
-        const cost = field === 'kkday_cost' ? (typeof value === 'number' ? value : 0) : (rate.kkday_cost || 0)
+        const selling =
+          field === 'kkday_selling_price'
+            ? typeof value === 'number'
+              ? value
+              : 0
+            : rate.kkday_selling_price || 0
+        const cost =
+          field === 'kkday_cost' ? (typeof value === 'number' ? value : 0) : rate.kkday_cost || 0
         updates.kkday_profit = selling - cost
       }
     }
@@ -140,7 +155,11 @@ export function EditableRatesTable({
   }
 
   // 處理鍵盤事件
-  const handleKeyDown = async (e: React.KeyboardEvent, rowId: string, field: keyof TransportationRate) => {
+  const handleKeyDown = async (
+    e: React.KeyboardEvent,
+    rowId: string,
+    field: keyof TransportationRate
+  ) => {
     if (e.key === 'Enter') {
       e.preventDefault()
       await saveEdit()
@@ -263,22 +282,36 @@ export function EditableRatesTable({
   }
 
   if (isLoading) {
-    return <div className="text-center py-8 text-morandi-secondary">{EDITABLE_RATES_TABLE_LABELS.LOADING_6912}</div>
+    return (
+      <div className="text-center py-8 text-morandi-secondary">
+        {EDITABLE_RATES_TABLE_LABELS.LOADING_6912}
+      </div>
+    )
   }
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleCategoryDragEnd}>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleCategoryDragEnd}
+    >
       <div className="rounded-lg overflow-hidden bg-card shadow-sm border border-border">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse" style={{ minWidth: '1400px' }}>
             <thead className="bg-card border-b-2 border-morandi-gold/30 sticky top-0 z-10">
               <tr>
                 {isEditMode && (
-                  <th className="px-2 py-2.5 text-center text-xs font-medium text-morandi-secondary border-r border-border/40" style={{ width: '40px' }}>
+                  <th
+                    className="px-2 py-2.5 text-center text-xs font-medium text-morandi-secondary border-r border-border/40"
+                    style={{ width: '40px' }}
+                  >
                     {EDITABLE_RATES_TABLE_LABELS.LABEL_35}
                   </th>
                 )}
-                <th className="px-4 py-2.5 text-left text-xs font-medium text-morandi-secondary border-r border-border/40 group" style={{ width: '140px' }}>
+                <th
+                  className="px-4 py-2.5 text-left text-xs font-medium text-morandi-secondary border-r border-border/40 group"
+                  style={{ width: '140px' }}
+                >
                   <div className="flex items-center justify-between gap-2">
                     <span>{EDITABLE_RATES_TABLE_LABELS.LABEL_2170}</span>
                     {isEditMode && (
@@ -306,35 +339,62 @@ export function EditableRatesTable({
                     )}
                   </div>
                 </th>
-                <th className="px-4 py-2.5 text-left text-xs font-medium text-morandi-secondary border-r border-border/40" style={{ width: '140px' }}>
+                <th
+                  className="px-4 py-2.5 text-left text-xs font-medium text-morandi-secondary border-r border-border/40"
+                  style={{ width: '140px' }}
+                >
                   {EDITABLE_RATES_TABLE_LABELS.LABEL_8557}
                 </th>
-                <th className="px-4 py-2.5 text-left text-xs font-medium text-morandi-secondary border-r border-border/40" style={{ width: '220px' }}>
+                <th
+                  className="px-4 py-2.5 text-left text-xs font-medium text-morandi-secondary border-r border-border/40"
+                  style={{ width: '220px' }}
+                >
                   {EDITABLE_RATES_TABLE_LABELS.LABEL_312}
                 </th>
-                <th className="px-4 py-2.5 text-center text-xs font-medium text-morandi-secondary border-r border-border/40" style={{ width: '100px' }}>
+                <th
+                  className="px-4 py-2.5 text-center text-xs font-medium text-morandi-secondary border-r border-border/40"
+                  style={{ width: '100px' }}
+                >
                   {EDITABLE_RATES_TABLE_LABELS.TYPE}
                 </th>
-                <th className="px-4 py-2.5 text-right text-xs font-medium text-morandi-secondary border-r border-border/40" style={{ width: '120px' }}>
+                <th
+                  className="px-4 py-2.5 text-right text-xs font-medium text-morandi-secondary border-r border-border/40"
+                  style={{ width: '120px' }}
+                >
                   {EDITABLE_RATES_TABLE_LABELS.LABEL_1818}
                 </th>
-                <th className="px-4 py-2.5 text-right text-xs font-medium text-morandi-secondary border-r border-morandi-gold/30" style={{ width: '100px' }}>
+                <th
+                  className="px-4 py-2.5 text-right text-xs font-medium text-morandi-secondary border-r border-morandi-gold/30"
+                  style={{ width: '100px' }}
+                >
                   {EDITABLE_RATES_TABLE_LABELS.LABEL_9977}
                 </th>
                 {!hideKKDAYColumns && (
                   <>
-                    <th className="px-4 py-2.5 text-right text-xs font-medium text-morandi-gold bg-status-warning-bg border-r border-morandi-gold/30" style={{ width: '100px' }}>
+                    <th
+                      className="px-4 py-2.5 text-right text-xs font-medium text-morandi-gold bg-status-warning-bg border-r border-morandi-gold/30"
+                      style={{ width: '100px' }}
+                    >
                       KKDAY售價
                     </th>
-                    <th className="px-4 py-2.5 text-right text-xs font-medium text-morandi-gold bg-status-warning-bg border-r border-morandi-gold/30" style={{ width: '100px' }}>
+                    <th
+                      className="px-4 py-2.5 text-right text-xs font-medium text-morandi-gold bg-status-warning-bg border-r border-morandi-gold/30"
+                      style={{ width: '100px' }}
+                    >
                       KKDAY成本
                     </th>
-                    <th className="px-4 py-2.5 text-right text-xs font-medium text-morandi-gold bg-status-warning-bg border-r border-border/40" style={{ width: '100px' }}>
+                    <th
+                      className="px-4 py-2.5 text-right text-xs font-medium text-morandi-gold bg-status-warning-bg border-r border-border/40"
+                      style={{ width: '100px' }}
+                    >
                       {EDITABLE_RATES_TABLE_LABELS.LABEL_7705}
                     </th>
                   </>
                 )}
-                <th className="px-4 py-2.5 text-center text-xs font-medium text-morandi-secondary" style={{ width: '80px' }}>
+                <th
+                  className="px-4 py-2.5 text-center text-xs font-medium text-morandi-secondary"
+                  style={{ width: '80px' }}
+                >
                   {EDITABLE_RATES_TABLE_LABELS.ACTIONS}
                 </th>
               </tr>
@@ -342,14 +402,19 @@ export function EditableRatesTable({
             <tbody className="bg-card">
               {orderedGroups.length === 0 && !isAdding && !isEditMode ? (
                 <tr>
-                  <td colSpan={hideKKDAYColumns ? 8 : 11} className="text-center py-12 text-morandi-secondary">
+                  <td
+                    colSpan={hideKKDAYColumns ? 8 : 11}
+                    className="text-center py-12 text-morandi-secondary"
+                  >
                     {EDITABLE_RATES_TABLE_LABELS.NOT_FOUND_9408}
                   </td>
                 </tr>
               ) : orderedGroups.length === 0 && isEditMode && !isAdding ? (
                 <tr>
                   <td colSpan={hideKKDAYColumns ? 9 : 12} className="text-center py-12">
-                    <div className="text-morandi-secondary mb-2">{EDITABLE_RATES_TABLE_LABELS.NOT_FOUND_9408}</div>
+                    <div className="text-morandi-secondary mb-2">
+                      {EDITABLE_RATES_TABLE_LABELS.NOT_FOUND_9408}
+                    </div>
                     <Button
                       onClick={() => {
                         setIsAdding(true)
@@ -365,8 +430,11 @@ export function EditableRatesTable({
                   </td>
                 </tr>
               ) : (
-                <SortableContext items={orderedGroups.map(g => `${g.category}_${g.supplier}`)} strategy={verticalListSortingStrategy}>
-                  {orderedGroups.map((group) => (
+                <SortableContext
+                  items={orderedGroups.map(g => `${g.category}_${g.supplier}`)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {orderedGroups.map(group => (
                     <React.Fragment key={`${group.category}_${group.supplier}`}>
                       <CategoryGroupRow
                         group={group}
@@ -445,17 +513,19 @@ function groupRatesByCategory(rates: TransportationRate[]): CategoryGroup[] {
   })
 
   // 轉換為 CategoryGroup 陣列
-  return Array.from(groups.entries()).map(([key, groupRates]) => {
-    // 安全分割：只在最後一個 _ 處分割
-    const lastUnderscoreIndex = key.lastIndexOf('_')
-    const category = key.substring(0, lastUnderscoreIndex)
-    const supplier = key.substring(lastUnderscoreIndex + 1)
+  return Array.from(groups.entries())
+    .map(([key, groupRates]) => {
+      // 安全分割：只在最後一個 _ 處分割
+      const lastUnderscoreIndex = key.lastIndexOf('_')
+      const category = key.substring(0, lastUnderscoreIndex)
+      const supplier = key.substring(lastUnderscoreIndex + 1)
 
-    return {
-      category: category === 'uncategorized' ? '' : category,
-      supplier: supplier === 'no-supplier' ? '' : supplier,
-      rates: groupRates,
-      displayOrder: Math.min(...groupRates.map(r => r.display_order || 0)),
-    }
-  }).sort((a, b) => a.displayOrder - b.displayOrder)
+      return {
+        category: category === 'uncategorized' ? '' : category,
+        supplier: supplier === 'no-supplier' ? '' : supplier,
+        rates: groupRates,
+        displayOrder: Math.min(...groupRates.map(r => r.display_order || 0)),
+      }
+    })
+    .sort((a, b) => a.displayOrder - b.displayOrder)
 }

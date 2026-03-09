@@ -39,8 +39,8 @@ export interface UnsplashSearchResult {
   total_pages: number
   results: UnsplashPhoto[]
   rateLimit?: {
-    limit: number      // 每小時上限
-    remaining: number  // 剩餘次數
+    limit: number // 每小時上限
+    remaining: number // 剩餘次數
   }
 }
 
@@ -100,23 +100,24 @@ export async function searchPhotos(
 
   return {
     ...data,
-    rateLimit: limit && remaining ? {
-      limit: parseInt(limit, 10),
-      remaining: parseInt(remaining, 10),
-    } : undefined,
+    rateLimit:
+      limit && remaining
+        ? {
+            limit: parseInt(limit, 10),
+            remaining: parseInt(remaining, 10),
+          }
+        : undefined,
   }
 }
 
 /**
  * 取得隨機圖片
  */
-export async function getRandomPhotos(
-  options?: {
-    query?: string
-    count?: number
-    orientation?: 'landscape' | 'portrait' | 'squarish'
-  }
-): Promise<UnsplashPhoto[]> {
+export async function getRandomPhotos(options?: {
+  query?: string
+  count?: number
+  orientation?: 'landscape' | 'portrait' | 'squarish'
+}): Promise<UnsplashPhoto[]> {
   if (!ACCESS_KEY) {
     throw new Error('Unsplash API 未設定')
   }
@@ -163,15 +164,47 @@ export async function trackDownload(downloadLocation: string): Promise<void> {
  */
 export const TRAVEL_KEYWORDS = {
   zh: [
-    '風景', '海灘', '山脈', '城市', '建築',
-    '美食', '咖啡', '夜景', '日落', '日出',
-    '飯店', '機場', '寺廟', '神社', '古蹟',
-    '櫻花', '雪景', '秋葉', '花園', '森林',
+    '風景',
+    '海灘',
+    '山脈',
+    '城市',
+    '建築',
+    '美食',
+    '咖啡',
+    '夜景',
+    '日落',
+    '日出',
+    '飯店',
+    '機場',
+    '寺廟',
+    '神社',
+    '古蹟',
+    '櫻花',
+    '雪景',
+    '秋葉',
+    '花園',
+    '森林',
   ],
   en: [
-    'landscape', 'beach', 'mountain', 'city', 'architecture',
-    'food', 'coffee', 'night view', 'sunset', 'sunrise',
-    'hotel', 'airport', 'temple', 'shrine', 'heritage',
-    'cherry blossom', 'snow', 'autumn leaves', 'garden', 'forest',
+    'landscape',
+    'beach',
+    'mountain',
+    'city',
+    'architecture',
+    'food',
+    'coffee',
+    'night view',
+    'sunset',
+    'sunrise',
+    'hotel',
+    'airport',
+    'temple',
+    'shrine',
+    'heritage',
+    'cherry blossom',
+    'snow',
+    'autumn leaves',
+    'garden',
+    'forest',
   ],
 }

@@ -33,7 +33,9 @@ export function PasswordAndRoleFields({ formData, setFormData }: PasswordAndRole
   return (
     <>
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_9167}</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">
+          {COMP_HR_LABELS.LABEL_9167}
+        </label>
         <Input
           type="text"
           value={formData.defaultPassword}
@@ -41,9 +43,7 @@ export function PasswordAndRoleFields({ formData, setFormData }: PasswordAndRole
           placeholder={COMP_HR_LABELS.請設定預設密碼}
           required
         />
-        <p className="text-xs text-morandi-muted mt-1">
-          {COMP_HR_LABELS.LABEL_3681}
-        </p>
+        <p className="text-xs text-morandi-muted mt-1">{COMP_HR_LABELS.LABEL_3681}</p>
       </div>
 
       <div>
@@ -64,9 +64,7 @@ export function PasswordAndRoleFields({ formData, setFormData }: PasswordAndRole
             </label>
           ))}
         </div>
-        <p className="text-xs text-morandi-muted mt-2">
-          {COMP_HR_LABELS.PLEASE_SELECT_1794}
-        </p>
+        <p className="text-xs text-morandi-muted mt-2">{COMP_HR_LABELS.PLEASE_SELECT_1794}</p>
       </div>
     </>
   )

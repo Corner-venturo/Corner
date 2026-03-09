@@ -3,7 +3,6 @@
  * SuppliersPage - 供應商管理頁面（僅基本資訊）
  */
 
-
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useCallback } from 'react'
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
@@ -157,11 +156,7 @@ export const SuppliersPage: React.FC = () => {
         </Button>
       }
     >
-      <SuppliersList
-        suppliers={filteredSuppliers}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      <SuppliersList suppliers={filteredSuppliers} onEdit={handleEdit} onDelete={handleDelete} />
 
       {/* 新增/編輯供應商對話框 */}
       <SuppliersDialog
@@ -174,10 +169,7 @@ export const SuppliersPage: React.FC = () => {
       />
 
       {/* 批次匯入對話框 */}
-      <ImportSuppliersDialog
-        open={isImportDialogOpen}
-        onOpenChange={setIsImportDialogOpen}
-      />
+      <ImportSuppliersDialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen} />
     </ContentPageLayout>
   )
 }

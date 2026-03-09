@@ -3,7 +3,6 @@
  * VersionDropdown - 版本選擇下拉選單
  */
 
-
 import { History, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import type { ItineraryVersionRecord, Itinerary } from '@/stores/types'
 import { stripHtml } from '@/lib/utils/string-utils'
-import { VERSION_DROPDOWN_LABELS } from '../../constants/labels';
+import { VERSION_DROPDOWN_LABELS } from '../../constants/labels'
 
 interface VersionDropdownProps {
   existingItinerary: Itinerary | undefined
@@ -51,15 +50,23 @@ export function VersionDropdown({
         >
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
-              <span className="font-medium text-sm">{stripHtml(existingItinerary?.title) || VERSION_DROPDOWN_LABELS.主版本}</span>
-              <span className="text-[10px] text-morandi-secondary bg-morandi-container px-1.5 py-0.5 rounded">{VERSION_DROPDOWN_LABELS.主版本}</span>
+              <span className="font-medium text-sm">
+                {stripHtml(existingItinerary?.title) || VERSION_DROPDOWN_LABELS.主版本}
+              </span>
+              <span className="text-[10px] text-morandi-secondary bg-morandi-container px-1.5 py-0.5 rounded">
+                {VERSION_DROPDOWN_LABELS.主版本}
+              </span>
             </div>
             <span className="text-xs text-morandi-secondary">
-              {existingItinerary?.updated_at ? new Date(existingItinerary.updated_at).toLocaleString('zh-TW') : VERSION_DROPDOWN_LABELS.當前編輯中}
+              {existingItinerary?.updated_at
+                ? new Date(existingItinerary.updated_at).toLocaleString('zh-TW')
+                : VERSION_DROPDOWN_LABELS.當前編輯中}
             </span>
           </div>
           {selectedVersionIndex === -1 && (
-            <div className="text-xs bg-morandi-gold text-white px-1.5 py-0.5 rounded">{VERSION_DROPDOWN_LABELS.當前}</div>
+            <div className="text-xs bg-morandi-gold text-white px-1.5 py-0.5 rounded">
+              {VERSION_DROPDOWN_LABELS.當前}
+            </div>
           )}
         </DropdownMenuItem>
         {/* 其他版本記錄 */}
@@ -73,14 +80,18 @@ export function VersionDropdown({
             >
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-medium text-sm">{record.note || VERSION_DROPDOWN_LABELS.版本(record.version)}</span>
+                  <span className="font-medium text-sm">
+                    {record.note || VERSION_DROPDOWN_LABELS.版本(record.version)}
+                  </span>
                 </div>
                 <span className="text-xs text-morandi-secondary">
                   {record.created_at ? new Date(record.created_at).toLocaleString('zh-TW') : ''}
                 </span>
               </div>
               {isCurrentVersion && (
-                <div className="text-xs bg-morandi-gold text-white px-1.5 py-0.5 rounded">{VERSION_DROPDOWN_LABELS.當前}</div>
+                <div className="text-xs bg-morandi-gold text-white px-1.5 py-0.5 rounded">
+                  {VERSION_DROPDOWN_LABELS.當前}
+                </div>
               )}
             </DropdownMenuItem>
           )

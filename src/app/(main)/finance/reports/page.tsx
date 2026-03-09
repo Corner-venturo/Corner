@@ -4,14 +4,7 @@ import Link from 'next/link'
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { ContentContainer } from '@/components/layout/content-container'
 import { Card } from '@/components/ui/card'
-import {
-  FileDown,
-  TrendingUp,
-  AlertCircle,
-  ArrowRight,
-  Wallet,
-  BarChart3,
-} from 'lucide-react'
+import { FileDown, TrendingUp, AlertCircle, ArrowRight, Wallet, BarChart3 } from 'lucide-react'
 import { REPORTS_LABELS } from './constants/labels'
 
 // 報表卡片組件
@@ -32,9 +25,7 @@ function ReportCard({
     <Link href={href}>
       <Card className="p-6 border border-border hover:border-morandi-gold hover:shadow-md transition-all cursor-pointer group">
         <div className="flex items-start gap-4">
-          <div
-            className={`p-3 rounded-lg bg-opacity-10 ${iconColor.replace('text-', 'bg-')}/10`}
-          >
+          <div className={`p-3 rounded-lg bg-opacity-10 ${iconColor.replace('text-', 'bg-')}/10`}>
             <Icon size={24} className={iconColor} />
           </div>
           <div className="flex-1">

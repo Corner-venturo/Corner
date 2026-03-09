@@ -25,6 +25,7 @@ function MyComponent() {
 ```
 
 **優點**：
+
 - 自動快取（跨組件共享）
 - 自動去重（多個組件同時請求只發一次）
 - 自動重試
@@ -34,13 +35,13 @@ function MyComponent() {
 
 每個 Entity 都提供以下 hooks：
 
-| Hook | 用途 | 回傳類型 |
-|------|------|---------|
-| `useXxx()` | 完整列表 | `{ items: T[], loading, error, refresh }` |
-| `useXxxSlim()` | 精簡列表（用於下拉選單） | `{ items: Partial<T>[], loading, error, refresh }` |
-| `useXxxDetail(id)` | 單筆詳細資料 | `{ item: T | null, loading, error, refresh }` |
-| `useXxxPaginated(params)` | 分頁查詢 | `{ items: T[], totalCount, loading, error, refresh }` |
-| `useXxxDictionary()` | O(1) 查詢字典 | `{ dictionary: Record<string, Partial<T>>, get, loading }` |
+| Hook                      | 用途                     | 回傳類型                                                   |
+| ------------------------- | ------------------------ | ---------------------------------------------------------- | -------------------------------- |
+| `useXxx()`                | 完整列表                 | `{ items: T[], loading, error, refresh }`                  |
+| `useXxxSlim()`            | 精簡列表（用於下拉選單） | `{ items: Partial<T>[], loading, error, refresh }`         |
+| `useXxxDetail(id)`        | 單筆詳細資料             | `{ item: T                                                 | null, loading, error, refresh }` |
+| `useXxxPaginated(params)` | 分頁查詢                 | `{ items: T[], totalCount, loading, error, refresh }`      |
+| `useXxxDictionary()`      | O(1) 查詢字典            | `{ dictionary: Record<string, Partial<T>>, get, loading }` |
 
 ### 3. 常見實體
 
@@ -62,9 +63,12 @@ import { usePaymentRequests, useReceiptOrders, useDisbursementOrders } from '@/d
 ```typescript
 // ❌ 錯誤：直接查詢 Supabase
 useEffect(() => {
-  supabase.from('countries').select('*').then(({ data }) => {
-    setCountries(data)
-  })
+  supabase
+    .from('countries')
+    .select('*')
+    .then(({ data }) => {
+      setCountries(data)
+    })
 }, [])
 
 // ✅ 正確：使用 @/data hooks
@@ -77,7 +81,9 @@ const { items: countries } = useCountries()
 // ❌ 錯誤：使用舊版 region-store
 import { useRegionStore } from '@/stores/region-store'
 const { countries, fetchAll } = useRegionStore()
-useEffect(() => { fetchAll() }, [])
+useEffect(() => {
+  fetchAll()
+}, [])
 
 // ✅ 正確：使用 @/data hooks
 import { useCountries } from '@/data'
@@ -90,11 +96,15 @@ const { items: countries } = useCountries()
 // ❌ 錯誤：多個組件各自載入
 // ComponentA.tsx
 const [countries, setCountries] = useState([])
-useEffect(() => { loadCountries() }, [])
+useEffect(() => {
+  loadCountries()
+}, [])
 
 // ComponentB.tsx
 const [countries, setCountries] = useState([])
-useEffect(() => { loadCountries() }, [])
+useEffect(() => {
+  loadCountries()
+}, [])
 
 // ✅ 正確：使用共享的 SWR 快取
 // ComponentA.tsx & ComponentB.tsx
@@ -154,11 +164,11 @@ await invalidateCountries()
 
 ## 快取策略
 
-| 資料類型 | TTL | Stale Time | 範例 |
-|---------|-----|------------|------|
-| 低頻（基礎資料） | 1 小時 | 5 分鐘 | countries, regions, cities |
-| 中頻（業務資料） | 5 分鐘 | 1 分鐘 | quotes, itineraries |
-| 高頻（即時資料） | 1 分鐘 | 30 秒 | tours, orders |
+| 資料類型         | TTL    | Stale Time | 範例                       |
+| ---------------- | ------ | ---------- | -------------------------- |
+| 低頻（基礎資料） | 1 小時 | 5 分鐘     | countries, regions, cities |
+| 中頻（業務資料） | 5 分鐘 | 1 分鐘     | quotes, itineraries        |
+| 高頻（即時資料） | 1 分鐘 | 30 秒      | tours, orders              |
 
 ## 遷移指南
 

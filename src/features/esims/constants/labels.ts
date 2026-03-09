@@ -6,7 +6,7 @@ export const LABELS = {
   selectTourCodePlaceholder: '選擇團號...',
   orderNumber: '訂單',
   orderAutoCreate: '(選填，未選擇將自動建立)',
-  orderPlaceholder: (hasTour: boolean) => hasTour ? '請選擇訂單或留空自動建立' : '請先選擇團號',
+  orderPlaceholder: (hasTour: boolean) => (hasTour ? '請選擇訂單或留空自動建立' : '請先選擇團號'),
   addOrder: '+ 新增訂單',
   contactPerson: '聯絡人',
   contactPersonPlaceholder: '請輸入聯絡人',

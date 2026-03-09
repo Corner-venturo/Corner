@@ -3,14 +3,16 @@
  * QuickQuoteReceiptInfo - 收據資訊區
  */
 
-
 import React from 'react'
 import { MORANDI_COLORS } from '../shared/print-styles'
 import { QUICK_QUOTE_LABELS } from './constants/labels'
 
 export const QuickQuoteReceiptInfo: React.FC = () => {
   return (
-    <div className="mt-4 pt-4 text-sm" style={{ borderTop: `1px solid ${MORANDI_COLORS.borderLight}` }}>
+    <div
+      className="mt-4 pt-4 text-sm"
+      style={{ borderTop: `1px solid ${MORANDI_COLORS.borderLight}` }}
+    >
       <h4 className="font-semibold mb-2" style={{ color: MORANDI_COLORS.brown }}>
         {QUICK_QUOTE_LABELS.LABEL_4917}
       </h4>

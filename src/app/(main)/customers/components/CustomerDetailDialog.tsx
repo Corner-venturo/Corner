@@ -33,9 +33,7 @@ export function CustomerDetailDialog({
           <DialogTitle className="flex items-center gap-2">
             {customer.name}
             {customer.is_vip && (
-              <span className="text-xs bg-morandi-gold text-white px-2 py-0.5 rounded">
-                VIP
-              </span>
+              <span className="text-xs bg-morandi-gold text-white px-2 py-0.5 rounded">VIP</span>
             )}
           </DialogTitle>
         </DialogHeader>
@@ -50,7 +48,7 @@ export function CustomerDetailDialog({
                   src={customer.passport_image_url}
                   alt={L.passport_alt(customer.name)}
                   className="w-full h-full object-cover"
-                  onError={(e) => {
+                  onError={e => {
                     // 圖片載入失敗時隱藏
                     e.currentTarget.style.display = 'none'
                     const parent = e.currentTarget.parentElement
@@ -89,14 +87,18 @@ export function CustomerDetailDialog({
                   <label className="text-xs text-morandi-muted">{L.label_phone}</label>
                   <div className="flex items-center gap-2 mt-1.5">
                     <Phone size={14} className="text-morandi-muted" />
-                    <span className="text-morandi-primary font-medium">{customer.phone || '-'}</span>
+                    <span className="text-morandi-primary font-medium">
+                      {customer.phone || '-'}
+                    </span>
                   </div>
                 </div>
                 <div>
                   <label className="text-xs text-morandi-muted">{L.label_email}</label>
                   <div className="flex items-center gap-2 mt-1.5">
                     <Mail size={14} className="text-morandi-muted" />
-                    <span className="text-morandi-primary text-sm break-all">{customer.email || '-'}</span>
+                    <span className="text-morandi-primary text-sm break-all">
+                      {customer.email || '-'}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -104,15 +106,21 @@ export function CustomerDetailDialog({
 
             {/* 護照資料 */}
             <div className="bg-morandi-container rounded-lg p-4 border border-morandi-border">
-              <h4 className="text-sm font-medium text-morandi-primary mb-3">{L.section_passport}</h4>
+              <h4 className="text-sm font-medium text-morandi-primary mb-3">
+                {L.section_passport}
+              </h4>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs text-morandi-muted">{L.label_passport_number}</label>
-                  <div className="font-mono text-morandi-primary mt-1.5">{customer.passport_number || '-'}</div>
+                  <div className="font-mono text-morandi-primary mt-1.5">
+                    {customer.passport_number || '-'}
+                  </div>
                 </div>
                 <div>
                   <label className="text-xs text-morandi-muted">{L.label_passport_name}</label>
-                  <div className="font-mono text-morandi-primary mt-1.5">{customer.passport_name || '-'}</div>
+                  <div className="font-mono text-morandi-primary mt-1.5">
+                    {customer.passport_name || '-'}
+                  </div>
                 </div>
                 <div>
                   <label className="text-xs text-morandi-muted">{L.label_passport_expiry}</label>
@@ -145,11 +153,15 @@ export function CustomerDetailDialog({
 
             {/* 身分資料 */}
             <div className="bg-morandi-container rounded-lg p-4 border border-morandi-border">
-              <h4 className="text-sm font-medium text-morandi-primary mb-3">{L.section_identity}</h4>
+              <h4 className="text-sm font-medium text-morandi-primary mb-3">
+                {L.section_identity}
+              </h4>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs text-morandi-muted">{L.label_national_id}</label>
-                  <div className="font-mono text-morandi-primary mt-1.5">{customer.national_id || '-'}</div>
+                  <div className="font-mono text-morandi-primary mt-1.5">
+                    {customer.national_id || '-'}
+                  </div>
                 </div>
                 <div>
                   <label className="text-xs text-morandi-muted">{L.label_birth_date}</label>
@@ -177,11 +189,7 @@ export function CustomerDetailDialog({
         </div>
 
         <div className="flex justify-end gap-2 pt-4 border-t">
-          <Button 
-            variant="outline" 
-            onClick={() => onOpenChange(false)} 
-            className="gap-2"
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-2">
             <X size={16} />
             {L.btn_close}
           </Button>

@@ -19,19 +19,23 @@ interface FAQSectionProps {
 const getDefaultFAQs = (): FAQ[] => [
   {
     question: COMP_EDITOR_LABELS.行程可以客製化嗎,
-    answer: COMP_EDITOR_LABELS.可以的_我們提供彈性的行程調整服務_可依您的需求增減景點_調整住宿等級或延長天數_歡迎與我們聯繫討論,
+    answer:
+      COMP_EDITOR_LABELS.可以的_我們提供彈性的行程調整服務_可依您的需求增減景點_調整住宿等級或延長天數_歡迎與我們聯繫討論,
   },
   {
     question: COMP_EDITOR_LABELS.需要準備什麼證件,
-    answer: COMP_EDITOR_LABELS.請準備有效期限超過六個月的護照_部分國家可能需要簽證_我們會在行前說明會提供詳細資訊,
+    answer:
+      COMP_EDITOR_LABELS.請準備有效期限超過六個月的護照_部分國家可能需要簽證_我們會在行前說明會提供詳細資訊,
   },
   {
     question: COMP_EDITOR_LABELS.團費包含小費嗎,
-    answer: COMP_EDITOR_LABELS.團費不含導遊_司機小費_建議每人每日小費約_NT_200_300_實際金額可依服務品質自行調整,
+    answer:
+      COMP_EDITOR_LABELS.團費不含導遊_司機小費_建議每人每日小費約_NT_200_300_實際金額可依服務品質自行調整,
   },
   {
     question: COMP_EDITOR_LABELS.可以刷卡付款嗎,
-    answer: COMP_EDITOR_LABELS.可以_我們接受信用卡付款_VISA_MasterCard_JCB_也可選擇銀行轉帳或現金付款,
+    answer:
+      COMP_EDITOR_LABELS.可以_我們接受信用卡付款_VISA_MasterCard_JCB_也可選擇銀行轉帳或現金付款,
   },
 ]
 
@@ -77,14 +81,12 @@ export function FAQSection({ data, onChange }: FAQSectionProps) {
           <MessageCircleQuestion className="h-5 w-5 text-morandi-primary" />
           <div>
             <h3 className="font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_4954}</h3>
-            <p className="text-sm text-morandi-secondary">
-              {COMP_EDITOR_LABELS.LABEL_7714}
-            </p>
+            <p className="text-sm text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_7714}</p>
           </div>
         </div>
         <Switch
           checked={data.showFaqs || false}
-          onCheckedChange={(checked) => {
+          onCheckedChange={checked => {
             onChange({
               ...data,
               showFaqs: checked,
@@ -127,10 +129,12 @@ export function FAQSection({ data, onChange }: FAQSectionProps) {
 
                 {/* 問題 */}
                 <div>
-                  <Label className="text-xs text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_5266}</Label>
+                  <Label className="text-xs text-morandi-primary">
+                    {COMP_EDITOR_LABELS.LABEL_5266}
+                  </Label>
                   <Input
                     value={faq.question}
-                    onChange={(e) => updateFAQ(index, { question: e.target.value })}
+                    onChange={e => updateFAQ(index, { question: e.target.value })}
                     placeholder={COMP_EDITOR_LABELS.輸入常見問題_如_行程可以客製化嗎}
                     className="mt-1"
                   />
@@ -138,10 +142,12 @@ export function FAQSection({ data, onChange }: FAQSectionProps) {
 
                 {/* 答案 */}
                 <div>
-                  <Label className="text-xs text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_1877}</Label>
+                  <Label className="text-xs text-morandi-primary">
+                    {COMP_EDITOR_LABELS.LABEL_1877}
+                  </Label>
                   <Textarea
                     value={faq.answer}
-                    onChange={(e) => updateFAQ(index, { answer: e.target.value })}
+                    onChange={e => updateFAQ(index, { answer: e.target.value })}
                     placeholder={COMP_EDITOR_LABELS.輸入問題的答案}
                     className="mt-1 min-h-[80px] resize-none"
                     rows={3}
@@ -152,12 +158,7 @@ export function FAQSection({ data, onChange }: FAQSectionProps) {
           </div>
 
           {/* 新增按鈕 */}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={addFAQ}
-            className="w-full border-dashed"
-          >
+          <Button type="button" variant="outline" onClick={addFAQ} className="w-full border-dashed">
             <Plus className="h-4 w-4 mr-2" />
             {COMP_EDITOR_LABELS.ADD_8197}
           </Button>

@@ -18,7 +18,7 @@ interface MemberSurchargeCellProps {
   memberId: string
   memberName: string
   surcharges: MemberSurcharges | null
-  baseCost: number | null  // 基本團費
+  baseCost: number | null // 基本團費
   onChange: (memberId: string, surcharges: MemberSurcharges) => void
 }
 
@@ -27,7 +27,7 @@ export function MemberSurchargeCell({
   memberName,
   surcharges,
   baseCost,
-  onChange
+  onChange,
 }: MemberSurchargeCellProps) {
   const [showDialog, setShowDialog] = useState(false)
   const [editData, setEditData] = useState<MemberSurcharges>(DEFAULT_SURCHARGES)
@@ -39,26 +39,26 @@ export function MemberSurchargeCell({
       single_room_surcharge: surcharges.single_room_surcharge || null,
       add_on_items: Array.isArray(surcharges.add_on_items) ? surcharges.add_on_items : [],
       visa_fee: surcharges.visa_fee || null,
-      other_charges: Array.isArray(surcharges.other_charges) ? surcharges.other_charges : []
+      other_charges: Array.isArray(surcharges.other_charges) ? surcharges.other_charges : [],
     }
   }, [surcharges])
 
   // 計算附加費用總額
   const totalSurcharge = useMemo(() => {
     const { single_room_surcharge, add_on_items, visa_fee, other_charges } = currentSurcharges
-    
+
     let total = 0
     if (single_room_surcharge) total += single_room_surcharge
     if (visa_fee) total += visa_fee
-    
+
     add_on_items.forEach(item => {
       if (item.amount) total += item.amount
     })
-    
+
     other_charges.forEach(item => {
       if (item.amount) total += item.amount
     })
-    
+
     return total
   }, [currentSurcharges])
 
@@ -94,7 +94,7 @@ export function MemberSurchargeCell({
   const handleAddItem = useCallback((field: 'add_on_items' | 'other_charges') => {
     setEditData(prev => ({
       ...prev,
-      [field]: [...prev[field], { name: '', amount: 0 }]
+      [field]: [...prev[field], { name: '', amount: 0 }],
     }))
   }, [])
 
@@ -102,37 +102,43 @@ export function MemberSurchargeCell({
   const handleRemoveItem = useCallback((field: 'add_on_items' | 'other_charges', index: number) => {
     setEditData(prev => ({
       ...prev,
-      [field]: prev[field].filter((_, i) => i !== index)
+      [field]: prev[field].filter((_, i) => i !== index),
     }))
   }, [])
 
   // 更新項目
-  const handleUpdateItem = useCallback((
-    field: 'add_on_items' | 'other_charges',
-    index: number,
-    itemField: keyof SurchargeItem,
-    value: string | number
-  ) => {
-    setEditData(prev => ({
-      ...prev,
-      [field]: prev[field].map((item, i) => {
-        if (i === index) {
-          if (itemField === 'amount') {
-            const num = typeof value === 'string' 
-              ? (value === '' ? 0 : parseInt(value.replace(/\D/g, ''), 10) || 0)
-              : value
-            return { ...item, [itemField]: num }
+  const handleUpdateItem = useCallback(
+    (
+      field: 'add_on_items' | 'other_charges',
+      index: number,
+      itemField: keyof SurchargeItem,
+      value: string | number
+    ) => {
+      setEditData(prev => ({
+        ...prev,
+        [field]: prev[field].map((item, i) => {
+          if (i === index) {
+            if (itemField === 'amount') {
+              const num =
+                typeof value === 'string'
+                  ? value === ''
+                    ? 0
+                    : parseInt(value.replace(/\D/g, ''), 10) || 0
+                  : value
+              return { ...item, [itemField]: num }
+            }
+            return { ...item, [itemField]: value }
           }
-          return { ...item, [itemField]: value }
-        }
-        return item
-      })
-    }))
-  }, [])
+          return item
+        }),
+      }))
+    },
+    []
+  )
 
   return (
     <>
-      <td 
+      <td
         className="border border-morandi-gold/20 px-2 py-1 bg-amber-50/50 cursor-pointer hover:bg-amber-100/50 transition-colors"
         onClick={handleOpenDialog}
       >
@@ -179,7 +185,7 @@ export function MemberSurchargeCell({
                 inputMode="numeric"
                 placeholder="0"
                 value={editData.single_room_surcharge || ''}
-                onChange={(e) => handleNumberChange('single_room_surcharge', e.target.value)}
+                onChange={e => handleNumberChange('single_room_surcharge', e.target.value)}
                 className="text-right"
               />
             </div>
@@ -194,7 +200,7 @@ export function MemberSurchargeCell({
                 inputMode="numeric"
                 placeholder="0"
                 value={editData.visa_fee || ''}
-                onChange={(e) => handleNumberChange('visa_fee', e.target.value)}
+                onChange={e => handleNumberChange('visa_fee', e.target.value)}
                 className="text-right"
               />
             </div>
@@ -220,7 +226,7 @@ export function MemberSurchargeCell({
                   <Input
                     placeholder={MEMBER_ROW_LABELS.LABEL_7515}
                     value={item.name}
-                    onChange={(e) => handleUpdateItem('add_on_items', index, 'name', e.target.value)}
+                    onChange={e => handleUpdateItem('add_on_items', index, 'name', e.target.value)}
                     className="flex-1"
                   />
                   <Input
@@ -228,7 +234,9 @@ export function MemberSurchargeCell({
                     inputMode="numeric"
                     placeholder={MEMBER_ROW_LABELS.AMOUNT}
                     value={item.amount || ''}
-                    onChange={(e) => handleUpdateItem('add_on_items', index, 'amount', e.target.value)}
+                    onChange={e =>
+                      handleUpdateItem('add_on_items', index, 'amount', e.target.value)
+                    }
                     className="w-24 text-right"
                   />
                   <Button
@@ -265,7 +273,7 @@ export function MemberSurchargeCell({
                   <Input
                     placeholder={MEMBER_ROW_LABELS.LABEL_9044}
                     value={item.name}
-                    onChange={(e) => handleUpdateItem('other_charges', index, 'name', e.target.value)}
+                    onChange={e => handleUpdateItem('other_charges', index, 'name', e.target.value)}
                     className="flex-1"
                   />
                   <Input
@@ -273,7 +281,9 @@ export function MemberSurchargeCell({
                     inputMode="numeric"
                     placeholder={MEMBER_ROW_LABELS.AMOUNT}
                     value={item.amount || ''}
-                    onChange={(e) => handleUpdateItem('other_charges', index, 'amount', e.target.value)}
+                    onChange={e =>
+                      handleUpdateItem('other_charges', index, 'amount', e.target.value)
+                    }
                     className="w-24 text-right"
                   />
                   <Button
@@ -302,8 +312,12 @@ export function MemberSurchargeCell({
                     let total = 0
                     if (editData.single_room_surcharge) total += editData.single_room_surcharge
                     if (editData.visa_fee) total += editData.visa_fee
-                    editData.add_on_items.forEach(item => { if (item.amount) total += item.amount })
-                    editData.other_charges.forEach(item => { if (item.amount) total += item.amount })
+                    editData.add_on_items.forEach(item => {
+                      if (item.amount) total += item.amount
+                    })
+                    editData.other_charges.forEach(item => {
+                      if (item.amount) total += item.amount
+                    })
                     return total.toLocaleString()
                   })()}
                 </span>
@@ -314,10 +328,15 @@ export function MemberSurchargeCell({
                 <span className="text-lg text-morandi-primary">
                   {(() => {
                     let surchargeTotal = 0
-                    if (editData.single_room_surcharge) surchargeTotal += editData.single_room_surcharge
+                    if (editData.single_room_surcharge)
+                      surchargeTotal += editData.single_room_surcharge
                     if (editData.visa_fee) surchargeTotal += editData.visa_fee
-                    editData.add_on_items.forEach(item => { if (item.amount) surchargeTotal += item.amount })
-                    editData.other_charges.forEach(item => { if (item.amount) surchargeTotal += item.amount })
+                    editData.add_on_items.forEach(item => {
+                      if (item.amount) surchargeTotal += item.amount
+                    })
+                    editData.other_charges.forEach(item => {
+                      if (item.amount) surchargeTotal += item.amount
+                    })
                     return ((baseCost || 0) + surchargeTotal).toLocaleString()
                   })()}
                 </span>
@@ -329,9 +348,7 @@ export function MemberSurchargeCell({
             <Button variant="outline" onClick={handleCloseDialog}>
               {MEMBER_ROW_LABELS.CANCEL}
             </Button>
-            <Button onClick={handleSave}>
-              {MEMBER_ROW_LABELS.SAVE}
-            </Button>
+            <Button onClick={handleSave}>{MEMBER_ROW_LABELS.SAVE}</Button>
           </div>
         </DialogContent>
       </Dialog>

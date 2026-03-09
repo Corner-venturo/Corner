@@ -8,37 +8,37 @@
 
 ## Domains
 
-| Domain | 路徑 | 說明 |
-|--------|------|------|
-| dashboard | /dashboard | 首頁儀表板 |
-| orders | /orders | 訂單管理（核心） |
-| tours | /tours | 出團管理（核心） |
-| itinerary | /itinerary | 行程設計 |
-| customers | /customers | 客戶管理 |
-| customer-groups | /customer-groups | 客戶群組 |
-| finance | /finance | 收款/請款/結案 |
-| quotes | /quotes | 報價單 |
-| proposals | /proposals | 提案 |
-| confirmations | /confirmations | 團確單 |
-| contracts | /contracts | 合約 |
-| supplier | /supplier | 供應商管理 |
-| visas | /visas | 簽證管理 |
-| esims | /esims | eSIM 管理 |
-| scheduling | /scheduling | 排程 |
-| calendar | /calendar | 日曆 |
-| hr | /hr | 人事 |
-| marketing | /marketing | 行銷 |
-| reports | /reports | 報表 |
-| files | /files | 檔案管理 |
-| todos | /todos | 待辦事項 |
-| tools | /tools | 工具 |
-| design | /design | 手冊設計系統 |
-| brochures | /brochures | 手冊管理 |
-| office | /office | 辦公室 |
-| settings | /settings | 系統設定 |
-| traveler-chat | /traveler-chat | 旅客通訊 |
-| workspace | /workspace | 工作區設定 |
-| tenants | /tenants | 租戶管理（超級管理員） |
+| Domain          | 路徑             | 說明                   |
+| --------------- | ---------------- | ---------------------- |
+| dashboard       | /dashboard       | 首頁儀表板             |
+| orders          | /orders          | 訂單管理（核心）       |
+| tours           | /tours           | 出團管理（核心）       |
+| itinerary       | /itinerary       | 行程設計               |
+| customers       | /customers       | 客戶管理               |
+| customer-groups | /customer-groups | 客戶群組               |
+| finance         | /finance         | 收款/請款/結案         |
+| quotes          | /quotes          | 報價單                 |
+| proposals       | /proposals       | 提案                   |
+| confirmations   | /confirmations   | 團確單                 |
+| contracts       | /contracts       | 合約                   |
+| supplier        | /supplier        | 供應商管理             |
+| visas           | /visas           | 簽證管理               |
+| esims           | /esims           | eSIM 管理              |
+| scheduling      | /scheduling      | 排程                   |
+| calendar        | /calendar        | 日曆                   |
+| hr              | /hr              | 人事                   |
+| marketing       | /marketing       | 行銷                   |
+| reports         | /reports         | 報表                   |
+| files           | /files           | 檔案管理               |
+| todos           | /todos           | 待辦事項               |
+| tools           | /tools           | 工具                   |
+| design          | /design          | 手冊設計系統           |
+| brochures       | /brochures       | 手冊管理               |
+| office          | /office          | 辦公室                 |
+| settings        | /settings        | 系統設定               |
+| traveler-chat   | /traveler-chat   | 旅客通訊               |
+| workspace       | /workspace       | 工作區設定             |
+| tenants         | /tenants         | 租戶管理（超級管理員） |
 
 ---
 
@@ -120,26 +120,26 @@ src/stores/
 
 ## API Routes
 
-| Route | 說明 |
-|-------|------|
-| /api/auth/* | 認證（登入、密碼、員工同步） |
-| /api/itineraries/* | 行程 CRUD + AI 生成 |
-| /api/quotes/* | 報價單 + 團確單 |
-| /api/proposals/* | 提案 + 轉團 |
-| /api/linkpay/* | 台新金流 webhook |
-| /api/travel-invoice/* | 旅行業代收轉付收據 |
-| /api/ocr/passport | 護照 OCR（Google Vision + MRZ） |
-| /api/ai/* | AI 功能（圖片編輯、景點建議） |
-| /api/gemini/* | Gemini 圖片生成 |
-| /api/storage/* | 檔案上傳 |
-| /api/health/* | 健康檢查 |
-| /api/traveler-chat/* | 旅客通訊 |
-| /api/meeting/* | 會議 |
-| /api/cron/* | 定時任務 |
-| /api/airports | 機場資料庫 |
-| /api/meeting/* | AI 會議（send, summary） |
-| /api/tenants/* | 租戶管理 |
-| /api/settings/* | 系統設定 |
+| Route                  | 說明                            |
+| ---------------------- | ------------------------------- |
+| /api/auth/\*           | 認證（登入、密碼、員工同步）    |
+| /api/itineraries/\*    | 行程 CRUD + AI 生成             |
+| /api/quotes/\*         | 報價單 + 團確單                 |
+| /api/proposals/\*      | 提案 + 轉團                     |
+| /api/linkpay/\*        | 台新金流 webhook                |
+| /api/travel-invoice/\* | 旅行業代收轉付收據              |
+| /api/ocr/passport      | 護照 OCR（Google Vision + MRZ） |
+| /api/ai/\*             | AI 功能（圖片編輯、景點建議）   |
+| /api/gemini/\*         | Gemini 圖片生成                 |
+| /api/storage/\*        | 檔案上傳                        |
+| /api/health/\*         | 健康檢查                        |
+| /api/traveler-chat/\*  | 旅客通訊                        |
+| /api/meeting/\*        | 會議                            |
+| /api/cron/\*           | 定時任務                        |
+| /api/airports          | 機場資料庫                      |
+| /api/meeting/\*        | AI 會議（send, summary）        |
+| /api/tenants/\*        | 租戶管理                        |
+| /api/settings/\*       | 系統設定                        |
 
 ---
 

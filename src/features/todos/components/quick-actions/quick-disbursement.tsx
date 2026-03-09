@@ -20,12 +20,12 @@ import { EditableRequestItemList } from '@/features/finance/requests/components/
 import { RequestDateInput } from '@/features/finance/requests/components/RequestDateInput'
 import { alert } from '@/lib/ui/alert-dialog'
 import { CurrencyCell } from '@/components/table-cells'
-import { 
-  FORM_LABELS, 
-  PLACEHOLDER_LABELS, 
-  MESSAGE_LABELS, 
+import {
+  FORM_LABELS,
+  PLACEHOLDER_LABELS,
+  MESSAGE_LABELS,
   CONTACT_LABELS,
-  createDisbursementButtonText 
+  createDisbursementButtonText,
 } from '@/features/todos/constants/labels'
 
 interface QuickDisbursementProps {
@@ -88,7 +88,9 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
       <div className="grid grid-cols-2 gap-3">
         {/* 選擇團體 */}
         <div>
-          <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.groupRequired}</Label>
+          <Label className="text-sm font-medium text-morandi-primary">
+            {FORM_LABELS.groupRequired}
+          </Label>
           <Combobox
             options={(tours || []).map(tour => ({
               value: tour.id,
@@ -113,7 +115,9 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
 
         {/* 選擇訂單 */}
         <div>
-          <Label className="text-sm font-medium text-morandi-primary">{FORM_LABELS.orderOptional}</Label>
+          <Label className="text-sm font-medium text-morandi-primary">
+            {FORM_LABELS.orderOptional}
+          </Label>
           <Select
             disabled={!formData.tour_id || filteredOrders.length === 0}
             value={formData.order_id}
@@ -146,7 +150,11 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
         <RequestDateInput
           value={formData.request_date}
           onChange={(date, isSpecialBilling) => {
-            setFormData(prev => ({ ...prev, request_date: date, is_special_billing: isSpecialBilling }))
+            setFormData(prev => ({
+              ...prev,
+              request_date: date,
+              is_special_billing: isSpecialBilling,
+            }))
           }}
         />
       </div>
@@ -164,7 +172,9 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
 
       {/* Note */}
       <div className="pt-3 border-t border-morandi-container/20">
-        <label className="text-sm font-medium text-morandi-primary mb-2 block">{FORM_LABELS.remarks}</label>
+        <label className="text-sm font-medium text-morandi-primary mb-2 block">
+          {FORM_LABELS.remarks}
+        </label>
         <Textarea
           placeholder={PLACEHOLDER_LABELS.disbursementNotes}
           rows={2}
@@ -182,7 +192,8 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
           className="w-full text-white shadow-sm bg-morandi-gold hover:bg-morandi-gold-hover"
         >
           <FileText size={16} className="mr-2" />
-          建立請款單 ({requestItems.length} 項，<CurrencyCell amount={total_amount} className="inline text-white" />)
+          建立請款單 ({requestItems.length} 項，
+          <CurrencyCell amount={total_amount} className="inline text-white" />)
         </Button>
       </div>
     </div>

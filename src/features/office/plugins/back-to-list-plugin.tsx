@@ -8,12 +8,7 @@ import {
   Plugin,
   UniverInstanceType,
 } from '@univerjs/core'
-import {
-  ComponentManager,
-  IMenuManagerService,
-  MenuItemType,
-  RibbonStartGroup,
-} from '@univerjs/ui'
+import { ComponentManager, IMenuManagerService, MenuItemType, RibbonStartGroup } from '@univerjs/ui'
 import type { IMenuButtonItem } from '@univerjs/ui'
 import { OFFICE_LABELS } from '../constants/labels'
 
@@ -23,8 +18,18 @@ const BACK_TO_LIST_COMMAND_ID = 'office.command.back-to-list'
 // Custom Icon Component - 返回箭頭
 function BackToListIcon() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M19 12H5M12 19l-7-7 7-7" />
     </svg>
   )
 }
@@ -99,7 +104,7 @@ export class UniverBackToListPlugin extends Plugin {
 
   override onStarting(): void {
     const deps: Dependency[] = [[BackToListController]]
-    deps.forEach((dep) => this._injector.add(dep))
+    deps.forEach(dep => this._injector.add(dep))
     // 立即取得 controller 觸發初始化
     this._injector.get(BackToListController)
   }

@@ -2,16 +2,16 @@
 
 import { useState } from 'react'
 import { Plus, X } from 'lucide-react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { TourItinerarySelector } from './TourItinerarySelector'
 import { useDesigns } from '../hooks/useDesigns'
-import { DESIGN_TYPE_CONFIG, DESIGN_CATEGORY_CONFIG, type DesignType, type DesignCategory } from '../types'
+import {
+  DESIGN_TYPE_CONFIG,
+  DESIGN_CATEGORY_CONFIG,
+  type DesignType,
+  type DesignCategory,
+} from '../types'
 import { LABELS, DESIGN_COMPONENT_LABELS } from '../constants/labels'
 
 // 按分類分組設計類型
@@ -108,13 +108,13 @@ export function CreateDesignDialog({
               {LABELS.designType}
             </label>
             <div className="space-y-4">
-              {(Object.keys(DESIGN_TYPES_BY_CATEGORY) as DesignCategory[]).map((category) => (
+              {(Object.keys(DESIGN_TYPES_BY_CATEGORY) as DesignCategory[]).map(category => (
                 <div key={category}>
                   <div className="text-xs text-morandi-secondary mb-2">
                     {DESIGN_CATEGORY_CONFIG[category].label}
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {DESIGN_TYPES_BY_CATEGORY[category].map((type) => {
+                    {DESIGN_TYPES_BY_CATEGORY[category].map(type => {
                       const config = DESIGN_TYPE_CONFIG[type]
                       const isSelected = designType === type
 
@@ -133,9 +133,7 @@ export function CreateDesignDialog({
                           `}
                         >
                           <div className="text-sm font-medium">{config.label}</div>
-                          <div className="text-xs text-morandi-secondary">
-                            {config.size}
-                          </div>
+                          <div className="text-xs text-morandi-secondary">{config.size}</div>
                         </button>
                       )
                     })}

@@ -8,7 +8,13 @@
 
 import { useState, useEffect } from 'react'
 import { DollarSign, X, Check, Building2, Calendar, FileText } from 'lucide-react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { RequestDateInput } from './RequestDateInput'
@@ -18,19 +24,23 @@ import { PaymentItemCategory } from '@/stores/types'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import { cn } from '@/lib/utils'
-import { ADD_REQUEST_DIALOG_LABELS, QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS, REQUEST_TYPE_LABELS } from '../../constants/labels';
+import {
+  ADD_REQUEST_DIALOG_LABELS,
+  QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS,
+  REQUEST_TYPE_LABELS,
+} from '../../constants/labels'
 
 // 類別對應的圖標和顏色
 const CATEGORY_CONFIG: Record<string, { icon: string; color: string }> = {
   [REQUEST_TYPE_LABELS.CAT_ACCOMMODATION]: { icon: '🏨', color: 'text-blue-600' },
-  'accommodation': { icon: '🏨', color: 'text-blue-600' },
+  accommodation: { icon: '🏨', color: 'text-blue-600' },
   [REQUEST_TYPE_LABELS.CAT_TRANSPORTATION]: { icon: '🚌', color: 'text-green-600' },
-  'transportation': { icon: '🚌', color: 'text-green-600' },
+  transportation: { icon: '🚌', color: 'text-green-600' },
   [REQUEST_TYPE_LABELS.CAT_TICKET]: { icon: '🎫', color: 'text-purple-600' },
-  'ticket': { icon: '🎫', color: 'text-purple-600' },
-  'activity': { icon: '🎫', color: 'text-purple-600' },
+  ticket: { icon: '🎫', color: 'text-purple-600' },
+  activity: { icon: '🎫', color: 'text-purple-600' },
   [REQUEST_TYPE_LABELS.CAT_MEAL]: { icon: '🍽️', color: 'text-orange-600' },
-  'meal': { icon: '🍽️', color: 'text-orange-600' },
+  meal: { icon: '🍽️', color: 'text-orange-600' },
   [REQUEST_TYPE_LABELS.CAT_OTHER]: { icon: '📦', color: 'text-morandi-secondary' },
 }
 
@@ -154,24 +164,26 @@ export function QuickRequestFromItemDialog({
             </div>
 
             <div>
-              <div className="text-sm text-morandi-secondary">{QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS.LABEL_7325}</div>
+              <div className="text-sm text-morandi-secondary">
+                {QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS.LABEL_7325}
+              </div>
               <div className="font-medium text-morandi-primary">{item.title}</div>
             </div>
 
             <div className="flex items-center gap-2">
               <Building2 size={14} className="text-morandi-secondary" />
-              <span className="text-sm text-morandi-secondary">{QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS.LABEL_4947}</span>
-              <span className="text-sm font-medium text-morandi-primary">
-                {item.supplierName}
+              <span className="text-sm text-morandi-secondary">
+                {QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS.LABEL_4947}
               </span>
+              <span className="text-sm font-medium text-morandi-primary">{item.supplierName}</span>
             </div>
 
             <div className="flex items-center gap-2">
               <FileText size={14} className="text-morandi-secondary" />
-              <span className="text-sm text-morandi-secondary">{QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS.LABEL_1073}</span>
-              <span className="text-sm font-medium text-morandi-primary">
-                {item.tourCode}
+              <span className="text-sm text-morandi-secondary">
+                {QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS.LABEL_1073}
               </span>
+              <span className="text-sm font-medium text-morandi-primary">{item.tourCode}</span>
             </div>
 
             {item.estimatedCost > 0 && (
@@ -198,7 +210,7 @@ export function QuickRequestFromItemDialog({
               <Input
                 type="text"
                 value={amount}
-                onChange={(e) => {
+                onChange={e => {
                   // 只允許數字和逗號
                   const value = e.target.value.replace(/[^\d,]/g, '')
                   setAmount(value)
@@ -211,17 +223,16 @@ export function QuickRequestFromItemDialog({
           </div>
 
           {/* 請款日期 */}
-          <RequestDateInput
-            value={requestDate}
-            onChange={(date) => setRequestDate(date)}
-          />
+          <RequestDateInput value={requestDate} onChange={date => setRequestDate(date)} />
 
           {/* 備註 */}
           <div>
-            <label className="text-sm font-medium text-morandi-primary">{QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS.REMARKS}</label>
+            <label className="text-sm font-medium text-morandi-primary">
+              {QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS.REMARKS}
+            </label>
             <Input
               value={note}
-              onChange={(e) => setNote(e.target.value)}
+              onChange={e => setNote(e.target.value)}
               placeholder={ADD_REQUEST_DIALOG_LABELS.輸入備註_可選}
               className="mt-1"
             />

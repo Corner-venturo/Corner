@@ -29,11 +29,11 @@ interface ImageLibrarySelectorProps {
   category?: string
 }
 
-export function ImageLibrarySelector({ 
-  isOpen, 
-  onClose, 
-  onSelect, 
-  category = 'activity' 
+export function ImageLibrarySelector({
+  isOpen,
+  onClose,
+  onSelect,
+  category = 'activity',
 }: ImageLibrarySelectorProps) {
   const [images, setImages] = useState<ImageLibraryItem[]>([])
   const [filteredImages, setFilteredImages] = useState<ImageLibraryItem[]>([])
@@ -53,9 +53,10 @@ export function ImageLibrarySelector({
     if (!searchTerm) {
       setFilteredImages(images)
     } else {
-      const filtered = images.filter(img => 
-        img.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        img.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+      const filtered = images.filter(
+        img =>
+          img.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          img.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
       )
       setFilteredImages(filtered)
     }
@@ -78,11 +79,13 @@ export function ImageLibrarySelector({
         return
       }
 
-      setImages((data || []).map(item => ({
-        ...item,
-        category: item.category ?? '',
-        tags: item.tags ?? []
-      })))
+      setImages(
+        (data || []).map(item => ({
+          ...item,
+          category: item.category ?? '',
+          tags: item.tags ?? [],
+        }))
+      )
     } catch (error) {
       logger.error(COMP_EDITOR_LABELS.載入圖庫錯誤, error)
       toast.error(COMP_EDITOR_LABELS.載入圖庫發生錯誤)
@@ -109,11 +112,14 @@ export function ImageLibrarySelector({
 
         {/* 搜尋框 */}
         <div className="relative">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary" />
+          <Search
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary"
+          />
           <Input
             placeholder={COMP_EDITOR_LABELS.搜尋圖片名稱或標籤}
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
             className="pl-10"
           />
         </div>
@@ -128,12 +134,14 @@ export function ImageLibrarySelector({
             <div className="flex flex-col items-center justify-center h-32 text-morandi-secondary">
               <ImageIcon size={32} className="mb-2 opacity-50" />
               <p className="text-sm">
-                {images.length === 0 ? COMP_EDITOR_LABELS.圖庫中還沒有圖片 : COMP_EDITOR_LABELS.沒有符合搜尋條件的圖片}
+                {images.length === 0
+                  ? COMP_EDITOR_LABELS.圖庫中還沒有圖片
+                  : COMP_EDITOR_LABELS.沒有符合搜尋條件的圖片}
               </p>
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {filteredImages.map((image) => (
+              {filteredImages.map(image => (
                 <motion.div
                   key={image.id}
                   initial={{ opacity: 0, scale: 0.9 }}

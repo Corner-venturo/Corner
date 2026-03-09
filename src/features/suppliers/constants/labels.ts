@@ -30,7 +30,6 @@ export const LABELS = {
   deleteSupplier: '刪除供應商',
 }
 
-
 // Supplier types
 export const SUPPLIER_TYPE_LABELS = {
   HOTEL: '飯店',
@@ -105,8 +104,7 @@ export const SUPPLIER_IMPORT_LABELS = {
   error_no_data_to_import: '沒有可匯入的資料',
   // Messages
   msg_import_success: (count: number) => `成功匯入 ${count} 家供應商`,
-  msg_import_partial: (success: number, total: number) =>
-    `匯入完成：${success}/${total} 筆成功`,
+  msg_import_partial: (success: number, total: number) => `匯入完成：${success}/${total} 筆成功`,
   msg_import_failed: '匯入失敗，請稍後再試',
   msg_duplicate_name: (name: string) => `供應商名稱「${name}」已存在`,
   // Supplier type mapping

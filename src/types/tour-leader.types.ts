@@ -71,5 +71,8 @@ export interface TourLeaderFormData {
 // CRUD 型別
 // ============================================
 
-export type CreateTourLeaderData = Omit<TourLeader, 'id' | 'created_at' | 'updated_at' | '_needs_sync' | '_synced_at'>
+export type CreateTourLeaderData = Omit<
+  TourLeader,
+  'id' | 'created_at' | 'updated_at' | '_needs_sync' | '_synced_at'
+>
 export type UpdateTourLeaderData = Partial<CreateTourLeaderData>

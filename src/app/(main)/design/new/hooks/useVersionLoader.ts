@@ -1,6 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { logger } from '@/lib/utils/logger'
-import { needsScaling, calculateScaleFactor, scaleFabricData, NEW_A5_WIDTH, NEW_A5_HEIGHT } from '@/features/designer/utils/scaling'
+import {
+  needsScaling,
+  calculateScaleFactor,
+  scaleFabricData,
+  NEW_A5_WIDTH,
+  NEW_A5_HEIGHT,
+} from '@/features/designer/utils/scaling'
 import { calculatePageNumber, formatPageNumber } from '@/features/designer/utils/page-number'
 import { styleSeries } from '@/features/designer/templates/engine'
 import type { CanvasPage, CanvasElement } from '@/features/designer/components/types'
@@ -88,7 +94,7 @@ export function useVersionLoader({
       const savedTemplateData = versionData.templateData as Record<string, unknown> | null
       const savedStyleId = versionData.styleId as string | null
 
-      const restoredPages = savedPages.map((page) => {
+      const restoredPages = savedPages.map(page => {
         let fixedTemplateKey = page.templateKey
         if (page.name?.includes('行程總覽') && page.templateKey === 'daily') {
           fixedTemplateKey = 'itinerary'
@@ -174,7 +180,7 @@ export function useVersionLoader({
       }
 
       if (savedStyleId) {
-        const style = styleSeries.find((s) => s.id === savedStyleId)
+        const style = styleSeries.find(s => s.id === savedStyleId)
         if (style) {
           setSelectedStyle(style)
         }
@@ -187,25 +193,38 @@ export function useVersionLoader({
         Array.isArray((currentPageData.fabricData as { objects?: unknown[] }).objects)
 
       if (hasValidFabricData && currentPageData.fabricData) {
-        loadCanvasData(currentPageData.fabricData).then(() => {
-          setLoadingStage('idle', 100)
-          initPageHistory(currentPageData.id)
-        }).catch(err => logger.error('[useVersionLoader] loadCanvasData', err))
+        loadCanvasData(currentPageData.fabricData)
+          .then(() => {
+            setLoadingStage('idle', 100)
+            initPageHistory(currentPageData.id)
+          })
+          .catch(err => logger.error('[useVersionLoader] loadCanvasData', err))
       } else if (restoredPages[savedPageIndex]) {
-        loadCanvasPage(restoredPages[savedPageIndex]).then(() => {
-          setLoadingStage('idle', 100)
-          initPageHistory(restoredPages[savedPageIndex].id)
-        }).catch(err => logger.error('[useVersionLoader] loadCanvasPage', err))
+        loadCanvasPage(restoredPages[savedPageIndex])
+          .then(() => {
+            setLoadingStage('idle', 100)
+            initPageHistory(restoredPages[savedPageIndex].id)
+          })
+          .catch(err => logger.error('[useVersionLoader] loadCanvasPage', err))
       } else {
         setLoadingStage('idle', 100)
       }
     } else {
-      loadCanvasData(versionData).then(() => {
-        setLoadingStage('idle', 100)
-        initPageHistory('legacy-page')
-      }).catch(err => logger.error('[useVersionLoader] loadCanvasData legacy', err))
+      loadCanvasData(versionData)
+        .then(() => {
+          setLoadingStage('idle', 100)
+          initPageHistory('legacy-page')
+        })
+        .catch(err => logger.error('[useVersionLoader] loadCanvasData legacy', err))
     }
-  }, [isCanvasReady, currentVersion, loadCanvasData, loadCanvasPage, setLoadingStage, initPageHistory])
+  }, [
+    isCanvasReady,
+    currentVersion,
+    loadCanvasData,
+    loadCanvasPage,
+    setLoadingStage,
+    initPageHistory,
+  ])
 
   // 初次載入 generated pages
   useEffect(() => {
@@ -216,9 +235,11 @@ export function useVersionLoader({
 
     const firstPage = generatedPages[0]
     if (firstPage) {
-      loadCanvasPage(firstPage).then(() => {
-        initPageHistory(firstPage.id)
-      }).catch(err => logger.error('[useVersionLoader] loadCanvasPage initial', err))
+      loadCanvasPage(firstPage)
+        .then(() => {
+          initPageHistory(firstPage.id)
+        })
+        .catch(err => logger.error('[useVersionLoader] loadCanvasPage initial', err))
     }
   }, [isCanvasReady, generatedPages, currentVersion, loadCanvasPage, initPageHistory])
 }

@@ -27,12 +27,7 @@ interface TourUnlockDialogProps {
   onUnlocked?: () => void
 }
 
-export function TourUnlockDialog({
-  tour,
-  open,
-  onOpenChange,
-  onUnlocked,
-}: TourUnlockDialogProps) {
+export function TourUnlockDialog({ tour, open, onOpenChange, onUnlocked }: TourUnlockDialogProps) {
   const [password, setPassword] = useState('')
   const [reason, setReason] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -50,7 +45,9 @@ export function TourUnlockDialog({
 
     try {
       // 取得當前 session token
-      const { data: { session } } = await supabase.auth.getSession()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
       if (!session?.access_token) {
         setError(TOUR_UNLOCK.error_login_required)
         setSubmitting(false)
@@ -62,7 +59,7 @@ export function TourUnlockDialog({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           password,
@@ -86,7 +83,7 @@ export function TourUnlockDialog({
     } catch (err) {
       logger.error('解鎖錯誤:', err)
       setError(TOUR_UNLOCK.error_generic)
-    } finally{
+    } finally {
       setSubmitting(false)
     }
   }
@@ -106,9 +103,7 @@ export function TourUnlockDialog({
             <Unlock className="h-5 w-5 text-morandi-gold" />
             {TOUR_UNLOCK.title}
           </DialogTitle>
-          <DialogDescription>
-            {TOUR_UNLOCK.subtitle}
-          </DialogDescription>
+          <DialogDescription>{TOUR_UNLOCK.subtitle}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -131,13 +126,13 @@ export function TourUnlockDialog({
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
-                onChange={(e) => {
+                onChange={e => {
                   setPassword(e.target.value)
                   setError(null)
                 }}
                 placeholder={TOUR_UNLOCK.password_placeholder}
                 className="pr-10"
-                onKeyDown={(e) => {
+                onKeyDown={e => {
                   if (e.key === 'Enter') {
                     handleUnlock()
                   }
@@ -159,7 +154,7 @@ export function TourUnlockDialog({
             <Textarea
               id="reason"
               value={reason}
-              onChange={(e) => setReason(e.target.value)}
+              onChange={e => setReason(e.target.value)}
               placeholder={TOUR_UNLOCK.reason_placeholder}
               rows={2}
             />

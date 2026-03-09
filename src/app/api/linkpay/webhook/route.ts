@@ -14,10 +14,7 @@ import { captureException } from '@/lib/error-tracking'
 import { logger } from '@/lib/utils/logger'
 import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
-import {
-  verifyWebhookSignature,
-  type TaishinWebhookParams,
-} from '@/lib/linkpay/signature'
+import { verifyWebhookSignature, type TaishinWebhookParams } from '@/lib/linkpay/signature'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
 

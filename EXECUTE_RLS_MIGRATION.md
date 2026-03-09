@@ -298,6 +298,7 @@ END $$;
 ## 步驟 3：驗證結果
 
 執行成功後，應該會看到類似的訊息：
+
 ```
 ✅ Workspace 權限系統建立完成！
 📊 RLS Policies 數量：112 個
@@ -315,11 +316,13 @@ END $$;
 ## CLI 問題說明
 
 Supabase CLI 無法執行的原因：
+
 - CLI 需要 `psql` 命令（PostgreSQL 客戶端工具）
 - `psql` 需要透過 Homebrew 安裝：`brew install postgresql@15`
 - Homebrew 安裝需要管理員密碼（sudo 權限）
 
 **解決方案（可選）**：
+
 ```bash
 # 1. 安裝 Homebrew（需要管理員密碼）
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"

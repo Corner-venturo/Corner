@@ -40,28 +40,28 @@ export interface GoogleVisionResult {
 /**
  * 呼叫 Google Vision API（辨識中文）
  */
-export async function callGoogleVision(base64Image: string, apiKey: string): Promise<GoogleVisionResult> {
+export async function callGoogleVision(
+  base64Image: string,
+  apiKey: string
+): Promise<GoogleVisionResult> {
   // 移除 data:image/xxx;base64, 前綴
   const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, '')
 
-  const response = await fetch(
-    `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        requests: [
-          {
-            image: { content: base64Data },
-            features: [{ type: 'DOCUMENT_TEXT_DETECTION', maxResults: 1 }],
-            imageContext: {
-              languageHints: ['zh-TW', 'en'],
-            },
+  const response = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      requests: [
+        {
+          image: { content: base64Data },
+          features: [{ type: 'DOCUMENT_TEXT_DETECTION', maxResults: 1 }],
+          imageContext: {
+            languageHints: ['zh-TW', 'en'],
           },
-        ],
-      }),
-    }
-  )
+        },
+      ],
+    }),
+  })
 
   const data = await response.json()
 

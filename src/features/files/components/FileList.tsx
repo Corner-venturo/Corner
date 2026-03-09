@@ -114,10 +114,7 @@ function FileItem({ file, isSelected, viewMode, onSelect, onToggleStar }: FileIt
 
         {/* 圖示 */}
         <div className="flex justify-center py-4">
-          <IconComponent
-            className="w-12 h-12"
-            style={{ color: categoryInfo.color }}
-          />
+          <IconComponent className="w-12 h-12" style={{ color: categoryInfo.color }} />
         </div>
 
         {/* 檔名 */}
@@ -148,10 +145,7 @@ function FileItem({ file, isSelected, viewMode, onSelect, onToggleStar }: FileIt
       />
 
       {/* 圖示 */}
-      <IconComponent
-        className="w-5 h-5 shrink-0"
-        style={{ color: categoryInfo.color }}
-      />
+      <IconComponent className="w-5 h-5 shrink-0" style={{ color: categoryInfo.color }} />
 
       {/* 檔名 */}
       <span className="flex-1 truncate text-sm">{file.filename}</span>
@@ -182,7 +176,9 @@ function FileItem({ file, isSelected, viewMode, onSelect, onToggleStar }: FileIt
         <Star
           className={cn(
             'w-4 h-4',
-            file.is_starred ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground opacity-0 group-hover:opacity-100'
+            file.is_starred
+              ? 'fill-amber-400 text-amber-400'
+              : 'text-muted-foreground opacity-0 group-hover:opacity-100'
           )}
         />
       </button>
@@ -192,7 +188,7 @@ function FileItem({ file, isSelected, viewMode, onSelect, onToggleStar }: FileIt
         <DropdownMenuTrigger asChild>
           <button
             className="w-6 h-6 flex items-center justify-center rounded opacity-0 group-hover:opacity-100 hover:bg-background"
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             <MoreHorizontal className="w-4 h-4" />
           </button>
@@ -290,7 +286,7 @@ export function FileList() {
             placeholder={LABELS.searchFiles}
             className="pl-8 h-8 text-sm"
             value={filter.search || ''}
-            onChange={(e) => setFilter({ ...filter, search: e.target.value })}
+            onChange={e => setFilter({ ...filter, search: e.target.value })}
           />
         </div>
 
@@ -336,11 +332,7 @@ export function FileList() {
         </div>
 
         {/* 上傳按鈕 */}
-        <Button
-          size="sm"
-          className="h-8"
-          onClick={() => setUploadDialogOpen(true)}
-        >
+        <Button size="sm" className="h-8" onClick={() => setUploadDialogOpen(true)}>
           <Upload className="w-4 h-4 mr-1" />
           {LABELS.upload}
         </Button>
@@ -349,9 +341,7 @@ export function FileList() {
       {/* 檔案列表 */}
       <ScrollArea className="flex-1">
         {loadingFiles ? (
-          <div className="py-12 text-center text-muted-foreground">
-            {LABELS.loading}
-          </div>
+          <div className="py-12 text-center text-muted-foreground">{LABELS.loading}</div>
         ) : files.length === 0 ? (
           <div className="py-12 text-center text-muted-foreground">
             <File className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -368,7 +358,7 @@ export function FileList() {
           </div>
         ) : viewMode === 'grid' ? (
           <div className="p-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-            {files.map((file) => (
+            {files.map(file => (
               <FileItem
                 key={file.id}
                 file={file}
@@ -381,7 +371,7 @@ export function FileList() {
           </div>
         ) : (
           <div className="p-2">
-            {files.map((file) => (
+            {files.map(file => (
               <FileItem
                 key={file.id}
                 file={file}
@@ -403,11 +393,7 @@ export function FileList() {
               ? LABELS.selectedFiles(selectedFileIds.size)
               : LABELS.totalFiles(files.length)}
           </span>
-          <span>
-            {formatFileSize(
-              files.reduce((sum, f) => sum + (f.size_bytes || 0), 0)
-            )}
-          </span>
+          <span>{formatFileSize(files.reduce((sum, f) => sum + (f.size_bytes || 0), 0))}</span>
         </div>
       )}
     </div>

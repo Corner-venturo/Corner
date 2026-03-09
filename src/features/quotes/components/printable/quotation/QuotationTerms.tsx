@@ -3,7 +3,6 @@
  * QuotationTerms - 注意事項
  */
 
-
 import React from 'react'
 import { formatDateTW } from '@/lib/utils/format-date'
 import { MORANDI_COLORS } from '../shared/print-styles'
@@ -31,7 +30,9 @@ export const QuotationTerms: React.FC<QuotationTermsProps> = ({ validUntil }) =>
         {QUOTATION_LABELS.LABEL_8733}
       </h4>
       <ul className="space-y-1">
-        <li>• {QUOTATION_TERMS_LABELS.本報價單有效期限至.replace('{validUntil}', formatValidUntil())}</li>
+        <li>
+          • {QUOTATION_TERMS_LABELS.本報價單有效期限至.replace('{validUntil}', formatValidUntil())}
+        </li>
         <li>• {QUOTATION_LABELS.FINAL_PRICE_NOTE}</li>
         <li>• {QUOTATION_LABELS.PEAK_SEASON_NOTE}</li>
         <li>• {QUOTATION_TERMS_LABELS.出發前30天內取消}</li>

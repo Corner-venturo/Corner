@@ -32,8 +32,14 @@ export function TourFeaturesSectionArt({ data, viewMode }: TourFeaturesSectionAr
     <section className="py-24 relative overflow-hidden" style={{ backgroundColor: colors.paper }}>
       {/* 背景裝飾線條 */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/3 w-px h-full" style={{ backgroundColor: `${colors.ink}08` }} />
-        <div className="absolute top-0 right-1/3 w-px h-full" style={{ backgroundColor: `${colors.ink}08` }} />
+        <div
+          className="absolute top-0 left-1/3 w-px h-full"
+          style={{ backgroundColor: `${colors.ink}08` }}
+        />
+        <div
+          className="absolute top-0 right-1/3 w-px h-full"
+          style={{ backgroundColor: `${colors.ink}08` }}
+        />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
@@ -77,7 +83,9 @@ export function TourFeaturesSectionArt({ data, viewMode }: TourFeaturesSectionAr
         </motion.div>
 
         {/* 特色卡片網格 */}
-        <div className={`grid ${isMobile ? 'grid-cols-1 gap-8' : 'md:grid-cols-2 lg:grid-cols-3 gap-8'}`}>
+        <div
+          className={`grid ${isMobile ? 'grid-cols-1 gap-8' : 'md:grid-cols-2 lg:grid-cols-3 gap-8'}`}
+        >
           {features.map((feature, index) => {
             const hasImage = feature.images && feature.images.length > 0 && feature.images[0]
 
@@ -100,7 +108,8 @@ export function TourFeaturesSectionArt({ data, viewMode }: TourFeaturesSectionAr
                   {/* 圖片區 */}
                   <div className="aspect-[16/10] overflow-hidden relative">
                     {hasImage ? (
-                      <img src={feature.images![0]}
+                      <img
+                        src={feature.images![0]}
                         alt={feature.title}
                         className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                       />
@@ -109,10 +118,7 @@ export function TourFeaturesSectionArt({ data, viewMode }: TourFeaturesSectionAr
                         className="w-full h-full flex items-center justify-center"
                         style={{ backgroundColor: colors.ink }}
                       >
-                        <span
-                          className="text-6xl"
-                          style={{ color: colors.paper }}
-                        >
+                        <span className="text-6xl" style={{ color: colors.paper }}>
                           {feature.icon || '✦'}
                         </span>
                       </div>
@@ -172,8 +178,18 @@ export function TourFeaturesSectionArt({ data, viewMode }: TourFeaturesSectionAr
                         }}
                       >
                         Read More
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17 8l4 4m0 0l-4 4m4-4H3"
+                          />
                         </svg>
                       </span>
                     </div>

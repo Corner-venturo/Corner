@@ -8,13 +8,13 @@
 
 ## 📋 修正總覽
 
-| # | 檔案 | 問題 | 狀態 |
-|---|------|------|------|
-| 1 | `src/app/reports/tour-closing/page.tsx` | 結團報表缺少 workspace_id 過濾 | ✅ 已修正 |
-| 2 | `src/components/tours/tour-close-dialog.tsx` | 員工選擇缺少 workspace_id 過濾 | ✅ 已修正 |
-| 3 | `src/features/tours/components/ToursPage.tsx` | 頻道檢查缺少 workspace_id 過濾 | ✅ 已修正 |
-| 4 | `src/stores/auth-store.ts` | 員工登入查詢 | ✅ 確認無需修正（employee_number 全公司唯一） |
-| 5 | `src/app/api/itineraries/[id]/route.ts` | API Route 權限驗證 | ✅ 已加上可選驗證（記錄警告） |
+| #   | 檔案                                          | 問題                           | 狀態                                          |
+| --- | --------------------------------------------- | ------------------------------ | --------------------------------------------- |
+| 1   | `src/app/reports/tour-closing/page.tsx`       | 結團報表缺少 workspace_id 過濾 | ✅ 已修正                                     |
+| 2   | `src/components/tours/tour-close-dialog.tsx`  | 員工選擇缺少 workspace_id 過濾 | ✅ 已修正                                     |
+| 3   | `src/features/tours/components/ToursPage.tsx` | 頻道檢查缺少 workspace_id 過濾 | ✅ 已修正                                     |
+| 4   | `src/stores/auth-store.ts`                    | 員工登入查詢                   | ✅ 確認無需修正（employee_number 全公司唯一） |
+| 5   | `src/app/api/itineraries/[id]/route.ts`       | API Route 權限驗證             | ✅ 已加上可選驗證（記錄警告）                 |
 
 ---
 
@@ -27,6 +27,7 @@
 **問題**: 台中員工會看到台北的結團報表
 
 **修正前**:
+
 ```typescript
 const { data: tours, error } = await supabase
   .from('tours')
@@ -36,13 +37,10 @@ const { data: tours, error } = await supabase
 ```
 
 **修正後**:
+
 ```typescript
 // 取得當前 workspace
-const { data: workspace } = await supabase
-  .from('workspaces')
-  .select('id')
-  .limit(1)
-  .single()
+const { data: workspace } = await supabase.from('workspaces').select('id').limit(1).single()
 
 if (!workspace) {
   toast.error('找不到工作空間')
@@ -59,6 +57,7 @@ const { data: tours, error } = await supabase
 ```
 
 **影響**:
+
 - ✅ 台中只能看台中的結團報表
 - ✅ 台北只能看台北的結團報表
 
@@ -71,21 +70,16 @@ const { data: tours, error } = await supabase
 **問題**: 獎金選擇下拉選單會顯示其他分公司的員工
 
 **修正前**:
+
 ```typescript
-const { data, error } = await supabase
-  .from('employees')
-  .select('id, name')
-  .order('name')
+const { data, error } = await supabase.from('employees').select('id, name').order('name')
 ```
 
 **修正後**:
+
 ```typescript
 // 取得當前 workspace
-const { data: workspace } = await supabase
-  .from('workspaces')
-  .select('id')
-  .limit(1)
-  .single()
+const { data: workspace } = await supabase.from('workspaces').select('id').limit(1).single()
 
 if (!workspace) {
   console.error('找不到工作空間')
@@ -101,6 +95,7 @@ const { data, error } = await supabase
 ```
 
 **影響**:
+
 - ✅ 台中結團時只能選擇台中員工
 - ✅ 台北結團時只能選擇台北員工
 - ✅ 避免獎金誤發給其他分公司員工
@@ -114,6 +109,7 @@ const { data, error } = await supabase
 **問題**: 檢查頻道是否存在時，可能誤判其他 workspace 的頻道
 
 **修正前**:
+
 ```typescript
 const { data: existingChannel, error: checkError } = await supabase
   .from('channels')
@@ -123,6 +119,7 @@ const { data: existingChannel, error: checkError } = await supabase
 ```
 
 **修正後**:
+
 ```typescript
 // 加上 workspace_id 過濾
 const { data: existingChannel, error: checkError } = await supabase
@@ -134,6 +131,7 @@ const { data: existingChannel, error: checkError } = await supabase
 ```
 
 **影響**:
+
 - ✅ 正確檢查同一 workspace 的頻道
 - ✅ 避免誤判頻道已存在
 
@@ -144,6 +142,7 @@ const { data: existingChannel, error: checkError } = await supabase
 **檔案**: `src/stores/auth-store.ts:284-288`
 
 **原始查詢**:
+
 ```typescript
 const { data: employees, error: queryError } = await supabase
   .from('employees')
@@ -153,12 +152,14 @@ const { data: employees, error: queryError } = await supabase
 ```
 
 **資料庫約束檢查**:
+
 ```sql
 -- supabase/migrations/20251111000003_unify_all_employee_ids.sql
 ALTER TABLE employees ADD CONSTRAINT employees_employee_number_key UNIQUE (employee_number);
 ```
 
 **結論**:
+
 - ✅ `employee_number` 有 UNIQUE 約束，全公司唯一
 - ✅ 不需要加上 workspace_id 過濾
 - ✅ 員工編號不會重複，不會有安全問題
@@ -172,13 +173,10 @@ ALTER TABLE employees ADD CONSTRAINT employees_employee_number_key UNIQUE (emplo
 **問題**: 使用 Service Role Key，跳過 RLS，但沒有 workspace_id 驗證
 
 **修正**:
+
 ```typescript
 // 使用 admin client 查詢（跳過 RLS）
-const { data, error } = await supabaseAdmin
-  .from('itineraries')
-  .select('*')
-  .eq('id', id)
-  .single()
+const { data, error } = await supabaseAdmin.from('itineraries').select('*').eq('id', id).single()
 
 // ... error handling ...
 
@@ -194,6 +192,7 @@ if (requestedWorkspace && data.workspace_id !== requestedWorkspace) {
 ```
 
 **說明**:
+
 - 這個 API 用於**公開分享行程表**，理論上不需要嚴格的 workspace 驗證
 - 加上可選驗證，記錄可疑請求，但不阻擋合法分享
 - 如果有安全疑慮，未來可以改為強制驗證
@@ -205,6 +204,7 @@ if (requestedWorkspace && data.workspace_id !== requestedWorkspace) {
 ### 修正後的行為
 
 #### 台中分公司員工
+
 ```
 登入 → workspace_id = 'taipei-office'
 
@@ -220,6 +220,7 @@ if (requestedWorkspace && data.workspace_id !== requestedWorkspace) {
 ```
 
 #### 台北分公司員工
+
 ```
 登入 → workspace_id = 'taichung-office'
 
@@ -241,6 +242,7 @@ if (requestedWorkspace && data.workspace_id !== requestedWorkspace) {
 ### 1. 待確認的功能
 
 **calendar_events 和 todos 的 workspace_id 過濾**
+
 - **位置**: `src/lib/workspace-filter.ts:39, 61`
 - **狀態**: 目前被註解停用（註記：「會導致資料消失」）
 - **建議**:
@@ -249,6 +251,7 @@ if (requestedWorkspace && data.workspace_id !== requestedWorkspace) {
   3. 然後啟用過濾
 
 **檢查 SQL**:
+
 ```sql
 -- 已建立 migration: 20251117200000_check_null_workspace_ids.sql
 SELECT COUNT(*) - COUNT(workspace_id) as null_count
@@ -271,6 +274,7 @@ FROM todos;
 **當前狀態**: 行程表分享 API 只記錄警告，不阻擋請求
 
 **建議**: 如果需要更嚴格的安全控制，可以改為：
+
 ```typescript
 if (requestedWorkspace && data.workspace_id !== requestedWorkspace) {
   return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
@@ -282,16 +286,19 @@ if (requestedWorkspace && data.workspace_id !== requestedWorkspace) {
 ## 📊 整體評估
 
 **修正前**:
+
 - ❌ 台中員工可能看到台北的結團報表
 - ❌ 獎金可能誤發給其他分公司員工
 - ❌ 頻道檢查可能誤判
 
 **修正後**:
+
 - ✅ 所有業務資料都正確隔離
 - ✅ 台中和台北資料完全分開
 - ✅ 不會有跨 workspace 的資料洩漏
 
 **Store 層自動過濾機制**:
+
 - ✅ 95%+ 的查詢都會自動加上 workspace_id
 - ✅ 透過 SupabaseAdapter 統一處理
 - ✅ 不用每次手動加過濾

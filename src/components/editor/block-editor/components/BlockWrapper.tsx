@@ -5,7 +5,6 @@
  * 為每個區塊提供標題、控制按鈕和收合功能
  */
 
-
 import { useState, ReactNode } from 'react'
 import {
   ChevronUp,
@@ -106,9 +105,7 @@ export function BlockWrapper({
         <div className="flex items-center gap-2 flex-1 min-w-0">
           {IconComponent && <IconComponent size={14} className="text-morandi-gold shrink-0" />}
           <span className="text-sm font-medium text-morandi-primary truncate">{label}</span>
-          {!block.meta.visible && (
-            <span className="text-xs text-morandi-secondary">(隱藏)</span>
-          )}
+          {!block.meta.visible && <span className="text-xs text-morandi-secondary">(隱藏)</span>}
         </div>
 
         {/* 控制按鈕 */}
@@ -117,9 +114,10 @@ export function BlockWrapper({
           {config.canReorder && !isFirst && (
             <Button
               variant="ghost"
-              size="icon" aria-label="Button"
+              size="icon"
+              aria-label="Button"
               className="h-6 w-6"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation()
                 onMoveUp?.()
               }}
@@ -132,9 +130,10 @@ export function BlockWrapper({
           {config.canReorder && !isLast && (
             <Button
               variant="ghost"
-              size="icon" aria-label="Button"
+              size="icon"
+              aria-label="Button"
               className="h-6 w-6"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation()
                 onMoveDown?.()
               }}
@@ -146,9 +145,10 @@ export function BlockWrapper({
           {/* 顯示/隱藏 */}
           <Button
             variant="ghost"
-            size="icon" aria-label="Toggle menu"
+            size="icon"
+            aria-label="Toggle menu"
             className="h-6 w-6"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation()
               onToggleVisibility?.()
             }}
@@ -160,9 +160,10 @@ export function BlockWrapper({
           {config.canRemove && (
             <Button
               variant="ghost"
-              size="icon" aria-label="Delete"
+              size="icon"
+              aria-label="Delete"
               className="h-6 w-6 text-status-danger hover:text-status-danger hover:bg-status-danger-bg"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation()
                 onRemove?.()
               }}
@@ -174,9 +175,10 @@ export function BlockWrapper({
           {/* 收合 */}
           <Button
             variant="ghost"
-            size="icon" aria-label="Button"
+            size="icon"
+            aria-label="Button"
             className="h-6 w-6"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation()
               setIsCollapsed(!isCollapsed)
             }}
@@ -190,11 +192,7 @@ export function BlockWrapper({
       </div>
 
       {/* 區塊內容 */}
-      {!isCollapsed && (
-        <div className="p-4">
-          {children}
-        </div>
-      )}
+      {!isCollapsed && <div className="p-4">{children}</div>}
     </div>
   )
 }

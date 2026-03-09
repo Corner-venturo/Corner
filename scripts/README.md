@@ -13,6 +13,7 @@ npm run db:migrate
 ```
 
 這個指令會：
+
 - ✅ 自動檢查 `supabase/migrations/` 目錄
 - ✅ 找出未執行的 migration 檔案
 - ✅ 按順序執行它們
@@ -36,12 +37,12 @@ node verify-final-status.js
 
 ## 📁 檔案說明
 
-| 檔案 | 用途 |
-|------|------|
-| `db-migrate.js` | 主要的 migration 執行工具 |
-| `check-rls-status.js` | 檢查資料表狀態 |
-| `execute-rls.js` | 手動執行單一 SQL |
-| `verify-final-status.js` | 驗證結果 |
+| 檔案                     | 用途                      |
+| ------------------------ | ------------------------- |
+| `db-migrate.js`          | 主要的 migration 執行工具 |
+| `check-rls-status.js`    | 檢查資料表狀態            |
+| `execute-rls.js`         | 手動執行單一 SQL          |
+| `verify-final-status.js` | 驗證結果                  |
 | `fill-workspace-data.js` | 填充遺漏的 migration 記錄 |
 
 ## 🔧 工作原理
@@ -198,11 +199,13 @@ req.end();
 ## ✅ 最佳實踐
 
 1. **每次 Pull 後執行**
+
    ```bash
    git pull && npm run db:migrate
    ```
 
 2. **建立 Migration 前檢查**
+
    ```bash
    npm run db:migrate  # 確保資料庫是最新狀態
    ```
@@ -216,6 +219,7 @@ req.end();
 ## 🎉 成功案例
 
 ✅ `updated_by` 欄位新增
+
 - Migration: `20251119085637_add_updated_by_to_todos.sql`
 - 使用 Management API 成功執行
 - 所有電腦都能自動同步

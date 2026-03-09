@@ -4,7 +4,6 @@
  * 用於將 Trip.com 等訂房憑證轉換為 Corner 風格
  */
 
-
 import React, { useState } from 'react'
 import { CornerHotelVoucher } from '@/features/accommodation/components/CornerHotelVoucher'
 import { Button } from '@/components/ui/button'
@@ -35,9 +34,19 @@ const SAMPLE_DATA_1 = {
   bed_type: '1張小型雙人床',
   meal_plan: '不包括任何餐膳',
   room_facilities: [
-    '牙刷', '牙膏', '洗頭水', '護髮素', '香皂',
-    '浴缸或淋浴', '私人浴室', '私人洗手間', '智能馬桶',
-    '風筒', '毛巾', '24小時熱水', '拖鞋'
+    '牙刷',
+    '牙膏',
+    '洗頭水',
+    '護髮素',
+    '香皂',
+    '浴缸或淋浴',
+    '私人浴室',
+    '私人洗手間',
+    '智能馬桶',
+    '風筒',
+    '毛巾',
+    '24小時熱水',
+    '拖鞋',
   ],
 }
 
@@ -63,9 +72,24 @@ const SAMPLE_DATA_2 = {
   bed_type: '2張單人床',
   meal_plan: '不包括任何餐膳',
   room_facilities: [
-    '牙刷', '牙膏', '沐浴露', '洗頭水', '護髮素', '浴帽', '梳子', '剃鬚刀',
-    '浴缸', '私人浴室', '私人洗手間', '風筒', '淋浴',
-    '毛巾', '浴巾', '24小時熱水', '拖鞋', '坐浴盆噴霧器（Shattaf）'
+    '牙刷',
+    '牙膏',
+    '沐浴露',
+    '洗頭水',
+    '護髮素',
+    '浴帽',
+    '梳子',
+    '剃鬚刀',
+    '浴缸',
+    '私人浴室',
+    '私人洗手間',
+    '風筒',
+    '淋浴',
+    '毛巾',
+    '浴巾',
+    '24小時熱水',
+    '拖鞋',
+    '坐浴盆噴霧器（Shattaf）',
   ],
 }
 
@@ -91,9 +115,27 @@ const SAMPLE_DATA_3 = {
   bed_type: '2張單人床',
   meal_plan: '不包括任何餐膳',
   room_facilities: [
-    '牙刷', '牙膏', '沐浴露', '洗頭水', '護髮素', '香皂', '浴帽', '梳子', '剃鬚刀',
-    '浴缸', '私人浴室', '私人洗手間', '智能馬桶', '風筒', '淋浴',
-    '浴室化妝放大鏡', '毛巾', '浴巾', '24小時熱水', '拖鞋', '坐浴盆噴霧器（Shattaf）'
+    '牙刷',
+    '牙膏',
+    '沐浴露',
+    '洗頭水',
+    '護髮素',
+    '香皂',
+    '浴帽',
+    '梳子',
+    '剃鬚刀',
+    '浴缸',
+    '私人浴室',
+    '私人洗手間',
+    '智能馬桶',
+    '風筒',
+    '淋浴',
+    '浴室化妝放大鏡',
+    '毛巾',
+    '浴巾',
+    '24小時熱水',
+    '拖鞋',
+    '坐浴盆噴霧器（Shattaf）',
   ],
 }
 
@@ -119,9 +161,18 @@ const SAMPLE_DATA_4 = {
   bed_type: '2張單人床',
   meal_plan: '無餐點',
   room_facilities: [
-    '牙刷', '洗髮乳', '護髮乳', '香皂', '浴缸或淋浴',
-    '私人浴室', '私人洗手間', '智慧型馬桶', '吹風機',
-    '毛巾', '24小時熱水', '拖鞋'
+    '牙刷',
+    '洗髮乳',
+    '護髮乳',
+    '香皂',
+    '浴缸或淋浴',
+    '私人浴室',
+    '私人洗手間',
+    '智慧型馬桶',
+    '吹風機',
+    '毛巾',
+    '24小時熱水',
+    '拖鞋',
   ],
 }
 
@@ -147,9 +198,18 @@ const SAMPLE_DATA_5 = {
   bed_type: '2張單人床',
   meal_plan: '無餐點',
   room_facilities: [
-    '牙刷', '洗髮乳', '護髮乳', '香皂', '浴缸或淋浴',
-    '私人浴室', '私人洗手間', '智慧型馬桶', '吹風機',
-    '毛巾', '24小時熱水', '拖鞋'
+    '牙刷',
+    '洗髮乳',
+    '護髮乳',
+    '香皂',
+    '浴缸或淋浴',
+    '私人浴室',
+    '私人洗手間',
+    '智慧型馬桶',
+    '吹風機',
+    '毛巾',
+    '24小時熱水',
+    '拖鞋',
   ],
 }
 
@@ -209,12 +269,18 @@ export default function HotelVoucherPage() {
 
   const getCurrentData = () => {
     switch (currentVoucher) {
-      case 1: return SAMPLE_DATA_1
-      case 2: return SAMPLE_DATA_2
-      case 3: return SAMPLE_DATA_3
-      case 4: return SAMPLE_DATA_4
-      case 5: return SAMPLE_DATA_5
-      default: return SAMPLE_DATA_1
+      case 1:
+        return SAMPLE_DATA_1
+      case 2:
+        return SAMPLE_DATA_2
+      case 3:
+        return SAMPLE_DATA_3
+      case 4:
+        return SAMPLE_DATA_4
+      case 5:
+        return SAMPLE_DATA_5
+      default:
+        return SAMPLE_DATA_1
     }
   }
 
@@ -298,7 +364,11 @@ export default function HotelVoucherPage() {
                   {HOTEL_VOUCHER_LABELS.LABEL_7190}
                 </Button>
               </div>
-              <Button size="sm" onClick={handlePrint} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+              <Button
+                size="sm"
+                onClick={handlePrint}
+                className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
+              >
                 <Printer size={16} />
                 {HOTEL_VOUCHER_LABELS.SAVING_2172}
               </Button>

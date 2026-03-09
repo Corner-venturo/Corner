@@ -37,7 +37,9 @@ export function TourMobileCard({ tour: tourProp, onClick, getStatusColor }: Tour
           <h3 className="font-semibold text-morandi-primary text-base truncate mb-1">
             {tour.code || TOUR_MOBILE_CARD.unnamed_tour}
           </h3>
-          <p className="text-sm text-morandi-secondary truncate">{tour.name || TOUR_MOBILE_CARD.no_name}</p>
+          <p className="text-sm text-morandi-secondary truncate">
+            {tour.name || TOUR_MOBILE_CARD.no_name}
+          </p>
         </div>
         <ChevronRight size={20} className="text-morandi-secondary flex-shrink-0 ml-2" />
       </div>
@@ -84,7 +86,10 @@ export function TourMobileCard({ tour: tourProp, onClick, getStatusColor }: Tour
         <div className="flex items-center text-sm">
           <Users size={16} className="text-morandi-secondary mr-2 flex-shrink-0" />
           <span className="text-morandi-primary">
-            {('member_count' in tour && typeof tour.member_count === 'number' ? tour.member_count : 0)} {TOUR_MOBILE_CARD.person_unit}
+            {'member_count' in tour && typeof tour.member_count === 'number'
+              ? tour.member_count
+              : 0}{' '}
+            {TOUR_MOBILE_CARD.person_unit}
             {tour.max_participants ? (
               <span className="text-morandi-secondary"> / {tour.max_participants}</span>
             ) : null}
@@ -95,8 +100,13 @@ export function TourMobileCard({ tour: tourProp, onClick, getStatusColor }: Tour
         {'price_per_person' in tour && typeof tour.price_per_person === 'number' ? (
           <div className="flex items-center text-sm">
             <DollarSign size={16} className="text-morandi-secondary mr-2 flex-shrink-0" />
-            <CurrencyCell amount={tour.price_per_person} className="text-morandi-primary font-medium" />
-            <span className="text-morandi-secondary text-xs ml-1">{TOUR_MOBILE_CARD.per_person}</span>
+            <CurrencyCell
+              amount={tour.price_per_person}
+              className="text-morandi-primary font-medium"
+            />
+            <span className="text-morandi-secondary text-xs ml-1">
+              {TOUR_MOBILE_CARD.per_person}
+            </span>
           </div>
         ) : null}
       </div>
@@ -106,7 +116,9 @@ export function TourMobileCard({ tour: tourProp, onClick, getStatusColor }: Tour
         <div className="mt-3 pt-3 border-t border-border">
           <div className="flex items-center justify-between text-xs">
             <span className="text-morandi-secondary">{TOUR_MOBILE_CARD.leader_label}</span>
-            <span className="text-morandi-primary font-medium">{String(tour.tour_leader_name)}</span>
+            <span className="text-morandi-primary font-medium">
+              {String(tour.tour_leader_name)}
+            </span>
           </div>
         </div>
       ) : null}

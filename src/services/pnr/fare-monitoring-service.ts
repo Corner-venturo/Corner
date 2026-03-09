@@ -59,13 +59,15 @@ export async function recordFareHistory(
       total_fare: fareData.totalFare,
       source,
       recorded_by: recordedBy || null,
-      raw_fare_data: JSON.parse(JSON.stringify({
-        taxBreakdown: fareData.taxBreakdown,
-        validatingCarrier: fareData.validatingCarrier,
-        perPassenger: fareData.perPassenger,
-        raw: fareData.raw
-      })),
-      recorded_at: new Date().toISOString()
+      raw_fare_data: JSON.parse(
+        JSON.stringify({
+          taxBreakdown: fareData.taxBreakdown,
+          validatingCarrier: fareData.validatingCarrier,
+          perPassenger: fareData.perPassenger,
+          raw: fareData.raw,
+        })
+      ),
+      recorded_at: new Date().toISOString(),
     }
 
     const { data, error } = await supabase
@@ -92,18 +94,14 @@ export async function recordFareHistory(
 /**
  * 更新 PNR 記錄的當前票價
  */
-async function updatePnrCurrentFare(
-  pnrId: string,
-  fare: number,
-  currency: string
-): Promise<void> {
+async function updatePnrCurrentFare(pnrId: string, fare: number, currency: string): Promise<void> {
   try {
     const { error } = await supabase
       .from('pnr_records')
       .update({
         current_fare: fare,
         fare_currency: currency,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq('id', pnrId)
 
@@ -118,9 +116,7 @@ async function updatePnrCurrentFare(
 /**
  * 取得最新的票價歷史
  */
-export async function getLatestFareHistory(
-  pnrId: string
-): Promise<PnrFareHistory | null> {
+export async function getLatestFareHistory(pnrId: string): Promise<PnrFareHistory | null> {
   try {
     const { data, error } = await supabase
       .from('pnr_fare_history')
@@ -149,10 +145,7 @@ export async function getLatestFareHistory(
 /**
  * 取得票價歷史列表
  */
-export async function getFareHistory(
-  pnrId: string,
-  limit: number = 10
-): Promise<PnrFareHistory[]> {
+export async function getFareHistory(pnrId: string, limit: number = 10): Promise<PnrFareHistory[]> {
   try {
     const { data, error } = await supabase
       .from('pnr_fare_history')
@@ -187,7 +180,7 @@ export function calculateFareChange(
       currentFare,
       changeAmount: 0,
       changePercent: 0,
-      direction: 'same'
+      direction: 'same',
     }
   }
 
@@ -204,7 +197,7 @@ export function calculateFareChange(
     currentFare,
     changeAmount,
     changePercent: Math.round(changePercent * 100) / 100,
-    direction
+    direction,
   }
 }
 
@@ -253,7 +246,10 @@ export async function checkFareAlerts(
             if (alert.threshold_percent && fareChange.changePercent >= alert.threshold_percent) {
               triggered = true
               message = `票價上漲 ${fareChange.changePercent.toFixed(1)}%，超過警報門檻 ${alert.threshold_percent}%`
-            } else if (alert.threshold_amount && fareChange.changeAmount >= alert.threshold_amount) {
+            } else if (
+              alert.threshold_amount &&
+              fareChange.changeAmount >= alert.threshold_amount
+            ) {
               triggered = true
               message = `票價上漲 ${fareChange.changeAmount}，超過警報門檻 ${alert.threshold_amount}`
             } else if (!alert.threshold_percent && !alert.threshold_amount) {
@@ -286,10 +282,13 @@ export async function checkFareAlerts(
         case 'threshold':
           // 固定門檻警報（當票價超過或低於特定金額時觸發）
           if (alert.threshold_amount) {
-            if (currentFare > alert.threshold_amount && (previousFare <= alert.threshold_amount)) {
+            if (currentFare > alert.threshold_amount && previousFare <= alert.threshold_amount) {
               triggered = true
               message = `票價 ${currentFare} 超過門檻 ${alert.threshold_amount}`
-            } else if (currentFare < alert.threshold_amount && (previousFare >= alert.threshold_amount)) {
+            } else if (
+              currentFare < alert.threshold_amount &&
+              previousFare >= alert.threshold_amount
+            ) {
               triggered = true
               message = `票價 ${currentFare} 低於門檻 ${alert.threshold_amount}`
             }
@@ -307,7 +306,7 @@ export async function checkFareAlerts(
           previousFare,
           currentFare,
           changeAmount: fareChange.changeAmount,
-          changePercent: fareChange.changePercent
+          changePercent: fareChange.changePercent,
         })
 
         // 更新警報的 last_fare 和 last_checked_at
@@ -315,7 +314,7 @@ export async function checkFareAlerts(
           .from('pnr_fare_alerts')
           .update({
             last_fare: currentFare,
-            last_checked_at: new Date().toISOString()
+            last_checked_at: new Date().toISOString(),
           })
           .eq('id', alert.id)
       }
@@ -356,7 +355,7 @@ export async function createFareAlert(
         is_active: true,
         last_fare: latestFare?.total_fare || null,
         notify_channel_id: options?.notifyChannelId || null,
-        notify_employee_ids: options?.notifyEmployeeIds || null
+        notify_employee_ids: options?.notifyEmployeeIds || null,
       })
       .select()
       .single()
@@ -390,7 +389,7 @@ export async function processPnrFareUpdate(
   const result = {
     fareRecorded: false,
     fareChange: null as FareChangeResult | null,
-    alertsTrigered: [] as FareAlertTrigger[]
+    alertsTrigered: [] as FareAlertTrigger[],
   }
 
   // 1. 解析票價
@@ -405,12 +404,7 @@ export async function processPnrFareUpdate(
   const previousFare = previousRecord?.total_fare ?? null
 
   // 3. 記錄新票價
-  const historyRecord = await recordFareHistory(
-    pnrId,
-    fareData,
-    'telegram',
-    userId
-  )
+  const historyRecord = await recordFareHistory(pnrId, fareData, 'telegram', userId)
 
   if (historyRecord) {
     result.fareRecorded = true
@@ -420,11 +414,7 @@ export async function processPnrFareUpdate(
 
     // 5. 檢查警報
     if (result.fareChange.hasChange) {
-      result.alertsTrigered = await checkFareAlerts(
-        pnrId,
-        fareData.totalFare,
-        previousFare
-      )
+      result.alertsTrigered = await checkFareAlerts(pnrId, fareData.totalFare, previousFare)
 
       // 記錄觸發的警報
       if (result.alertsTrigered.length > 0) {
@@ -461,7 +451,7 @@ export async function recordManualFare(
     validatingCarrier: null,
     taxBreakdown: [],
     perPassenger: true,
-    raw: `Manual entry: ${fare.currency} ${fare.totalFare}`
+    raw: `Manual entry: ${fare.currency} ${fare.totalFare}`,
   }
 
   return recordFareHistory(pnrId, fareData, 'manual', userId)
@@ -475,5 +465,5 @@ export default {
   checkFareAlerts,
   createFareAlert,
   processPnrFareUpdate,
-  recordManualFare
+  recordManualFare,
 }

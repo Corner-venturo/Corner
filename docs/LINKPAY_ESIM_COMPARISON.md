@@ -36,13 +36,13 @@
 
 ### 新版功能對應
 
-| # | 功能 | 狀態 | 備註 |
-|---|------|------|------|
-| 1 | LinkPay 狀態管理 | ✅ 已有 | `types/receipt.types.ts` - LinkPayStatus enum + labels + colors |
-| 2 | 付款連結生成 API | ✅ 已有且更完整 | `api/linkpay/route.ts` - 直接呼叫台新銀行 API，不再透過中間層 |
-| 3 | LinkPay 列表顯示 | 🟡 部分有 | PaymentItemRow 中有 LinkPay 欄位，但沒有獨立的展開式歷史列表 |
-| 4 | 建立 LinkPay 功能 | ✅ 已有 | PaymentItemRow 內的「產生連結」按鈕 |
-| 5 | LinkPay 記錄 Entity | ✅ 已有 | `data/entities/linkpay-logs.ts` - 完整 CRUD |
+| #   | 功能                | 狀態            | 備註                                                            |
+| --- | ------------------- | --------------- | --------------------------------------------------------------- |
+| 1   | LinkPay 狀態管理    | ✅ 已有         | `types/receipt.types.ts` - LinkPayStatus enum + labels + colors |
+| 2   | 付款連結生成 API    | ✅ 已有且更完整 | `api/linkpay/route.ts` - 直接呼叫台新銀行 API，不再透過中間層   |
+| 3   | LinkPay 列表顯示    | 🟡 部分有       | PaymentItemRow 中有 LinkPay 欄位，但沒有獨立的展開式歷史列表    |
+| 4   | 建立 LinkPay 功能   | ✅ 已有         | PaymentItemRow 內的「產生連結」按鈕                             |
+| 5   | LinkPay 記錄 Entity | ✅ 已有         | `data/entities/linkpay-logs.ts` - 完整 CRUD                     |
 
 ### 新版額外功能（舊版沒有的）
 
@@ -141,17 +141,17 @@
 
 ### 新版功能對應
 
-| # | 功能 | 狀態 | 備註 |
-|---|------|------|------|
-| 1 | eSIM 資料模型 | ✅ 已有 | `types/esim.types.ts` - 新增 price 欄位、完整型別 |
-| 2 | eSIM 列表頁面 | ✅ 已有 | `app/(main)/esims/page.tsx` |
-| 3 | 詳細搜尋 | ✅ 已有 | `features/esims/components/EsimSearchDialog.tsx` |
-| 4 | 新增網卡對話框 | ✅ 已有且更強 | `features/esims/components/EsimCreateDialog.tsx` - 批次新增 |
-| 5 | 網卡詳情頁面 | 🟡 需確認 | 可能用對話框取代獨立頁面 |
-| 6 | FastMove 自動下單 | ✅ 已有 | EsimCreateDialog 中整合 |
-| 7 | FastMove API 整合 | 🟡 部分有 | `services/fastmove.service.ts` - 但使用 mock 資料，API 未真正串接 |
-| 8 | 供應商訂單詳情 | 🔴 缺少 | 沒有 OrderDetailDialog（查看兌換碼、使用量、到期日等） |
-| 9 | eSIM 字典 Hook | ✅ 已有 | `data/entities/esims.ts` - useDictionary |
+| #   | 功能              | 狀態          | 備註                                                              |
+| --- | ----------------- | ------------- | ----------------------------------------------------------------- |
+| 1   | eSIM 資料模型     | ✅ 已有       | `types/esim.types.ts` - 新增 price 欄位、完整型別                 |
+| 2   | eSIM 列表頁面     | ✅ 已有       | `app/(main)/esims/page.tsx`                                       |
+| 3   | 詳細搜尋          | ✅ 已有       | `features/esims/components/EsimSearchDialog.tsx`                  |
+| 4   | 新增網卡對話框    | ✅ 已有且更強 | `features/esims/components/EsimCreateDialog.tsx` - 批次新增       |
+| 5   | 網卡詳情頁面      | 🟡 需確認     | 可能用對話框取代獨立頁面                                          |
+| 6   | FastMove 自動下單 | ✅ 已有       | EsimCreateDialog 中整合                                           |
+| 7   | FastMove API 整合 | 🟡 部分有     | `services/fastmove.service.ts` - 但使用 mock 資料，API 未真正串接 |
+| 8   | 供應商訂單詳情    | 🔴 缺少       | 沒有 OrderDetailDialog（查看兌換碼、使用量、到期日等）            |
+| 9   | eSIM 字典 Hook    | ✅ 已有       | `data/entities/esims.ts` - useDictionary                          |
 
 ### 新版額外功能（舊版沒有的）
 
@@ -202,12 +202,15 @@
 ## 三、總結
 
 ### LinkPay：新版已超越舊版 ✅
+
 新版 LinkPay 系統已大幅超越舊版：直接對接台新銀行、Webhook 自動回調、MAC 簽名驗證、金額防竄改。主要缺的是收款單詳情頁的 LinkPay 歷史展示。
 
 ### 網卡系統：新版架構更好，但 API 串接未完成 🟡
+
 新版架構設計更好（批次新增、自動建團/建單），但 FastMove API 還在用 mock 資料，且缺少供應商訂單詳情對話框。**需要優先完成 FastMove 真實 API 串接**才能上線使用。
 
 ### 下一步行動
+
 1. FastMove API 串接（改 URL + 測試）
 2. 建立 OrderDetailDialog（兌換碼、使用量查看）
 3. 收款單 LinkPay 歷史展示

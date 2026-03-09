@@ -3,14 +3,19 @@
  * TourLeadersDialog - 領隊新增/編輯對話框
  */
 
-
 import React, { useRef, useState } from 'react'
 import { logger } from '@/lib/utils/logger'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Upload, User, X, Loader2 } from 'lucide-react'
 import { uploadFileToStorage } from '@/services/storage'
 import type { TourLeaderFormData } from '@/types/tour-leader.types'
@@ -73,14 +78,17 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
       <div className="space-y-6">
         {/* 基本資料 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{TOUR_LEADERS_LABELS.BASIC_INFO}</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">
+            {TOUR_LEADERS_LABELS.BASIC_INFO}
+          </h4>
           <div className="flex gap-4 mb-4">
             {/* 頭像上傳 */}
             <div className="flex-shrink-0">
               <div className="relative">
                 {formData.photo ? (
                   <div className="relative">
-                    <img src={formData.photo}
+                    <img
+                      src={formData.photo}
                       alt={TOUR_LEADERS_LABELS.LABEL_2837}
                       className="w-20 h-20 rounded-full object-cover border-2 border-morandi-container"
                     />
@@ -137,7 +145,9 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-morandi-primary">{TOUR_LEADERS_LABELS.ENGLISH_NICKNAME}</label>
+                <label className="text-sm font-medium text-morandi-primary">
+                  {TOUR_LEADERS_LABELS.ENGLISH_NICKNAME}
+                </label>
                 <Input
                   value={formData.english_name}
                   onChange={e => onFormFieldChange('english_name', e.target.value)}
@@ -149,7 +159,9 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{TOUR_LEADERS_LABELS.DOMESTIC_PHONE}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {TOUR_LEADERS_LABELS.DOMESTIC_PHONE}
+              </label>
               <Input
                 value={formData.domestic_phone}
                 onChange={e => onFormFieldChange('domestic_phone', e.target.value)}
@@ -158,7 +170,9 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{TOUR_LEADERS_LABELS.INTERNATIONAL_PHONE}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {TOUR_LEADERS_LABELS.INTERNATIONAL_PHONE}
+              </label>
               <Input
                 value={formData.overseas_phone}
                 onChange={e => onFormFieldChange('overseas_phone', e.target.value)}
@@ -177,7 +191,9 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{TOUR_LEADERS_LABELS.PHONE_OLD}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {TOUR_LEADERS_LABELS.PHONE_OLD}
+              </label>
               <Input
                 value={formData.phone}
                 onChange={e => onFormFieldChange('phone', e.target.value)}
@@ -186,7 +202,9 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
               />
             </div>
             <div className="md:col-span-2">
-              <label className="text-sm font-medium text-morandi-primary">{TOUR_LEADERS_LABELS.ADDRESS}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {TOUR_LEADERS_LABELS.ADDRESS}
+              </label>
               <Input
                 value={formData.address}
                 onChange={e => onFormFieldChange('address', e.target.value)}
@@ -199,10 +217,14 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
 
         {/* 證件資料 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{TOUR_LEADERS_LABELS.DOCUMENT_INFO}</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">
+            {TOUR_LEADERS_LABELS.DOCUMENT_INFO}
+          </h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{TOUR_LEADERS_LABELS.ID_NUMBER}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {TOUR_LEADERS_LABELS.ID_NUMBER}
+              </label>
               <Input
                 value={formData.national_id}
                 onChange={e => onFormFieldChange('national_id', e.target.value)}
@@ -211,7 +233,9 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{TOUR_LEADERS_LABELS.PASSPORT_NUMBER}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {TOUR_LEADERS_LABELS.PASSPORT_NUMBER}
+              </label>
               <Input
                 value={formData.passport_number}
                 onChange={e => onFormFieldChange('passport_number', e.target.value)}
@@ -220,10 +244,12 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{TOUR_LEADERS_LABELS.PASSPORT_EXPIRY}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {TOUR_LEADERS_LABELS.PASSPORT_EXPIRY}
+              </label>
               <DatePicker
                 value={formData.passport_expiry}
-                onChange={(date) => onFormFieldChange('passport_expiry', date)}
+                onChange={date => onFormFieldChange('passport_expiry', date)}
                 placeholder={TOUR_LEADERS_LABELS.PLACEHOLDER_SELECT_DATE}
                 className="mt-1"
               />
@@ -233,20 +259,28 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
 
         {/* 專業資料 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{TOUR_LEADERS_LABELS.PROFESSIONAL_INFO}</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">
+            {TOUR_LEADERS_LABELS.PROFESSIONAL_INFO}
+          </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{TOUR_LEADERS_LABELS.LANGUAGES}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {TOUR_LEADERS_LABELS.LANGUAGES}
+              </label>
               <Input
                 value={formData.languages}
                 onChange={e => onFormFieldChange('languages', e.target.value)}
                 placeholder={TOUR_LEADERS_LABELS.PLACEHOLDER_LANGUAGES}
                 className="mt-1"
               />
-              <p className="text-xs text-morandi-muted mt-1">{TOUR_LEADERS_LABELS.LANGUAGES_HINT}</p>
+              <p className="text-xs text-morandi-muted mt-1">
+                {TOUR_LEADERS_LABELS.LANGUAGES_HINT}
+              </p>
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{TOUR_LEADERS_LABELS.SPECIALTY_REGIONS}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {TOUR_LEADERS_LABELS.SPECIALTY_REGIONS}
+              </label>
               <Input
                 value={formData.specialties}
                 onChange={e => onFormFieldChange('specialties', e.target.value)}
@@ -256,7 +290,9 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
               <p className="text-xs text-morandi-muted mt-1">{TOUR_LEADERS_LABELS.REGIONS_HINT}</p>
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{TOUR_LEADERS_LABELS.LICENSE_NUMBER}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {TOUR_LEADERS_LABELS.LICENSE_NUMBER}
+              </label>
               <Input
                 value={formData.license_number}
                 onChange={e => onFormFieldChange('license_number', e.target.value)}
@@ -265,7 +301,9 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{TOUR_LEADERS_LABELS.STATUS}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {TOUR_LEADERS_LABELS.STATUS}
+              </label>
               <Select
                 value={formData.status}
                 onValueChange={value => onFormFieldChange('status', value as 'active' | 'inactive')}
@@ -284,7 +322,9 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
 
         {/* 備註 */}
         <div>
-          <label className="text-sm font-medium text-morandi-primary">{TOUR_LEADERS_LABELS.NOTES}</label>
+          <label className="text-sm font-medium text-morandi-primary">
+            {TOUR_LEADERS_LABELS.NOTES}
+          </label>
           <Textarea
             value={formData.notes}
             onChange={e => onFormFieldChange('notes', e.target.value)}

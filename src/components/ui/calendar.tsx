@@ -174,7 +174,8 @@ export function Calendar({
     if (mode === 'single') {
       onSelect?.(date)
     } else if (mode === 'range') {
-      const isRangeSelected = selected && !((selected as Date) instanceof Date) && 'from' in selected
+      const isRangeSelected =
+        selected && !((selected as Date) instanceof Date) && 'from' in selected
       const rangeHasTo = isRangeSelected && 'to' in selected && selected.to !== undefined
 
       if (!isRangeSelected || rangeHasTo) {
@@ -268,15 +269,11 @@ export function Calendar({
               className={cn(
                 'py-1.5 focus:z-10',
                 // 背景色
-                day.isCurrentMonth
-                  ? 'bg-card'
-                  : 'bg-morandi-container/30',
+                day.isCurrentMonth ? 'bg-card' : 'bg-morandi-container/30',
                 // Hover 效果
                 !isDisabled && 'hover:bg-accent',
                 // 文字顏色
-                day.isCurrentMonth && !day.isSelected && !day.isToday
-                  ? 'text-morandi-primary'
-                  : '',
+                day.isCurrentMonth && !day.isSelected && !day.isToday ? 'text-morandi-primary' : '',
                 !day.isCurrentMonth && !day.isSelected && !day.isToday
                   ? 'text-morandi-secondary/40'
                   : '',
@@ -301,7 +298,9 @@ export function Calendar({
                   'mx-auto flex h-7 w-7 items-center justify-center rounded-full',
                   // 選中狀態的背景 - 使用 gold 確保深色模式也能看清
                   day.isSelected && !day.isToday && 'bg-morandi-gold text-white',
-                  day.isSelected && day.isToday && 'bg-morandi-gold text-white ring-2 ring-morandi-gold/30',
+                  day.isSelected &&
+                    day.isToday &&
+                    'bg-morandi-gold text-white ring-2 ring-morandi-gold/30',
                   // 範圍起點/終點
                   day.isRangeStart && 'bg-morandi-gold text-white',
                   day.isRangeEnd && 'bg-morandi-gold text-white'

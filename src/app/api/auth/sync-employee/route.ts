@@ -30,7 +30,10 @@ export async function POST(request: NextRequest) {
 
     if (access_token) {
       // 用 admin client 驗證 token 對應的用戶
-      const { data: { user }, error } = await supabaseAdmin.auth.getUser(access_token)
+      const {
+        data: { user },
+        error,
+      } = await supabaseAdmin.auth.getUser(access_token)
       if (error || !user || user.id !== supabase_user_id) {
         logger.error('Token 驗證失敗:', error?.message || 'user mismatch')
         return errorResponse('Unauthorized: invalid token', 401, ErrorCode.UNAUTHORIZED)
@@ -39,7 +42,9 @@ export async function POST(request: NextRequest) {
     } else {
       // 備用：用 cookie session 驗證
       const supabase = await createSupabaseServerClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
 
       if (!user || user.id !== supabase_user_id) {
         return errorResponse('Unauthorized: user mismatch', 401, ErrorCode.UNAUTHORIZED)

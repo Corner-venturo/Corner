@@ -82,16 +82,56 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
         // 使用 DOMPurify 清理最終的 HTML，移除任何潛在的惡意腳本
         const sanitizedHtml = DOMPurify.sanitize(template, {
           ALLOWED_TAGS: [
-            'html', 'head', 'body', 'style', 'title',
-            'div', 'span', 'p', 'br', 'hr',
-            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-            'table', 'thead', 'tbody', 'tr', 'th', 'td',
-            'ul', 'ol', 'li',
-            'strong', 'em', 'b', 'i', 'u',
-            'a', 'img',
-            'header', 'footer', 'section', 'article',
+            'html',
+            'head',
+            'body',
+            'style',
+            'title',
+            'div',
+            'span',
+            'p',
+            'br',
+            'hr',
+            'h1',
+            'h2',
+            'h3',
+            'h4',
+            'h5',
+            'h6',
+            'table',
+            'thead',
+            'tbody',
+            'tr',
+            'th',
+            'td',
+            'ul',
+            'ol',
+            'li',
+            'strong',
+            'em',
+            'b',
+            'i',
+            'u',
+            'a',
+            'img',
+            'header',
+            'footer',
+            'section',
+            'article',
           ],
-          ALLOWED_ATTR: ['class', 'id', 'style', 'src', 'alt', 'href', 'target', 'colspan', 'rowspan', 'width', 'height'],
+          ALLOWED_ATTR: [
+            'class',
+            'id',
+            'style',
+            'src',
+            'alt',
+            'href',
+            'target',
+            'colspan',
+            'rowspan',
+            'width',
+            'height',
+          ],
           FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input'],
           FORBID_ATTR: ['onclick', 'onerror', 'onload', 'onmouseover'],
         })
@@ -99,7 +139,9 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
         setContractHtml(sanitizedHtml)
       } catch (error) {
         logger.error(COMP_CONTRACTS_LABELS.載入合約失敗, error)
-        setContractHtml(COMP_CONTRACTS_LABELS.p_class_text_status_danger_載入合約範本失敗_請稍後再試_p)
+        setContractHtml(
+          COMP_CONTRACTS_LABELS.p_class_text_status_danger_載入合約範本失敗_請稍後再試_p
+        )
       } finally {
         setLoading(false)
       }

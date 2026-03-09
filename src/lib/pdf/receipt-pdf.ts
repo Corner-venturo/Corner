@@ -14,11 +14,7 @@ import type { Receipt } from '@/types/receipt.types'
 import { ReceiptStatus } from '@/types/receipt.types'
 import type { Order } from '@/types'
 import { formatDate } from '@/lib/utils'
-import {
-  RECEIPT_TYPE_LABELS,
-  RECEIPT_STATUS_LABELS,
-  ReceiptType,
-} from '@/types/receipt.types'
+import { RECEIPT_TYPE_LABELS, RECEIPT_STATUS_LABELS, ReceiptType } from '@/types/receipt.types'
 import { loadChineseFonts } from './pdf-fonts'
 
 interface ReceiptPDFData {
@@ -62,9 +58,17 @@ export async function generateReceiptPDF(data: ReceiptPDFData): Promise<void> {
   yPos += 6
   doc.text(`Receipt Date / 收款日期: ${formatDate(receipt.receipt_date)}`, infoLeft, yPos)
   yPos += 6
-  doc.text(`Receipt Type / 收款方式: ${RECEIPT_TYPE_LABELS[receipt.receipt_type as ReceiptType]}`, infoLeft, yPos)
+  doc.text(
+    `Receipt Type / 收款方式: ${RECEIPT_TYPE_LABELS[receipt.receipt_type as ReceiptType]}`,
+    infoLeft,
+    yPos
+  )
   yPos += 6
-  doc.text(`Status / 狀態: ${RECEIPT_STATUS_LABELS[parseInt(receipt.status, 10) as ReceiptStatus] || receipt.status}`, infoLeft, yPos)
+  doc.text(
+    `Status / 狀態: ${RECEIPT_STATUS_LABELS[parseInt(receipt.status, 10) as ReceiptStatus] || receipt.status}`,
+    infoLeft,
+    yPos
+  )
   yPos += 10
 
   // 訂單資訊
@@ -95,9 +99,7 @@ export async function generateReceiptPDF(data: ReceiptPDFData): Promise<void> {
     ['Expected Amount / 應收金額', `NT$ ${receipt.receipt_amount.toLocaleString()}`],
     [
       'Actual Amount / 實收金額',
-      receipt.actual_amount
-        ? `NT$ ${receipt.actual_amount.toLocaleString()}`
-        : 'Pending / 待確認',
+      receipt.actual_amount ? `NT$ ${receipt.actual_amount.toLocaleString()}` : 'Pending / 待確認',
     ],
   ]
 

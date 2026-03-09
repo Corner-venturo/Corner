@@ -10,12 +10,14 @@
 ### ⚠️ 絕對規則：永遠使用 Supabase CLI
 
 **禁止以下做法**：
+
 - ❌ 創建 HTML 工具讓用戶手動執行
 - ❌ 創建 Node.js 腳本嘗試直接連 PostgreSQL
 - ❌ 使用 REST API 執行 DDL
 - ❌ 要求用戶到 Supabase Dashboard 手動操作
 
 **唯一正確做法**：
+
 - ✅ 使用 Supabase CLI + Personal Access Token
 - ✅ 執行 `SUPABASE_ACCESS_TOKEN=xxx npx supabase db push`
 
@@ -24,6 +26,7 @@
 ## 🔑 連接資訊
 
 ### Supabase 專案資訊
+
 ```bash
 Personal Access Token: sbp_94746ae5e9ecc9d270d27006ba5ed1d0da0bbaf0
 Project Ref: pfqvdacxowpgfamuvnsn
@@ -31,6 +34,7 @@ Project URL: https://pfqvdacxowpgfamuvnsn.supabase.co
 ```
 
 ### 相關連結
+
 - [Supabase Dashboard](https://supabase.com/dashboard/project/pfqvdacxowpgfamuvnsn)
 - [SQL Editor](https://supabase.com/dashboard/project/pfqvdacxowpgfamuvnsn/sql)
 - [Table Editor](https://supabase.com/dashboard/project/pfqvdacxowpgfamuvnsn/editor)
@@ -41,17 +45,20 @@ Project URL: https://pfqvdacxowpgfamuvnsn.supabase.co
 ## 📋 一次性設定（已完成）
 
 ### 1. 安裝 Supabase CLI
+
 ```bash
 npm install -D supabase
 ```
 
 ### 2. 連結到專案
+
 ```bash
 export SUPABASE_ACCESS_TOKEN=sbp_94746ae5e9ecc9d270d27006ba5ed1d0da0bbaf0
 npx supabase link --project-ref pfqvdacxowpgfamuvnsn
 ```
 
 ### 3. 生成 TypeScript 類型
+
 ```bash
 npm run db:types
 ```
@@ -133,6 +140,7 @@ echo "Y" | SUPABASE_ACCESS_TOKEN=sbp_94746ae5e9ecc9d270d27006ba5ed1d0da0bbaf0 np
 ```
 
 **說明**:
+
 - `echo "Y"` 自動確認執行
 - 使用環境變數傳遞 token
 
@@ -170,13 +178,13 @@ SUPABASE_ACCESS_TOKEN=sbp_94746ae5e9ecc9d270d27006ba5ed1d0da0bbaf0 \
 
 ### 常用指令
 
-| 指令 | 說明 | 使用時機 |
-|------|------|----------|
-| `npm run db:types` | 生成 TypeScript 類型 | 每次 migration 後 |
-| `npm run db:push` | 推送 migration 到雲端 | 建立或修改表格後 |
-| `npm run db:pull` | 下載目前資料庫結構 | 查看目前 schema |
-| `npm run db:diff` | 比較本地與遠端差異 | 檢查未同步的變更 |
-| `npm run db:reset` | ⚠️ 重置資料庫 | 危險！會清空資料 |
+| 指令               | 說明                  | 使用時機          |
+| ------------------ | --------------------- | ----------------- |
+| `npm run db:types` | 生成 TypeScript 類型  | 每次 migration 後 |
+| `npm run db:push`  | 推送 migration 到雲端 | 建立或修改表格後  |
+| `npm run db:pull`  | 下載目前資料庫結構    | 查看目前 schema   |
+| `npm run db:diff`  | 比較本地與遠端差異    | 檢查未同步的變更  |
+| `npm run db:reset` | ⚠️ 重置資料庫         | 危險！會清空資料  |
 
 ---
 
@@ -200,6 +208,7 @@ ALTER TABLE public.new_table DISABLE ROW LEVEL SECURITY;
 ```
 
 ### 原因
+
 - ✅ 內部系統，所有已認證用戶都應該能訪問所有數據
 - ✅ 使用 Supabase Auth 控制登入即可
 - ❌ 不需要 RLS 的複雜策略
@@ -212,13 +221,13 @@ ALTER TABLE public.new_table DISABLE ROW LEVEL SECURITY;
 
 當發現以下問題時，**直接執行修復**，不要要求用戶操作：
 
-| 問題類型 | 解決方式 |
-|---------|---------|
-| 表格缺失 | 建立 migration → 執行 db push |
-| 欄位錯誤 | 建立 migration → 執行 db push |
+| 問題類型     | 解決方式                      |
+| ------------ | ----------------------------- |
+| 表格缺失     | 建立 migration → 執行 db push |
+| 欄位錯誤     | 建立 migration → 執行 db push |
 | 資料類型不符 | 建立 migration → 執行 db push |
-| 索引缺失 | 建立 migration → 執行 db push |
-| RLS 錯誤 | 禁用 RLS（見上方規範） |
+| 索引缺失     | 建立 migration → 執行 db push |
+| RLS 錯誤     | 禁用 RLS（見上方規範）        |
 
 ---
 
@@ -307,8 +316,8 @@ venturo-new/
 
 ## 📚 Migration 執行記錄
 
-| 日期 | Migration 檔案 | 目的 | 狀態 |
-|------|---------------|------|------|
+| 日期       | Migration 檔案                         | 目的                                 | 狀態      |
+| ---------- | -------------------------------------- | ------------------------------------ | --------- |
 | 2025-10-27 | `20251027000000_add_channel_order.sql` | 新增 channels.order 欄位用於拖曳排序 | ✅ 已執行 |
 
 ---
@@ -325,12 +334,12 @@ venturo-new/
 
 ### 常見錯誤
 
-| 錯誤 | 原因 | 解決方式 |
-|------|------|----------|
-| Migration 被跳過 | 檔名不符合格式 | 重新命名為 `YYYYMMDDHHMMSS_description.sql` |
-| 權限錯誤 | 沒有提供 token | 確認 `SUPABASE_ACCESS_TOKEN` 環境變數 |
-| RLS 錯誤 | 未禁用 RLS | 加入 `ALTER TABLE ... DISABLE ROW LEVEL SECURITY` |
-| 類型不同步 | 忘記執行 db:types | 執行 `npm run db:types` |
+| 錯誤             | 原因              | 解決方式                                          |
+| ---------------- | ----------------- | ------------------------------------------------- |
+| Migration 被跳過 | 檔名不符合格式    | 重新命名為 `YYYYMMDDHHMMSS_description.sql`       |
+| 權限錯誤         | 沒有提供 token    | 確認 `SUPABASE_ACCESS_TOKEN` 環境變數             |
+| RLS 錯誤         | 未禁用 RLS        | 加入 `ALTER TABLE ... DISABLE ROW LEVEL SECURITY` |
+| 類型不同步       | 忘記執行 db:types | 執行 `npm run db:types`                           |
 
 ---
 
@@ -351,6 +360,7 @@ venturo-new/
    - ✅ 更新 Supabase client 程式碼
 
 3. **你只需要：**
+
 ```bash
 echo "Y" | npm run db:push    # 推送到資料庫
 npm run db:types              # 更新類型
@@ -368,6 +378,7 @@ npm run db:types              # 更新類型
 - [x] 資料表已建立並可正常使用
 
 ### 已建立的主要表格
+
 - workspaces
 - channels (✅ 2025-10-27: 新增 order 欄位用於拖曳排序)
 - channel_groups

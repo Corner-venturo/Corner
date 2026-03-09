@@ -34,7 +34,7 @@ export function calculateExpression(expression: string): number | null {
 
   try {
     // 使用 Function 而非 eval，更安全
-     
+
     const result = new Function(`return (${cleaned})`)()
 
     if (typeof result !== 'number' || !isFinite(result)) {
@@ -93,9 +93,7 @@ export function useCalculableInput(
 ): UseCalculableInputReturn {
   const { allowDecimal = false, decimalPlaces = 0 } = options
 
-  const [displayValue, setDisplayValue] = useState<string>(
-    value != null ? String(value) : ''
-  )
+  const [displayValue, setDisplayValue] = useState<string>(value != null ? String(value) : '')
   const [isExpression, setIsExpression] = useState(false)
 
   // 當外部 value 改變且不在編輯表達式時，更新顯示

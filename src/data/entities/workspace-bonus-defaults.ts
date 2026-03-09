@@ -4,17 +4,20 @@ import { createEntityHook } from '../core/createEntityHook'
 import { CACHE_PRESETS } from '../core/types'
 import type { WorkspaceBonusDefault } from '@/types/bonus.types'
 
-export const workspaceBonusDefaultEntity = createEntityHook<WorkspaceBonusDefault>('workspace_bonus_defaults', {
-  list: {
-    select: '*',
-    orderBy: { column: 'type', ascending: true },
-  },
-  slim: {
-    select: 'id,type,bonus,bonus_type,employee_id',
-  },
-  detail: { select: '*' },
-  cache: CACHE_PRESETS.low,
-})
+export const workspaceBonusDefaultEntity = createEntityHook<WorkspaceBonusDefault>(
+  'workspace_bonus_defaults',
+  {
+    list: {
+      select: '*',
+      orderBy: { column: 'type', ascending: true },
+    },
+    slim: {
+      select: 'id,type,bonus,bonus_type,employee_id',
+    },
+    detail: { select: '*' },
+    cache: CACHE_PRESETS.low,
+  }
+)
 
 export const useWorkspaceBonusDefaults = workspaceBonusDefaultEntity.useList
 export const useWorkspaceBonusDefaultsSlim = workspaceBonusDefaultEntity.useListSlim

@@ -188,37 +188,37 @@
   ],
   "connections": {
     "Every 6 hours": {
-      "main": [[{"node": "Gmail - Search Messages", "type": "main", "index": 0}]]
+      "main": [[{ "node": "Gmail - Search Messages", "type": "main", "index": 0 }]]
     },
     "Gmail - Search Messages": {
-      "main": [[{"node": "Loop Over Messages", "type": "main", "index": 0}]]
+      "main": [[{ "node": "Loop Over Messages", "type": "main", "index": 0 }]]
     },
     "Loop Over Messages": {
-      "main": [[{"node": "Gmail - Get Message", "type": "main", "index": 0}]]
+      "main": [[{ "node": "Gmail - Get Message", "type": "main", "index": 0 }]]
     },
     "Gmail - Get Message": {
-      "main": [[{"node": "Find PDF Attachment", "type": "main", "index": 0}]]
+      "main": [[{ "node": "Find PDF Attachment", "type": "main", "index": 0 }]]
     },
     "Find PDF Attachment": {
       "main": [
-        [{"node": "Gmail - Download PDF", "type": "main", "index": 0}],
-        [{"node": "Telegram - Error Notification", "type": "main", "index": 0}]
+        [{ "node": "Gmail - Download PDF", "type": "main", "index": 0 }],
+        [{ "node": "Telegram - Error Notification", "type": "main", "index": 0 }]
       ]
     },
     "Gmail - Download PDF": {
-      "main": [[{"node": "Parse PDF", "type": "main", "index": 0}]]
+      "main": [[{ "node": "Parse PDF", "type": "main", "index": 0 }]]
     },
     "Parse PDF": {
-      "main": [[{"node": "Parse JSON Output", "type": "main", "index": 0}]]
+      "main": [[{ "node": "Parse JSON Output", "type": "main", "index": 0 }]]
     },
     "Parse JSON Output": {
       "main": [
-        [{"node": "Google Sheets - Append Row", "type": "main", "index": 0}],
-        [{"node": "Telegram - Error Notification", "type": "main", "index": 0}]
+        [{ "node": "Google Sheets - Append Row", "type": "main", "index": 0 }],
+        [{ "node": "Telegram - Error Notification", "type": "main", "index": 0 }]
       ]
     },
     "Google Sheets - Append Row": {
-      "main": [[{"node": "Gmail - Mark as Read", "type": "main", "index": 0}]]
+      "main": [[{ "node": "Gmail - Mark as Read", "type": "main", "index": 0 }]]
     }
   },
   "settings": {

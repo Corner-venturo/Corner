@@ -9,11 +9,17 @@ export function useTourFormHandlers(
   onChange: (data: TourFormData) => void,
   selectedCountry: string
 ) {
-
   const updateField = (field: string, value: unknown) => {
-    logger.log('[useTourFormHandlers] updateField:', { field, value, currentCoverImage: data.coverImage })
+    logger.log('[useTourFormHandlers] updateField:', {
+      field,
+      value,
+      currentCoverImage: data.coverImage,
+    })
     const newData = { ...data, [field]: value }
-    logger.log(COMP_EDITOR_LABELS.useTourFormHandlers_呼叫_onChange_更新, { field, newValue: newData[field as keyof typeof newData] })
+    logger.log(COMP_EDITOR_LABELS.useTourFormHandlers_呼叫_onChange_更新, {
+      field,
+      newValue: newData[field as keyof typeof newData],
+    })
     onChange(newData)
   }
 
@@ -145,8 +151,16 @@ export function useTourFormHandlers(
     })
   }
 
-  const updateDailyItinerary = (index: number, field: string | Record<string, unknown>, value?: unknown) => {
-    logger.log(COMP_EDITOR_LABELS.useTourFormHandlers_updateDailyItinerary_被呼叫, { index, field, value })
+  const updateDailyItinerary = (
+    index: number,
+    field: string | Record<string, unknown>,
+    value?: unknown
+  ) => {
+    logger.log(COMP_EDITOR_LABELS.useTourFormHandlers_updateDailyItinerary_被呼叫, {
+      index,
+      field,
+      value,
+    })
     const newItinerary = [...data.dailyItinerary]
     if (typeof field === 'string') {
       newItinerary[index] = { ...newItinerary[index], [field]: value }
@@ -197,7 +211,10 @@ export function useTourFormHandlers(
 
     const newItinerary = [...data.dailyItinerary]
     // 交換兩天的內容
-    ;[newItinerary[fromIndex], newItinerary[toIndex]] = [newItinerary[toIndex], newItinerary[fromIndex]]
+    ;[newItinerary[fromIndex], newItinerary[toIndex]] = [
+      newItinerary[toIndex],
+      newItinerary[fromIndex],
+    ]
     onChange({ ...data, dailyItinerary: newItinerary })
   }
 

@@ -6,7 +6,17 @@ import { logger } from '@/lib/utils/logger'
 import { useMemo } from 'react'
 import { useAuthStore } from '@/stores'
 import { alert } from '@/lib/ui/alert-dialog'
-import { useOrdersSlim, useTourDictionary, useEmployeeDictionary, useReceipts, createReceipt, updateReceipt, deleteReceipt, invalidateReceipts, useLinkPayLogs } from '@/data'
+import {
+  useOrdersSlim,
+  useTourDictionary,
+  useEmployeeDictionary,
+  useReceipts,
+  createReceipt,
+  updateReceipt,
+  deleteReceipt,
+  invalidateReceipts,
+  useLinkPayLogs,
+} from '@/data'
 import { sendPaymentAbnormalNotification } from '@/lib/utils/bot-notification'
 import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator'
 import { recalculateReceiptStats } from '@/features/finance/payments/services/receipt-core.service'
@@ -97,7 +107,8 @@ export function usePaymentData() {
         tour_name: selectedOrder?.tour_name || '',
         receipt_date: item.transaction_date,
         payment_date: item.transaction_date,
-        payment_method: ['transfer', 'cash', 'card', 'check', 'linkpay'][item.receipt_type] || 'transfer',
+        payment_method:
+          ['transfer', 'cash', 'card', 'check', 'linkpay'][item.receipt_type] || 'transfer',
         receipt_type: item.receipt_type,
         receipt_amount: item.amount,
         amount: item.amount,
@@ -137,7 +148,11 @@ export function usePaymentData() {
   }
 
   // 確認收款（更新實收金額和狀態，異常時記錄備註並通知建立者）
-  const handleConfirmReceipt = async (receiptId: string, actualAmount: number, isAbnormal: boolean = false) => {
+  const handleConfirmReceipt = async (
+    receiptId: string,
+    actualAmount: number,
+    isAbnormal: boolean = false
+  ) => {
     if (!user?.id) {
       throw new Error(PAYMENT_DATA_LABELS.PLEASE_LOGIN)
     }
@@ -146,9 +161,13 @@ export function usePaymentData() {
     const receipt = receipts.find(r => r.id === receiptId)
 
     // 如果金額異常，在備註中記錄
-    const abnormalNote = isAbnormal && receipt
-      ? PAYMENT_DATA_LABELS.AMOUNT_ABNORMAL_NOTE((receipt.receipt_amount || 0).toLocaleString(), actualAmount.toLocaleString())
-      : null
+    const abnormalNote =
+      isAbnormal && receipt
+        ? PAYMENT_DATA_LABELS.AMOUNT_ABNORMAL_NOTE(
+            (receipt.receipt_amount || 0).toLocaleString(),
+            actualAmount.toLocaleString()
+          )
+        : null
 
     await updateReceipt(receiptId, {
       actual_amount: actualAmount,
@@ -160,7 +179,8 @@ export function usePaymentData() {
     // 如果金額異常，發送機器人通知給建立者
     if (isAbnormal && receipt?.created_by && receipt.created_by !== user.id) {
       const confirmer = getEmployee(user.id)
-      const confirmerName = confirmer?.chinese_name || confirmer?.display_name || PAYMENT_DATA_LABELS.ACCOUNTANT
+      const confirmerName =
+        confirmer?.chinese_name || confirmer?.display_name || PAYMENT_DATA_LABELS.ACCOUNTANT
 
       try {
         await sendPaymentAbnormalNotification({
@@ -183,7 +203,11 @@ export function usePaymentData() {
     }
 
     if (isAbnormal) {
-      logger.info('⚠️ 收款金額異常已記錄', { receiptId, actualAmount, expectedAmount: receipt?.receipt_amount })
+      logger.info('⚠️ 收款金額異常已記錄', {
+        receiptId,
+        actualAmount,
+        expectedAmount: receipt?.receipt_amount,
+      })
     }
 
     // 重算訂單付款狀態 + 團財務數據
@@ -196,7 +220,7 @@ export function usePaymentData() {
   }
 
   // 更新收款單（編輯模式使用）
-  const handleUpdateReceipt = async (receiptId: string, data: Partial<typeof receipts[0]>) => {
+  const handleUpdateReceipt = async (receiptId: string, data: Partial<(typeof receipts)[0]>) => {
     if (!user?.id) {
       throw new Error(PAYMENT_DATA_LABELS.PLEASE_LOGIN)
     }

@@ -46,8 +46,8 @@ export function useChannelChat() {
     updateChannel,
     deleteChannel,
   } = useWorkspaceChannels()
-  
-  const { isAdmin } = useAuthStore(); // Get isAdmin flag
+
+  const { isAdmin } = useAuthStore() // Get isAdmin flag
 
   const { channelMessages, messagesLoading, loadMessages } = useWorkspaceChat()
   const { subscribeToMessages, unsubscribeFromMessages } = useChatStore()

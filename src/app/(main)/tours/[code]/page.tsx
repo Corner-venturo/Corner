@@ -16,16 +16,15 @@ import { CODE_LABELS } from './constants/labels'
 import { TOUR_DETAIL_PAGE_LABELS } from '@/features/tours/constants/labels'
 
 const TourRequestFormDialog = dynamic(
-  () => import('@/features/proposals/components/TourRequestFormDialog').then(m => m.TourRequestFormDialog),
+  () =>
+    import('@/features/proposals/components/TourRequestFormDialog').then(
+      m => m.TourRequestFormDialog
+    ),
   { ssr: false }
 )
 
 const fetchTourIdByCode = async (code: string): Promise<string | null> => {
-  const { data, error } = await supabase
-    .from('tours')
-    .select('id')
-    .eq('code', code)
-    .single()
+  const { data, error } = await supabase.from('tours').select('id').eq('code', code).single()
 
   if (error || !data) return null
   return data.id
@@ -40,30 +39,29 @@ export default function TourDetailPage() {
   const { channels, currentWorkspace } = useWorkspaceChannels()
 
   // 用 SWR 查詢 tour_id
-  const { data: tourId, isLoading: loadingTourId } = useSWR(
-    code ? `tour-id-${code}` : null,
-    () => fetchTourIdByCode(code)
+  const { data: tourId, isLoading: loadingTourId } = useSWR(code ? `tour-id-${code}` : null, () =>
+    fetchTourIdByCode(code)
   )
-  
+
   // 分頁記憶：優先順序 URL > localStorage > 預設值
   const getInitialTab = (): string => {
     // 1. 優先使用 URL query
     const urlTab = searchParams.get('tab')
     if (urlTab) return urlTab
-    
+
     // 2. 其次使用 localStorage
     if (typeof window !== 'undefined') {
       const lastTab = localStorage.getItem(`tour-${code}-lastTab`)
       if (lastTab) return lastTab
     }
-    
+
     // 3. 最後使用預設值
     return 'members'
   }
-  
+
   const [activeTab, setActiveTab] = useState(getInitialTab())
   const [forceShowPnr, setForceShowPnr] = useState(false)
-  
+
   // 監聽分頁變更，更新 URL 和 localStorage
   useEffect(() => {
     // 更新 URL（不增加瀏覽器歷史記錄）
@@ -88,7 +86,9 @@ export default function TourDetailPage() {
   const { tour, loading, actions } = useTourDetails(tourId || '')
 
   // 檢查是否已有工作頻道
-  const existingChannel = channels.find((ch: { tour_id?: string | null }) => ch.tour_id === tour?.id)
+  const existingChannel = channels.find(
+    (ch: { tour_id?: string | null }) => ch.tour_id === tour?.id
+  )
 
   // 返回列表
   const handleBack = () => {
@@ -134,7 +134,9 @@ export default function TourDetailPage() {
       >
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <p className="text-morandi-secondary mb-4">{CODE_LABELS.NOT_FOUND_2154} {code} {CODE_LABELS.NOT_FOUND_SUFFIX}</p>
+            <p className="text-morandi-secondary mb-4">
+              {CODE_LABELS.NOT_FOUND_2154} {code} {CODE_LABELS.NOT_FOUND_SUFFIX}
+            </p>
             <Button onClick={handleBack}>{CODE_LABELS.LABEL_5810}</Button>
           </div>
         </div>
@@ -175,7 +177,7 @@ export default function TourDetailPage() {
         activeTab={activeTab}
         workspaceId={currentWorkspace?.id}
         forceShowPnr={forceShowPnr}
-        onOpenRequestDialog={(data) => {
+        onOpenRequestDialog={data => {
           setRequestData({
             category: data.category,
             supplierName: data.supplierName,

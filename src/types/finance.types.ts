@@ -21,10 +21,7 @@ export type CompanyExpenseType =
   | 'TRN' // 培訓費用
 
 // 費用類型配置
-export const EXPENSE_TYPE_CONFIG: Record<
-  CompanyExpenseType,
-  { name: string; prefix: string }
-> = {
+export const EXPENSE_TYPE_CONFIG: Record<CompanyExpenseType, { name: string; prefix: string }> = {
   SAL: { name: '薪資', prefix: 'SAL' },
   ENT: { name: '公關費用', prefix: 'ENT' },
   TRV: { name: '差旅費用', prefix: 'TRV' },
@@ -71,19 +68,19 @@ export interface PaymentRequest {
 
 // 請款項目類型（參考 cornerERP 的 INVOICE_ITEM_TYPES）
 export type PaymentItemCategory =
-  | '匯款'      // 匯款（預設選項）
-  | '住宿'      // 飯店住宿
-  | '交通'      // 機票、巴士、高鐵等
-  | '餐食'      // 餐廳、用餐
-  | '門票'      // 景點門票、活動
-  | '導遊'      // 導遊小費、領隊費用
-  | '保險'      // 旅遊平安險
-  | '出團款'    // 出團預支款項
-  | '回團款'    // 回團結算款項
-  | '員工代墊'  // 員工墊付費用
-  | 'ESIM'      // eSIM 網卡
-  | '同業'      // 同業分潤
-  | '其他'      // 其他雜支
+  | '匯款' // 匯款（預設選項）
+  | '住宿' // 飯店住宿
+  | '交通' // 機票、巴士、高鐵等
+  | '餐食' // 餐廳、用餐
+  | '門票' // 景點門票、活動
+  | '導遊' // 導遊小費、領隊費用
+  | '保險' // 旅遊平安險
+  | '出團款' // 出團預支款項
+  | '回團款' // 回團結算款項
+  | '員工代墊' // 員工墊付費用
+  | 'ESIM' // eSIM 網卡
+  | '同業' // 同業分潤
+  | '其他' // 其他雜支
 
 export interface PaymentRequestItem {
   id: string

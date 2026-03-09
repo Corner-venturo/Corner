@@ -5,10 +5,4 @@
 
 export { AnalyticsService, analyticsService } from './analytics-service'
 export { ReportBuilder } from './report-builder'
-export type {
-  DateRange,
-  MetricResult,
-  ChartData,
-  ReportDefinition,
-  ReportFormat,
-} from './types'
+export type { DateRange, MetricResult, ChartData, ReportDefinition, ReportFormat } from './types'

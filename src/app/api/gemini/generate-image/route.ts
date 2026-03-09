@@ -40,7 +40,7 @@ function getAvailableKey(): string | null {
 function markKeyAsBlocked(key: string, retryAfterSeconds: number = 60) {
   keyStatus[key] = {
     blocked: true,
-    blockedUntil: Date.now() + (retryAfterSeconds * 1000),
+    blockedUntil: Date.now() + retryAfterSeconds * 1000,
   }
   logger.log(`[Gemini] Key ${key.slice(-6)} blocked for ${retryAfterSeconds}s`)
 }
@@ -80,7 +80,9 @@ export async function POST(request: NextRequest) {
       }
 
       triedKeys++
-      logger.log(`[Gemini] Trying key ${apiKey.slice(-6)}... (attempt ${triedKeys}/${GEMINI_API_KEYS.length})`)
+      logger.log(
+        `[Gemini] Trying key ${apiKey.slice(-6)}... (attempt ${triedKeys}/${GEMINI_API_KEYS.length})`
+      )
 
       // 先嘗試 Gemini 2.0 Flash（支援圖片生成）
       const result = await tryGenerateWithKey(apiKey, fullPrompt)
@@ -105,7 +107,6 @@ export async function POST(request: NextRequest) {
     }
 
     return errorResponse('所有 API Key 都失敗了', 500, ErrorCode.EXTERNAL_API_ERROR)
-
   } catch (error) {
     logger.error('Generate image error:', error)
     return errorResponse(
@@ -117,7 +118,10 @@ export async function POST(request: NextRequest) {
 }
 
 // 使用指定的 key 嘗試生成圖片
-async function tryGenerateWithKey(apiKey: string, prompt: string): Promise<{
+async function tryGenerateWithKey(
+  apiKey: string,
+  prompt: string
+): Promise<{
   success: boolean
   image?: string
   error?: string
@@ -142,7 +146,11 @@ async function tryGenerateWithKey(apiKey: string, prompt: string): Promise<{
       const errorMessage = errorData.error?.message || 'Unknown error'
 
       // 檢查是否為配額錯誤
-      if (response.status === 429 || errorMessage.includes('quota') || errorMessage.includes('RESOURCE_EXHAUSTED')) {
+      if (
+        response.status === 429 ||
+        errorMessage.includes('quota') ||
+        errorMessage.includes('RESOURCE_EXHAUSTED')
+      ) {
         // 嘗試解析 retry delay
         const retryMatch = errorMessage.match(/retry in (\d+)/i)
         const retryAfter = retryMatch ? parseInt(retryMatch[1]) : 60
@@ -173,7 +181,6 @@ async function tryGenerateWithKey(apiKey: string, prompt: string): Promise<{
     }
 
     return { success: false, error: 'No image in response' }
-
   } catch (error) {
     return {
       success: false,
@@ -186,13 +193,12 @@ async function tryGenerateWithKey(apiKey: string, prompt: string): Promise<{
 function buildPrompt(basePrompt: string, style?: string): string {
   const styleGuides: Record<string, string> = {
     'travel-cover': `Create a stunning travel destination cover image. Style: Elegant watercolor and ink wash painting fusion, with golden accents, dreamy atmosphere, cinematic lighting. The image should feel premium and artistic, suitable for a luxury travel brochure. `,
-    'food': `Create an appetizing food photography. Style: Warm lighting, shallow depth of field, rich colors, professional food styling, elegant plating on beautiful tableware. `,
-    'landmark': `Create a breathtaking landmark photograph. Style: Golden hour lighting, dramatic sky, architectural details highlighted, professional travel photography quality. `,
-    'culture': `Create a cultural scene image. Style: Artistic, respectful representation, warm colors, storytelling composition, traditional elements with modern aesthetics. `,
+    food: `Create an appetizing food photography. Style: Warm lighting, shallow depth of field, rich colors, professional food styling, elegant plating on beautiful tableware. `,
+    landmark: `Create a breathtaking landmark photograph. Style: Golden hour lighting, dramatic sky, architectural details highlighted, professional travel photography quality. `,
+    culture: `Create a cultural scene image. Style: Artistic, respectful representation, warm colors, storytelling composition, traditional elements with modern aesthetics. `,
   }
 
   const stylePrefix = styleGuides[style || 'travel-cover'] || styleGuides['travel-cover']
 
   return `${stylePrefix}${basePrompt}. High quality, 8K resolution, masterpiece.`
 }
-

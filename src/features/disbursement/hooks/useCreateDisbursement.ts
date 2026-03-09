@@ -63,7 +63,11 @@ interface UseCreateDisbursementProps {
   editingOrder?: DisbursementOrder | null
 }
 
-export function useCreateDisbursement({ pendingRequests, onSuccess, editingOrder }: UseCreateDisbursementProps) {
+export function useCreateDisbursement({
+  pendingRequests,
+  onSuccess,
+  editingOrder,
+}: UseCreateDisbursementProps) {
   // 使用 @/data hooks（SWR 自動載入）
   const { items: disbursement_orders } = useDisbursementOrders()
   const user = useAuthStore(state => state.user)
@@ -71,9 +75,7 @@ export function useCreateDisbursement({ pendingRequests, onSuccess, editingOrder
   const isEditMode = !!editingOrder
 
   // 狀態
-  const [disbursementDate, setDisbursementDate] = useState(
-    formatDate(getNextThursday())
-  )
+  const [disbursementDate, setDisbursementDate] = useState(formatDate(getNextThursday()))
   const [selectedRequestIds, setSelectedRequestIds] = useState<string[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [dateFilter, setDateFilter] = useState('')
@@ -125,9 +127,7 @@ export function useCreateDisbursement({ pendingRequests, onSuccess, editingOrder
   // 切換選擇
   const toggleSelect = useCallback((requestId: string) => {
     setSelectedRequestIds(prev =>
-      prev.includes(requestId)
-        ? prev.filter(id => id !== requestId)
-        : [...prev, requestId]
+      prev.includes(requestId) ? prev.filter(id => id !== requestId) : [...prev, requestId]
     )
   }, [])
 
@@ -220,14 +220,7 @@ export function useCreateDisbursement({ pendingRequests, onSuccess, editingOrder
     } finally {
       setIsSubmitting(false)
     }
-  }, [
-    selectedRequestIds,
-    selectedAmount,
-    disbursement_orders,
-    disbursementDate,
-    user,
-    onSuccess,
-  ])
+  }, [selectedRequestIds, selectedAmount, disbursement_orders, disbursementDate, user, onSuccess])
 
   // 更新出納單（編輯模式）
   const handleUpdate = useCallback(async () => {
@@ -284,10 +277,7 @@ export function useCreateDisbursement({ pendingRequests, onSuccess, editingOrder
       }
 
       // SWR 快取失效
-      await Promise.all([
-        invalidateDisbursementOrders(),
-        invalidatePaymentRequests(),
-      ])
+      await Promise.all([invalidateDisbursementOrders(), invalidatePaymentRequests()])
 
       await alert(DISBURSEMENT_LABELS.出納單已更新(editingOrder.order_number || ''), 'success')
 

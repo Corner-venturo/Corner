@@ -230,7 +230,7 @@ function AlertDialogComponent() {
           <div className="flex items-start gap-3">
             <div className={`${config.bgColor} ${config.color} p-2 rounded-lg`}>{config.icon}</div>
             <div className="flex-1">
-              <DialogTitle className={alert.title ? "text-morandi-primary mb-2" : "sr-only"}>
+              <DialogTitle className={alert.title ? 'text-morandi-primary mb-2' : 'sr-only'}>
                 {alert.title || '提示'}
               </DialogTitle>
               <DialogDescription className="text-morandi-secondary whitespace-pre-wrap">
@@ -267,7 +267,7 @@ function ConfirmDialogComponent() {
           <div className="flex items-start gap-3">
             <div className={`${config.bgColor} ${config.color} p-2 rounded-lg`}>{config.icon}</div>
             <div className="flex-1">
-              <DialogTitle className={confirm.title ? "text-morandi-primary mb-2" : "sr-only"}>
+              <DialogTitle className={confirm.title ? 'text-morandi-primary mb-2' : 'sr-only'}>
                 {confirm.title || '確認'}
               </DialogTitle>
               <DialogDescription className="text-morandi-secondary whitespace-pre-wrap">
@@ -325,12 +325,10 @@ function PromptDialogComponent() {
     <Dialog open={prompt.isOpen} onOpenChange={open => !open && prompt.onCancel?.()}>
       <DialogContent level={4} className="max-w-md">
         <DialogHeader>
-          <DialogTitle className={prompt.title ? "text-morandi-primary" : "sr-only"}>
+          <DialogTitle className={prompt.title ? 'text-morandi-primary' : 'sr-only'}>
             {prompt.title || '輸入'}
           </DialogTitle>
-          <DialogDescription className="text-morandi-secondary">
-            {prompt.message}
-          </DialogDescription>
+          <DialogDescription className="text-morandi-secondary">{prompt.message}</DialogDescription>
         </DialogHeader>
         <div className="py-2">
           <Input
@@ -382,15 +380,17 @@ export const alert = (message: string, type: AlertType = 'info', title?: string)
 
 export const confirm = (
   message: string,
-  typeOrOptions?: AlertType | {
-    type?: AlertType
-    title?: string
-    htmlContent?: string
-    confirmText?: string
-    cancelText?: string
-    showThirdOption?: boolean
-    thirdOptionText?: string
-  },
+  typeOrOptions?:
+    | AlertType
+    | {
+        type?: AlertType
+        title?: string
+        htmlContent?: string
+        confirmText?: string
+        cancelText?: string
+        showThirdOption?: boolean
+        thirdOptionText?: string
+      },
   htmlContent?: string
 ) => {
   // 支援簡易呼叫: confirm(message, type, htmlContent)

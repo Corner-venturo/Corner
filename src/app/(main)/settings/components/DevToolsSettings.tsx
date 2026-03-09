@@ -92,9 +92,7 @@ export function DevToolsSettings() {
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <h3 className="font-medium mb-1">{DEVTOOLS_LABELS.ONE_CLICK_ENV}</h3>
-              <p className="text-sm text-morandi-secondary">
-                {DEVTOOLS_LABELS.COPYING_1479}
-              </p>
+              <p className="text-sm text-morandi-secondary">{DEVTOOLS_LABELS.COPYING_1479}</p>
             </div>
             <Button
               variant="outline"
@@ -122,9 +120,7 @@ export function DevToolsSettings() {
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <h3 className="font-medium mb-1">{DEVTOOLS_LABELS.VERCEL_ENV_LIST}</h3>
-              <p className="text-sm text-morandi-secondary">
-                {DEVTOOLS_LABELS.SETTINGS_6471}
-              </p>
+              <p className="text-sm text-morandi-secondary">{DEVTOOLS_LABELS.SETTINGS_6471}</p>
             </div>
             <Button
               variant="outline"
@@ -168,7 +164,12 @@ export function DevToolsSettings() {
                 <li>{DEVTOOLS_LABELS.STEP_OPEN_TERMINAL}</li>
                 <li>{DEVTOOLS_LABELS.STEP_PASTE}</li>
                 <li>{DEVTOOLS_LABELS.STEP_CLAUDE_AUTO}</li>
-                <li>{DEVTOOLS_LABELS.STEP_RESTART}<code className="bg-morandi-container dark:bg-morandi-container/30 px-1 rounded">npm run dev</code></li>
+                <li>
+                  {DEVTOOLS_LABELS.STEP_RESTART}
+                  <code className="bg-morandi-container dark:bg-morandi-container/30 px-1 rounded">
+                    npm run dev
+                  </code>
+                </li>
               </ol>
             </div>
           </div>

@@ -53,9 +53,7 @@ export default async function RootLayout({
             <ErrorBoundary>
               <ReactQueryProvider>
                 <SWRProvider>
-                  <ThemeProvider>
-                    {children}
-                  </ThemeProvider>
+                  <ThemeProvider>{children}</ThemeProvider>
                 </SWRProvider>
               </ReactQueryProvider>
             </ErrorBoundary>

@@ -53,13 +53,9 @@ export function LoadingOverlay({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-morandi-gold/10 mb-4">
             <Palette className="w-8 h-8 text-morandi-gold" />
           </div>
-          <h2 className="text-xl font-semibold text-morandi-primary">
-            Venturo Designer
-          </h2>
+          <h2 className="text-xl font-semibold text-morandi-primary">Venturo Designer</h2>
           {documentName && (
-            <p className="text-sm text-morandi-secondary mt-1 truncate">
-              {documentName}
-            </p>
+            <p className="text-sm text-morandi-secondary mt-1 truncate">{documentName}</p>
           )}
         </div>
 
@@ -89,14 +85,12 @@ export function LoadingOverlay({
           </div>
 
           {/* Progress percentage */}
-          <div className="text-center text-xs text-morandi-muted">
-            {progress}%
-          </div>
+          <div className="text-center text-xs text-morandi-muted">{progress}%</div>
         </div>
 
         {/* Loading animation dots */}
         <div className="flex justify-center gap-1.5 mt-6">
-          {[0, 1, 2].map((i) => (
+          {[0, 1, 2].map(i => (
             <div
               key={i}
               className="w-2 h-2 rounded-full bg-morandi-gold animate-pulse"

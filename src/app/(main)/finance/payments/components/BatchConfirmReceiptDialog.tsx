@@ -9,7 +9,6 @@
  * 4. 每筆獨立處理，失敗不影響其他
  */
 
-
 import { useState, useMemo, useCallback } from 'react'
 import {
   Dialog,
@@ -68,7 +67,15 @@ export function BatchConfirmReceiptDialog({
 
   // 建立收款單 ID 到收款單資訊的 Map
   const receiptMap = useMemo(() => {
-    const map = new Map<string, { receipt_number: string; order_number: string | null; tour_name: string | null; order_id: string | null }>()
+    const map = new Map<
+      string,
+      {
+        receipt_number: string
+        order_number: string | null
+        tour_name: string | null
+        order_id: string | null
+      }
+    >()
     receipts.forEach(r => {
       map.set(r.id, {
         receipt_number: r.receipt_number,
@@ -83,12 +90,15 @@ export function BatchConfirmReceiptDialog({
   // 篩選待確認的收款品項 (status = '0' 或 null)
   const pendingItems = useMemo(() => {
     if (open && receiptItems.length > 0) {
-      logger.log('📋 所有收款品項 status:', receiptItems.slice(0, 5).map(r => ({
-        id: r.id,
-        receipt_id: r.receipt_id,
-        status: r.status,
-        amount: r.amount,
-      })))
+      logger.log(
+        '📋 所有收款品項 status:',
+        receiptItems.slice(0, 5).map(r => ({
+          id: r.id,
+          receipt_id: r.receipt_id,
+          status: r.status,
+          amount: r.amount,
+        }))
+      )
     }
     return receiptItems.filter(r => r.status === '0' || r.status === null)
   }, [receiptItems, open])
@@ -197,7 +207,8 @@ export function BatchConfirmReceiptDialog({
           orderUpdates.set(orderId, currentAmount + confirmItem.actualAmount)
         }
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : BATCH_CONFIRM_LABELS.UNKNOWN_ERROR
+        const errorMessage =
+          error instanceof Error ? error.message : BATCH_CONFIRM_LABELS.UNKNOWN_ERROR
         failedItems.push({ item: confirmItem, error: errorMessage })
         logger.error(`確認收款品項 ${confirmItem.receiptNumber} 失敗:`, error)
       }
@@ -208,8 +219,8 @@ export function BatchConfirmReceiptDialog({
       try {
         // 檢查該收款單的所有品項是否都已確認
         const allItemsForReceipt = receiptItems.filter(ri => ri.receipt_id === receiptId)
-        const confirmedCount = allItemsForReceipt.filter(ri => 
-          ri.status === '1' || successItems.some(s => s.item.id === ri.id)
+        const confirmedCount = allItemsForReceipt.filter(
+          ri => ri.status === '1' || successItems.some(s => s.item.id === ri.id)
         ).length
 
         const allConfirmed = confirmedCount === allItemsForReceipt.length
@@ -263,7 +274,11 @@ export function BatchConfirmReceiptDialog({
       // 部分成功
       const failedNumbers = failedItems.map(f => f.item.receiptNumber).join('、')
       await alert(
-        BATCH_CONFIRM_LABELS.CONFIRM_PARTIAL(successItems.length, failedItems.length, failedNumbers),
+        BATCH_CONFIRM_LABELS.CONFIRM_PARTIAL(
+          successItems.length,
+          failedItems.length,
+          failedNumbers
+        ),
         'warning'
       )
       onSuccess?.()
@@ -308,7 +323,8 @@ export function BatchConfirmReceiptDialog({
                 <div className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-morandi-gold" />
                   <span className="text-sm font-medium flex items-center gap-1">
-                    {BATCH_CONFIRM_LABELS.TOTAL_PREFIX}<CurrencyCell amount={stats.totalAmount} />
+                    {BATCH_CONFIRM_LABELS.TOTAL_PREFIX}
+                    <CurrencyCell amount={stats.totalAmount} />
                   </span>
                 </div>
               </div>
@@ -367,7 +383,8 @@ export function BatchConfirmReceiptDialog({
                         </td>
                         <td className="py-3 px-3">
                           <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-morandi-container text-morandi-primary">
-                            {RECEIPT_TYPE_LABELS[confirmItem.item.receipt_type as ReceiptType] || '未知'}
+                            {RECEIPT_TYPE_LABELS[confirmItem.item.receipt_type as ReceiptType] ||
+                              '未知'}
                           </span>
                         </td>
                         <td className="py-3 px-3 text-right text-morandi-primary">
@@ -402,9 +419,7 @@ export function BatchConfirmReceiptDialog({
               ) && (
                 <div className="flex items-center gap-2 p-3 mt-4 border border-morandi-gold/20 rounded-lg bg-morandi-gold/5 text-sm">
                   <AlertCircle className="h-4 w-4 text-morandi-gold flex-shrink-0" />
-                  <span className="text-morandi-gold">
-                    {BATCH_CONFIRM_LABELS.CONFIRM_4237}
-                  </span>
+                  <span className="text-morandi-gold">{BATCH_CONFIRM_LABELS.CONFIRM_4237}</span>
                 </div>
               )}
             </>
@@ -412,7 +427,12 @@ export function BatchConfirmReceiptDialog({
         </div>
 
         <DialogFooter className="mt-4">
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting} className="gap-2">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isSubmitting}
+            className="gap-2"
+          >
             <X size={16} />
             {BATCH_CONFIRM_LABELS.CANCEL}
           </Button>
@@ -422,7 +442,9 @@ export function BatchConfirmReceiptDialog({
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
             <Check size={16} />
-            {isSubmitting ? BATCH_CONFIRM_LABELS.CONFIRMING : BATCH_CONFIRM_LABELS.CONFIRM_N_RECEIPTS(stats.selected)}
+            {isSubmitting
+              ? BATCH_CONFIRM_LABELS.CONFIRMING
+              : BATCH_CONFIRM_LABELS.CONFIRM_N_RECEIPTS(stats.selected)}
           </Button>
         </DialogFooter>
       </DialogContent>

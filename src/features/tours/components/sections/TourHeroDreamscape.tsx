@@ -37,7 +37,10 @@ interface TourHeroDreamscapeProps {
 }
 
 // 從標題或行程陣列中提取天數
-function extractDayNumber(title: string | undefined, dailyItinerary?: Array<{ dayLabel?: string }>): number {
+function extractDayNumber(
+  title: string | undefined,
+  dailyItinerary?: Array<{ dayLabel?: string }>
+): number {
   if (dailyItinerary && dailyItinerary.length > 0) {
     const lastDay = dailyItinerary[dailyItinerary.length - 1]
     if (lastDay?.dayLabel) {
@@ -126,9 +129,13 @@ export function TourHeroDreamscape({ data, viewMode }: TourHeroDreamscapeProps) 
           isMobile ? 'py-16' : 'py-20 min-h-screen flex items-center'
         }`}
       >
-        <div className={`w-full grid ${isMobile ? 'grid-cols-1 gap-8' : 'lg:grid-cols-12 gap-8'} items-center`}>
+        <div
+          className={`w-full grid ${isMobile ? 'grid-cols-1 gap-8' : 'lg:grid-cols-12 gap-8'} items-center`}
+        >
           {/* 左側文字區 */}
-          <div className={`${isMobile ? 'order-2' : 'lg:col-span-5 order-2 lg:order-1'} relative ${isMobile ? '' : 'pl-4 lg:pl-12'}`}>
+          <div
+            className={`${isMobile ? 'order-2' : 'lg:col-span-5 order-2 lg:order-1'} relative ${isMobile ? '' : 'pl-4 lg:pl-12'}`}
+          >
             {/* 大數字背景 */}
             <div
               className="absolute select-none leading-none z-0"
@@ -207,7 +214,9 @@ export function TourHeroDreamscape({ data, viewMode }: TourHeroDreamscapeProps) 
                     color: `${DREAM.text}cc`,
                   }}
                 >
-                  <span className="uppercase tracking-[0.2em] text-sm font-bold">{dateFormatted}</span>
+                  <span className="uppercase tracking-[0.2em] text-sm font-bold">
+                    {dateFormatted}
+                  </span>
                   <span style={{ color: DREAM.purple }}>{TOURS_LABELS.LABEL_5480}</span>
                 </div>
               )}
@@ -227,7 +236,9 @@ export function TourHeroDreamscape({ data, viewMode }: TourHeroDreamscapeProps) 
           </div>
 
           {/* 右側圖片區 */}
-          <div className={`${isMobile ? 'order-1' : 'lg:col-span-7 order-1 lg:order-2'} relative ${isMobile ? 'h-[50vh]' : 'h-[80vh]'}`}>
+          <div
+            className={`${isMobile ? 'order-1' : 'lg:col-span-7 order-1 lg:order-2'} relative ${isMobile ? 'h-[50vh]' : 'h-[80vh]'}`}
+          >
             {/* Blob 背景動畫 */}
             <motion.div
               className="absolute inset-0"
@@ -256,7 +267,8 @@ export function TourHeroDreamscape({ data, viewMode }: TourHeroDreamscapeProps) 
               transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
             >
               {coverImage ? (
-                <img src={coverImage}
+                <img
+                  src={coverImage}
                   alt={data.title}
                   className="w-full h-full object-cover scale-110"
                   style={{ filter: 'brightness(1.05) contrast(1.1)' }}
@@ -264,7 +276,9 @@ export function TourHeroDreamscape({ data, viewMode }: TourHeroDreamscapeProps) 
               ) : (
                 <div
                   className="w-full h-full scale-110"
-                  style={{ background: `linear-gradient(135deg, ${DREAM.lavender}, ${DREAM.peach}, ${DREAM.sky})` }}
+                  style={{
+                    background: `linear-gradient(135deg, ${DREAM.lavender}, ${DREAM.peach}, ${DREAM.sky})`,
+                  }}
                 />
               )}
               <div
@@ -293,7 +307,10 @@ export function TourHeroDreamscape({ data, viewMode }: TourHeroDreamscapeProps) 
                       <path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" />
                     </svg>
                   </span>
-                  <span className="text-xs uppercase tracking-widest" style={{ color: `${DREAM.text}99` }}>
+                  <span
+                    className="text-xs uppercase tracking-widest"
+                    style={{ color: `${DREAM.text}99` }}
+                  >
                     Destination
                   </span>
                 </div>

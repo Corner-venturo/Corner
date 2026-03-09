@@ -127,7 +127,6 @@ interface MessageMetadata {
   [key: string]: JsonValue | undefined
 }
 
-
 export type RawMessage = Omit<Message, 'attachments' | 'created_at'> & {
   attachments?: unknown
   created_at: string | null

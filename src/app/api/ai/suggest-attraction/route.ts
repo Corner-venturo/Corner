@@ -16,14 +16,16 @@ import { suggestAttractionSchema } from '@/lib/validations/api-schemas'
 
 // Gemini API 設定
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent'
+const GEMINI_API_URL =
+  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent'
 
 interface SuggestAttractionRequest {
-  name: string          // 景點名稱
-  city?: string         // 城市名稱
-  country?: string      // 國家名稱
-  category?: string     // 分類（景點、餐廳、購物等）
-  existingData?: {      // 現有資料（避免重複查詢）
+  name: string // 景點名稱
+  city?: string // 城市名稱
+  country?: string // 國家名稱
+  category?: string // 分類（景點、餐廳、購物等）
+  existingData?: {
+    // 現有資料（避免重複查詢）
     latitude?: number
     longitude?: number
     duration_minutes?: number
@@ -44,8 +46,8 @@ interface SuggestAttractionResponse {
   address?: string
   website?: string
   phone?: string
-  confidence: number    // AI 信心度 0-1
-  source: string        // 資料來源說明
+  confidence: number // AI 信心度 0-1
+  source: string // 資料來源說明
 }
 
 export async function POST(request: NextRequest) {
@@ -133,7 +135,7 @@ ${missingFields.map(f => `- ${f}`).join('\n')}
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
-          temperature: 0.2,  // 低溫度，更精確
+          temperature: 0.2, // 低溫度，更精確
           topP: 0.8,
           maxOutputTokens: 1024,
         },
@@ -178,7 +180,10 @@ ${missingFields.map(f => `- ${f}`).join('\n')}
     }
 
     // 驗證時長合理性
-    if (suggestion.duration_minutes && (suggestion.duration_minutes < 10 || suggestion.duration_minutes > 480)) {
+    if (
+      suggestion.duration_minutes &&
+      (suggestion.duration_minutes < 10 || suggestion.duration_minutes > 480)
+    ) {
       suggestion.duration_minutes = Math.min(Math.max(suggestion.duration_minutes, 10), 480)
     }
 
@@ -195,7 +200,6 @@ ${missingFields.map(f => `- ${f}`).join('\n')}
         limit: API_LIMITS.gemini_suggest,
       },
     })
-
   } catch (error) {
     logger.error('AI 補充景點資料錯誤:', error)
     return errorResponse(

@@ -22,58 +22,64 @@ export const useQuoteGroupCostUpdate = ({
   const hasCalculatedWithValidGroupSize = useRef(false)
 
   // 重新計算所有團體分攤項目的邏輯（抽出來方便重用）
-  const recalculateGroupCosts = useCallback((currentGroupSize: number, currentGroupSizeForGuide: number) => {
-    // 只有當人數有效時才計算
-    if (currentGroupSizeForGuide <= 0) return
+  const recalculateGroupCosts = useCallback(
+    (currentGroupSize: number, currentGroupSizeForGuide: number) => {
+      // 只有當人數有效時才計算
+      if (currentGroupSizeForGuide <= 0) return
 
-    setCategories(prevCategories => {
-      return prevCategories.map(category => {
-        if (
-          category.id === 'group-transport' ||
-          category.id === 'transport' ||
-          category.id === 'guide'
-        ) {
-          const updatedItems = category.items.map(item => {
-            const effectiveQuantity = item.quantity && item.quantity !== 1 ? item.quantity : 1
-            let total = 0
+      setCategories(prevCategories => {
+        return prevCategories.map(category => {
+          if (
+            category.id === 'group-transport' ||
+            category.id === 'transport' ||
+            category.id === 'guide'
+          ) {
+            const updatedItems = category.items.map(item => {
+              const effectiveQuantity = item.quantity && item.quantity !== 1 ? item.quantity : 1
+              let total = 0
 
-            if (category.id === 'group-transport') {
-              // 團體分攤分類：自動執行團體分攤邏輯
-              if (item.name === '領隊分攤') {
-                // 領隊分攤：(單價 × 數量) ÷ 人數（不含嬰兒）
-                const guideTotalCost = (item.unit_price || 0) * effectiveQuantity
-                total = currentGroupSizeForGuide > 0 ? Math.ceil(guideTotalCost / currentGroupSizeForGuide) : 0
-              } else if (currentGroupSizeForGuide > 1) {
-                // 其他團體分攤項目：執行一般團體分攤邏輯（不含嬰兒）
+              if (category.id === 'group-transport') {
+                // 團體分攤分類：自動執行團體分攤邏輯
+                if (item.name === '領隊分攤') {
+                  // 領隊分攤：(單價 × 數量) ÷ 人數（不含嬰兒）
+                  const guideTotalCost = (item.unit_price || 0) * effectiveQuantity
+                  total =
+                    currentGroupSizeForGuide > 0
+                      ? Math.ceil(guideTotalCost / currentGroupSizeForGuide)
+                      : 0
+                } else if (currentGroupSizeForGuide > 1) {
+                  // 其他團體分攤項目：執行一般團體分攤邏輯（不含嬰兒）
+                  const total_cost = effectiveQuantity * (item.unit_price || 0)
+                  total = Math.ceil(total_cost / currentGroupSizeForGuide)
+                } else {
+                  // 人數為1時，不分攤
+                  total = Math.ceil(effectiveQuantity * (item.unit_price || 0))
+                }
+              } else if (
+                (category.id === 'transport' || category.id === 'guide') &&
+                item.is_group_cost &&
+                currentGroupSize > 1
+              ) {
+                // 交通和領隊導遊的團體分攤邏輯：小計 = (數量 × 單價) ÷ 團體人數
                 const total_cost = effectiveQuantity * (item.unit_price || 0)
-                total = Math.ceil(total_cost / currentGroupSizeForGuide)
+                total = Math.ceil(total_cost / currentGroupSize)
               } else {
-                // 人數為1時，不分攤
-                total = Math.ceil(effectiveQuantity * (item.unit_price || 0))
+                // 維持原有的 total 值
+                total = item.total || 0
               }
-            } else if (
-              (category.id === 'transport' || category.id === 'guide') &&
-              item.is_group_cost &&
-              currentGroupSize > 1
-            ) {
-              // 交通和領隊導遊的團體分攤邏輯：小計 = (數量 × 單價) ÷ 團體人數
-              const total_cost = effectiveQuantity * (item.unit_price || 0)
-              total = Math.ceil(total_cost / currentGroupSize)
-            } else {
-              // 維持原有的 total 值
-              total = item.total || 0
-            }
 
-            return { ...item, total }
-          })
+              return { ...item, total }
+            })
 
-          const categoryTotal = updatedItems.reduce((sum, item) => sum + (item.total || 0), 0)
-          return { ...category, items: updatedItems, total: categoryTotal }
-        }
-        return category
+            const categoryTotal = updatedItems.reduce((sum, item) => sum + (item.total || 0), 0)
+            return { ...category, items: updatedItems, total: categoryTotal }
+          }
+          return category
+        })
       })
-    })
-  }, [setCategories])
+    },
+    [setCategories]
+  )
 
   // 當人數改變時，重新計算所有團體分攤項目
   useEffect(() => {
@@ -146,6 +152,5 @@ export const useQuoteGroupCostUpdate = ({
         return category
       })
     })
-
   }, [groupSize, groupSizeForGuide, setCategories]) // 只依賴數值，不依賴 participantCounts 對象
 }

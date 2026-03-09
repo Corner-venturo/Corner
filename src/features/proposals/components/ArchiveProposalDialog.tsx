@@ -61,7 +61,8 @@ export function ArchiveProposalDialog({
 
         <div>
           <label className="text-sm font-medium text-morandi-primary mb-2 block">
-            {PROPOSAL_LABELS.archiveDialog.reasonLabel} <span className="text-morandi-red">{PROPOSAL_LABELS.required}</span>
+            {PROPOSAL_LABELS.archiveDialog.reasonLabel}{' '}
+            <span className="text-morandi-red">{PROPOSAL_LABELS.required}</span>
           </label>
           <Combobox
             value={reason}
@@ -74,7 +75,8 @@ export function ArchiveProposalDialog({
         {reason === 'other' && (
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              {PROPOSAL_LABELS.archiveDialog.customReasonLabel} <span className="text-morandi-red">{PROPOSAL_LABELS.required}</span>
+              {PROPOSAL_LABELS.archiveDialog.customReasonLabel}{' '}
+              <span className="text-morandi-red">{PROPOSAL_LABELS.required}</span>
             </label>
             <Textarea
               value={customReason}

@@ -23,12 +23,10 @@ export function RecommendationsSection({
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
-        <label className="text-sm font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_7651}</label>
-        <Button
-          onClick={() => addRecommendation(dayIndex)}
-          size="xs"
-          variant="secondary"
-        >
+        <label className="text-sm font-medium text-morandi-primary">
+          {COMP_EDITOR_LABELS.LABEL_7651}
+        </label>
+        <Button onClick={() => addRecommendation(dayIndex)} size="xs" variant="secondary">
           + 新增推薦
         </Button>
       </div>

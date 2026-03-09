@@ -44,10 +44,7 @@ export function CollapsiblePanel({
   }, [isOpen, controlledIsOpen, onOpenChange])
 
   return (
-    <div className={cn(
-      'border-b border-border/40',
-      className
-    )}>
+    <div className={cn('border-b border-border/40', className)}>
       {/* Header - 可點擊展開/收合 */}
       <button
         type="button"
@@ -58,41 +55,46 @@ export function CollapsiblePanel({
         )}
       >
         {/* 展開/收合箭頭 */}
-        <span className={cn(
-          'transition-transform duration-200 flex-shrink-0',
-          isOpen ? 'text-morandi-gold' : 'text-morandi-secondary'
-        )}>
-          {isOpen ? (
-            <ChevronDown size={14} />
-          ) : (
-            <ChevronRight size={14} />
+        <span
+          className={cn(
+            'transition-transform duration-200 flex-shrink-0',
+            isOpen ? 'text-morandi-gold' : 'text-morandi-secondary'
           )}
+        >
+          {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
         </span>
 
         {/* 圖標 */}
         {Icon && (
-          <Icon size={14} className={cn(
-            'flex-shrink-0 transition-colors',
-            isOpen ? 'text-morandi-gold' : 'text-morandi-secondary'
-          )} />
+          <Icon
+            size={14}
+            className={cn(
+              'flex-shrink-0 transition-colors',
+              isOpen ? 'text-morandi-gold' : 'text-morandi-secondary'
+            )}
+          />
         )}
 
         {/* 標題 */}
-        <span className={cn(
-          'flex-1 text-xs font-medium truncate transition-colors',
-          isOpen ? 'text-morandi-primary' : 'text-morandi-secondary'
-        )}>
+        <span
+          className={cn(
+            'flex-1 text-xs font-medium truncate transition-colors',
+            isOpen ? 'text-morandi-primary' : 'text-morandi-secondary'
+          )}
+        >
           {title}
         </span>
 
         {/* 徽章 */}
         {badge !== undefined && (
-          <span className={cn(
-            'text-[10px] px-1.5 py-0.5 rounded-full font-medium',
-            isOpen
-              ? 'bg-morandi-gold/20 text-morandi-gold'
-              : 'bg-morandi-container/50 text-morandi-secondary'
-          )}>
+          <span
+            className={cn(
+              'text-[10px] px-1.5 py-0.5 rounded-full font-medium',
+              isOpen
+                ? 'bg-morandi-gold/20 text-morandi-gold'
+                : 'bg-morandi-container/50 text-morandi-secondary'
+            )}
+          >
             {badge}
           </span>
         )}
@@ -106,9 +108,7 @@ export function CollapsiblePanel({
         )}
         style={maxHeight ? { maxHeight: isOpen ? maxHeight : 0 } : undefined}
       >
-        <div className="px-3 pb-3">
-          {children}
-        </div>
+        <div className="px-3 pb-3">{children}</div>
       </div>
     </div>
   )
@@ -122,13 +122,6 @@ interface CollapsiblePanelGroupProps {
   className?: string
 }
 
-export function CollapsiblePanelGroup({
-  children,
-  className,
-}: CollapsiblePanelGroupProps) {
-  return (
-    <div className={className}>
-      {children}
-    </div>
-  )
+export function CollapsiblePanelGroup({ children, className }: CollapsiblePanelGroupProps) {
+  return <div className={className}>{children}</div>
 }

@@ -31,34 +31,34 @@ const BANK_CODES = {
   '085': '新加坡商新加坡華僑銀行',
 
   // 其他銀行
-  '101': '瑞興商業銀行',
-  '102': '華泰商業銀行',
-  '103': '臺灣新光商業銀行',
-  '108': '陽信商業銀行',
-  '118': '板信商業銀行',
-  '147': '三信商業銀行',
+  101: '瑞興商業銀行',
+  102: '華泰商業銀行',
+  103: '臺灣新光商業銀行',
+  108: '陽信商業銀行',
+  118: '板信商業銀行',
+  147: '三信商業銀行',
 
   // 外商銀行
-  '803': '聯邦商業銀行',
-  '805': '遠東國際商業銀行',
-  '806': '元大商業銀行',
-  '807': '永豐商業銀行',
-  '808': '玉山商業銀行',
-  '809': '凱基商業銀行',
-  '810': '星展銀行',
-  '812': '台新國際商業銀行',
-  '815': '日盛國際商業銀行',
-  '816': '安泰商業銀行',
-  '822': '中國信託商業銀行',
-  '826': '美商摩根大通銀行',
-  '845': '日商瑞穗實業銀行',
+  803: '聯邦商業銀行',
+  805: '遠東國際商業銀行',
+  806: '元大商業銀行',
+  807: '永豐商業銀行',
+  808: '玉山商業銀行',
+  809: '凱基商業銀行',
+  810: '星展銀行',
+  812: '台新國際商業銀行',
+  815: '日盛國際商業銀行',
+  816: '安泰商業銀行',
+  822: '中國信託商業銀行',
+  826: '美商摩根大通銀行',
+  845: '日商瑞穗實業銀行',
 
   // 郵局
-  '700': '中華郵政',
+  700: '中華郵政',
 
   // 農漁會信用部
-  '997': '聯合信用卡處理中心',
-};
+  997: '聯合信用卡處理中心',
+}
 
 /**
  * 根據銀行代碼取得銀行名稱
@@ -67,14 +67,14 @@ const BANK_CODES = {
  */
 function getBankName(code) {
   if (!code || code.trim() === '') {
-    return null;
+    return null
   }
 
   // 移除可能的空白
-  const cleanCode = code.trim();
+  const cleanCode = code.trim()
 
   // 查找對照表
-  return BANK_CODES[cleanCode] || cleanCode;
+  return BANK_CODES[cleanCode] || cleanCode
 }
 
 /**
@@ -83,11 +83,11 @@ function getBankName(code) {
  * @returns {boolean}
  */
 function isValidBankCode(code) {
-  return code && BANK_CODES.hasOwnProperty(code.trim());
+  return code && BANK_CODES.hasOwnProperty(code.trim())
 }
 
 module.exports = {
   BANK_CODES,
   getBankName,
   isValidBankCode,
-};
+}

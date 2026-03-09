@@ -139,13 +139,13 @@ export interface FleetDriver {
 // ============================================
 
 export type LogType =
-  | 'inspection'   // 驗車
-  | 'maintenance'  // 保養
-  | 'repair'       // 維修
-  | 'insurance'    // 保險
-  | 'mileage'      // 里程更新
-  | 'incident'     // 事故
-  | 'fuel'         // 加油
+  | 'inspection' // 驗車
+  | 'maintenance' // 保養
+  | 'repair' // 維修
+  | 'insurance' // 保險
+  | 'mileage' // 里程更新
+  | 'incident' // 事故
+  | 'fuel' // 加油
 
 export const LOG_TYPE_OPTIONS = [
   { value: 'inspection', label: '驗車', icon: '🔍' },
@@ -433,8 +433,8 @@ export function getDaysUntilDue(dueDate: string | null): number | null {
  */
 export function getDueStatusColor(daysUntilDue: number | null): string {
   if (daysUntilDue === null) return 'text-morandi-secondary'
-  if (daysUntilDue < 0) return 'text-morandi-red'  // 已過期
-  if (daysUntilDue <= 7) return 'text-morandi-red'  // 7天內
-  if (daysUntilDue <= 30) return 'text-morandi-gold'  // 30天內
-  return 'text-morandi-green'  // 正常
+  if (daysUntilDue < 0) return 'text-morandi-red' // 已過期
+  if (daysUntilDue <= 7) return 'text-morandi-red' // 7天內
+  if (daysUntilDue <= 30) return 'text-morandi-gold' // 30天內
+  return 'text-morandi-green' // 正常
 }

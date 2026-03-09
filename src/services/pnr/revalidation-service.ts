@@ -17,7 +17,7 @@ import type {
   ScheduleChangeType,
   ScheduleChangeStatus,
   SCHEDULE_CHANGE_TYPE_LABELS,
-  SCHEDULE_CHANGE_STATUS_LABELS
+  SCHEDULE_CHANGE_STATUS_LABELS,
 } from '@/types/pnr.types'
 
 type PnrScheduleChange = Database['public']['Tables']['pnr_schedule_changes']['Row']
@@ -141,7 +141,7 @@ export function detectScheduleChanges(
         requiresReissue: true,
         requiresRefund: false,
         severity: 'critical',
-        description: `航段 ${oldSeg.origin}-${oldSeg.destination} 已被移除`
+        description: `航段 ${oldSeg.origin}-${oldSeg.destination} 已被移除`,
       })
     }
   }
@@ -172,7 +172,7 @@ function createScheduleChange(
     requiresReissue: changeType === 'route_change' || changeType === 'cancellation',
     requiresRefund: false,
     severity: changeType === 'cancellation' ? 'critical' : 'minor',
-    description: getChangeDescription(changeType, oldSeg, newSeg)
+    description: getChangeDescription(changeType, oldSeg, newSeg),
   }
 }
 
@@ -219,7 +219,7 @@ export function assessImpact(change: DetectedScheduleChange): ImpactAssessment {
     revalidation: false,
     reissue: false,
     refund: false,
-    reason: []
+    reason: [],
   }
 
   // 航班取消
@@ -288,7 +288,7 @@ export async function createScheduleChangeRecord(
       requires_refund: change.requiresRefund,
       status: 'pending',
       notes: change.description,
-      detected_at: new Date().toISOString()
+      detected_at: new Date().toISOString(),
     }
 
     const { data, error } = await supabase
@@ -326,7 +326,7 @@ export async function updateScheduleChangeStatus(
   try {
     const updates: Record<string, unknown> = {
       status,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     }
 
     if (['revalidated', 'reissued', 'refunded', 'cancelled'].includes(status)) {
@@ -338,10 +338,7 @@ export async function updateScheduleChangeStatus(
       updates.notes = options.notes
     }
 
-    const { error } = await supabase
-      .from('pnr_schedule_changes')
-      .update(updates)
-      .eq('id', changeId)
+    const { error } = await supabase.from('pnr_schedule_changes').update(updates).eq('id', changeId)
 
     if (error) {
       logger.error('[Revalidation] Failed to update schedule change status:', error)
@@ -413,9 +410,7 @@ export async function getScheduleChanges(
 /**
  * 取得待處理的航變記錄（全 workspace）
  */
-export async function getPendingScheduleChanges(
-  limit: number = 50
-): Promise<PnrScheduleChange[]> {
+export async function getPendingScheduleChanges(limit: number = 50): Promise<PnrScheduleChange[]> {
   try {
     const { data, error } = await supabase
       .from('pnr_schedule_changes')
@@ -453,7 +448,7 @@ export async function processPnrScheduleChanges(
 }> {
   const result = {
     changesDetected: [] as DetectedScheduleChange[],
-    recordsCreated: 0
+    recordsCreated: 0,
   }
 
   // 1. 偵測航變
@@ -463,7 +458,9 @@ export async function processPnrScheduleChanges(
     return result
   }
 
-  logger.log(`[Revalidation] Detected ${result.changesDetected.length} schedule change(s) for PNR ${pnrId}`)
+  logger.log(
+    `[Revalidation] Detected ${result.changesDetected.length} schedule change(s) for PNR ${pnrId}`
+  )
 
   // 2. 建立航變記錄
   for (const change of result.changesDetected) {
@@ -483,16 +480,13 @@ export async function processPnrScheduleChanges(
 /**
  * 更新 PNR 的 has_schedule_change 標記
  */
-async function updatePnrScheduleChangeFlag(
-  pnrId: string,
-  hasChange: boolean
-): Promise<void> {
+async function updatePnrScheduleChangeFlag(pnrId: string, hasChange: boolean): Promise<void> {
   try {
     await supabase
       .from('pnr_records')
       .update({
         has_schedule_change: hasChange,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq('id', pnrId)
   } catch (err) {
@@ -547,5 +541,5 @@ export default {
   updateScheduleChangeStatus,
   getScheduleChanges,
   getPendingScheduleChanges,
-  processPnrScheduleChanges
+  processPnrScheduleChanges,
 }

@@ -57,9 +57,7 @@ describe('QuoteService', () => {
     it('should throw error when total cost is negative', () => {
       const validateFn = (quoteService as any).validate.bind(quoteService)
 
-      const negativeCategories = [
-        { id: 'cat-1', name: '費用', items: [], total: -100 },
-      ]
+      const negativeCategories = [{ id: 'cat-1', name: '費用', items: [], total: -100 }]
 
       expect(() => validateFn({ categories: negativeCategories })).toThrow(ValidationError)
       expect(() => validateFn({ categories: negativeCategories })).toThrow('總金額不能為負數')
@@ -69,9 +67,11 @@ describe('QuoteService', () => {
       const validateFn = (quoteService as any).validate.bind(quoteService)
 
       expect(() => validateFn({ name: '有效報價單' })).not.toThrow()
-      expect(() => validateFn({
-        categories: [{ id: '1', name: 'test', items: [], total: 1000 }]
-      })).not.toThrow()
+      expect(() =>
+        validateFn({
+          categories: [{ id: '1', name: 'test', items: [], total: 1000 }],
+        })
+      ).not.toThrow()
     })
   })
 

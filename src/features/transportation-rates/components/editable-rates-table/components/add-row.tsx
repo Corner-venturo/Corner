@@ -41,9 +41,7 @@ export function AddRow({
       {/* 品項欄位 */}
       <td className="px-3 py-2 border-r border-border/40 bg-morandi-container/20">
         {isAddingToCategory ? (
-          <span className="text-sm font-medium text-morandi-primary">
-            {newRow.category || '-'}
-          </span>
+          <span className="text-sm font-medium text-morandi-primary">{newRow.category || '-'}</span>
         ) : (
           <Input
             placeholder={EDITABLE_RATES_TABLE_LABELS.LABEL_5093}
@@ -57,9 +55,7 @@ export function AddRow({
       {/* 廠商欄位 */}
       <td className="px-3 py-2 border-r border-border/40 bg-morandi-container/20">
         {isAddingToCategory ? (
-          <span className="text-sm text-muted-foreground">
-            {newRow.supplier || '-'}
-          </span>
+          <span className="text-sm text-muted-foreground">{newRow.supplier || '-'}</span>
         ) : (
           <Input
             placeholder={EDITABLE_RATES_TABLE_LABELS.LABEL_6949}
@@ -111,7 +107,9 @@ export function AddRow({
               type="number"
               placeholder="0"
               value={newRow.kkday_selling_price || ''}
-              onChange={e => setNewRow({ ...newRow, kkday_selling_price: parseFloat(e.target.value) || 0 })}
+              onChange={e =>
+                setNewRow({ ...newRow, kkday_selling_price: parseFloat(e.target.value) || 0 })
+              }
               className="h-8 text-sm"
             />
           </td>
@@ -129,7 +127,9 @@ export function AddRow({
               type="number"
               placeholder="0"
               value={newRow.kkday_profit || ''}
-              onChange={e => setNewRow({ ...newRow, kkday_profit: parseFloat(e.target.value) || 0 })}
+              onChange={e =>
+                setNewRow({ ...newRow, kkday_profit: parseFloat(e.target.value) || 0 })
+              }
               className="h-8 text-sm"
             />
           </td>

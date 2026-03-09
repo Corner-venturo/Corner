@@ -36,42 +36,41 @@ interface MemoEditorProps {
   onTemplateDataChange: (newData: Record<string, unknown>) => void
 }
 
-export function MemoEditor({
-  templateData,
-  onTemplateDataChange,
-}: MemoEditorProps) {
+export function MemoEditor({ templateData, onTemplateDataChange }: MemoEditorProps) {
   // 取得備忘錄設定
-  const memoSettings = templateData.memoSettings as {
-    title?: string
-    subtitle?: string
-    items?: Array<{
-      id: string
-      category: string
-      icon: string
-      title: string
-      titleZh?: string
-      content: string
-      enabled: boolean
-    }>
-    seasons?: Array<{
-      season: string
-      icon: string
-      iconColor?: string
-      months: string
-      description: string
-      enabled: boolean
-    }>
-    infoItems?: Array<{
-      id: string
-      icon: string
-      iconColor?: string
-      title: string
-      content: string
-      enabled: boolean
-    }>
-    // 儲存統一排序
-    unifiedOrder?: string[] // 儲存所有項目的 ID，決定顯示順序
-  } | undefined
+  const memoSettings = templateData.memoSettings as
+    | {
+        title?: string
+        subtitle?: string
+        items?: Array<{
+          id: string
+          category: string
+          icon: string
+          title: string
+          titleZh?: string
+          content: string
+          enabled: boolean
+        }>
+        seasons?: Array<{
+          season: string
+          icon: string
+          iconColor?: string
+          months: string
+          description: string
+          enabled: boolean
+        }>
+        infoItems?: Array<{
+          id: string
+          icon: string
+          iconColor?: string
+          title: string
+          content: string
+          enabled: boolean
+        }>
+        // 儲存統一排序
+        unifiedOrder?: string[] // 儲存所有項目的 ID，決定顯示順序
+      }
+    | undefined
 
   // 季節名稱對照
   const seasonLabels: Record<string, string> = {
@@ -175,7 +174,7 @@ export function MemoEditor({
       newList.splice(toIndex, 0, removed)
 
       // 儲存新的排序
-      const newOrder = newList.map((item) => item.id)
+      const newOrder = newList.map(item => item.id)
       onTemplateDataChange({
         ...templateData,
         memoSettings: { ...memoSettings, unifiedOrder: newOrder },
@@ -211,20 +210,18 @@ export function MemoEditor({
   if (!memoSettings || !memoSettings.items) {
     return (
       <div className="space-y-3">
-        <p className="text-xs text-morandi-secondary">
-          {DESIGNER_LABELS.LOADING_9662}
-        </p>
+        <p className="text-xs text-morandi-secondary">{DESIGNER_LABELS.LOADING_9662}</p>
         <div className="space-y-2">
           <Label className="text-xs">{DESIGNER_LABELS.SELECT_8015}</Label>
           <Select
             value={currentCountryCode}
-            onValueChange={(v) => handleCountryChange(v as CountryCode)}
+            onValueChange={v => handleCountryChange(v as CountryCode)}
           >
             <SelectTrigger className="h-8 text-sm">
               <SelectValue placeholder={DESIGNER_LABELS.SELECT_7302} />
             </SelectTrigger>
             <SelectContent>
-              {countryOptions.map((opt) => (
+              {countryOptions.map(opt => (
                 <SelectItem key={opt.value} value={opt.value} className="text-sm">
                   {opt.label}
                 </SelectItem>
@@ -237,7 +234,7 @@ export function MemoEditor({
   }
 
   // 計算頁數（統一列表中啟用的項目）
-  const enabledItemCount = unifiedList.filter((i) => i.enabled).length
+  const enabledItemCount = unifiedList.filter(i => i.enabled).length
   const totalPages = Math.max(1, Math.ceil(enabledItemCount / 7)) // 每頁 7 個項目
 
   return (
@@ -247,13 +244,13 @@ export function MemoEditor({
         <Label className="text-xs">{DESIGNER_LABELS.LABEL_2650}</Label>
         <Select
           value={currentCountryCode}
-          onValueChange={(v) => handleCountryChange(v as CountryCode)}
+          onValueChange={v => handleCountryChange(v as CountryCode)}
         >
           <SelectTrigger className="h-8 text-sm">
             <SelectValue placeholder={DESIGNER_LABELS.SELECT_7169} />
           </SelectTrigger>
           <SelectContent>
-            {countryOptions.map((opt) => (
+            {countryOptions.map(opt => (
               <SelectItem key={opt.value} value={opt.value} className="text-sm">
                 {opt.label}
               </SelectItem>
@@ -269,9 +266,7 @@ export function MemoEditor({
       </div>
 
       {/* 提示文字 */}
-      <p className="text-[10px] text-morandi-muted">
-        {DESIGNER_LABELS.LABEL_177}
-      </p>
+      <p className="text-[10px] text-morandi-muted">{DESIGNER_LABELS.LABEL_177}</p>
 
       {/* 扁平化項目列表（一般項目 + 天氣季節 + 緊急聯絡） */}
       <div className="space-y-1">
@@ -279,10 +274,10 @@ export function MemoEditor({
           <label
             key={item.id}
             draggable
-            onDragStart={(e) => dragHandlers.onDragStart(e, idx)}
-            onDragOver={(e) => dragHandlers.onDragOver(e, idx)}
+            onDragStart={e => dragHandlers.onDragStart(e, idx)}
+            onDragOver={e => dragHandlers.onDragOver(e, idx)}
             onDragLeave={dragHandlers.onDragLeave}
-            onDrop={(e) => dragHandlers.onDrop(e, idx)}
+            onDrop={e => dragHandlers.onDrop(e, idx)}
             onDragEnd={dragHandlers.onDragEnd}
             className={cn(
               'flex items-center gap-1.5 p-2 rounded border border-border/50 bg-morandi-container/10 cursor-pointer transition-all',
@@ -307,24 +302,24 @@ export function MemoEditor({
             />
 
             {/* 標題 */}
-            <span className="flex-1 text-xs text-morandi-primary truncate">
-              {item.label}
-            </span>
+            <span className="flex-1 text-xs text-morandi-primary truncate">{item.label}</span>
 
             {/* 類型標籤（可選） */}
             {item.type === 'season' && (
-              <span className="text-[10px] text-blue-500 shrink-0">{DESIGNER_LABELS.LABEL_270}</span>
+              <span className="text-[10px] text-blue-500 shrink-0">
+                {DESIGNER_LABELS.LABEL_270}
+              </span>
             )}
             {item.type === 'info' && (
-              <span className="text-[10px] text-amber-600 shrink-0">{DESIGNER_LABELS.LABEL_2152}</span>
+              <span className="text-[10px] text-amber-600 shrink-0">
+                {DESIGNER_LABELS.LABEL_2152}
+              </span>
             )}
           </label>
         ))}
       </div>
 
-      <p className="text-[10px] text-morandi-muted">
-        {DESIGNER_LABELS.ADD_9046}
-      </p>
+      <p className="text-[10px] text-morandi-muted">{DESIGNER_LABELS.ADD_9046}</p>
     </div>
   )
 }

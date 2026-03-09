@@ -75,15 +75,15 @@
 
 ## 核心檔案
 
-| 檔案 | 位置 | 說明 |
-|------|------|------|
-| **logan-service.ts** | `src/lib/logan/` | 核心服務邏輯 |
-| **ollama.ts** | `src/lib/logan/` | Ollama 連接器 |
-| **index.ts** | `src/lib/logan/` | 模組匯出入口 |
-| **base.ts** | `src/lib/logan/providers/` | AI Provider 介面 |
-| **useLogan.ts** | `src/hooks/` | React Hook |
-| **route.ts** | `src/app/api/logan/chat/` | API 端點 |
-| **useBotResponse.ts** | `src/components/workspace/channel-chat/hooks/` | 聊天室整合 |
+| 檔案                  | 位置                                           | 說明             |
+| --------------------- | ---------------------------------------------- | ---------------- |
+| **logan-service.ts**  | `src/lib/logan/`                               | 核心服務邏輯     |
+| **ollama.ts**         | `src/lib/logan/`                               | Ollama 連接器    |
+| **index.ts**          | `src/lib/logan/`                               | 模組匯出入口     |
+| **base.ts**           | `src/lib/logan/providers/`                     | AI Provider 介面 |
+| **useLogan.ts**       | `src/hooks/`                                   | React Hook       |
+| **route.ts**          | `src/app/api/logan/chat/`                      | API 端點         |
+| **useBotResponse.ts** | `src/components/workspace/channel-chat/hooks/` | 聊天室整合       |
 
 ---
 
@@ -139,22 +139,22 @@ roles: ['bot']
 
 ## 記憶分類 (Memory Categories)
 
-| 分類 | 說明 | 範例 |
-|------|------|------|
-| `company_culture` | 公司文化 | 「我們重視團隊合作」 |
-| `philosophy` | 理念與價值觀 | 「客戶滿意是最高原則」 |
-| `journey` | 心路歷程 | 「公司創立的故事」 |
-| `why_we_do_this` | 為什麼這樣做 | 「為什麼選擇這個技術架構」 |
-| `how_to` | 怎麼做某件事 | 「如何開一個新團」 |
-| `where_is` | 東西在哪裡 | 「護照在哪裡保管」 |
-| `workflow` | 流程順序 | 「訂單處理流程」 |
-| `business_rule` | 業務規則 | 「取消政策」 |
-| `term_definition` | 名詞解釋 | 「什麼是 PNR」 |
-| `tech_decision` | 技術決策 | 「為什麼用 Supabase」 |
-| `lesson_learned` | 踩過的坑 | 「之前遇過的問題」 |
-| `conversation` | 重要對話 | 「客戶的重要反饋」 |
-| `dont_do` | 不要做的事 | 「絕對不能做的事」 |
-| `personality` | 人格特質 | 「Logan 的回答風格」 |
+| 分類              | 說明         | 範例                       |
+| ----------------- | ------------ | -------------------------- |
+| `company_culture` | 公司文化     | 「我們重視團隊合作」       |
+| `philosophy`      | 理念與價值觀 | 「客戶滿意是最高原則」     |
+| `journey`         | 心路歷程     | 「公司創立的故事」         |
+| `why_we_do_this`  | 為什麼這樣做 | 「為什麼選擇這個技術架構」 |
+| `how_to`          | 怎麼做某件事 | 「如何開一個新團」         |
+| `where_is`        | 東西在哪裡   | 「護照在哪裡保管」         |
+| `workflow`        | 流程順序     | 「訂單處理流程」           |
+| `business_rule`   | 業務規則     | 「取消政策」               |
+| `term_definition` | 名詞解釋     | 「什麼是 PNR」             |
+| `tech_decision`   | 技術決策     | 「為什麼用 Supabase」      |
+| `lesson_learned`  | 踩過的坑     | 「之前遇過的問題」         |
+| `conversation`    | 重要對話     | 「客戶的重要反饋」         |
+| `dont_do`         | 不要做的事   | 「絕對不能做的事」         |
+| `personality`     | 人格特質     | 「Logan 的回答風格」       |
 
 ---
 
@@ -176,8 +176,8 @@ const response = await fetch('/api/logan/chat', {
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     action: 'chat',
-    message: '請問如何開一個新團？'
-  })
+    message: '請問如何開一個新團？',
+  }),
 })
 const { success, message, conversationId, error } = await response.json()
 // { success: true, message: '開新團的步驟是...', conversationId: 'uuid' }
@@ -195,8 +195,8 @@ const response = await fetch('/api/logan/chat', {
     content: '出發前 30 天取消，收取 10% 手續費',
     category: 'business_rule',
     tags: ['取消', '退款', '政策'],
-    importance: 8
-  })
+    importance: 8,
+  }),
 })
 const { success, memoryId, error } = await response.json()
 // { success: true, memoryId: 'uuid' }
@@ -213,14 +213,14 @@ import { useLogan } from '@/hooks/useLogan'
 
 function MyComponent() {
   const {
-    messages,      // 對話訊息陣列
-    isLoading,     // 是否載入中
-    error,         // 錯誤訊息
-    isAvailable,   // Logan 是否可用
-    model,         // 使用的模型
-    sendMessage,   // 發送訊息
-    teach,         // 教導新知識
-    clearMessages  // 清除對話
+    messages, // 對話訊息陣列
+    isLoading, // 是否載入中
+    error, // 錯誤訊息
+    isAvailable, // Logan 是否可用
+    model, // 使用的模型
+    sendMessage, // 發送訊息
+    teach, // 教導新知識
+    clearMessages, // 清除對話
   } = useLogan()
 
   const handleSend = async () => {
@@ -231,7 +231,7 @@ function MyComponent() {
     await teach('取消政策', '出發前 30 天取消...', {
       type: 'procedure',
       tags: ['取消', '退款'],
-      importance: 8
+      importance: 8,
     })
   }
 
@@ -293,26 +293,26 @@ npx tsx scripts/seed-logan-memories.ts
 
 種子腳本會寫入以下知識：
 
-| 分類 | 內容 |
-|------|------|
-| **公司理念** | 核心願景、三大核心假設、角色模型 |
-| **技術架構** | ERP 權力中心、雙平台架構 |
-| **業務流程** | 團為中心架構、價值飛輪、提案到開團流程 |
-| **系統操作** | 開報價、加成員、收款、簽證流程 |
+| 分類         | 內容                                                  |
+| ------------ | ----------------------------------------------------- |
+| **公司理念** | 核心願景、三大核心假設、角色模型                      |
+| **技術架構** | ERP 權力中心、雙平台架構                              |
+| **業務流程** | 團為中心架構、價值飛輪、提案到開團流程                |
+| **系統操作** | 開報價、加成員、收款、簽證流程                        |
 | **文件位置** | THESIS、VISION、特洛伊計畫、SITEMAP、CLAUDE.md、docs/ |
 
 ### 公司核心文件
 
 羅根知道這些重要文件的位置：
 
-| 文件 | 位置 | 說明 |
-|------|------|------|
-| **VENTURO_THESIS.md** | `/Projects/` | 九章產業論文（核心理念） |
-| **VENTURO_VISION.md** | `/Projects/venturo-erp/.claude/` | 雙平台架構願景 |
-| **特洛伊計畫.md** | `/Projects/` | 完整版商業計劃 |
-| **SITEMAP.md** | `/Projects/` | 專案網站地圖 |
-| **CLAUDE.md** | `/Projects/venturo-erp/.claude/` | AI 開發規範 |
-| **docs/** | `/Projects/venturo-erp/docs/` | 開發文檔目錄 |
+| 文件                  | 位置                             | 說明                     |
+| --------------------- | -------------------------------- | ------------------------ |
+| **VENTURO_THESIS.md** | `/Projects/`                     | 九章產業論文（核心理念） |
+| **VENTURO_VISION.md** | `/Projects/venturo-erp/.claude/` | 雙平台架構願景           |
+| **特洛伊計畫.md**     | `/Projects/`                     | 完整版商業計劃           |
+| **SITEMAP.md**        | `/Projects/`                     | 專案網站地圖             |
+| **CLAUDE.md**         | `/Projects/venturo-erp/.claude/` | AI 開發規範              |
+| **docs/**             | `/Projects/venturo-erp/docs/`    | 開發文檔目錄             |
 
 ---
 
@@ -358,10 +358,10 @@ npx tsx scripts/seed-logan-memories.ts
 
 ### 教學權限
 
-| 帳號 | 可以對話 | 可以教學 |
-|------|---------|---------|
-| **威廉 (William)** | ✅ | ✅ |
-| 其他員工 | ✅ | ❌ |
+| 帳號               | 可以對話 | 可以教學 |
+| ------------------ | -------- | -------- |
+| **威廉 (William)** | ✅       | ✅       |
+| 其他員工           | ✅       | ❌       |
 
 **為什麼限制教學權限？**
 
@@ -463,7 +463,7 @@ curl https://your-domain.vercel.app/api/cron/sync-logan-knowledge
   "crons": [
     {
       "path": "/api/cron/sync-logan-knowledge",
-      "schedule": "0 2 * * *"  // UTC 02:00 = 台灣 10:00
+      "schedule": "0 2 * * *" // UTC 02:00 = 台灣 10:00
     }
   ]
 }
@@ -473,13 +473,13 @@ curl https://your-domain.vercel.app/api/cron/sync-logan-knowledge
 
 ## 待開發功能
 
-| 功能 | 優先級 | 說明 |
-|------|--------|------|
-| 向量搜尋 | P1 | 使用 embedding 進行記憶檢索 |
-| 串流回應 | P2 | 即時顯示 AI 回應 |
-| 多模型支援 | P2 | 支援 Claude、OpenAI |
-| 管理介面 | P3 | 管理記憶庫的 UI |
-| ~~自動學習~~ | ✅ 已完成 | 每日同步景點/餐廳資料 |
+| 功能         | 優先級    | 說明                        |
+| ------------ | --------- | --------------------------- |
+| 向量搜尋     | P1        | 使用 embedding 進行記憶檢索 |
+| 串流回應     | P2        | 即時顯示 AI 回應            |
+| 多模型支援   | P2        | 支援 Claude、OpenAI         |
+| 管理介面     | P3        | 管理記憶庫的 UI             |
+| ~~自動學習~~ | ✅ 已完成 | 每日同步景點/餐廳資料       |
 
 ---
 

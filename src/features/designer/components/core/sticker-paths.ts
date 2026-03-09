@@ -463,8 +463,10 @@ export const STICKER_PATHS: Record<string, StickerDefinition> = {
 /**
  * 按分類取得貼紙列表
  */
-export function getStickersByCategory(category: StickerDefinition['category']): StickerDefinition[] {
-  return Object.values(STICKER_PATHS).filter((s) => s.category === category)
+export function getStickersByCategory(
+  category: StickerDefinition['category']
+): StickerDefinition[] {
+  return Object.values(STICKER_PATHS).filter(s => s.category === category)
 }
 
 /**

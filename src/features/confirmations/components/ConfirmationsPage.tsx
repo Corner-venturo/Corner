@@ -3,7 +3,6 @@
  * ConfirmationsPage - 確認單列表頁面
  */
 
-
 import { logger } from '@/lib/utils/logger'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'

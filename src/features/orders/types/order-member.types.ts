@@ -77,7 +77,7 @@ export interface ProcessedFile {
 export interface CustomCostField {
   id: string
   name: string
-  values: Record<string, string>  // memberId -> value
+  values: Record<string, string> // memberId -> value
 }
 
 // ============================================

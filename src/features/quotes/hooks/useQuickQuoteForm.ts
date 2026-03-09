@@ -160,9 +160,10 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
       return true
     } catch (error) {
       // 解析 Supabase 錯誤
-      const errorMessage = error instanceof Error
-        ? error.message
-        : (error as { message?: string })?.message || JSON.stringify(error)
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : (error as { message?: string })?.message || JSON.stringify(error)
       logger.error('Error creating quick quote:', errorMessage, error)
       alert(`建立快速報價單失敗：${errorMessage}`)
       return false

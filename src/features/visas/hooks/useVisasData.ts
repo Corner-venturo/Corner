@@ -1,7 +1,12 @@
 'use client'
 
 import { createTour, invalidateTours } from '@/data'
-import { useVisas, createVisa, updateVisa as updateVisaData, deleteVisa as deleteVisaData } from '@/data'
+import {
+  useVisas,
+  createVisa,
+  updateVisa as updateVisaData,
+  deleteVisa as deleteVisaData,
+} from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { createOrder, updateOrder, deleteOrder as deleteOrderData } from '@/data'
 import { useMemo, useCallback, useState } from 'react'
@@ -46,7 +51,9 @@ export function useVisasData() {
     if (orders.length > 0) return
     const { data } = await supabase
       .from('orders')
-      .select('id, code, order_number, tour_id, tour_name, contact_person, status, workspace_id, created_at')
+      .select(
+        'id, code, order_number, tour_id, tour_name, contact_person, status, workspace_id, created_at'
+      )
       .order('created_at', { ascending: false })
       .limit(500)
     if (data) setOrders(data as Order[])
@@ -55,83 +62,86 @@ export function useVisasData() {
   /**
    * 刪除簽證並連動處理（直接查詢 Supabase，不依賴預載入的 orders）
    */
-  const deleteVisaWithCascade = useCallback(async (visaId: string) => {
-    const visa = visas.find(v => v.id === visaId)
-    if (!visa) {
-      logger.error('找不到簽證:', visaId)
-      return
-    }
+  const deleteVisaWithCascade = useCallback(
+    async (visaId: string) => {
+      const visa = visas.find(v => v.id === visaId)
+      if (!visa) {
+        logger.error('找不到簽證:', visaId)
+        return
+      }
 
-    const { order_id, applicant_name, fee } = visa
+      const { order_id, applicant_name, fee } = visa
 
-    try {
-      // 1. 刪除簽證
-      await deleteVisaData(visaId)
+      try {
+        // 1. 刪除簽證
+        await deleteVisaData(visaId)
 
-      // 2. 刪除對應的訂單成員
-      if (order_id && applicant_name) {
-        const { data: memberToDelete } = await supabase
-          .from('order_members')
-          .select('id')
-          .eq('order_id', order_id)
-          .or(`chinese_name.eq.${applicant_name},name.eq.${applicant_name}`)
-          .limit(1)
-          .single()
+        // 2. 刪除對應的訂單成員
+        if (order_id && applicant_name) {
+          const { data: memberToDelete } = await supabase
+            .from('order_members')
+            .select('id')
+            .eq('order_id', order_id)
+            .or(`chinese_name.eq.${applicant_name},name.eq.${applicant_name}`)
+            .limit(1)
+            .single()
 
-        if (memberToDelete) {
-          await deleteMember(memberToDelete.id)
-          // 重算團人數
-          if (order_id) {
-            const { data: order } = await supabase
-              .from('orders')
-              .select('tour_id')
-              .eq('id', order_id)
-              .single()
-            if (order?.tour_id) {
-              recalculateParticipants(order.tour_id).catch(err => {
-                logger.error('重算團人數失敗:', err)
-              })
+          if (memberToDelete) {
+            await deleteMember(memberToDelete.id)
+            // 重算團人數
+            if (order_id) {
+              const { data: order } = await supabase
+                .from('orders')
+                .select('tour_id')
+                .eq('id', order_id)
+                .single()
+              if (order?.tour_id) {
+                recalculateParticipants(order.tour_id).catch(err => {
+                  logger.error('重算團人數失敗:', err)
+                })
+              }
             }
           }
         }
-      }
 
-      // 3. 檢查該訂單是否還有其他簽證（直接查詢）
-      if (order_id) {
-        const remainingVisas = visas.filter(v => v.order_id === order_id && v.id !== visaId)
+        // 3. 檢查該訂單是否還有其他簽證（直接查詢）
+        if (order_id) {
+          const remainingVisas = visas.filter(v => v.order_id === order_id && v.id !== visaId)
 
-        // 直接查詢訂單資料
-        const { data: targetOrder } = await supabase
-          .from('orders')
-          .select('id, total_amount, remaining_amount, member_count')
-          .eq('id', order_id)
-          .single()
+          // 直接查詢訂單資料
+          const { data: targetOrder } = await supabase
+            .from('orders')
+            .select('id, total_amount, remaining_amount, member_count')
+            .eq('id', order_id)
+            .single()
 
-        if (remainingVisas.length === 0 && targetOrder) {
-          await deleteOrderData(order_id)
-          toast.success('已刪除簽證及相關訂單')
-        } else if (targetOrder) {
-          const newTotalAmount = (targetOrder.total_amount || 0) - (fee || 0)
-          const newRemainingAmount = (targetOrder.remaining_amount || 0) - (fee || 0)
-          const newMemberCount = Math.max(0, (targetOrder.member_count || 0) - 1)
+          if (remainingVisas.length === 0 && targetOrder) {
+            await deleteOrderData(order_id)
+            toast.success('已刪除簽證及相關訂單')
+          } else if (targetOrder) {
+            const newTotalAmount = (targetOrder.total_amount || 0) - (fee || 0)
+            const newRemainingAmount = (targetOrder.remaining_amount || 0) - (fee || 0)
+            const newMemberCount = Math.max(0, (targetOrder.member_count || 0) - 1)
 
-          await updateOrder(order_id, {
-            total_amount: Math.max(0, newTotalAmount),
-            remaining_amount: Math.max(0, newRemainingAmount),
-            member_count: newMemberCount,
-          })
-          toast.success('已刪除簽證')
+            await updateOrder(order_id, {
+              total_amount: Math.max(0, newTotalAmount),
+              remaining_amount: Math.max(0, newRemainingAmount),
+              member_count: newMemberCount,
+            })
+            toast.success('已刪除簽證')
+          } else {
+            toast.success('已刪除簽證')
+          }
         } else {
           toast.success('已刪除簽證')
         }
-      } else {
-        toast.success('已刪除簽證')
+      } catch (error) {
+        logger.error('刪除簽證失敗:', error)
+        toast.error('刪除簽證失敗')
       }
-    } catch (error) {
-      logger.error('刪除簽證失敗:', error)
-      toast.error('刪除簽證失敗')
-    }
-  }, [visas])
+    },
+    [visas]
+  )
 
   return {
     // 資料

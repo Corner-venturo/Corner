@@ -12,10 +12,7 @@ export default defineConfig({
   workers: 1, // 只用一個 worker
   timeout: 60000, // 每個測試 60 秒
 
-  reporter: [
-    ['html', { open: 'never' }],
-    ['list'],
-  ],
+  reporter: [['html', { open: 'never' }], ['list']],
 
   // 全域設定：登入一次
   globalSetup: require.resolve('./tests/e2e/global-setup.ts'),

@@ -131,9 +131,7 @@ describe('OrderService', () => {
     })
 
     it('should return 0 when no paid orders', () => {
-      mockItems.push(
-        createMockOrder({ payment_status: 'unpaid', total_amount: 10000 })
-      )
+      mockItems.push(createMockOrder({ payment_status: 'unpaid', total_amount: 10000 }))
 
       const revenue = orderService.calculateTotalRevenue()
 

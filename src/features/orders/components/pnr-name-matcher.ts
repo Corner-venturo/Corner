@@ -77,8 +77,7 @@ export function calculateSimilarity(str1: string, str2: string): number {
     k++
   }
 
-  const jaro =
-    (matches / len1 + matches / len2 + (matches - transpositions / 2) / matches) / 3
+  const jaro = (matches / len1 + matches / len2 + (matches - transpositions / 2) / matches) / 3
 
   // Winkler 加權（共同前綴）
   let prefix = 0

@@ -8,17 +8,17 @@ export interface SurchargeItem {
 }
 
 export interface MemberSurcharges {
-  single_room_surcharge: number | null  // 單人房差
-  add_on_items: SurchargeItem[]  // 加購項目（可多筆）
-  visa_fee: number | null  // 簽證代辦費
-  other_charges: SurchargeItem[]  // 其他費用（可多筆）
+  single_room_surcharge: number | null // 單人房差
+  add_on_items: SurchargeItem[] // 加購項目（可多筆）
+  visa_fee: number | null // 簽證代辦費
+  other_charges: SurchargeItem[] // 其他費用（可多筆）
 }
 
 export const DEFAULT_SURCHARGES: MemberSurcharges = {
   single_room_surcharge: null,
   add_on_items: [],
   visa_fee: null,
-  other_charges: []
+  other_charges: [],
 }
 
 // 標籤定義
@@ -32,5 +32,5 @@ export const SURCHARGE_LABELS = {
   remove_item: '移除',
   total_surcharge: '附加費用合計',
   total_cost: '總費用',
-  base_cost: '基本團費'
+  base_cost: '基本團費',
 } as const

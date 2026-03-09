@@ -3,7 +3,6 @@
  * QuickQuoteCustomerInfo - 快速報價單客戶資訊區
  */
 
-
 import { getTodayString } from '@/lib/utils/format-date'
 import React from 'react'
 import { Quote } from '@/types/quote.types'
@@ -30,9 +29,7 @@ export const QuickQuoteCustomerInfo: React.FC<QuickQuoteCustomerInfoProps> = ({ 
       </div>
       <div className="flex">
         <span className="font-semibold w-24">{QUICK_QUOTE_LABELS.LABEL_7518}</span>
-        <span className="flex-1 border-b border-border">
-          {quote.handler_name || 'William'}
-        </span>
+        <span className="flex-1 border-b border-border">{quote.handler_name || 'William'}</span>
       </div>
       <div className="flex col-span-2">
         <span className="font-semibold w-24">{QUICK_QUOTE_LABELS.LABEL_1301}</span>

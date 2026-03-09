@@ -39,9 +39,9 @@ function generateUUID(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID()
   }
-  
+
   // Fallback: 手動生成 UUID v4
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
     const r = (Math.random() * 16) | 0
     const v = c === 'x' ? r : (r & 0x3) | 0x8
     return v.toString(16)
@@ -55,34 +55,55 @@ function generateUUID(): string {
 // 需要 workspace 隔離的表格列表
 const WORKSPACE_SCOPED_TABLES = [
   // === 核心業務 ===
-  'tours', 'orders', 'customers',
+  'tours',
+  'orders',
+  'customers',
   // === 提案系統 ===
   'proposals',
   // === 行程與報價 ===
-  'quotes', 'itineraries',
+  'quotes',
+  'itineraries',
   // === 財務管理 ===
-  'payment_requests', 'disbursement_orders', 'receipt_orders',
+  'payment_requests',
+  'disbursement_orders',
+  'receipt_orders',
   // === 會計模組 ===
-  'chart_of_accounts', 'erp_bank_accounts',
+  'chart_of_accounts',
+  'erp_bank_accounts',
   // 'erp_transactions', 'erp_vouchers', // ⚠️ 2026-01-17: 移除，表沒有 workspace_id
-  'journal_vouchers', 'confirmations',
+  'journal_vouchers',
+  'confirmations',
   // === 供應商 ===
   // 'suppliers', // ⚠️ 2026-01-17: 移除，表沒有 workspace_id
   // === 其他業務 ===
-  'visas', 'todos', 'calendar_events', 'tour_addons',
+  'visas',
+  'todos',
+  'calendar_events',
+  'tour_addons',
   // === 溝通頻道 ===
-  'channels', 'messages',
+  'channels',
+  'messages',
   // === PNR 系統 ===
-  'pnrs', 'pnr_records', 'pnr_fare_history', 'pnr_fare_alerts',
-  'pnr_flight_status_history', 'flight_status_subscriptions',
-  'pnr_queue_items', 'pnr_schedule_changes', 'pnr_ai_queries',
+  'pnrs',
+  'pnr_records',
+  'pnr_fare_history',
+  'pnr_fare_alerts',
+  'pnr_flight_status_history',
+  'flight_status_subscriptions',
+  'pnr_queue_items',
+  'pnr_schedule_changes',
+  'pnr_ai_queries',
   // === 其他 ===
-  'airport_images', 'customer_groups', 'leader_availability',
-  'request_responses', 'request_response_items',
+  'airport_images',
+  'customer_groups',
+  'leader_availability',
+  'request_responses',
+  'request_response_items',
   // === 資料庫（景點/飯店等，需要 workspace 隔離寫入）===
   'attractions',
   // === 獎金系統 ===
-  'tour_bonus_settings', 'workspace_bonus_defaults',
+  'tour_bonus_settings',
+  'workspace_bonus_defaults',
   // === 核心表 ===
   'tour_itinerary_items',
 ]
@@ -103,7 +124,11 @@ const TABLE_CODE_PREFIX: Record<string, string> = {
 /**
  * 取得當前使用者的 workspace_id 和 role
  */
-function getCurrentUserContext(): { workspaceId: string | null; userRole: UserRole | null; userId: string | null } {
+function getCurrentUserContext(): {
+  workspaceId: string | null
+  userRole: UserRole | null
+  userId: string | null
+} {
   if (typeof window === 'undefined') return { workspaceId: null, userRole: null, userId: null }
   try {
     const authData = localStorage.getItem('auth-storage')
@@ -111,7 +136,7 @@ function getCurrentUserContext(): { workspaceId: string | null; userRole: UserRo
       const parsed = JSON.parse(authData)
       const user = parsed?.state?.user
       const roles = user?.roles as UserRole[] | undefined
-      const userRole = roles?.includes('super_admin') ? 'super_admin' : (roles?.[0] || null)
+      const userRole = roles?.includes('super_admin') ? 'super_admin' : roles?.[0] || null
       return {
         workspaceId: user?.workspace_id || null,
         userRole,
@@ -165,7 +190,9 @@ export function createEntityHook<T extends BaseEntity>(
       isReady: hasHydrated && isAuthenticated && !!user?.id,
       hasHydrated,
       workspaceId: user?.workspace_id || null,
-      userRole: (user?.roles?.includes('super_admin') ? 'super_admin' : user?.roles?.[0]) as UserRole | null,
+      userRole: (user?.roles?.includes('super_admin')
+        ? 'super_admin'
+        : user?.roles?.[0]) as UserRole | null,
     }
   }
 
@@ -198,12 +225,18 @@ export function createEntityHook<T extends BaseEntity>(
     useEffect(() => {
       if (!cache_key) return
       let cancelled = false
-      get_cache<D>(cache_key).then(entry => {
-        if (!cancelled && entry) {
-          setFallback(entry.data)
-        }
-      }).catch(() => { /* cache miss is non-critical */ })
-      return () => { cancelled = true }
+      get_cache<D>(cache_key)
+        .then(entry => {
+          if (!cancelled && entry) {
+            setFallback(entry.data)
+          }
+        })
+        .catch(() => {
+          /* cache miss is non-critical */
+        })
+      return () => {
+        cancelled = true
+      }
     }, [cache_key])
 
     return fallback
@@ -223,8 +256,7 @@ export function createEntityHook<T extends BaseEntity>(
       async () => {
         const selectFields = config.list?.select || '*'
 
-        // @ts-expect-error - Dynamic table factory: tableName is a runtime value
-        let query = supabase.from(tableName).select(selectFields)
+        let query = supabase.from(tableName as any).select(selectFields)
 
         // 套用 workspace 過濾
         const workspaceFilter = getWorkspaceFilter()
@@ -269,7 +301,9 @@ export function createEntityHook<T extends BaseEntity>(
       items: data || [],
       loading: !hasHydrated || isLoading,
       error: error?.message || null,
-      refresh: async () => { await mutate() },
+      refresh: async () => {
+        await mutate()
+      },
     }
   }
 
@@ -289,8 +323,7 @@ export function createEntityHook<T extends BaseEntity>(
       async () => {
         const selectFields = config.slim?.select || 'id'
 
-        // @ts-expect-error - Dynamic table factory: tableName is a runtime value
-        let query = supabase.from(tableName).select(selectFields)
+        let query = supabase.from(tableName as any).select(selectFields)
 
         // 套用 workspace 過濾
         const workspaceFilter = getWorkspaceFilter()
@@ -321,7 +354,9 @@ export function createEntityHook<T extends BaseEntity>(
       items: data || [],
       loading: !hasHydrated || isLoading,
       error: error?.message || null,
-      refresh: async () => { await mutate() },
+      refresh: async () => {
+        await mutate()
+      },
     }
   }
 
@@ -341,8 +376,11 @@ export function createEntityHook<T extends BaseEntity>(
 
         const selectFields = config.detail?.select || '*'
 
-        // @ts-expect-error - Dynamic table factory: tableName is a runtime value
-        const { data, error } = await supabase.from(tableName).select(selectFields).eq('id', id).maybeSingle()
+        const { data, error } = await supabase
+          .from(tableName as any)
+          .select(selectFields)
+          .eq('id', id)
+          .maybeSingle()
 
         if (error) {
           logger.error(`[${tableName}] Detail fetch error:`, error.message)
@@ -371,7 +409,9 @@ export function createEntityHook<T extends BaseEntity>(
       item: data || null,
       loading: !hasHydrated || isLoading,
       error: error?.message || null,
-      refresh: async () => { await mutate() },
+      refresh: async () => {
+        await mutate()
+      },
     }
   }
 
@@ -380,9 +420,7 @@ export function createEntityHook<T extends BaseEntity>(
   // ============================================
   function usePaginated(params: PaginatedParams): PaginatedResult<T> {
     const { isReady, hasHydrated } = useAuth()
-    const swrKey = isReady
-      ? `${cacheKeyPrefix}:paginated:${JSON.stringify(params)}`
-      : null
+    const swrKey = isReady ? `${cacheKeyPrefix}:paginated:${JSON.stringify(params)}` : null
 
     const { data, error, isLoading, mutate } = useSWR(
       swrKey,
@@ -393,8 +431,10 @@ export function createEntityHook<T extends BaseEntity>(
 
         const selectFields = config.list?.select || '*'
 
-        // @ts-expect-error - Dynamic table factory: tableName is a runtime value
-        let query = supabase.from(tableName).select(selectFields, { count: 'exact' }).range(from, to)
+        let query = supabase
+          .from(tableName as any)
+          .select(selectFields, { count: 'exact' })
+          .range(from, to)
 
         // 套用 workspace 過濾
         const workspaceFilter = getWorkspaceFilter()
@@ -404,7 +444,10 @@ export function createEntityHook<T extends BaseEntity>(
 
         // 排序
         const orderColumn = sortBy || config.list?.orderBy?.column || 'created_at'
-        const orderAsc = sortOrder === 'asc' || (sortOrder === undefined && config.list?.orderBy?.ascending) || false
+        const orderAsc =
+          sortOrder === 'asc' ||
+          (sortOrder === undefined && config.list?.orderBy?.ascending) ||
+          false
         query = query.order(orderColumn, { ascending: orderAsc })
 
         // 過濾
@@ -418,9 +461,7 @@ export function createEntityHook<T extends BaseEntity>(
 
         // 搜尋
         if (search && searchFields && searchFields.length > 0) {
-          const searchConditions = searchFields
-            .map(field => `${field}.ilike.%${search}%`)
-            .join(',')
+          const searchConditions = searchFields.map(field => `${field}.ilike.%${search}%`).join(',')
           query = query.or(searchConditions)
         }
 
@@ -444,7 +485,9 @@ export function createEntityHook<T extends BaseEntity>(
       totalCount: data?.totalCount || 0,
       loading: !hasHydrated || isLoading,
       error: error?.message || null,
-      refresh: async () => { await mutate() },
+      refresh: async () => {
+        await mutate()
+      },
     }
   }
 
@@ -455,12 +498,15 @@ export function createEntityHook<T extends BaseEntity>(
   function useDictionary(): DictionaryResult<T> {
     const { items, loading } = useListSlim()
 
-    const dictionary = (items || []).reduce((acc, item) => {
-      if (item.id) {
-        acc[item.id] = item
-      }
-      return acc
-    }, {} as Record<string, T>)
+    const dictionary = (items || []).reduce(
+      (acc, item) => {
+        if (item.id) {
+          acc[item.id] = item
+        }
+        return acc
+      },
+      {} as Record<string, T>
+    )
 
     return {
       dictionary,
@@ -472,9 +518,7 @@ export function createEntityHook<T extends BaseEntity>(
   // ============================================
   // create - 建立（支援 code 自動生成 + 樂觀更新）
   // ============================================
-  async function create(
-    data: EntityCreateData<T>
-  ): Promise<T> {
+  async function create(data: EntityCreateData<T>): Promise<T> {
     const now = new Date().toISOString()
 
     // 自動注入 workspace_id 和 created_by
@@ -498,8 +542,12 @@ export function createEntityHook<T extends BaseEntity>(
 
       // 每次重試都重新查詢並生成 code
       if (needsCodeGeneration) {
-        // @ts-expect-error - Dynamic table factory
-        const { data: maxCodeResults } = await supabase.from(tableName).select('code').like('code', `${codePrefix}%`).order('code', { ascending: false }).limit(1)
+        const { data: maxCodeResults } = await supabase
+          .from(tableName as any)
+          .select('code')
+          .like('code', `${codePrefix}%`)
+          .order('code', { ascending: false })
+          .limit(1)
 
         let nextNumber = 1
         const codeResults = maxCodeResults as Array<{ code?: string }> | null
@@ -537,8 +585,11 @@ export function createEntityHook<T extends BaseEntity>(
       )
 
       try {
-        // @ts-expect-error - Dynamic table factory
-        const { data: created, error } = await supabase.from(tableName).insert(newItem).select().single()
+        const { data: created, error } = await supabase
+          .from(tableName as any)
+          .insert(newItem)
+          .select()
+          .single()
 
         if (!error) {
           await invalidate()
@@ -548,7 +599,8 @@ export function createEntityHook<T extends BaseEntity>(
         // 檢查是否為 unique constraint 錯誤
         const errorCode = (error as { code?: string })?.code
         const errorMessage = (error as { message?: string })?.message || ''
-        const isUniqueViolation = errorCode === '23505' ||
+        const isUniqueViolation =
+          errorCode === '23505' ||
           errorMessage.includes('duplicate key') ||
           errorMessage.includes('unique constraint')
 
@@ -585,15 +637,12 @@ export function createEntityHook<T extends BaseEntity>(
     globalMutate(
       cacheKeyList,
       (currentItems: T[] | undefined) =>
-        (currentItems || []).map(item =>
-          item.id === id ? { ...item, ...updateData } : item
-        ),
+        (currentItems || []).map(item => (item.id === id ? { ...item, ...updateData } : item)),
       false
     )
 
     try {
-      // @ts-expect-error - Dynamic table factory
-      const { error } = await supabase.from(tableName).update(updateData).eq('id', id)
+      const { error } = await supabase.from(tableName as any).update(updateData).eq('id', id)
 
       if (error) {
         logger.error(`[${tableName}] Update error:`, error.message)
@@ -616,14 +665,12 @@ export function createEntityHook<T extends BaseEntity>(
     // 樂觀更新
     globalMutate(
       cacheKeyList,
-      (currentItems: T[] | undefined) =>
-        (currentItems || []).filter(item => item.id !== id),
+      (currentItems: T[] | undefined) => (currentItems || []).filter(item => item.id !== id),
       false
     )
 
     try {
-      // @ts-expect-error - Dynamic table factory
-      const { error } = await supabase.from(tableName).delete().eq('id', id)
+      const { error } = await supabase.from(tableName as any).delete().eq('id', id)
 
       if (error) {
         logger.error(`[${tableName}] Delete error:`, error.message)
@@ -654,8 +701,7 @@ export function createEntityHook<T extends BaseEntity>(
     )
 
     try {
-      // @ts-expect-error - Dynamic table factory
-      const { error } = await supabase.from(tableName).delete().in('id', ids)
+      const { error } = await supabase.from(tableName as any).delete().in('id', ids)
 
       if (error) {
         logger.error(`[${tableName}] BatchRemove error:`, error.message)

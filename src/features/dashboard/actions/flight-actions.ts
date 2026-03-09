@@ -7,8 +7,8 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 // 機場/航空公司名稱快取（統一從資料庫讀取）
 // ============================================
 interface RefCache {
-  airports: Map<string, string>  // iata_code -> name_zh
-  airlines: Map<string, string>  // iata_code -> name_zh
+  airports: Map<string, string> // iata_code -> name_zh
+  airlines: Map<string, string> // iata_code -> name_zh
   lastFetched: number
 }
 
@@ -48,7 +48,9 @@ async function loadReferenceData(): Promise<void> {
   }
 
   refCache.lastFetched = now
-  logger.log(`✅ 航班參考資料已載入: ${refCache.airports.size} 機場, ${refCache.airlines.size} 航空公司`)
+  logger.log(
+    `✅ 航班參考資料已載入: ${refCache.airports.size} 機場, ${refCache.airlines.size} 航空公司`
+  )
 }
 
 // 航班資料介面
@@ -240,7 +242,11 @@ function validateFlightData(flight: ApiFlightData): string[] {
 /**
  * 將 API 回傳的單筆航班資料轉換為 FlightData 格式
  */
-function transformFlightData(flight: ApiFlightData, flightDate: string, cleanFlightNumber: string): FlightData {
+function transformFlightData(
+  flight: ApiFlightData,
+  flightDate: string,
+  cleanFlightNumber: string
+): FlightData {
   const dep = flight.departure || {}
   const arr = flight.arrival || {}
 
@@ -280,9 +286,10 @@ function transformFlightData(flight: ApiFlightData, flightDate: string, cleanFli
     statusText: getStatusText(flight.status || 'Unknown'),
     aircraft: (flight as ApiFlightData & { aircraft?: { model?: string } }).aircraft?.model,
     date: flightDate,
-    duration: depScheduledTime && arrScheduledTime
-      ? calculateDuration(depScheduledTime, arrScheduledTime)
-      : undefined,
+    duration:
+      depScheduledTime && arrScheduledTime
+        ? calculateDuration(depScheduledTime, arrScheduledTime)
+        : undefined,
   }
 }
 
@@ -361,12 +368,13 @@ export async function searchFlightAction(
     )
 
     // 檢查是否有航段資料不完整
-    const incompleteSegments = apiData.filter((flight: ApiFlightData) =>
-      validateFlightData(flight).length > 0
+    const incompleteSegments = apiData.filter(
+      (flight: ApiFlightData) => validateFlightData(flight).length > 0
     )
-    const warning = incompleteSegments.length > 0
-      ? `部分航段資料不完整，可能是日期太遠，請確認後手動補充。`
-      : undefined
+    const warning =
+      incompleteSegments.length > 0
+        ? `部分航段資料不完整，可能是日期太遠，請確認後手動補充。`
+        : undefined
 
     logger.log(`✅ 航班查詢成功: ${cleanFlightNumber}，共 ${segments.length} 個航段`)
     return { segments, warning }
@@ -439,7 +447,9 @@ export async function searchAirportDeparturesAction(
         logger.error(`❌ Request: ${cleanAirportCode} on ${date}`)
 
         if (response.status === 400) {
-          return { error: `查詢參數錯誤：機場 ${cleanAirportCode}，日期 ${date}。請確認機場代碼正確。` }
+          return {
+            error: `查詢參數錯誤：機場 ${cleanAirportCode}，日期 ${date}。請確認機場代碼正確。`,
+          }
         }
         if (response.status === 404) {
           return { error: '找不到該機場的資訊。' }
@@ -489,9 +499,7 @@ export async function searchAirportDeparturesAction(
     if (destinationFilter) {
       const filterUpper = destinationFilter.toUpperCase()
       flights = flights.filter(
-        f =>
-          f.destinationIata === filterUpper ||
-          f.destination.toUpperCase().includes(filterUpper)
+        f => f.destinationIata === filterUpper || f.destination.toUpperCase().includes(filterUpper)
       )
     }
 
@@ -593,8 +601,7 @@ export async function searchAirportArrivalsAction(
       const filterUpper = originFilter.toUpperCase()
       flights = flights.filter(
         f =>
-          f.originIata === filterUpper ||
-          (f.origin && f.origin.toUpperCase().includes(filterUpper))
+          f.originIata === filterUpper || (f.origin && f.origin.toUpperCase().includes(filterUpper))
       )
     }
 

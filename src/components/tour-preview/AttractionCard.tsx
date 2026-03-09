@@ -153,7 +153,14 @@ export function AttractionCard({
       {hasImage ? (
         <div className="flex gap-5">
           <div className="relative w-32 h-32 flex-shrink-0 rounded-[12px] overflow-hidden">
-            <Image src={image} alt={title} fill className="object-cover" sizes="128px" {...getOptimizedImageProps(image)} />
+            <Image
+              src={image}
+              alt={title}
+              fill
+              className="object-cover"
+              sizes="128px"
+              {...getOptimizedImageProps(image)}
+            />
           </div>
           <div className="flex-1 min-w-0">
             <h4 className="font-bold text-base mb-2" style={{ color: morandiColors.text.primary }}>
@@ -169,7 +176,10 @@ export function AttractionCard({
           <h4 className="font-bold text-base mb-2" style={{ color: morandiColors.text.primary }}>
             {title}
           </h4>
-          <p className="text-sm leading-relaxed line-clamp-4" style={{ color: morandiColors.text.secondary }}>
+          <p
+            className="text-sm leading-relaxed line-clamp-4"
+            style={{ color: morandiColors.text.secondary }}
+          >
             {description}
           </p>
         </div>

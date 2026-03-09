@@ -22,7 +22,9 @@ async function diagnose() {
   // 1. 檢查所有員工的 supabase_user_id
   const { data: employees, error: empError } = await supabase
     .from('employees')
-    .select('id, employee_number, display_name, chinese_name, workspace_id, supabase_user_id, status')
+    .select(
+      'id, employee_number, display_name, chinese_name, workspace_id, supabase_user_id, status'
+    )
     .neq('employee_number', 'BOT001')
     .order('employee_number')
 

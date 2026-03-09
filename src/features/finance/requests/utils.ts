@@ -1,14 +1,16 @@
 import { PaymentRequest } from '@/stores/types'
 
-export function getNextStatuses(currentStatus: PaymentRequest['status']): Array<'pending' | 'confirmed' | 'billed'> {
+export function getNextStatuses(
+  currentStatus: PaymentRequest['status']
+): Array<'pending' | 'confirmed' | 'billed'> {
   switch (currentStatus) {
     case 'pending':
-      return ['confirmed'];
+      return ['confirmed']
     case 'confirmed':
-      return ['billed'];
+      return ['billed']
     case 'billed':
-      return [];
+      return []
     default:
-      return [];
+      return []
   }
 }

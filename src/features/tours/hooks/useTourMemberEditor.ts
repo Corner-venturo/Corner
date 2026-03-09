@@ -133,7 +133,12 @@ export function useTourMemberEditor(
         { room_type: string; hotel_name: string | null; room_number: string | null }
       > = {}
       rooms.forEach(
-        (room: { id: string; room_type: string; hotel_name: string | null; room_number: string | null }) => {
+        (room: {
+          id: string
+          room_type: string
+          hotel_name: string | null
+          room_number: string | null
+        }) => {
           roomMap[room.id] = {
             room_type: room.room_type,
             hotel_name: room.hotel_name,
@@ -294,8 +299,10 @@ export function useTourMemberEditor(
         ...convertedData,
         selling_price: tour.selling_price_per_person || null,
       }
-      
-      const newMember = await createMember(memberWithPrice as unknown as Parameters<typeof createMember>[0])
+
+      const newMember = await createMember(
+        memberWithPrice as unknown as Parameters<typeof createMember>[0]
+      )
 
       const updatedMembers = [...tableMembers]
       updatedMembers[index] = { ...member, id: newMember.id, isNew: false }
@@ -337,10 +344,13 @@ export function useTourMemberEditor(
     const member = tableMembers[index]
     const memberName = member.name || member.nameEn || COMP_TOURS_LABELS.此成員
 
-    const confirmed = await confirm(COMP_TOURS_LABELS.確定要刪除 + memberName + COMP_TOURS_LABELS.嗎, {
-      title: COMP_TOURS_LABELS.刪除成員,
-      type: 'warning',
-    })
+    const confirmed = await confirm(
+      COMP_TOURS_LABELS.確定要刪除 + memberName + COMP_TOURS_LABELS.嗎,
+      {
+        title: COMP_TOURS_LABELS.刪除成員,
+        type: 'warning',
+      }
+    )
     if (!confirmed) return
 
     if (member.id && !member.isNew) {

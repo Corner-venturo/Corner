@@ -61,7 +61,9 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
           sessionCheckedRef.current = true
           try {
             const { supabase } = await import('@/lib/supabase/client')
-            const { data: { session } } = await supabase.auth.getSession()
+            const {
+              data: { session },
+            } = await supabase.auth.getSession()
             if (!session) {
               logger.warn(LIB_LABELS.SESSION_CHECK_EXPIRED)
               redirectingRef.current = true
@@ -108,9 +110,10 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
 
       // 2. 檢查指定權限
       if (requiredPermission) {
-        const hasPermission = permissions.includes(requiredPermission) ||
-                             permissions.includes('admin') ||
-                             permissions.includes('super_admin')
+        const hasPermission =
+          permissions.includes(requiredPermission) ||
+          permissions.includes('admin') ||
+          permissions.includes('super_admin')
 
         if (!hasPermission) {
           logger.warn(`用戶無權限訪問 ${pathname}（需要 ${requiredPermission}）`)
@@ -130,17 +133,8 @@ export function AuthGuard({ children, requiredPermission }: AuthGuardProps) {
       }
     }
 
-    checkAuth().catch((err) => logger.error('[checkAuth]', err))
-  }, [
-    user,
-    _hasHydrated,
-    isAuthenticated,
-    requiredPermission,
-    pathname,
-    router,
-    syncTokenState,
-  ])
-
+    checkAuth().catch(err => logger.error('[checkAuth]', err))
+  }, [user, _hasHydrated, isAuthenticated, requiredPermission, pathname, router, syncTokenState])
 
   // 登入頁面不顯示載入畫面，直接渲染
   if (pathname === '/login') {
@@ -176,16 +170,12 @@ export function usePermissionCheck(requiredRoute?: string) {
   const { user } = useAuthStore()
 
   const checkRoute = requiredRoute || pathname
-  const hasPermission = user
-    ? hasPermissionForRoute(user.permissions || [], checkRoute)
-    : false
+  const hasPermission = user ? hasPermissionForRoute(user.permissions || [], checkRoute) : false
 
   return {
     hasPermission,
     userPermissions: user?.permissions || [],
-    isAdmin:
-      user?.permissions?.includes('admin') ||
-      user?.permissions?.includes('super_admin'),
+    isAdmin: user?.permissions?.includes('admin') || user?.permissions?.includes('super_admin'),
     isSuperAdmin: user?.permissions?.includes('super_admin'),
   }
 }

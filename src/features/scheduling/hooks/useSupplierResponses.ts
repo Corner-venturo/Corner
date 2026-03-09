@@ -83,9 +83,7 @@ export function useSupplierResponses(options?: UseSupplierResponsesOptions) {
 
     try {
       // 查詢供應商回覆
-      let query = supabase
-        .from('request_responses')
-        .select(`
+      let query = supabase.from('request_responses').select(`
           id,
           request_id,
           responder_workspace_id,
@@ -144,7 +142,7 @@ export function useSupplierResponses(options?: UseSupplierResponsesOptions) {
         notes: row.notes as string | null,
         responded_at: row.created_at as string | null,
         created_at: row.created_at as string,
-        items: ((row.request_response_items as Record<string, unknown>[]) || []).map((item) => ({
+        items: ((row.request_response_items as Record<string, unknown>[]) || []).map(item => ({
           id: item.id as string,
           response_id: row.id as string,
           item_type: item.resource_type as 'vehicle' | 'leader' | 'other',
@@ -157,14 +155,20 @@ export function useSupplierResponses(options?: UseSupplierResponsesOptions) {
           notes: item.notes as string | null,
           created_at: item.created_at as string,
         })),
-        request: row.tour_requests ? {
-          id: (row.tour_requests as Record<string, unknown>).id as string,
-          code: (row.tour_requests as Record<string, unknown>).code as string,
-          category: (row.tour_requests as Record<string, unknown>).category as string,
-          tour_name: (row.tour_requests as Record<string, unknown>).tour_name as string | null,
-          service_date: (row.tour_requests as Record<string, unknown>).service_date as string | null,
-          service_date_end: (row.tour_requests as Record<string, unknown>).service_date_end as string | null,
-        } : undefined,
+        request: row.tour_requests
+          ? {
+              id: (row.tour_requests as Record<string, unknown>).id as string,
+              code: (row.tour_requests as Record<string, unknown>).code as string,
+              category: (row.tour_requests as Record<string, unknown>).category as string,
+              tour_name: (row.tour_requests as Record<string, unknown>).tour_name as string | null,
+              service_date: (row.tour_requests as Record<string, unknown>).service_date as
+                | string
+                | null,
+              service_date_end: (row.tour_requests as Record<string, unknown>).service_date_end as
+                | string
+                | null,
+            }
+          : undefined,
       }))
     } catch (error) {
       logger.error('取得供應商回覆失敗:', error)

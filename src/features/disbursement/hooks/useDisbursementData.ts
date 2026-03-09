@@ -30,7 +30,10 @@ function getNextThursday(): Date {
 
 // 生成出納單號: P + YYMMDD + A-Z
 // 例如: P250128A, P250128B, ...
-function generateDisbursementNumber(existingOrders: DisbursementOrder[], disbursementDate?: string): string {
+function generateDisbursementNumber(
+  existingOrders: DisbursementOrder[],
+  disbursementDate?: string
+): string {
   const date = disbursementDate ? new Date(disbursementDate) : new Date()
   const year = date.getFullYear().toString().slice(-2)
   const month = (date.getMonth() + 1).toString().padStart(2, '0')
@@ -62,7 +65,7 @@ export function useDisbursementData() {
 
   // 🔧 優化：建立 Map 避免 N+1 查詢
   const paymentRequestMap = useMemo(() => {
-    const map = new Map<string, typeof payment_requests[0]>()
+    const map = new Map<string, (typeof payment_requests)[0]>()
     payment_requests.forEach(r => map.set(r.id, r))
     return map
   }, [payment_requests])
@@ -110,15 +113,18 @@ export function useDisbursementData() {
 
   // 按供應商分組的請款項目 - 使用 Map 做 O(1) 查詢
   const groupedBySupplier = useMemo(() => {
-    const groups: Record<string, {
-      supplier_id: string
-      supplier_name: string
-      items: Array<{
-        request: PaymentRequest
-        item: typeof requestItems[0]
-      }>
-      total: number
-    }> = {}
+    const groups: Record<
+      string,
+      {
+        supplier_id: string
+        supplier_name: string
+        items: Array<{
+          request: PaymentRequest
+          item: (typeof requestItems)[0]
+        }>
+        total: number
+      }
+    > = {}
 
     // 遍歷待出帳的請款單，使用 Map 取得 items
     pendingRequests.forEach(request => {
@@ -145,21 +151,116 @@ export function useDisbursementData() {
   }, [pendingRequests, requestItemsByRequestId])
 
   // 加入本週出帳
-  const addToCurrentDisbursementOrder = useCallback(async (requestIds: string[]) => {
-    if (currentOrder) {
-      // 已有本週出納單，更新它
-      const existingIds = currentOrder.payment_request_ids || []
-      const newIds = [...new Set([...existingIds, ...requestIds])]
+  const addToCurrentDisbursementOrder = useCallback(
+    async (requestIds: string[]) => {
+      if (currentOrder) {
+        // 已有本週出納單，更新它
+        const existingIds = currentOrder.payment_request_ids || []
+        const newIds = [...new Set([...existingIds, ...requestIds])]
+        const newAmount = payment_requests
+          .filter(r => newIds.includes(r.id))
+          .reduce((sum, r) => sum + (r.amount || 0), 0)
+
+        await updateDisbursementOrderApi(currentOrder.id, {
+          payment_request_ids: newIds,
+          amount: newAmount,
+        })
+      } else {
+        // 沒有本週出納單，建立新的
+        const amount = payment_requests
+          .filter(r => requestIds.includes(r.id))
+          .reduce((sum, r) => sum + (r.amount || 0), 0)
+
+        const disbursementDateStr = formatDate(nextThursday)
+
+        await createDisbursementOrderApi({
+          order_number: generateDisbursementNumber(disbursement_orders, disbursementDateStr),
+          disbursement_date: disbursementDateStr,
+          payment_request_ids: requestIds,
+          amount: amount,
+          status: 'pending',
+        })
+      }
+
+      // 更新請款單狀態為 billed（已加入出納單）
+      for (const id of requestIds) {
+        await updatePaymentRequestApi(id, { status: 'billed' })
+      }
+    },
+    [currentOrder, payment_requests, disbursement_orders, nextThursday]
+  )
+
+  // 從出納單移除請款單
+  const removeFromDisbursementOrder = useCallback(
+    async (orderId: string, requestId: string) => {
+      const order = disbursement_orders.find(o => o.id === orderId)
+      if (!order) return
+
+      const existingIds = order.payment_request_ids || []
+      const newIds = existingIds.filter(id => id !== requestId)
       const newAmount = payment_requests
         .filter(r => newIds.includes(r.id))
         .reduce((sum, r) => sum + (r.amount || 0), 0)
 
-      await updateDisbursementOrderApi(currentOrder.id, {
-        payment_request_ids: newIds,
-        amount: newAmount,
+      if (newIds.length === 0) {
+        // 沒有請款單了，刪除出納單
+        await deleteDisbursementOrderApi(orderId)
+      } else {
+        await updateDisbursementOrderApi(orderId, {
+          payment_request_ids: newIds,
+          amount: newAmount,
+        })
+      }
+
+      // 將請款單狀態改回 confirmed
+      await updatePaymentRequestApi(requestId, { status: 'confirmed' })
+
+      // 重算團成本
+      const request = payment_requests.find(r => r.id === requestId)
+      if (request?.tour_id) {
+        await recalculateExpenseStats(request.tour_id)
+      }
+    },
+    [disbursement_orders, payment_requests]
+  )
+
+  // 確認出帳
+  const confirmDisbursementOrder = useCallback(
+    async (orderId: string, confirmedBy: string) => {
+      const order = disbursement_orders.find(o => o.id === orderId)
+      if (!order) return
+
+      await updateDisbursementOrderApi(orderId, {
+        status: 'confirmed',
+        confirmed_by: confirmedBy,
+        confirmed_at: new Date().toISOString(),
       })
-    } else {
-      // 沒有本週出納單，建立新的
+
+      // 更新所有請款單狀態為 billed
+      const requestIds = order.payment_request_ids || []
+      const tour_ids_to_recalculate = new Set<string>()
+
+      for (const requestId of requestIds) {
+        await updatePaymentRequestApi(requestId, {
+          status: 'billed',
+        })
+        const request = payment_requests.find(r => r.id === requestId)
+        if (request?.tour_id) {
+          tour_ids_to_recalculate.add(request.tour_id)
+        }
+      }
+
+      // 重算相關團的成本
+      for (const tour_id of tour_ids_to_recalculate) {
+        await recalculateExpenseStats(tour_id)
+      }
+    },
+    [disbursement_orders, payment_requests]
+  )
+
+  // 建立新出納單
+  const createNewDisbursementOrder = useCallback(
+    async (requestIds: string[]) => {
       const amount = payment_requests
         .filter(r => requestIds.includes(r.id))
         .reduce((sum, r) => sum + (r.amount || 0), 0)
@@ -173,107 +274,24 @@ export function useDisbursementData() {
         amount: amount,
         status: 'pending',
       })
-    }
 
-    // 更新請款單狀態為 billed（已加入出納單）
-    for (const id of requestIds) {
-      await updatePaymentRequestApi(id, { status: 'billed' })
-    }
-  }, [currentOrder, payment_requests, disbursement_orders, nextThursday])
-
-  // 從出納單移除請款單
-  const removeFromDisbursementOrder = useCallback(async (orderId: string, requestId: string) => {
-    const order = disbursement_orders.find(o => o.id === orderId)
-    if (!order) return
-
-    const existingIds = order.payment_request_ids || []
-    const newIds = existingIds.filter(id => id !== requestId)
-    const newAmount = payment_requests
-      .filter(r => newIds.includes(r.id))
-      .reduce((sum, r) => sum + (r.amount || 0), 0)
-
-    if (newIds.length === 0) {
-      // 沒有請款單了，刪除出納單
-      await deleteDisbursementOrderApi(orderId)
-    } else {
-      await updateDisbursementOrderApi(orderId, {
-        payment_request_ids: newIds,
-        amount: newAmount,
-      })
-    }
-
-    // 將請款單狀態改回 confirmed
-    await updatePaymentRequestApi(requestId, { status: 'confirmed' })
-
-    // 重算團成本
-    const request = payment_requests.find(r => r.id === requestId)
-    if (request?.tour_id) {
-      await recalculateExpenseStats(request.tour_id)
-    }
-  }, [disbursement_orders, payment_requests])
-
-  // 確認出帳
-  const confirmDisbursementOrder = useCallback(async (orderId: string, confirmedBy: string) => {
-    const order = disbursement_orders.find(o => o.id === orderId)
-    if (!order) return
-
-    await updateDisbursementOrderApi(orderId, {
-      status: 'confirmed',
-      confirmed_by: confirmedBy,
-      confirmed_at: new Date().toISOString(),
-    })
-
-    // 更新所有請款單狀態為 billed
-    const requestIds = order.payment_request_ids || []
-    const tour_ids_to_recalculate = new Set<string>()
-
-    for (const requestId of requestIds) {
-      await updatePaymentRequestApi(requestId, {
-        status: 'billed',
-      })
-      const request = payment_requests.find(r => r.id === requestId)
-      if (request?.tour_id) {
-        tour_ids_to_recalculate.add(request.tour_id)
+      // 更新請款單狀態為 billed（已加入出納單）
+      const tour_ids_to_recalculate = new Set<string>()
+      for (const id of requestIds) {
+        await updatePaymentRequestApi(id, { status: 'billed' })
+        const request = payment_requests.find(r => r.id === id)
+        if (request?.tour_id) {
+          tour_ids_to_recalculate.add(request.tour_id)
+        }
       }
-    }
 
-    // 重算相關團的成本
-    for (const tour_id of tour_ids_to_recalculate) {
-      await recalculateExpenseStats(tour_id)
-    }
-  }, [disbursement_orders, payment_requests])
-
-  // 建立新出納單
-  const createNewDisbursementOrder = useCallback(async (requestIds: string[]) => {
-    const amount = payment_requests
-      .filter(r => requestIds.includes(r.id))
-      .reduce((sum, r) => sum + (r.amount || 0), 0)
-
-    const disbursementDateStr = formatDate(nextThursday)
-
-    await createDisbursementOrderApi({
-      order_number: generateDisbursementNumber(disbursement_orders, disbursementDateStr),
-      disbursement_date: disbursementDateStr,
-      payment_request_ids: requestIds,
-      amount: amount,
-      status: 'pending',
-    })
-
-    // 更新請款單狀態為 billed（已加入出納單）
-    const tour_ids_to_recalculate = new Set<string>()
-    for (const id of requestIds) {
-      await updatePaymentRequestApi(id, { status: 'billed' })
-      const request = payment_requests.find(r => r.id === id)
-      if (request?.tour_id) {
-        tour_ids_to_recalculate.add(request.tour_id)
+      // 重算相關團的成本（processing 不計入成本）
+      for (const tour_id of tour_ids_to_recalculate) {
+        await recalculateExpenseStats(tour_id)
       }
-    }
-
-    // 重算相關團的成本（processing 不計入成本）
-    for (const tour_id of tour_ids_to_recalculate) {
-      await recalculateExpenseStats(tour_id)
-    }
-  }, [payment_requests, disbursement_orders, nextThursday])
+    },
+    [payment_requests, disbursement_orders, nextThursday]
+  )
 
   return {
     payment_requests,

@@ -8,6 +8,7 @@
 ## 1. 首頁小工具 (Dashboard Widgets)
 
 ### 設定來源
+
 - **Hook**: `src/features/dashboard/hooks/use-widgets.ts`
 - **設定 Dialog**: 首頁右上角齒輪圖示 → `WidgetSettingsDialog`
 - **儲存方式**:
@@ -17,17 +18,17 @@
 
 ### 小工具清單
 
-| 小工具 ID | 名稱 | 圖示 | 佔用列數 | 組件路徑 | 說明 |
-|----------|------|------|---------|---------|------|
-| `manifestation` | 顯化魔法 | `Sparkles` | 1 | `manifestation-widget.tsx` | 宣示/願望功能 |
-| `flight` | 航班查詢 | `Plane` | 1 | `flight-widget.tsx` | 查詢航班資訊 |
-| `pnr` | PNR 解析 | `FileText` | 1 | `pnr-widget.tsx` | 解析 PNR 資料 |
-| `weather` | 天氣查詢 | `Cloud` | 1 | `weather-widget.tsx` | 查詢城市天氣 |
-| `weather-weekly` | 天氣週報 | `CloudSun` | 2 | `weather-widget-weekly.tsx` | 一週天氣預報 |
-| `calculator` | 計算機 | `Calculator` | 1 | `calculator-widget.tsx` | 基礎計算機 |
-| `currency` | 匯率換算 | `DollarSign` | 1 | `currency-widget.tsx` | 多幣別換算 |
-| `timer` | 計時器 | `Clock` | 1 | `timer-widget.tsx` | 倒數計時 |
-| `notes` | 便條紙 | `Clipboard` | 1 | `notes-widget.tsx` | 個人便條 |
+| 小工具 ID        | 名稱     | 圖示         | 佔用列數 | 組件路徑                    | 說明          |
+| ---------------- | -------- | ------------ | -------- | --------------------------- | ------------- |
+| `manifestation`  | 顯化魔法 | `Sparkles`   | 1        | `manifestation-widget.tsx`  | 宣示/願望功能 |
+| `flight`         | 航班查詢 | `Plane`      | 1        | `flight-widget.tsx`         | 查詢航班資訊  |
+| `pnr`            | PNR 解析 | `FileText`   | 1        | `pnr-widget.tsx`            | 解析 PNR 資料 |
+| `weather`        | 天氣查詢 | `Cloud`      | 1        | `weather-widget.tsx`        | 查詢城市天氣  |
+| `weather-weekly` | 天氣週報 | `CloudSun`   | 2        | `weather-widget-weekly.tsx` | 一週天氣預報  |
+| `calculator`     | 計算機   | `Calculator` | 1        | `calculator-widget.tsx`     | 基礎計算機    |
+| `currency`       | 匯率換算 | `DollarSign` | 1        | `currency-widget.tsx`       | 多幣別換算    |
+| `timer`          | 計時器   | `Clock`      | 1        | `timer-widget.tsx`          | 倒數計時      |
+| `notes`          | 便條紙   | `Clipboard`  | 1        | `notes-widget.tsx`          | 個人便條      |
 
 ### 小工具類型定義
 
@@ -50,28 +51,28 @@ export interface WidgetConfig {
   name: string
   icon: unknown
   component: React.ComponentType
-  span?: number  // 佔據的列數（1 或 2）
+  span?: number // 佔據的列數（1 或 2）
 }
 ```
 
 ### 小工具操作功能
 
-| 操作 | 觸發方式 | 說明 |
-|------|---------|------|
-| 顯示/隱藏 | 設定 Dialog 切換 | `toggleWidget(widgetId)` |
-| 拖拽排序 | 長按 500ms 後拖拽 | 使用 `@dnd-kit` 實現 |
-| 儲存順序 | 自動 | `reorderWidgets(oldIndex, newIndex)` |
+| 操作      | 觸發方式          | 說明                                 |
+| --------- | ----------------- | ------------------------------------ |
+| 顯示/隱藏 | 設定 Dialog 切換  | `toggleWidget(widgetId)`             |
+| 拖拽排序  | 長按 500ms 後拖拽 | 使用 `@dnd-kit` 實現                 |
+| 儲存順序  | 自動              | `reorderWidgets(oldIndex, newIndex)` |
 
 ### 統計項目類型 (Stats Widget)
 
 ```typescript
 export type StatType =
-  | 'todos'             // 待辦事項數
-  | 'paymentsThisWeek'  // 本週收款
-  | 'paymentsNextWeek'  // 下週收款
-  | 'depositsThisWeek'  // 本週訂金
-  | 'toursThisWeek'     // 本週出團
-  | 'toursThisMonth'    // 本月出團
+  | 'todos' // 待辦事項數
+  | 'paymentsThisWeek' // 本週收款
+  | 'paymentsNextWeek' // 下週收款
+  | 'depositsThisWeek' // 本週訂金
+  | 'toursThisWeek' // 本週出團
+  | 'toursThisMonth' // 本月出團
 ```
 
 ---
@@ -81,6 +82,7 @@ export type StatType =
 ### 2.1 旅遊團管理 `/tours`
 
 #### 頁面結構
+
 ```
 /tours
 ├── 狀態分頁 (Tab)
@@ -104,22 +106,22 @@ export type StatType =
 
 #### 操作按鈕對照表
 
-| 按鈕 | 圖示 | 顯示條件 | 點擊動作 | 開啟元件 | 服務層 API |
-|------|------|---------|---------|---------|-----------|
-| 確認 | `CheckCircle2` | `status === '提案'` | `onConfirmTour(tour)` | `DocumentVersionPicker` (mode='confirm') | `tourService.lockTour()` |
-| 解鎖 | `LockOpen` | `status === '進行中'` | `onUnlockLockedTour(tour)` | `TourUnlockDialog` | `tourService.unlockTour()` |
-| 鎖定 | `Lock` | `status === '進行中'` (無解鎖權限) | 僅顯示狀態 | - | - |
-| 結案 | `FileCheck` | `status === '進行中'` | `onCloseTour(tour)` | `TourClosingDialog` | `tourService.updateTourStatus()` |
-| 編輯 | `Edit2` | 永遠顯示 | `openDialog('edit', tour)` | `TourForm` | `actions.update()` |
-| 頻道 | `MessageSquare` | 永遠顯示 | `handleCreateChannel(tour)` | - | `channelService` |
-| 報價 | `Calculator` | 永遠顯示 | `onOpenQuoteDialog(tour)` | `DocumentVersionPicker` | - |
-| 行程 | `FileText` | 永遠顯示 | `onOpenItineraryDialog(tour)` | `LinkItineraryToTourDialog` | - |
-| 合約 | `FileSignature` | 永遠顯示 | `onOpenContractDialog(tour)` | `ContractDialog` | - |
-| 需求 | `ClipboardList` | 永遠顯示 | `onOpenTourRequestDialog(tour)` | `TourRequestDialog` | - |
-| 封存 | `Archive` | `!tour.archived` | `onOpenArchiveDialog(tour)` | `ArchiveReasonDialog` | `operations.handleArchiveTour()` |
-| 解封 | `ArchiveRestore` | `tour.archived` | `operations.handleArchiveTour(tour)` | - | `actions.update()` |
-| 解鎖結團 | `LockOpen` | `archived && closing_status === 'closed' && super_admin` | `handleUnlockTour(tour)` | - | `handleUnlockTour()` |
-| 刪除 | `Trash2` | 永遠顯示 | `setDeleteConfirm({ isOpen: true, tour })` | `DeleteConfirmDialog` | `actions.delete()` |
+| 按鈕     | 圖示             | 顯示條件                                                 | 點擊動作                                   | 開啟元件                                 | 服務層 API                       |
+| -------- | ---------------- | -------------------------------------------------------- | ------------------------------------------ | ---------------------------------------- | -------------------------------- |
+| 確認     | `CheckCircle2`   | `status === '提案'`                                      | `onConfirmTour(tour)`                      | `DocumentVersionPicker` (mode='confirm') | `tourService.lockTour()`         |
+| 解鎖     | `LockOpen`       | `status === '進行中'`                                    | `onUnlockLockedTour(tour)`                 | `TourUnlockDialog`                       | `tourService.unlockTour()`       |
+| 鎖定     | `Lock`           | `status === '進行中'` (無解鎖權限)                       | 僅顯示狀態                                 | -                                        | -                                |
+| 結案     | `FileCheck`      | `status === '進行中'`                                    | `onCloseTour(tour)`                        | `TourClosingDialog`                      | `tourService.updateTourStatus()` |
+| 編輯     | `Edit2`          | 永遠顯示                                                 | `openDialog('edit', tour)`                 | `TourForm`                               | `actions.update()`               |
+| 頻道     | `MessageSquare`  | 永遠顯示                                                 | `handleCreateChannel(tour)`                | -                                        | `channelService`                 |
+| 報價     | `Calculator`     | 永遠顯示                                                 | `onOpenQuoteDialog(tour)`                  | `DocumentVersionPicker`                  | -                                |
+| 行程     | `FileText`       | 永遠顯示                                                 | `onOpenItineraryDialog(tour)`              | `LinkItineraryToTourDialog`              | -                                |
+| 合約     | `FileSignature`  | 永遠顯示                                                 | `onOpenContractDialog(tour)`               | `ContractDialog`                         | -                                |
+| 需求     | `ClipboardList`  | 永遠顯示                                                 | `onOpenTourRequestDialog(tour)`            | `TourRequestDialog`                      | -                                |
+| 封存     | `Archive`        | `!tour.archived`                                         | `onOpenArchiveDialog(tour)`                | `ArchiveReasonDialog`                    | `operations.handleArchiveTour()` |
+| 解封     | `ArchiveRestore` | `tour.archived`                                          | `operations.handleArchiveTour(tour)`       | -                                        | `actions.update()`               |
+| 解鎖結團 | `LockOpen`       | `archived && closing_status === 'closed' && super_admin` | `handleUnlockTour(tour)`                   | -                                        | `handleUnlockTour()`             |
+| 刪除     | `Trash2`         | 永遠顯示                                                 | `setDeleteConfirm({ isOpen: true, tour })` | `DeleteConfirmDialog`                    | `actions.delete()`               |
 
 #### 狀態轉換規則
 
@@ -137,39 +139,40 @@ ALLOWED_STATUS_TRANSITIONS:
 
 #### Dialog 元件對照表
 
-| Dialog 元件 | 檔案路徑 | 觸發來源 | 功能說明 |
-|------------|---------|---------|---------|
-| `TourForm` | `features/tours/components/TourForm.tsx` | 編輯按鈕 | 新增/編輯團資料 |
-| `DocumentVersionPicker` | `components/documents/DocumentVersionPicker.tsx` | 報價/確認按鈕 | 報價單管理 + 確認出團 |
-| `LinkItineraryToTourDialog` | `features/tours/components/LinkItineraryToTourDialog.tsx` | 行程按鈕 | 連結行程表 |
-| `ContractDialog` | `components/contracts/ContractDialog.tsx` | 合約按鈕 | 合約管理 |
-| `TourRequestDialog` | `app/(main)/tour-requests/components/TourRequestDialog.tsx` | 需求按鈕 | 需求單管理 |
-| `ArchiveReasonDialog` | `features/tours/components/ArchiveReasonDialog.tsx` | 封存按鈕 | 選擇封存原因 |
-| `DeleteConfirmDialog` | `features/tours/components/DeleteConfirmDialog.tsx` | 刪除按鈕 | 確認刪除 |
-| `TourUnlockDialog` | `features/tours/components/TourUnlockDialog.tsx` | 解鎖按鈕 | 解鎖確認 |
-| `TourClosingDialog` | `features/tours/components/TourClosingDialog.tsx` | 結案按鈕 | 結案確認 |
-| `TourConfirmationWizard` | `features/tours/components/TourConfirmationWizard.tsx` | (已整合) | 已整合至 DocumentVersionPicker |
-| `TourDetailDialog` | `components/tours/TourDetailDialog.tsx` | 點擊列 | 團詳細資訊 |
+| Dialog 元件                 | 檔案路徑                                                    | 觸發來源      | 功能說明                       |
+| --------------------------- | ----------------------------------------------------------- | ------------- | ------------------------------ |
+| `TourForm`                  | `features/tours/components/TourForm.tsx`                    | 編輯按鈕      | 新增/編輯團資料                |
+| `DocumentVersionPicker`     | `components/documents/DocumentVersionPicker.tsx`            | 報價/確認按鈕 | 報價單管理 + 確認出團          |
+| `LinkItineraryToTourDialog` | `features/tours/components/LinkItineraryToTourDialog.tsx`   | 行程按鈕      | 連結行程表                     |
+| `ContractDialog`            | `components/contracts/ContractDialog.tsx`                   | 合約按鈕      | 合約管理                       |
+| `TourRequestDialog`         | `app/(main)/tour-requests/components/TourRequestDialog.tsx` | 需求按鈕      | 需求單管理                     |
+| `ArchiveReasonDialog`       | `features/tours/components/ArchiveReasonDialog.tsx`         | 封存按鈕      | 選擇封存原因                   |
+| `DeleteConfirmDialog`       | `features/tours/components/DeleteConfirmDialog.tsx`         | 刪除按鈕      | 確認刪除                       |
+| `TourUnlockDialog`          | `features/tours/components/TourUnlockDialog.tsx`            | 解鎖按鈕      | 解鎖確認                       |
+| `TourClosingDialog`         | `features/tours/components/TourClosingDialog.tsx`           | 結案按鈕      | 結案確認                       |
+| `TourConfirmationWizard`    | `features/tours/components/TourConfirmationWizard.tsx`      | (已整合)      | 已整合至 DocumentVersionPicker |
+| `TourDetailDialog`          | `components/tours/TourDetailDialog.tsx`                     | 點擊列        | 團詳細資訊                     |
 
 #### 欄位對照表
 
-| 前端顯示 | 前端欄位名 | API 欄位名 | 資料庫欄位 | 類型 | 備註 |
-|---------|-----------|-----------|-----------|------|------|
-| 團號 | `code` | `code` | `tours.code` | `string` | 自動生成 |
-| 團名 | `name` | `name` | `tours.name` | `string` | |
-| 目的地 | `location` | `location` | `tours.location` | `string` | |
-| 出發日期 | `departure_date` | `departure_date` | `tours.departure_date` | `date` | |
-| 回程日期 | `return_date` | `return_date` | `tours.return_date` | `date` | |
-| 狀態 | `status` | `status` | `tours.status` | `string` | 中文值 |
-| 人數上限 | `max_participants` | `max_participants` | `tours.max_participants` | `integer` | |
-| 目前人數 | `current_participants` | `current_participants` | `tours.current_participants` | `integer` | |
-| 售價 | `price` | `price` | `tours.price` | `numeric` | |
+| 前端顯示 | 前端欄位名             | API 欄位名             | 資料庫欄位                   | 類型      | 備註     |
+| -------- | ---------------------- | ---------------------- | ---------------------------- | --------- | -------- |
+| 團號     | `code`                 | `code`                 | `tours.code`                 | `string`  | 自動生成 |
+| 團名     | `name`                 | `name`                 | `tours.name`                 | `string`  |          |
+| 目的地   | `location`             | `location`             | `tours.location`             | `string`  |          |
+| 出發日期 | `departure_date`       | `departure_date`       | `tours.departure_date`       | `date`    |          |
+| 回程日期 | `return_date`          | `return_date`          | `tours.return_date`          | `date`    |          |
+| 狀態     | `status`               | `status`               | `tours.status`               | `string`  | 中文值   |
+| 人數上限 | `max_participants`     | `max_participants`     | `tours.max_participants`     | `integer` |          |
+| 目前人數 | `current_participants` | `current_participants` | `tours.current_participants` | `integer` |          |
+| 售價     | `price`                | `price`                | `tours.price`                | `numeric` |          |
 
 ---
 
 ### 2.2 訂單管理 `/orders`
 
 #### 頁面來源
+
 - **頁面檔案**: `src/app/(main)/orders/page.tsx`
 - **表格組件**: `src/components/orders/simple-order-table.tsx`
 - **表單組件**: `src/components/orders/add-order-form.tsx`
@@ -177,6 +180,7 @@ ALLOWED_STATUS_TRANSITIONS:
 - **Hook**: `useOrdersListSlim`, `useToursListSlim`, `useMemberActions`
 
 #### 頁面結構
+
 ```
 /orders
 ├── ResponsiveHeader (標題、搜尋、分頁)
@@ -196,12 +200,12 @@ ALLOWED_STATUS_TRANSITIONS:
 
 #### 訂單操作按鈕對照表
 
-| 按鈕 | 圖示 | 點擊動作 | 跳轉/開啟 |
-|------|------|---------|---------|
-| 成員 | `User` | `setExpandedOrderId(order.id)` | 展開 `OrderMembersExpandable` |
-| 收款 | `$` | `router.push('/finance/payments?...')` | 跳轉收款頁面帶參數 |
-| 請款 | `¥` | `router.push('/finance/requests?...')` | 跳轉請款頁面帶參數 |
-| 刪除 | `Trash2` | `deleteOrder(order.id)` | 確認後刪除 |
+| 按鈕 | 圖示     | 點擊動作                               | 跳轉/開啟                     |
+| ---- | -------- | -------------------------------------- | ----------------------------- |
+| 成員 | `User`   | `setExpandedOrderId(order.id)`         | 展開 `OrderMembersExpandable` |
+| 收款 | `$`      | `router.push('/finance/payments?...')` | 跳轉收款頁面帶參數            |
+| 請款 | `¥`      | `router.push('/finance/requests?...')` | 跳轉請款頁面帶參數            |
+| 刪除 | `Trash2` | `deleteOrder(order.id)`                | 確認後刪除                    |
 
 #### 篩選邏輯
 
@@ -217,16 +221,16 @@ default:          // 按 payment_status 篩選
 
 #### 欄位對照表
 
-| 前端顯示 | 前端欄位名 | API 欄位名 | 資料庫欄位 | 類型 | 備註 |
-|---------|-----------|-----------|-----------|------|------|
-| 訂單編號 | `order_number` | `order_number` | `orders.order_number` | `string` | |
-| 團號 | `code` | `code` | `orders.code` | `string` | 關聯 tours |
-| 聯絡人 | `contact_person` | `contact_person` | `orders.contact_person` | `string` | |
-| 業務 | `sales_person` | `sales_person` | `orders.sales_person` | `string` | |
-| 人數 | `member_count` | `member_count` | `orders.member_count` | `integer` | |
-| 總金額 | `total_amount` | `total_amount` | `orders.total_amount` | `numeric` | |
-| 已付金額 | `paid_amount` | `paid_amount` | `orders.paid_amount` | `numeric` | |
-| 付款狀態 | `payment_status` | `payment_status` | `orders.payment_status` | `string` | |
+| 前端顯示 | 前端欄位名       | API 欄位名       | 資料庫欄位              | 類型      | 備註       |
+| -------- | ---------------- | ---------------- | ----------------------- | --------- | ---------- |
+| 訂單編號 | `order_number`   | `order_number`   | `orders.order_number`   | `string`  |            |
+| 團號     | `code`           | `code`           | `orders.code`           | `string`  | 關聯 tours |
+| 聯絡人   | `contact_person` | `contact_person` | `orders.contact_person` | `string`  |            |
+| 業務     | `sales_person`   | `sales_person`   | `orders.sales_person`   | `string`  |            |
+| 人數     | `member_count`   | `member_count`   | `orders.member_count`   | `integer` |            |
+| 總金額   | `total_amount`   | `total_amount`   | `orders.total_amount`   | `numeric` |            |
+| 已付金額 | `paid_amount`    | `paid_amount`    | `orders.paid_amount`    | `numeric` |            |
+| 付款狀態 | `payment_status` | `payment_status` | `orders.payment_status` | `string`  |            |
 
 ---
 
@@ -234,21 +238,21 @@ default:          // 按 payment_status 篩選
 
 #### 欄位對照表
 
-| 前端顯示 | 前端欄位名 | API 欄位名 | 資料庫欄位 | 類型 | 備註 |
-|---------|-----------|-----------|-----------|------|------|
-| 護照姓名 | `passport_name` | `passport_name` | `order_members.passport_name` | `string` | |
-| 生日 | `birth_date` | `birth_date` | `order_members.birth_date` | `date` | |
-| 性別 | `gender` | `gender` | `order_members.gender` | `string` | M/F |
-| 身分證 | `id_number` | `id_number` | `order_members.id_number` | `string` | |
-| 護照號碼 | `passport_number` | `passport_number` | `order_members.passport_number` | `string` | |
-| 護照效期 | `passport_expiry` | `passport_expiry` | `order_members.passport_expiry` | `date` | |
-| 飲食禁忌 | `special_meal` | `special_meal` | `order_members.special_meal` | `string` | |
-| 應付金額 | `total_payable` | `total_payable` | `order_members.total_payable` | `numeric` | |
-| 訂金 | `deposit_amount` | `deposit_amount` | `order_members.deposit_amount` | `numeric` | |
-| 備註 | `remarks` | `remarks` | `order_members.remarks` | `string` | |
-| PNR | `pnr` | `pnr` | `order_members.pnr` | `string` | |
-| 機票號碼 | `ticket_number` | `ticket_number` | `order_members.ticket_number` | `string` | |
-| 開票期限 | `ticketing_deadline` | `ticketing_deadline` | `order_members.ticketing_deadline` | `date` | |
+| 前端顯示 | 前端欄位名           | API 欄位名           | 資料庫欄位                         | 類型      | 備註 |
+| -------- | -------------------- | -------------------- | ---------------------------------- | --------- | ---- |
+| 護照姓名 | `passport_name`      | `passport_name`      | `order_members.passport_name`      | `string`  |      |
+| 生日     | `birth_date`         | `birth_date`         | `order_members.birth_date`         | `date`    |      |
+| 性別     | `gender`             | `gender`             | `order_members.gender`             | `string`  | M/F  |
+| 身分證   | `id_number`          | `id_number`          | `order_members.id_number`          | `string`  |      |
+| 護照號碼 | `passport_number`    | `passport_number`    | `order_members.passport_number`    | `string`  |      |
+| 護照效期 | `passport_expiry`    | `passport_expiry`    | `order_members.passport_expiry`    | `date`    |      |
+| 飲食禁忌 | `special_meal`       | `special_meal`       | `order_members.special_meal`       | `string`  |      |
+| 應付金額 | `total_payable`      | `total_payable`      | `order_members.total_payable`      | `numeric` |      |
+| 訂金     | `deposit_amount`     | `deposit_amount`     | `order_members.deposit_amount`     | `numeric` |      |
+| 備註     | `remarks`            | `remarks`            | `order_members.remarks`            | `string`  |      |
+| PNR      | `pnr`                | `pnr`                | `order_members.pnr`                | `string`  |      |
+| 機票號碼 | `ticket_number`      | `ticket_number`      | `order_members.ticket_number`      | `string`  |      |
+| 開票期限 | `ticketing_deadline` | `ticketing_deadline` | `order_members.ticketing_deadline` | `date`    |      |
 
 ---
 
@@ -256,31 +260,31 @@ default:          // 按 payment_status 篩選
 
 ### 3.1 Tours API
 
-| 方法 | 端點 | 功能 | Request Body | Response | 資料庫操作 |
-|------|------|------|-------------|----------|-----------|
-| GET | `/api/tours` | 取得團列表 | - | `Tour[]` | `SELECT * FROM tours` |
-| GET | `/api/tours/:id` | 取得單一團 | - | `Tour` | `SELECT * FROM tours WHERE id = :id` |
-| POST | `/api/tours` | 新增團 | `CreateTourInput` | `Tour` | `INSERT INTO tours` |
-| PUT | `/api/tours/:id` | 更新團 | `UpdateTourInput` | `Tour` | `UPDATE tours SET ... WHERE id = :id` |
-| DELETE | `/api/tours/:id` | 刪除團 | - | `void` | `DELETE FROM tours WHERE id = :id` |
-| POST | `/api/tours/:id/unlock` | 解鎖團 | `{ password, reason }` | `{ success }` | `UPDATE tours SET status = '提案'` |
+| 方法   | 端點                    | 功能       | Request Body           | Response      | 資料庫操作                            |
+| ------ | ----------------------- | ---------- | ---------------------- | ------------- | ------------------------------------- |
+| GET    | `/api/tours`            | 取得團列表 | -                      | `Tour[]`      | `SELECT * FROM tours`                 |
+| GET    | `/api/tours/:id`        | 取得單一團 | -                      | `Tour`        | `SELECT * FROM tours WHERE id = :id`  |
+| POST   | `/api/tours`            | 新增團     | `CreateTourInput`      | `Tour`        | `INSERT INTO tours`                   |
+| PUT    | `/api/tours/:id`        | 更新團     | `UpdateTourInput`      | `Tour`        | `UPDATE tours SET ... WHERE id = :id` |
+| DELETE | `/api/tours/:id`        | 刪除團     | -                      | `void`        | `DELETE FROM tours WHERE id = :id`    |
+| POST   | `/api/tours/:id/unlock` | 解鎖團     | `{ password, reason }` | `{ success }` | `UPDATE tours SET status = '提案'`    |
 
 ### 3.2 Orders API
 
-| 方法 | 端點 | 功能 | Request Body | Response | 資料庫操作 |
-|------|------|------|-------------|----------|-----------|
-| GET | `/api/orders` | 取得訂單列表 | - | `Order[]` | `SELECT * FROM orders` |
-| POST | `/api/orders` | 新增訂單 | `CreateOrderInput` | `Order` | `INSERT INTO orders` |
-| PUT | `/api/orders/:id` | 更新訂單 | `UpdateOrderInput` | `Order` | `UPDATE orders SET ...` |
-| DELETE | `/api/orders/:id` | 刪除訂單 | - | `void` | `DELETE FROM orders` |
+| 方法   | 端點              | 功能         | Request Body       | Response  | 資料庫操作              |
+| ------ | ----------------- | ------------ | ------------------ | --------- | ----------------------- |
+| GET    | `/api/orders`     | 取得訂單列表 | -                  | `Order[]` | `SELECT * FROM orders`  |
+| POST   | `/api/orders`     | 新增訂單     | `CreateOrderInput` | `Order`   | `INSERT INTO orders`    |
+| PUT    | `/api/orders/:id` | 更新訂單     | `UpdateOrderInput` | `Order`   | `UPDATE orders SET ...` |
+| DELETE | `/api/orders/:id` | 刪除訂單     | -                  | `void`    | `DELETE FROM orders`    |
 
 ### 3.3 Quotes API
 
-| 方法 | 端點 | 功能 | Request Body | Response | 資料庫操作 |
-|------|------|------|-------------|----------|-----------|
-| GET | `/api/quotes` | 取得報價單列表 | - | `Quote[]` | `SELECT * FROM quotes` |
-| POST | `/api/quotes` | 新增報價單 | `CreateQuoteInput` | `Quote` | `INSERT INTO quotes` |
-| PUT | `/api/quotes/:id` | 更新報價單 | `UpdateQuoteInput` | `Quote` | `UPDATE quotes SET ...` |
+| 方法 | 端點              | 功能           | Request Body       | Response  | 資料庫操作              |
+| ---- | ----------------- | -------------- | ------------------ | --------- | ----------------------- |
+| GET  | `/api/quotes`     | 取得報價單列表 | -                  | `Quote[]` | `SELECT * FROM quotes`  |
+| POST | `/api/quotes`     | 新增報價單     | `CreateQuoteInput` | `Quote`   | `INSERT INTO quotes`    |
+| PUT  | `/api/quotes/:id` | 更新報價單     | `UpdateQuoteInput` | `Quote`   | `UPDATE quotes SET ...` |
 
 ---
 
@@ -288,59 +292,59 @@ default:          // 按 payment_status 篩選
 
 ### 4.1 tours 表
 
-| 欄位名 | 類型 | 預設值 | 說明 | 前端對應 |
-|--------|------|--------|------|---------|
-| id | uuid | gen_random_uuid() | 主鍵 | `tour.id` |
-| workspace_id | uuid | - | 工作區 ID | - (自動) |
-| code | text | - | 團號 | `tour.code` |
-| name | text | - | 團名 | `tour.name` |
-| location | text | - | 目的地 | `tour.location` |
-| departure_date | date | - | 出發日期 | `tour.departure_date` |
-| return_date | date | - | 回程日期 | `tour.return_date` |
-| status | text | '提案' | 狀態 | `tour.status` |
-| price | numeric | 0 | 售價 | `tour.price` |
-| max_participants | integer | 20 | 人數上限 | `tour.max_participants` |
-| current_participants | integer | 0 | 目前人數 | `tour.current_participants` |
-| archived | boolean | false | 是否封存 | `tour.archived` |
-| created_at | timestamptz | now() | 建立時間 | - |
-| updated_at | timestamptz | now() | 更新時間 | - |
+| 欄位名               | 類型        | 預設值            | 說明      | 前端對應                    |
+| -------------------- | ----------- | ----------------- | --------- | --------------------------- |
+| id                   | uuid        | gen_random_uuid() | 主鍵      | `tour.id`                   |
+| workspace_id         | uuid        | -                 | 工作區 ID | - (自動)                    |
+| code                 | text        | -                 | 團號      | `tour.code`                 |
+| name                 | text        | -                 | 團名      | `tour.name`                 |
+| location             | text        | -                 | 目的地    | `tour.location`             |
+| departure_date       | date        | -                 | 出發日期  | `tour.departure_date`       |
+| return_date          | date        | -                 | 回程日期  | `tour.return_date`          |
+| status               | text        | '提案'            | 狀態      | `tour.status`               |
+| price                | numeric     | 0                 | 售價      | `tour.price`                |
+| max_participants     | integer     | 20                | 人數上限  | `tour.max_participants`     |
+| current_participants | integer     | 0                 | 目前人數  | `tour.current_participants` |
+| archived             | boolean     | false             | 是否封存  | `tour.archived`             |
+| created_at           | timestamptz | now()             | 建立時間  | -                           |
+| updated_at           | timestamptz | now()             | 更新時間  | -                           |
 
 ### 4.2 orders 表
 
-| 欄位名 | 類型 | 預設值 | 說明 | 前端對應 |
-|--------|------|--------|------|---------|
-| id | uuid | gen_random_uuid() | 主鍵 | `order.id` |
-| workspace_id | uuid | - | 工作區 ID | - (自動) |
-| tour_id | uuid | - | 關聯團 ID | `order.tour_id` |
-| order_number | text | - | 訂單編號 | `order.order_number` |
-| code | text | - | 團號 | `order.code` |
-| contact_person | text | - | 聯絡人 | `order.contact_person` |
-| sales_person | text | - | 業務 | `order.sales_person` |
-| member_count | integer | 1 | 人數 | `order.member_count` |
-| total_amount | numeric | 0 | 總金額 | `order.total_amount` |
-| paid_amount | numeric | 0 | 已付金額 | `order.paid_amount` |
-| payment_status | text | 'unpaid' | 付款狀態 | `order.payment_status` |
-| status | text | 'draft' | 訂單狀態 | `order.status` |
+| 欄位名         | 類型    | 預設值            | 說明      | 前端對應               |
+| -------------- | ------- | ----------------- | --------- | ---------------------- |
+| id             | uuid    | gen_random_uuid() | 主鍵      | `order.id`             |
+| workspace_id   | uuid    | -                 | 工作區 ID | - (自動)               |
+| tour_id        | uuid    | -                 | 關聯團 ID | `order.tour_id`        |
+| order_number   | text    | -                 | 訂單編號  | `order.order_number`   |
+| code           | text    | -                 | 團號      | `order.code`           |
+| contact_person | text    | -                 | 聯絡人    | `order.contact_person` |
+| sales_person   | text    | -                 | 業務      | `order.sales_person`   |
+| member_count   | integer | 1                 | 人數      | `order.member_count`   |
+| total_amount   | numeric | 0                 | 總金額    | `order.total_amount`   |
+| paid_amount    | numeric | 0                 | 已付金額  | `order.paid_amount`    |
+| payment_status | text    | 'unpaid'          | 付款狀態  | `order.payment_status` |
+| status         | text    | 'draft'           | 訂單狀態  | `order.status`         |
 
 ### 4.3 order_members 表
 
-| 欄位名 | 類型 | 預設值 | 說明 | 前端對應 |
-|--------|------|--------|------|---------|
-| id | uuid | gen_random_uuid() | 主鍵 | `member.id` |
-| order_id | uuid | - | 關聯訂單 ID | `member.order_id` |
-| passport_name | text | - | 護照姓名 | `member.passport_name` |
-| birth_date | date | - | 生日 | `member.birth_date` |
-| gender | text | - | 性別 | `member.gender` |
-| id_number | text | - | 身分證 | `member.id_number` |
-| passport_number | text | - | 護照號碼 | `member.passport_number` |
-| passport_expiry | date | - | 護照效期 | `member.passport_expiry` |
-| special_meal | text | - | 飲食禁忌 | `member.special_meal` |
-| total_payable | numeric | - | 應付金額 | `member.total_payable` |
-| deposit_amount | numeric | - | 訂金 | `member.deposit_amount` |
-| remarks | text | - | 備註 | `member.remarks` |
-| pnr | text | - | PNR | `member.pnr` |
-| ticket_number | text | - | 機票號碼 | `member.ticket_number` |
-| ticketing_deadline | date | - | 開票期限 | `member.ticketing_deadline` |
+| 欄位名             | 類型    | 預設值            | 說明        | 前端對應                    |
+| ------------------ | ------- | ----------------- | ----------- | --------------------------- |
+| id                 | uuid    | gen_random_uuid() | 主鍵        | `member.id`                 |
+| order_id           | uuid    | -                 | 關聯訂單 ID | `member.order_id`           |
+| passport_name      | text    | -                 | 護照姓名    | `member.passport_name`      |
+| birth_date         | date    | -                 | 生日        | `member.birth_date`         |
+| gender             | text    | -                 | 性別        | `member.gender`             |
+| id_number          | text    | -                 | 身分證      | `member.id_number`          |
+| passport_number    | text    | -                 | 護照號碼    | `member.passport_number`    |
+| passport_expiry    | date    | -                 | 護照效期    | `member.passport_expiry`    |
+| special_meal       | text    | -                 | 飲食禁忌    | `member.special_meal`       |
+| total_payable      | numeric | -                 | 應付金額    | `member.total_payable`      |
+| deposit_amount     | numeric | -                 | 訂金        | `member.deposit_amount`     |
+| remarks            | text    | -                 | 備註        | `member.remarks`            |
+| pnr                | text    | -                 | PNR         | `member.pnr`                |
+| ticket_number      | text    | -                 | 機票號碼    | `member.ticket_number`      |
+| ticketing_deadline | date    | -                 | 開票期限    | `member.ticketing_deadline` |
 
 ---
 
@@ -348,18 +352,18 @@ default:          // 按 payment_status 篩選
 
 ### 待檢查項目
 
-| 位置 | 欄位 | 前端名稱 | 後端名稱 | 一致? | 備註 |
-|------|------|---------|---------|-------|------|
-| order_members | 姓名 | `passport_name` | `passport_name` | ✅ | |
-| order_members | 生日 | `birth_date` | `birth_date` | ✅ | |
-| quotes | 客戶名稱 | `customer_name` | `customer_name` | ✅ | |
-| - | - | - | - | - | 待補充... |
+| 位置          | 欄位     | 前端名稱        | 後端名稱        | 一致? | 備註      |
+| ------------- | -------- | --------------- | --------------- | ----- | --------- |
+| order_members | 姓名     | `passport_name` | `passport_name` | ✅    |           |
+| order_members | 生日     | `birth_date`    | `birth_date`    | ✅    |           |
+| quotes        | 客戶名稱 | `customer_name` | `customer_name` | ✅    |           |
+| -             | -        | -               | -               | -     | 待補充... |
 
 ### 已知不一致問題
 
-| 位置 | 問題描述 | 前端 | 後端 | 修復建議 |
-|------|---------|------|------|---------|
-| - | - | - | - | 待審計發現... |
+| 位置 | 問題描述 | 前端 | 後端 | 修復建議      |
+| ---- | -------- | ---- | ---- | ------------- |
+| -    | -        | -    | -    | 待審計發現... |
 
 ---
 
@@ -415,6 +419,7 @@ default:          // 按 payment_status 篩選
 ### 2.4 報價單管理 `/quotes`
 
 #### 頁面結構
+
 ```
 /quotes (報價單管理列表)
 ├── ResponsiveHeader
@@ -446,43 +451,44 @@ default:          // 按 payment_status 篩選
 
 #### 報價單類型對照表
 
-| 類型 | 編號格式 | 範例 | 特性 |
-|------|---------|------|------|
+| 類型       | 編號格式   | 範例      | 特性                         |
+| ---------- | ---------- | --------- | ---------------------------- |
 | 標準報價單 | `Q{6位數}` | `Q000001` | 完整分類、成本分析、版本管理 |
-| 快速報價單 | `X{6位數}` | `X000001` | 簡易格式、快速產出 |
+| 快速報價單 | `X{6位數}` | `X000001` | 簡易格式、快速產出           |
 
 #### 標準 vs 快速報價單功能對比
 
-| 功能 | 標準 | 快速 | 說明 |
-|------|-----|-----|------|
-| 分類編輯 | ✅ | ❌ | 標準有7個分類（交通/住宿/餐飲等）|
-| 成本分析 | ✅ | ❌ | 標準顯示成本利潤 |
-| 砍次表 | ✅ | ❌ | 不同人數不同價格 |
-| 版本管理 | ✅ | ✅ | 都支援版本歷史 |
-| 行程表同步 | ✅ | ❌ | 只有標準支援 |
-| 確認機制 | ✅ | ✅ | 雙軌確認（客戶+業務）|
+| 功能       | 標準 | 快速 | 說明                              |
+| ---------- | ---- | ---- | --------------------------------- |
+| 分類編輯   | ✅   | ❌   | 標準有7個分類（交通/住宿/餐飲等） |
+| 成本分析   | ✅   | ❌   | 標準顯示成本利潤                  |
+| 砍次表     | ✅   | ❌   | 不同人數不同價格                  |
+| 版本管理   | ✅   | ✅   | 都支援版本歷史                    |
+| 行程表同步 | ✅   | ❌   | 只有標準支援                      |
+| 確認機制   | ✅   | ✅   | 雙軌確認（客戶+業務）             |
 
 #### 操作按鈕對照表（DocumentVersionPicker）
 
-| 按鈕 | 圖示 | 點擊動作 | 說明 |
-|------|------|---------|------|
-| 報價單項目 | - | `handleView()` → `/quotes/{id}` | 進入編輯頁 |
-| 改名 (Hover) | `Pencil` | `handleStartRename()` | inline 編輯 |
-| 新增團體報價單 | `Plus` | `handleCreateStandard()` | 建立 Q 開頭報價單 |
-| 新增快速報價單 | `Zap + Plus` | `handleCreateQuick()` | 建立 X 開頭報價單 |
+| 按鈕           | 圖示         | 點擊動作                        | 說明              |
+| -------------- | ------------ | ------------------------------- | ----------------- |
+| 報價單項目     | -            | `handleView()` → `/quotes/{id}` | 進入編輯頁        |
+| 改名 (Hover)   | `Pencil`     | `handleStartRename()`           | inline 編輯       |
+| 新增團體報價單 | `Plus`       | `handleCreateStandard()`        | 建立 Q 開頭報價單 |
+| 新增快速報價單 | `Zap + Plus` | `handleCreateQuick()`           | 建立 X 開頭報價單 |
 
 #### 使用的 Store 和 Service
 
-| Store/Service | 用途 |
-|--------------|------|
-| `useQuoteStore` | 報價單 CRUD（createStore 工廠生成）|
-| `quoteService` | 複製報價單、計算總成本 |
+| Store/Service   | 用途                                |
+| --------------- | ----------------------------------- |
+| `useQuoteStore` | 報價單 CRUD（createStore 工廠生成） |
+| `quoteService`  | 複製報價單、計算總成本              |
 
 ---
 
 ### 2.5 行程表管理 `/itinerary`
 
 #### 頁面結構
+
 ```
 /itinerary（主列表頁面）
 ├── ResponsiveHeader
@@ -516,28 +522,28 @@ default:          // 按 payment_status 篩選
 
 #### 區塊類型對照表
 
-| 區塊類型 | 名稱 | 圖示 | 必要 | 可刪除 |
-|---------|------|------|------|--------|
-| `COVER` | 封面 | `Image` | ✅ | ❌ |
-| `FLIGHT` | 航班資訊 | `Plane` | ✅ | ❌ |
-| `FEATURES` | 行程特色 | `Star` | ✅ | ❌ |
-| `FOCUS_CARDS` | 精選景點 | `MapPin` | ✅ | ❌ |
-| `LEADER_MEETING` | 領隊與集合 | `Users` | ✅ | ❌ |
-| `HOTELS` | 飯店資訊 | `Building` | ✅ | ❌ |
-| `DAILY_ITINERARY` | 每日行程 | `Calendar` | ✅ | ❌ |
-| `PRICING` | 團費明細 | `DollarSign` | ❌ | ✅ |
-| `PRICE_TIERS` | 價格方案 | `Tag` | ❌ | ✅ |
-| `FAQS` | 常見問題 | `HelpCircle` | ❌ | ✅ |
-| `NOTICES` | 提醒事項 | `AlertCircle` | ❌ | ✅ |
-| `CANCELLATION` | 取消政策 | `XCircle` | ❌ | ✅ |
+| 區塊類型          | 名稱       | 圖示          | 必要 | 可刪除 |
+| ----------------- | ---------- | ------------- | ---- | ------ |
+| `COVER`           | 封面       | `Image`       | ✅   | ❌     |
+| `FLIGHT`          | 航班資訊   | `Plane`       | ✅   | ❌     |
+| `FEATURES`        | 行程特色   | `Star`        | ✅   | ❌     |
+| `FOCUS_CARDS`     | 精選景點   | `MapPin`      | ✅   | ❌     |
+| `LEADER_MEETING`  | 領隊與集合 | `Users`       | ✅   | ❌     |
+| `HOTELS`          | 飯店資訊   | `Building`    | ✅   | ❌     |
+| `DAILY_ITINERARY` | 每日行程   | `Calendar`    | ✅   | ❌     |
+| `PRICING`         | 團費明細   | `DollarSign`  | ❌   | ✅     |
+| `PRICE_TIERS`     | 價格方案   | `Tag`         | ❌   | ✅     |
+| `FAQS`            | 常見問題   | `HelpCircle`  | ❌   | ✅     |
+| `NOTICES`         | 提醒事項   | `AlertCircle` | ❌   | ✅     |
+| `CANCELLATION`    | 取消政策   | `XCircle`     | ❌   | ✅     |
 
 #### 版本控制機制
 
 ```typescript
 interface ItineraryVersionRecord {
-  id: string              // UUID
-  version: number         // 版本號
-  note: string            // 版本備註
+  id: string // UUID
+  version: number // 版本號
+  note: string // 版本備註
   daily_itinerary: DailyItineraryDay[]
   features?: ItineraryFeature[]
   focus_cards?: FocusCard[]
@@ -556,18 +562,19 @@ interface ItineraryVersionRecord {
 
 #### 使用的 Store 和 Hook
 
-| Store/Hook | 用途 |
-|-----------|------|
-| `useItineraryStore` | 行程表 CRUD |
-| `useItineraryEditor` | 編輯器狀態管理 |
-| `useItineraryDataLoader` | 資料載入 |
-| `usePublish` | 發布/版本管理 |
+| Store/Hook               | 用途           |
+| ------------------------ | -------------- |
+| `useItineraryStore`      | 行程表 CRUD    |
+| `useItineraryEditor`     | 編輯器狀態管理 |
+| `useItineraryDataLoader` | 資料載入       |
+| `usePublish`             | 發布/版本管理  |
 
 ---
 
 ### 2.6 財務模組 `/finance`
 
 #### 頁面結構
+
 ```
 /finance（財務首頁）
 ├── 財務總覽卡片（總收入、總支出、淨利潤、待確認款項）
@@ -620,27 +627,27 @@ interface ItineraryVersionRecord {
 
 #### 財務操作按鈕對照表
 
-| 頁面 | 按鈕 | 圖示 | 功能 | 開啟 Dialog |
-|------|------|------|------|-----------|
-| 請款管理 | 新增請款 | `Plus` | 建立請款單 | `AddRequestDialog` |
-| 請款管理 | 批次請款 | `Layers` | 批次建立 | `BatchAllocateRequestDialog` |
-| 收款管理 | 新增收款 | `Plus` | 建立收款單 | `AddReceiptDialog` |
-| 收款管理 | 批量收款 | `Layers` | 批量建立 | `BatchReceiptDialog` |
-| 收款管理 | 批量確認 | `CheckSquare` | 批量確認 | `BatchConfirmReceiptDialog` |
-| 收款管理 | 進階搜尋 | `Search` | 篩選 | `ReceiptSearchDialog` |
-| 收款管理 | 匯出 Excel | `FileDown` | 匯出 | - |
-| 收款管理 | 確認金額 | `Eye` | 確認收款 | `ReceiptConfirmDialog` |
-| 代轉發票 | 開立新發票 | `Plus` | 建立發票 | `InvoiceDialog` |
+| 頁面     | 按鈕       | 圖示          | 功能       | 開啟 Dialog                  |
+| -------- | ---------- | ------------- | ---------- | ---------------------------- |
+| 請款管理 | 新增請款   | `Plus`        | 建立請款單 | `AddRequestDialog`           |
+| 請款管理 | 批次請款   | `Layers`      | 批次建立   | `BatchAllocateRequestDialog` |
+| 收款管理 | 新增收款   | `Plus`        | 建立收款單 | `AddReceiptDialog`           |
+| 收款管理 | 批量收款   | `Layers`      | 批量建立   | `BatchReceiptDialog`         |
+| 收款管理 | 批量確認   | `CheckSquare` | 批量確認   | `BatchConfirmReceiptDialog`  |
+| 收款管理 | 進階搜尋   | `Search`      | 篩選       | `ReceiptSearchDialog`        |
+| 收款管理 | 匯出 Excel | `FileDown`    | 匯出       | -                            |
+| 收款管理 | 確認金額   | `Eye`         | 確認收款   | `ReceiptConfirmDialog`       |
+| 代轉發票 | 開立新發票 | `Plus`        | 建立發票   | `InvoiceDialog`              |
 
 #### 收款方式
 
-| 代碼 | 收款方式 |
-|------|---------|
-| 0 | 銀行匯款 |
-| 1 | 現金 |
-| 2 | 信用卡 |
-| 3 | 支票 |
-| 4 | LinkPay 線上付款 |
+| 代碼 | 收款方式         |
+| ---- | ---------------- |
+| 0    | 銀行匯款         |
+| 1    | 現金             |
+| 2    | 信用卡           |
+| 3    | 支票             |
+| 4    | LinkPay 線上付款 |
 
 #### 財務狀態流轉
 
@@ -662,19 +669,20 @@ interface ItineraryVersionRecord {
 
 #### 使用的 Store
 
-| Store | 用途 |
-|-------|------|
-| `useAccountingStore` | 交易資料、統計信息 |
-| `usePayments` | 請款單 CRUD |
-| `usePaymentData` | 收款單資料 |
-| `useTravelInvoiceStore` | 發票管理 |
-| `useDisbursementData` | 出納單資料 |
+| Store                   | 用途               |
+| ----------------------- | ------------------ |
+| `useAccountingStore`    | 交易資料、統計信息 |
+| `usePayments`           | 請款單 CRUD        |
+| `usePaymentData`        | 收款單資料         |
+| `useTravelInvoiceStore` | 發票管理           |
+| `useDisbursementData`   | 出納單資料         |
 
 ---
 
 ### 2.7 設定與資料庫 `/settings` & `/database`
 
 #### 設定頁面結構
+
 ```
 /settings（設定首頁）
 ├── 一般使用者可見
@@ -718,6 +726,7 @@ interface ItineraryVersionRecord {
 ```
 
 #### 資料庫頁面結構
+
 ```
 /database（資料庫首頁）
 ├── 概覽卡片（統計數字）
@@ -774,31 +783,32 @@ interface ItineraryVersionRecord {
 
 #### 設定頁面權限要求
 
-| 頁面 | 需要權限 | 說明 |
-|------|---------|------|
-| `/settings` | 登入即可 | 帳號設定所有人可見 |
-| `/settings/workspaces` | admin/super_admin | 工作空間管理 |
-| `/settings/permissions` | 無（已停用）| 權限管理已停用 |
-| `/settings/menu` | 登入即可 | 選單個人化 |
-| `/settings/modules` | admin/super_admin | 模組授權 |
+| 頁面                    | 需要權限          | 說明               |
+| ----------------------- | ----------------- | ------------------ |
+| `/settings`             | 登入即可          | 帳號設定所有人可見 |
+| `/settings/workspaces`  | admin/super_admin | 工作空間管理       |
+| `/settings/permissions` | 無（已停用）      | 權限管理已停用     |
+| `/settings/menu`        | 登入即可          | 選單個人化         |
+| `/settings/modules`     | admin/super_admin | 模組授權           |
 
 #### 使用的 Store
 
-| Store | 用途 |
-|-------|------|
-| `useAuthStore` | 使用者資訊、權限驗證 |
-| `useThemeStore` | 主題設定 |
-| `useUserStore` | 使用者資料更新 |
-| `useWorkspaceChannels` | 工作空間管理 |
-| `useWorkspaceModuleStore` | 模組授權 |
-| `useSupplierStore` | 供應商 CRUD |
-| `useTourLeaderStore` | 領隊 CRUD |
+| Store                     | 用途                 |
+| ------------------------- | -------------------- |
+| `useAuthStore`            | 使用者資訊、權限驗證 |
+| `useThemeStore`           | 主題設定             |
+| `useUserStore`            | 使用者資料更新       |
+| `useWorkspaceChannels`    | 工作空間管理         |
+| `useWorkspaceModuleStore` | 模組授權             |
+| `useSupplierStore`        | 供應商 CRUD          |
+| `useTourLeaderStore`      | 領隊 CRUD            |
 
 ---
 
 ### 2.8 會計模組 `/accounting` & `/erp-accounting`
 
 #### 頁面結構
+
 ```
 /accounting（個人記帳）
 ├── ResponsiveHeader
@@ -828,39 +838,40 @@ interface ItineraryVersionRecord {
 
 #### 會計操作按鈕對照表
 
-| 頁面 | 按鈕 | 圖示 | 動作 | 開啟 Dialog |
-|------|------|------|------|-----------|
-| 傳票列表 | 查看明細 | `Eye` | 查看分錄 | `VoucherDetailDialog` |
-| 傳票列表 | 反沖 | `RotateCcw` | 反沖傳票 | `ReverseVoucherDialog` |
-| 科目表 | 新增 | `Plus` | 新增科目 | `AccountDialog` |
-| 科目表 | 編輯 | `Pencil` | 編輯科目 | `AccountDialog` |
-| 銀行帳戶 | 新增 | `Plus` | 新增帳戶 | `BankAccountDialog` |
-| 銀行帳戶 | 編輯 | `Pencil` | 編輯帳戶 | `BankAccountDialog` |
+| 頁面     | 按鈕     | 圖示        | 動作     | 開啟 Dialog            |
+| -------- | -------- | ----------- | -------- | ---------------------- |
+| 傳票列表 | 查看明細 | `Eye`       | 查看分錄 | `VoucherDetailDialog`  |
+| 傳票列表 | 反沖     | `RotateCcw` | 反沖傳票 | `ReverseVoucherDialog` |
+| 科目表   | 新增     | `Plus`      | 新增科目 | `AccountDialog`        |
+| 科目表   | 編輯     | `Pencil`    | 編輯科目 | `AccountDialog`        |
+| 銀行帳戶 | 新增     | `Plus`      | 新增帳戶 | `BankAccountDialog`    |
+| 銀行帳戶 | 編輯     | `Pencil`    | 編輯帳戶 | `BankAccountDialog`    |
 
 #### 會計 API 端點
 
-| 端點 | 功能 |
-|------|------|
-| `POST /api/accounting/reverse` | 傳票反沖 |
-| `POST /api/accounting/post/customer-receipt` | 客戶收款過帳 |
+| 端點                                         | 功能           |
+| -------------------------------------------- | -------------- |
+| `POST /api/accounting/reverse`               | 傳票反沖       |
+| `POST /api/accounting/post/customer-receipt` | 客戶收款過帳   |
 | `POST /api/accounting/post/supplier-payment` | 供應商付款過帳 |
-| `POST /api/accounting/post/group-settlement` | 結團過帳 |
+| `POST /api/accounting/post/group-settlement` | 結團過帳       |
 
 #### 使用的 Store
 
-| Store | 表格 | 用途 |
-|-------|------|------|
-| `useAccounts()` | `chart_of_accounts` | 科目表管理 |
-| `useBankAccounts()` | `erp_bank_accounts` | 銀行帳戶 |
-| `useJournalVouchers()` | `journal_vouchers` | 會計傳票 |
-| `useJournalLines()` | `journal_lines` | 傳票分錄 |
-| `useAccountingStore` | - | 個人記帳（Zustand）|
+| Store                  | 表格                | 用途                |
+| ---------------------- | ------------------- | ------------------- |
+| `useAccounts()`        | `chart_of_accounts` | 科目表管理          |
+| `useBankAccounts()`    | `erp_bank_accounts` | 銀行帳戶            |
+| `useJournalVouchers()` | `journal_vouchers`  | 會計傳票            |
+| `useJournalLines()`    | `journal_lines`     | 傳票分錄            |
+| `useAccountingStore`   | -                   | 個人記帳（Zustand） |
 
 ---
 
 ### 2.9 客戶管理 `/customers`
 
 #### 頁面結構
+
 ```
 /customers（客戶列表）
 ├── ResponsiveHeader
@@ -885,29 +896,29 @@ interface ItineraryVersionRecord {
 
 #### 客戶操作按鈕對照表
 
-| 按鈕 | 圖示 | 條件 | 動作 | 開啟 Dialog |
-|------|------|------|------|-----------|
-| 進階搜尋 | `Search` | 永遠 | 篩選客戶 | `CustomerSearchDialog` |
-| 新增顧客 | `Plus` | 永遠 | 新增客戶 | `CustomerAddDialog` |
-| 驗證 | `AlertTriangle` | 未驗證+有護照圖 | 驗證資料 | `CustomerVerifyDialog` |
-| 編輯 | `Edit` | 永遠 | 編輯客戶 | `CustomerVerifyDialog` |
-| 刪除 | `Trash2` | 永遠 | 刪除客戶 | 確認 Dialog |
+| 按鈕     | 圖示            | 條件            | 動作     | 開啟 Dialog            |
+| -------- | --------------- | --------------- | -------- | ---------------------- |
+| 進階搜尋 | `Search`        | 永遠            | 篩選客戶 | `CustomerSearchDialog` |
+| 新增顧客 | `Plus`          | 永遠            | 新增客戶 | `CustomerAddDialog`    |
+| 驗證     | `AlertTriangle` | 未驗證+有護照圖 | 驗證資料 | `CustomerVerifyDialog` |
+| 編輯     | `Edit`          | 永遠            | 編輯客戶 | `CustomerVerifyDialog` |
+| 刪除     | `Trash2`        | 永遠            | 刪除客戶 | 確認 Dialog            |
 
 #### 客戶驗證狀態
 
-| 狀態值 | 中文 | 說明 |
-|--------|------|------|
-| `verified` | 已驗證 | 人工驗證通過 |
-| `unverified` | 未驗證 | 待驗證（OCR 新建或編輯後）|
-| `rejected` | 已拒絕 | 驗證失敗 |
+| 狀態值       | 中文   | 說明                       |
+| ------------ | ------ | -------------------------- |
+| `verified`   | 已驗證 | 人工驗證通過               |
+| `unverified` | 未驗證 | 待驗證（OCR 新建或編輯後） |
+| `rejected`   | 已拒絕 | 驗證失敗                   |
 
 #### 使用的 Store/Hook
 
-| Hook | 用途 |
-|------|------|
-| `useCustomers()` | 客戶 CRUD |
-| `useCustomerSearch()` | 搜尋/篩選邏輯 |
-| `useCustomerVerify()` | 驗證對話框狀態 |
+| Hook                  | 用途               |
+| --------------------- | ------------------ |
+| `useCustomers()`      | 客戶 CRUD          |
+| `useCustomerSearch()` | 搜尋/篩選邏輯      |
+| `useCustomerVerify()` | 驗證對話框狀態     |
 | `usePassportUpload()` | 護照批次上傳 + OCR |
 
 ---
@@ -915,6 +926,7 @@ interface ItineraryVersionRecord {
 ### 2.10 簽證管理 `/visas`
 
 #### 頁面結構
+
 ```
 /visas（簽證列表）
 ├── ResponsiveHeader
@@ -934,14 +946,14 @@ interface ItineraryVersionRecord {
 
 #### 簽證操作按鈕對照表
 
-| 按鈕 | 顯示條件 | 動作 | 開啟 Dialog |
-|------|---------|------|-----------|
-| 送件 | pending/submitted/collected/rejected | 更新為 submitted | `SubmitVisaDialog` |
-| 取件 | submitted/rejected | 更新為 collected | `BatchPickupDialog` |
-| 歸還 | collected/rejected | 更新為 returned | `ReturnDocumentsDialog` |
-| 退件 | pending/submitted/collected | 更新為 rejected | `BatchRejectDialog` |
-| 編輯 | 行內 | 編輯簽證 | `EditVisaDialog` |
-| 刪除 | 行內 | 刪除簽證 | 確認 Dialog |
+| 按鈕 | 顯示條件                             | 動作             | 開啟 Dialog             |
+| ---- | ------------------------------------ | ---------------- | ----------------------- |
+| 送件 | pending/submitted/collected/rejected | 更新為 submitted | `SubmitVisaDialog`      |
+| 取件 | submitted/rejected                   | 更新為 collected | `BatchPickupDialog`     |
+| 歸還 | collected/rejected                   | 更新為 returned  | `ReturnDocumentsDialog` |
+| 退件 | pending/submitted/collected          | 更新為 rejected  | `BatchRejectDialog`     |
+| 編輯 | 行內                                 | 編輯簽證         | `EditVisaDialog`        |
+| 刪除 | 行內                                 | 刪除簽證         | 確認 Dialog             |
 
 #### 簽證狀態流轉
 
@@ -965,21 +977,21 @@ rejected（退件）
 
 #### 簽證類型與費用
 
-| 簽證類型 | 預設費用 | 預計天數 |
-|---------|---------|---------|
-| 護照 成人 | NT$1,800 | 21 天 |
-| 護照 兒童 | NT$1,500 | 21 天 |
-| 台胞證 | NT$1,800 | 14 天 |
-| 台胞證 首辦 | NT$800 | 14 天 |
-| 美國 ESTA | NT$1,000 | 3 天 |
-| 急件 | +NT$1,000 | 縮短 |
+| 簽證類型    | 預設費用  | 預計天數 |
+| ----------- | --------- | -------- |
+| 護照 成人   | NT$1,800  | 21 天    |
+| 護照 兒童   | NT$1,500  | 21 天    |
+| 台胞證      | NT$1,800  | 14 天    |
+| 台胞證 首辦 | NT$800    | 14 天    |
+| 美國 ESTA   | NT$1,000  | 3 天     |
+| 急件        | +NT$1,000 | 縮短     |
 
 #### 使用的 Store
 
-| Store | 用途 |
-|-------|------|
-| `useVisaStore` | 簽證 CRUD |
-| `useOrderStore` | 關聯訂單 |
+| Store                | 用途           |
+| -------------------- | -------------- |
+| `useVisaStore`       | 簽證 CRUD      |
+| `useOrderStore`      | 關聯訂單       |
 | `useVendorCostStore` | 代辦商成本歷史 |
 
 ---
@@ -987,6 +999,7 @@ rejected（退件）
 ### 2.11 員工管理 `/hr`
 
 #### 頁面結構
+
 ```
 /hr（人資管理）
 ├── ResponsiveHeader
@@ -1006,41 +1019,41 @@ rejected（退件）
 
 #### 員工操作按鈕對照表
 
-| 位置 | 按鈕 | 圖示 | 動作 | 開啟 Dialog |
-|------|------|------|------|-----------|
-| Header | 薪資請款 | `DollarSign` | 建立請款單 | `SalaryPaymentDialog` |
-| Header | 新增員工 | `Plus` | 新增員工 | `AddEmployeeDialog` |
-| 行內 | 編輯 | `Edit2` | 展開詳細 | `EmployeeExpandedView` |
-| 行內 | 辦理離職 | `UserX` | 變更狀態 | 確認 Dialog |
-| 行內 | 刪除 | `Trash2` | 刪除員工 | 確認 Dialog |
+| 位置   | 按鈕     | 圖示         | 動作       | 開啟 Dialog            |
+| ------ | -------- | ------------ | ---------- | ---------------------- |
+| Header | 薪資請款 | `DollarSign` | 建立請款單 | `SalaryPaymentDialog`  |
+| Header | 新增員工 | `Plus`       | 新增員工   | `AddEmployeeDialog`    |
+| 行內   | 編輯     | `Edit2`      | 展開詳細   | `EmployeeExpandedView` |
+| 行內   | 辦理離職 | `UserX`      | 變更狀態   | 確認 Dialog            |
+| 行內   | 刪除     | `Trash2`     | 刪除員工   | 確認 Dialog            |
 
 #### 員工狀態
 
-| 狀態值 | 中文 | 顏色 |
-|--------|------|------|
-| `active` | 在職 | morandi-primary |
-| `probation` | 試用期 | status-warning |
-| `leave` | 請假 | status-info |
-| `terminated` | 離職 | morandi-red |
+| 狀態值       | 中文   | 顏色            |
+| ------------ | ------ | --------------- |
+| `active`     | 在職   | morandi-primary |
+| `probation`  | 試用期 | status-warning  |
+| `leave`      | 請假   | status-info     |
+| `terminated` | 離職   | morandi-red     |
 
 #### RBAC 角色矩陣
 
-| 角色 | ID | 說明 |
-|------|----|------|
+| 角色       | ID            | 說明                   |
+| ---------- | ------------- | ---------------------- |
 | 超級管理員 | `super_admin` | 所有權限，跨 workspace |
-| 管理員 | `admin` | workspace 內所有權限 |
-| 領隊 | `tour_leader` | 管理自己帶的團 |
-| 業務 | `sales` | 報價單、客戶、訂單 |
-| 會計 | `accountant` | 財務、付款、會計 |
-| 助理 | `assistant` | 訂單、客戶、行政 |
-| 一般員工 | `staff` | 基本查看權限 |
+| 管理員     | `admin`       | workspace 內所有權限   |
+| 領隊       | `tour_leader` | 管理自己帶的團         |
+| 業務       | `sales`       | 報價單、客戶、訂單     |
+| 會計       | `accountant`  | 財務、付款、會計       |
+| 助理       | `assistant`   | 訂單、客戶、行政       |
+| 一般員工   | `staff`       | 基本查看權限           |
 
 #### 使用的 Store
 
-| Store | 用途 |
-|-------|------|
-| `useUserStore` | 員工 CRUD |
-| `useAuthStore` | 當前用戶資訊 |
+| Store                  | 用途         |
+| ---------------------- | ------------ |
+| `useUserStore`         | 員工 CRUD    |
+| `useAuthStore`         | 當前用戶資訊 |
 | `useWorkspaceChannels` | 工作空間管理 |
 
 ---
@@ -1048,6 +1061,7 @@ rejected（退件）
 ### 2.12 頻道管理 `/workspace`
 
 #### 頁面結構
+
 ```
 /workspace（頻道工作區）
 ├── ChannelSidebar（左側邊欄）
@@ -1072,53 +1086,54 @@ rejected（退件）
 
 #### 頻道類型
 
-| 類型 | 值 | 特性 |
-|------|-----|------|
-| 公開頻道 | `public` | 所有成員可見，自由加入 |
-| 私密頻道 | `private` | 需邀請加入 |
-| 直接訊息 | `direct` | 一對一聊天 |
-| 公告頻道 | `public` + `is_announcement=true` | 僅管理員可發言 |
+| 類型     | 值                                | 特性                   |
+| -------- | --------------------------------- | ---------------------- |
+| 公開頻道 | `public`                          | 所有成員可見，自由加入 |
+| 私密頻道 | `private`                         | 需邀請加入             |
+| 直接訊息 | `direct`                          | 一對一聊天             |
+| 公告頻道 | `public` + `is_announcement=true` | 僅管理員可發言         |
 
 #### 頻道操作按鈕對照表
 
-| 位置 | 按鈕 | 圖示 | 動作 | 開啟 Dialog |
-|------|------|------|------|-----------|
-| Header | 搜尋 | `Search` | 篩選頻道 | - |
-| Header | 刷新 | `RefreshCw` | 重載列表 | - |
-| Header | 設定 | `Settings` | 建立頻道/群組 | 下拉菜單 |
-| 頻道項目 | 星標 | `Star` | 加/移除星標 | - |
-| 頻道項目 | 更多 | `EllipsisVertical` | 編輯/刪除/成員 | 內容菜單 |
-| 訊息輸入 | 快速操作 | `Plus` | 分享清單 | `QuickActionMenu` |
-| 訊息輸入 | 附件 | `Paperclip` | 上傳檔案 | - |
-| 訊息項目 | 反應 | `Smile` | 表情反應 | 表情選擇器 |
-| 訊息項目 | 回覆 | `MessageSquare` | 討論串 | `ThreadPanel` |
-| 訊息項目 | 刪除 | `Trash2` | 刪除訊息 | - |
+| 位置     | 按鈕     | 圖示               | 動作           | 開啟 Dialog       |
+| -------- | -------- | ------------------ | -------------- | ----------------- |
+| Header   | 搜尋     | `Search`           | 篩選頻道       | -                 |
+| Header   | 刷新     | `RefreshCw`        | 重載列表       | -                 |
+| Header   | 設定     | `Settings`         | 建立頻道/群組  | 下拉菜單          |
+| 頻道項目 | 星標     | `Star`             | 加/移除星標    | -                 |
+| 頻道項目 | 更多     | `EllipsisVertical` | 編輯/刪除/成員 | 內容菜單          |
+| 訊息輸入 | 快速操作 | `Plus`             | 分享清單       | `QuickActionMenu` |
+| 訊息輸入 | 附件     | `Paperclip`        | 上傳檔案       | -                 |
+| 訊息項目 | 反應     | `Smile`            | 表情反應       | 表情選擇器        |
+| 訊息項目 | 回覆     | `MessageSquare`    | 討論串         | `ThreadPanel`     |
+| 訊息項目 | 刪除     | `Trash2`           | 刪除訊息       | -                 |
 
 #### 快速操作菜單
 
-| ID | 圖示 | 名稱 | 開啟 Dialog |
-|----|------|------|-----------|
-| `share-order` | `Receipt` | 分享待收款 | `ShareOrdersDialog` |
-| `share-quote` | `Receipt` | 分享報價單 | `ShareQuoteDialog` |
-| `new-payment` | `DollarSign` | 新增請款單 | `CreatePaymentRequestDialog` |
-| `new-receipt` | `DollarSign` | 新增收款單 | `CreateReceiptDialog` |
-| `share-advance` | `Wallet` | 分享代墊清單 | `ShareAdvanceDialog` |
-| `new-task` | `CheckSquare` | 新增任務 | 內部邏輯 |
+| ID              | 圖示          | 名稱         | 開啟 Dialog                  |
+| --------------- | ------------- | ------------ | ---------------------------- |
+| `share-order`   | `Receipt`     | 分享待收款   | `ShareOrdersDialog`          |
+| `share-quote`   | `Receipt`     | 分享報價單   | `ShareQuoteDialog`           |
+| `new-payment`   | `DollarSign`  | 新增請款單   | `CreatePaymentRequestDialog` |
+| `new-receipt`   | `DollarSign`  | 新增收款單   | `CreateReceiptDialog`        |
+| `share-advance` | `Wallet`      | 分享代墊清單 | `ShareAdvanceDialog`         |
+| `new-task`      | `CheckSquare` | 新增任務     | 內部邏輯                     |
 
 #### 使用的 Store
 
-| Store | 用途 |
-|-------|------|
-| `useChannelsStore` | 頻道 CRUD |
-| `useChatStore` | 訊息管理 |
-| `useChannelMemberStore` | 頻道成員 |
-| `useWorkspaceStore` | 工作區管理 |
+| Store                   | 用途       |
+| ----------------------- | ---------- |
+| `useChannelsStore`      | 頻道 CRUD  |
+| `useChatStore`          | 訊息管理   |
+| `useChannelMemberStore` | 頻道成員   |
+| `useWorkspaceStore`     | 工作區管理 |
 
 ---
 
 ### 2.13 需求單管理 `/tour-requests`
 
 #### 頁面結構
+
 ```
 TourRequestsPage (主頁面)
 ├── ListPageLayout (列表頁佈局)
@@ -1148,12 +1163,12 @@ TourRequestsPage (主頁面)
 
 #### 操作按鈕對照表
 
-| 按鈕 | 圖示 | 位置 | 動作 | 開啟 Dialog |
-|------|------|------|------|-----------|
-| 新增需求 | `Plus` | ListPageLayout 標題列 | 開啟新增對話框 | TourRequestDialog |
-| 檢視 | `Eye` | ActionCell | 開啟詳情對話框 | TourRequestDetailDialog |
-| 編輯 | `Edit2` | ActionCell | 開啟編輯對話框 | TourRequestDialog |
-| 刪除 | `Trash2` | ActionCell | 刪除後刷新列表 | 確認 Dialog |
+| 按鈕     | 圖示     | 位置                  | 動作           | 開啟 Dialog             |
+| -------- | -------- | --------------------- | -------------- | ----------------------- |
+| 新增需求 | `Plus`   | ListPageLayout 標題列 | 開啟新增對話框 | TourRequestDialog       |
+| 檢視     | `Eye`    | ActionCell            | 開啟詳情對話框 | TourRequestDetailDialog |
+| 編輯     | `Edit2`  | ActionCell            | 開啟編輯對話框 | TourRequestDialog       |
+| 刪除     | `Trash2` | ActionCell            | 刪除後刷新列表 | 確認 Dialog             |
 
 #### 狀態流轉
 
@@ -1175,22 +1190,22 @@ TourRequestsPage (主頁面)
 
 #### 類別對應
 
-| 類別 | 圖示 | 顏色 |
-|------|------|------|
-| flight | `Plane` | info (藍) |
-| hotel | `Hotel` | success (綠) |
-| transport | `Car` | warning (黃) |
-| restaurant | `Utensils` | danger (紅) |
-| ticket | `Ticket` | info (藍) |
-| guide | `User` | default (灰) |
-| itinerary | `Map` | success (綠) |
-| other | `MoreHorizontal` | default (灰) |
+| 類別       | 圖示             | 顏色         |
+| ---------- | ---------------- | ------------ |
+| flight     | `Plane`          | info (藍)    |
+| hotel      | `Hotel`          | success (綠) |
+| transport  | `Car`            | warning (黃) |
+| restaurant | `Utensils`       | danger (紅)  |
+| ticket     | `Ticket`         | info (藍)    |
+| guide      | `User`           | default (灰) |
+| itinerary  | `Map`            | success (綠) |
+| other      | `MoreHorizontal` | default (灰) |
 
 #### 使用的 Store
 
-| Store | 用途 |
-|-------|------|
-| `useTourRequests()` | 需求單資料管理 (CRUD) |
+| Store                    | 用途                  |
+| ------------------------ | --------------------- |
+| `useTourRequests()`      | 需求單資料管理 (CRUD) |
 | `useWorkspaceChannels()` | 取得當前 workspace_id |
 
 ---
@@ -1198,6 +1213,7 @@ TourRequestsPage (主頁面)
 ### 2.14 日曆功能 `/calendar`
 
 #### 頁面結構
+
 ```
 日曆頁面 (CalendarPage)
 ├── ResponsiveHeader
@@ -1223,26 +1239,26 @@ TourRequestsPage (主頁面)
 
 #### 事件類型與顏色
 
-| 事件類型 | 背景色 | 圖示 | 可編輯 | 可刪除 |
-|---------|--------|------|--------|--------|
-| **tour** | 依狀態變化 | `MapPin` | 否 | 否 |
-| **personal** | `#B8A9D1` | `CheckSquare` | 是 | 是 |
-| **company** | `#E0C3A0` | `Briefcase` | 有條件 | 有條件 |
-| **birthday** | `#E6B8C8` | `Cake` | 否 | 否 |
+| 事件類型     | 背景色     | 圖示          | 可編輯 | 可刪除 |
+| ------------ | ---------- | ------------- | ------ | ------ |
+| **tour**     | 依狀態變化 | `MapPin`      | 否     | 否     |
+| **personal** | `#B8A9D1`  | `CheckSquare` | 是     | 是     |
+| **company**  | `#E0C3A0`  | `Briefcase`   | 有條件 | 有條件 |
+| **birthday** | `#E6B8C8`  | `Cake`        | 否     | 否     |
 
 #### 操作按鈕對照表
 
-| 按鈕 | 圖示 | 條件 | 動作 | 開啟 Dialog |
-|------|------|------|------|-----------|
-| 上月 | `←` | - | 顯示上個月 | - |
-| 下月 | `→` | - | 顯示下個月 | - |
-| 今天 | - | - | 回到今月 | - |
-| 月/週/日視圖 | `Calendar`/`CalendarDays`/`CalendarClock` | - | 切換視圖 | - |
-| 生日名單 | `Cake` | - | 打開生日名單 | BirthdayListDialog |
-| 顯示設定 | `Settings` | - | 打開顯示設定 | CalendarSettingsDialog |
-| 新增事項 | `Plus` | - | 新增行事曆事項 | AddEventDialog |
-| 刪除 | `Trash2` | 非 tour/birthday 且為建立者 | 刪除事件 | ConfirmDialog |
-| 編輯 | - | 非 tour/birthday 且為建立者 | 編輯事項 | EditEventDialog |
+| 按鈕         | 圖示                                      | 條件                        | 動作           | 開啟 Dialog            |
+| ------------ | ----------------------------------------- | --------------------------- | -------------- | ---------------------- |
+| 上月         | `←`                                       | -                           | 顯示上個月     | -                      |
+| 下月         | `→`                                       | -                           | 顯示下個月     | -                      |
+| 今天         | -                                         | -                           | 回到今月       | -                      |
+| 月/週/日視圖 | `Calendar`/`CalendarDays`/`CalendarClock` | -                           | 切換視圖       | -                      |
+| 生日名單     | `Cake`                                    | -                           | 打開生日名單   | BirthdayListDialog     |
+| 顯示設定     | `Settings`                                | -                           | 打開顯示設定   | CalendarSettingsDialog |
+| 新增事項     | `Plus`                                    | -                           | 新增行事曆事項 | AddEventDialog         |
+| 刪除         | `Trash2`                                  | 非 tour/birthday 且為建立者 | 刪除事件       | ConfirmDialog          |
+| 編輯         | -                                         | 非 tour/birthday 且為建立者 | 編輯事項       | EditEventDialog        |
 
 #### 顯示設定選項
 
@@ -1252,21 +1268,22 @@ TourRequestsPage (主頁面)
 
 #### 使用的 Store/Hook
 
-| Store/Hook | 用途 |
-|-----------|------|
-| `useCalendarStore` | UI 狀態管理 (日期、視圖、設定) |
-| `useCalendarEventStore` | 行事曆事件 CRUD |
-| `useCalendarEvents()` | 資料轉換與過濾 |
-| `useCalendarNavigation()` | 月份/視圖切換 |
-| `useEventOperations()` | 事件 CRUD 操作 |
-| `useTourStore` | 旅遊團資料 |
-| `useCustomerStore` | 客戶資料 (生日) |
+| Store/Hook                | 用途                           |
+| ------------------------- | ------------------------------ |
+| `useCalendarStore`        | UI 狀態管理 (日期、視圖、設定) |
+| `useCalendarEventStore`   | 行事曆事件 CRUD                |
+| `useCalendarEvents()`     | 資料轉換與過濾                 |
+| `useCalendarNavigation()` | 月份/視圖切換                  |
+| `useEventOperations()`    | 事件 CRUD 操作                 |
+| `useTourStore`            | 旅遊團資料                     |
+| `useCustomerStore`        | 客戶資料 (生日)                |
 
 ---
 
 ### 2.15 待辦事項 `/todos`
 
 #### 頁面結構
+
 ```
 待辦事項頁面
 ├── ResponsiveHeader
@@ -1298,15 +1315,15 @@ TourRequestsPage (主頁面)
 
 #### 操作按鈕對照表
 
-| 按鈕 | 圖示 | 條件 | 動作 | 開啟 Dialog |
-|------|------|------|------|-----------|
-| 新增任務 | `Plus` | 已登入 | 開啟新增對話框 | AddTodoDialog |
-| 快速新增 | Enter | 輸入內容 | 直接新增待辦 | - |
-| 完成/取消完成 | `CheckCircle` | - | 切換狀態 | - |
-| 編輯 | `Edit2` | - | 展開詳細檢視 | TodoExpandedView |
-| 刪除 | `Trash2` | - | 確認後刪除 | ConfirmDialog |
-| 標記完成 | `Check` | canEdit | 更新為 completed | - |
-| 延期一週 | `Calendar` | canEdit | 期限延後7天 | - |
+| 按鈕          | 圖示          | 條件     | 動作             | 開啟 Dialog      |
+| ------------- | ------------- | -------- | ---------------- | ---------------- |
+| 新增任務      | `Plus`        | 已登入   | 開啟新增對話框   | AddTodoDialog    |
+| 快速新增      | Enter         | 輸入內容 | 直接新增待辦     | -                |
+| 完成/取消完成 | `CheckCircle` | -        | 切換狀態         | -                |
+| 編輯          | `Edit2`       | -        | 展開詳細檢視     | TodoExpandedView |
+| 刪除          | `Trash2`      | -        | 確認後刪除       | ConfirmDialog    |
+| 標記完成      | `Check`       | canEdit  | 更新為 completed | -                |
+| 延期一週      | `Calendar`    | canEdit  | 期限延後7天      | -                |
 
 #### 狀態流轉
 
@@ -1324,36 +1341,37 @@ pending (待辦)
 
 #### 權限機制
 
-| 條件 | 權限 |
-|------|------|
-| creator = 當前用戶 | 完全編輯 (canEdit=true) |
-| assignee = 當前用戶 | 完全編輯 (canEdit=true) |
-| visibility 包含用戶ID | 完全編輯 (canEdit=true) |
-| is_public = true | 唯讀 (canEdit=false, 可留言) |
+| 條件                  | 權限                         |
+| --------------------- | ---------------------------- |
+| creator = 當前用戶    | 完全編輯 (canEdit=true)      |
+| assignee = 當前用戶   | 完全編輯 (canEdit=true)      |
+| visibility 包含用戶ID | 完全編輯 (canEdit=true)      |
+| is_public = true      | 唯讀 (canEdit=false, 可留言) |
 
 #### 截止日期視覺提示
 
-| 條件 | 顏色 |
-|------|------|
-| 逾期 | 紅色 |
-| 今天 | 金色 |
+| 條件  | 顏色   |
+| ----- | ------ |
+| 逾期  | 紅色   |
+| 今天  | 金色   |
 | 3天內 | 淡金色 |
-| 其他 | 次要色 |
+| 其他  | 次要色 |
 
 #### 使用的 Store/Hook
 
-| Store/Hook | 用途 |
-|-----------|------|
-| `useTodos` | 待辦事項 CRUD + Realtime |
-| `useAuthStore` | 當前登入用戶 |
-| `useUserStore` | 員工列表 (用於指派) |
-| `useConfirmDialog` | 刪除確認對話框 |
+| Store/Hook         | 用途                     |
+| ------------------ | ------------------------ |
+| `useTodos`         | 待辦事項 CRUD + Realtime |
+| `useAuthStore`     | 當前登入用戶             |
+| `useUserStore`     | 員工列表 (用於指派)      |
+| `useConfirmDialog` | 刪除確認對話框           |
 
 ---
 
 ### 2.16 eSIM 管理 `/esims`
 
 #### 頁面結構
+
 ```
 EsimsPage
 ├── ListPageLayout
@@ -1379,23 +1397,23 @@ EsimsPage
 
 #### 操作按鈕對照表
 
-| 按鈕 | 圖示 | 位置 | 動作 | 開啟 Dialog |
-|------|------|------|------|-----------|
-| 詳細搜尋 | `Search` | Header | 開啟搜尋對話框 | EsimSearchDialog |
-| 新增網卡 | `Plus` | Header | 開啟批次新增對話框 | EsimCreateDialog |
-| 編輯 | `Edit2` | ActionCell | 跳轉詳細頁 | - |
-| 刪除 | `Trash2` | ActionCell | 確認後刪除 | 確認 Dialog |
-| 重新整理 | `RefreshCw` | CreateDialog | 重載 FastMove 產品 | - |
-| 新增行 | `+` | 批次列表 | 新增網卡項目 | - |
-| 刪除行 | `✕` | 批次列表 | 刪除該項目 | - |
+| 按鈕     | 圖示        | 位置         | 動作               | 開啟 Dialog      |
+| -------- | ----------- | ------------ | ------------------ | ---------------- |
+| 詳細搜尋 | `Search`    | Header       | 開啟搜尋對話框     | EsimSearchDialog |
+| 新增網卡 | `Plus`      | Header       | 開啟批次新增對話框 | EsimCreateDialog |
+| 編輯     | `Edit2`     | ActionCell   | 跳轉詳細頁         | -                |
+| 刪除     | `Trash2`    | ActionCell   | 確認後刪除         | 確認 Dialog      |
+| 重新整理 | `RefreshCw` | CreateDialog | 重載 FastMove 產品 | -                |
+| 新增行   | `+`         | 批次列表     | 新增網卡項目       | -                |
+| 刪除行   | `✕`         | 批次列表     | 刪除該項目         | -                |
 
 #### eSIM 狀態
 
-| 狀態值 | 名稱 | 顏色 | 圖示 |
-|--------|------|------|------|
-| 0 | 待確認 | morandi-gold | `Clock` |
-| 1 | 已確認 | morandi-green | `CheckCircle` |
-| 2 | 錯誤 | morandi-red | `XCircle` |
+| 狀態值 | 名稱   | 顏色          | 圖示          |
+| ------ | ------ | ------------- | ------------- |
+| 0      | 待確認 | morandi-gold  | `Clock`       |
+| 1      | 已確認 | morandi-green | `CheckCircle` |
+| 2      | 錯誤   | morandi-red   | `XCircle`     |
 
 #### eSIM 編號規則
 
@@ -1405,18 +1423,19 @@ EsimsPage
 
 #### 使用的 Store/Service
 
-| Store/Service | 用途 |
-|--------------|------|
-| `useEsimStore` | 網卡資料管理 (CRUD) |
-| `useOrderStore` | 訂單資料 (自動建立) |
-| `useTourStore` | 團資料查詢 |
-| `fastMoveService` | FastMove API 呼叫 |
+| Store/Service     | 用途                |
+| ----------------- | ------------------- |
+| `useEsimStore`    | 網卡資料管理 (CRUD) |
+| `useOrderStore`   | 訂單資料 (自動建立) |
+| `useTourStore`    | 團資料查詢          |
+| `fastMoveService` | FastMove API 呼叫   |
 
 ---
 
 ### 2.17 報表功能 `/reports` & `/finance/reports`
 
 #### 頁面結構
+
 ```
 /finance/reports (財務報表主頁 - 待開發)
 ├── 頁面標題 + "🚧 待開發" 徽章
@@ -1439,19 +1458,19 @@ EsimsPage
 
 #### 報表類型清單
 
-| 報表類型 | 路由 | 狀態 | 說明 |
-|---------|------|------|------|
-| 結團報表 | `/reports/tour-closing` | ✅ 已實現 | 已結束團隊財務數據 |
-| 月度損益表 | `/finance/reports` | 🚧 開發中 | 月度收支分析 |
-| 現金流分析 | `/finance/reports` | 🚧 開發中 | 現金流動分析 |
+| 報表類型   | 路由                    | 狀態      | 說明               |
+| ---------- | ----------------------- | --------- | ------------------ |
+| 結團報表   | `/reports/tour-closing` | ✅ 已實現 | 已結束團隊財務數據 |
+| 月度損益表 | `/finance/reports`      | 🚧 開發中 | 月度收支分析       |
+| 現金流分析 | `/finance/reports`      | 🚧 開發中 | 現金流動分析       |
 
 #### 結團報表操作按鈕
 
-| 按鈕 | 圖示 | 位置 | 動作 |
-|------|------|------|------|
-| 匯出 Excel | `FileDown` | Header | 匯出選中月份報表 |
-| 月份篩選 | - | Header | 按月份過濾 |
-| 匯出此團 | `FileDown` | ActionCell | 匯出單團報表 |
+| 按鈕       | 圖示       | 位置       | 動作             |
+| ---------- | ---------- | ---------- | ---------------- |
+| 匯出 Excel | `FileDown` | Header     | 匯出選中月份報表 |
+| 月份篩選   | -          | Header     | 按月份過濾       |
+| 匯出此團   | `FileDown` | ActionCell | 匯出單團報表     |
 
 #### Excel 匯出欄位
 
@@ -1459,10 +1478,10 @@ EsimsPage
 
 #### 使用的 Store/Hook
 
-| 頁面 | Store/Hook | 用途 |
-|------|-----------|------|
-| `/finance/reports` | `useTourStore`, `useOrderStore` | 團+訂單資料 |
-| `/reports/tour-closing` | Supabase 直接查詢 | 批量資料載入 |
+| 頁面                    | Store/Hook                      | 用途         |
+| ----------------------- | ------------------------------- | ------------ |
+| `/finance/reports`      | `useTourStore`, `useOrderStore` | 團+訂單資料  |
+| `/reports/tour-closing` | Supabase 直接查詢               | 批量資料載入 |
 
 ---
 
@@ -1499,20 +1518,20 @@ EsimsPage
 
 #### 狀態定義完整性總覽
 
-| 模組 | 狀態定義 | 配置支援 | 使用正確性 | 評估 |
-|------|---------|---------|----------|------|
-| Tours | ✅ 完整 | ✅ 完整 | ✅ 正確 | 👍 良好 |
-| Orders | ✅ 完整 | ✅ 完整 | ✅ 正確 | 👍 良好 |
-| Quotes | ⚠️ 多處定義 | ❌ 缺失 | ⚠️ 使用本地配置 | 🔴 需修復 |
-| Visas | ✅ 完整 | ✅ 完整 | ✅ 正確 | 👍 良好 |
-| Todos | ✅ 完整 | ✅ 完整 | ✅ 正確 | 👍 良好 |
-| Tour Requests | ⚠️ 不完整 | ❌ 缺失 | ❌ 混用 todo | 🔴 需修復 |
-| Calendar Events | ⚠️ 不完整 | ❌ 缺失 | ✅ 使用類型 | 🟡 中等 |
-| eSIMs | ✅ 完整 | ✅ 完整 | ❌ 類型錯誤 | 🟡 需微調 |
-| Disbursement | ❌ 多處定義 | ⚠️ 不一致 | ⚠️ 混雜 | 🔴 需修復 |
-| Voucher | ✅ 完整 | ✅ 完整 | ✅ 正確 | 👍 良好 |
-| Receipt | ✅ 完整 | ✅ 完整 | ✅ 正確 | 👍 良好 |
-| Invoice | ✅ 完整 | ✅ 完整 | ✅ 正確 | 👍 良好 |
+| 模組            | 狀態定義    | 配置支援  | 使用正確性      | 評估      |
+| --------------- | ----------- | --------- | --------------- | --------- |
+| Tours           | ✅ 完整     | ✅ 完整   | ✅ 正確         | 👍 良好   |
+| Orders          | ✅ 完整     | ✅ 完整   | ✅ 正確         | 👍 良好   |
+| Quotes          | ⚠️ 多處定義 | ❌ 缺失   | ⚠️ 使用本地配置 | 🔴 需修復 |
+| Visas           | ✅ 完整     | ✅ 完整   | ✅ 正確         | 👍 良好   |
+| Todos           | ✅ 完整     | ✅ 完整   | ✅ 正確         | 👍 良好   |
+| Tour Requests   | ⚠️ 不完整   | ❌ 缺失   | ❌ 混用 todo    | 🔴 需修復 |
+| Calendar Events | ⚠️ 不完整   | ❌ 缺失   | ✅ 使用類型     | 🟡 中等   |
+| eSIMs           | ✅ 完整     | ✅ 完整   | ❌ 類型錯誤     | 🟡 需微調 |
+| Disbursement    | ❌ 多處定義 | ⚠️ 不一致 | ⚠️ 混雜         | 🔴 需修復 |
+| Voucher         | ✅ 完整     | ✅ 完整   | ✅ 正確         | 👍 良好   |
+| Receipt         | ✅ 完整     | ✅ 完整   | ✅ 正確         | 👍 良好   |
+| Invoice         | ✅ 完整     | ✅ 完整   | ✅ 正確         | 👍 良好   |
 
 #### 發現的問題
 
@@ -1527,16 +1546,16 @@ EsimsPage
 
 #### 檢查結果總覽
 
-| 實體 | 狀態 | 不一致欄位 | 缺失欄位 |
-|------|------|----------|---------|
-| Tour | ✅ 一致 | 0 | 0 |
-| Order | ✅ 一致 | 0 | 0 |
-| OrderMember | ⚠️ 需修復 | 1 | 0 |
-| Quote | ❌ 嚴重問題 | 0 | 2 |
-| Customer | ✅ 一致 | 0 | 0 |
-| Visa | ✅ 一致 | 0 | 0 |
-| Todo | ✅ 一致 | 0 | 0 |
-| CalendarEvent | ⚠️ 需映射 | 3 | 0 |
+| 實體          | 狀態        | 不一致欄位 | 缺失欄位 |
+| ------------- | ----------- | ---------- | -------- |
+| Tour          | ✅ 一致     | 0          | 0        |
+| Order         | ✅ 一致     | 0          | 0        |
+| OrderMember   | ⚠️ 需修復   | 1          | 0        |
+| Quote         | ❌ 嚴重問題 | 0          | 2        |
+| Customer      | ✅ 一致     | 0          | 0        |
+| Visa          | ✅ 一致     | 0          | 0        |
+| Todo          | ✅ 一致     | 0          | 0        |
+| CalendarEvent | ⚠️ 需映射   | 3          | 0        |
 
 #### 發現的問題
 
@@ -1557,6 +1576,7 @@ EsimsPage
 #### 架構說明
 
 系統採用「Supabase 直連 + 特定功能 API」混合架構：
+
 - **數據操作**：通過 `createCloudHook` 直連 Supabase
 - **業務邏輯**：通過特定 API 端點處理
 
@@ -1612,30 +1632,30 @@ EsimsPage
 
 ### 優先級 1（高 - 立即修復）
 
-| 問題 | 位置 | 修復方式 |
-|------|------|---------|
-| Quote 狀態配置 | `status-config.ts` | 新增 quote 類型配置 |
+| 問題              | 位置               | 修復方式               |
+| ----------------- | ------------------ | ---------------------- |
+| Quote 狀態配置    | `status-config.ts` | 新增 quote 類型配置    |
 | Tour Request 類型 | `status-config.ts` | 新增 tour_request 類型 |
-| eSIM 類型錯誤 | `/esims/page.tsx` | 改為 `type="esim"` |
-| Disbursement 狀態 | `constants.ts` | 統一狀態定義 |
+| eSIM 類型錯誤     | `/esims/page.tsx`  | 改為 `type="esim"`     |
+| Disbursement 狀態 | `constants.ts`     | 統一狀態定義           |
 
 ### 優先級 2（中 - 近期修復）
 
-| 問題 | 位置 | 修復方式 |
-|------|------|---------|
-| OrderMember birth_date | `order.types.ts` | 統一為 birth_date |
-| Quote 缺失欄位 | 資料庫 | 新增 contact_person, contact_phone |
-| 重複 Store 定義 | `stores/` | 統一為單一實現 |
-| 日期格式化 | 9 個頁面 | 改用 DateCell 組件 |
+| 問題                   | 位置             | 修復方式                           |
+| ---------------------- | ---------------- | ---------------------------------- |
+| OrderMember birth_date | `order.types.ts` | 統一為 birth_date                  |
+| Quote 缺失欄位         | 資料庫           | 新增 contact_person, contact_phone |
+| 重複 Store 定義        | `stores/`        | 統一為單一實現                     |
+| 日期格式化             | 9 個頁面         | 改用 DateCell 組件                 |
 
 ### 優先級 3（低 - 未來優化）
 
-| 問題 | 位置 | 修復方式 |
-|------|------|---------|
-| CalendarEvent 欄位映射 | API 層 | 新增映射函數 |
-| Store 命名規範 | workspace/ | 統一命名 |
-| createStore 初始化 | 所有 store | 統一用配置物件 |
-| /fitness/ 顏色規範 | fitness 頁面 | 改用 CSS 變數 |
+| 問題                   | 位置         | 修復方式       |
+| ---------------------- | ------------ | -------------- |
+| CalendarEvent 欄位映射 | API 層       | 新增映射函數   |
+| Store 命名規範         | workspace/   | 統一命名       |
+| createStore 初始化     | 所有 store   | 統一用配置物件 |
+| /fitness/ 顏色規範     | fitness 頁面 | 改用 CSS 變數  |
 
 ---
 
@@ -1643,29 +1663,30 @@ EsimsPage
 
 ### 系統健康度評估
 
-| 檢查項目 | 評分 | 說明 |
-|---------|------|------|
-| 狀態值一致性 | 7/10 | 3 個高優先級問題需修復 |
-| 欄位名稱一致性 | 8/10 | 1 個嚴重問題、2 個中等問題 |
-| API 端點映射 | 10/10 | 無問題，設計合理 |
-| Store 使用模式 | 8/10 | 有重複定義需清理 |
-| UI 組件一致性 | 8/10 | 大部分符合規範 |
-| **總體評分** | **8.2/10** | **系統整體健康，有改進空間** |
+| 檢查項目       | 評分       | 說明                         |
+| -------------- | ---------- | ---------------------------- |
+| 狀態值一致性   | 7/10       | 3 個高優先級問題需修復       |
+| 欄位名稱一致性 | 8/10       | 1 個嚴重問題、2 個中等問題   |
+| API 端點映射   | 10/10      | 無問題，設計合理             |
+| Store 使用模式 | 8/10       | 有重複定義需清理             |
+| UI 組件一致性  | 8/10       | 大部分符合規範               |
+| **總體評分**   | **8.2/10** | **系統整體健康，有改進空間** |
 
 ### 總結
 
 Venturo ERP 系統經過全面審計，共審計 **18 個模組**、**71 個頁面**。
 
 **優點**：
+
 - 架構清晰，採用 feature-based + layer-based 混合模式
 - 標準組件使用率高，UI 一致性良好
 - API 設計合理，Supabase 直連效能優異
 - 莫蘭迪色系設計系統確立
 
 **待改進**：
+
 - 狀態配置需補充 Quote 和 Tour Request
 - 部分 Store 有重複定義需清理
 - 舊頁面日期格式化需升級
 
 **建議**：優先修復 4 個高優先級問題，可在下個 sprint 完成。
-

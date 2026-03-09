@@ -3,7 +3,6 @@
  * QuickQuotePaymentInfo - 付款資訊區
  */
 
-
 import React from 'react'
 import { MORANDI_COLORS } from '../shared/print-styles'
 import { PAYMENT_INFO_LABELS } from '@/constants/labels'
@@ -29,10 +28,28 @@ export const QuickQuotePaymentInfo: React.FC = () => {
         <div className="space-y-1" style={{ color: MORANDI_COLORS.gray }}>
           {hasBankInfo ? (
             <>
-              <div>{QUICK_QUOTE_LABELS.LABEL_8910_PREFIX}{ws.bank_account_name || fullName}</div>
-              {ws.bank_name && <div>{PAYMENT_INFO_LABELS.銀行}{ws.bank_name}</div>}
-              {ws.bank_branch && <div>{PAYMENT_INFO_LABELS.分行}{ws.bank_branch}</div>}
-              {ws.bank_account && <div>{PAYMENT_INFO_LABELS.帳號}{ws.bank_account}</div>}
+              <div>
+                {QUICK_QUOTE_LABELS.LABEL_8910_PREFIX}
+                {ws.bank_account_name || fullName}
+              </div>
+              {ws.bank_name && (
+                <div>
+                  {PAYMENT_INFO_LABELS.銀行}
+                  {ws.bank_name}
+                </div>
+              )}
+              {ws.bank_branch && (
+                <div>
+                  {PAYMENT_INFO_LABELS.分行}
+                  {ws.bank_branch}
+                </div>
+              )}
+              {ws.bank_account && (
+                <div>
+                  {PAYMENT_INFO_LABELS.帳號}
+                  {ws.bank_account}
+                </div>
+              )}
             </>
           ) : (
             <div style={{ color: MORANDI_COLORS.lightGray, fontStyle: 'italic' }}>
@@ -46,7 +63,10 @@ export const QuickQuotePaymentInfo: React.FC = () => {
           {QUICK_QUOTE_LABELS.LABEL_9304}
         </h4>
         <div className="space-y-1" style={{ color: MORANDI_COLORS.gray }}>
-          <div>{QUICK_QUOTE_LABELS.LABEL_5024_PREFIX}{fullName}</div>
+          <div>
+            {QUICK_QUOTE_LABELS.LABEL_5024_PREFIX}
+            {fullName}
+          </div>
           <div className="font-semibold" style={{ color: '#DC2626' }}>
             {QUICK_QUOTE_LABELS.LABEL_2697}
           </div>

@@ -15,7 +15,10 @@ const GOOGLE_VISION_LIMIT_PER_KEY = 980
 export function getGoogleVisionKeys(): string[] {
   const multiKeys = process.env.GOOGLE_VISION_API_KEYS
   if (multiKeys) {
-    return multiKeys.split(',').map(k => k.trim()).filter(Boolean)
+    return multiKeys
+      .split(',')
+      .map(k => k.trim())
+      .filter(Boolean)
   }
   const singleKey = process.env.GOOGLE_VISION_API_KEY
   if (singleKey) {
@@ -134,17 +137,15 @@ export async function updateGoogleVisionUsage(count: number, usedKey: string): P
 
     const newCount = (existing?.usage_count || 0) + count
 
-    const { error } = await supabase
-      .from('api_usage')
-      .upsert(
-        {
-          api_name: keyId,
-          month: currentMonth,
-          usage_count: newCount,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'api_name,month' }
-      )
+    const { error } = await supabase.from('api_usage').upsert(
+      {
+        api_name: keyId,
+        month: currentMonth,
+        usage_count: newCount,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'api_name,month' }
+    )
 
     if (error) {
       logger.error('upsert 失敗:', error)

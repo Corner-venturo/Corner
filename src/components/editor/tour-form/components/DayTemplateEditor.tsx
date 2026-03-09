@@ -32,7 +32,20 @@ function calculateDayDate(departureDate: string | undefined, dayNumber: number):
     const date = new Date(departureDate)
     if (isNaN(date.getTime())) return ''
     date.setDate(date.getDate() + (dayNumber - 1))
-    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+    const months = [
+      'JAN',
+      'FEB',
+      'MAR',
+      'APR',
+      'MAY',
+      'JUN',
+      'JUL',
+      'AUG',
+      'SEP',
+      'OCT',
+      'NOV',
+      'DEC',
+    ]
     return `${months[date.getMonth()]} ${date.getDate()}`
   } catch {
     return ''

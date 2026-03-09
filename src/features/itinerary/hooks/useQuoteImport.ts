@@ -122,7 +122,8 @@ export const useQuoteImport = (): UseQuoteImportResult => {
     hotelsData.forEach(hotel => {
       const dayIndex = hotel.day - 1
       if (dayIndex >= 0 && dayIndex < updatedItinerary.length) {
-        updatedItinerary[dayIndex].accommodation = hotel.name + (hotel.note ? ` (${hotel.note})` : '')
+        updatedItinerary[dayIndex].accommodation =
+          hotel.name + (hotel.note ? ` (${hotel.note})` : '')
       }
     })
 

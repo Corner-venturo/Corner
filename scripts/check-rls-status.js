@@ -5,7 +5,8 @@
 const { createClient } = require('@supabase/supabase-js')
 
 const supabaseUrl = 'https://pfqvdacxowpgfamuvnsn.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE'
+const supabaseKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE'
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
@@ -23,7 +24,7 @@ async function checkRLSStatus() {
         FROM pg_tables
         WHERE schemaname = 'public'
         ORDER BY tablename;
-      `
+      `,
     })
 
     if (error) {
@@ -47,11 +48,22 @@ async function checkRLSStatus() {
 
       // 至少列出我們知道的核心表格
       const knownTables = [
-        'employees', 'workspaces', 'user_roles',
-        'channels', 'channel_members', 'messages',
-        'tours', 'orders', 'quotes', 'itineraries',
-        'customers', 'todos', 'calendar_events',
-        'suppliers', 'payments', 'receipts'
+        'employees',
+        'workspaces',
+        'user_roles',
+        'channels',
+        'channel_members',
+        'messages',
+        'tours',
+        'orders',
+        'quotes',
+        'itineraries',
+        'customers',
+        'todos',
+        'calendar_events',
+        'suppliers',
+        'payments',
+        'receipts',
       ]
 
       console.log('📊 已知的核心表格：')
@@ -105,7 +117,6 @@ async function checkRLSStatus() {
 
     console.log('📋 請在 Supabase SQL Editor 執行以下查詢檢查 policies：\n')
     console.log(policiesQuery)
-
   } catch (error) {
     console.error('❌ 檢查失敗:', error.message)
   }

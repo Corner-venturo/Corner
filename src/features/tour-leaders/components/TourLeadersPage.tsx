@@ -3,7 +3,6 @@
  * TourLeadersPage - 領隊資料管理頁面
  */
 
-
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useCallback } from 'react'
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
@@ -100,24 +99,24 @@ export const TourLeadersPage: React.FC = () => {
     setAvailabilityLeader(null)
   }, [])
 
-  const handleDelete = useCallback(
-    async (item: TourLeader) => {
-      const confirmed = await confirm(`${TOUR_LEADERS_LABELS.CONFIRM_DELETE_LEADER}${item.name}${TOUR_LEADERS_LABELS.CONFIRM_DELETE_SUFFIX}`, {
+  const handleDelete = useCallback(async (item: TourLeader) => {
+    const confirmed = await confirm(
+      `${TOUR_LEADERS_LABELS.CONFIRM_DELETE_LEADER}${item.name}${TOUR_LEADERS_LABELS.CONFIRM_DELETE_SUFFIX}`,
+      {
         title: TOUR_LEADERS_LABELS.DELETE_LEADER_TITLE,
         type: 'warning',
-      })
-      if (!confirmed) return
-
-      try {
-        await deleteTourLeader(item.id)
-        await alert(TOUR_LEADERS_LABELS.LEADER_DELETED, 'success')
-      } catch (error) {
-        logger.error('Delete TourLeader Error:', error)
-        await alert(TOUR_LEADERS_LABELS.DELETE_FAILED, 'error')
       }
-    },
-    []
-  )
+    )
+    if (!confirmed) return
+
+    try {
+      await deleteTourLeader(item.id)
+      await alert(TOUR_LEADERS_LABELS.LEADER_DELETED, 'success')
+    } catch (error) {
+      logger.error('Delete TourLeader Error:', error)
+      await alert(TOUR_LEADERS_LABELS.DELETE_FAILED, 'error')
+    }
+  }, [])
 
   const handleCloseDialog = useCallback(() => {
     setIsDialogOpen(false)
@@ -148,10 +147,16 @@ export const TourLeadersPage: React.FC = () => {
         passport_number: formData.passport_number || null,
         passport_expiry: formData.passport_expiry || null,
         languages: formData.languages
-          ? formData.languages.split(',').map(s => s.trim()).filter(Boolean)
+          ? formData.languages
+              .split(',')
+              .map(s => s.trim())
+              .filter(Boolean)
           : [],
         specialties: formData.specialties
-          ? formData.specialties.split(',').map(s => s.trim()).filter(Boolean)
+          ? formData.specialties
+              .split(',')
+              .map(s => s.trim())
+              .filter(Boolean)
           : [],
         license_number: formData.license_number || null,
         notes: formData.notes || null,

@@ -41,7 +41,10 @@ export function useDailyItinerary({
   const [currentMealSelector, setCurrentMealSelector] = useState<MealSelectorState | null>(null)
 
   // 圖片上傳相關狀態
-  const [uploadingActivityImage, setUploadingActivityImage] = useState<{ dayIndex: number; actIndex: number } | null>(null)
+  const [uploadingActivityImage, setUploadingActivityImage] = useState<{
+    dayIndex: number
+    actIndex: number
+  } | null>(null)
   const activityFileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
 
   // 景點圖片位置調整狀態
@@ -87,7 +90,10 @@ export function useDailyItinerary({
   }
 
   // 開啟餐廳選擇器
-  const handleOpenRestaurantSelector = (dayIndex: number, mealType: 'breakfast' | 'lunch' | 'dinner') => {
+  const handleOpenRestaurantSelector = (
+    dayIndex: number,
+    mealType: 'breakfast' | 'lunch' | 'dinner'
+  ) => {
     setCurrentDayIndex(dayIndex)
     setCurrentMealSelector({ dayIndex, mealType })
     setShowRestaurantSelector(true)
@@ -173,11 +179,7 @@ export function useDailyItinerary({
   }
 
   // 上傳活動圖片
-  const handleActivityImageUpload = async (
-    dayIndex: number,
-    actIndex: number,
-    file: File
-  ) => {
+  const handleActivityImageUpload = async (dayIndex: number, actIndex: number, file: File) => {
     if (!file.type.startsWith('image/')) {
       void alert(COMP_EDITOR_LABELS.請選擇圖片檔案, 'warning')
       return
@@ -200,9 +202,7 @@ export function useDailyItinerary({
         return
       }
 
-      const { data: urlData } = supabase.storage
-        .from('workspace-files')
-        .getPublicUrl(filePath)
+      const { data: urlData } = supabase.storage.from('workspace-files').getPublicUrl(filePath)
 
       updateActivity(dayIndex, actIndex, 'image', urlData.publicUrl)
 
@@ -254,9 +254,7 @@ export function useDailyItinerary({
         return
       }
 
-      const { data: urlData } = supabase.storage
-        .from('workspace-files')
-        .getPublicUrl(filePath)
+      const { data: urlData } = supabase.storage.from('workspace-files').getPublicUrl(filePath)
 
       updateActivity(dayIndex, actIndex, 'image', urlData.publicUrl)
 

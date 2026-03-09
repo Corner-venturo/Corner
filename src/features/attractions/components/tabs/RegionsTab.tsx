@@ -15,7 +15,7 @@ import { useCountries, useRegions, useCities } from '@/data'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { ATTRACTIONS_LIST_LABELS, REGIONS_TAB_LABELS } from '../../constants/labels';
+import { ATTRACTIONS_LIST_LABELS, REGIONS_TAB_LABELS } from '../../constants/labels'
 
 // 使用 @/data 中定義的型別
 type Country = NonNullable<ReturnType<typeof useCountries>['items']>[number]
@@ -143,7 +143,9 @@ export default function RegionsTab() {
           </DialogHeader>
 
           {countryCities.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">{REGIONS_TAB_LABELS.EMPTY_4173}</div>
+            <div className="text-center py-8 text-muted-foreground">
+              {REGIONS_TAB_LABELS.EMPTY_4173}
+            </div>
           ) : (
             <div className="space-y-6">
               {Object.entries(citiesByRegion).map(([regionId, regionCities]) => (
@@ -153,10 +155,7 @@ export default function RegionsTab() {
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {regionCities.map(city => (
-                      <div
-                        key={city.id}
-                        className="px-2 py-1.5 text-sm"
-                      >
+                      <div key={city.id} className="px-2 py-1.5 text-sm">
                         {city.name}
                       </div>
                     ))}

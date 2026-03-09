@@ -9,14 +9,8 @@
  * - 使用 iframe 列印確保穩定
  */
 
-
 import { useCallback, useRef, useState, useEffect } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Printer, Download, Loader2 } from 'lucide-react'
 import type { DisbursementOrder, PaymentRequest, PaymentRequestItem } from '@/stores/types'
@@ -204,7 +198,10 @@ export function DisbursementPrintDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent level={1} className="w-[95vw] max-w-[1200px] h-[90vh] overflow-hidden flex flex-col p-0">
+      <DialogContent
+        level={1}
+        className="w-[95vw] max-w-[1200px] h-[90vh] overflow-hidden flex flex-col p-0"
+      >
         {/* 標題列 */}
         <DialogHeader className="flex-shrink-0 px-6 py-4 border-b bg-morandi-background">
           <div className="flex items-center justify-between">
@@ -212,21 +209,11 @@ export function DisbursementPrintDialog({
               {DISBURSEMENT_LABELS.PRINT_PREVIEW} - {order.order_number}
             </DialogTitle>
             <div className="flex items-center gap-2 no-print">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handlePrint}
-                className="gap-2"
-              >
+              <Button variant="outline" size="sm" onClick={handlePrint} className="gap-2">
                 <Printer size={16} />
                 {DISBURSEMENT_LABELS.PRINT}
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleDownloadPDF}
-                className="gap-2"
-              >
+              <Button variant="outline" size="sm" onClick={handleDownloadPDF} className="gap-2">
                 <Download size={16} />
                 {DISBURSEMENT_LABELS.LABEL_3604}
               </Button>
@@ -239,7 +226,9 @@ export function DisbursementPrintDialog({
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <Loader2 className="w-8 h-8 animate-spin text-morandi-secondary" />
-              <span className="ml-2 text-morandi-secondary">{DISBURSEMENT_LABELS.LOADING_2648}</span>
+              <span className="ml-2 text-morandi-secondary">
+                {DISBURSEMENT_LABELS.LOADING_2648}
+              </span>
             </div>
           ) : (
             <div className="shadow-lg">

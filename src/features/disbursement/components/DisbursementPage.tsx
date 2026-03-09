@@ -11,7 +11,6 @@
  * - 點 paid 出納單 → 確認出帳詳情
  */
 
-
 import { useCallback, useState, useMemo } from 'react'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { Button } from '@/components/ui/button'
@@ -57,9 +56,7 @@ export function DisbursementPage() {
     })
 
     // 只顯示「請款中」且「尚未加入出納單」的請款單
-    return payment_requests.filter(r =>
-      r.status === 'pending' && !usedRequestIds.has(r.id)
-    )
+    return payment_requests.filter(r => r.status === 'pending' && !usedRequestIds.has(r.id))
   }, [payment_requests, disbursement_orders])
 
   // 編輯模式用的請款單列表：pending + 目前編輯中出納單包含的 billed 請款單
@@ -78,68 +75,74 @@ export function DisbursementPage() {
     // 可選的請款單：
     // 1. 屬於當前出納單的（billed 狀態，顯示為已勾選）
     // 2. pending 且不在其他出納單中的
-    return payment_requests.filter(r =>
-      editingIds.has(r.id) ||
-      (r.status === 'pending' && !usedByOthers.has(r.id))
+    return payment_requests.filter(
+      r => editingIds.has(r.id) || (r.status === 'pending' && !usedByOthers.has(r.id))
     )
   }, [editingOrder, pendingRequests, payment_requests, disbursement_orders])
 
   // 表格欄位
-  const columns = useMemo(() => [
-    {
-      key: 'order_number' as const,
-      label: DISBURSEMENT_LABELS.出納單號,
-      sortable: true,
-      width: '140px',
-      render: (value: unknown) => (
-        <div className="font-medium text-morandi-primary">{String(value || DISBURSEMENT_LABELS.自動產生)}</div>
-      ),
-    },
-    {
-      key: 'disbursement_date' as const,
-      label: DISBURSEMENT_LABELS.出帳日期,
-      sortable: true,
-      width: '110px',
-      render: (value: unknown) => (
-        <DateCell date={value as string | null} showIcon={false} className="text-morandi-secondary" />
-      ),
-    },
-    {
-      key: 'payment_request_ids' as const,
-      label: DISBURSEMENT_LABELS.請款單數,
-      width: '80px',
-      render: (value: unknown) => (
-        <div className="text-center">
-          {Array.isArray(value) ? value.length : 0} {DISBURSEMENT_LABELS.筆}
-        </div>
-      ),
-    },
-    {
-      key: 'amount' as const,
-      label: DISBURSEMENT_LABELS.總金額,
-      sortable: true,
-      width: '120px',
-      render: (value: unknown) => (
-        <div className="text-right">
-          <CurrencyCell amount={Number(value) || 0} className="font-semibold text-morandi-gold" />
-        </div>
-      ),
-    },
-    {
-      key: 'status' as const,
-      label: DISBURSEMENT_LABELS.狀態,
-      sortable: true,
-      width: '80px',
-      render: (value: unknown) => {
-        const status = DISBURSEMENT_STATUS[value as keyof typeof DISBURSEMENT_STATUS] || DISBURSEMENT_STATUS.pending
-        return (
-          <Badge className={cn('text-white', status.color)}>
-            {status.label}
-          </Badge>
-        )
+  const columns = useMemo(
+    () => [
+      {
+        key: 'order_number' as const,
+        label: DISBURSEMENT_LABELS.出納單號,
+        sortable: true,
+        width: '140px',
+        render: (value: unknown) => (
+          <div className="font-medium text-morandi-primary">
+            {String(value || DISBURSEMENT_LABELS.自動產生)}
+          </div>
+        ),
       },
-    },
-  ], [])
+      {
+        key: 'disbursement_date' as const,
+        label: DISBURSEMENT_LABELS.出帳日期,
+        sortable: true,
+        width: '110px',
+        render: (value: unknown) => (
+          <DateCell
+            date={value as string | null}
+            showIcon={false}
+            className="text-morandi-secondary"
+          />
+        ),
+      },
+      {
+        key: 'payment_request_ids' as const,
+        label: DISBURSEMENT_LABELS.請款單數,
+        width: '80px',
+        render: (value: unknown) => (
+          <div className="text-center">
+            {Array.isArray(value) ? value.length : 0} {DISBURSEMENT_LABELS.筆}
+          </div>
+        ),
+      },
+      {
+        key: 'amount' as const,
+        label: DISBURSEMENT_LABELS.總金額,
+        sortable: true,
+        width: '120px',
+        render: (value: unknown) => (
+          <div className="text-right">
+            <CurrencyCell amount={Number(value) || 0} className="font-semibold text-morandi-gold" />
+          </div>
+        ),
+      },
+      {
+        key: 'status' as const,
+        label: DISBURSEMENT_LABELS.狀態,
+        sortable: true,
+        width: '80px',
+        render: (value: unknown) => {
+          const status =
+            DISBURSEMENT_STATUS[value as keyof typeof DISBURSEMENT_STATUS] ||
+            DISBURSEMENT_STATUS.pending
+          return <Badge className={cn('text-white', status.color)}>{status.label}</Badge>
+        },
+      },
+    ],
+    []
+  )
 
   // 點擊列：pending → 編輯模式，paid → 詳情
   const handleRowClick = useCallback((order: DisbursementOrder) => {
@@ -168,10 +171,13 @@ export function DisbursementPage() {
 
   // 刪除出納單
   const handleDelete = useCallback(async (order: DisbursementOrder) => {
-    const confirmed = await confirm(`${DISBURSEMENT_LABELS.CONFIRM_DELETE_PREFIX}${order.order_number}${DISBURSEMENT_LABELS.CONFIRM_DELETE_SUFFIX}`, {
-      title: DISBURSEMENT_LABELS.刪除出納單,
-      type: 'warning',
-    })
+    const confirmed = await confirm(
+      `${DISBURSEMENT_LABELS.CONFIRM_DELETE_PREFIX}${order.order_number}${DISBURSEMENT_LABELS.CONFIRM_DELETE_SUFFIX}`,
+      {
+        title: DISBURSEMENT_LABELS.刪除出納單,
+        type: 'warning',
+      }
+    )
     if (!confirmed) return
 
     try {
@@ -188,10 +194,7 @@ export function DisbursementPage() {
     setIsCreateDialogOpen(false)
     setEditingOrder(null)
     // SWR 快取失效，自動重新載入
-    await Promise.all([
-      invalidateDisbursementOrders(),
-      invalidatePaymentRequests(),
-    ])
+    await Promise.all([invalidateDisbursementOrders(), invalidatePaymentRequests()])
   }, [])
 
   // 新增按鈕（清除編輯狀態）
@@ -224,7 +227,10 @@ export function DisbursementPage() {
       return date >= monday && date <= sunday
     })
   }, [disbursement_orders])
-  const thisWeekAmount = useMemo(() => thisWeekOrders.reduce((sum, o) => sum + (o.amount || 0), 0), [thisWeekOrders])
+  const thisWeekAmount = useMemo(
+    () => thisWeekOrders.reduce((sum, o) => sum + (o.amount || 0), 0),
+    [thisWeekOrders]
+  )
 
   return (
     <>
@@ -242,11 +248,17 @@ export function DisbursementPage() {
           <div className="flex items-center gap-6 text-sm">
             <div className="text-right">
               <span className="text-morandi-muted">{DISBURSEMENT_LABELS.待出帳}</span>
-              <span className="ml-2 font-semibold text-morandi-gold">{pendingRequests.length}{DISBURSEMENT_LABELS.筆}</span>
+              <span className="ml-2 font-semibold text-morandi-gold">
+                {pendingRequests.length}
+                {DISBURSEMENT_LABELS.筆}
+              </span>
             </div>
             <div className="text-right">
               <span className="text-morandi-muted">{DISBURSEMENT_LABELS.本週出帳}</span>
-              <span className="ml-2 font-semibold text-morandi-primary">{thisWeekOrders.length}{DISBURSEMENT_LABELS.筆}</span>
+              <span className="ml-2 font-semibold text-morandi-primary">
+                {thisWeekOrders.length}
+                {DISBURSEMENT_LABELS.筆}
+              </span>
             </div>
             <div className="text-right flex items-center gap-2">
               <span className="text-morandi-muted">{DISBURSEMENT_LABELS.本週金額}</span>
@@ -260,7 +272,7 @@ export function DisbursementPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation()
                   setEditingOrder(row)
                   setIsCreateDialogOpen(true)
@@ -273,7 +285,7 @@ export function DisbursementPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation()
                 handleViewDetail(row)
               }}
@@ -284,7 +296,7 @@ export function DisbursementPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation()
                 handlePrintPDF(row)
               }}
@@ -296,7 +308,7 @@ export function DisbursementPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation()
                   handleDelete(row)
                 }}

@@ -5,6 +5,7 @@
 ## Core (Orders & Tours)
 
 ### customers
+
 - id: text
 - code: text
 - name: text
@@ -53,6 +54,7 @@
 - online_user_id: uuid?
 
 ### order_members
+
 - id: uuid
 - order_id: uuid
 - customer_id: uuid?
@@ -102,6 +104,7 @@
 - custom_costs: jsonb?
 
 ### orders
+
 - id: text
 - code: text
 - tour_id: text?
@@ -133,6 +136,7 @@
 - updated_by: uuid?
 
 ### proposals
+
 - id: uuid
 - code: text
 - customer_id: text?
@@ -162,11 +166,12 @@
 - updated_at: timestamp with time zone
 - archived_at: timestamp with time zone?
 - archive_reason: text?
-- _deleted: boolean?
-- _needs_sync: boolean?
-- _synced_at: timestamp with time zone?
+- \_deleted: boolean?
+- \_needs_sync: boolean?
+- \_synced_at: timestamp with time zone?
 
 ### quote_items
+
 - id: text
 - quote_id: text?
 - category: text
@@ -193,6 +198,7 @@
 - resource_google_maps_url: text?
 
 ### quotes
+
 - id: text
 - code: text?
 - customer_name: text
@@ -264,6 +270,7 @@
 - proposal_package_id: uuid?
 
 ### tour_members
+
 - id: uuid
 - tour_id: uuid
 - customer_id: uuid
@@ -277,6 +284,7 @@
 - updated_by: uuid?
 
 ### tours
+
 - id: text
 - code: text
 - name: text
@@ -304,9 +312,9 @@
 - contract_completed: boolean?
 - contract_archived_date: timestamp with time zone?
 - envelope_records: text?
-- _needs_sync: boolean?
-- _synced_at: timestamp with time zone?
-- _deleted: boolean?
+- \_needs_sync: boolean?
+- \_synced_at: timestamp with time zone?
+- \_deleted: boolean?
 - features: jsonb?
 - archived: boolean?
 - country_id: text?
@@ -344,6 +352,7 @@
 ## Finance
 
 ### accounting_accounts
+
 - id: uuid
 - user_id: uuid
 - name: text
@@ -360,6 +369,7 @@
 - updated_at: timestamp with time zone?
 
 ### accounting_categories
+
 - id: uuid
 - name: text
 - type: text
@@ -369,6 +379,7 @@
 - created_at: timestamp with time zone?
 
 ### accounting_entries
+
 - id: uuid
 - entry_date: date
 - entry_number: text
@@ -388,6 +399,7 @@
 - updated_at: timestamp with time zone?
 
 ### accounting_events
+
 - id: uuid
 - workspace_id: uuid?
 - event_type: USER-DEFINED
@@ -406,6 +418,7 @@
 - updated_at: timestamp with time zone?
 
 ### accounting_period_closings
+
 - id: uuid
 - workspace_id: uuid?
 - period_type: character varying
@@ -418,6 +431,7 @@
 - created_at: timestamp with time zone?
 
 ### accounting_periods
+
 - id: uuid
 - workspace_id: uuid?
 - period_name: text
@@ -429,6 +443,7 @@
 - created_at: timestamp with time zone?
 
 ### accounting_subjects
+
 - id: uuid
 - workspace_id: uuid?
 - code: character varying
@@ -443,6 +458,7 @@
 - updated_at: timestamp with time zone?
 
 ### accounting_transactions
+
 - id: uuid
 - user_id: uuid
 - account_id: uuid
@@ -460,6 +476,7 @@
 - updated_at: timestamp with time zone?
 
 ### disbursement_orders
+
 - id: text
 - code: text?
 - amount: numeric
@@ -483,12 +500,14 @@
 - refund_id: uuid?
 
 ### disbursement_requests
+
 - id: uuid
 - disbursement_order_id: uuid
 - payment_request_id: uuid
 - created_at: timestamp with time zone?
 
 ### invoice_orders
+
 - id: uuid
 - invoice_id: uuid
 - order_id: text
@@ -498,6 +517,7 @@
 - created_by: text?
 
 ### linkpay_logs
+
 - id: uuid
 - receipt_number: character varying
 - workspace_id: uuid
@@ -514,6 +534,7 @@
 - sync_status: text?
 
 ### orders_invoice_summary
+
 - order_id: text?
 - order_number: text?
 - contact_person: text?
@@ -525,6 +546,7 @@
 - invoiceable_amount: numeric?
 
 ### payment_request_items
+
 - id: uuid
 - request_id: uuid?
 - description: text
@@ -549,6 +571,7 @@
 - confirmation_item_id: uuid?
 
 ### payment_requests
+
 - id: uuid
 - code: text
 - tour_id: uuid?
@@ -583,6 +606,7 @@
 - batch_id: uuid?
 
 ### payments
+
 - id: uuid
 - payment_number: text
 - order_id: uuid?
@@ -601,6 +625,7 @@
 - updated_by: uuid?
 
 ### travel_invoices
+
 - id: uuid
 - transaction_no: text
 - merchant_id: text?
@@ -639,6 +664,7 @@
 ## Supplier & Procurement
 
 ### confirmations
+
 - id: uuid
 - workspace_id: uuid
 - type: USER-DEFINED
@@ -653,6 +679,7 @@
 - updated_by: uuid?
 
 ### hotel_templates
+
 - id: text
 - name: text
 - description: text?
@@ -663,6 +690,7 @@
 - updated_at: timestamp with time zone?
 
 ### hotels
+
 - id: uuid
 - name: text
 - english_name: text?
@@ -719,6 +747,7 @@
 - updated_by: uuid?
 
 ### quote_confirmation_logs
+
 - id: uuid
 - quote_id: text
 - workspace_id: uuid?
@@ -735,6 +764,7 @@
 - created_at: timestamp with time zone?
 
 ### supplier_categories
+
 - id: uuid
 - name: text
 - icon: text?
@@ -745,6 +775,7 @@
 - updated_at: timestamp with time zone?
 
 ### supplier_employees
+
 - id: uuid
 - supplier_id: uuid
 - code: character varying?
@@ -763,6 +794,7 @@
 - updated_at: timestamp with time zone?
 
 ### supplier_payment_accounts
+
 - id: text
 - supplier_id: text
 - account_name: text
@@ -783,6 +815,7 @@
 - updated_by: text?
 
 ### supplier_price_list
+
 - id: text
 - supplier_id: text
 - item_name: text
@@ -799,6 +832,7 @@
 - updated_by: text?
 
 ### supplier_request_responses
+
 - id: uuid
 - request_id: uuid
 - supplier_id: text
@@ -811,6 +845,7 @@
 - created_at: timestamp with time zone?
 
 ### supplier_service_areas
+
 - id: text
 - supplier_id: text
 - city_id: text
@@ -819,6 +854,7 @@
 - updated_by: uuid?
 
 ### supplier_users
+
 - id: uuid
 - supplier_id: text
 - user_id: uuid?
@@ -832,6 +868,7 @@
 - updated_at: timestamp with time zone?
 
 ### suppliers
+
 - id: text
 - code: text
 - name: text
@@ -865,14 +902,15 @@
 - region: text?
 - status: text?
 - category_id: uuid?
-- _deleted: boolean?
-- _needs_sync: boolean?
-- _synced_at: timestamp with time zone?
+- \_deleted: boolean?
+- \_needs_sync: boolean?
+- \_synced_at: timestamp with time zone?
 - bank_code_legacy: text?
 - workspace_id: uuid?
 - fax: character varying?
 
 ### tour_confirmation_items
+
 - id: uuid
 - sheet_id: uuid
 - category: text
@@ -913,6 +951,7 @@
 - updated_by: uuid?
 
 ### tour_confirmation_sheets
+
 - id: uuid
 - tour_id: text
 - tour_code: text
@@ -942,6 +981,7 @@
 ## Travel (Itinerary, Flights, Visa)
 
 ### assigned_itineraries
+
 - id: uuid
 - itinerary_id: text
 - assigned_date: date
@@ -953,6 +993,7 @@
 - updated_by: uuid?
 
 ### attractions
+
 - id: uuid
 - name: text
 - english_name: text?
@@ -985,6 +1026,7 @@
 - updated_by: uuid?
 
 ### customer_assigned_itineraries
+
 - id: uuid
 - customer_id: text
 - itinerary_id: text
@@ -1001,6 +1043,7 @@
 - room_allocation: jsonb?
 
 ### esims
+
 - id: uuid
 - workspace_id: uuid
 - esim_number: text
@@ -1019,6 +1062,7 @@
 - updated_by: uuid?
 
 ### flight_status_subscriptions
+
 - id: uuid
 - workspace_id: uuid
 - pnr_id: uuid?
@@ -1037,6 +1081,7 @@
 - updated_at: timestamp with time zone?
 
 ### flight_templates
+
 - id: text
 - name: text
 - description: text?
@@ -1048,14 +1093,15 @@
 - updated_at: timestamp with time zone?
 
 ### itineraries
+
 - id: text
 - tour_id: text?
 - description: text?
 - created_at: timestamp with time zone
 - updated_at: timestamp with time zone
-- _deleted: boolean?
-- _needs_sync: boolean?
-- _synced_at: timestamp with time zone?
+- \_deleted: boolean?
+- \_needs_sync: boolean?
+- \_synced_at: timestamp with time zone?
 - created_by: uuid?
 - author_name: text?
 - code: text?
@@ -1118,6 +1164,7 @@
 - proposal_package_id: uuid?
 
 ### itinerary_days
+
 - id: uuid
 - itinerary_id: text
 - day_number: integer
@@ -1127,6 +1174,7 @@
 - updated_at: timestamp with time zone
 
 ### itinerary_documents
+
 - id: uuid
 - tour_id: text?
 - workspace_id: uuid
@@ -1138,6 +1186,7 @@
 - updated_by: text?
 
 ### itinerary_items
+
 - id: uuid
 - itinerary_day_id: uuid
 - item_order: integer
@@ -1157,6 +1206,7 @@
 - updated_at: timestamp with time zone
 
 ### itinerary_permissions
+
 - id: bigint
 - itinerary_id: text
 - user_id: uuid
@@ -1164,6 +1214,7 @@
 - created_at: timestamp with time zone?
 
 ### itinerary_versions
+
 - id: uuid
 - document_id: uuid
 - version_number: integer
@@ -1174,6 +1225,7 @@
 - created_by: text?
 
 ### pnr_flight_status_history
+
 - id: uuid
 - workspace_id: uuid
 - pnr_id: uuid
@@ -1193,6 +1245,7 @@
 - recorded_at: timestamp with time zone?
 
 ### tour_itinerary_items
+
 - id: uuid
 - tour_id: text?
 - itinerary_id: text?
@@ -1252,6 +1305,7 @@
 - updated_by: uuid?
 
 ### transportation_rates
+
 - id: uuid
 - workspace_id: uuid?
 - country_id: text?
@@ -1281,6 +1335,7 @@
 - deleted_by: uuid?
 
 ### traveler_trip_flights
+
 - id: uuid
 - trip_id: uuid
 - flight_type: text?
@@ -1303,6 +1358,7 @@
 - updated_at: timestamp with time zone?
 
 ### traveler_trip_itinerary_items
+
 - id: uuid
 - trip_id: uuid
 - day_number: integer?
@@ -1326,6 +1382,7 @@
 - updated_at: timestamp with time zone?
 
 ### visas
+
 - id: uuid
 - created_at: timestamp with time zone?
 - updated_at: timestamp with time zone?
@@ -1346,8 +1403,8 @@
 - cost: numeric?
 - notes: text?
 - created_by: text?
-- _needs_sync: boolean?
-- _synced_at: timestamp with time zone?
+- \_needs_sync: boolean?
+- \_synced_at: timestamp with time zone?
 - is_active: boolean?
 - workspace_id: uuid
 - updated_by: uuid?
@@ -1360,6 +1417,7 @@
 ## Workspace & Auth
 
 ### employees
+
 - employee_number: text
 - english_name: text?
 - chinese_name: text?
@@ -1395,6 +1453,7 @@
 - pinyin: text?
 
 ### supplier_employees
+
 - id: uuid
 - supplier_id: uuid
 - code: character varying?
@@ -1413,6 +1472,7 @@
 - updated_at: timestamp with time zone?
 
 ### workspace_bonus_defaults
+
 - id: uuid
 - workspace_id: uuid
 - type: smallint
@@ -1423,6 +1483,7 @@
 - updated_at: timestamp with time zone?
 
 ### workspace_items
+
 - id: uuid
 - owner: text
 - title: text
@@ -1437,6 +1498,7 @@
 - updated_at: timestamp with time zone?
 
 ### workspace_modules
+
 - id: uuid
 - workspace_id: uuid
 - module_name: character varying
@@ -1447,6 +1509,7 @@
 - updated_at: timestamp with time zone?
 
 ### workspaces
+
 - id: uuid
 - name: text
 - description: text?
@@ -1454,9 +1517,9 @@
 - is_active: boolean?
 - created_at: timestamp with time zone?
 - updated_at: timestamp with time zone?
-- _needs_sync: boolean?
-- _synced_at: timestamp with time zone?
-- _deleted: boolean?
+- \_needs_sync: boolean?
+- \_synced_at: timestamp with time zone?
+- \_deleted: boolean?
 - created_by: uuid?
 - payment_config: jsonb?
 - code: text
@@ -1480,12 +1543,14 @@
 
 ## Other (197 tables)
 
-### _migrations
+### \_migrations
+
 - id: integer
 - name: text
 - executed_at: timestamp with time zone?
 
 ### accounts
+
 - id: uuid
 - account_code: text
 - account_name: text
@@ -1495,6 +1560,7 @@
 - ... (10 columns)
 
 ### activities
+
 - id: uuid
 - activity_code: text
 - activity_name: text
@@ -1504,6 +1570,7 @@
 - ... (19 columns)
 
 ### advance_items
+
 - id: uuid
 - advance_list_id: uuid
 - name: character varying
@@ -1513,15 +1580,17 @@
 - ... (15 columns)
 
 ### advance_lists
+
 - id: uuid
 - channel_id: uuid
 - created_at: timestamp with time zone?
 - updated_at: timestamp with time zone?
-- _needs_sync: boolean?
-- _synced_at: timestamp with time zone?
+- \_needs_sync: boolean?
+- \_synced_at: timestamp with time zone?
 - ... (9 columns)
 
 ### ai_conversations
+
 - id: uuid
 - workspace_id: uuid?
 - employee_id: uuid?
@@ -1531,6 +1600,7 @@
 - ... (9 columns)
 
 ### ai_memories
+
 - id: uuid
 - workspace_id: uuid?
 - category: text
@@ -1540,6 +1610,7 @@
 - ... (15 columns)
 
 ### ai_messages
+
 - id: uuid
 - from_agent: text
 - to_agent: text
@@ -1549,6 +1620,7 @@
 - ... (8 columns)
 
 ### ai_settings
+
 - id: uuid
 - workspace_id: uuid?
 - name: text?
@@ -1558,6 +1630,7 @@
 - ... (15 columns)
 
 ### airport_images
+
 - id: uuid
 - airport_code: text
 - image_url: text
@@ -1567,6 +1640,7 @@
 - ... (11 columns)
 
 ### api_usage
+
 - id: uuid
 - api_name: text
 - month: text
@@ -1574,12 +1648,14 @@
 - updated_at: timestamp with time zone?
 
 ### api_usage_log
+
 - id: bigint
 - created_at: timestamp with time zone
 - api_service: text
 - notes: text?
 
 ### attendance_records
+
 - id: uuid
 - workspace_id: uuid
 - employee_id: uuid
@@ -1589,6 +1665,7 @@
 - ... (15 columns)
 
 ### background_tasks
+
 - id: uuid
 - type: character varying
 - payload: jsonb
@@ -1598,6 +1675,7 @@
 - ... (16 columns)
 
 ### badge_definitions
+
 - id: text
 - name: text
 - description: text
@@ -1607,6 +1685,7 @@
 - ... (11 columns)
 
 ### badges
+
 - id: uuid
 - code: text
 - name: text
@@ -1616,6 +1695,7 @@
 - ... (8 columns)
 
 ### body_measurements
+
 - id: uuid
 - user_id: uuid
 - workspace_id: uuid?
@@ -1625,6 +1705,7 @@
 - ... (20 columns)
 
 ### brochure_documents
+
 - id: uuid
 - tour_id: text?
 - workspace_id: uuid?
@@ -1634,6 +1715,7 @@
 - ... (17 columns)
 
 ### brochure_versions
+
 - id: uuid
 - document_id: uuid
 - version_number: integer
@@ -1643,6 +1725,7 @@
 - ... (8 columns)
 
 ### budgets
+
 - id: uuid
 - category_id: uuid
 - period: character varying
@@ -1652,6 +1735,7 @@
 - ... (9 columns)
 
 ### bulletins
+
 - id: uuid
 - workspace_id: uuid
 - title: text
@@ -1661,6 +1745,7 @@
 - ... (14 columns)
 
 ### calendar_events
+
 - id: uuid
 - title: text
 - description: text?
@@ -1670,6 +1755,7 @@
 - ... (21 columns)
 
 ### casual_trips
+
 - id: uuid
 - user_id: uuid?
 - title: text
@@ -1679,6 +1765,7 @@
 - ... (14 columns)
 
 ### categories
+
 - id: uuid
 - name: character varying
 - type: character varying
@@ -1688,6 +1775,7 @@
 - ... (9 columns)
 
 ### channel_groups
+
 - id: uuid
 - workspace_id: uuid
 - name: character varying
@@ -1697,6 +1785,7 @@
 - ... (12 columns)
 
 ### channel_members
+
 - id: uuid
 - workspace_id: uuid
 - channel_id: uuid
@@ -1706,6 +1795,7 @@
 - ... (8 columns)
 
 ### channel_threads
+
 - id: uuid
 - channel_id: uuid
 - name: text
@@ -1715,6 +1805,7 @@
 - ... (12 columns)
 
 ### channels
+
 - id: uuid
 - workspace_id: uuid
 - name: text
@@ -1724,6 +1815,7 @@
 - ... (25 columns)
 
 ### chart_of_accounts
+
 - id: uuid
 - workspace_id: uuid?
 - code: text
@@ -1733,6 +1825,7 @@
 - ... (11 columns)
 
 ### cities
+
 - id: text
 - country_id: text
 - region_id: text?
@@ -1742,6 +1835,7 @@
 - ... (19 columns)
 
 ### companies
+
 - id: uuid
 - code: text?
 - workspace_id: uuid?
@@ -1751,6 +1845,7 @@
 - ... (30 columns)
 
 ### company_announcements
+
 - id: uuid
 - workspace_id: uuid?
 - title: text
@@ -1760,6 +1855,7 @@
 - ... (21 columns)
 
 ### company_asset_folders
+
 - id: uuid
 - workspace_id: uuid
 - name: text
@@ -1769,6 +1865,7 @@
 - ... (11 columns)
 
 ### company_assets
+
 - id: uuid
 - name: text
 - file_path: text
@@ -1778,6 +1875,7 @@
 - ... (16 columns)
 
 ### company_contacts
+
 - id: uuid
 - workspace_id: uuid?
 - company_id: uuid?
@@ -1787,6 +1885,7 @@
 - ... (21 columns)
 
 ### cost_templates
+
 - id: uuid
 - supplier_id: text
 - city_id: text
@@ -1796,6 +1895,7 @@
 - ... (34 columns)
 
 ### countries
+
 - id: text
 - name: text
 - name_en: text
@@ -1805,6 +1905,7 @@
 - ... (13 columns)
 
 ### cover_templates
+
 - id: text
 - name: text
 - description: text?
@@ -1814,6 +1915,7 @@
 - ... (9 columns)
 
 ### cron_execution_logs
+
 - id: uuid
 - job_name: text
 - executed_at: timestamp with time zone?
@@ -1822,12 +1924,14 @@
 - error_message: text?
 
 ### customer_badges
+
 - id: uuid
 - customer_id: text
 - badge_id: text
 - earned_at: timestamp with time zone?
 
 ### customer_group_members
+
 - id: uuid
 - group_id: uuid
 - customer_id: text
@@ -1836,6 +1940,7 @@
 - updated_at: timestamp with time zone?
 
 ### customer_groups
+
 - id: uuid
 - workspace_id: uuid
 - name: text
@@ -1845,6 +1950,7 @@
 - ... (9 columns)
 
 ### customer_travel_cards
+
 - id: uuid
 - customer_id: text
 - template_id: uuid?
@@ -1854,6 +1960,7 @@
 - ... (10 columns)
 
 ### customization_requests
+
 - id: uuid
 - customer_id: text
 - assigned_itinerary_id: uuid
@@ -1863,6 +1970,7 @@
 - ... (11 columns)
 
 ### daily_templates
+
 - id: text
 - name: text
 - description: text?
@@ -1872,6 +1980,7 @@
 - ... (9 columns)
 
 ### design_templates
+
 - id: uuid
 - workspace_id: uuid?
 - name: text
@@ -1881,6 +1990,7 @@
 - ... (16 columns)
 
 ### designer_drafts
+
 - id: uuid
 - workspace_id: uuid
 - user_id: uuid
@@ -1890,6 +2000,7 @@
 - ... (18 columns)
 
 ### driver_tasks
+
 - id: uuid
 - task_code: character varying
 - tour_request_id: uuid?
@@ -1899,6 +2010,7 @@
 - ... (49 columns)
 
 ### email_accounts
+
 - id: uuid
 - workspace_id: uuid
 - email_address: text
@@ -1908,6 +2020,7 @@
 - ... (15 columns)
 
 ### email_attachments
+
 - id: uuid
 - email_id: uuid
 - workspace_id: uuid
@@ -1917,6 +2030,7 @@
 - ... (11 columns)
 
 ### emails
+
 - id: uuid
 - workspace_id: uuid
 - message_id: text?
@@ -1926,6 +2040,7 @@
 - ... (37 columns)
 
 ### erp_bank_accounts
+
 - id: uuid
 - workspace_id: uuid?
 - name: text
@@ -1935,6 +2050,7 @@
 - ... (9 columns)
 
 ### expense_categories
+
 - id: uuid
 - user_id: uuid?
 - name: text
@@ -1944,6 +2060,7 @@
 - ... (11 columns)
 
 ### expense_monthly_stats
+
 - id: uuid
 - user_id: uuid
 - year_month: text
@@ -1953,6 +2070,7 @@
 - ... (9 columns)
 
 ### expense_streaks
+
 - id: uuid
 - user_id: uuid
 - current_streak: integer?
@@ -1962,6 +2080,7 @@
 - ... (11 columns)
 
 ### eyeline_submissions
+
 - id: uuid
 - user_id: text
 - submission_type: text
@@ -1971,6 +2090,7 @@
 - ... (13 columns)
 
 ### features_templates
+
 - id: text
 - name: text
 - description: text?
@@ -1980,6 +2100,7 @@
 - ... (8 columns)
 
 ### files
+
 - id: uuid
 - workspace_id: uuid
 - folder_id: uuid?
@@ -1989,6 +2110,7 @@
 - ... (34 columns)
 
 ### fleet_drivers
+
 - id: uuid
 - workspace_id: uuid
 - employee_id: uuid?
@@ -1998,6 +2120,7 @@
 - ... (20 columns)
 
 ### fleet_schedules
+
 - id: uuid
 - workspace_id: uuid
 - vehicle_id: uuid
@@ -2007,6 +2130,7 @@
 - ... (24 columns)
 
 ### fleet_schedules_with_vehicle
+
 - id: uuid?
 - workspace_id: uuid?
 - vehicle_id: uuid?
@@ -2016,6 +2140,7 @@
 - ... (30 columns)
 
 ### fleet_vehicle_logs
+
 - id: uuid
 - workspace_id: uuid
 - vehicle_id: uuid
@@ -2025,6 +2150,7 @@
 - ... (16 columns)
 
 ### fleet_vehicles
+
 - id: uuid
 - workspace_id: uuid
 - license_plate: character varying
@@ -2034,6 +2160,7 @@
 - ... (28 columns)
 
 ### folders
+
 - id: uuid
 - workspace_id: uuid
 - name: text
@@ -2043,6 +2170,7 @@
 - ... (18 columns)
 
 ### friends
+
 - id: uuid
 - user_id: uuid
 - friend_id: uuid
@@ -2051,6 +2179,7 @@
 - updated_at: timestamp with time zone?
 
 ### game_office_rooms
+
 - id: uuid
 - workspace_id: uuid
 - room_data: jsonb
@@ -2060,6 +2189,7 @@
 - ... (7 columns)
 
 ### general_ledger
+
 - id: uuid
 - workspace_id: uuid
 - subject_id: uuid
@@ -2069,6 +2199,7 @@
 - ... (11 columns)
 
 ### image_library
+
 - id: uuid
 - workspace_id: uuid
 - name: text
@@ -2078,6 +2209,7 @@
 - ... (18 columns)
 
 ### journal_lines
+
 - id: uuid
 - voucher_id: uuid?
 - line_no: integer
@@ -2087,6 +2219,7 @@
 - ... (10 columns)
 
 ### journal_vouchers
+
 - id: uuid
 - workspace_id: uuid?
 - voucher_no: text
@@ -2096,6 +2229,7 @@
 - ... (13 columns)
 
 ### leader_availability
+
 - id: uuid
 - workspace_id: uuid
 - leader_id: uuid
@@ -2105,6 +2239,7 @@
 - ... (9 columns)
 
 ### leader_schedules
+
 - id: uuid
 - workspace_id: uuid
 - leader_id: uuid
@@ -2114,6 +2249,7 @@
 - ... (14 columns)
 
 ### leader_schedules_with_leader
+
 - id: uuid?
 - workspace_id: uuid?
 - leader_id: uuid?
@@ -2123,6 +2259,7 @@
 - ... (18 columns)
 
 ### leader_templates
+
 - id: text
 - name: text
 - description: text?
@@ -2132,6 +2269,7 @@
 - ... (8 columns)
 
 ### leave_balances
+
 - id: uuid
 - workspace_id: uuid
 - employee_id: uuid
@@ -2141,6 +2279,7 @@
 - ... (12 columns)
 
 ### leave_requests
+
 - id: uuid
 - workspace_id: uuid
 - employee_id: uuid
@@ -2150,6 +2289,7 @@
 - ... (19 columns)
 
 ### leave_types
+
 - id: uuid
 - workspace_id: uuid
 - name: character varying
@@ -2159,6 +2299,7 @@
 - ... (12 columns)
 
 ### manifestation_records
+
 - id: uuid
 - user_id: uuid
 - record_date: date
@@ -2167,6 +2308,7 @@
 - updated_at: timestamp with time zone?
 
 ### members
+
 - id: text
 - order_id: text?
 - tour_id: text?
@@ -2176,6 +2318,7 @@
 - ... (40 columns)
 
 ### messages
+
 - id: uuid
 - channel_id: uuid
 - content: text
@@ -2185,6 +2328,7 @@
 - ... (21 columns)
 
 ### michelin_restaurants
+
 - id: uuid
 - name: text
 - english_name: text?
@@ -2194,6 +2338,7 @@
 - ... (59 columns)
 
 ### my_erp_tours
+
 - id: text?
 - tour_code: text?
 - title: text?
@@ -2203,6 +2348,7 @@
 - ... (16 columns)
 
 ### my_tours
+
 - id: uuid?
 - tour_code: text?
 - title: text?
@@ -2212,6 +2358,7 @@
 - ... (18 columns)
 
 ### notes
+
 - id: uuid
 - user_id: uuid
 - tab_id: text
@@ -2221,6 +2368,7 @@
 - ... (11 columns)
 
 ### office_documents
+
 - id: uuid
 - workspace_id: uuid?
 - name: text
@@ -2230,6 +2378,7 @@
 - ... (10 columns)
 
 ### online_trip_members
+
 - id: uuid
 - trip_id: uuid
 - role: text
@@ -2239,6 +2388,7 @@
 - ... (21 columns)
 
 ### online_trips
+
 - id: uuid
 - erp_tour_id: text?
 - erp_itinerary_id: text?
@@ -2248,6 +2398,7 @@
 - ... (18 columns)
 
 ### payroll_periods
+
 - id: uuid
 - workspace_id: uuid
 - year: integer
@@ -2257,6 +2408,7 @@
 - ... (13 columns)
 
 ### payroll_records
+
 - id: uuid
 - workspace_id: uuid
 - payroll_period_id: uuid
@@ -2266,6 +2418,7 @@
 - ... (29 columns)
 
 ### personal_canvases
+
 - id: uuid
 - employee_id: uuid
 - workspace_id: uuid
@@ -2275,6 +2428,7 @@
 - ... (10 columns)
 
 ### personal_expenses
+
 - id: uuid
 - user_id: uuid
 - amount: numeric
@@ -2284,6 +2438,7 @@
 - ... (26 columns)
 
 ### personal_records
+
 - id: uuid
 - user_id: uuid
 - workspace_id: uuid?
@@ -2293,6 +2448,7 @@
 - ... (12 columns)
 
 ### pnr_ai_queries
+
 - id: uuid
 - workspace_id: uuid
 - pnr_id: uuid?
@@ -2302,6 +2458,7 @@
 - ... (9 columns)
 
 ### pnr_fare_alerts
+
 - id: uuid
 - workspace_id: uuid
 - pnr_id: uuid
@@ -2311,6 +2468,7 @@
 - ... (13 columns)
 
 ### pnr_fare_history
+
 - id: uuid
 - workspace_id: uuid
 - pnr_id: uuid
@@ -2320,6 +2478,7 @@
 - ... (13 columns)
 
 ### pnr_passengers
+
 - id: uuid
 - pnr_id: uuid
 - sequence_number: integer?
@@ -2329,6 +2488,7 @@
 - ... (11 columns)
 
 ### pnr_queue_items
+
 - id: uuid
 - workspace_id: uuid
 - pnr_id: uuid
@@ -2338,6 +2498,7 @@
 - ... (18 columns)
 
 ### pnr_records
+
 - id: uuid
 - record_locator: character varying
 - raw_content: text?
@@ -2347,6 +2508,7 @@
 - ... (20 columns)
 
 ### pnr_remarks
+
 - id: uuid
 - pnr_id: uuid
 - remark_type: character varying?
@@ -2354,6 +2516,7 @@
 - created_at: timestamp with time zone?
 
 ### pnr_schedule_changes
+
 - id: uuid
 - workspace_id: uuid
 - pnr_id: uuid
@@ -2363,6 +2526,7 @@
 - ... (23 columns)
 
 ### pnr_segments
+
 - id: uuid
 - pnr_id: uuid
 - segment_number: integer?
@@ -2372,6 +2536,7 @@
 - ... (17 columns)
 
 ### pnr_ssr_elements
+
 - id: uuid
 - pnr_id: uuid
 - passenger_id: uuid?
@@ -2381,6 +2546,7 @@
 - ... (9 columns)
 
 ### pnrs
+
 - id: uuid
 - record_locator: text
 - workspace_id: uuid
@@ -2390,6 +2556,7 @@
 - ... (18 columns)
 
 ### posting_rules
+
 - id: uuid
 - workspace_id: uuid?
 - event_type: USER-DEFINED
@@ -2399,6 +2566,7 @@
 - ... (8 columns)
 
 ### premium_experiences
+
 - id: uuid
 - name: text
 - english_name: text?
@@ -2408,6 +2576,7 @@
 - ... (75 columns)
 
 ### price_list_items
+
 - id: uuid
 - supplier_id: uuid?
 - item_code: text
@@ -2417,6 +2586,7 @@
 - ... (14 columns)
 
 ### pricing_templates
+
 - id: text
 - name: text
 - description: text?
@@ -2426,6 +2596,7 @@
 - ... (8 columns)
 
 ### private_messages
+
 - id: uuid
 - sender_id: uuid
 - receiver_id: uuid
@@ -2434,6 +2605,7 @@
 - created_at: timestamp with time zone?
 
 ### profiles
+
 - id: uuid
 - name: text?
 - nickname: text?
@@ -2443,6 +2615,7 @@
 - ... (17 columns)
 
 ### progress_photos
+
 - id: uuid
 - user_id: uuid
 - workspace_id: uuid?
@@ -2452,6 +2625,7 @@
 - ... (10 columns)
 
 ### proposal_packages
+
 - id: uuid
 - proposal_id: uuid?
 - version_name: text
@@ -2461,6 +2635,7 @@
 - ... (27 columns)
 
 ### quote_categories
+
 - id: uuid
 - quote_id: uuid?
 - name: text
@@ -2470,6 +2645,7 @@
 - ... (7 columns)
 
 ### quote_regions
+
 - id: uuid
 - quote_id: text
 - country: text
@@ -2479,6 +2655,7 @@
 - ... (11 columns)
 
 ### quote_versions
+
 - id: uuid
 - quote_id: uuid?
 - version: integer
@@ -2488,6 +2665,7 @@
 - ... (7 columns)
 
 ### receipt_items
+
 - id: uuid
 - receipt_id: uuid
 - tour_id: text?
@@ -2497,6 +2675,7 @@
 - ... (31 columns)
 
 ### receipt_orders
+
 - id: text
 - code: text
 - order_id: text?
@@ -2506,6 +2685,7 @@
 - ... (13 columns)
 
 ### receipt_payment_items
+
 - id: uuid
 - receipt_id: uuid?
 - item_name: text
@@ -2514,6 +2694,7 @@
 - created_at: timestamp with time zone?
 
 ### receipts
+
 - id: uuid
 - receipt_number: text
 - order_id: uuid
@@ -2523,6 +2704,7 @@
 - ... (44 columns)
 
 ### ref_airlines
+
 - iata_code: character varying
 - icao_code: character varying?
 - english_name: character varying?
@@ -2532,6 +2714,7 @@
 - ... (8 columns)
 
 ### ref_airports
+
 - iata_code: character varying
 - icao_code: character varying?
 - english_name: character varying?
@@ -2541,6 +2724,7 @@
 - ... (15 columns)
 
 ### ref_airports_backup
+
 - iata_code: character varying?
 - icao_code: character varying?
 - english_name: character varying?
@@ -2550,6 +2734,7 @@
 - ... (15 columns)
 
 ### ref_booking_classes
+
 - code: character varying
 - cabin_type: character varying?
 - description: character varying?
@@ -2557,6 +2742,7 @@
 - created_at: timestamp with time zone?
 
 ### ref_ssr_codes
+
 - code: character varying
 - category: character varying?
 - description_en: character varying?
@@ -2564,6 +2750,7 @@
 - created_at: timestamp with time zone?
 
 ### ref_status_codes
+
 - code: character varying
 - category: character varying?
 - description_en: character varying?
@@ -2571,6 +2758,7 @@
 - created_at: timestamp with time zone?
 
 ### refunds
+
 - id: uuid
 - workspace_id: uuid
 - refund_number: character varying
@@ -2580,6 +2768,7 @@
 - ... (20 columns)
 
 ### region_stats
+
 - city_id: text
 - attractions_count: integer?
 - cost_templates_count: integer?
@@ -2588,6 +2777,7 @@
 - updated_at: timestamp with time zone?
 
 ### regions
+
 - id: text
 - country_id: text
 - name: text
@@ -2597,6 +2787,7 @@
 - ... (10 columns)
 
 ### request_response_items
+
 - id: uuid
 - response_id: uuid
 - resource_type: text
@@ -2606,6 +2797,7 @@
 - ... (16 columns)
 
 ### request_responses
+
 - id: uuid
 - request_id: uuid
 - responder_workspace_id: uuid
@@ -2615,6 +2807,7 @@
 - ... (9 columns)
 
 ### restaurants
+
 - id: uuid
 - name: text
 - english_name: text?
@@ -2624,6 +2817,7 @@
 - ... (57 columns)
 
 ### rich_documents
+
 - id: uuid
 - canvas_id: uuid
 - title: text
@@ -2633,6 +2827,7 @@
 - ... (12 columns)
 
 ### shared_order_lists
+
 - id: uuid
 - channel_id: uuid
 - order_ids: jsonb
@@ -2642,6 +2837,7 @@
 - ... (11 columns)
 
 ### social_group_members
+
 - id: uuid
 - group_id: uuid
 - user_id: uuid
@@ -2651,11 +2847,13 @@
 - ... (7 columns)
 
 ### social_group_tags
+
 - id: uuid
 - group_id: uuid
 - tag: text
 
 ### social_groups
+
 - id: uuid
 - title: text
 - description: text?
@@ -2665,6 +2863,7 @@
 - ... (22 columns)
 
 ### syncqueue
+
 - id: uuid
 - table_name: character varying
 - operation: character varying
@@ -2674,6 +2873,7 @@
 - ... (9 columns)
 
 ### system_settings
+
 - id: uuid
 - category: text
 - settings: jsonb
@@ -2683,6 +2883,7 @@
 - ... (8 columns)
 
 ### templates
+
 - id: uuid
 - name: character varying
 - type: character varying
@@ -2692,6 +2893,7 @@
 - ... (9 columns)
 
 ### todos
+
 - id: uuid
 - title: text
 - priority: integer
@@ -2701,6 +2903,7 @@
 - ... (20 columns)
 
 ### tour_addons
+
 - id: text
 - tour_id: text?
 - name: text
@@ -2710,6 +2913,7 @@
 - ... (11 columns)
 
 ### tour_bonus_settings
+
 - id: uuid
 - workspace_id: uuid
 - tour_id: text
@@ -2719,6 +2923,7 @@
 - ... (9 columns)
 
 ### tour_control_forms
+
 - id: uuid
 - package_id: uuid
 - workspace_id: uuid
@@ -2728,6 +2933,7 @@
 - ... (8 columns)
 
 ### tour_custom_cost_fields
+
 - id: uuid
 - tour_id: text
 - field_name: text
@@ -2736,6 +2942,7 @@
 - updated_at: timestamp with time zone?
 
 ### tour_custom_cost_values
+
 - id: uuid
 - field_id: uuid
 - member_id: uuid
@@ -2744,6 +2951,7 @@
 - updated_at: timestamp with time zone?
 
 ### tour_departure_data
+
 - id: uuid
 - tour_id: text
 - flight_info: jsonb?
@@ -2753,6 +2961,7 @@
 - ... (12 columns)
 
 ### tour_destinations
+
 - id: uuid
 - country: text
 - city: text
@@ -2761,6 +2970,7 @@
 - updated_at: timestamp with time zone?
 
 ### tour_documents
+
 - id: uuid
 - tour_id: text
 - workspace_id: uuid
@@ -2770,6 +2980,7 @@
 - ... (15 columns)
 
 ### tour_expenses
+
 - expense_id: bigint
 - itinerary_id: text
 - leader_id: uuid
@@ -2778,6 +2989,7 @@
 - created_at: timestamp with time zone?
 
 ### tour_folder_templates
+
 - id: uuid
 - workspace_id: uuid?
 - name: text
@@ -2787,6 +2999,7 @@
 - ... (8 columns)
 
 ### tour_leaders
+
 - id: uuid
 - code: character varying?
 - name: character varying
@@ -2796,6 +3009,7 @@
 - ... (21 columns)
 
 ### tour_meal_settings
+
 - id: uuid
 - tour_id: text
 - day_number: integer
@@ -2805,6 +3019,7 @@
 - ... (10 columns)
 
 ### tour_member_fields
+
 - id: uuid
 - tour_id: text
 - order_member_id: uuid
@@ -2814,6 +3029,7 @@
 - ... (8 columns)
 
 ### tour_refunds
+
 - id: uuid
 - tour_id: uuid?
 - order_id: uuid?
@@ -2823,6 +3039,7 @@
 - ... (12 columns)
 
 ### tour_request_items
+
 - id: uuid
 - request_id: uuid
 - item_type: character varying
@@ -2832,6 +3049,7 @@
 - ... (15 columns)
 
 ### tour_request_member_vouchers
+
 - id: uuid
 - request_id: uuid
 - member_id: uuid
@@ -2841,6 +3059,7 @@
 - ... (12 columns)
 
 ### tour_request_messages
+
 - id: uuid
 - request_id: uuid
 - sender_type: character varying
@@ -2850,6 +3069,7 @@
 - ... (17 columns)
 
 ### tour_request_payment_summary
+
 - tour_request_id: uuid?
 - tour_id: uuid?
 - supplier_id: uuid?
@@ -2859,6 +3079,7 @@
 - ... (10 columns)
 
 ### tour_requests
+
 - id: uuid
 - code: character varying
 - tour_id: uuid?
@@ -2868,6 +3089,7 @@
 - ... (67 columns)
 
 ### tour_requests_progress
+
 - tour_id: uuid?
 - tour_code: character varying?
 - tour_name: character varying?
@@ -2877,6 +3099,7 @@
 - ... (10 columns)
 
 ### tour_room_assignments
+
 - id: uuid
 - room_id: uuid
 - order_member_id: uuid
@@ -2885,6 +3108,7 @@
 - updated_at: timestamp with time zone?
 
 ### tour_rooms
+
 - id: uuid
 - tour_id: text
 - hotel_name: text?
@@ -2894,6 +3118,7 @@
 - ... (13 columns)
 
 ### tour_rooms_status
+
 - id: uuid?
 - tour_id: text?
 - hotel_name: text?
@@ -2903,12 +3128,14 @@
 - ... (12 columns)
 
 ### tour_table_assignments
+
 - id: uuid
 - table_id: uuid
 - order_member_id: uuid
 - created_at: timestamp with time zone?
 
 ### tour_tables
+
 - id: uuid
 - tour_id: text
 - meal_setting_id: uuid
@@ -2918,6 +3145,7 @@
 - ... (9 columns)
 
 ### tour_tables_status
+
 - id: uuid?
 - tour_id: text?
 - meal_setting_id: uuid?
@@ -2927,6 +3155,7 @@
 - ... (12 columns)
 
 ### tour_vehicle_assignments
+
 - id: uuid
 - vehicle_id: uuid
 - order_member_id: uuid
@@ -2935,6 +3164,7 @@
 - updated_at: timestamp with time zone?
 
 ### tour_vehicles
+
 - id: uuid
 - tour_id: text
 - vehicle_name: text
@@ -2944,6 +3174,7 @@
 - ... (12 columns)
 
 ### tour_vehicles_status
+
 - id: uuid?
 - tour_id: text?
 - vehicle_name: text?
@@ -2953,6 +3184,7 @@
 - ... (13 columns)
 
 ### transactions
+
 - id: text
 - type: text
 - order_id: text?
@@ -2962,6 +3194,7 @@
 - ... (11 columns)
 
 ### travel_card_templates
+
 - id: uuid
 - category: text
 - code: text
@@ -2971,6 +3204,7 @@
 - ... (9 columns)
 
 ### traveler_badges
+
 - id: uuid
 - user_id: uuid
 - badge_type: text
@@ -2978,6 +3212,7 @@
 - earned_at: timestamp with time zone?
 
 ### traveler_conversation_members
+
 - id: uuid
 - conversation_id: uuid
 - user_id: uuid
@@ -2987,6 +3222,7 @@
 - ... (11 columns)
 
 ### traveler_conversations
+
 - id: uuid
 - type: text
 - name: text?
@@ -2996,6 +3232,7 @@
 - ... (18 columns)
 
 ### traveler_expense_splits
+
 - id: uuid
 - expense_id: uuid
 - user_id: uuid
@@ -3004,6 +3241,7 @@
 - settled_at: timestamp with time zone?
 
 ### traveler_expenses
+
 - id: uuid
 - trip_id: uuid?
 - split_group_id: uuid?
@@ -3013,6 +3251,7 @@
 - ... (13 columns)
 
 ### traveler_friends
+
 - id: uuid
 - user_id: uuid
 - friend_id: uuid
@@ -3022,6 +3261,7 @@
 - ... (9 columns)
 
 ### traveler_messages
+
 - id: uuid
 - conversation_id: uuid
 - sender_id: uuid
@@ -3031,6 +3271,7 @@
 - ... (12 columns)
 
 ### traveler_profiles
+
 - id: uuid
 - full_name: text?
 - display_name: text?
@@ -3040,6 +3281,7 @@
 - ... (22 columns)
 
 ### traveler_settlements
+
 - id: uuid
 - trip_id: uuid?
 - split_group_id: uuid?
@@ -3049,6 +3291,7 @@
 - ... (11 columns)
 
 ### traveler_split_group_members
+
 - id: uuid
 - group_id: uuid
 - user_id: uuid?
@@ -3058,6 +3301,7 @@
 - ... (8 columns)
 
 ### traveler_split_groups
+
 - id: uuid
 - name: text
 - description: text?
@@ -3067,6 +3311,7 @@
 - ... (9 columns)
 
 ### traveler_tour_cache
+
 - id: uuid
 - traveler_id: uuid
 - id_number: text
@@ -3076,6 +3321,7 @@
 - ... (26 columns)
 
 ### traveler_trip_accommodations
+
 - id: uuid
 - trip_id: uuid
 - name: text
@@ -3085,6 +3331,7 @@
 - ... (15 columns)
 
 ### traveler_trip_briefings
+
 - id: uuid
 - trip_id: uuid
 - title: text
@@ -3094,6 +3341,7 @@
 - ... (8 columns)
 
 ### traveler_trip_invitations
+
 - id: uuid
 - trip_id: uuid
 - inviter_id: uuid
@@ -3103,6 +3351,7 @@
 - ... (9 columns)
 
 ### traveler_trip_members
+
 - id: uuid
 - trip_id: uuid
 - user_id: uuid
@@ -3111,6 +3360,7 @@
 - joined_at: timestamp with time zone?
 
 ### traveler_trips
+
 - id: uuid
 - title: text
 - description: text?
@@ -3120,6 +3370,7 @@
 - ... (14 columns)
 
 ### trip_members
+
 - id: uuid
 - assigned_itinerary_id: uuid
 - customer_id: text?
@@ -3129,6 +3380,7 @@
 - ... (12 columns)
 
 ### trip_members_v2
+
 - id: uuid
 - assigned_itinerary_id: uuid
 - customer_id: uuid
@@ -3138,6 +3390,7 @@
 - ... (25 columns)
 
 ### usa_esta
+
 - id: uuid
 - workspace_id: uuid
 - tour_id: text?
@@ -3147,12 +3400,14 @@
 - ... (100 columns)
 
 ### user_badges
+
 - id: uuid
 - user_id: uuid
 - badge_id: uuid
 - awarded_at: timestamp with time zone?
 
 ### user_points_transactions
+
 - id: uuid
 - user_id: text
 - points_change: integer
@@ -3162,6 +3417,7 @@
 - ... (7 columns)
 
 ### user_preferences
+
 - id: uuid
 - user_id: uuid
 - preference_key: text
@@ -3170,6 +3426,7 @@
 - updated_at: timestamp with time zone?
 
 ### user_roles
+
 - id: uuid
 - user_id: uuid
 - role: text
@@ -3178,6 +3435,7 @@
 - updated_at: timestamp with time zone?
 
 ### vendor_costs
+
 - id: uuid
 - vendor_name: text
 - visa_type: text
@@ -3186,6 +3444,7 @@
 - updated_at: timestamp with time zone?
 
 ### voucher_entries
+
 - id: uuid
 - voucher_id: uuid
 - entry_no: integer
@@ -3195,6 +3454,7 @@
 - ... (8 columns)
 
 ### vouchers
+
 - id: uuid
 - workspace_id: uuid
 - voucher_no: character varying
@@ -3202,5 +3462,3 @@
 - type: character varying
 - source_type: character varying?
 - ... (20 columns)
-
-

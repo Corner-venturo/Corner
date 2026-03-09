@@ -128,16 +128,20 @@ function parseTransportItems(quoteCategories: CostCategory[], items: QuoteItem[]
 /**
  * 按分類整理項目並排序
  */
-export function groupItemsByCategory(
-  quoteItems: QuoteItem[]
-): Record<CategoryKey, QuoteItem[]> {
+export function groupItemsByCategory(quoteItems: QuoteItem[]): Record<CategoryKey, QuoteItem[]> {
   const result: Record<CategoryKey, QuoteItem[]> = {
-    transport: [], accommodation: [], meal: [], activity: [], other: [],
+    transport: [],
+    accommodation: [],
+    meal: [],
+    activity: [],
+    other: [],
   }
 
   for (const item of quoteItems) {
     const validKeys: CategoryKey[] = ['transport', 'accommodation', 'meal', 'activity', 'other']
-    const cat = validKeys.includes(item.category as CategoryKey) ? (item.category as CategoryKey) : 'other'
+    const cat = validKeys.includes(item.category as CategoryKey)
+      ? (item.category as CategoryKey)
+      : 'other'
     result[cat].push(item)
   }
 

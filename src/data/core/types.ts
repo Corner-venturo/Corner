@@ -11,13 +11,14 @@ type NullableKeys<T> = {
   [K in keyof T]: null extends T[K] ? K : never
 }[keyof T]
 
-type CreateInput<T> = Omit<T, 'id' | 'created_at' | 'updated_at' | '_needs_sync' | '_synced_at' | '_deleted' | 'code'>
+type CreateInput<T> = Omit<
+  T,
+  'id' | 'created_at' | 'updated_at' | '_needs_sync' | '_synced_at' | '_deleted' | 'code'
+>
 
 /** Makes nullable fields optional — matches Supabase Insert semantics */
-export type EntityCreateData<T> =
-  Partial<Pick<CreateInput<T>, NullableKeys<CreateInput<T>>>> &
-  Omit<CreateInput<T>, NullableKeys<CreateInput<T>>> &
-  { code?: string }
+export type EntityCreateData<T> = Partial<Pick<CreateInput<T>, NullableKeys<CreateInput<T>>>> &
+  Omit<CreateInput<T>, NullableKeys<CreateInput<T>>> & { code?: string }
 
 export interface BaseEntity {
   id: string
@@ -45,8 +46,8 @@ export interface CacheConfig {
 
 // 預設快取配置
 export const DEFAULT_CACHE_CONFIG: Required<CacheConfig> = {
-  ttl: 60000,              // 1 分鐘
-  staleTime: 30000,        // 30 秒
+  ttl: 60000, // 1 分鐘
+  staleTime: 30000, // 30 秒
   dedupe: true,
   revalidateOnFocus: false,
   revalidateOnReconnect: true,

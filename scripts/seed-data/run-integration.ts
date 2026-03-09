@@ -22,7 +22,7 @@ async function run() {
       .from('ref_airports')
       .update({ name_zh: u.name_zh, city_name_zh: u.city_name_zh })
       .eq('iata_code', u.iata_code)
-    
+
     if (error) {
       console.log(`   ❌ ${u.iata_code}: ${error.message}`)
     } else {
@@ -33,16 +33,18 @@ async function run() {
   // 2. 檢查結果
   console.log('\n2️⃣ 驗證常用機場資料...')
   const favCodes = ['KMQ', 'KIX', 'HKG', 'NRT', 'FUK', 'SFO', 'DAD', 'PUS', 'HRB', 'HND', 'XMN']
-  
+
   const { data: airports } = await supabase
     .from('ref_airports')
     .select('iata_code, name_zh, city_name_zh, country_code')
     .in('iata_code', favCodes)
-  
+
   console.log('\n   常用機場清單:')
   airports?.forEach(a => {
     const status = a.name_zh ? '✅' : '⚠️'
-    console.log(`   ${status} ${a.iata_code} | ${a.country_code || '--'} | ${a.city_name_zh || '--'} | ${a.name_zh || '(無中文)'}`)
+    console.log(
+      `   ${status} ${a.iata_code} | ${a.country_code || '--'} | ${a.city_name_zh || '--'} | ${a.name_zh || '(無中文)'}`
+    )
   })
 
   console.log('\n🎉 資料整合完成！')

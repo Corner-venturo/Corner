@@ -153,22 +153,26 @@ export function CountriesSection({
     <div className="space-y-4">
       <div className="border-b-2 border-[#B8A99A] pb-2">
         <h2 className="text-lg font-bold text-morandi-primary">🌍 旅遊國家/地區</h2>
-        <p className="text-xs text-morandi-primary mt-1">
-          {COMP_EDITOR_LABELS.SELECT_1146}
-        </p>
+        <p className="text-xs text-morandi-primary mt-1">{COMP_EDITOR_LABELS.SELECT_1146}</p>
       </div>
 
       {/* 主要國家 */}
       {primaryCountry && (
         <div className="p-4 bg-[#F9F8F6] border-2 border-[#C6B9AC] rounded-lg">
           <div className="flex items-center justify-between mb-3">
-            <label className="text-sm font-semibold text-[var(--morandi-primary)]">{COMP_EDITOR_LABELS.LABEL_2736}</label>
-            <span className="text-xs bg-[#B8A99A] text-white px-2 py-0.5 rounded">{COMP_EDITOR_LABELS.LABEL_4022}</span>
+            <label className="text-sm font-semibold text-[var(--morandi-primary)]">
+              {COMP_EDITOR_LABELS.LABEL_2736}
+            </label>
+            <span className="text-xs bg-[#B8A99A] text-white px-2 py-0.5 rounded">
+              {COMP_EDITOR_LABELS.LABEL_4022}
+            </span>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5040}</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">
+                {COMP_EDITOR_LABELS.LABEL_5040}
+              </label>
               <Combobox
                 value={primaryCountry.country_id}
                 onChange={value => {

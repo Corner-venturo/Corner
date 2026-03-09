@@ -30,7 +30,7 @@ function AdjustmentSlider({ label, value, min, max, onChange }: AdjustmentSlider
         min={min}
         max={max}
         step={1}
-        onValueChange={(values) => onChange(values[0])}
+        onValueChange={values => onChange(values[0])}
         className="w-full"
       />
     </div>
@@ -86,28 +86,28 @@ export function ImageAdjustmentsPanel({
           value={adjustments.exposure}
           min={-100}
           max={100}
-          onChange={(v) => handleChange('exposure', v)}
+          onChange={v => handleChange('exposure', v)}
         />
         <AdjustmentSlider
           label={DESIGNER_LABELS.對比度}
           value={adjustments.contrast}
           min={-100}
           max={100}
-          onChange={(v) => handleChange('contrast', v)}
+          onChange={v => handleChange('contrast', v)}
         />
         <AdjustmentSlider
           label={DESIGNER_LABELS.高光}
           value={adjustments.highlights}
           min={-100}
           max={100}
-          onChange={(v) => handleChange('highlights', v)}
+          onChange={v => handleChange('highlights', v)}
         />
         <AdjustmentSlider
           label={DESIGNER_LABELS.陰影}
           value={adjustments.shadows}
           min={-100}
           max={100}
-          onChange={(v) => handleChange('shadows', v)}
+          onChange={v => handleChange('shadows', v)}
         />
       </div>
 
@@ -121,21 +121,21 @@ export function ImageAdjustmentsPanel({
           value={adjustments.saturation}
           min={-100}
           max={100}
-          onChange={(v) => handleChange('saturation', v)}
+          onChange={v => handleChange('saturation', v)}
         />
         <AdjustmentSlider
           label={DESIGNER_LABELS.色溫}
           value={adjustments.temperature}
           min={-100}
           max={100}
-          onChange={(v) => handleChange('temperature', v)}
+          onChange={v => handleChange('temperature', v)}
         />
         <AdjustmentSlider
           label={DESIGNER_LABELS.色調}
           value={adjustments.tint}
           min={-100}
           max={100}
-          onChange={(v) => handleChange('tint', v)}
+          onChange={v => handleChange('tint', v)}
         />
       </div>
 
@@ -149,14 +149,14 @@ export function ImageAdjustmentsPanel({
           value={adjustments.clarity}
           min={-100}
           max={100}
-          onChange={(v) => handleChange('clarity', v)}
+          onChange={v => handleChange('clarity', v)}
         />
         <AdjustmentSlider
           label={DESIGNER_LABELS.暈影}
           value={adjustments.vignette}
           min={0}
           max={100}
-          onChange={(v) => handleChange('vignette', v)}
+          onChange={v => handleChange('vignette', v)}
         />
       </div>
 

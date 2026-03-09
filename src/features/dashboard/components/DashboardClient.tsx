@@ -50,7 +50,6 @@ function SortableWidget({ id, widget }: { id: string; widget: (typeof AVAILABLE_
   )
 }
 
-
 export function DashboardClient() {
   const router = useRouter()
   const t = useI18n()
@@ -138,37 +137,33 @@ export function DashboardClient() {
       }
       contentClassName="flex-1 overflow-auto min-h-0"
     >
-        {filteredActiveWidgets.length === 0 ? (
-          <Card className="p-12 text-center border-morandi-gold/20 shadow-sm rounded-2xl bg-card">
-            <div className="max-w-md mx-auto">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-[#B5986A]/10 to-[#D4C4A8]/10 flex items-center justify-center mx-auto mb-4 shadow-sm">
-                <Settings className="h-8 w-8 text-morandi-gold" />
-              </div>
-              <h3 className="text-lg font-semibold text-morandi-primary mb-2">
-                {t('dashboard.no_widgets_title')}
-              </h3>
-              <p className="text-sm text-morandi-muted mb-6">
-                {t('dashboard.no_widgets_description')}
-              </p>
+      {filteredActiveWidgets.length === 0 ? (
+        <Card className="p-12 text-center border-morandi-gold/20 shadow-sm rounded-2xl bg-card">
+          <div className="max-w-md mx-auto">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-[#B5986A]/10 to-[#D4C4A8]/10 flex items-center justify-center mx-auto mb-4 shadow-sm">
+              <Settings className="h-8 w-8 text-morandi-gold" />
             </div>
-          </Card>
-        ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext items={filteredActiveWidgets} strategy={rectSortingStrategy}>
-              <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredActiveWidgets.map(widgetId => {
-                  const widget = AVAILABLE_WIDGETS.find(w => w.id === widgetId)
-                  if (!widget) return null
-                  return <SortableWidget key={widget.id} id={widget.id} widget={widget} />
-                })}
-              </div>
-            </SortableContext>
-          </DndContext>
-        )}
+            <h3 className="text-lg font-semibold text-morandi-primary mb-2">
+              {t('dashboard.no_widgets_title')}
+            </h3>
+            <p className="text-sm text-morandi-muted mb-6">
+              {t('dashboard.no_widgets_description')}
+            </p>
+          </div>
+        </Card>
+      ) : (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={filteredActiveWidgets} strategy={rectSortingStrategy}>
+            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {filteredActiveWidgets.map(widgetId => {
+                const widget = AVAILABLE_WIDGETS.find(w => w.id === widgetId)
+                if (!widget) return null
+                return <SortableWidget key={widget.id} id={widget.id} widget={widget} />
+              })}
+            </div>
+          </SortableContext>
+        </DndContext>
+      )}
     </ContentPageLayout>
   )
 }

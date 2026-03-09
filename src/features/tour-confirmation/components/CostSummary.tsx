@@ -9,7 +9,7 @@
 import { Bus, Utensils, Hotel, Ticket, FileText, Calculator } from 'lucide-react'
 import type { CostSummary as CostSummaryType } from '@/types/tour-confirmation-sheet.types'
 import { formatMoney } from '@/lib/utils/format-currency'
-import { COST_SUMMARY_LABELS } from '../constants/labels';
+import { COST_SUMMARY_LABELS } from '../constants/labels'
 
 interface CostSummaryCardProps {
   summary: CostSummaryType
@@ -21,15 +21,24 @@ export function CostSummaryCard({ summary }: CostSummaryCardProps) {
   const categories = [
     { key: 'transport', label: COST_SUMMARY_LABELS.交通, icon: Bus, color: 'text-blue-500' },
     { key: 'meal', label: COST_SUMMARY_LABELS.餐食, icon: Utensils, color: 'text-orange-500' },
-    { key: 'accommodation', label: COST_SUMMARY_LABELS.住宿, icon: Hotel, color: 'text-purple-500' },
+    {
+      key: 'accommodation',
+      label: COST_SUMMARY_LABELS.住宿,
+      icon: Hotel,
+      color: 'text-purple-500',
+    },
     { key: 'activity', label: COST_SUMMARY_LABELS.活動, icon: Ticket, color: 'text-green-500' },
-    { key: 'other', label: COST_SUMMARY_LABELS.其他, icon: FileText, color: 'text-morandi-secondary' },
+    {
+      key: 'other',
+      label: COST_SUMMARY_LABELS.其他,
+      icon: FileText,
+      color: 'text-morandi-secondary',
+    },
   ] as const
 
   const difference = summary.total.actual - summary.total.expected
-  const diffPercent = summary.total.expected > 0
-    ? ((difference / summary.total.expected) * 100).toFixed(1)
-    : '0'
+  const diffPercent =
+    summary.total.expected > 0 ? ((difference / summary.total.expected) * 100).toFixed(1) : '0'
 
   return (
     <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
@@ -70,10 +79,13 @@ export function CostSummaryCard({ summary }: CostSummaryCardProps) {
                   <td className="py-2 text-right text-sm font-mono">
                     {formatCurrency(categoryData.actual)}
                   </td>
-                  <td className={`py-2 text-right text-sm font-mono ${
-                    diff > 0 ? 'text-morandi-red' : diff < 0 ? 'text-morandi-green' : ''
-                  }`}>
-                    {diff > 0 ? '+' : ''}{formatCurrency(diff)}
+                  <td
+                    className={`py-2 text-right text-sm font-mono ${
+                      diff > 0 ? 'text-morandi-red' : diff < 0 ? 'text-morandi-green' : ''
+                    }`}
+                  >
+                    {diff > 0 ? '+' : ''}
+                    {formatCurrency(diff)}
                   </td>
                 </tr>
               )
@@ -88,13 +100,14 @@ export function CostSummaryCard({ summary }: CostSummaryCardProps) {
               <td className="pt-3 text-right font-mono text-base">
                 {formatCurrency(summary.total.actual)}
               </td>
-              <td className={`pt-3 text-right font-mono text-base ${
-                difference > 0 ? 'text-morandi-red' : difference < 0 ? 'text-morandi-green' : ''
-              }`}>
-                {difference > 0 ? '+' : ''}{formatCurrency(difference)}
-                <span className="text-xs ml-1">
-                  ({diffPercent}%)
-                </span>
+              <td
+                className={`pt-3 text-right font-mono text-base ${
+                  difference > 0 ? 'text-morandi-red' : difference < 0 ? 'text-morandi-green' : ''
+                }`}
+              >
+                {difference > 0 ? '+' : ''}
+                {formatCurrency(difference)}
+                <span className="text-xs ml-1">({diffPercent}%)</span>
               </td>
             </tr>
           </tfoot>
@@ -103,13 +116,14 @@ export function CostSummaryCard({ summary }: CostSummaryCardProps) {
 
       {/* 底部提示 */}
       {difference !== 0 && (
-        <div className={`px-4 py-2 text-xs border-t border-border ${
-          difference > 0 ? 'bg-red-50 text-morandi-red' : 'bg-green-50 text-morandi-green'
-        }`}>
+        <div
+          className={`px-4 py-2 text-xs border-t border-border ${
+            difference > 0 ? 'bg-red-50 text-morandi-red' : 'bg-green-50 text-morandi-green'
+          }`}
+        >
           {difference > 0
             ? `實際支出超出預計 ${formatCurrency(difference)} 元 (${diffPercent}%)`
-            : `實際支出低於預計 ${formatCurrency(Math.abs(difference))} 元 (${Math.abs(Number(diffPercent))}%)`
-          }
+            : `實際支出低於預計 ${formatCurrency(Math.abs(difference))} 元 (${Math.abs(Number(diffPercent))}%)`}
         </div>
       )}
     </div>

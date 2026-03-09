@@ -44,7 +44,7 @@ export function FlightInfoSection({
   updateField,
   canUndoItinerary,
   onUndoItinerary,
-  compact = false
+  compact = false,
 }: FlightInfoSectionProps) {
   // 從資料庫載入模板
   const { flightTemplates, loading: templatesLoading } = useTemplates()
@@ -84,7 +84,9 @@ export function FlightInfoSection({
   }, [flightTemplates])
 
   // 取得目前選擇的風格資訊
-  const currentStyle = flightStyleOptions.find(s => s.value === (data.flightStyle || 'original')) || {
+  const currentStyle = flightStyleOptions.find(
+    s => s.value === (data.flightStyle || 'original')
+  ) || {
     value: 'original' as FlightStyleType,
     label: COMP_EDITOR_LABELS.經典金色,
     description: COMP_EDITOR_LABELS.莫蘭迪金色風格,
@@ -101,67 +103,69 @@ export function FlightInfoSection({
   }, [tripDays, data.departureDate, onGenerateDailyItinerary])
 
   // 處理航線選擇
-  const handleFlightRouteSelect = useCallback((
-    flightType: 'outboundFlight' | 'returnFlight',
-    flight: {
-      flightNumber: string
-      airline: string
-      departureAirport: string
-      arrivalAirport: string
-      departureTime: string
-      arrivalTime?: string
-    }
-  ) => {
-    const fields: Record<string, string> = {
-      flightNumber: flight.flightNumber,
-      airline: flight.airline,
-      departureAirport: flight.departureAirport,
-      arrivalAirport: flight.arrivalAirport,
-      departureTime: flight.departureTime,
-    }
-    if (flight.arrivalTime) {
-      fields.arrivalTime = flight.arrivalTime
-    }
-    if (updateFlightFields) {
-      updateFlightFields(flightType, fields)
-    } else {
-      Object.entries(fields).forEach(([key, value]) => {
-        updateFlightField(flightType, key, value)
-      })
-    }
-  }, [updateFlightField, updateFlightFields])
+  const handleFlightRouteSelect = useCallback(
+    (
+      flightType: 'outboundFlight' | 'returnFlight',
+      flight: {
+        flightNumber: string
+        airline: string
+        departureAirport: string
+        arrivalAirport: string
+        departureTime: string
+        arrivalTime?: string
+      }
+    ) => {
+      const fields: Record<string, string> = {
+        flightNumber: flight.flightNumber,
+        airline: flight.airline,
+        departureAirport: flight.departureAirport,
+        arrivalAirport: flight.arrivalAirport,
+        departureTime: flight.departureTime,
+      }
+      if (flight.arrivalTime) {
+        fields.arrivalTime = flight.arrivalTime
+      }
+      if (updateFlightFields) {
+        updateFlightFields(flightType, fields)
+      } else {
+        Object.entries(fields).forEach(([key, value]) => {
+          updateFlightField(flightType, key, value)
+        })
+      }
+    },
+    [updateFlightField, updateFlightFields]
+  )
 
   // 計算預設日期
-  const getDefaultDate = useCallback((flightType: 'outbound' | 'return'): string => {
-    if (flightType === 'outbound') {
-      if (data.departureDate) {
-        const dep = parseDate(data.departureDate)
-        if (dep) return formatDate(dep)
-      }
-    } else {
-      if (data.returnFlight?.departureDate && data.departureDate) {
-        const dep = parseDate(data.departureDate)
-        if (dep) {
-          const [month, day] = (data.returnFlight.departureDate || '').split('/').map(Number)
-          if (month && day) {
-            let year = dep.getFullYear()
-            if (month < dep.getMonth() + 1) year += 1
-            return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+  const getDefaultDate = useCallback(
+    (flightType: 'outbound' | 'return'): string => {
+      if (flightType === 'outbound') {
+        if (data.departureDate) {
+          const dep = parseDate(data.departureDate)
+          if (dep) return formatDate(dep)
+        }
+      } else {
+        if (data.returnFlight?.departureDate && data.departureDate) {
+          const dep = parseDate(data.departureDate)
+          if (dep) {
+            const [month, day] = (data.returnFlight.departureDate || '').split('/').map(Number)
+            if (month && day) {
+              let year = dep.getFullYear()
+              if (month < dep.getMonth() + 1) year += 1
+              return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+            }
           }
         }
       }
-    }
-    return getTodayString()
-  }, [data.departureDate, data.returnFlight?.departureDate])
+      return getTodayString()
+    },
+    [data.departureDate, data.returnFlight?.departureDate]
+  )
 
   return (
     <div className="space-y-3">
       {/* 摘要按鈕卡片 - 點擊開啟設定 Modal */}
-      <button
-        type="button"
-        onClick={() => setShowFlightSettings(true)}
-        className="w-full group"
-      >
+      <button type="button" onClick={() => setShowFlightSettings(true)} className="w-full group">
         <div className="flex items-center gap-3 p-3 rounded-lg border-2 border-[#B8A99A]/30 bg-[#B8A99A]/5 hover:border-[#B8A99A] hover:shadow-md transition-all">
           <div
             className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -170,9 +174,12 @@ export function FlightInfoSection({
             <Plane className="w-5 h-5 text-white" />
           </div>
           <div className="flex-1 text-left">
-            <h2 className="text-base font-bold text-morandi-primary">{COMP_EDITOR_LABELS.航班資訊}</h2>
+            <h2 className="text-base font-bold text-morandi-primary">
+              {COMP_EDITOR_LABELS.航班資訊}
+            </h2>
             <p className="text-xs text-morandi-secondary">
-              {currentStyle.label}{tripDays > 0 ? ` · ${tripDays} 天` : ''}
+              {currentStyle.label}
+              {tripDays > 0 ? ` · ${tripDays} 天` : ''}
             </p>
           </div>
         </div>
@@ -183,7 +190,9 @@ export function FlightInfoSection({
         <div className="bg-gradient-to-r from-morandi-gold/10 to-morandi-gold/5 p-3 rounded-lg border border-morandi-gold/30">
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_6915}</span>
+              <span className="text-sm font-medium text-morandi-primary">
+                {COMP_EDITOR_LABELS.LABEL_6915}
+              </span>
               <span className="text-lg font-bold text-morandi-gold">{tripDays}</span>
               <span className="text-sm text-morandi-secondary">{COMP_EDITOR_LABELS.LABEL_690}</span>
             </div>
@@ -232,56 +241,56 @@ export function FlightInfoSection({
 
       {/* 航班設定 Modal */}
       <Dialog open={showFlightSettings} onOpenChange={setShowFlightSettings}>
-        <DialogContent level={1} className="!flex !flex-row max-w-[95vw] h-[90vh] overflow-hidden p-0">
+        <DialogContent
+          level={1}
+          className="!flex !flex-row max-w-[95vw] h-[90vh] overflow-hidden p-0"
+        >
           {/* 左側：設定表單 */}
           <div className="w-1/2 min-w-0 p-6 overflow-y-auto overflow-x-hidden border-r border-morandi-container">
-              <DialogHeader className="mb-4">
-                <DialogTitle className="flex items-center gap-2">
-                  <Plane className="w-5 h-5" style={{ color: '#B8A99A' }} />
-                  {COMP_EDITOR_LABELS.SETTINGS_7677}
-                </DialogTitle>
-              </DialogHeader>
+            <DialogHeader className="mb-4">
+              <DialogTitle className="flex items-center gap-2">
+                <Plane className="w-5 h-5" style={{ color: '#B8A99A' }} />
+                {COMP_EDITOR_LABELS.SETTINGS_7677}
+              </DialogTitle>
+            </DialogHeader>
 
-              <div className="space-y-4 pt-2">
-                {/* 
-                 * 航班風格已統一 - 跟隨主題設定 (coverStyle)
-                 * 不再提供獨立的 flightStyle 選項
-                 */}
+            <div className="space-y-4 pt-2">
+              {/*
+               * 航班風格已統一 - 跟隨主題設定 (coverStyle)
+               * 不再提供獨立的 flightStyle 選項
+               */}
 
-                {/* 去程航班 */}
-                <FlightSegmentCard
-                  title={COMP_EDITOR_LABELS.去程航班}
-                  flightData={data.outboundFlight || {}}
-                  onFieldChange={(field, value) => updateFlightField('outboundFlight', field, value)}
-                  onSearch={handleSearchOutbound}
-                  onRouteSearch={() => setShowRouteSearchOutbound(true)}
-                  isLoading={loadingOutbound}
-                  segments={outboundSegments}
-                  onSelectSegment={handleSelectOutboundSegment}
-                  onClearSegments={clearOutboundSegments}
-                />
+              {/* 去程航班 */}
+              <FlightSegmentCard
+                title={COMP_EDITOR_LABELS.去程航班}
+                flightData={data.outboundFlight || {}}
+                onFieldChange={(field, value) => updateFlightField('outboundFlight', field, value)}
+                onSearch={handleSearchOutbound}
+                onRouteSearch={() => setShowRouteSearchOutbound(true)}
+                isLoading={loadingOutbound}
+                segments={outboundSegments}
+                onSelectSegment={handleSelectOutboundSegment}
+                onClearSegments={clearOutboundSegments}
+              />
 
-                {/* 回程航班 */}
-                <FlightSegmentCard
-                  title={COMP_EDITOR_LABELS.回程航班}
-                  flightData={data.returnFlight || {}}
-                  onFieldChange={(field, value) => updateFlightField('returnFlight', field, value)}
-                  onSearch={handleSearchReturn}
-                  onRouteSearch={() => setShowRouteSearchReturn(true)}
-                  isLoading={loadingReturn}
-                  segments={returnSegments}
-                  onSelectSegment={handleSelectReturnSegment}
-                  onClearSegments={clearReturnSegments}
-                />
-              </div>
+              {/* 回程航班 */}
+              <FlightSegmentCard
+                title={COMP_EDITOR_LABELS.回程航班}
+                flightData={data.returnFlight || {}}
+                onFieldChange={(field, value) => updateFlightField('returnFlight', field, value)}
+                onSearch={handleSearchReturn}
+                onRouteSearch={() => setShowRouteSearchReturn(true)}
+                isLoading={loadingReturn}
+                segments={returnSegments}
+                onSelectSegment={handleSelectReturnSegment}
+                onClearSegments={clearReturnSegments}
+              />
+            </div>
           </div>
 
           {/* 右側：即時預覽 */}
-          <PreviewPanel
-            styleLabel={currentStyle?.label}
-            styleColor={currentStyle?.color}
-          >
-            {(viewMode) => (
+          <PreviewPanel styleLabel={currentStyle?.label} styleColor={currentStyle?.color}>
+            {viewMode => (
               <div className="w-full h-full overflow-auto p-6">
                 <TourFlightSection
                   data={{
@@ -304,17 +313,19 @@ export function FlightInfoSection({
         defaultOrigin={data.outboundFlight?.departureAirport || 'TPE'}
         defaultDestination={data.outboundFlight?.arrivalAirport || ''}
         defaultDate={getDefaultDate('outbound')}
-        onSelectFlight={(flight) => handleFlightRouteSelect('outboundFlight', flight)}
+        onSelectFlight={flight => handleFlightRouteSelect('outboundFlight', flight)}
       />
 
       {/* 回程航線查詢 Dialog */}
       <FlightRouteSearchDialog
         open={showRouteSearchReturn}
         onOpenChange={setShowRouteSearchReturn}
-        defaultOrigin={data.returnFlight?.departureAirport || data.outboundFlight?.arrivalAirport || ''}
+        defaultOrigin={
+          data.returnFlight?.departureAirport || data.outboundFlight?.arrivalAirport || ''
+        }
         defaultDestination={data.returnFlight?.arrivalAirport || 'TPE'}
         defaultDate={getDefaultDate('return')}
-        onSelectFlight={(flight) => handleFlightRouteSelect('returnFlight', flight)}
+        onSelectFlight={flight => handleFlightRouteSelect('returnFlight', flight)}
       />
     </div>
   )

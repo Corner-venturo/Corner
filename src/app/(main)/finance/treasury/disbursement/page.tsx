@@ -4,7 +4,6 @@
  * 使用 feature-based 架構重構
  */
 
-
 export const dynamic = 'force-dynamic'
 
 export { DisbursementPage as default } from '@/features/disbursement'

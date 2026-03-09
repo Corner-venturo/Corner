@@ -33,11 +33,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const messagesQuery = before
       ? supabase
           .from('traveler_messages')
-          .select(`
+          .select(
+            `
             id, sender_id, type, content, attachments,
             reply_to_id, reactions, metadata,
             created_at, edited_at, deleted_at
-          `)
+          `
+          )
           .eq('conversation_id', conversationId)
           .is('deleted_at', null)
           .lt('created_at', before)
@@ -45,11 +47,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           .limit(limit)
       : supabase
           .from('traveler_messages')
-          .select(`
+          .select(
+            `
             id, sender_id, type, content, attachments,
             reply_to_id, reactions, metadata,
             created_at, edited_at, deleted_at
-          `)
+          `
+          )
           .eq('conversation_id', conversationId)
           .is('deleted_at', null)
           .order('created_at', { ascending: false })
@@ -58,19 +62,23 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const [convResult, msgResult, memberResult] = await Promise.all([
       supabase
         .from('traveler_conversations')
-        .select(`
+        .select(
+          `
           id, type, name, tour_id, is_open, open_at,
           tours (id, tour_code, name, departure_date)
-        `)
+        `
+        )
         .eq('id', conversationId)
         .single(),
       messagesQuery,
       supabase
         .from('traveler_conversation_members')
-        .select(`
+        .select(
+          `
           id, user_id, employee_id, member_type,
           role, last_read_at, is_muted, joined_at
-        `)
+        `
+        )
         .eq('conversation_id', conversationId)
         .is('left_at', null),
     ])
@@ -109,7 +117,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         ? supabase.from('profiles').select('id, name, avatar_url').in('id', travelerIds)
         : Promise.resolve({ data: [] }),
       employeeIds.length > 0
-        ? supabase.from('employees').select('id, display_name, chinese_name, avatar_url').in('id', employeeIds)
+        ? supabase
+            .from('employees')
+            .select('id, display_name, chinese_name, avatar_url')
+            .in('id', employeeIds)
         : Promise.resolve({ data: [] }),
     ])
 

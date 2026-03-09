@@ -4,7 +4,6 @@
  * VENTURO 機器人 = 系統通知 + Logan AI 對話
  */
 
-
 import { useMemo, useState, useEffect } from 'react'
 import { Bot, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -17,10 +16,7 @@ interface BotSectionProps {
   selectedBotId?: string | null
 }
 
-export function BotSection({
-  onSelectBot,
-  selectedBotId,
-}: BotSectionProps) {
+export function BotSection({ onSelectBot, selectedBotId }: BotSectionProps) {
   const { items: employees } = useEmployeesSlim()
   const [aiAvailable, setAiAvailable] = useState(false)
 
@@ -28,7 +24,7 @@ export function BotSection({
   useEffect(() => {
     const cacheKey = 'logan-ai-available'
     const cached = sessionStorage.getItem(cacheKey)
-    
+
     if (cached) {
       const { available, timestamp } = JSON.parse(cached)
       // 5 分鐘內用快取
@@ -37,24 +33,25 @@ export function BotSection({
         return
       }
     }
-    
+
     fetch('/api/logan/chat')
       .then(res => res.json())
       .then(data => {
         setAiAvailable(data.available)
-        sessionStorage.setItem(cacheKey, JSON.stringify({
-          available: data.available,
-          timestamp: Date.now()
-        }))
+        sessionStorage.setItem(
+          cacheKey,
+          JSON.stringify({
+            available: data.available,
+            timestamp: Date.now(),
+          })
+        )
       })
       .catch(() => setAiAvailable(false))
   }, [])
 
   // 找到 VENTURO 機器人
   const bot = useMemo(() => {
-    return employees.find(
-      emp => emp.id === SYSTEM_BOT_ID || emp.employee_number === 'BOT001'
-    )
+    return employees.find(emp => emp.id === SYSTEM_BOT_ID || emp.employee_number === 'BOT001')
   }, [employees])
 
   if (!bot) {
@@ -72,12 +69,12 @@ export function BotSection({
             : 'text-morandi-secondary hover:bg-morandi-container/30'
         )}
       >
-        <div className={cn(
-          'w-6 h-6 rounded-full flex items-center justify-center',
-          aiAvailable
-            ? 'bg-emerald-500/20'
-            : 'bg-morandi-gold/20'
-        )}>
+        <div
+          className={cn(
+            'w-6 h-6 rounded-full flex items-center justify-center',
+            aiAvailable ? 'bg-emerald-500/20' : 'bg-morandi-gold/20'
+          )}
+        >
           {aiAvailable ? (
             <Sparkles size={14} className="text-emerald-500" />
           ) : (

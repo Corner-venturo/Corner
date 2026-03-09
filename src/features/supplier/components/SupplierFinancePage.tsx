@@ -5,7 +5,6 @@
  * 顯示營收統計、請款記錄
  */
 
-
 import React, { useState, useEffect, useMemo } from 'react'
 import { logger } from '@/lib/utils/logger'
 import { formatCurrency } from '@/lib/utils/format-currency'
@@ -91,7 +90,8 @@ export function SupplierFinancePage() {
         // 載入已確認的需求回覆（有金額的）
         const { data: responsesData } = await supabase
           .from('supplier_request_responses')
-          .select(`
+          .select(
+            `
             id,
             response_type,
             quoted_price,
@@ -106,7 +106,8 @@ export function SupplierFinancePage() {
                 name
               )
             )
-          `)
+          `
+          )
           .eq('supplier_id', user.workspace_id)
           .eq('response_type', 'accepted')
           .gte('created_at', dateRange.start.toISOString())
@@ -159,12 +160,7 @@ export function SupplierFinancePage() {
   }, [user?.workspace_id, dateRange])
 
   return (
-    <ContentPageLayout
-      title={SUPPLIER_LABELS.LABEL_8192}
-      icon={LineChart}
-      className="space-y-6"
-    >
-
+    <ContentPageLayout title={SUPPLIER_LABELS.LABEL_8192} icon={LineChart} className="space-y-6">
       {/* 期間選擇 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -200,9 +196,7 @@ export function SupplierFinancePage() {
             <DollarSign className="h-4 w-4 text-morandi-gold" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {formatCurrency(summary.totalRevenue)}
-            </div>
+            <div className="text-2xl font-bold">{formatCurrency(summary.totalRevenue)}</div>
             <p className="text-xs text-morandi-secondary mt-1">
               {SUPPLIER_LABELS.TASK_COUNT(summary.taskCount)}
             </p>
@@ -248,7 +242,8 @@ export function SupplierFinancePage() {
             <div className="text-2xl font-bold">
               {summary.totalRevenue > 0
                 ? Math.round((summary.completedPayment / summary.totalRevenue) * 100)
-                : 0}%
+                : 0}
+              %
             </div>
           </CardContent>
         </Card>
@@ -301,18 +296,16 @@ export function SupplierFinancePage() {
                           ? format(new Date(payment.service_date), 'MM/dd (EEE)', { locale: zhTW })
                           : '-'}
                       </td>
-                      <td className="py-3 px-2 font-mono text-sm">
-                        {payment.tour_code}
-                      </td>
+                      <td className="py-3 px-2 font-mono text-sm">{payment.tour_code}</td>
                       <td className="py-3 px-2">{payment.tour_name}</td>
                       <td className="py-3 px-2 text-right font-medium">
                         {formatCurrency(payment.amount)}
                       </td>
                       <td className="py-3 px-2 text-center">
-                        <Badge
-                          variant={payment.status === 'paid' ? 'default' : 'outline'}
-                        >
-                          {payment.status === 'paid' ? SUPPLIER_LABELS.STATUS_PAID : SUPPLIER_LABELS.STATUS_PENDING_CLAIM}
+                        <Badge variant={payment.status === 'paid' ? 'default' : 'outline'}>
+                          {payment.status === 'paid'
+                            ? SUPPLIER_LABELS.STATUS_PAID
+                            : SUPPLIER_LABELS.STATUS_PENDING_CLAIM}
                         </Badge>
                       </td>
                     </tr>

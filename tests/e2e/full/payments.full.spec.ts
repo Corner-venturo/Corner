@@ -115,7 +115,11 @@ test.describe('收款管理 - 完整功能測試', () => {
 
       // 如果是對話框，關閉它
       if (hasDialog) {
-        const closeButton = page.locator('[role="dialog"]').locator('button').filter({ hasText: /取消|關閉|×/ }).first()
+        const closeButton = page
+          .locator('[role="dialog"]')
+          .locator('button')
+          .filter({ hasText: /取消|關閉|×/ })
+          .first()
         if (await closeButton.isVisible()) {
           await closeButton.click()
         }
@@ -162,7 +166,11 @@ test.describe('收款管理 - 完整功能測試', () => {
       await page.waitForTimeout(1000)
 
       // 檢查表頭
-      const hasReceiptNumber = await page.locator('th').filter({ hasText: '收款單號' }).first().isVisible()
+      const hasReceiptNumber = await page
+        .locator('th')
+        .filter({ hasText: '收款單號' })
+        .first()
+        .isVisible()
       const hasDate = await page.locator('th').filter({ hasText: '收款日期' }).first().isVisible()
 
       expect(hasReceiptNumber || hasDate).toBe(true)

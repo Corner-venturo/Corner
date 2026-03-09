@@ -3,7 +3,6 @@
  * Canvas Editor - main rich text editor component
  */
 
-
 import { useCanvasEditor } from './useCanvasEditor'
 import { CanvasToolbar } from './CanvasToolbar'
 import { EditorContent } from './EditorContent'

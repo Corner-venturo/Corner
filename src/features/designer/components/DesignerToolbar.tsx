@@ -41,19 +41,18 @@ import {
   FlipVertical,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 // 簡易分隔線組件
-function Separator({ orientation = 'horizontal', className = '' }: { orientation?: 'horizontal' | 'vertical'; className?: string }) {
+function Separator({
+  orientation = 'horizontal',
+  className = '',
+}: {
+  orientation?: 'horizontal' | 'vertical'
+  className?: string
+}) {
   return (
-    <div
-      className={`bg-border ${orientation === 'vertical' ? 'w-px' : 'h-px'} ${className}`}
-    />
+    <div className={`bg-border ${orientation === 'vertical' ? 'w-px' : 'h-px'} ${className}`} />
   )
 }
 import {
@@ -234,7 +233,13 @@ export function DesignerToolbar({
         <div className="flex items-center gap-0.5">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" onClick={onCopy} disabled={!hasSelection} className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onCopy}
+                disabled={!hasSelection}
+                className="h-8 w-8 p-0"
+              >
                 <Copy size={16} />
               </Button>
             </TooltipTrigger>
@@ -243,7 +248,13 @@ export function DesignerToolbar({
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" onClick={onCut} disabled={!hasSelection} className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onCut}
+                disabled={!hasSelection}
+                className="h-8 w-8 p-0"
+              >
                 <Scissors size={16} />
               </Button>
             </TooltipTrigger>
@@ -252,7 +263,13 @@ export function DesignerToolbar({
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" onClick={onPaste} disabled={clipboard.length === 0} className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onPaste}
+                disabled={clipboard.length === 0}
+                className="h-8 w-8 p-0"
+              >
                 <Clipboard size={16} />
               </Button>
             </TooltipTrigger>
@@ -261,7 +278,13 @@ export function DesignerToolbar({
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" onClick={onDelete} disabled={!hasSelection} className="h-8 w-8 p-0 text-morandi-red hover:text-morandi-red">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onDelete}
+                disabled={!hasSelection}
+                className="h-8 w-8 p-0 text-morandi-red hover:text-morandi-red"
+              >
                 <Trash2 size={16} />
               </Button>
             </TooltipTrigger>
@@ -275,7 +298,13 @@ export function DesignerToolbar({
         <div className="flex items-center gap-0.5">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" onClick={onGroup} disabled={!hasMultiSelection} className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onGroup}
+                disabled={!hasMultiSelection}
+                className="h-8 w-8 p-0"
+              >
                 <Group size={16} />
               </Button>
             </TooltipTrigger>
@@ -284,7 +313,13 @@ export function DesignerToolbar({
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" onClick={onUngroup} disabled={!isGroup} className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onUngroup}
+                disabled={!isGroup}
+                className="h-8 w-8 p-0"
+              >
                 <Ungroup size={16} />
               </Button>
             </TooltipTrigger>
@@ -298,7 +333,13 @@ export function DesignerToolbar({
         <div className="flex items-center gap-0.5">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" onClick={onFlipHorizontal} disabled={!hasSelection} className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onFlipHorizontal}
+                disabled={!hasSelection}
+                className="h-8 w-8 p-0"
+              >
                 <FlipHorizontal size={16} />
               </Button>
             </TooltipTrigger>
@@ -307,7 +348,13 @@ export function DesignerToolbar({
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" onClick={onFlipVertical} disabled={!hasSelection} className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onFlipVertical}
+                disabled={!hasSelection}
+                className="h-8 w-8 p-0"
+              >
                 <FlipVertical size={16} />
               </Button>
             </TooltipTrigger>
@@ -323,7 +370,12 @@ export function DesignerToolbar({
             <Tooltip>
               <TooltipTrigger asChild>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" disabled={!hasSelection} className="h-8 px-2 gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={!hasSelection}
+                    className="h-8 px-2 gap-1"
+                  >
                     <Layers size={16} />
                     <span className="text-xs hidden sm:inline">{TOOLBAR_LABELS.LAYERS}</span>
                   </Button>
@@ -372,7 +424,13 @@ export function DesignerToolbar({
         <div className="flex items-center gap-0.5">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" onClick={onAlignLeft} disabled={!hasSelection} className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onAlignLeft}
+                disabled={!hasSelection}
+                className="h-8 w-8 p-0"
+              >
                 <AlignLeft size={16} />
               </Button>
             </TooltipTrigger>
@@ -381,7 +439,13 @@ export function DesignerToolbar({
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" onClick={onAlignCenterH} disabled={!hasSelection} className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onAlignCenterH}
+                disabled={!hasSelection}
+                className="h-8 w-8 p-0"
+              >
                 <AlignCenter size={16} />
               </Button>
             </TooltipTrigger>
@@ -390,7 +454,13 @@ export function DesignerToolbar({
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" onClick={onAlignRight} disabled={!hasSelection} className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onAlignRight}
+                disabled={!hasSelection}
+                className="h-8 w-8 p-0"
+              >
                 <AlignRight size={16} />
               </Button>
             </TooltipTrigger>
@@ -399,7 +469,13 @@ export function DesignerToolbar({
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" onClick={onAlignTop} disabled={!hasSelection} className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onAlignTop}
+                disabled={!hasSelection}
+                className="h-8 w-8 p-0"
+              >
                 <AlignStartVertical size={16} />
               </Button>
             </TooltipTrigger>
@@ -408,7 +484,13 @@ export function DesignerToolbar({
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" onClick={onAlignCenterV} disabled={!hasSelection} className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onAlignCenterV}
+                disabled={!hasSelection}
+                className="h-8 w-8 p-0"
+              >
                 <AlignCenterVertical size={16} />
               </Button>
             </TooltipTrigger>
@@ -417,7 +499,13 @@ export function DesignerToolbar({
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" onClick={onAlignBottom} disabled={!hasSelection} className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onAlignBottom}
+                disabled={!hasSelection}
+                className="h-8 w-8 p-0"
+              >
                 <AlignEndVertical size={16} />
               </Button>
             </TooltipTrigger>
@@ -431,7 +519,13 @@ export function DesignerToolbar({
         <div className="flex items-center gap-0.5">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" onClick={onDistributeH} disabled={selectedCount < 3} className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onDistributeH}
+                disabled={selectedCount < 3}
+                className="h-8 w-8 p-0"
+              >
                 <AlignHorizontalSpaceAround size={16} />
               </Button>
             </TooltipTrigger>
@@ -440,7 +534,13 @@ export function DesignerToolbar({
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" onClick={onDistributeV} disabled={selectedCount < 3} className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onDistributeV}
+                disabled={selectedCount < 3}
+                className="h-8 w-8 p-0"
+              >
                 <AlignVerticalSpaceAround size={16} />
               </Button>
             </TooltipTrigger>

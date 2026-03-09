@@ -4,7 +4,13 @@ import React from 'react'
 import { TransportationRate } from '@/types/transportation-rates.types'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { DndContext, closestCenter, DragEndEvent, SensorDescriptor, SensorOptions } from '@dnd-kit/core'
+import {
+  DndContext,
+  closestCenter,
+  DragEndEvent,
+  SensorDescriptor,
+  SensorOptions,
+} from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { ItemRow } from './item-row'
 
@@ -25,8 +31,17 @@ interface CategoryGroupRowProps {
   inputRef: React.RefObject<HTMLInputElement>
   startEdit: (rowId: string, field: keyof TransportationRate, currentValue: unknown) => void
   saveEdit: () => Promise<void>
-  handleKeyDown: (e: React.KeyboardEvent, rowId: string, field: keyof TransportationRate) => Promise<void>
-  renderEditableCell: (rate: TransportationRate, field: keyof TransportationRate, value: unknown, type?: 'text' | 'number') => React.ReactNode
+  handleKeyDown: (
+    e: React.KeyboardEvent,
+    rowId: string,
+    field: keyof TransportationRate
+  ) => Promise<void>
+  renderEditableCell: (
+    rate: TransportationRate,
+    field: keyof TransportationRate,
+    value: unknown,
+    type?: 'text' | 'number'
+  ) => React.ReactNode
   onUpdate: (id: string, updates: Partial<TransportationRate>) => Promise<void>
   onDelete: (id: string) => Promise<void>
   onInsert?: (rate: TransportationRate) => void
@@ -98,7 +113,9 @@ export function CategoryGroupRow({
       isBackup={rate.is_backup || false}
       categoryDragRef={index === 0 ? setNodeRef : undefined}
       categoryDragStyle={index === 0 ? style : undefined}
-      categoryDragAttributes={index === 0 ? attributes as unknown as Record<string, unknown> : undefined}
+      categoryDragAttributes={
+        index === 0 ? (attributes as unknown as Record<string, unknown>) : undefined
+      }
       categoryDragListeners={index === 0 ? listeners : undefined}
     />
   ))
@@ -108,9 +125,12 @@ export function CategoryGroupRow({
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
-      onDragEnd={(event) => handleItemDragEnd(categoryKey, event)}
+      onDragEnd={event => handleItemDragEnd(categoryKey, event)}
     >
-      <SortableContext items={group.rates.map((r: TransportationRate) => r.id)} strategy={verticalListSortingStrategy}>
+      <SortableContext
+        items={group.rates.map((r: TransportationRate) => r.id)}
+        strategy={verticalListSortingStrategy}
+      >
         {rows}
       </SortableContext>
     </DndContext>

@@ -124,29 +124,38 @@ export function useFlightSearch({
     } finally {
       setLoadingOutbound(false)
     }
-  }, [data.outboundFlight?.flightNumber, data.outboundFlight?.departureDate, data.departureDate, updateFlightField, updateFlightFields])
+  }, [
+    data.outboundFlight?.flightNumber,
+    data.outboundFlight?.departureDate,
+    data.departureDate,
+    updateFlightField,
+    updateFlightFields,
+  ])
 
   // 選擇去程航段
-  const handleSelectOutboundSegment = useCallback((segment: FlightSegment) => {
-    const fields: Record<string, string> = {
-      airline: segment.airline,
-      departureAirport: segment.departureAirport,
-      arrivalAirport: segment.arrivalAirport,
-      departureTime: segment.departureTime,
-      arrivalTime: segment.arrivalTime,
-    }
-    if (segment.duration) {
-      fields.duration = segment.duration
-    }
-    if (updateFlightFields) {
-      updateFlightFields('outboundFlight', fields)
-    } else {
-      Object.entries(fields).forEach(([key, value]) => {
-        updateFlightField('outboundFlight', key, value)
-      })
-    }
-    setOutboundSegments([])
-  }, [updateFlightField, updateFlightFields])
+  const handleSelectOutboundSegment = useCallback(
+    (segment: FlightSegment) => {
+      const fields: Record<string, string> = {
+        airline: segment.airline,
+        departureAirport: segment.departureAirport,
+        arrivalAirport: segment.arrivalAirport,
+        departureTime: segment.departureTime,
+        arrivalTime: segment.arrivalTime,
+      }
+      if (segment.duration) {
+        fields.duration = segment.duration
+      }
+      if (updateFlightFields) {
+        updateFlightFields('outboundFlight', fields)
+      } else {
+        Object.entries(fields).forEach(([key, value]) => {
+          updateFlightField('outboundFlight', key, value)
+        })
+      }
+      setOutboundSegments([])
+    },
+    [updateFlightField, updateFlightFields]
+  )
 
   // 查詢回程航班
   const handleSearchReturn = useCallback(async () => {
@@ -218,29 +227,38 @@ export function useFlightSearch({
     } finally {
       setLoadingReturn(false)
     }
-  }, [data.returnFlight?.flightNumber, data.returnFlight?.departureDate, data.departureDate, updateFlightField, updateFlightFields])
+  }, [
+    data.returnFlight?.flightNumber,
+    data.returnFlight?.departureDate,
+    data.departureDate,
+    updateFlightField,
+    updateFlightFields,
+  ])
 
   // 選擇回程航段
-  const handleSelectReturnSegment = useCallback((segment: FlightSegment) => {
-    const fields: Record<string, string> = {
-      airline: segment.airline,
-      departureAirport: segment.departureAirport,
-      arrivalAirport: segment.arrivalAirport,
-      departureTime: segment.departureTime,
-      arrivalTime: segment.arrivalTime,
-    }
-    if (segment.duration) {
-      fields.duration = segment.duration
-    }
-    if (updateFlightFields) {
-      updateFlightFields('returnFlight', fields)
-    } else {
-      Object.entries(fields).forEach(([key, value]) => {
-        updateFlightField('returnFlight', key, value)
-      })
-    }
-    setReturnSegments([])
-  }, [updateFlightField, updateFlightFields])
+  const handleSelectReturnSegment = useCallback(
+    (segment: FlightSegment) => {
+      const fields: Record<string, string> = {
+        airline: segment.airline,
+        departureAirport: segment.departureAirport,
+        arrivalAirport: segment.arrivalAirport,
+        departureTime: segment.departureTime,
+        arrivalTime: segment.arrivalTime,
+      }
+      if (segment.duration) {
+        fields.duration = segment.duration
+      }
+      if (updateFlightFields) {
+        updateFlightFields('returnFlight', fields)
+      } else {
+        Object.entries(fields).forEach(([key, value]) => {
+          updateFlightField('returnFlight', key, value)
+        })
+      }
+      setReturnSegments([])
+    },
+    [updateFlightField, updateFlightFields]
+  )
 
   // 清除航段選擇
   const clearOutboundSegments = useCallback(() => setOutboundSegments([]), [])

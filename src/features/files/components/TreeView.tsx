@@ -2,7 +2,7 @@
 
 /**
  * TreeView - 樹狀資料夾展開元件
- * 
+ *
  * 特點：
  * - 點擊展開/收合（不是點進去）
  * - 可以同時看到多個資料夾內容
@@ -55,7 +55,8 @@ function TreeNode({
   const isExpanded = expanded.has(item.id)
   const isSelected = selected === item.id
   const isLoading = loadingIds.has(item.id)
-  const hasChildren = item.type === 'folder' && (item.children?.length || item.childCount || item.onLoadChildren)
+  const hasChildren =
+    item.type === 'folder' && (item.children?.length || item.childCount || item.onLoadChildren)
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -113,16 +114,19 @@ function TreeNode({
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
         draggable={!!onDragStart}
-        onDragStart={(e) => onDragStart?.(e, item)}
+        onDragStart={e => onDragStart?.(e, item)}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
         {/* 拖曳把手 */}
         {onDragStart && (
-          <GripVertical size={14} className="text-morandi-muted opacity-0 group-hover:opacity-100 cursor-grab" />
+          <GripVertical
+            size={14}
+            className="text-morandi-muted opacity-0 group-hover:opacity-100 cursor-grab"
+          />
         )}
-        
+
         {/* 展開/收合箭頭 */}
         <div className="w-4 h-4 flex items-center justify-center">
           {hasChildren ? (
@@ -137,9 +141,7 @@ function TreeNode({
         </div>
 
         {/* 圖示 */}
-        <div className="w-5 h-5 flex items-center justify-center">
-          {renderIcon()}
-        </div>
+        <div className="w-5 h-5 flex items-center justify-center">{renderIcon()}</div>
 
         {/* 名稱 */}
         <span className={cn('flex-1 truncate text-sm', isSelected && 'font-medium')}>
@@ -148,16 +150,14 @@ function TreeNode({
 
         {/* 子項目數量 */}
         {item.type === 'folder' && item.childCount !== undefined && (
-          <span className="text-xs text-morandi-muted">
-            {item.childCount}
-          </span>
+          <span className="text-xs text-morandi-muted">{item.childCount}</span>
         )}
       </div>
 
       {/* 子項目 */}
       {isExpanded && item.children && (
         <div>
-          {item.children.map((child) => (
+          {item.children.map(child => (
             <TreeNode
               key={child.id}
               item={child}
@@ -210,62 +210,71 @@ export function TreeView({
   // 更新 items 的 children（用於懶加載）
   const [itemsWithChildren, setItemsWithChildren] = useState<Map<string, TreeItem[]>>(new Map())
 
-  const handleToggle = useCallback(async (id: string) => {
-    const newExpanded = new Set(expanded)
-    
-    if (newExpanded.has(id)) {
-      newExpanded.delete(id)
-    } else {
-      newExpanded.add(id)
-      
-      // 懶加載子項目
-      const item = findItem(items, id)
-      if (item && item.onLoadChildren && !item.children?.length) {
-        setLoadingIds(prev => new Set(prev).add(id))
-        try {
-          const children = await item.onLoadChildren()
-          setItemsWithChildren(prev => new Map(prev).set(id, children))
-        } finally {
-          setLoadingIds(prev => {
-            const next = new Set(prev)
-            next.delete(id)
-            return next
-          })
-        }
-      } else if (item && onLoadChildren && !item.children?.length) {
-        setLoadingIds(prev => new Set(prev).add(id))
-        try {
-          const children = await onLoadChildren(item)
-          setItemsWithChildren(prev => new Map(prev).set(id, children))
-        } finally {
-          setLoadingIds(prev => {
-            const next = new Set(prev)
-            next.delete(id)
-            return next
-          })
+  const handleToggle = useCallback(
+    async (id: string) => {
+      const newExpanded = new Set(expanded)
+
+      if (newExpanded.has(id)) {
+        newExpanded.delete(id)
+      } else {
+        newExpanded.add(id)
+
+        // 懶加載子項目
+        const item = findItem(items, id)
+        if (item && item.onLoadChildren && !item.children?.length) {
+          setLoadingIds(prev => new Set(prev).add(id))
+          try {
+            const children = await item.onLoadChildren()
+            setItemsWithChildren(prev => new Map(prev).set(id, children))
+          } finally {
+            setLoadingIds(prev => {
+              const next = new Set(prev)
+              next.delete(id)
+              return next
+            })
+          }
+        } else if (item && onLoadChildren && !item.children?.length) {
+          setLoadingIds(prev => new Set(prev).add(id))
+          try {
+            const children = await onLoadChildren(item)
+            setItemsWithChildren(prev => new Map(prev).set(id, children))
+          } finally {
+            setLoadingIds(prev => {
+              const next = new Set(prev)
+              next.delete(id)
+              return next
+            })
+          }
         }
       }
-    }
-    
-    setExpanded(newExpanded)
-  }, [expanded, items, onLoadChildren])
 
-  const handleSelect = useCallback((item: TreeItem) => {
-    setSelected(item.id)
-    onSelect?.(item)
-  }, [onSelect])
+      setExpanded(newExpanded)
+    },
+    [expanded, items, onLoadChildren]
+  )
+
+  const handleSelect = useCallback(
+    (item: TreeItem) => {
+      setSelected(item.id)
+      onSelect?.(item)
+    },
+    [onSelect]
+  )
 
   const handleDragStart = useCallback((e: React.DragEvent, item: TreeItem) => {
     setDragSource(item)
     e.dataTransfer.effectAllowed = 'move'
   }, [])
 
-  const handleDrop = useCallback((e: React.DragEvent, target: TreeItem) => {
-    if (dragSource && target.type === 'folder' && dragSource.id !== target.id) {
-      onMove?.(dragSource.id, target.id)
-    }
-    setDragSource(null)
-  }, [dragSource, onMove])
+  const handleDrop = useCallback(
+    (e: React.DragEvent, target: TreeItem) => {
+      if (dragSource && target.type === 'folder' && dragSource.id !== target.id) {
+        onMove?.(dragSource.id, target.id)
+      }
+      setDragSource(null)
+    },
+    [dragSource, onMove]
+  )
 
   // 合併 items 和懶加載的 children
   const mergedItems = items.map(item => ({
@@ -275,7 +284,7 @@ export function TreeView({
 
   return (
     <div className={cn('py-2', className)}>
-      {mergedItems.map((item) => (
+      {mergedItems.map(item => (
         <TreeNode
           key={item.id}
           item={item}

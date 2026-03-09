@@ -1,6 +1,16 @@
 'use client'
 
-import { Hash, Lock, Star, Trash2, UserPlus, Edit2, LogOut, Archive, ArchiveRestore } from 'lucide-react'
+import {
+  Hash,
+  Lock,
+  Star,
+  Trash2,
+  UserPlus,
+  Edit2,
+  LogOut,
+  Archive,
+  ArchiveRestore,
+} from 'lucide-react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
@@ -110,33 +120,31 @@ export function SortableChannelItem({
               </button>
             )}
             {/* 封存/解除封存按鈕 */}
-            {channel.is_archived ? (
-              onUnarchive && (
-                <button
-                  onClick={e => {
-                    e.stopPropagation()
-                    onUnarchive(channel.id)
-                  }}
-                  className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-morandi-green/20 text-morandi-green transition-opacity"
-                  title={COMP_WORKSPACE_LABELS.解除封存}
-                >
-                  <ArchiveRestore size={12} />
-                </button>
-              )
-            ) : (
-              onArchive && (
-                <button
-                  onClick={e => {
-                    e.stopPropagation()
-                    onArchive(channel.id)
-                  }}
-                  className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-status-warning-bg text-status-warning transition-opacity"
-                  title={COMP_WORKSPACE_LABELS.封存頻道}
-                >
-                  <Archive size={12} />
-                </button>
-              )
-            )}
+            {channel.is_archived
+              ? onUnarchive && (
+                  <button
+                    onClick={e => {
+                      e.stopPropagation()
+                      onUnarchive(channel.id)
+                    }}
+                    className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-morandi-green/20 text-morandi-green transition-opacity"
+                    title={COMP_WORKSPACE_LABELS.解除封存}
+                  >
+                    <ArchiveRestore size={12} />
+                  </button>
+                )
+              : onArchive && (
+                  <button
+                    onClick={e => {
+                      e.stopPropagation()
+                      onArchive(channel.id)
+                    }}
+                    className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-status-warning-bg text-status-warning transition-opacity"
+                    title={COMP_WORKSPACE_LABELS.封存頻道}
+                  >
+                    <Archive size={12} />
+                  </button>
+                )}
             {/* 釘選按鈕 */}
             <button
               onClick={e => {
@@ -145,9 +153,15 @@ export function SortableChannelItem({
               }}
               className={cn(
                 'p-0.5 rounded hover:bg-morandi-gold/20 transition-colors',
-                channel.is_favorite ? 'text-morandi-gold' : 'text-morandi-secondary opacity-0 group-hover:opacity-100'
+                channel.is_favorite
+                  ? 'text-morandi-gold'
+                  : 'text-morandi-secondary opacity-0 group-hover:opacity-100'
               )}
-              title={channel.is_favorite ? COMP_WORKSPACE_LABELS.取消釘選 : COMP_WORKSPACE_LABELS.釘選頻道}
+              title={
+                channel.is_favorite
+                  ? COMP_WORKSPACE_LABELS.取消釘選
+                  : COMP_WORKSPACE_LABELS.釘選頻道
+              }
             >
               <Star size={12} fill={channel.is_favorite ? 'currentColor' : 'none'} />
             </button>
@@ -159,11 +173,14 @@ export function SortableChannelItem({
 
                   // 如果是旅遊團頻道，需要輸入密碼
                   if (isTourChannel) {
-                    const password = await prompt(`即將刪除：${channel.name}\n此操作無法復原，請輸入密碼確認`, {
-                      title: COMP_WORKSPACE_LABELS.刪除旅遊團頻道,
-                      inputType: 'password',
-                      placeholder: COMP_WORKSPACE_LABELS.請輸入密碼,
-                    })
+                    const password = await prompt(
+                      `即將刪除：${channel.name}\n此操作無法復原，請輸入密碼確認`,
+                      {
+                        title: COMP_WORKSPACE_LABELS.刪除旅遊團頻道,
+                        inputType: 'password',
+                        placeholder: COMP_WORKSPACE_LABELS.請輸入密碼,
+                      }
+                    )
 
                     // 使用者取消
                     if (password === null) {
@@ -180,7 +197,11 @@ export function SortableChannelItem({
                   onDelete(channel.id)
                 }}
                 className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-status-danger-bg text-status-danger hover:text-status-danger transition-opacity"
-                title={isTourChannel ? COMP_WORKSPACE_LABELS.刪除頻道_需要密碼 : COMP_WORKSPACE_LABELS.刪除頻道}
+                title={
+                  isTourChannel
+                    ? COMP_WORKSPACE_LABELS.刪除頻道_需要密碼
+                    : COMP_WORKSPACE_LABELS.刪除頻道
+                }
               >
                 <Trash2 size={12} />
               </button>

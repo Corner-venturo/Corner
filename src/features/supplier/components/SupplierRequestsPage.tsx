@@ -5,27 +5,26 @@
  * 顯示所有發送給此供應商的需求單
  */
 
-
 import React, { useState, useCallback } from 'react'
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import {
-  ClipboardList,
-  Send,
-  Eye,
-  Clock,
-  CheckCircle2,
-  XCircle,
-} from 'lucide-react'
+import { ClipboardList, Send, Eye, Clock, CheckCircle2, XCircle } from 'lucide-react'
 import { useSupplierRequests, type SupplierRequest } from '../hooks/useSupplierRequests'
 import { SupplierResponseDialog } from './SupplierResponseDialog'
 import { cn } from '@/lib/utils'
 import { SUPPLIER_LABELS } from './constants/labels'
 
 // 回覆狀態配置
-const RESPONSE_STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ReactNode }> = {
+const RESPONSE_STATUS_CONFIG: Record<
+  string,
+  {
+    label: string
+    variant: 'default' | 'secondary' | 'destructive' | 'outline'
+    icon: React.ReactNode
+  }
+> = {
   pending: {
     label: SUPPLIER_LABELS.STATUS_PENDING_REPLY,
     variant: 'outline',
@@ -105,7 +104,7 @@ export function SupplierRequestsPage() {
       key: 'response_status',
       label: SUPPLIER_LABELS.COL_STATUS,
       width: '100px',
-      render: (value) => {
+      render: value => {
         const status = String(value || 'pending')
         const config = RESPONSE_STATUS_CONFIG[status]
         return (
@@ -120,7 +119,7 @@ export function SupplierRequestsPage() {
       key: 'category',
       label: SUPPLIER_LABELS.COL_CATEGORY,
       width: '120px',
-      render: (value) => (
+      render: value => (
         <span className="text-morandi-primary">
           {CATEGORY_CONFIG[String(value)] || String(value)}
         </span>
@@ -136,9 +135,7 @@ export function SupplierRequestsPage() {
             <div className="font-medium text-morandi-primary">
               {String(value || request.tour_code || SUPPLIER_LABELS.UNNAMED)}
             </div>
-            {request.title && (
-              <div className="text-xs text-morandi-secondary">{request.title}</div>
-            )}
+            {request.title && <div className="text-xs text-morandi-secondary">{request.title}</div>}
           </div>
         )
       },
@@ -165,7 +162,7 @@ export function SupplierRequestsPage() {
       key: 'quantity',
       label: SUPPLIER_LABELS.COL_QUANTITY_REQ,
       width: '80px',
-      render: (value) => (
+      render: value => (
         <span className="font-medium text-morandi-primary">{String(value || 1)}</span>
       ),
     },
@@ -173,7 +170,7 @@ export function SupplierRequestsPage() {
       key: 'created_at',
       label: SUPPLIER_LABELS.COL_RECEIVED_AT,
       width: '120px',
-      render: (value) => (
+      render: value => (
         <span className="text-morandi-secondary text-sm">
           {value ? new Date(String(value)).toLocaleDateString('zh-TW') : '-'}
         </span>
@@ -191,15 +188,31 @@ export function SupplierRequestsPage() {
         { label: SUPPLIER_LABELS.BREADCRUMB_REQUESTS, href: '/supplier/requests' },
       ]}
     >
-
       {/* 篩選 Tabs */}
       <div className="px-4 py-2 border-b border-border bg-card flex gap-2">
         {[
           { value: 'all', label: SUPPLIER_LABELS.TAB_ALL, count: requests.length },
-          { value: 'pending', label: SUPPLIER_LABELS.TAB_PENDING, count: requests.filter(r => r.response_status === 'pending' || !r.response_status).length },
-          { value: 'quoted', label: SUPPLIER_LABELS.TAB_QUOTED, count: requests.filter(r => r.response_status === 'quoted').length },
-          { value: 'accepted', label: SUPPLIER_LABELS.TAB_ACCEPTED, count: requests.filter(r => r.response_status === 'accepted').length },
-          { value: 'rejected', label: SUPPLIER_LABELS.TAB_REJECTED, count: requests.filter(r => r.response_status === 'rejected').length },
+          {
+            value: 'pending',
+            label: SUPPLIER_LABELS.TAB_PENDING,
+            count: requests.filter(r => r.response_status === 'pending' || !r.response_status)
+              .length,
+          },
+          {
+            value: 'quoted',
+            label: SUPPLIER_LABELS.TAB_QUOTED,
+            count: requests.filter(r => r.response_status === 'quoted').length,
+          },
+          {
+            value: 'accepted',
+            label: SUPPLIER_LABELS.TAB_ACCEPTED,
+            count: requests.filter(r => r.response_status === 'accepted').length,
+          },
+          {
+            value: 'rejected',
+            label: SUPPLIER_LABELS.TAB_REJECTED,
+            count: requests.filter(r => r.response_status === 'rejected').length,
+          },
         ].map(tab => (
           <Button
             key={tab.value}
@@ -212,12 +225,12 @@ export function SupplierRequestsPage() {
           >
             {tab.label}
             {tab.count > 0 && (
-              <span className={cn(
-                'ml-1.5 px-1.5 py-0.5 rounded-full text-xs',
-                filterStatus === tab.value
-                  ? 'bg-white/20'
-                  : 'bg-morandi-container'
-              )}>
+              <span
+                className={cn(
+                  'ml-1.5 px-1.5 py-0.5 rounded-full text-xs',
+                  filterStatus === tab.value ? 'bg-white/20' : 'bg-morandi-container'
+                )}
+              >
                 {tab.count}
               </span>
             )}
@@ -231,7 +244,7 @@ export function SupplierRequestsPage() {
           columns={columns}
           data={filteredRequests}
           loading={isLoading}
-          actions={(row) => {
+          actions={row => {
             const request = row as SupplierRequest
             const isPending = request.response_status === 'pending'
             return (
@@ -239,7 +252,7 @@ export function SupplierRequestsPage() {
                 <Button
                   variant="ghost"
                   size="iconSm"
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation()
                     handleRespond(request)
                   }}

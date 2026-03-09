@@ -12,7 +12,8 @@ const attractions = [
   {
     name: '大熊貓繁育研究基地',
     name_en: 'Chengdu Research Base of Giant Panda Breeding',
-    description: '全球最大的大熊貓繁育研究中心，可近距離觀賞大熊貓和小熊貓。園區環境優美，有熊貓產房、熊貓廚房等設施。建議早上9點前入園，熊貓最為活躍。',
+    description:
+      '全球最大的大熊貓繁育研究中心，可近距離觀賞大熊貓和小熊貓。園區環境優美，有熊貓產房、熊貓廚房等設施。建議早上9點前入園，熊貓最為活躍。',
     country_id: 'china',
     city_id: 'chengdu',
     category: '自然生態',
@@ -24,12 +25,13 @@ const attractions = [
     is_active: true,
     display_order: 1,
     notes: '建議早上入園，熊貓下午易休息',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '青城山',
     name_en: 'Mount Qingcheng',
-    description: '中國道教名山，世界文化遺產。分為前山和後山，前山道教文化濃厚，後山自然風光優美。「青城天下幽」形容其清幽環境。',
+    description:
+      '中國道教名山，世界文化遺產。分為前山和後山，前山道教文化濃厚，後山自然風光優美。「青城天下幽」形容其清幽環境。',
     country_id: 'china',
     city_id: 'chengdu',
     category: '自然景觀',
@@ -41,12 +43,13 @@ const attractions = [
     is_active: true,
     display_order: 2,
     notes: '前山適合半日遊，後山需一整天',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '都江堰',
     name_en: 'Dujiangyan Irrigation System',
-    description: '世界文化遺產，建於西元前256年的古代水利工程，至今仍在使用。由魚嘴、飛沙堰、寶瓶口組成，是古代水利智慧的傑作。',
+    description:
+      '世界文化遺產，建於西元前256年的古代水利工程，至今仍在使用。由魚嘴、飛沙堰、寶瓶口組成，是古代水利智慧的傑作。',
     country_id: 'china',
     city_id: 'chengdu',
     category: '歷史古蹟',
@@ -58,12 +61,13 @@ const attractions = [
     is_active: true,
     display_order: 3,
     notes: '可與青城山安排同一天行程',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '寬窄巷子',
     name_en: 'Kuanzhai Alley',
-    description: '成都最具代表性的歷史文化街區，由寬巷子、窄巷子、井巷子組成。清代建築風格，集合茶館、小吃、手工藝品等，是體驗成都慢生活的最佳去處。',
+    description:
+      '成都最具代表性的歷史文化街區，由寬巷子、窄巷子、井巷子組成。清代建築風格，集合茶館、小吃、手工藝品等，是體驗成都慢生活的最佳去處。',
     country_id: 'china',
     city_id: 'chengdu',
     category: '歷史街區',
@@ -75,12 +79,13 @@ const attractions = [
     is_active: true,
     display_order: 4,
     notes: '傍晚至夜間氛圍最佳',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '武侯祠',
     name_en: 'Wuhou Shrine',
-    description: '紀念諸葛亮的祠堂，也是劉備的陵墓所在地。中國唯一的君臣合祀祠廟，三國文化聖地。紅牆夾道的竹林是網紅打卡點。',
+    description:
+      '紀念諸葛亮的祠堂，也是劉備的陵墓所在地。中國唯一的君臣合祀祠廟，三國文化聖地。紅牆夾道的竹林是網紅打卡點。',
     country_id: 'china',
     city_id: 'chengdu',
     category: '歷史古蹟',
@@ -92,12 +97,13 @@ const attractions = [
     is_active: true,
     display_order: 5,
     notes: '可與錦里連遊',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '錦里古街',
     name_en: 'Jinli Ancient Street',
-    description: '武侯祠旁的仿古商業街，被稱為「成都版清明上河圖」。匯集四川小吃、茶館、手工藝品，夜晚燈籠高掛，古色古香。',
+    description:
+      '武侯祠旁的仿古商業街，被稱為「成都版清明上河圖」。匯集四川小吃、茶館、手工藝品，夜晚燈籠高掛，古色古香。',
     country_id: 'china',
     city_id: 'chengdu',
     category: '歷史街區',
@@ -109,12 +115,13 @@ const attractions = [
     is_active: true,
     display_order: 6,
     notes: '晚上比白天更有氛圍',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '杜甫草堂',
     name_en: 'Du Fu Thatched Cottage',
-    description: '唐代大詩人杜甫流寓成都時的故居，現為紀念性博物館。園林優美，竹林茂密，是了解杜甫生平和唐詩文化的重要場所。',
+    description:
+      '唐代大詩人杜甫流寓成都時的故居，現為紀念性博物館。園林優美，竹林茂密，是了解杜甫生平和唐詩文化的重要場所。',
     country_id: 'china',
     city_id: 'chengdu',
     category: '歷史古蹟',
@@ -126,12 +133,13 @@ const attractions = [
     is_active: true,
     display_order: 7,
     notes: '適合文學愛好者',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '春熙路太古里',
     name_en: 'Chunxi Road & Taikoo Li',
-    description: '成都最繁華的商業中心，春熙路是傳統購物街，太古里是開放式低密度購物中心。IFS熊貓爬牆是著名地標。潮牌、美食、娛樂應有盡有。',
+    description:
+      '成都最繁華的商業中心，春熙路是傳統購物街，太古里是開放式低密度購物中心。IFS熊貓爬牆是著名地標。潮牌、美食、娛樂應有盡有。',
     country_id: 'china',
     city_id: 'chengdu',
     category: '購物娛樂',
@@ -143,12 +151,13 @@ const attractions = [
     is_active: true,
     display_order: 8,
     notes: 'IFS樓頂熊貓必拍',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '三星堆博物館',
     name_en: 'Sanxingdui Museum',
-    description: '展示距今約3000-5000年前古蜀文明的遺址博物館。青銅面具、黃金面具、青銅神樹等文物造型奇特，被譽為「世界第九大奇蹟」。',
+    description:
+      '展示距今約3000-5000年前古蜀文明的遺址博物館。青銅面具、黃金面具、青銅神樹等文物造型奇特，被譽為「世界第九大奇蹟」。',
     country_id: 'china',
     city_id: 'chengdu',
     category: '博物館',
@@ -156,18 +165,19 @@ const attractions = [
     duration_minutes: 240,
     address: '德陽市廣漢市三星堆鎮',
     latitude: 31.1333,
-    longitude: 104.2000,
+    longitude: 104.2,
     is_active: true,
     display_order: 9,
     notes: '距成都約40公里，建議預留半天',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
 
   // ===== 重慶 (Chongqing) =====
   {
     name: '洪崖洞民俗風貌區',
     name_en: 'Hongya Cave',
-    description: '重慶最具代表性的景點，依山而建的11層吊腳樓建築群。夜晚燈火輝煌，被譽為「現實版千與千尋」。一樓和十一樓都是馬路，展現重慶3D魔幻城市特色。',
+    description:
+      '重慶最具代表性的景點，依山而建的11層吊腳樓建築群。夜晚燈火輝煌，被譽為「現實版千與千尋」。一樓和十一樓都是馬路，展現重慶3D魔幻城市特色。',
     country_id: 'china',
     city_id: 'chongqing',
     category: '歷史街區',
@@ -179,12 +189,13 @@ const attractions = [
     is_active: true,
     display_order: 1,
     notes: '晚上7-9點燈光最美',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '解放碑步行街',
     name_en: 'Jiefangbei Pedestrian Street',
-    description: '重慶的商業中心和城市地標，解放碑是中國唯一紀念抗戰勝利的紀念碑。周邊是大型購物中心和美食街，「解放碑打望」是重慶特色活動。',
+    description:
+      '重慶的商業中心和城市地標，解放碑是中國唯一紀念抗戰勝利的紀念碑。周邊是大型購物中心和美食街，「解放碑打望」是重慶特色活動。',
     country_id: 'china',
     city_id: 'chongqing',
     category: '購物娛樂',
@@ -196,12 +207,13 @@ const attractions = [
     is_active: true,
     display_order: 2,
     notes: '可與洪崖洞連遊',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '磁器口古鎮',
     name_en: 'Ciqikou Ancient Town',
-    description: '千年古鎮，巴渝民俗文化旅遊勝地。石板路、明清建築、茶館、小吃街保留完整。陳麻花、毛血旺是必嚐美食。週末人潮洶湧。',
+    description:
+      '千年古鎮，巴渝民俗文化旅遊勝地。石板路、明清建築、茶館、小吃街保留完整。陳麻花、毛血旺是必嚐美食。週末人潮洶湧。',
     country_id: 'china',
     city_id: 'chongqing',
     category: '歷史街區',
@@ -213,12 +225,13 @@ const attractions = [
     is_active: true,
     display_order: 3,
     notes: '陳麻花是必買伴手禮',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '長江索道',
     name_en: 'Yangtze River Cableway',
-    description: '橫跨長江的空中纜車，被稱為「萬里長江第一條空中走廊」。從空中俯瞰重慶兩岸景色，體驗山城獨特交通方式。',
+    description:
+      '橫跨長江的空中纜車，被稱為「萬里長江第一條空中走廊」。從空中俯瞰重慶兩岸景色，體驗山城獨特交通方式。',
     country_id: 'china',
     city_id: 'chongqing',
     category: '交通體驗',
@@ -230,29 +243,31 @@ const attractions = [
     is_active: true,
     display_order: 4,
     notes: '傍晚搭乘可看日落和夜景',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '武隆天生三橋',
     name_en: 'Wulong Natural Three Bridges',
-    description: '世界自然遺產，亞洲最大的天生橋群。三座石灰岩天然橋樑橫跨峽谷，電影《變形金剛4》、《滿城盡帶黃金甲》取景地。',
+    description:
+      '世界自然遺產，亞洲最大的天生橋群。三座石灰岩天然橋樑橫跨峽谷，電影《變形金剛4》、《滿城盡帶黃金甲》取景地。',
     country_id: 'china',
     city_id: 'chongqing',
     category: '自然景觀',
     tags: ['世界遺產', '喀斯特', '電影取景', '自然奇觀'],
     duration_minutes: 240,
     address: '重慶市武隆區仙女山鎮',
-    latitude: 29.3500,
-    longitude: 107.7500,
+    latitude: 29.35,
+    longitude: 107.75,
     is_active: true,
     display_order: 5,
     notes: '距重慶市區約3小時車程',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '仙女山國家森林公園',
     name_en: 'Xiannv Mountain National Forest Park',
-    description: '被譽為「東方瑞士」，高山草原風光。夏季避暑勝地，冬季可滑雪。與天生三橋、龍水峽地縫組成武隆喀斯特旅遊區。',
+    description:
+      '被譽為「東方瑞士」，高山草原風光。夏季避暑勝地，冬季可滑雪。與天生三橋、龍水峽地縫組成武隆喀斯特旅遊區。',
     country_id: 'china',
     city_id: 'chongqing',
     category: '自然景觀',
@@ -264,12 +279,13 @@ const attractions = [
     is_active: true,
     display_order: 6,
     notes: '可與天生三橋安排兩日遊',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '大足石刻',
     name_en: 'Dazu Rock Carvings',
-    description: '世界文化遺產，中國晚期石窟藝術的巔峰之作。始建於唐末，歷經五代至南宋。寶頂山的千手觀音和臥佛最為壯觀。',
+    description:
+      '世界文化遺產，中國晚期石窟藝術的巔峰之作。始建於唐末，歷經五代至南宋。寶頂山的千手觀音和臥佛最為壯觀。',
     country_id: 'china',
     city_id: 'chongqing',
     category: '歷史古蹟',
@@ -281,14 +297,15 @@ const attractions = [
     is_active: true,
     display_order: 7,
     notes: '距重慶市區約2小時',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
 
   // ===== 西安 (Xi'an) =====
   {
     name: '秦始皇兵馬俑博物館',
     name_en: 'Terracotta Army Museum',
-    description: '世界第八大奇蹟，秦始皇陵的陪葬坑。一號坑規模最大，排列著數千件真人大小的陶俑陶馬。每個陶俑面部表情各異，展現高超的藝術水準。',
+    description:
+      '世界第八大奇蹟，秦始皇陵的陪葬坑。一號坑規模最大，排列著數千件真人大小的陶俑陶馬。每個陶俑面部表情各異，展現高超的藝術水準。',
     country_id: 'china',
     city_id: 'xian',
     category: '歷史古蹟',
@@ -300,12 +317,13 @@ const attractions = [
     is_active: true,
     display_order: 1,
     notes: '建議請講解員',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '華清宮',
     name_en: 'Huaqing Palace',
-    description: '唐代皇家溫泉行宮，楊貴妃沐浴處。西安事變發生地，蔣介石曾在此被扣押。《長恨歌》大型實景演出是一大亮點。',
+    description:
+      '唐代皇家溫泉行宮，楊貴妃沐浴處。西安事變發生地，蔣介石曾在此被扣押。《長恨歌》大型實景演出是一大亮點。',
     country_id: 'china',
     city_id: 'xian',
     category: '歷史古蹟',
@@ -317,12 +335,13 @@ const attractions = [
     is_active: true,
     display_order: 2,
     notes: '可與兵馬俑安排同日',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '大雁塔',
     name_en: 'Giant Wild Goose Pagoda',
-    description: '唐代高僧玄奘為存放經書而建的佛塔，西安地標。塔高64米，可登塔俯瞰西安。北廣場有亞洲最大的音樂噴泉。',
+    description:
+      '唐代高僧玄奘為存放經書而建的佛塔，西安地標。塔高64米，可登塔俯瞰西安。北廣場有亞洲最大的音樂噴泉。',
     country_id: 'china',
     city_id: 'xian',
     category: '歷史古蹟',
@@ -334,29 +353,31 @@ const attractions = [
     is_active: true,
     display_order: 3,
     notes: '晚上可看噴泉表演',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '回民街',
     name_en: 'Muslim Quarter',
-    description: '西安最著名的美食街，千年歷史的回族聚居區。肉夾饃、羊肉泡饃、涼皮、biangbiang麵等西安名吃匯集於此。建築也極具伊斯蘭風情。',
+    description:
+      '西安最著名的美食街，千年歷史的回族聚居區。肉夾饃、羊肉泡饃、涼皮、biangbiang麵等西安名吃匯集於此。建築也極具伊斯蘭風情。',
     country_id: 'china',
     city_id: 'xian',
     category: '美食街區',
     tags: ['美食', '回族', '小吃', '清真'],
     duration_minutes: 120,
     address: '西安市蓮湖區北院門',
-    latitude: 34.2650,
-    longitude: 108.9400,
+    latitude: 34.265,
+    longitude: 108.94,
     is_active: true,
     display_order: 4,
     notes: '下午至晚上最熱鬧',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '西安城牆',
     name_en: "Xi'an City Wall",
-    description: '中國現存最完整的古代城牆，明代修建。全長13.7公里，可步行或騎自行車環城。夜晚燈光璀璨，是感受古都氛圍的最佳方式。',
+    description:
+      '中國現存最完整的古代城牆，明代修建。全長13.7公里，可步行或騎自行車環城。夜晚燈光璀璨，是感受古都氛圍的最佳方式。',
     country_id: 'china',
     city_id: 'xian',
     category: '歷史古蹟',
@@ -368,12 +389,13 @@ const attractions = [
     is_active: true,
     display_order: 5,
     notes: '騎車環城約1.5-2小時',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '陝西歷史博物館',
     name_en: 'Shaanxi History Museum',
-    description: '中國第一座大型現代化國家級博物館，被譽為「古都明珠」。收藏170萬件文物，從史前到清代，以周秦漢唐文物最為精彩。',
+    description:
+      '中國第一座大型現代化國家級博物館，被譽為「古都明珠」。收藏170萬件文物，從史前到清代，以周秦漢唐文物最為精彩。',
     country_id: 'china',
     city_id: 'xian',
     category: '博物館',
@@ -381,16 +403,17 @@ const attractions = [
     duration_minutes: 180,
     address: '西安市雁塔區小寨東路91號',
     latitude: 34.2217,
-    longitude: 108.9550,
+    longitude: 108.955,
     is_active: true,
     display_order: 6,
     notes: '免費但需預約，建議提前網上預約',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '鐘樓鼓樓',
     name_en: 'Bell Tower & Drum Tower',
-    description: '西安的標誌性建築，明代建造。鐘樓位於西安市中心，鼓樓與之相望。古代用於報時，現可登樓觀賞編鐘、鼓樂表演。',
+    description:
+      '西安的標誌性建築，明代建造。鐘樓位於西安市中心，鼓樓與之相望。古代用於報時，現可登樓觀賞編鐘、鼓樂表演。',
     country_id: 'china',
     city_id: 'xian',
     category: '歷史古蹟',
@@ -402,31 +425,33 @@ const attractions = [
     is_active: true,
     display_order: 7,
     notes: '可購聯票參觀兩樓',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '大唐不夜城',
     name_en: 'Tang Paradise Pedestrian Street',
-    description: '以盛唐文化為主題的步行街，全長2.1公里。仿唐建築群輝煌大氣，「不倒翁小姐姐」等表演爆紅網路。夜晚燈火輝煌，是西安最熱門的打卡地。',
+    description:
+      '以盛唐文化為主題的步行街，全長2.1公里。仿唐建築群輝煌大氣，「不倒翁小姐姐」等表演爆紅網路。夜晚燈火輝煌，是西安最熱門的打卡地。',
     country_id: 'china',
     city_id: 'xian',
     category: '購物娛樂',
     tags: ['唐朝', '夜景', '表演', '網紅景點'],
     duration_minutes: 150,
     address: '西安市雁塔區慈恩路',
-    latitude: 34.2150,
+    latitude: 34.215,
     longitude: 108.9633,
     is_active: true,
     display_order: 8,
     notes: '晚上7點後最熱鬧',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
 
   // ===== 敦煌 (Dunhuang) =====
   {
     name: '莫高窟',
     name_en: 'Mogao Caves',
-    description: '世界文化遺產，中國四大石窟之首。現存735個洞窟，壁畫4.5萬平方米，彩塑2000餘身。跨越1600多年的佛教藝術寶庫，被譽為「東方羅浮宮」。',
+    description:
+      '世界文化遺產，中國四大石窟之首。現存735個洞窟，壁畫4.5萬平方米，彩塑2000餘身。跨越1600多年的佛教藝術寶庫，被譽為「東方羅浮宮」。',
     country_id: 'china',
     city_id: 'dunhuang',
     category: '歷史古蹟',
@@ -438,29 +463,31 @@ const attractions = [
     is_active: true,
     display_order: 1,
     notes: '必須提前網上預約，旺季票很難搶',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '鳴沙山月牙泉',
     name_en: 'Mingsha Mountain & Crescent Spring',
-    description: '沙漠與清泉共存的自然奇觀。鳴沙山因風吹沙鳴而得名，月牙泉形如彎月，千年不涸。可騎駱駝、滑沙、看日落。',
+    description:
+      '沙漠與清泉共存的自然奇觀。鳴沙山因風吹沙鳴而得名，月牙泉形如彎月，千年不涸。可騎駱駝、滑沙、看日落。',
     country_id: 'china',
     city_id: 'dunhuang',
     category: '自然景觀',
     tags: ['沙漠', '月牙泉', '駱駝', '日落'],
     duration_minutes: 240,
     address: '敦煌市城南5公里',
-    latitude: 40.0870,
+    latitude: 40.087,
     longitude: 94.6688,
     is_active: true,
     display_order: 2,
     notes: '建議下午4點後入園看日落',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '玉門關',
     name_en: 'Yumen Pass',
-    description: '漢代絲綢之路重要關隘，「春風不度玉門關」的所在地。現存小方盤城遺址，黃沙漫漫中感受古代邊塞蒼涼。',
+    description:
+      '漢代絲綢之路重要關隘，「春風不度玉門關」的所在地。現存小方盤城遺址，黃沙漫漫中感受古代邊塞蒼涼。',
     country_id: 'china',
     city_id: 'dunhuang',
     category: '歷史古蹟',
@@ -472,29 +499,31 @@ const attractions = [
     is_active: true,
     display_order: 3,
     notes: '可與雅丹、陽關組成一日遊',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '陽關',
     name_en: 'Yang Pass',
-    description: '「西出陽關無故人」的歷史名關。漢代通往西域的門戶，現為博物館和遺址公園。可體驗通關文牒。',
+    description:
+      '「西出陽關無故人」的歷史名關。漢代通往西域的門戶，現為博物館和遺址公園。可體驗通關文牒。',
     country_id: 'china',
     city_id: 'dunhuang',
     category: '歷史古蹟',
     tags: ['絲路', '漢代', '邊塞', '博物館'],
     duration_minutes: 90,
     address: '敦煌市西南70公里',
-    latitude: 39.8500,
-    longitude: 94.0500,
+    latitude: 39.85,
+    longitude: 94.05,
     is_active: true,
     display_order: 4,
     notes: '可領取「通關文牒」紀念品',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '雅丹國家地質公園',
     name_en: 'Yardang National Geopark',
-    description: '世界最大的雅丹地貌群之一，被稱為「魔鬼城」。風蝕地貌奇特壯觀，日落時分色彩絢爛，是攝影愛好者的天堂。',
+    description:
+      '世界最大的雅丹地貌群之一，被稱為「魔鬼城」。風蝕地貌奇特壯觀，日落時分色彩絢爛，是攝影愛好者的天堂。',
     country_id: 'china',
     city_id: 'dunhuang',
     category: '自然景觀',
@@ -506,31 +535,33 @@ const attractions = [
     is_active: true,
     display_order: 5,
     notes: '距離較遠，建議跟團或包車',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '西千佛洞',
     name_en: 'Western Thousand Buddha Caves',
-    description: '敦煌石窟群的重要組成部分，比莫高窟遊客少。現存16個洞窟，北魏至宋代開鑿，壁畫保存完好。',
+    description:
+      '敦煌石窟群的重要組成部分，比莫高窟遊客少。現存16個洞窟，北魏至宋代開鑿，壁畫保存完好。',
     country_id: 'china',
     city_id: 'dunhuang',
     category: '歷史古蹟',
     tags: ['石窟', '壁畫', '佛教', '小眾'],
     duration_minutes: 90,
     address: '敦煌市西南35公里',
-    latitude: 40.0000,
-    longitude: 94.4000,
+    latitude: 40.0,
+    longitude: 94.4,
     is_active: true,
     display_order: 6,
     notes: '遊客較少，可細細品味',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
 
   // ===== 長沙 (Changsha) =====
   {
     name: '橘子洲',
     name_en: 'Orange Isle',
-    description: '湘江中的狹長島嶼，毛澤東青年時期常在此遊玩吟詩。島上有32米高的青年毛澤東雕塑，是長沙的標誌性景點。',
+    description:
+      '湘江中的狹長島嶼，毛澤東青年時期常在此遊玩吟詩。島上有32米高的青年毛澤東雕塑，是長沙的標誌性景點。',
     country_id: 'china',
     city_id: 'changsha',
     category: '公園綠地',
@@ -542,12 +573,13 @@ const attractions = [
     is_active: true,
     display_order: 1,
     notes: '週六晚有煙火表演（夏季）',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '嶽麓山與嶽麓書院',
     name_en: 'Yuelu Mountain & Academy',
-    description: '中國四大名山之一，湖湘文化的象徵。嶽麓書院是中國四大書院之首，千年學府。愛晚亭是觀賞紅葉的勝地。',
+    description:
+      '中國四大名山之一，湖湘文化的象徵。嶽麓書院是中國四大書院之首，千年學府。愛晚亭是觀賞紅葉的勝地。',
     country_id: 'china',
     city_id: 'changsha',
     category: '自然景觀',
@@ -559,12 +591,13 @@ const attractions = [
     is_active: true,
     display_order: 2,
     notes: '秋季賞紅葉最佳',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '湖南省博物館',
     name_en: 'Hunan Provincial Museum',
-    description: '中國八大博物館之一，以馬王堆漢墓出土文物聞名。辛追夫人千年不腐女屍、素紗禪衣等國寶級文物令人震撼。',
+    description:
+      '中國八大博物館之一，以馬王堆漢墓出土文物聞名。辛追夫人千年不腐女屍、素紗禪衣等國寶級文物令人震撼。',
     country_id: 'china',
     city_id: 'changsha',
     category: '博物館',
@@ -576,12 +609,13 @@ const attractions = [
     is_active: true,
     display_order: 3,
     notes: '免費預約，辛追夫人必看',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '太平老街',
     name_en: 'Taiping Old Street',
-    description: '長沙保存最完整的歷史街區，2000多年歷史。青石板路、明清建築、老字號小吃。臭豆腐、糖油粑粑是必嚐美食。',
+    description:
+      '長沙保存最完整的歷史街區，2000多年歷史。青石板路、明清建築、老字號小吃。臭豆腐、糖油粑粑是必嚐美食。',
     country_id: 'china',
     city_id: 'changsha',
     category: '歷史街區',
@@ -589,52 +623,55 @@ const attractions = [
     duration_minutes: 120,
     address: '長沙市天心區太平街',
     latitude: 28.1917,
-    longitude: 112.9750,
+    longitude: 112.975,
     is_active: true,
     display_order: 4,
     notes: '黑色經典臭豆腐最出名',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '杜甫江閣',
     name_en: 'Du Fu River Pavilion',
-    description: '紀念杜甫的仿唐建築，位於湘江東岸。是觀賞橘子洲煙火和湘江夜景的最佳位置。夜晚燈火通明，古韻悠長。',
+    description:
+      '紀念杜甫的仿唐建築，位於湘江東岸。是觀賞橘子洲煙火和湘江夜景的最佳位置。夜晚燈火通明，古韻悠長。',
     country_id: 'china',
     city_id: 'changsha',
     category: '歷史古蹟',
     tags: ['杜甫', '夜景', '唐式建築', '觀景'],
     duration_minutes: 60,
     address: '長沙市天心區西湖路',
-    latitude: 28.1850,
-    longitude: 112.9700,
+    latitude: 28.185,
+    longitude: 112.97,
     is_active: true,
     display_order: 5,
     notes: '看煙火的最佳位置',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '長沙文和友',
     name_en: 'Changsha Wenheyou',
-    description: '超級文和友是長沙最火的網紅打卡地，復刻80年代長沙老街市井文化。7層樓的懷舊主題餐飲綜合體，龍蝦和小吃聞名。',
+    description:
+      '超級文和友是長沙最火的網紅打卡地，復刻80年代長沙老街市井文化。7層樓的懷舊主題餐飲綜合體，龍蝦和小吃聞名。',
     country_id: 'china',
     city_id: 'changsha',
     category: '美食娛樂',
     tags: ['網紅', '美食', '懷舊', '龍蝦'],
     duration_minutes: 180,
     address: '長沙市天心區湘江中路',
-    latitude: 28.1900,
+    latitude: 28.19,
     longitude: 112.9683,
     is_active: true,
     display_order: 6,
     notes: '週末排隊很長，建議工作日去',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
 
   // ===== 深圳 (Shenzhen) =====
   {
     name: '世界之窗',
     name_en: 'Window of the World',
-    description: '微縮世界著名景點的主題公園，包含130多個世界知名景點的縮小版。艾菲爾鐵塔、金字塔、悉尼歌劇院等應有盡有。',
+    description:
+      '微縮世界著名景點的主題公園，包含130多個世界知名景點的縮小版。艾菲爾鐵塔、金字塔、悉尼歌劇院等應有盡有。',
     country_id: 'china',
     city_id: 'shenzhen',
     category: '主題公園',
@@ -646,63 +683,67 @@ const attractions = [
     is_active: true,
     display_order: 1,
     notes: '晚上有大型歌舞表演',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '東部華僑城',
     name_en: 'OCT East',
-    description: '大型生態度假區，包含大俠谷、茶溪谷兩大主題樂園。大俠谷有刺激遊樂設施，茶溪谷是歐洲小鎮風情。',
+    description:
+      '大型生態度假區，包含大俠谷、茶溪谷兩大主題樂園。大俠谷有刺激遊樂設施，茶溪谷是歐洲小鎮風情。',
     country_id: 'china',
     city_id: 'shenzhen',
     category: '主題公園',
     tags: ['度假區', '主題樂園', '茶園', '歐式風情'],
     duration_minutes: 480,
     address: '深圳市鹽田區大梅沙',
-    latitude: 22.6000,
-    longitude: 114.2500,
+    latitude: 22.6,
+    longitude: 114.25,
     is_active: true,
     display_order: 2,
     notes: '建議玩1-2天',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '大梅沙海濱公園',
     name_en: 'Dameisha Beach Park',
-    description: '深圳最長的海濱沙灘，免費開放。金色沙灘、蔚藍大海，是深圳人週末休閒的熱門去處。夏季可游泳戲水。',
+    description:
+      '深圳最長的海濱沙灘，免費開放。金色沙灘、蔚藍大海，是深圳人週末休閒的熱門去處。夏季可游泳戲水。',
     country_id: 'china',
     city_id: 'shenzhen',
     category: '海濱公園',
     tags: ['沙灘', '免費', '游泳', '親子'],
     duration_minutes: 240,
     address: '深圳市鹽田區大梅沙',
-    latitude: 22.5950,
+    latitude: 22.595,
     longitude: 114.3033,
     is_active: true,
     display_order: 3,
     notes: '夏季週末人很多，建議預約',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '蓮花山公園',
     name_en: 'Lianhua Mountain Park',
-    description: '深圳市中心的城市公園，山頂有鄧小平銅像。可俯瞰福田中心區的摩天大樓群，是深圳發展的最佳見證地。',
+    description:
+      '深圳市中心的城市公園，山頂有鄧小平銅像。可俯瞰福田中心區的摩天大樓群，是深圳發展的最佳見證地。',
     country_id: 'china',
     city_id: 'shenzhen',
     category: '公園綠地',
     tags: ['公園', '鄧小平', '俯瞰', '免費'],
     duration_minutes: 120,
     address: '深圳市福田區紅荔路6030號',
-    latitude: 22.5500,
+    latitude: 22.55,
     longitude: 114.0583,
     is_active: true,
     display_order: 4,
     notes: '傍晚看日落最佳',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '歡樂港灣',
     name_en: 'Happy Harbor',
-    description: '深圳最新的濱海文化藝術區，有128米高的「灣區之光」摩天輪。海濱棧道、音樂噴泉、藝術展覽，是年輕人打卡熱點。',
+    description:
+      '深圳最新的濱海文化藝術區，有128米高的「灣區之光」摩天輪。海濱棧道、音樂噴泉、藝術展覽，是年輕人打卡熱點。',
     country_id: 'china',
     city_id: 'shenzhen',
     category: '購物娛樂',
@@ -710,35 +751,37 @@ const attractions = [
     duration_minutes: 180,
     address: '深圳市南山區望海路',
     latitude: 22.4867,
-    longitude: 113.9200,
+    longitude: 113.92,
     is_active: true,
     display_order: 5,
     notes: '灣區之光摩天輪必搭',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '深圳灣公園',
     name_en: 'Shenzhen Bay Park',
-    description: '沿深圳灣海岸線延伸13公里的濱海公園，可遠眺香港。是觀鳥、騎行、散步的好去處，日落時分景色絕美。',
+    description:
+      '沿深圳灣海岸線延伸13公里的濱海公園，可遠眺香港。是觀鳥、騎行、散步的好去處，日落時分景色絕美。',
     country_id: 'china',
     city_id: 'shenzhen',
     category: '公園綠地',
     tags: ['海濱', '騎行', '觀鳥', '日落'],
     duration_minutes: 150,
     address: '深圳市南山區濱海大道',
-    latitude: 22.5100,
-    longitude: 113.9500,
+    latitude: 22.51,
+    longitude: 113.95,
     is_active: true,
     display_order: 6,
     notes: '可租自行車沿海濱騎行',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
 
   // ===== 廣州 (Guangzhou) =====
   {
     name: '廣州塔（小蠻腰）',
     name_en: 'Canton Tower',
-    description: '廣州地標建築，高600米，因纖細的腰身被稱為「小蠻腰」。觀光層可360度俯瞰廣州。塔頂有世界最高的戶外觀景旋轉餐廳和摩天輪。',
+    description:
+      '廣州地標建築，高600米，因纖細的腰身被稱為「小蠻腰」。觀光層可360度俯瞰廣州。塔頂有世界最高的戶外觀景旋轉餐廳和摩天輪。',
     country_id: 'china',
     city_id: 'guangzhou',
     category: '地標建築',
@@ -746,16 +789,17 @@ const attractions = [
     duration_minutes: 150,
     address: '廣州市海珠區閱江西路222號',
     latitude: 23.1086,
-    longitude: 113.3240,
+    longitude: 113.324,
     is_active: true,
     display_order: 1,
     notes: '夜景最美，建議傍晚上塔',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '沙面島',
     name_en: 'Shamian Island',
-    description: '珠江沙洲上的小島，曾是英法租界。150多座歐式建築保存完好，綠樹成蔭，是廣州最具異國情調的地方。適合拍照和漫步。',
+    description:
+      '珠江沙洲上的小島，曾是英法租界。150多座歐式建築保存完好，綠樹成蔭，是廣州最具異國情調的地方。適合拍照和漫步。',
     country_id: 'china',
     city_id: 'guangzhou',
     category: '歷史街區',
@@ -767,12 +811,13 @@ const attractions = [
     is_active: true,
     display_order: 2,
     notes: '適合悠閒散步拍照',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '陳家祠',
     name_en: 'Chen Clan Ancestral Hall',
-    description: '廣東現存最完整的清代宗祠建築，嶺南建築藝術的巔峰之作。木雕、石雕、磚雕、陶塑、灰塑、銅鐵鑄和彩繪等工藝精湛絕倫。',
+    description:
+      '廣東現存最完整的清代宗祠建築，嶺南建築藝術的巔峰之作。木雕、石雕、磚雕、陶塑、灰塑、銅鐵鑄和彩繪等工藝精湛絕倫。',
     country_id: 'china',
     city_id: 'guangzhou',
     category: '歷史古蹟',
@@ -780,16 +825,17 @@ const attractions = [
     duration_minutes: 120,
     address: '廣州市荔灣區中山七路恩龍里34號',
     latitude: 23.1269,
-    longitude: 113.2450,
+    longitude: 113.245,
     is_active: true,
     display_order: 3,
     notes: '嶺南建築藝術代表作',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '上下九步行街',
     name_en: 'Shangxiajiu Pedestrian Street',
-    description: '廣州最繁華的傳統商業街，騎樓建築連綿不絕。老字號雲集，蓮香樓、陶陶居、廣州酒家等粵式茶樓和小吃店是美食天堂。',
+    description:
+      '廣州最繁華的傳統商業街，騎樓建築連綿不絕。老字號雲集，蓮香樓、陶陶居、廣州酒家等粵式茶樓和小吃店是美食天堂。',
     country_id: 'china',
     city_id: 'guangzhou',
     category: '購物街區',
@@ -801,12 +847,13 @@ const attractions = [
     is_active: true,
     display_order: 4,
     notes: '必嚐雙皮奶、腸粉、蝦餃',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '長隆野生動物世界',
     name_en: 'Chimelong Safari Park',
-    description: '中國最大的野生動物主題公園，擁有500多種、2萬多隻動物。大熊貓三胞胎、白虎、考拉等珍稀動物。自駕車區可近距離接觸動物。',
+    description:
+      '中國最大的野生動物主題公園，擁有500多種、2萬多隻動物。大熊貓三胞胎、白虎、考拉等珍稀動物。自駕車區可近距離接觸動物。',
     country_id: 'china',
     city_id: 'guangzhou',
     category: '主題公園',
@@ -818,12 +865,13 @@ const attractions = [
     is_active: true,
     display_order: 5,
     notes: '建議一整天遊玩',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '越秀公園',
     name_en: 'Yuexiu Park',
-    description: '廣州最大的綜合性公園，五羊雕塑是廣州的城市標誌。園內有鎮海樓（廣州博物館）、明代古城牆等歷史遺跡。',
+    description:
+      '廣州最大的綜合性公園，五羊雕塑是廣州的城市標誌。園內有鎮海樓（廣州博物館）、明代古城牆等歷史遺跡。',
     country_id: 'china',
     city_id: 'guangzhou',
     category: '公園綠地',
@@ -831,16 +879,17 @@ const attractions = [
     duration_minutes: 150,
     address: '廣州市越秀區解放北路960號',
     latitude: 23.1417,
-    longitude: 113.2700,
+    longitude: 113.27,
     is_active: true,
     display_order: 6,
     notes: '五羊雕塑是廣州市徽來源',
-    workspace_id: WORKSPACE_ID
+    workspace_id: WORKSPACE_ID,
   },
   {
     name: '白雲山',
     name_en: 'Baiyun Mountain',
-    description: '廣州「市肺」，南粵名山之一。山頂摩星嶺海拔382米，是廣州最高點。索道、滑道、蹦極等娛樂設施豐富，是市民週末休閒首選。',
+    description:
+      '廣州「市肺」，南粵名山之一。山頂摩星嶺海拔382米，是廣州最高點。索道、滑道、蹦極等娛樂設施豐富，是市民週末休閒首選。',
     country_id: 'china',
     city_id: 'guangzhou',
     category: '自然景觀',
@@ -852,8 +901,8 @@ const attractions = [
     is_active: true,
     display_order: 7,
     notes: '可搭纜車上山',
-    workspace_id: WORKSPACE_ID
-  }
+    workspace_id: WORKSPACE_ID,
+  },
 ]
 
 async function importAttractions() {
@@ -876,7 +925,10 @@ async function importAttractions() {
       console.error(`批次 ${Math.floor(i / batchSize) + 1} 錯誤:`, error.message)
       errorCount += batch.length
     } else {
-      console.log(`批次 ${Math.floor(i / batchSize) + 1} 成功:`, data.map(d => `${d.name} (${d.city_id})`).join(', '))
+      console.log(
+        `批次 ${Math.floor(i / batchSize) + 1} 成功:`,
+        data.map(d => `${d.name} (${d.city_id})`).join(', ')
+      )
       successCount += data.length
     }
   }

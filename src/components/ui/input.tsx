@@ -12,18 +12,21 @@ export interface InputProps extends React.ComponentProps<'input'> {
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({
-    className,
-    type,
-    onChange,
-    onKeyDown,
-    onBlur,
-    onCompositionStart,
-    onCompositionEnd,
-    enableMathCalculation,
-    style,
-    ...props
-  }, ref) => {
+  (
+    {
+      className,
+      type,
+      onChange,
+      onKeyDown,
+      onBlur,
+      onCompositionStart,
+      onCompositionEnd,
+      enableMathCalculation,
+      style,
+      ...props
+    },
+    ref
+  ) => {
     const isComposingRef = React.useRef(false)
     const justFinishedComposingRef = React.useRef(false)
 
@@ -125,14 +128,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
-        onCompositionStart={(e) => {
+        onCompositionStart={e => {
           isComposingRef.current = true
           // 調用外部的 onCompositionStart
           if (onCompositionStart) {
             onCompositionStart(e)
           }
         }}
-        onCompositionEnd={(e) => {
+        onCompositionEnd={e => {
           handleCompositionEnd(e)
           // 調用外部的 onCompositionEnd
           if (onCompositionEnd) {

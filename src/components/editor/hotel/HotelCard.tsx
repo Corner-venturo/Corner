@@ -22,10 +22,14 @@ const getPriceDisplay = (priceRange: string | null) => {
 // 轉換飯店等級顯示
 const getHotelClassLabel = (hotelClass: string | null) => {
   switch (hotelClass) {
-    case 'ultra-luxury': return COMP_EDITOR_LABELS.頂級奢華
-    case 'luxury': return COMP_EDITOR_LABELS.奢華
-    case 'boutique': return COMP_EDITOR_LABELS.精品
-    default: return hotelClass
+    case 'ultra-luxury':
+      return COMP_EDITOR_LABELS.頂級奢華
+    case 'luxury':
+      return COMP_EDITOR_LABELS.奢華
+    case 'boutique':
+      return COMP_EDITOR_LABELS.精品
+    default:
+      return hotelClass
   }
 }
 
@@ -41,11 +45,12 @@ export function HotelCard({ hotel, isSelected, onToggle }: HotelCardProps) {
       className={`
         relative flex gap-3 p-3 rounded-xl cursor-pointer transition-all
         border-2 hover:shadow-md
-        ${isSelected
-          ? 'border-morandi-gold bg-morandi-gold/10 shadow-sm'
-          : hotel.is_featured
-            ? 'border-morandi-gold/30 bg-morandi-gold/5 hover:bg-morandi-gold/10'
-            : 'border-transparent bg-morandi-container/20 hover:bg-morandi-container/30'
+        ${
+          isSelected
+            ? 'border-morandi-gold bg-morandi-gold/10 shadow-sm'
+            : hotel.is_featured
+              ? 'border-morandi-gold/30 bg-morandi-gold/5 hover:bg-morandi-gold/10'
+              : 'border-transparent bg-morandi-container/20 hover:bg-morandi-container/30'
         }
       `}
     >
@@ -59,10 +64,7 @@ export function HotelCard({ hotel, isSelected, onToggle }: HotelCardProps) {
       {/* 縮圖 */}
       <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-morandi-container/30">
         {image ? (
-          <img src={image}
-            alt={hotel.name}
-            className="w-full h-full object-cover"
-          />
+          <img src={image} alt={hotel.name} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-morandi-secondary/50">
             <ImageIcon size={24} />
@@ -73,15 +75,11 @@ export function HotelCard({ hotel, isSelected, onToggle }: HotelCardProps) {
       {/* 資訊 */}
       <div className="flex-1 min-w-0 flex flex-col justify-center">
         <div className="font-medium text-morandi-primary text-sm leading-tight line-clamp-1 flex items-center gap-1">
-          {hotel.is_featured && (
-            <Crown size={12} className="text-morandi-gold flex-shrink-0" />
-          )}
+          {hotel.is_featured && <Crown size={12} className="text-morandi-gold flex-shrink-0" />}
           {hotel.name}
         </div>
         {hotel.name_en && (
-          <div className="text-xs text-morandi-muted truncate mt-0.5">
-            {hotel.name_en}
-          </div>
+          <div className="text-xs text-morandi-muted truncate mt-0.5">{hotel.name_en}</div>
         )}
         <div className="text-xs text-morandi-secondary mt-1 flex items-center gap-1.5 flex-wrap">
           {/* 顯示區域與城市 */}
@@ -90,14 +88,8 @@ export function HotelCard({ hotel, isSelected, onToggle }: HotelCardProps) {
               {hotel.region_name}
             </span>
           )}
-          <span className="px-1.5 py-0.5 bg-morandi-container/50 rounded">
-            {hotel.city_name}
-          </span>
-          {hotel.brand && (
-            <span className="text-morandi-gold font-medium">
-              {hotel.brand}
-            </span>
-          )}
+          <span className="px-1.5 py-0.5 bg-morandi-container/50 rounded">{hotel.city_name}</span>
+          {hotel.brand && <span className="text-morandi-gold font-medium">{hotel.brand}</span>}
         </div>
         <div className="text-xs mt-1 flex items-center gap-2">
           {hotel.star_rating && (
@@ -107,9 +99,7 @@ export function HotelCard({ hotel, isSelected, onToggle }: HotelCardProps) {
             </span>
           )}
           {hotel.hotel_class && (
-            <span className="text-purple-600">
-              {getHotelClassLabel(hotel.hotel_class)}
-            </span>
+            <span className="text-purple-600">{getHotelClassLabel(hotel.hotel_class)}</span>
           )}
           {hotel.price_range && (
             <span className="text-status-success font-medium">

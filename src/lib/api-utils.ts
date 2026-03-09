@@ -53,10 +53,7 @@ export function jsonResponse<T>(
 /**
  * 建立錯誤回應
  */
-export function errorResponse(
-  error: string,
-  status = 500
-) {
+export function errorResponse(error: string, status = 500) {
   return NextResponse.json({ error }, { status })
 }
 

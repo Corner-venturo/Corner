@@ -89,11 +89,7 @@ export async function createTask<T = TaskPayload>(options: {
     updated_at: now,
   }
 
-  const { data, error } = await supabase
-    .from('background_tasks')
-    .insert(taskData)
-    .select()
-    .single()
+  const { data, error } = await supabase.from('background_tasks').insert(taskData).select().single()
 
   if (error) {
     logger.error('Failed to create task', { error, type, workspaceId })
@@ -203,10 +199,7 @@ async function updateTaskStatus(
     updateData.result = data.result
   }
 
-  await supabase
-    .from('background_tasks')
-    .update(updateData)
-    .eq('id', taskId)
+  await supabase.from('background_tasks').update(updateData).eq('id', taskId)
 }
 
 /**
@@ -260,9 +253,7 @@ export async function getTaskStats(workspaceId?: string): Promise<{
   completed: number
   failed: number
 }> {
-  let query = supabase
-    .from('background_tasks')
-    .select('status', { count: 'exact' })
+  let query = supabase.from('background_tasks').select('status', { count: 'exact' })
 
   if (workspaceId) {
     query = query.eq('workspace_id', workspaceId)
@@ -299,4 +290,4 @@ export const TaskTypes = {
   SEND_NOTIFICATION: 'send_notification',
 } as const
 
-export type TaskType = typeof TaskTypes[keyof typeof TaskTypes]
+export type TaskType = (typeof TaskTypes)[keyof typeof TaskTypes]

@@ -22,6 +22,7 @@
 ### 用戶預期
 
 用戶打開 PS/AI/Word 時：
+
 - 預期要等一下載入
 - 編輯時流暢（因為是本地操作）
 - 儲存時再等一下
@@ -123,7 +124,7 @@ async function loadDocument(documentId: string) {
 
 // 只追蹤「是否有修改」
 canvas.on('object:modified', () => {
-  setIsDirty(true)  // 唯一需要的 state 更新
+  setIsDirty(true) // 唯一需要的 state 更新
 })
 
 canvas.on('object:added', () => {
@@ -150,15 +151,19 @@ async function saveDocument() {
 
   // 1. 從 canvas 導出完整 JSON
   const canvasData = canvas.toJSON([
-    'id', 'name', 'selectable', 'locked',
-    'elementType', 'customData'  // 自定義屬性
+    'id',
+    'name',
+    'selectable',
+    'locked',
+    'elementType',
+    'customData', // 自定義屬性
   ])
 
   // 2. 生成縮圖
   const thumbnail = canvas.toDataURL({
     format: 'jpeg',
     quality: 0.5,
-    multiplier: 0.3
+    multiplier: 0.3,
   })
 
   // 3. 上傳縮圖
@@ -168,12 +173,12 @@ async function saveDocument() {
   const newVersion = await createVersion({
     document_id: documentId,
     data: canvasData,
-    thumbnail_url: thumbnailUrl
+    thumbnail_url: thumbnailUrl,
   })
 
   // 5. 更新文件的 current_version
   await updateDocument(documentId, {
-    current_version: newVersion.id
+    current_version: newVersion.id,
   })
 
   setSaving(false)
@@ -186,11 +191,14 @@ async function saveDocument() {
 ```typescript
 // 每 5 分鐘自動儲存（如果有修改）
 useEffect(() => {
-  const interval = setInterval(() => {
-    if (isDirty) {
-      saveDocument()
-    }
-  }, 5 * 60 * 1000)
+  const interval = setInterval(
+    () => {
+      if (isDirty) {
+        saveDocument()
+      }
+    },
+    5 * 60 * 1000
+  )
 
   return () => clearInterval(interval)
 }, [isDirty])
@@ -245,12 +253,12 @@ async function restoreVersion(versionId: string) {
     document_id: documentId,
     data: oldVersion.data,
     thumbnail_url: oldVersion.thumbnail_url,
-    restored_from: versionId  // 標記來源
+    restored_from: versionId, // 標記來源
   })
 
   // 3. 更新文件
   await updateDocument(documentId, {
-    current_version: newVersion.id
+    current_version: newVersion.id,
   })
 
   // 4. 重新載入
@@ -293,7 +301,7 @@ async function applyTemplate(templateId: string) {
   canvas.renderAll()
 
   setLoading(false)
-  setIsDirty(true)  // 標記為有修改（因為套用了模板）
+  setIsDirty(true) // 標記為有修改（因為套用了模板）
 }
 ```
 
@@ -316,7 +324,7 @@ async function saveAsTemplate(name: string, category: string) {
     name,
     category,
     data: templateData,
-    thumbnail_url: thumbnailUrl
+    thumbnail_url: thumbnailUrl,
   })
 }
 ```
@@ -451,25 +459,29 @@ CREATE TABLE itinerary_versions (
 ## 實作順序
 
 ### Phase 1: 基礎架構
+
 1. [ ] 建立資料庫表格
 2. [ ] 建立 DocumentStore
 3. [ ] 實作載入流程（含 Loading UI）
 
 ### Phase 2: 編輯器簡化
+
 4. [ ] 移除複雜的 state 管理
 5. [ ] 改為純 Fabric.js 操作
 6. [ ] 只追蹤 isDirty
 
 ### Phase 3: 版本系統
+
 7. [ ] 實作儲存流程
 8. [ ] 實作版本歷史 UI
 9. [ ] 實作版本恢復
 
 ### Phase 4: 模板系統
+
 10. [ ] 模板套用流程
 11. [ ] 儲存為模板
 12. [ ] 模板庫管理
 
 ---
 
-*最後更新: 2026-01-14*
+_最後更新: 2026-01-14_

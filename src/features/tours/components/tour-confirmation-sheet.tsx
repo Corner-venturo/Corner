@@ -32,7 +32,12 @@ import { useTourRequests } from '@/stores/tour-request-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { useToast } from '@/components/ui/use-toast'
 import { QuickRequestFromItemDialog } from '@/features/finance/requests/components/QuickRequestFromItemDialog'
-import { useRequirementsData, type QuoteItem, type CategoryKey, CATEGORIES } from '@/features/confirmations/components/hooks/useRequirementsData'
+import {
+  useRequirementsData,
+  type QuoteItem,
+  type CategoryKey,
+  CATEGORIES,
+} from '@/features/confirmations/components/hooks/useRequirementsData'
 import { COMP_TOURS_LABELS } from '../constants/labels'
 
 interface TourConfirmationSheetProps {
@@ -51,13 +56,9 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
   const { items: existingRequests, fetchAll: refreshRequests } = useTourRequests()
 
   // 使用需求總覽的資料來源
-  const {
-    loading,
-    tour,
-    linkedQuoteId,
-    quoteItems,
-    changeTrackByCategory,
-  } = useRequirementsData({ tourId })
+  const { loading, tour, linkedQuoteId, quoteItems, changeTrackByCategory } = useRequirementsData({
+    tourId,
+  })
 
   const [generatingFor, setGeneratingFor] = useState<string | null>(null)
 
@@ -118,20 +119,19 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
 
   // 過濾出有供應商的需求單（可請款）
   const requestsWithSupplier = useMemo(() => {
-    return existingRequests.filter(req =>
-      req.tour_id === tourId &&
-      req.supplier_id
-    )
+    return existingRequests.filter(req => req.tour_id === tourId && req.supplier_id)
   }, [existingRequests, tourId])
 
   // 檢查是否已產生需求單
-  const hasExistingRequest = useCallback((supplierName: string, category: string) => {
-    return existingRequests.some(req =>
-      req.tour_id === tourId &&
-      req.supplier_name === supplierName &&
-      req.category === category
-    )
-  }, [existingRequests, tourId])
+  const hasExistingRequest = useCallback(
+    (supplierName: string, category: string) => {
+      return existingRequests.some(
+        req =>
+          req.tour_id === tourId && req.supplier_name === supplierName && req.category === category
+      )
+    },
+    [existingRequests, tourId]
+  )
 
   // 取得類別圖標
   const getCategoryIcon = (category: string) => {
@@ -158,7 +158,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
   }
 
   // 處理請款按鈕點擊
-  const handleRequestPayment = (request: typeof existingRequests[0]) => {
+  const handleRequestPayment = (request: (typeof existingRequests)[0]) => {
     if (!tour) return
 
     setQuickRequestItem({
@@ -175,72 +175,71 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
   }
 
   // 產生需求單
-  const handleGenerateRequest = useCallback(async (
-    supplierName: string,
-    category: 'accommodation' | 'meal',
-    items: QuoteItem[]
-  ) => {
-    if (!tour) return
+  const handleGenerateRequest = useCallback(
+    async (supplierName: string, category: 'accommodation' | 'meal', items: QuoteItem[]) => {
+      if (!tour) return
 
-    setGeneratingFor(`${category}-${supplierName}`)
+      setGeneratingFor(`${category}-${supplierName}`)
 
-    try {
-      // 計算服務日期範圍
-      const dates = items.map(item => item.serviceDate).filter(Boolean) as string[]
-      const serviceDate = dates[0] || ''
-      const serviceDateEnd = dates.length > 1 ? dates[dates.length - 1] : serviceDate
+      try {
+        // 計算服務日期範圍
+        const dates = items.map(item => item.serviceDate).filter(Boolean) as string[]
+        const serviceDate = dates[0] || ''
+        const serviceDateEnd = dates.length > 1 ? dates[dates.length - 1] : serviceDate
 
-      // 產生描述
-      let description = ''
-      if (category === 'accommodation') {
-        description = items.map(item => `${item.serviceDate || ''}`).join('\n')
-      } else {
-        description = items.map(item => `${item.serviceDate || ''} ${item.title}`).join('\n')
+        // 產生描述
+        let description = ''
+        if (category === 'accommodation') {
+          description = items.map(item => `${item.serviceDate || ''}`).join('\n')
+        } else {
+          description = items.map(item => `${item.serviceDate || ''} ${item.title}`).join('\n')
+        }
+
+        // 透過 API 建立需求單
+        const response = await fetch('/api/tour-requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            workspace_id: tour.workspace_id || '',
+            tour_id: tourId,
+            tour_code: tour.code,
+            tour_name: tour.name,
+            title: `${supplierName} - ${category === 'accommodation' ? COMP_TOURS_LABELS.住宿預訂 : COMP_TOURS_LABELS.餐食預訂}`,
+            category: category, // 直接使用 accommodation/meal
+            supplier_name: supplierName,
+            service_date: serviceDate,
+            service_date_end: serviceDateEnd,
+            quantity: items.length,
+            description,
+            status: 'draft',
+            handler_type: 'internal',
+            created_by: currentUser?.id || '',
+            created_by_name: currentUser?.name || '',
+          }),
+        })
+
+        if (!response.ok) {
+          throw new Error('API request failed')
+        }
+
+        await refreshRequests()
+
+        toast({
+          title: COMP_TOURS_LABELS.需求單已建立,
+          description: COMP_TOURS_LABELS.REQUEST_CREATED_DESC(supplierName),
+        })
+      } catch (error) {
+        toast({
+          title: COMP_TOURS_LABELS.建立失敗,
+          description: COMP_TOURS_LABELS.無法建立需求單_請稍後再試,
+          variant: 'destructive',
+        })
+      } finally {
+        setGeneratingFor(null)
       }
-
-      // 透過 API 建立需求單
-      const response = await fetch('/api/tour-requests', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          workspace_id: tour.workspace_id || '',
-          tour_id: tourId,
-          tour_code: tour.code,
-          tour_name: tour.name,
-          title: `${supplierName} - ${category === 'accommodation' ? COMP_TOURS_LABELS.住宿預訂 : COMP_TOURS_LABELS.餐食預訂}`,
-          category: category,  // 直接使用 accommodation/meal
-          supplier_name: supplierName,
-          service_date: serviceDate,
-          service_date_end: serviceDateEnd,
-          quantity: items.length,
-          description,
-          status: 'draft',
-          handler_type: 'internal',
-          created_by: currentUser?.id || '',
-          created_by_name: currentUser?.name || '',
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error('API request failed')
-      }
-
-      await refreshRequests()
-
-      toast({
-        title: COMP_TOURS_LABELS.需求單已建立,
-        description: COMP_TOURS_LABELS.REQUEST_CREATED_DESC(supplierName),
-      })
-    } catch (error) {
-      toast({
-        title: COMP_TOURS_LABELS.建立失敗,
-        description: COMP_TOURS_LABELS.無法建立需求單_請稍後再試,
-        variant: 'destructive',
-      })
-    } finally {
-      setGeneratingFor(null)
-    }
-  }, [tour, tourId, currentUser, refreshRequests, toast])
+    },
+    [tour, tourId, currentUser, refreshRequests, toast]
+  )
 
   // Loading 狀態
   if (loading) {
@@ -282,7 +281,9 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
           <div className="flex items-center gap-2 px-4 py-3 bg-blue-500 text-white">
             <Hotel size={18} />
             <span className="font-medium">{COMP_TOURS_LABELS.LABEL_460}</span>
-            <span className="text-blue-100 text-sm">{COMP_TOURS_LABELS.HOTEL_COUNT(hotelGroups.length)}</span>
+            <span className="text-blue-100 text-sm">
+              {COMP_TOURS_LABELS.HOTEL_COUNT(hotelGroups.length)}
+            </span>
           </div>
           <div className="bg-card p-4 space-y-4">
             {hotelGroups.map(group => {
@@ -290,13 +291,18 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
               const isGenerating = generatingFor === `accommodation-${group.supplierName}`
 
               return (
-                <div key={group.supplierName} className="border border-border rounded-lg overflow-hidden">
+                <div
+                  key={group.supplierName}
+                  className="border border-border rounded-lg overflow-hidden"
+                >
                   {/* 飯店名稱標題 */}
                   <div className="flex items-center justify-between px-4 py-2 bg-morandi-container/50 border-b border-border">
                     <div className="flex items-center gap-2">
                       <Hotel size={14} className="text-morandi-gold" />
                       <span className="font-medium text-morandi-primary">{group.supplierName}</span>
-                      <span className="text-xs text-morandi-secondary">{COMP_TOURS_LABELS.NIGHT_COUNT(group.items.length)}</span>
+                      <span className="text-xs text-morandi-secondary">
+                        {COMP_TOURS_LABELS.NIGHT_COUNT(group.items.length)}
+                      </span>
                     </div>
                     {hasRequest ? (
                       <span className="flex items-center gap-1 text-xs text-morandi-green">
@@ -306,7 +312,9 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                     ) : (
                       <Button
                         size="sm"
-                        onClick={() => handleGenerateRequest(group.supplierName, 'accommodation', group.items)}
+                        onClick={() =>
+                          handleGenerateRequest(group.supplierName, 'accommodation', group.items)
+                        }
                         disabled={isGenerating}
                         className="h-7 text-xs bg-morandi-gold hover:bg-morandi-gold-hover text-white"
                       >
@@ -324,14 +332,20 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-morandi-container/30 text-morandi-secondary">
-                        <th className="text-left px-3 py-2 font-medium w-24">{COMP_TOURS_LABELS.日期}</th>
-                        <th className="text-left px-3 py-2 font-medium">{COMP_TOURS_LABELS.LABEL_5591}</th>
+                        <th className="text-left px-3 py-2 font-medium w-24">
+                          {COMP_TOURS_LABELS.日期}
+                        </th>
+                        <th className="text-left px-3 py-2 font-medium">
+                          {COMP_TOURS_LABELS.LABEL_5591}
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
                       {group.items.map((item, idx) => (
                         <tr key={idx} className="hover:bg-morandi-container/10">
-                          <td className="px-3 py-2 text-morandi-primary">{item.serviceDate || '-'}</td>
+                          <td className="px-3 py-2 text-morandi-primary">
+                            {item.serviceDate || '-'}
+                          </td>
                           <td className="px-3 py-2 text-morandi-secondary">{item.title}</td>
                         </tr>
                       ))}
@@ -350,7 +364,9 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
           <div className="flex items-center gap-2 px-4 py-3 bg-orange-500 text-white">
             <Utensils size={18} />
             <span className="font-medium">{COMP_TOURS_LABELS.LABEL_9767}</span>
-            <span className="text-orange-100 text-sm">{COMP_TOURS_LABELS.RESTAURANT_COUNT(restaurantGroups.length)}</span>
+            <span className="text-orange-100 text-sm">
+              {COMP_TOURS_LABELS.RESTAURANT_COUNT(restaurantGroups.length)}
+            </span>
           </div>
           <div className="bg-card p-4 space-y-4">
             {restaurantGroups.map(group => {
@@ -358,13 +374,18 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
               const isGenerating = generatingFor === `meal-${group.supplierName}`
 
               return (
-                <div key={group.supplierName} className="border border-border rounded-lg overflow-hidden">
+                <div
+                  key={group.supplierName}
+                  className="border border-border rounded-lg overflow-hidden"
+                >
                   {/* 餐廳名稱標題 */}
                   <div className="flex items-center justify-between px-4 py-2 bg-morandi-container/50 border-b border-border">
                     <div className="flex items-center gap-2">
                       <Utensils size={14} className="text-morandi-gold" />
                       <span className="font-medium text-morandi-primary">{group.supplierName}</span>
-                      <span className="text-xs text-morandi-secondary">{COMP_TOURS_LABELS.MEAL_COUNT(group.items.length)}</span>
+                      <span className="text-xs text-morandi-secondary">
+                        {COMP_TOURS_LABELS.MEAL_COUNT(group.items.length)}
+                      </span>
                     </div>
                     {hasRequest ? (
                       <span className="flex items-center gap-1 text-xs text-morandi-green">
@@ -374,7 +395,9 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                     ) : (
                       <Button
                         size="sm"
-                        onClick={() => handleGenerateRequest(group.supplierName, 'meal', group.items)}
+                        onClick={() =>
+                          handleGenerateRequest(group.supplierName, 'meal', group.items)
+                        }
                         disabled={isGenerating}
                         className="h-7 text-xs bg-morandi-gold hover:bg-morandi-gold-hover text-white"
                       >
@@ -392,14 +415,20 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-morandi-container/30 text-morandi-secondary">
-                        <th className="text-left px-3 py-2 font-medium w-24">{COMP_TOURS_LABELS.日期}</th>
-                        <th className="text-left px-3 py-2 font-medium">{COMP_TOURS_LABELS.LABEL_5591}</th>
+                        <th className="text-left px-3 py-2 font-medium w-24">
+                          {COMP_TOURS_LABELS.日期}
+                        </th>
+                        <th className="text-left px-3 py-2 font-medium">
+                          {COMP_TOURS_LABELS.LABEL_5591}
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
                       {group.items.map((item, idx) => (
                         <tr key={idx} className="hover:bg-morandi-container/10">
-                          <td className="px-3 py-2 text-morandi-primary">{item.serviceDate || '-'}</td>
+                          <td className="px-3 py-2 text-morandi-primary">
+                            {item.serviceDate || '-'}
+                          </td>
                           <td className="px-3 py-2 text-morandi-secondary">{item.title}</td>
                         </tr>
                       ))}
@@ -418,7 +447,9 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
           <div className="flex items-center gap-2 px-4 py-3 bg-morandi-gold text-white">
             <DollarSign size={18} />
             <span className="font-medium">{COMP_TOURS_LABELS.LABEL_6198}</span>
-            <span className="text-white/80 text-sm">{COMP_TOURS_LABELS.PAYABLE_COUNT(requestsWithSupplier.length)}</span>
+            <span className="text-white/80 text-sm">
+              {COMP_TOURS_LABELS.PAYABLE_COUNT(requestsWithSupplier.length)}
+            </span>
           </div>
           <div className="bg-card divide-y divide-border">
             {requestsWithSupplier.map(request => (
@@ -434,15 +465,21 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                         {request.title}
                       </span>
                       {request.status && (
-                        <span className={`
+                        <span
+                          className={`
                           text-xs px-1.5 py-0.5 rounded
                           ${request.status === 'confirmed' ? 'bg-morandi-green/20 text-morandi-green' : ''}
                           ${request.status === 'draft' ? 'bg-morandi-container text-morandi-secondary' : ''}
                           ${request.status === 'billed' ? 'bg-morandi-green/20 text-morandi-green' : ''}
-                        `}>
-                          {request.status === 'confirmed' ? COMP_TOURS_LABELS.已確認 :
-                           request.status === 'draft' ? COMP_TOURS_LABELS.草稿 :
-                           request.status === 'billed' ? COMP_TOURS_LABELS.已出帳 : request.status}
+                        `}
+                        >
+                          {request.status === 'confirmed'
+                            ? COMP_TOURS_LABELS.已確認
+                            : request.status === 'draft'
+                              ? COMP_TOURS_LABELS.草稿
+                              : request.status === 'billed'
+                                ? COMP_TOURS_LABELS.已出帳
+                                : request.status}
                         </span>
                       )}
                     </div>
@@ -455,9 +492,10 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                         <span className="flex items-center gap-1">
                           <Calendar size={12} />
                           {request.service_date}
-                          {request.service_date_end && request.service_date_end !== request.service_date && (
-                            <> ~ {request.service_date_end}</>
-                          )}
+                          {request.service_date_end &&
+                            request.service_date_end !== request.service_date && (
+                              <> ~ {request.service_date_end}</>
+                            )}
                         </span>
                       )}
                     </div>
@@ -465,7 +503,9 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
                       <div className="text-xs text-morandi-secondary mt-1">
                         {request.final_cost
                           ? COMP_TOURS_LABELS.CONFIRMED_COST(request.final_cost.toLocaleString())
-                          : COMP_TOURS_LABELS.ESTIMATED_COST((request.estimated_cost || 0).toLocaleString())}
+                          : COMP_TOURS_LABELS.ESTIMATED_COST(
+                              (request.estimated_cost || 0).toLocaleString()
+                            )}
                       </div>
                     )}
                   </div>
@@ -488,7 +528,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
       {quickRequestItem && (
         <QuickRequestFromItemDialog
           open={!!quickRequestItem}
-          onOpenChange={(open) => {
+          onOpenChange={open => {
             if (!open) setQuickRequestItem(null)
           }}
           item={quickRequestItem}

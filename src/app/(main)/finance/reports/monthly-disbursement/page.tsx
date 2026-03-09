@@ -35,13 +35,7 @@ function formatYearMonth(yearMonth: string): string {
 }
 
 // 月份選擇器
-function MonthSelector({
-  value,
-  onChange,
-}: {
-  value: string
-  onChange: (value: string) => void
-}) {
+function MonthSelector({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   const handlePrev = () => {
     const [year, month] = value.split('-').map(Number)
     const prevMonth = month === 1 ? 12 : month - 1
@@ -150,9 +144,7 @@ export default function MonthlyDisbursementReportPage() {
       key: 'code',
       label: MONTHLY_DISBURSEMENT_LABELS.COL_PAYMENT_CODE,
       width: '150',
-      render: value => (
-        <span className="font-mono text-sm">{String(value || '')}</span>
-      ),
+      render: value => <span className="font-mono text-sm">{String(value || '')}</span>,
     },
     {
       key: 'request_date',
@@ -176,11 +168,7 @@ export default function MonthlyDisbursementReportPage() {
             </span>
           )
         }
-        return (
-          <span className="text-sm text-morandi-secondary">
-            {row.tour_code || '-'}
-          </span>
-        )
+        return <span className="text-sm text-morandi-secondary">{row.tour_code || '-'}</span>
       },
     },
     {
@@ -209,9 +197,7 @@ export default function MonthlyDisbursementReportPage() {
       key: 'order_number',
       label: MONTHLY_DISBURSEMENT_LABELS.COL_DISBURSEMENT_CODE,
       width: '150',
-      render: value => (
-        <span className="font-mono text-sm">{String(value || '')}</span>
-      ),
+      render: value => <span className="font-mono text-sm">{String(value || '')}</span>,
     },
     {
       key: 'disbursement_date',
@@ -225,7 +211,8 @@ export default function MonthlyDisbursementReportPage() {
       width: '100',
       render: value => (
         <span className="text-sm">
-          {Array.isArray(value) ? value.length : 0}{MONTHLY_DISBURSEMENT_LABELS.COUNT_SUFFIX}
+          {Array.isArray(value) ? value.length : 0}
+          {MONTHLY_DISBURSEMENT_LABELS.COUNT_SUFFIX}
         </span>
       ),
     },
@@ -250,12 +237,14 @@ export default function MonthlyDisbursementReportPage() {
         { label: MONTHLY_DISBURSEMENT_LABELS.BREADCRUMB_HOME, href: '/dashboard' },
         { label: MONTHLY_DISBURSEMENT_LABELS.BREADCRUMB_FINANCE, href: '/finance' },
         { label: MONTHLY_DISBURSEMENT_LABELS.BREADCRUMB_REPORTS, href: '/finance/reports' },
-        { label: MONTHLY_DISBURSEMENT_LABELS.LABEL_3446, href: '/finance/reports/monthly-disbursement' },
+        {
+          label: MONTHLY_DISBURSEMENT_LABELS.LABEL_3446,
+          href: '/finance/reports/monthly-disbursement',
+        },
       ]}
       headerActions={<MonthSelector value={selectedMonth} onChange={setSelectedMonth} />}
       className="space-y-6"
     >
-
       {/* 統計卡片 */}
       <ContentContainer>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

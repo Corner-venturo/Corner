@@ -13,6 +13,7 @@
 **檔案**: `supabase/migrations/20251115060000_final_disable_all_rls.sql`
 
 **內容**:
+
 - 禁用所有核心表格的 RLS (24+ 表格)
 - 刪除所有 RLS policies
 - 保留 RLS Helper Functions（`get_user_workspace_id`, `is_super_admin`）但不使用
@@ -20,12 +21,14 @@
 ### 2. 文檔更新
 
 #### Global CLAUDE.md (`~/.claude/CLAUDE.md`)
+
 - ✅ 更新 RLS 規範章節
 - ✅ 說明完全不使用 RLS 的決策
 - ✅ 提供 Venturo 權限控制架構說明
 - ✅ 提供權限處理範例代碼
 
 #### Project CLAUDE.md (`.claude/CLAUDE.md`)
+
 - ✅ 更新 RLS 規範章節
 - ✅ 與 Global CLAUDE.md 保持一致
 - ✅ 提供新建表格時的標準模板
@@ -48,12 +51,14 @@ Layer 4: user.roles
 ### 權限處理方式
 
 #### 一般員工
+
 ```typescript
 // 看自己 workspace 的所有資料
 fetchOrders({ workspace_id: user.workspace_id })
 ```
 
 #### 領隊
+
 ```typescript
 // 只能看自己帶的團
 if (user.roles.includes('tour_leader')) {
@@ -62,6 +67,7 @@ if (user.roles.includes('tour_leader')) {
 ```
 
 #### Super Admin
+
 ```typescript
 // 可以跨 workspace 查看
 if (user.permissions.includes('super_admin')) {
@@ -75,13 +81,13 @@ if (user.permissions.includes('super_admin')) {
 
 ### 時間線
 
-| 日期 | 事件 | 檔案 |
-|------|------|------|
-| 2025-11-12 | 啟用 RLS 系統 | `20251113000000_enable_rls_for_core_tables.sql` |
-| 2025-11-15 | 禁用 channels RLS | `20251115010000_disable_channels_rls.sql` |
-| 2025-11-15 | 禁用 quotes RLS | `20251115020000_disable_quotes_rls.sql` |
-| 2025-11-15 | 禁用所有 RLS | `20251115030000_disable_all_rls.sql` |
-| 2025-11-15 | **最終移除 RLS** | `20251115060000_final_disable_all_rls.sql` |
+| 日期       | 事件              | 檔案                                            |
+| ---------- | ----------------- | ----------------------------------------------- |
+| 2025-11-12 | 啟用 RLS 系統     | `20251113000000_enable_rls_for_core_tables.sql` |
+| 2025-11-15 | 禁用 channels RLS | `20251115010000_disable_channels_rls.sql`       |
+| 2025-11-15 | 禁用 quotes RLS   | `20251115020000_disable_quotes_rls.sql`         |
+| 2025-11-15 | 禁用所有 RLS      | `20251115030000_disable_all_rls.sql`            |
+| 2025-11-15 | **最終移除 RLS**  | `20251115060000_final_disable_all_rls.sql`      |
 
 ### 為什麼反覆啟用/禁用？
 
@@ -127,12 +133,13 @@ if (user.roles.includes('tour_leader')) {
   // 只顯示自己帶的團
   const orders = fetchOrders({
     tour_leader_id: user.id,
-    workspace_id: user.workspace_id
+    workspace_id: user.workspace_id,
   })
 }
 ```
 
 **為什麼可以這樣做？**
+
 - 領隊是公司合作的領隊，不是完全的外部使用者
 - 領隊需要登入系統（Supabase Auth 驗證）
 - 前端邏輯 + service_role key 已經足夠安全
@@ -164,16 +171,19 @@ ALTER TABLE public.new_table DISABLE ROW LEVEL SECURITY;
 ## 📊 受影響的表格（已禁用 RLS）
 
 ### 系統表
+
 - employees
 - workspaces
 - user_roles
 
 ### Workspace 相關
+
 - channels
 - channel_members
 - messages
 
 ### 核心業務
+
 - tours
 - orders
 - order_members
@@ -183,11 +193,13 @@ ALTER TABLE public.new_table DISABLE ROW LEVEL SECURITY;
 - suppliers
 
 ### 財務
+
 - payments
 - receipts
 - finance_requests
 
 ### 其他
+
 - todos
 - calendar_events
 - esims
@@ -195,6 +207,7 @@ ALTER TABLE public.new_table DISABLE ROW LEVEL SECURITY;
 - contracts
 
 ### 輔助表
+
 - cost_templates
 - price_lists
 - bank_codes
@@ -212,6 +225,7 @@ is_super_admin() → boolean
 ```
 
 **為什麼保留？**
+
 - 刪除可能影響舊的 migrations
 - 保留作為未來的參考
 - 不影響系統運作
@@ -239,15 +253,20 @@ is_super_admin() → boolean
 ## 🔧 2025-12-11 更新
 
 ### 發現問題
+
 Supabase Dashboard 顯示 107 個 RLS 錯誤：
+
 - 錯誤類型：「Policy Exists RLS Disabled」
 - 受影響表格：advance_lists, bulletins, channel_groups, channels, cities, countries, itineraries, messages 等
 
 ### 原因分析
+
 某些表格的 RLS 被意外啟用，但沒有對應的 policies，導致 Supabase 報錯。
 
 ### 解決方案
+
 創建了最終的 RLS 清理 migration：
+
 - 檔案：`supabase/migrations/20251211000000_disable_all_remaining_rls.sql`
 - 功能：
   1. 禁用所有業務表格的 RLS
@@ -255,7 +274,9 @@ Supabase Dashboard 顯示 107 個 RLS 錯誤：
   3. 驗證結果並輸出報告
 
 ### 更新規範
+
 更新了 `.claude/CLAUDE.md` 的 RLS 規範：
+
 - 移除「user_preferences 需要 RLS」的例外
 - 明確說明：**所有表格都禁用 RLS**
 - 更新了權限控制架構圖（移除 Layer 2: RLS）
@@ -268,6 +289,7 @@ Supabase Dashboard 顯示 107 個 RLS 錯誤：
 Venturo 已完全移除 RLS，改用 **permissions + workspace_id filter** 的權限控制方式。
 
 這個決策：
+
 - ✅ 簡化了架構
 - ✅ 提升了開發效率
 - ✅ 保持了足夠的安全性（內部系統）

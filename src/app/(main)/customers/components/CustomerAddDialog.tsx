@@ -91,7 +91,7 @@ export function CustomerAddDialog({
   // 更新欄位並追蹤 dirty 狀態
   const updateField = useCallback(
     <K extends keyof NewCustomerData>(field: K, value: NewCustomerData[K]) => {
-      setNewCustomer((prev) => {
+      setNewCustomer(prev => {
         const updated = { ...prev, [field]: value }
         // 檢查是否與原始數據不同
         checkDirty(updated)
@@ -148,7 +148,7 @@ export function CustomerAddDialog({
             <FormField label={L.label_name} required labelClassName="text-xs">
               <Input
                 value={newCustomer.name}
-                onChange={(e) => updateField('name', e.target.value)}
+                onChange={e => updateField('name', e.target.value)}
                 placeholder={L.placeholder_name}
                 className="h-8 text-sm"
               />
@@ -157,7 +157,7 @@ export function CustomerAddDialog({
             <FormField label={L.label_phone} required labelClassName="text-xs">
               <Input
                 value={newCustomer.phone}
-                onChange={(e) => updateField('phone', e.target.value)}
+                onChange={e => updateField('phone', e.target.value)}
                 placeholder={L.placeholder_phone}
                 className="h-8 text-sm"
               />
@@ -168,7 +168,7 @@ export function CustomerAddDialog({
                 <Input
                   type="email"
                   value={newCustomer.email}
-                  onChange={(e) => updateField('email', e.target.value)}
+                  onChange={e => updateField('email', e.target.value)}
                   placeholder="Email"
                   className="h-8 text-sm"
                 />
@@ -176,7 +176,7 @@ export function CustomerAddDialog({
               <FormField label={L.label_national_id} labelClassName="text-xs">
                 <Input
                   value={newCustomer.national_id}
-                  onChange={(e) => updateField('national_id', e.target.value)}
+                  onChange={e => updateField('national_id', e.target.value)}
                   placeholder={L.placeholder_national_id}
                   className="h-8 text-sm"
                 />
@@ -186,7 +186,7 @@ export function CustomerAddDialog({
             <FormField label={L.label_passport_name} labelClassName="text-xs">
               <Input
                 value={newCustomer.passport_name}
-                onChange={(e) => updateField('passport_name', e.target.value.toUpperCase())}
+                onChange={e => updateField('passport_name', e.target.value.toUpperCase())}
                 placeholder={L.placeholder_passport_name}
                 className="h-8 text-sm"
               />
@@ -196,7 +196,7 @@ export function CustomerAddDialog({
               <FormField label={L.label_passport_number} labelClassName="text-xs">
                 <Input
                   value={newCustomer.passport_number}
-                  onChange={(e) => updateField('passport_number', e.target.value)}
+                  onChange={e => updateField('passport_number', e.target.value)}
                   placeholder={L.placeholder_passport_number}
                   className="h-8 text-sm"
                 />
@@ -204,7 +204,7 @@ export function CustomerAddDialog({
               <FormField label={L.label_passport_expiry} labelClassName="text-xs">
                 <DatePicker
                   value={newCustomer.passport_expiry}
-                  onChange={(date) => updateField('passport_expiry', date)}
+                  onChange={date => updateField('passport_expiry', date)}
                   className="h-8 text-sm"
                   placeholder={L.placeholder_date}
                 />
@@ -214,7 +214,7 @@ export function CustomerAddDialog({
             <FormField label={L.label_birth_date} labelClassName="text-xs">
               <DatePicker
                 value={newCustomer.birth_date}
-                onChange={(date) => updateField('birth_date', date)}
+                onChange={date => updateField('birth_date', date)}
                 className="h-8 text-sm"
                 placeholder={L.placeholder_date}
               />
@@ -304,7 +304,7 @@ export function CustomerAddDialog({
                     </div>
                     <button
                       type="button"
-                      onClick={(e) => {
+                      onClick={e => {
                         e.preventDefault()
                         e.stopPropagation()
                         passportUpload.removeFile(index)
@@ -336,8 +336,14 @@ export function CustomerAddDialog({
             </button>
             {showReminder && (
               <ul className="text-xs text-morandi-secondary space-y-1 p-3 pt-2">
-                <li>{L.reminder_1}<strong>{L.reminder_1_strong}</strong></li>
-                <li>{L.reminder_2_prefix}<strong>{L.reminder_2_strong}</strong></li>
+                <li>
+                  {L.reminder_1}
+                  <strong>{L.reminder_1_strong}</strong>
+                </li>
+                <li>
+                  {L.reminder_2_prefix}
+                  <strong>{L.reminder_2_strong}</strong>
+                </li>
                 <li>{L.reminder_3}</li>
               </ul>
             )}
@@ -359,7 +365,11 @@ export function CustomerAddDialog({
             </button>
             {showTips && (
               <ul className="text-xs text-morandi-secondary space-y-1 p-3 pt-2">
-                <li>{L.tip_1_prefix}<strong>{L.tip_1_strong}</strong>{L.tip_1_suffix}</li>
+                <li>
+                  {L.tip_1_prefix}
+                  <strong>{L.tip_1_strong}</strong>
+                  {L.tip_1_suffix}
+                </li>
                 <li>{L.tip_2}</li>
                 <li>{L.tip_3}</li>
               </ul>

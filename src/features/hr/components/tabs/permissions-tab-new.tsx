@@ -26,9 +26,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
     )
 
     // 額外權限（可複選，用於特殊需求）
-    const [extraPermissions, setExtraPermissions] = useState<string[]>(
-      employee.permissions || []
-    )
+    const [extraPermissions, setExtraPermissions] = useState<string[]>(employee.permissions || [])
 
     const [isSaving, setIsSaving] = useState(false)
     const [showSavedMessage, setShowSavedMessage] = useState(false)
@@ -188,8 +186,12 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
         {/* 角色選擇（複選） */}
         <div className="bg-card rounded-lg border border-border p-6">
           <div className="flex items-center gap-2 mb-4">
-            <h4 className="font-semibold text-lg text-morandi-primary">{COMP_HR_LABELS.SELECT_1620}</h4>
-            <span className="text-xs text-morandi-secondary bg-morandi-container/30 px-2 py-1 rounded">{COMP_HR_LABELS.LABEL_9521}</span>
+            <h4 className="font-semibold text-lg text-morandi-primary">
+              {COMP_HR_LABELS.SELECT_1620}
+            </h4>
+            <span className="text-xs text-morandi-secondary bg-morandi-container/30 px-2 py-1 rounded">
+              {COMP_HR_LABELS.LABEL_9521}
+            </span>
             <div className="group relative">
               <Info size={16} className="text-morandi-secondary cursor-help" />
               <div className="absolute left-0 top-6 w-64 bg-foreground text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
@@ -210,45 +212,42 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
                 return true
               })
               .map(role => {
-              const isSelected = selectedRoles.includes(role.id)
-              return (
-                <div
-                  key={role.id}
-                  onClick={() => handleRoleToggle(role.id)}
-                  className={cn(
-                    'p-4 rounded-lg border-2 cursor-pointer transition-all',
-                    isSelected
-                      ? 'border-morandi-gold bg-morandi-gold/5'
-                      : 'border-border bg-card hover:border-morandi-gold/50'
-                  )}
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={cn(
-                          'w-5 h-5 rounded border-2 flex items-center justify-center',
-                          isSelected
-                            ? 'border-morandi-gold bg-morandi-gold'
-                            : 'border-border'
-                        )}
-                      >
-                        {isSelected && <Check size={12} className="text-white" />}
+                const isSelected = selectedRoles.includes(role.id)
+                return (
+                  <div
+                    key={role.id}
+                    onClick={() => handleRoleToggle(role.id)}
+                    className={cn(
+                      'p-4 rounded-lg border-2 cursor-pointer transition-all',
+                      isSelected
+                        ? 'border-morandi-gold bg-morandi-gold/5'
+                        : 'border-border bg-card hover:border-morandi-gold/50'
+                    )}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className={cn(
+                            'w-5 h-5 rounded border-2 flex items-center justify-center',
+                            isSelected ? 'border-morandi-gold bg-morandi-gold' : 'border-border'
+                          )}
+                        >
+                          {isSelected && <Check size={12} className="text-white" />}
+                        </div>
+                        <h5 className="font-medium text-morandi-primary">{role.label}</h5>
                       </div>
-                      <h5 className="font-medium text-morandi-primary">{role.label}</h5>
+                      <span className={cn('text-xs px-2 py-1 rounded-full border', role.color)}>
+                        {role.canCrossWorkspace
+                          ? COMP_HR_LABELS.跨空間
+                          : role.canManageWorkspace
+                            ? COMP_HR_LABELS.管理員
+                            : COMP_HR_LABELS.一般}
+                      </span>
                     </div>
-                    <span
-                      className={cn(
-                        'text-xs px-2 py-1 rounded-full border',
-                        role.color
-                      )}
-                    >
-                      {role.canCrossWorkspace ? COMP_HR_LABELS.跨空間 : role.canManageWorkspace ? COMP_HR_LABELS.管理員 : COMP_HR_LABELS.一般}
-                    </span>
+                    <p className="text-sm text-morandi-secondary">{role.description}</p>
                   </div>
-                  <p className="text-sm text-morandi-secondary">{role.description}</p>
-                </div>
-              )
-            })}
+                )
+              })}
           </div>
         </div>
 
@@ -261,9 +260,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
                 <h5 className="font-medium text-morandi-primary mb-1">
                   已選角色：{selectedRoles.map(r => getRoleConfig(r)?.label).join('、')}
                 </h5>
-                <p className="text-sm text-morandi-secondary mb-3">
-                  {COMP_HR_LABELS.ADD_9036}
-                </p>
+                <p className="text-sm text-morandi-secondary mb-3">{COMP_HR_LABELS.ADD_9036}</p>
                 <div className="flex flex-wrap gap-2">
                   {rolePermissions.includes('*') ? (
                     <span className="px-3 py-1 bg-morandi-primary/10 border border-morandi-primary/20 rounded-full text-sm text-morandi-primary font-medium">
@@ -294,9 +291,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
             {COMP_HR_LABELS.ADD_223}
           </summary>
           <div className="p-4 pt-0 border-t border-border space-y-4">
-            <p className="text-sm text-morandi-secondary mb-4">
-              {COMP_HR_LABELS.LABEL_8504}
-            </p>
+            <p className="text-sm text-morandi-secondary mb-4">{COMP_HR_LABELS.LABEL_8504}</p>
 
             {categories.map(category => (
               <div key={category} className="bg-morandi-container/10 rounded-lg p-4">
@@ -306,7 +301,8 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                   {permissionsByCategory[category].map(permission => {
-                    const isDefault = rolePermissions.includes('*') || rolePermissions.includes(permission.id)
+                    const isDefault =
+                      rolePermissions.includes('*') || rolePermissions.includes(permission.id)
                     const isExtra = extraPermissions.includes(permission.id)
                     const isSelected = isDefault || isExtra
 
@@ -337,7 +333,9 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
                         </div>
                         <p className="text-sm font-medium text-morandi-primary truncate">
                           {permission.label}
-                          {isDefault && <span className="text-xs ml-1">{COMP_HR_LABELS.DEFAULT_TAG}</span>}
+                          {isDefault && (
+                            <span className="text-xs ml-1">{COMP_HR_LABELS.DEFAULT_TAG}</span>
+                          )}
                         </p>
                       </div>
                     )

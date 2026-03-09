@@ -34,7 +34,15 @@ export interface LocalTourData {
   tourCode: string
   coverImage?: string
   coverStyle?: 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
-  flightStyle?: 'original' | 'chinese' | 'japanese' | 'luxury' | 'art' | 'none' | 'dreamscape' | 'collage'
+  flightStyle?:
+    | 'original'
+    | 'chinese'
+    | 'japanese'
+    | 'luxury'
+    | 'art'
+    | 'none'
+    | 'dreamscape'
+    | 'collage'
   itineraryStyle?: 'original' | 'luxury' | 'art' | 'dreamscape'
   price?: string | null
   priceNote?: string | null
@@ -96,7 +104,11 @@ export function useItineraryEditor() {
   // 轉換資料格式（camelCase → snake_case）
   const convertDataForSave = useCallback(() => {
     const data = tourDataRef.current
-    logger.log('[ItineraryEditor] convertDataForSave - features:', data.features?.length || 0, data.features)
+    logger.log(
+      '[ItineraryEditor] convertDataForSave - features:',
+      data.features?.length || 0,
+      data.features
+    )
     return {
       tour_id: undefined,
       tagline: data.tagline,
@@ -148,7 +160,10 @@ export function useItineraryEditor() {
     try {
       const convertedData = convertDataForSave()
       logger.log('[ItineraryEditor] 準備存檔 - features:', convertedData.features?.length || 0)
-      logger.log('[ItineraryEditor] 準備存檔 - daily_itinerary:', convertedData.daily_itinerary?.length || 0)
+      logger.log(
+        '[ItineraryEditor] 準備存檔 - daily_itinerary:',
+        convertedData.daily_itinerary?.length || 0
+      )
 
       if (currentItineraryId) {
         logger.log('[ItineraryEditor] 更新行程:', currentItineraryId)
@@ -157,7 +172,10 @@ export function useItineraryEditor() {
 
         // 同步飯店到報價單
         if (convertedData.daily_itinerary && convertedData.daily_itinerary.length > 0) {
-          syncHotelsFromItineraryToQuote(currentItineraryId, convertedData.daily_itinerary as { accommodation?: string }[])
+          syncHotelsFromItineraryToQuote(
+            currentItineraryId,
+            convertedData.daily_itinerary as { accommodation?: string }[]
+          )
             .then(result => {
               if (!result.success && result.message !== '無關聯報價單，跳過同步') {
                 logger.warn('飯店同步到報價單:', result.message)

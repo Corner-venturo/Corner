@@ -3,12 +3,7 @@
 import React, { useState } from 'react'
 import { Move } from 'lucide-react'
 import { toast } from 'sonner'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { DailyImage } from '../types'
 import { ThreeDPhotoWall } from '@/components/ui/3d-photo-wall'
 import { ImageGrid } from './daily-images/ImageGrid'
@@ -44,12 +39,8 @@ export function DailyImagesUploader({
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [previewIndex, setPreviewIndex] = useState<number | null>(null)
 
-  const {
-    isUploading,
-    uploadProgress,
-    handleMultipleUpload,
-    uploadImageFromUrl,
-  } = useImageUpload(dayIndex)
+  const { isUploading, uploadProgress, handleMultipleUpload, uploadImageFromUrl } =
+    useImageUpload(dayIndex)
 
   // 處理檔案選擇
   const handleFileSelect = async (files: FileList | File[]) => {
@@ -91,14 +82,15 @@ export function DailyImagesUploader({
     if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
       const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp', '.avif']
       const lowerUrl = url.toLowerCase()
-      const isImageUrl = imageExtensions.some(ext => lowerUrl.includes(ext)) ||
-                         lowerUrl.includes('image') ||
-                         lowerUrl.includes('photo') ||
-                         lowerUrl.includes('unsplash') ||
-                         lowerUrl.includes('imgur') ||
-                         lowerUrl.includes('pexels') ||
-                         lowerUrl.includes('pixabay') ||
-                         lowerUrl.includes('googleusercontent')
+      const isImageUrl =
+        imageExtensions.some(ext => lowerUrl.includes(ext)) ||
+        lowerUrl.includes('image') ||
+        lowerUrl.includes('photo') ||
+        lowerUrl.includes('unsplash') ||
+        lowerUrl.includes('imgur') ||
+        lowerUrl.includes('pexels') ||
+        lowerUrl.includes('pixabay') ||
+        lowerUrl.includes('googleusercontent')
 
       if (isImageUrl) {
         toast.info(COMP_EDITOR_LABELS.正在下載並上傳圖片)
@@ -162,14 +154,15 @@ export function DailyImagesUploader({
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <label className="text-sm font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_6290}</label>
+          <label className="text-sm font-medium text-morandi-primary">
+            {COMP_EDITOR_LABELS.LABEL_6290}
+          </label>
           <p className="text-xs text-morandi-secondary mt-1">
-            點擊縮圖可預覽，點擊 <Move size={12} className="inline" /> {COMP_EDITOR_LABELS.LABEL_7764}
+            點擊縮圖可預覽，點擊 <Move size={12} className="inline" />{' '}
+            {COMP_EDITOR_LABELS.LABEL_7764}
           </p>
         </div>
-        <span className="text-xs text-morandi-secondary">
-          {images.length} 張
-        </span>
+        <span className="text-xs text-morandi-secondary">{images.length} 張</span>
       </div>
 
       {/* 上傳區域 + 縮圖網格 */}
@@ -204,7 +197,7 @@ export function DailyImagesUploader({
             </DialogHeader>
             <ImagePositionEditor
               image={images[editingIndex]}
-              onSave={(position) => handleUpdatePosition(editingIndex, position)}
+              onSave={position => handleUpdatePosition(editingIndex, position)}
               onClose={() => setEditingIndex(null)}
             />
           </DialogContent>
@@ -212,12 +205,9 @@ export function DailyImagesUploader({
       )}
 
       {/* 預覽 - 如果有整個行程的照片就顯示照片牆，否則顯示單張預覽 */}
-      {previewIndex !== null && (
-        allTourImages.length >= 4 ? (
-          <ThreeDPhotoWall
-            images={allTourImages}
-            onClose={() => setPreviewIndex(null)}
-          />
+      {previewIndex !== null &&
+        (allTourImages.length >= 4 ? (
+          <ThreeDPhotoWall images={allTourImages} onClose={() => setPreviewIndex(null)} />
         ) : (
           <ImagePreviewModal
             images={images}
@@ -225,8 +215,7 @@ export function DailyImagesUploader({
             onClose={() => setPreviewIndex(null)}
             onNavigate={setPreviewIndex}
           />
-        )
-      )}
+        ))}
     </div>
   )
 }

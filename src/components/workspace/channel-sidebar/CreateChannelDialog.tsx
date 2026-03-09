@@ -48,7 +48,8 @@ export function CreateChannelDialog({
   const { workspaces, loadWorkspaces } = useWorkspaceStore()
 
   // 檢查是否為超級管理員
-  const isSuperAdmin = user?.roles?.includes('super_admin') || user?.permissions?.includes('super_admin')
+  const isSuperAdmin =
+    user?.roles?.includes('super_admin') || user?.permissions?.includes('super_admin')
 
   // 載入工作空間資料（employees 由 SWR 自動載入）
   useEffect(() => {
@@ -58,9 +59,12 @@ export function CreateChannelDialog({
   }, [isOpen, isSuperAdmin, workspaces.length, loadWorkspaces])
 
   // 根據範圍顯示員工列表
-  const displayEmployees = channelScope === 'company'
-    ? employees // 全集團：顯示所有員工
-    : employees.filter(emp => (emp as unknown as { workspace_id?: string }).workspace_id === user?.workspace_id)
+  const displayEmployees =
+    channelScope === 'company'
+      ? employees // 全集團：顯示所有員工
+      : employees.filter(
+          emp => (emp as unknown as { workspace_id?: string }).workspace_id === user?.workspace_id
+        )
 
   // 取得員工所屬的 workspace 名稱
   const getWorkspaceName = (workspaceId: string | undefined) => {
@@ -88,11 +92,15 @@ export function CreateChannelDialog({
     // eslint-disable-next-line venturo/no-custom-modal
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9100]">
       <div className="card-morandi-elevated w-96 max-h-[80vh] flex flex-col">
-        <h3 className="font-semibold mb-4 text-morandi-primary">{COMP_WORKSPACE_LABELS.LABEL_3910}</h3>
+        <h3 className="font-semibold mb-4 text-morandi-primary">
+          {COMP_WORKSPACE_LABELS.LABEL_3910}
+        </h3>
 
         <div className="space-y-3 flex-1 overflow-y-auto">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_WORKSPACE_LABELS.頻道名稱}</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              {COMP_WORKSPACE_LABELS.頻道名稱}
+            </label>
             <input
               type="text"
               placeholder={COMP_WORKSPACE_LABELS.例如_專案討論}
@@ -150,7 +158,9 @@ export function CreateChannelDialog({
               </button>
             </div>
             <p className="text-xs text-morandi-secondary mt-1">
-              {channelType === 'public' ? COMP_WORKSPACE_LABELS.所有成員都可以看到並加入 : COMP_WORKSPACE_LABELS.只有被邀請的成員可以看到}
+              {channelType === 'public'
+                ? COMP_WORKSPACE_LABELS.所有成員都可以看到並加入
+                : COMP_WORKSPACE_LABELS.只有被邀請的成員可以看到}
             </p>
           </div>
 
@@ -216,8 +226,10 @@ export function CreateChannelDialog({
               {displayEmployees.map(employee => {
                 const isCreator = employee.id === user?.id
                 const isSelected = selectedMembers.includes(employee.id)
-                const empWorkspaceId = (employee as unknown as { workspace_id?: string }).workspace_id
-                const workspaceName = channelScope === 'company' ? getWorkspaceName(empWorkspaceId) : ''
+                const empWorkspaceId = (employee as unknown as { workspace_id?: string })
+                  .workspace_id
+                const workspaceName =
+                  channelScope === 'company' ? getWorkspaceName(empWorkspaceId) : ''
 
                 return (
                   <button

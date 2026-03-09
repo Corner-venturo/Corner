@@ -9,8 +9,11 @@
 
 import { LucideIcon, Plus, Edit2, Trash2, FileOutput, Navigation } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import type { TourConfirmationItem, ConfirmationItemCategory } from '@/types/tour-confirmation-sheet.types'
-import { CONFIRMATION_SECTION_LABELS } from '../constants/labels';
+import type {
+  TourConfirmationItem,
+  ConfirmationItemCategory,
+} from '@/types/tour-confirmation-sheet.types'
+import { CONFIRMATION_SECTION_LABELS } from '../constants/labels'
 import { formatDateCompactPadded } from '@/lib/utils/format-date'
 import { formatMoney } from '@/lib/utils/format-currency'
 
@@ -98,9 +101,7 @@ export function ConfirmationSection({
             <Icon size={16} className="text-white" />
           </div>
           <h3 className="font-medium text-morandi-primary">{title}</h3>
-          <span className="text-sm text-morandi-secondary">
-            ({items.length} 項)
-          </span>
+          <span className="text-sm text-morandi-secondary">({items.length} 項)</span>
         </div>
         <Button
           size="sm"
@@ -117,7 +118,7 @@ export function ConfirmationSection({
         <table className="w-full">
           <thead>
             <tr className="bg-morandi-container/20 border-b border-border/60">
-              {columns.map((col) => (
+              {columns.map(col => (
                 <th
                   key={col.key}
                   className="px-3 py-2 text-left text-xs font-medium text-morandi-secondary"
@@ -152,7 +153,7 @@ export function ConfirmationSection({
                     index % 2 === 0 ? '' : 'bg-morandi-container/5'
                   }`}
                 >
-                  {columns.map((col) => (
+                  {columns.map(col => (
                     <td
                       key={col.key}
                       className={`px-3 py-2 text-sm ${
@@ -225,13 +226,17 @@ export function ConfirmationSection({
                 </td>
                 <td className="px-3 py-2 text-right text-sm font-mono">
                   <div className="flex flex-col">
-                    <span className="text-morandi-secondary text-xs">{CONFIRMATION_SECTION_LABELS.LABEL_6009}</span>
+                    <span className="text-morandi-secondary text-xs">
+                      {CONFIRMATION_SECTION_LABELS.LABEL_6009}
+                    </span>
                     <span className="font-medium">{formatCurrency(sectionTotal.expected)}</span>
                   </div>
                 </td>
                 <td className="px-3 py-2 text-right text-sm font-mono">
                   <div className="flex flex-col">
-                    <span className="text-morandi-secondary text-xs">{CONFIRMATION_SECTION_LABELS.LABEL_3550}</span>
+                    <span className="text-morandi-secondary text-xs">
+                      {CONFIRMATION_SECTION_LABELS.LABEL_3550}
+                    </span>
                     <span className="font-medium">{formatCurrency(sectionTotal.actual)}</span>
                   </div>
                 </td>

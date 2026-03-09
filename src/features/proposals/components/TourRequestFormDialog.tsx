@@ -8,7 +8,6 @@
  * 3. 開新視窗列印（避免 Dialog z-index 問題）
  */
 
-
 import { PROPOSAL_FORM_LABELS } from '../constants/labels'
 
 import React, { useState, useEffect } from 'react'
@@ -22,17 +21,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  X,
-  Printer,
-  FileText,
-  Plus,
-  Trash2,
-  Loader2,
-  Receipt,
-  Send,
-  Building2,
-} from 'lucide-react'
+import { X, Printer, FileText, Plus, Trash2, Loader2, Receipt, Send, Building2 } from 'lucide-react'
 import { SupplierSearchInput, type Supplier as SupplierData } from './SupplierSearchInput'
 import { usePrintLogo } from '@/features/quotes/components/printable/shared/usePrintLogo'
 import { COMPANY } from '@/lib/constants/company'
@@ -44,7 +33,11 @@ import { logger } from '@/lib/utils/logger'
 import type { Proposal, ProposalPackage } from '@/types/proposal.types'
 import type { Tour } from '@/stores/types'
 import type { Database } from '@/lib/supabase/types'
-import { ADD_MANUAL_REQUEST_DIALOG_LABELS, PACKAGE_LIST_PANEL_LABELS, TOUR_REQUEST_FORM_DIALOG_LABELS } from '../constants/labels';
+import {
+  ADD_MANUAL_REQUEST_DIALOG_LABELS,
+  PACKAGE_LIST_PANEL_LABELS,
+  TOUR_REQUEST_FORM_DIALOG_LABELS,
+} from '../constants/labels'
 import { formatDateTW } from '@/lib/utils/format-date'
 
 type Workspace = Database['public']['Tables']['workspaces']['Row']
@@ -54,7 +47,7 @@ const CATEGORY_TO_SUPPLIER_TYPE: Record<string, string> = {
   hotel: 'hotel',
   restaurant: 'restaurant',
   transport: 'transport',
-  activity: 'attraction',  // 注意：不同名稱
+  activity: 'attraction', // 注意：不同名稱
   other: 'other',
 }
 
@@ -62,19 +55,42 @@ const CATEGORY_TO_SUPPLIER_TYPE: Record<string, string> = {
 interface RequestItem {
   id: string
   date: string
-  title: string      // 餐別/房型/項目
+  title: string // 餐別/房型/項目
   quantity: number
   unitPrice: number
   note: string
 }
 
 // 分類對應的欄位標題
-const CATEGORY_COLUMNS: Record<string, { dateLabel: string; titleLabel: string; qtyLabel: string }> = {
-  hotel: { dateLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.日期, titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.房型, qtyLabel: ADD_MANUAL_REQUEST_DIALOG_LABELS.間數 },
-  restaurant: { dateLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.日期, titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.餐別, qtyLabel: ADD_MANUAL_REQUEST_DIALOG_LABELS.人數 },
-  transport: { dateLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.日期, titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.路線_車型, qtyLabel: ADD_MANUAL_REQUEST_DIALOG_LABELS.台數 },
-  activity: { dateLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.日期, titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.項目, qtyLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.人數 },
-  other: { dateLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.日期, titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.項目, qtyLabel: ADD_MANUAL_REQUEST_DIALOG_LABELS.數量 },
+const CATEGORY_COLUMNS: Record<
+  string,
+  { dateLabel: string; titleLabel: string; qtyLabel: string }
+> = {
+  hotel: {
+    dateLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.日期,
+    titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.房型,
+    qtyLabel: ADD_MANUAL_REQUEST_DIALOG_LABELS.間數,
+  },
+  restaurant: {
+    dateLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.日期,
+    titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.餐別,
+    qtyLabel: ADD_MANUAL_REQUEST_DIALOG_LABELS.人數,
+  },
+  transport: {
+    dateLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.日期,
+    titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.路線_車型,
+    qtyLabel: ADD_MANUAL_REQUEST_DIALOG_LABELS.台數,
+  },
+  activity: {
+    dateLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.日期,
+    titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.項目,
+    qtyLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.人數,
+  },
+  other: {
+    dateLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.日期,
+    titleLabel: TOUR_REQUEST_FORM_DIALOG_LABELS.項目,
+    qtyLabel: ADD_MANUAL_REQUEST_DIALOG_LABELS.數量,
+  },
 }
 
 // 分類中文名
@@ -143,7 +159,7 @@ export function TourRequestFormDialog({
 
   // 供應商資訊（可編輯）
   const [supplierInfo, setSupplierInfo] = useState({
-    id: '',  // 如果是已存在的供應商，記錄 ID
+    id: '', // 如果是已存在的供應商，記錄 ID
     name: supplierName,
     contactPerson: '',
     phone: '',
@@ -156,7 +172,7 @@ export function TourRequestFormDialog({
     cityCode: '',
     cityName: '',
     countryName: '',
-    customCity: '',  // 不在列表時手動輸入
+    customCity: '', // 不在列表時手動輸入
   })
 
   // 接收供應商 workspace
@@ -180,7 +196,7 @@ export function TourRequestFormDialog({
       name: supplier.name,
       contactPerson: supplier.contact_person || '',
       phone: supplier.phone || '',
-      fax: '',  // 供應商表沒有 fax 欄位
+      fax: '', // 供應商表沒有 fax 欄位
     })
 
     // 如果供應商有國家資訊，帶入
@@ -237,7 +253,9 @@ export function TourRequestFormDialog({
 
   // 員工選單：自己排最前面，其他依員工編號排序
   const sortedEmployees = React.useMemo(() => {
-    const filtered = employees.filter(emp => emp.employee_type !== 'bot' && emp.workspace_id === user?.workspace_id)
+    const filtered = employees.filter(
+      emp => emp.employee_type !== 'bot' && emp.workspace_id === user?.workspace_id
+    )
     const currentUserName = user?.chinese_name || user?.display_name || user?.name || ''
     return filtered.sort((a, b) => {
       const aIsMe = a.chinese_name === currentUserName || a.display_name === currentUserName
@@ -255,11 +273,7 @@ export function TourRequestFormDialog({
 
   // 更新項目
   const updateItem = (id: string, field: keyof RequestItem, value: string | number) => {
-    setItems(prev =>
-      prev.map(item =>
-        item.id === id ? { ...item, [field]: value } : item
-      )
-    )
+    setItems(prev => prev.map(item => (item.id === id ? { ...item, [field]: value } : item)))
   }
 
   // 新增項目
@@ -383,7 +397,9 @@ export function TourRequestFormDialog({
             </tr>
           </thead>
           <tbody>
-            ${items.map(item => `
+            ${items
+              .map(
+                item => `
               <tr>
                 <td>${formatDate(item.date)}</td>
                 <td>${item.title}</td>
@@ -391,7 +407,9 @@ export function TourRequestFormDialog({
                 <td class="text-right">${item.unitPrice > 0 ? '$' + item.unitPrice.toLocaleString() : '-'}</td>
                 <td>${item.note || '-'}</td>
               </tr>
-            `).join('')}
+            `
+              )
+              .join('')}
           </tbody>
         </table>
 
@@ -416,7 +434,6 @@ export function TourRequestFormDialog({
 
       // 如果有 ID，表示是選擇的既有供應商，更新聯絡資訊
       if (supplierInfo.id) {
-         
         const { error } = await dynamicFrom('suppliers')
           .update({
             contact_person: supplierInfo.contactPerson || null,
@@ -432,7 +449,7 @@ export function TourRequestFormDialog({
       }
 
       // 檢查是否已存在同名同類別的供應商
-       
+
       const { data: existing } = await dynamicFrom('suppliers')
         .select('id')
         .eq('name', supplierInfo.name)
@@ -442,7 +459,7 @@ export function TourRequestFormDialog({
 
       if (existing) {
         // 已存在，更新聯絡資訊
-         
+
         const { error } = await dynamicFrom('suppliers')
           .update({
             contact_person: supplierInfo.contactPerson || null,
@@ -457,7 +474,7 @@ export function TourRequestFormDialog({
       } else {
         // 不存在，建立新供應商
         // 生成供應商代碼
-         
+
         const { data: maxCodeData } = await dynamicFrom('suppliers')
           .select('code')
           .like('code', 'S%')
@@ -470,17 +487,15 @@ export function TourRequestFormDialog({
           newCode = `S${String(maxNum + 1).padStart(6, '0')}`
         }
 
-         
-        const { error } = await dynamicFrom('suppliers')
-          .insert({
-            code: newCode,
-            name: supplierInfo.name,
-            type: supplierTypeCode,
-            contact_person: supplierInfo.contactPerson || null,
-            phone: supplierInfo.phone || null,
-            workspace_id: user.workspace_id,
-            is_active: true,
-          })
+        const { error } = await dynamicFrom('suppliers').insert({
+          code: newCode,
+          name: supplierInfo.name,
+          type: supplierTypeCode,
+          contact_person: supplierInfo.contactPerson || null,
+          phone: supplierInfo.phone || null,
+          workspace_id: user.workspace_id,
+          is_active: true,
+        })
 
         if (error) {
           logger.warn('建立供應商失敗:', error)
@@ -534,7 +549,11 @@ export function TourRequestFormDialog({
         .filter((id: string): id is string => !!id && !id.startsWith('new-'))
 
       if (requestIds.length === 0) {
-        toast({ title: TOUR_REQUEST_FORM_DIALOG_LABELS.發送失敗, description: '沒有可發送的需求項目', variant: 'destructive' })
+        toast({
+          title: TOUR_REQUEST_FORM_DIALOG_LABELS.發送失敗,
+          description: '沒有可發送的需求項目',
+          variant: 'destructive',
+        })
         return
       }
 
@@ -554,7 +573,11 @@ export function TourRequestFormDialog({
 
       if (error) {
         logger.error('發送需求單失敗:', error)
-        toast({ title: TOUR_REQUEST_FORM_DIALOG_LABELS.發送失敗, description: TOUR_REQUEST_FORM_DIALOG_LABELS.請重試或聯繫系統管理員, variant: 'destructive' })
+        toast({
+          title: TOUR_REQUEST_FORM_DIALOG_LABELS.發送失敗,
+          description: TOUR_REQUEST_FORM_DIALOG_LABELS.請重試或聯繫系統管理員,
+          variant: 'destructive',
+        })
         return
       }
 
@@ -566,7 +589,11 @@ export function TourRequestFormDialog({
       onClose()
     } catch (err) {
       logger.error('發送需求單錯誤:', err)
-      toast({ title: TOUR_REQUEST_FORM_DIALOG_LABELS.發送失敗, description: TOUR_REQUEST_FORM_DIALOG_LABELS.請重試或聯繫系統管理員, variant: 'destructive' })
+      toast({
+        title: TOUR_REQUEST_FORM_DIALOG_LABELS.發送失敗,
+        description: TOUR_REQUEST_FORM_DIALOG_LABELS.請重試或聯繫系統管理員,
+        variant: 'destructive',
+      })
     } finally {
       setSending(false)
     }
@@ -589,20 +616,26 @@ export function TourRequestFormDialog({
       // 全部存檔成功後，開啟新視窗列印
       const printWindow = window.open('', '_blank', 'width=900,height=700')
       if (!printWindow) {
-        toast({ title: TOUR_REQUEST_FORM_DIALOG_LABELS.請允許彈出視窗以進行列印, variant: 'destructive' })
+        toast({
+          title: TOUR_REQUEST_FORM_DIALOG_LABELS.請允許彈出視窗以進行列印,
+          variant: 'destructive',
+        })
         return
       }
 
       printWindow.document.write(printContent)
       printWindow.document.close()
 
-      toast({ title: TOUR_REQUEST_FORM_DIALOG_LABELS.需求單已發送並存檔, description: TOUR_REQUEST_FORM_DIALOG_LABELS.狀態已更新為_已發送 })
+      toast({
+        title: TOUR_REQUEST_FORM_DIALOG_LABELS.需求單已發送並存檔,
+        description: TOUR_REQUEST_FORM_DIALOG_LABELS.狀態已更新為_已發送,
+      })
     } catch (err) {
       logger.error('需求單處理失敗:', err)
-      toast({ 
-        title: TOUR_REQUEST_FORM_DIALOG_LABELS.存檔失敗, 
+      toast({
+        title: TOUR_REQUEST_FORM_DIALOG_LABELS.存檔失敗,
         description: TOUR_REQUEST_FORM_DIALOG_LABELS.請重試或聯繫系統管理員,
-        variant: 'destructive' 
+        variant: 'destructive',
       })
     } finally {
       setSaving(false)
@@ -610,300 +643,362 @@ export function TourRequestFormDialog({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()} modal={true}>
-      <DialogContent level={2} className={`${DIALOG_SIZES['4xl']} max-h-[85vh] overflow-hidden flex flex-col`}>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <FileText size={18} className="text-morandi-gold" />
-              {categoryName}需求單 - {supplierInfo.name}
-            </DialogTitle>
-          </DialogHeader>
+    <Dialog open={isOpen} onOpenChange={open => !open && onClose()} modal={true}>
+      <DialogContent
+        level={2}
+        className={`${DIALOG_SIZES['4xl']} max-h-[85vh] overflow-hidden flex flex-col`}
+      >
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <FileText size={18} className="text-morandi-gold" />
+            {categoryName}需求單 - {supplierInfo.name}
+          </DialogTitle>
+        </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto space-y-6 py-4">
-            {/* 雙欄資訊區 */}
-            <div className="grid grid-cols-2 gap-6">
-              {/* 我方資訊 */}
-              <div className="space-y-2">
-                <h3 className="font-medium text-morandi-primary border-b border-border pb-1">
-                  {PROPOSAL_FORM_LABELS.LABEL_7720}
-                </h3>
-                <div className="space-y-1 text-sm">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.COMPANY}</span>
-                    <span className="text-morandi-primary">{companyInfo.name}</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-x-4">
-                    <div className="flex items-baseline">
-                      <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.PHONE}</span>
-                      <input
-                        value={companyInfo.phone}
-                        onChange={(e) => setCompanyInfo(prev => ({ ...prev, phone: e.target.value }))}
-                        className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold"
-                      />
-                    </div>
-                    <div className="flex items-baseline">
-                      <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.FAX}</span>
-                      <input
-                        value={companyInfo.fax}
-                        onChange={(e) => setCompanyInfo(prev => ({ ...prev, fax: e.target.value }))}
-                        className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-x-4">
-                    <div className="flex items-baseline">
-                      <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.SALES}</span>
-                      <select
-                        value={companyInfo.sales}
-                        onChange={(e) => setCompanyInfo(prev => ({ ...prev, sales: e.target.value }))}
-                        className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold cursor-pointer"
-                      >
-                        <option value=""></option>
-                        {sortedEmployees.map(emp => {
-                          const label = [emp.chinese_name, emp.display_name].filter(Boolean).join(' / ') || ''
-                          return <option key={emp.id} value={emp.chinese_name || emp.display_name || ''}>{label}</option>
-                        })}
-                      </select>
-                    </div>
-                    <div className="flex items-baseline">
-                      <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.ASSISTANT}</span>
-                      <select
-                        value={companyInfo.assistant}
-                        onChange={(e) => setCompanyInfo(prev => ({ ...prev, assistant: e.target.value }))}
-                        className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold cursor-pointer"
-                      >
-                        <option value=""></option>
-                        {sortedEmployees.map(emp => {
-                          const label = [emp.chinese_name, emp.display_name].filter(Boolean).join(' / ') || ''
-                          return <option key={emp.id} value={emp.chinese_name || emp.display_name || ''}>{label}</option>
-                        })}
-                      </select>
-                    </div>
-                  </div>
+        <div className="flex-1 overflow-y-auto space-y-6 py-4">
+          {/* 雙欄資訊區 */}
+          <div className="grid grid-cols-2 gap-6">
+            {/* 我方資訊 */}
+            <div className="space-y-2">
+              <h3 className="font-medium text-morandi-primary border-b border-border pb-1">
+                {PROPOSAL_FORM_LABELS.LABEL_7720}
+              </h3>
+              <div className="space-y-1 text-sm">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-morandi-secondary whitespace-nowrap">
+                    {PROPOSAL_FORM_LABELS.COMPANY}
+                  </span>
+                  <span className="text-morandi-primary">{companyInfo.name}</span>
                 </div>
-              </div>
-
-              {/* 廠商資訊 */}
-              <div className="space-y-2">
-                <h3 className="font-medium text-morandi-primary border-b border-border pb-1">
-                  {PROPOSAL_FORM_LABELS.LABEL_3340}
-                </h3>
-                <div className="space-y-1 text-sm">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.SUPPLIER}</span>
-                    <SupplierSearchInput
-                      value={supplierInfo.name}
-                      onChange={(val) => setSupplierInfo(prev => ({ ...prev, name: val, id: '' }))}
-                      onSupplierSelect={handleSupplierSelect}
-                      category={category}
-                      className="flex-1"
+                <div className="grid grid-cols-2 gap-x-4">
+                  <div className="flex items-baseline">
+                    <span className="text-morandi-secondary whitespace-nowrap">
+                      {PROPOSAL_FORM_LABELS.PHONE}
+                    </span>
+                    <input
+                      value={companyInfo.phone}
+                      onChange={e => setCompanyInfo(prev => ({ ...prev, phone: e.target.value }))}
+                      className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-x-4">
-                    <div className="flex items-baseline">
-                      <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.CITY}</span>
-                      <input
-                        value={cityInfo.customCity}
-                        onChange={(e) => setCityInfo(prev => ({ ...prev, customCity: e.target.value }))}
-                        className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold"
-                      />
-                    </div>
-                    <div className="flex items-baseline">
-                      <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.CONTACT}</span>
-                      <input
-                        value={supplierInfo.contactPerson}
-                        onChange={(e) => setSupplierInfo(prev => ({ ...prev, contactPerson: e.target.value }))}
-                        className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-x-4">
-                    <div className="flex items-baseline">
-                      <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.PHONE}</span>
-                      <input
-                        value={supplierInfo.phone}
-                        onChange={(e) => setSupplierInfo(prev => ({ ...prev, phone: e.target.value }))}
-                        className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold"
-                      />
-                    </div>
-                    <div className="flex items-baseline">
-                      <span className="text-morandi-secondary whitespace-nowrap">{PROPOSAL_FORM_LABELS.FAX}</span>
-                      <input
-                        value={supplierInfo.fax}
-                        onChange={(e) => setSupplierInfo(prev => ({ ...prev, fax: e.target.value }))}
-                        className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold"
-                      />
-                    </div>
+                  <div className="flex items-baseline">
+                    <span className="text-morandi-secondary whitespace-nowrap">
+                      {PROPOSAL_FORM_LABELS.FAX}
+                    </span>
+                    <input
+                      value={companyInfo.fax}
+                      onChange={e => setCompanyInfo(prev => ({ ...prev, fax: e.target.value }))}
+                      className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold"
+                    />
                   </div>
                 </div>
+                <div className="grid grid-cols-2 gap-x-4">
+                  <div className="flex items-baseline">
+                    <span className="text-morandi-secondary whitespace-nowrap">
+                      {PROPOSAL_FORM_LABELS.SALES}
+                    </span>
+                    <select
+                      value={companyInfo.sales}
+                      onChange={e => setCompanyInfo(prev => ({ ...prev, sales: e.target.value }))}
+                      className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold cursor-pointer"
+                    >
+                      <option value=""></option>
+                      {sortedEmployees.map(emp => {
+                        const label =
+                          [emp.chinese_name, emp.display_name].filter(Boolean).join(' / ') || ''
+                        return (
+                          <option key={emp.id} value={emp.chinese_name || emp.display_name || ''}>
+                            {label}
+                          </option>
+                        )
+                      })}
+                    </select>
+                  </div>
+                  <div className="flex items-baseline">
+                    <span className="text-morandi-secondary whitespace-nowrap">
+                      {PROPOSAL_FORM_LABELS.ASSISTANT}
+                    </span>
+                    <select
+                      value={companyInfo.assistant}
+                      onChange={e =>
+                        setCompanyInfo(prev => ({ ...prev, assistant: e.target.value }))
+                      }
+                      className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold cursor-pointer"
+                    >
+                      <option value=""></option>
+                      {sortedEmployees.map(emp => {
+                        const label =
+                          [emp.chinese_name, emp.display_name].filter(Boolean).join(' / ') || ''
+                        return (
+                          <option key={emp.id} value={emp.chinese_name || emp.display_name || ''}>
+                            {label}
+                          </option>
+                        )
+                      })}
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* 接收供應商 workspace 選擇器 */}
-            <div className="flex items-center gap-3 px-1">
-              <div className="flex items-center gap-1.5 text-sm text-morandi-secondary whitespace-nowrap">
-                <Building2 size={14} />
-                <span>{TOUR_REQUEST_FORM_DIALOG_LABELS.接收供應商}</span>
-              </div>
-              <select
-                value={recipientWorkspaceId}
-                onChange={(e) => setRecipientWorkspaceId(e.target.value)}
-                className="flex-1 h-8 px-2 text-sm rounded-md border border-border bg-background focus:outline-none focus:ring-1 focus:ring-morandi-gold"
-              >
-                <option value="">{TOUR_REQUEST_FORM_DIALOG_LABELS.不發送_列印模式}</option>
-                {workspaces.map((ws) => (
-                  <option key={ws.id} value={ws.id}>
-                    {ws.name}{ws.code ? ` (${ws.code})` : ''}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* 團體資訊 */}
-            <div className="bg-morandi-container/30 rounded-lg p-4">
-              <div className="grid grid-cols-4 gap-4 text-sm">
-                <div>
-                  <span className="text-morandi-secondary">{PROPOSAL_FORM_LABELS.LABEL_3785}</span>
-                  <span className="font-medium ml-1">{tourCode || tour?.code || '-'}</span>
+            {/* 廠商資訊 */}
+            <div className="space-y-2">
+              <h3 className="font-medium text-morandi-primary border-b border-border pb-1">
+                {PROPOSAL_FORM_LABELS.LABEL_3340}
+              </h3>
+              <div className="space-y-1 text-sm">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-morandi-secondary whitespace-nowrap">
+                    {PROPOSAL_FORM_LABELS.SUPPLIER}
+                  </span>
+                  <SupplierSearchInput
+                    value={supplierInfo.name}
+                    onChange={val => setSupplierInfo(prev => ({ ...prev, name: val, id: '' }))}
+                    onSupplierSelect={handleSupplierSelect}
+                    category={category}
+                    className="flex-1"
+                  />
                 </div>
-                <div>
-                  <span className="text-morandi-secondary">{PROPOSAL_FORM_LABELS.LABEL_168}</span>
-                  <span className="font-medium ml-1">{tourName || tour?.name || proposal?.title || '-'}</span>
+                <div className="grid grid-cols-2 gap-x-4">
+                  <div className="flex items-baseline">
+                    <span className="text-morandi-secondary whitespace-nowrap">
+                      {PROPOSAL_FORM_LABELS.CITY}
+                    </span>
+                    <input
+                      value={cityInfo.customCity}
+                      onChange={e => setCityInfo(prev => ({ ...prev, customCity: e.target.value }))}
+                      className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold"
+                    />
+                  </div>
+                  <div className="flex items-baseline">
+                    <span className="text-morandi-secondary whitespace-nowrap">
+                      {PROPOSAL_FORM_LABELS.CONTACT}
+                    </span>
+                    <input
+                      value={supplierInfo.contactPerson}
+                      onChange={e =>
+                        setSupplierInfo(prev => ({ ...prev, contactPerson: e.target.value }))
+                      }
+                      className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <span className="text-morandi-secondary">{PROPOSAL_FORM_LABELS.LABEL_2816}</span>
-                  <span className="font-medium ml-1">{formatDate(departureDate || tour?.departure_date || pkg?.start_date)}</span>
+                <div className="grid grid-cols-2 gap-x-4">
+                  <div className="flex items-baseline">
+                    <span className="text-morandi-secondary whitespace-nowrap">
+                      {PROPOSAL_FORM_LABELS.PHONE}
+                    </span>
+                    <input
+                      value={supplierInfo.phone}
+                      onChange={e => setSupplierInfo(prev => ({ ...prev, phone: e.target.value }))}
+                      className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold"
+                    />
+                  </div>
+                  <div className="flex items-baseline">
+                    <span className="text-morandi-secondary whitespace-nowrap">
+                      {PROPOSAL_FORM_LABELS.FAX}
+                    </span>
+                    <input
+                      value={supplierInfo.fax}
+                      onChange={e => setSupplierInfo(prev => ({ ...prev, fax: e.target.value }))}
+                      className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <span className="text-morandi-secondary">{PROPOSAL_FORM_LABELS.LABEL_8361}</span>
-                  <span className="font-medium ml-1">{pax || tour?.current_participants || tour?.max_participants || proposal?.group_size || '-'} 人</span>
-                </div>
-              </div>
-            </div>
-
-            {/* 需求明細表格 */}
-            <div className="border border-border rounded-lg overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-morandi-container/50 border-b border-border">
-                    <th className="px-3 py-2 text-left font-medium w-[100px]">{columns.dateLabel}</th>
-                    <th className="px-3 py-2 text-left font-medium">{columns.titleLabel}</th>
-                    <th className="px-3 py-2 text-center font-medium w-[80px]">{columns.qtyLabel}</th>
-                    <th className="px-3 py-2 text-center font-medium w-[100px]">{PROPOSAL_FORM_LABELS.LABEL_9413}</th>
-                    <th className="px-3 py-2 text-left font-medium w-[150px]">{PROPOSAL_FORM_LABELS.REMARKS}</th>
-                    <th className="px-3 py-2 text-center font-medium w-[60px]">{PROPOSAL_FORM_LABELS.ACTIONS}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((item) => (
-                    <tr key={item.id} className="border-t border-border/50 hover:bg-morandi-container/10">
-                      <td className="p-0">
-                        <input
-                          type="date"
-                          value={item.date}
-                          onChange={(e) => updateItem(item.id, 'date', e.target.value)}
-                          className="w-full h-9 px-3 text-sm bg-transparent border-0 focus:outline-none focus:bg-morandi-container/20"
-                        />
-                      </td>
-                      <td className="p-0">
-                        <input
-                          value={item.title}
-                          onChange={(e) => updateItem(item.id, 'title', e.target.value)}
-                          className="w-full h-9 px-3 text-sm bg-transparent border-0 focus:outline-none focus:bg-morandi-container/20"
-                        />
-                      </td>
-                      <td className="p-0">
-                        <input
-                          type="number"
-                          value={item.quantity}
-                          onChange={(e) => updateItem(item.id, 'quantity', parseInt(e.target.value) || 0)}
-                          className="w-full h-9 px-3 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-morandi-container/20"
-                        />
-                      </td>
-                      <td className="p-0">
-                        <input
-                          type="number"
-                          value={item.unitPrice || ''}
-                          onChange={(e) => updateItem(item.id, 'unitPrice', parseInt(e.target.value) || 0)}
-                          className="w-full h-9 px-3 text-sm text-right bg-transparent border-0 focus:outline-none focus:bg-morandi-container/20"
-                        />
-                      </td>
-                      <td className="p-0">
-                        <input
-                          value={item.note}
-                          onChange={(e) => updateItem(item.id, 'note', e.target.value)}
-                          className="w-full h-9 px-3 text-sm bg-transparent border-0 focus:outline-none focus:bg-morandi-container/20"
-                        />
-                      </td>
-                      <td className="px-2 py-1 text-center">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeItem(item.id)}
-                          className="h-7 w-7 p-0 text-morandi-red hover:bg-red-50"
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              {/* 新增按鈕 */}
-              <div className="p-2 border-t border-border/50">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={addItem}
-                  className="gap-1 text-morandi-gold hover:text-morandi-gold-hover"
-                >
-                  <Plus size={14} />
-                  {PROPOSAL_FORM_LABELS.ADD_2089}
-                </Button>
               </div>
             </div>
           </div>
 
-          {/* 底部按鈕 */}
-          <div className="flex justify-end gap-2 pt-4 border-t border-border">
-            <Button variant="outline" onClick={onClose} className="gap-2">
-              <X size={16} />
-              {PROPOSAL_FORM_LABELS.CLOSE}
-            </Button>
-            {tour?.id && (
-              <Button
-                variant="outline"
-                onClick={() => {
-                  onClose()
-                  router.push(`/finance/requests?tour_id=${tour.id}`)
-                }}
-                className="gap-2 text-morandi-gold border-morandi-gold hover:bg-morandi-gold hover:text-white"
-              >
-                <Receipt size={16} />
-                {PROPOSAL_FORM_LABELS.LABEL_4890}
-              </Button>
-            )}
-            <Button
-              onClick={handlePrintInNewWindow}
-              disabled={saving || sending}
-              className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+          {/* 接收供應商 workspace 選擇器 */}
+          <div className="flex items-center gap-3 px-1">
+            <div className="flex items-center gap-1.5 text-sm text-morandi-secondary whitespace-nowrap">
+              <Building2 size={14} />
+              <span>{TOUR_REQUEST_FORM_DIALOG_LABELS.接收供應商}</span>
+            </div>
+            <select
+              value={recipientWorkspaceId}
+              onChange={e => setRecipientWorkspaceId(e.target.value)}
+              className="flex-1 h-8 px-2 text-sm rounded-md border border-border bg-background focus:outline-none focus:ring-1 focus:ring-morandi-gold"
             >
-              {saving ? <Loader2 size={16} className="animate-spin" /> : <Printer size={16} />}
-              {PROPOSAL_FORM_LABELS.PRINT}
-            </Button>
-            {recipientWorkspaceId && (
-              <Button
-                onClick={handleSendRequest}
-                disabled={sending || saving}
-                className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
-              >
-                {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                {TOUR_REQUEST_FORM_DIALOG_LABELS.發送}
-              </Button>
-            )}
+              <option value="">{TOUR_REQUEST_FORM_DIALOG_LABELS.不發送_列印模式}</option>
+              {workspaces.map(ws => (
+                <option key={ws.id} value={ws.id}>
+                  {ws.name}
+                  {ws.code ? ` (${ws.code})` : ''}
+                </option>
+              ))}
+            </select>
           </div>
-        </DialogContent>
-      </Dialog>
+
+          {/* 團體資訊 */}
+          <div className="bg-morandi-container/30 rounded-lg p-4">
+            <div className="grid grid-cols-4 gap-4 text-sm">
+              <div>
+                <span className="text-morandi-secondary">{PROPOSAL_FORM_LABELS.LABEL_3785}</span>
+                <span className="font-medium ml-1">{tourCode || tour?.code || '-'}</span>
+              </div>
+              <div>
+                <span className="text-morandi-secondary">{PROPOSAL_FORM_LABELS.LABEL_168}</span>
+                <span className="font-medium ml-1">
+                  {tourName || tour?.name || proposal?.title || '-'}
+                </span>
+              </div>
+              <div>
+                <span className="text-morandi-secondary">{PROPOSAL_FORM_LABELS.LABEL_2816}</span>
+                <span className="font-medium ml-1">
+                  {formatDate(departureDate || tour?.departure_date || pkg?.start_date)}
+                </span>
+              </div>
+              <div>
+                <span className="text-morandi-secondary">{PROPOSAL_FORM_LABELS.LABEL_8361}</span>
+                <span className="font-medium ml-1">
+                  {pax ||
+                    tour?.current_participants ||
+                    tour?.max_participants ||
+                    proposal?.group_size ||
+                    '-'}{' '}
+                  人
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 需求明細表格 */}
+          <div className="border border-border rounded-lg overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-morandi-container/50 border-b border-border">
+                  <th className="px-3 py-2 text-left font-medium w-[100px]">{columns.dateLabel}</th>
+                  <th className="px-3 py-2 text-left font-medium">{columns.titleLabel}</th>
+                  <th className="px-3 py-2 text-center font-medium w-[80px]">{columns.qtyLabel}</th>
+                  <th className="px-3 py-2 text-center font-medium w-[100px]">
+                    {PROPOSAL_FORM_LABELS.LABEL_9413}
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium w-[150px]">
+                    {PROPOSAL_FORM_LABELS.REMARKS}
+                  </th>
+                  <th className="px-3 py-2 text-center font-medium w-[60px]">
+                    {PROPOSAL_FORM_LABELS.ACTIONS}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map(item => (
+                  <tr
+                    key={item.id}
+                    className="border-t border-border/50 hover:bg-morandi-container/10"
+                  >
+                    <td className="p-0">
+                      <input
+                        type="date"
+                        value={item.date}
+                        onChange={e => updateItem(item.id, 'date', e.target.value)}
+                        className="w-full h-9 px-3 text-sm bg-transparent border-0 focus:outline-none focus:bg-morandi-container/20"
+                      />
+                    </td>
+                    <td className="p-0">
+                      <input
+                        value={item.title}
+                        onChange={e => updateItem(item.id, 'title', e.target.value)}
+                        className="w-full h-9 px-3 text-sm bg-transparent border-0 focus:outline-none focus:bg-morandi-container/20"
+                      />
+                    </td>
+                    <td className="p-0">
+                      <input
+                        type="number"
+                        value={item.quantity}
+                        onChange={e =>
+                          updateItem(item.id, 'quantity', parseInt(e.target.value) || 0)
+                        }
+                        className="w-full h-9 px-3 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-morandi-container/20"
+                      />
+                    </td>
+                    <td className="p-0">
+                      <input
+                        type="number"
+                        value={item.unitPrice || ''}
+                        onChange={e =>
+                          updateItem(item.id, 'unitPrice', parseInt(e.target.value) || 0)
+                        }
+                        className="w-full h-9 px-3 text-sm text-right bg-transparent border-0 focus:outline-none focus:bg-morandi-container/20"
+                      />
+                    </td>
+                    <td className="p-0">
+                      <input
+                        value={item.note}
+                        onChange={e => updateItem(item.id, 'note', e.target.value)}
+                        className="w-full h-9 px-3 text-sm bg-transparent border-0 focus:outline-none focus:bg-morandi-container/20"
+                      />
+                    </td>
+                    <td className="px-2 py-1 text-center">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeItem(item.id)}
+                        className="h-7 w-7 p-0 text-morandi-red hover:bg-red-50"
+                      >
+                        <Trash2 size={14} />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* 新增按鈕 */}
+            <div className="p-2 border-t border-border/50">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={addItem}
+                className="gap-1 text-morandi-gold hover:text-morandi-gold-hover"
+              >
+                <Plus size={14} />
+                {PROPOSAL_FORM_LABELS.ADD_2089}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* 底部按鈕 */}
+        <div className="flex justify-end gap-2 pt-4 border-t border-border">
+          <Button variant="outline" onClick={onClose} className="gap-2">
+            <X size={16} />
+            {PROPOSAL_FORM_LABELS.CLOSE}
+          </Button>
+          {tour?.id && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                onClose()
+                router.push(`/finance/requests?tour_id=${tour.id}`)
+              }}
+              className="gap-2 text-morandi-gold border-morandi-gold hover:bg-morandi-gold hover:text-white"
+            >
+              <Receipt size={16} />
+              {PROPOSAL_FORM_LABELS.LABEL_4890}
+            </Button>
+          )}
+          <Button
+            onClick={handlePrintInNewWindow}
+            disabled={saving || sending}
+            className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+          >
+            {saving ? <Loader2 size={16} className="animate-spin" /> : <Printer size={16} />}
+            {PROPOSAL_FORM_LABELS.PRINT}
+          </Button>
+          {recipientWorkspaceId && (
+            <Button
+              onClick={handleSendRequest}
+              disabled={sending || saving}
+              className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+              {TOUR_REQUEST_FORM_DIALOG_LABELS.發送}
+            </Button>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }

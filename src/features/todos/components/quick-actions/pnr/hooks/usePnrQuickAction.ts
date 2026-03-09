@@ -100,8 +100,8 @@ export function usePnrQuickAction({ todo, onUpdate, onClose }: UsePnrQuickAction
     logger.log('🔍 handleAddDeadline called', {
       parsedData,
       onUpdate: !!onUpdate,
-      todo
-    });
+      todo,
+    })
 
     if (!parsedData || !parsedData.ticketingDeadline) {
       toast.error('請先解析電報並確認有出票期限')
@@ -110,7 +110,7 @@ export function usePnrQuickAction({ todo, onUpdate, onClose }: UsePnrQuickAction
 
     if (!onUpdate) {
       toast.error('無法更新待辦事項（onUpdate 未傳入）')
-      logger.error('❌ onUpdate is not defined');
+      logger.error('❌ onUpdate is not defined')
       return
     }
 
@@ -119,12 +119,12 @@ export function usePnrQuickAction({ todo, onUpdate, onClose }: UsePnrQuickAction
         deadline: parsedData.ticketingDeadline.toISOString(),
         priority: (isUrgent(parsedData.ticketingDeadline) ? 5 : 4) as 1 | 2 | 3 | 4 | 5,
         title: `出票：${parsedData.recordLocator} - ${parsedData.passengerNames[0]}`,
-      };
+      }
 
-      logger.log('📝 Updating todo with:', JSON.stringify(updates, null, 2));
-      logger.log('📝 Update keys:', Object.keys(updates));
-      await onUpdate(updates);
-      logger.log('✅ Todo updated successfully');
+      logger.log('📝 Updating todo with:', JSON.stringify(updates, null, 2))
+      logger.log('📝 Update keys:', Object.keys(updates))
+      await onUpdate(updates)
+      logger.log('✅ Todo updated successfully')
 
       // 儲存 PNR 記錄
       await savePNRRecord()

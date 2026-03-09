@@ -88,18 +88,23 @@ export function AirportImageLibrary({
   }, [newImageUrl, newImageLabel, airportCode, airportImages.length, user, create, onImageUpload])
 
   // 刪除圖片
-  const handleDeleteImage = useCallback(async (imageId: string) => {
-    try {
-      await deleteImage(imageId)
-    } catch (error) {
-      logger.error(COMP_EDITOR_LABELS.刪除圖片失敗, error)
-    }
-  }, [deleteImage])
+  const handleDeleteImage = useCallback(
+    async (imageId: string) => {
+      try {
+        await deleteImage(imageId)
+      } catch (error) {
+        logger.error(COMP_EDITOR_LABELS.刪除圖片失敗, error)
+      }
+    },
+    [deleteImage]
+  )
 
   if (!airportCode) {
     return (
       <div className="space-y-3">
-        <label className="block text-sm font-medium text-morandi-primary">{COMP_EDITOR_LABELS.封面圖片}</label>
+        <label className="block text-sm font-medium text-morandi-primary">
+          {COMP_EDITOR_LABELS.封面圖片}
+        </label>
         <div className="text-sm text-morandi-secondary p-4 bg-morandi-container/30 rounded-lg text-center">
           {COMP_EDITOR_LABELS.SELECT_6587}
         </div>
@@ -122,7 +127,8 @@ export function AirportImageLibrary({
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <label className="block text-sm font-medium text-morandi-primary">
-          {COMP_EDITOR_LABELS.封面圖片} <span className="text-morandi-secondary font-normal">({airportCode})</span>
+          {COMP_EDITOR_LABELS.封面圖片}{' '}
+          <span className="text-morandi-secondary font-normal">({airportCode})</span>
         </label>
         <Button
           type="button"
@@ -143,7 +149,7 @@ export function AirportImageLibrary({
         </div>
       ) : airportImages.length > 0 ? (
         <div className="grid grid-cols-3 gap-2">
-          {airportImages.map((image) => (
+          {airportImages.map(image => (
             <button
               key={image.id}
               type="button"
@@ -155,7 +161,8 @@ export function AirportImageLibrary({
                   : 'border-morandi-container hover:border-morandi-gold/50'
               )}
             >
-              <img src={image.image_url}
+              <img
+                src={image.image_url}
                 alt={image.label || COMP_EDITOR_LABELS.封面圖片}
                 className="w-full h-full object-cover"
               />
@@ -174,7 +181,7 @@ export function AirportImageLibrary({
 
               <button
                 type="button"
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation()
                   handleDeleteImage(image.id)
                 }}
@@ -255,7 +262,9 @@ export function AirportImageLibrary({
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent level={2} className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{COMP_EDITOR_LABELS.ADD_6489} {airportCode}</DialogTitle>
+            <DialogTitle>
+              {COMP_EDITOR_LABELS.ADD_6489} {airportCode}
+            </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -275,7 +284,7 @@ export function AirportImageLibrary({
               </label>
               <Input
                 value={newImageLabel}
-                onChange={(e) => setNewImageLabel(e.target.value)}
+                onChange={e => setNewImageLabel(e.target.value)}
                 placeholder={COMP_EDITOR_LABELS.如_春季_夏季_寺廟}
                 className="h-9"
               />
@@ -300,7 +309,11 @@ export function AirportImageLibrary({
                 disabled={!newImageUrl || isUploading}
                 className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
-                {isUploading ? <Loader2 size={14} className="animate-spin" /> : COMP_EDITOR_LABELS.加入圖片庫}
+                {isUploading ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  COMP_EDITOR_LABELS.加入圖片庫
+                )}
               </Button>
             </div>
           </div>
@@ -318,7 +331,7 @@ export function AirportImageLibrary({
           </DialogHeader>
 
           <UnsplashSearch
-            onSelect={(url) => {
+            onSelect={url => {
               onImageUpload(url)
               setShowUnsplashDialog(false)
             }}
@@ -338,7 +351,7 @@ export function AirportImageLibrary({
 
           <div className="overflow-y-auto max-h-[calc(85vh-80px)]">
             <PexelsPicker
-              onSelectImage={(url) => {
+              onSelectImage={url => {
                 onImageUpload(url)
                 setShowPexelsDialog(false)
               }}

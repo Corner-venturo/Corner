@@ -1,8 +1,5 @@
 import { PaymentRequest, PaymentRequestItem } from '@/stores/types'
-import {
-  PaymentRequestCategory,
-  CompanyExpenseType,
-} from '@/stores/types/finance.types'
+import { PaymentRequestCategory, CompanyExpenseType } from '@/stores/types/finance.types'
 
 export interface RequestFormData {
   request_category: PaymentRequestCategory // 請款類別（團體/公司）
@@ -65,10 +62,11 @@ export const categoryOptions = [
   { value: REQUEST_TYPE_LABELS.CAT_INSURANCE, label: REQUEST_TYPE_LABELS.CAT_INSURANCE },
   { value: REQUEST_TYPE_LABELS.CAT_TOUR_ADVANCE, label: REQUEST_TYPE_LABELS.CAT_TOUR_ADVANCE },
   { value: REQUEST_TYPE_LABELS.CAT_TOUR_RETURN, label: REQUEST_TYPE_LABELS.CAT_TOUR_RETURN },
-  { value: REQUEST_TYPE_LABELS.CAT_EMPLOYEE_ADVANCE, label: REQUEST_TYPE_LABELS.CAT_EMPLOYEE_ADVANCE },
+  {
+    value: REQUEST_TYPE_LABELS.CAT_EMPLOYEE_ADVANCE,
+    label: REQUEST_TYPE_LABELS.CAT_EMPLOYEE_ADVANCE,
+  },
   { value: 'ESIM', label: 'ESIM' },
   { value: REQUEST_TYPE_LABELS.CAT_PEER, label: REQUEST_TYPE_LABELS.CAT_PEER },
   { value: REQUEST_TYPE_LABELS.CAT_OTHER, label: REQUEST_TYPE_LABELS.CAT_OTHER },
 ] as const
-
-

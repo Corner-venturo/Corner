@@ -63,10 +63,7 @@ export interface UseAsyncDataReturn<T = unknown> {
   /** 重置所有狀態 */
   reset: () => void
   /** 執行異步操作 */
-  execute: <R = T>(
-    fn: () => Promise<R>,
-    options?: ExecuteOptions
-  ) => Promise<R | null>
+  execute: <R = T>(fn: () => Promise<R>, options?: ExecuteOptions) => Promise<R | null>
   /** 檢查特定操作是否正在執行 */
   loadingFor: (key: string) => boolean
   /** 執行特定操作（可追蹤） */
@@ -101,10 +98,7 @@ export function useAsyncData<T = unknown>(
   }, [])
 
   const execute = useCallback(
-    async <R = T>(
-      fn: () => Promise<R>,
-      options?: ExecuteOptions
-    ): Promise<R | null> => {
+    async <R = T>(fn: () => Promise<R>, options?: ExecuteOptions): Promise<R | null> => {
       const showToast = options?.showToast ?? globalOptions?.showToast ?? false
 
       setLoading(true)
@@ -250,29 +244,32 @@ export function useMultiLoadingState() {
     return loadingKeys.current.size > 0
   }, [])
 
-  const withLoading = useCallback(async <T>(
-    key: string,
-    fn: () => Promise<T>,
-    options?: { successMessage?: string; errorMessage?: string }
-  ): Promise<T | null> => {
-    loadingKeys.current.add(key)
-    forceUpdate({})
-
-    try {
-      const result = await fn()
-      if (options?.successMessage) {
-        toast.success(options.successMessage)
-      }
-      return result
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error(String(err))
-      toast.error(options?.errorMessage || error.message || '操作失敗')
-      return null
-    } finally {
-      loadingKeys.current.delete(key)
+  const withLoading = useCallback(
+    async <T>(
+      key: string,
+      fn: () => Promise<T>,
+      options?: { successMessage?: string; errorMessage?: string }
+    ): Promise<T | null> => {
+      loadingKeys.current.add(key)
       forceUpdate({})
-    }
-  }, [])
+
+      try {
+        const result = await fn()
+        if (options?.successMessage) {
+          toast.success(options.successMessage)
+        }
+        return result
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error(String(err))
+        toast.error(options?.errorMessage || error.message || '操作失敗')
+        return null
+      } finally {
+        loadingKeys.current.delete(key)
+        forceUpdate({})
+      }
+    },
+    []
+  )
 
   return {
     isLoading,

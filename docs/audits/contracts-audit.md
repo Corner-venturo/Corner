@@ -9,6 +9,7 @@
 ## 📋 模組概覽
 
 合約管理模組提供以下功能：
+
 - 從旅遊團建立合約
 - 合約範本選擇（國內/國外/個別國外）
 - 合約內容編輯與儲存
@@ -30,16 +31,18 @@
 // 替換所有變數
 Object.entries(contractData).forEach(([key, value]) => {
   const regex = new RegExp(`{{${key}}}`, 'g')
-  template = template.replace(regex, value || '')  // ⚠️ 沒有轉義！
+  template = template.replace(regex, value || '') // ⚠️ 沒有轉義！
 })
 ```
 
 **風險**: 攻擊者可以在表單欄位中注入惡意 JavaScript 代碼，例如：
+
 ```
 <script>alert('XSS')</script>
 ```
 
 **建議修復**:
+
 ```typescript
 // 使用與 ContractViewDialog 相同的消毒邏輯
 const safeValue = String(value || '')
@@ -61,11 +64,11 @@ template = template.replace(regex, safeValue)
 
 **問題**: `ContractData` 介面在三個地方定義，但內容不完全相同：
 
-| 位置 | 欄位數 | 缺少的欄位 |
-|------|--------|-----------|
-| `contract-dialog/types.ts` | 23 | - |
-| `lib/contract-utils.ts` | 23 | - |
-| `useContractForm.ts` | 使用 Partial | - |
+| 位置                       | 欄位數       | 缺少的欄位 |
+| -------------------------- | ------------ | ---------- |
+| `contract-dialog/types.ts` | 23           | -          |
+| `lib/contract-utils.ts`    | 23           | -          |
+| `useContractForm.ts`       | 使用 Partial | -          |
 
 兩處定義是重複的，應該合併為單一來源。
 
@@ -77,7 +80,8 @@ template = template.replace(regex, safeValue)
 
 ### 3. 合約範本映射不一致
 
-**檔案**: 
+**檔案**:
+
 - `ContractViewDialog.tsx` (第 55-59 行)
 - `useContractForm.ts` (第 304-308 行)
 
@@ -88,14 +92,14 @@ template = template.replace(regex, safeValue)
 const templateMap = {
   domestic: 'domestic.html',
   international: 'international.html',
-  individual_international: 'individual_international_full.html',  // 使用 _full
+  individual_international: 'individual_international_full.html', // 使用 _full
 }
 
 // useContractForm.ts
 const templateMap: Record<string, string> = {
   domestic: 'domestic.html',
   international: 'international.html',
-  individual_international: 'individual_international.html',  // 沒有 _full
+  individual_international: 'individual_international.html', // 沒有 _full
 }
 ```
 
@@ -112,6 +116,7 @@ const templateMap: Record<string, string> = {
 **問題**: Dialog 組件沒有 Error Boundary，如果子組件拋出錯誤，整個對話框會崩潰。
 
 **建議**: 添加 ErrorBoundary 包裝：
+
 ```tsx
 <ErrorBoundary fallback={<ContractErrorFallback />}>
   <ContractFormFields ... />
@@ -129,7 +134,7 @@ const templateMap: Record<string, string> = {
 ```typescript
 useEffect(() => {
   // ... 使用 tour.contract_template, tour.contract_content, etc.
-}, [isOpen, mode, tour.id, itinerary?.id, linkedQuote?.id])  // 只依賴 tour.id
+}, [isOpen, mode, tour.id, itinerary?.id, linkedQuote?.id]) // 只依賴 tour.id
 ```
 
 **風險**: 如果 tour 的其他屬性變更但 id 不變，effect 不會重新執行。
@@ -140,7 +145,8 @@ useEffect(() => {
 
 ### 6. 列印視窗可能被阻擋
 
-**檔案**: 
+**檔案**:
+
 - `ContractViewDialog.tsx` (第 80-102 行)
 - `useContractForm.ts` (第 310-350 行)
 - `EnvelopeDialog.tsx` (第 90-160 行)
@@ -189,7 +195,11 @@ const senderCompany = '角落旅行社'
 **檔案**: `ContractDialog.tsx` (第 276-278 行)
 
 ```typescript
-const memberData = member as unknown as { chinese_name?: string; passport_name?: string; id_number?: string }
+const memberData = member as unknown as {
+  chinese_name?: string
+  passport_name?: string
+  id_number?: string
+}
 ```
 
 **問題**: 使用 `as unknown as` 是不安全的類型斷言。
@@ -202,7 +212,8 @@ const memberData = member as unknown as { chinese_name?: string; passport_name?:
 
 **問題**: 合約修改後沒有歷史記錄，無法追蹤變更。
 
-**建議**: 
+**建議**:
+
 - 添加 `contract_version` 欄位
 - 保存合約變更歷史到 `contract_history` 表
 
@@ -215,6 +226,7 @@ const memberData = member as unknown as { chinese_name?: string; passport_name?:
 **問題**: 表單欄位沒有驗證規則（如身分證格式、電話格式）。
 
 **建議**: 添加驗證邏輯：
+
 ```typescript
 // 身分證驗證
 const isValidTWID = (id: string) => /^[A-Z][12]\d{8}$/.test(id)
@@ -244,11 +256,11 @@ const isValidTWID = (id: string) => /^[A-Z][12]\d{8}$/.test(id)
 
 ## 📊 問題統計
 
-| 嚴重程度 | 數量 |
-|---------|------|
-| 🔴 嚴重 | 2 |
-| 🟠 中等 | 4 |
-| 🟡 輕微 | 6 |
+| 嚴重程度 | 數量   |
+| -------- | ------ |
+| 🔴 嚴重  | 2      |
+| 🟠 中等  | 4      |
+| 🟡 輕微  | 6      |
 | **總計** | **12** |
 
 ---
@@ -265,16 +277,16 @@ const isValidTWID = (id: string) => /^[A-Z][12]\d{8}$/.test(id)
 
 ## 📝 附錄：檔案清單
 
-| 檔案 | 用途 | 行數 |
-|------|------|------|
-| `contracts/page.tsx` | 合約列表頁面 | ~210 |
-| `ContractDialog.tsx` (重導出) | 向後相容的重導出 | ~3 |
-| `ContractViewDialog.tsx` | 查看合約對話框 | ~130 |
-| `SelectTourDialog.tsx` | 選擇團建立合約 | ~90 |
-| `EnvelopeDialog.tsx` | 信封列印對話框 | ~230 |
-| `contract-dialog/ContractDialog.tsx` | 合約編輯對話框 | ~350 |
-| `contract-dialog/ContractFormFields.tsx` | 合約表單欄位 | ~200 |
-| `contract-dialog/useContractForm.ts` | 合約表單邏輯 | ~360 |
-| `contract-dialog/types.ts` | 類型定義 | ~60 |
-| `contract-dialog/index.ts` | 導出 | ~2 |
-| `lib/contract-utils.ts` | 合約工具函數 | ~200 |
+| 檔案                                     | 用途             | 行數 |
+| ---------------------------------------- | ---------------- | ---- |
+| `contracts/page.tsx`                     | 合約列表頁面     | ~210 |
+| `ContractDialog.tsx` (重導出)            | 向後相容的重導出 | ~3   |
+| `ContractViewDialog.tsx`                 | 查看合約對話框   | ~130 |
+| `SelectTourDialog.tsx`                   | 選擇團建立合約   | ~90  |
+| `EnvelopeDialog.tsx`                     | 信封列印對話框   | ~230 |
+| `contract-dialog/ContractDialog.tsx`     | 合約編輯對話框   | ~350 |
+| `contract-dialog/ContractFormFields.tsx` | 合約表單欄位     | ~200 |
+| `contract-dialog/useContractForm.ts`     | 合約表單邏輯     | ~360 |
+| `contract-dialog/types.ts`               | 類型定義         | ~60  |
+| `contract-dialog/index.ts`               | 導出             | ~2   |
+| `lib/contract-utils.ts`                  | 合約工具函數     | ~200 |

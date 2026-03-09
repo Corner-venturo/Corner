@@ -4,7 +4,6 @@
  * 甘特圖式日曆，顯示車輛和領隊的調度情況
  */
 
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Calendar, Bus, Users, ChevronLeft, ChevronRight, ClipboardList } from 'lucide-react'
@@ -28,7 +27,13 @@ import {
 } from '@/data'
 import { useLeaderAvailability } from '@/stores/leader-availability-store'
 import { useSupplierResponses } from '../hooks/useSupplierResponses'
-import type { FleetVehicle, FleetSchedule, LeaderSchedule, FleetScheduleFormData, LeaderScheduleFormData } from '@/types/fleet.types'
+import type {
+  FleetVehicle,
+  FleetSchedule,
+  LeaderSchedule,
+  FleetScheduleFormData,
+  LeaderScheduleFormData,
+} from '@/types/fleet.types'
 import type { TourLeader } from '@/types/tour-leader.types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
@@ -118,13 +123,15 @@ export const SchedulingPage: React.FC = () => {
   const [vehicleDialogOpen, setVehicleDialogOpen] = useState(false)
   const [vehicleEditMode, setVehicleEditMode] = useState(false)
   const [editingVehicleSchedule, setEditingVehicleSchedule] = useState<FleetSchedule | null>(null)
-  const [vehicleFormData, setVehicleFormData] = useState<FleetScheduleFormData>(emptyVehicleScheduleForm)
+  const [vehicleFormData, setVehicleFormData] =
+    useState<FleetScheduleFormData>(emptyVehicleScheduleForm)
 
   // 領隊調度
   const [leaderDialogOpen, setLeaderDialogOpen] = useState(false)
   const [leaderEditMode, setLeaderEditMode] = useState(false)
   const [editingLeaderSchedule, setEditingLeaderSchedule] = useState<LeaderSchedule | null>(null)
-  const [leaderFormData, setLeaderFormData] = useState<LeaderScheduleFormData>(emptyLeaderScheduleForm)
+  const [leaderFormData, setLeaderFormData] =
+    useState<LeaderScheduleFormData>(emptyLeaderScheduleForm)
 
   // Data hooks
   const { items: vehicles } = useFleetVehicles()
@@ -182,28 +189,31 @@ export const SchedulingPage: React.FC = () => {
   }, [])
 
   // 處理需求分配資源
-  const handleAssignResource = useCallback(async (requestId: string, resourceId: string, _index: number) => {
-    try {
-      const isVehicle = activeTab === 'vehicles'
-      const updateData = isVehicle
-        ? { assigned_vehicle_id: resourceId, assigned_at: new Date().toISOString() }
-        : { assigned_leader_id: resourceId, assigned_at: new Date().toISOString() }
+  const handleAssignResource = useCallback(
+    async (requestId: string, resourceId: string, _index: number) => {
+      try {
+        const isVehicle = activeTab === 'vehicles'
+        const updateData = isVehicle
+          ? { assigned_vehicle_id: resourceId, assigned_at: new Date().toISOString() }
+          : { assigned_leader_id: resourceId, assigned_at: new Date().toISOString() }
 
-      const { error } = await supabase
-        .from('tour_requests')
-        .update(updateData)
-        .eq('id', requestId)
+        const { error } = await supabase
+          .from('tour_requests')
+          .update(updateData)
+          .eq('id', requestId)
 
-      if (error) throw error
+        if (error) throw error
 
-      // 重新載入需求單
-      await fetchRequests()
-      await alert('分配成功', 'success')
-    } catch (error) {
-      logger.error('分配資源失敗:', error)
-      await alert('分配失敗', 'error')
-    }
-  }, [activeTab, fetchRequests])
+        // 重新載入需求單
+        await fetchRequests()
+        await alert('分配成功', 'success')
+      } catch (error) {
+        logger.error('分配資源失敗:', error)
+        await alert('分配失敗', 'error')
+      }
+    },
+    [activeTab, fetchRequests]
+  )
 
   useEffect(() => {
     fetchRequests()
@@ -255,19 +265,22 @@ export const SchedulingPage: React.FC = () => {
   }, [dateRange, currentDate, viewMode])
 
   // ========== 車輛調度操作 ==========
-  const handleAddVehicleSchedule = useCallback((vehicleId: string, date: string) => {
-    const vehicle = vehicles.find(v => v.id === vehicleId)
-    setVehicleEditMode(false)
-    setEditingVehicleSchedule(null)
-    setVehicleFormData({
-      ...emptyVehicleScheduleForm,
-      vehicle_id: vehicleId,
-      driver_id: vehicle?.default_driver_id || '',
-      start_date: date,
-      end_date: date,
-    })
-    setVehicleDialogOpen(true)
-  }, [vehicles])
+  const handleAddVehicleSchedule = useCallback(
+    (vehicleId: string, date: string) => {
+      const vehicle = vehicles.find(v => v.id === vehicleId)
+      setVehicleEditMode(false)
+      setEditingVehicleSchedule(null)
+      setVehicleFormData({
+        ...emptyVehicleScheduleForm,
+        vehicle_id: vehicleId,
+        driver_id: vehicle?.default_driver_id || '',
+        start_date: date,
+        end_date: date,
+      })
+      setVehicleDialogOpen(true)
+    },
+    [vehicles]
+  )
 
   const handleEditVehicleSchedule = useCallback((schedule: FleetSchedule) => {
     setVehicleEditMode(true)
@@ -306,12 +319,12 @@ export const SchedulingPage: React.FC = () => {
     }
   }, [])
 
-  const handleVehicleFormChange = useCallback(<K extends keyof FleetScheduleFormData>(
-    field: K,
-    value: FleetScheduleFormData[K]
-  ) => {
-    setVehicleFormData(prev => ({ ...prev, [field]: value }))
-  }, [])
+  const handleVehicleFormChange = useCallback(
+    <K extends keyof FleetScheduleFormData>(field: K, value: FleetScheduleFormData[K]) => {
+      setVehicleFormData(prev => ({ ...prev, [field]: value }))
+    },
+    []
+  )
 
   const handleVehicleSubmit = useCallback(async () => {
     try {
@@ -406,12 +419,12 @@ export const SchedulingPage: React.FC = () => {
     }
   }, [])
 
-  const handleLeaderFormChange = useCallback(<K extends keyof LeaderScheduleFormData>(
-    field: K,
-    value: LeaderScheduleFormData[K]
-  ) => {
-    setLeaderFormData(prev => ({ ...prev, [field]: value }))
-  }, [])
+  const handleLeaderFormChange = useCallback(
+    <K extends keyof LeaderScheduleFormData>(field: K, value: LeaderScheduleFormData[K]) => {
+      setLeaderFormData(prev => ({ ...prev, [field]: value }))
+    },
+    []
+  )
 
   const handleLeaderSubmit = useCallback(async () => {
     try {
@@ -467,66 +480,78 @@ export const SchedulingPage: React.FC = () => {
         { label: SCHEDULING_LABELS.BREADCRUMB_SCHEDULING, href: '/scheduling' },
       ]}
       headerActions={
-          <div className="flex items-center gap-4">
-            {/* 資源類型切換 */}
-            <div className="flex items-center gap-1">
-              <Button
-                variant={activeTab === 'vehicles' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setActiveTab('vehicles')}
-                className={activeTab === 'vehicles' ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1' : 'gap-1'}
-              >
-                <Bus size={14} />
-                {SCHEDULING_LABELS.LABEL_2119}
-              </Button>
-              <Button
-                variant={activeTab === 'leaders' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setActiveTab('leaders')}
-                className={activeTab === 'leaders' ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1' : 'gap-1'}
-              >
-                <Users size={14} />
-                {SCHEDULING_LABELS.LABEL_1098}
-              </Button>
-            </div>
-
-            {/* 日期導航 */}
-            <div className="flex items-center gap-1">
-              <Button variant="outline" size="sm" onClick={navigatePrev}>
-                <ChevronLeft size={16} />
-              </Button>
-              <Button variant="outline" size="sm" onClick={navigateToday}>
-                {SCHEDULING_LABELS.LABEL_6113}
-              </Button>
-              <Button variant="outline" size="sm" onClick={navigateNext}>
-                <ChevronRight size={16} />
-              </Button>
-              <span className="ml-2 text-sm font-medium text-morandi-primary whitespace-nowrap">
-                {dateRangeTitle}
-              </span>
-            </div>
-
-            {/* 視圖切換 */}
-            <div className="flex items-center gap-1">
-              <Button
-                variant={viewMode === 'week' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('week')}
-                className={viewMode === 'week' ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white' : ''}
-              >
-                {SCHEDULING_LABELS.LABEL_8946}
-              </Button>
-              <Button
-                variant={viewMode === 'month' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('month')}
-                className={viewMode === 'month' ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white' : ''}
-              >
-                {SCHEDULING_LABELS.LABEL_6426}
-              </Button>
-            </div>
+        <div className="flex items-center gap-4">
+          {/* 資源類型切換 */}
+          <div className="flex items-center gap-1">
+            <Button
+              variant={activeTab === 'vehicles' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setActiveTab('vehicles')}
+              className={
+                activeTab === 'vehicles'
+                  ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1'
+                  : 'gap-1'
+              }
+            >
+              <Bus size={14} />
+              {SCHEDULING_LABELS.LABEL_2119}
+            </Button>
+            <Button
+              variant={activeTab === 'leaders' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setActiveTab('leaders')}
+              className={
+                activeTab === 'leaders'
+                  ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1'
+                  : 'gap-1'
+              }
+            >
+              <Users size={14} />
+              {SCHEDULING_LABELS.LABEL_1098}
+            </Button>
           </div>
-        }
+
+          {/* 日期導航 */}
+          <div className="flex items-center gap-1">
+            <Button variant="outline" size="sm" onClick={navigatePrev}>
+              <ChevronLeft size={16} />
+            </Button>
+            <Button variant="outline" size="sm" onClick={navigateToday}>
+              {SCHEDULING_LABELS.LABEL_6113}
+            </Button>
+            <Button variant="outline" size="sm" onClick={navigateNext}>
+              <ChevronRight size={16} />
+            </Button>
+            <span className="ml-2 text-sm font-medium text-morandi-primary whitespace-nowrap">
+              {dateRangeTitle}
+            </span>
+          </div>
+
+          {/* 視圖切換 */}
+          <div className="flex items-center gap-1">
+            <Button
+              variant={viewMode === 'week' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setViewMode('week')}
+              className={
+                viewMode === 'week' ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white' : ''
+              }
+            >
+              {SCHEDULING_LABELS.LABEL_8946}
+            </Button>
+            <Button
+              variant={viewMode === 'month' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setViewMode('month')}
+              className={
+                viewMode === 'month' ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white' : ''
+              }
+            >
+              {SCHEDULING_LABELS.LABEL_6426}
+            </Button>
+          </div>
+        </div>
+      }
     >
       {/* 需求甘特圖 - 左邊需求列表，右邊資源庫存 */}
       <div className="flex-1 min-h-0 pb-4">

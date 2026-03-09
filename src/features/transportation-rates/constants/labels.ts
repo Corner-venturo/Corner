@@ -18,4 +18,4 @@ export const TRANSPORTATION_RATES_LABELS = {
   顯示_KKDAY_欄位: '顯示 KKDAY 欄位',
   COUNT_UNIT: '筆',
   RATES_MANAGEMENT_SUFFIX: '車資管理',
-};
+}

@@ -5,11 +5,21 @@
 const { createClient } = require('@supabase/supabase-js')
 
 const supabaseUrl = 'https://pfqvdacxowpgfamuvnsn.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE'
+const supabaseKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE'
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-const TABLES = ['quotes', 'calendar_events', 'todos', 'tours', 'orders', 'customers', 'itineraries', 'channels']
+const TABLES = [
+  'quotes',
+  'calendar_events',
+  'todos',
+  'tours',
+  'orders',
+  'customers',
+  'itineraries',
+  'channels',
+]
 
 async function fillNullWorkspaceIds() {
   console.log('🔍 開始填充 NULL workspace_id...\n')
@@ -62,10 +72,7 @@ async function fillNullWorkspaceIds() {
 
   for (const table of TABLES) {
     try {
-      const { data, error } = await supabase
-        .from(table)
-        .select('id')
-        .is('workspace_id', null)
+      const { data, error } = await supabase.from(table).select('id').is('workspace_id', null)
 
       if (error) continue
 

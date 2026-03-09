@@ -10,11 +10,7 @@ import { getRequiredWorkspaceId } from '@/lib/workspace-context'
 import { logger } from '@/lib/utils/logger'
 import { formatDateChinese } from '@/lib/utils/format-date'
 import type { Database } from '@/lib/supabase/types'
-import type {
-  PNR,
-  PNRSegment,
-  QueryIntent
-} from '@/types/pnr.types'
+import type { PNR, PNRSegment, QueryIntent } from '@/types/pnr.types'
 import type { EnhancedSSR, EnhancedOSI } from '@/lib/pnr-parser'
 
 type PnrAiQuery = Database['public']['Tables']['pnr_ai_queries']['Row']
@@ -36,74 +32,44 @@ interface IntentPattern {
 const INTENT_PATTERNS: IntentPattern[] = [
   {
     intent: 'meal',
-    patterns: [
-      /餐|meal|food|用餐|特殊餐|vgml|avml|素食|清真|兒童餐/i,
-      /有.*餐/i,
-      /什麼.*餐/i
-    ],
-    priority: 10
+    patterns: [/餐|meal|food|用餐|特殊餐|vgml|avml|素食|清真|兒童餐/i, /有.*餐/i, /什麼.*餐/i],
+    priority: 10,
   },
   {
     intent: 'wheelchair',
-    patterns: [
-      /輪椅|wheelchair|wchr|wchs|wchc|行動不便|殘障/i,
-      /有.*輪椅/i,
-      /需要.*輪椅/i
-    ],
-    priority: 10
+    patterns: [/輪椅|wheelchair|wchr|wchs|wchc|行動不便|殘障/i, /有.*輪椅/i, /需要.*輪椅/i],
+    priority: 10,
   },
   {
     intent: 'deadline',
-    patterns: [
-      /期限|deadline|出票|開票|tlk|tl|到期/i,
-      /什麼時候.*開票/i,
-      /幾號.*出票/i
-    ],
-    priority: 9
+    patterns: [/期限|deadline|出票|開票|tlk|tl|到期/i, /什麼時候.*開票/i, /幾號.*出票/i],
+    priority: 9,
   },
   {
     intent: 'times',
-    patterns: [
-      /時間|time|幾點|起飛|降落|出發|抵達|航班時間/i,
-      /什麼時候.*飛/i,
-      /幾點.*起飛/i
-    ],
-    priority: 8
+    patterns: [/時間|time|幾點|起飛|降落|出發|抵達|航班時間/i, /什麼時候.*飛/i, /幾點.*起飛/i],
+    priority: 8,
   },
   {
     intent: 'passengers',
-    patterns: [
-      /誰|旅客|乘客|姓名|名字|passenger|name|pax/i,
-      /有誰|幾位|幾個人/i
-    ],
-    priority: 7
+    patterns: [/誰|旅客|乘客|姓名|名字|passenger|name|pax/i, /有誰|幾位|幾個人/i],
+    priority: 7,
   },
   {
     intent: 'baggage',
-    patterns: [
-      /行李|baggage|luggage|bag|托運|公斤|kg/i,
-      /有.*行李/i,
-      /多少.*行李/i
-    ],
-    priority: 6
+    patterns: [/行李|baggage|luggage|bag|托運|公斤|kg/i, /有.*行李/i, /多少.*行李/i],
+    priority: 6,
   },
   {
     intent: 'status',
-    patterns: [
-      /狀態|status|確認|訂位|hk|tk|uc|是否.*確認/i,
-      /訂位.*狀態/i
-    ],
-    priority: 5
+    patterns: [/狀態|status|確認|訂位|hk|tk|uc|是否.*確認/i, /訂位.*狀態/i],
+    priority: 5,
   },
   {
     intent: 'segments',
-    patterns: [
-      /航段|航班|segment|flight|飛機|路線|行程/i,
-      /哪.*航班/i,
-      /幾個.*航段/i
-    ],
-    priority: 4
-  }
+    patterns: [/航段|航班|segment|flight|飛機|路線|行程/i, /哪.*航班/i, /幾個.*航段/i],
+    priority: 4,
+  },
 ]
 
 /**
@@ -150,7 +116,7 @@ function handleMealQuery(pnr: PNR): QueryResponse {
     return {
       intent: 'meal',
       answer: '此 PNR 沒有特殊餐食請求。',
-      suggestions: ['要加訂特殊餐嗎？常見的有 VGML（素食）、AVML（印度素食）、CHML（兒童餐）']
+      suggestions: ['要加訂特殊餐嗎？常見的有 VGML（素食）、AVML（印度素食）、CHML（兒童餐）'],
     }
   }
 
@@ -163,7 +129,7 @@ function handleMealQuery(pnr: PNR): QueryResponse {
   return {
     intent: 'meal',
     answer: `共有 ${mealSSRs.length} 個特殊餐請求：\n${mealDescriptions.join('\n')}`,
-    data: mealSSRs
+    data: mealSSRs,
   }
 }
 
@@ -172,14 +138,12 @@ function handleMealQuery(pnr: PNR): QueryResponse {
  */
 function handleWheelchairQuery(pnr: PNR): QueryResponse {
   const ssrs = pnr.special_requests || []
-  const wheelchairSSRs = ssrs.filter(
-    (ssr: EnhancedSSR) => WHEELCHAIR_CODES.includes(ssr.code)
-  )
+  const wheelchairSSRs = ssrs.filter((ssr: EnhancedSSR) => WHEELCHAIR_CODES.includes(ssr.code))
 
   if (wheelchairSSRs.length === 0) {
     return {
       intent: 'wheelchair',
-      answer: '此 PNR 沒有輪椅服務請求。'
+      answer: '此 PNR 沒有輪椅服務請求。',
     }
   }
 
@@ -192,7 +156,7 @@ function handleWheelchairQuery(pnr: PNR): QueryResponse {
   return {
     intent: 'wheelchair',
     answer: `有 ${wheelchairSSRs.length} 個輪椅服務請求：\n${wcDescriptions.join('\n')}`,
-    data: wheelchairSSRs
+    data: wheelchairSSRs,
   }
 }
 
@@ -206,7 +170,7 @@ function handleDeadlineQuery(pnr: PNR): QueryResponse {
     return {
       intent: 'deadline',
       answer: '此 PNR 沒有記錄出票期限。',
-      suggestions: ['建議確認電報中是否有 TL 或 OPW 資訊']
+      suggestions: ['建議確認電報中是否有 TL 或 OPW 資訊'],
     }
   }
 
@@ -228,7 +192,7 @@ function handleDeadlineQuery(pnr: PNR): QueryResponse {
   return {
     intent: 'deadline',
     answer: `出票期限：${formatDateFull(deadline)}\n${urgencyMessage}`,
-    data: { deadline, daysLeft }
+    data: { deadline, daysLeft },
   }
 }
 
@@ -241,7 +205,7 @@ function handleTimesQuery(pnr: PNR): QueryResponse {
   if (segments.length === 0) {
     return {
       intent: 'times',
-      answer: '此 PNR 沒有航班資訊。'
+      answer: '此 PNR 沒有航班資訊。',
     }
   }
 
@@ -254,7 +218,7 @@ function handleTimesQuery(pnr: PNR): QueryResponse {
   return {
     intent: 'times',
     answer: `航班時間：\n${flightTimes.join('\n')}`,
-    data: segments
+    data: segments,
   }
 }
 
@@ -267,18 +231,16 @@ function handlePassengersQuery(pnr: PNR): QueryResponse {
   if (passengers.length === 0) {
     return {
       intent: 'passengers',
-      answer: '此 PNR 沒有旅客資訊。'
+      answer: '此 PNR 沒有旅客資訊。',
     }
   }
 
-  const passengerList = passengers.map(
-    (name: string, index: number) => `${index + 1}. ${name}`
-  )
+  const passengerList = passengers.map((name: string, index: number) => `${index + 1}. ${name}`)
 
   return {
     intent: 'passengers',
     answer: `共 ${passengers.length} 位旅客：\n${passengerList.join('\n')}`,
-    data: passengers
+    data: passengers,
   }
 }
 
@@ -295,7 +257,7 @@ function handleBaggageQuery(pnr: PNR): QueryResponse {
     return {
       intent: 'baggage',
       answer: '此 PNR 沒有特殊行李請求。行李額度請查看機票或航空公司規定。',
-      suggestions: ['常見行李 SSR 有 CBBG（攜帶寵物）、BIKE（腳踏車）、GOLF（高爾夫球具）']
+      suggestions: ['常見行李 SSR 有 CBBG（攜帶寵物）、BIKE（腳踏車）、GOLF（高爾夫球具）'],
     }
   }
 
@@ -307,7 +269,7 @@ function handleBaggageQuery(pnr: PNR): QueryResponse {
   return {
     intent: 'baggage',
     answer: `有 ${baggageSSRs.length} 個特殊行李請求：\n${baggageDescriptions.join('\n')}`,
-    data: baggageSSRs
+    data: baggageSSRs,
   }
 }
 
@@ -320,7 +282,7 @@ function handleStatusQuery(pnr: PNR): QueryResponse {
   if (segments.length === 0) {
     return {
       intent: 'status',
-      answer: `PNR 狀態：${pnr.status || '未知'}\n無航班資訊。`
+      answer: `PNR 狀態：${pnr.status || '未知'}\n無航班資訊。`,
     }
   }
 
@@ -339,7 +301,7 @@ function handleStatusQuery(pnr: PNR): QueryResponse {
   return {
     intent: 'status',
     answer: `PNR 狀態：${pnr.status || '未知'}\n航段狀態：\n${statusSummary.join('\n')}${warningMessage}`,
-    data: segments
+    data: segments,
   }
 }
 
@@ -352,7 +314,7 @@ function handleSegmentsQuery(pnr: PNR): QueryResponse {
   if (segments.length === 0) {
     return {
       intent: 'segments',
-      answer: '此 PNR 沒有航班資訊。'
+      answer: '此 PNR 沒有航班資訊。',
     }
   }
 
@@ -363,7 +325,7 @@ function handleSegmentsQuery(pnr: PNR): QueryResponse {
   return {
     intent: 'segments',
     answer: `共 ${segments.length} 個航段：\n${segmentDetails.join('\n')}`,
-    data: segments
+    data: segments,
   }
 }
 
@@ -374,7 +336,7 @@ function handleUnknownQuery(pnr: PNR, queryText: string): QueryResponse {
   return {
     intent: 'unknown',
     answer: `抱歉，我無法理解您的問題「${queryText}」。\n\n您可以問我：\n- 有什麼特殊餐？\n- 出票期限是什麼時候？\n- 航班時間？\n- 有幾位旅客？\n- 訂位狀態？\n- 有輪椅需求嗎？`,
-    suggestions: ['餐食', '出票期限', '航班時間', '旅客名單', '訂位狀態']
+    suggestions: ['餐食', '出票期限', '航班時間', '旅客名單', '訂位狀態'],
   }
 }
 
@@ -426,12 +388,14 @@ export async function recordQuery(
       query_text: queryText,
       query_context: pnrId ? { pnr_id: pnrId } : null,
       response_text: response.answer,
-      response_metadata: JSON.parse(JSON.stringify({
-        intent: response.intent,
-        suggestions: response.suggestions,
-        hasData: !!response.data
-      })),
-      queried_by: userId || null
+      response_metadata: JSON.parse(
+        JSON.stringify({
+          intent: response.intent,
+          suggestions: response.suggestions,
+          hasData: !!response.data,
+        })
+      ),
+      queried_by: userId || null,
     }
 
     const { data, error } = await supabase
@@ -455,10 +419,7 @@ export async function recordQuery(
 /**
  * 取得查詢歷史
  */
-export async function getQueryHistory(
-  pnrId: string,
-  limit: number = 20
-): Promise<PnrAiQuery[]> {
+export async function getQueryHistory(pnrId: string, limit: number = 20): Promise<PnrAiQuery[]> {
   try {
     const { data, error } = await supabase
       .from('pnr_ai_queries')
@@ -483,44 +444,58 @@ export async function getQueryHistory(
 // Constants
 // =====================================================
 
-const MEAL_CODES = ['VGML', 'AVML', 'HNML', 'KOSV', 'MOML', 'SPML', 'BBML', 'CHML', 'GFML', 'DBML', 'LFML', 'NLML', 'SFML']
+const MEAL_CODES = [
+  'VGML',
+  'AVML',
+  'HNML',
+  'KOSV',
+  'MOML',
+  'SPML',
+  'BBML',
+  'CHML',
+  'GFML',
+  'DBML',
+  'LFML',
+  'NLML',
+  'SFML',
+]
 
 const MEAL_CODE_LABELS: Record<string, string> = {
-  'VGML': '西式素食',
-  'AVML': '印度素食',
-  'HNML': '印度非素食',
-  'KOSV': '猶太餐',
-  'MOML': '伊斯蘭餐',
-  'SPML': '特殊餐',
-  'BBML': '嬰兒餐',
-  'CHML': '兒童餐',
-  'GFML': '無麩質餐',
-  'DBML': '糖尿病餐',
-  'LFML': '低脂餐',
-  'NLML': '低鹽餐',
-  'SFML': '海鮮餐'
+  VGML: '西式素食',
+  AVML: '印度素食',
+  HNML: '印度非素食',
+  KOSV: '猶太餐',
+  MOML: '伊斯蘭餐',
+  SPML: '特殊餐',
+  BBML: '嬰兒餐',
+  CHML: '兒童餐',
+  GFML: '無麩質餐',
+  DBML: '糖尿病餐',
+  LFML: '低脂餐',
+  NLML: '低鹽餐',
+  SFML: '海鮮餐',
 }
 
 const WHEELCHAIR_CODES = ['WCHR', 'WCHS', 'WCHC']
 
 const WHEELCHAIR_CODE_LABELS: Record<string, string> = {
-  'WCHR': '輪椅（可上下樓梯）',
-  'WCHS': '輪椅（無法上下樓梯）',
-  'WCHC': '輪椅（完全無法行動）'
+  WCHR: '輪椅（可上下樓梯）',
+  WCHS: '輪椅（無法上下樓梯）',
+  WCHC: '輪椅（完全無法行動）',
 }
 
 const BAGGAGE_CODES = ['CBBG', 'BIKE', 'GOLF', 'SURF', 'SKIS', 'PETC', 'AVIH']
 
 const BOOKING_STATUS_LABELS: Record<string, string> = {
-  'HK': '已確認',
-  'TK': '已開票',
-  'UC': '待確認',
-  'UN': '待確認',
-  'XX': '已取消',
-  'HL': '候補優先',
-  'HN': '候補',
-  'RR': '已開票確認',
-  'SC': '航班取消'
+  HK: '已確認',
+  TK: '已開票',
+  UC: '待確認',
+  UN: '待確認',
+  XX: '已取消',
+  HL: '候補優先',
+  HN: '候補',
+  RR: '已開票確認',
+  SC: '航班取消',
 }
 
 // =====================================================
@@ -566,5 +541,5 @@ export default {
   parseQueryIntent,
   processQuery,
   recordQuery,
-  getQueryHistory
+  getQueryHistory,
 }

@@ -17,10 +17,7 @@ type EmployeeRow = Database['public']['Tables']['employees']['Row']
  * 根據員工的角色，合併角色預設權限和資料庫中的額外權限
  * 這確保了當 rbac-config.ts 更新時，員工會自動獲得新的權限
  */
-function mergePermissionsWithRoles(
-  dbPermissions: string[],
-  roles: UserRole[]
-): string[] {
+function mergePermissionsWithRoles(dbPermissions: string[], roles: UserRole[]): string[] {
   const allPermissions = new Set<string>(dbPermissions)
 
   // 合併所有角色的預設權限
@@ -81,10 +78,7 @@ function buildUserFromEmployee(
   options?: { mustChangePassword?: boolean }
 ): User {
   const userRoles = (employeeData.roles || []) as UserRole[]
-  const mergedPermissions = mergePermissionsWithRoles(
-    employeeData.permissions || [],
-    userRoles
-  )
+  const mergedPermissions = mergePermissionsWithRoles(employeeData.permissions || [], userRoles)
 
   return {
     id: employeeData.id,
@@ -97,7 +91,10 @@ function buildUserFromEmployee(
     salary_info: (employeeData.salary_info ?? {}) as User['salary_info'],
     permissions: mergedPermissions,
     roles: userRoles as User['roles'],
-    attendance: (employeeData.attendance ?? { leave_records: [], overtime_records: [] }) as User['attendance'],
+    attendance: (employeeData.attendance ?? {
+      leave_records: [],
+      overtime_records: [],
+    }) as User['attendance'],
     contracts: (employeeData.contracts ?? []) as User['contracts'],
     status: employeeData.status as User['status'],
     workspace_id: employeeData.workspace_id ?? undefined,
@@ -136,7 +133,8 @@ interface AuthState {
 
 function setSecureCookie(token: string, _rememberMe: boolean = false): void {
   const maxAge = 30 * 24 * 60 * 60 // 30 days — 登入後不應該頻繁要求重新登入
-  const secure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'Secure; ' : ''
+  const secure =
+    typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'Secure; ' : ''
 
   if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
     document.cookie = `auth-token=${token}; path=/; max-age=${maxAge}; SameSite=Lax`
@@ -153,11 +151,12 @@ export const useAuthStore = create<AuthState>()(
       isAdmin: false, // Initial state
       sidebarCollapsed: true,
       _hasHydrated: false,
-      
-      setUser: (user) => {
-        const isAuthenticated = !!user;
-        const isAdmin = isAuthenticated && (user.permissions.includes('admin') || user.permissions.includes('*'));
-        set({ user, isAuthenticated, isAdmin });
+
+      setUser: user => {
+        const isAuthenticated = !!user
+        const isAdmin =
+          isAuthenticated && (user.permissions.includes('admin') || user.permissions.includes('*'))
+        set({ user, isAuthenticated, isAdmin })
       },
 
       logout: async () => {
@@ -187,7 +186,12 @@ export const useAuthStore = create<AuthState>()(
         })
       },
 
-      validateLogin: async (username: string, password: string, code?: string, rememberMe: boolean = true) => {
+      validateLogin: async (
+        username: string,
+        password: string,
+        code?: string,
+        rememberMe: boolean = true
+      ) => {
         try {
           if (!code) {
             return { success: false, message: '請輸入辦公室或廠商代號' }
@@ -229,7 +233,8 @@ export const useAuthStore = create<AuthState>()(
             }
           }
 
-          const employeeData = (validateResult.data?.employee ?? validateResult.employee) as EmployeeRow
+          const employeeData = (validateResult.data?.employee ??
+            validateResult.employee) as EmployeeRow
 
           // 3. 確保 Auth 同步（處理 RLS 所需的 supabase_user_id）
           await ensureAuthSync({
@@ -249,18 +254,24 @@ export const useAuthStore = create<AuthState>()(
           } else {
             // fallback: 舊格式（向下相容，待移除）
             const userRoles = (employeeData.roles || []) as UserRole[]
-            const mergedPermissions = mergePermissionsWithRoles(employeeData.permissions || [], userRoles)
+            const mergedPermissions = mergePermissionsWithRoles(
+              employeeData.permissions || [],
+              userRoles
+            )
             const authPayload: AuthPayload = {
               id: employeeData.id,
               employee_number: employeeData.employee_number,
               permissions: mergedPermissions,
-              role: mergedPermissions.includes('admin') || mergedPermissions.includes('*') ? 'admin' : 'employee',
+              role:
+                mergedPermissions.includes('admin') || mergedPermissions.includes('*')
+                  ? 'admin'
+                  : 'employee',
             }
             const token = generateToken(authPayload, rememberMe)
             setSecureCookie(token, rememberMe)
           }
 
-          get().setUser(user);
+          get().setUser(user)
 
           logger.log(`✅ 登入成功: ${employeeData.display_name}`)
 
@@ -320,7 +331,7 @@ export const useAuthStore = create<AuthState>()(
           logger.error('💥 Error refreshing user data:', error)
         }
       },
-      
+
       toggleSidebar: () => set(state => ({ sidebarCollapsed: !state.sidebarCollapsed })),
       setSidebarCollapsed: collapsed => set({ sidebarCollapsed: collapsed }),
       setHasHydrated: hasHydrated => set({ _hasHydrated: hasHydrated }),

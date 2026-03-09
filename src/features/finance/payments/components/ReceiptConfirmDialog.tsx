@@ -4,7 +4,6 @@
  * 收款單確認對話框（與新增介面相同風格）
  */
 
-
 import { RECEIPT_CONFIRM_LABELS } from '../../constants/labels'
 
 import { useState } from 'react'
@@ -20,7 +19,11 @@ import { useAuthStore } from '@/stores'
 import { deleteReceipt, invalidateReceipts } from '@/data'
 import { recalculateReceiptStats } from '../services/receipt-core.service'
 import type { Receipt } from '@/types/receipt.types'
-import { ADD_RECEIPT_DIALOG_LABELS, RECEIPT_CONFIRM_DIALOG_LABELS, RECEIPT_CONFIRM_TOAST_LABELS } from '../../constants/labels';
+import {
+  ADD_RECEIPT_DIALOG_LABELS,
+  RECEIPT_CONFIRM_DIALOG_LABELS,
+  RECEIPT_CONFIRM_TOAST_LABELS,
+} from '../../constants/labels'
 
 interface ReceiptConfirmDialogProps {
   open: boolean
@@ -53,9 +56,9 @@ export function ReceiptConfirmDialog({
   const isCreator = user?.id === receipt.created_by
   const canDelete = isAccountant || isCreator
 
-  const receiptTypeLabel = RECEIPT_TYPE_OPTIONS.find(
-    opt => opt.value === receipt.receipt_type
-  )?.label || RECEIPT_CONFIRM_DIALOG_LABELS.未知
+  const receiptTypeLabel =
+    RECEIPT_TYPE_OPTIONS.find(opt => opt.value === receipt.receipt_type)?.label ||
+    RECEIPT_CONFIRM_DIALOG_LABELS.未知
 
   const isConfirmed = receipt.status === '1'
 
@@ -104,7 +107,8 @@ export function ReceiptConfirmDialog({
     } catch (error) {
       toast({
         title: RECEIPT_CONFIRM_TOAST_LABELS.CONFIRM_FAILED,
-        description: error instanceof Error ? error.message : RECEIPT_CONFIRM_TOAST_LABELS.PLEASE_TRY_LATER,
+        description:
+          error instanceof Error ? error.message : RECEIPT_CONFIRM_TOAST_LABELS.PLEASE_TRY_LATER,
         variant: 'destructive',
       })
     } finally {
@@ -143,7 +147,8 @@ export function ReceiptConfirmDialog({
     } catch (error) {
       toast({
         title: ADD_RECEIPT_DIALOG_LABELS.刪除失敗,
-        description: error instanceof Error ? error.message : RECEIPT_CONFIRM_TOAST_LABELS.PLEASE_TRY_LATER,
+        description:
+          error instanceof Error ? error.message : RECEIPT_CONFIRM_TOAST_LABELS.PLEASE_TRY_LATER,
         variant: 'destructive',
       })
     } finally {
@@ -156,9 +161,7 @@ export function ReceiptConfirmDialog({
       <DialogContent level={2} className="max-w-[800px] flex flex-col">
         <DialogHeader>
           <DialogTitle>{RECEIPT_CONFIRM_LABELS.TITLE}</DialogTitle>
-          <p className="text-sm text-muted-foreground">
-            {receipt.receipt_number}
-          </p>
+          <p className="text-sm text-muted-foreground">{receipt.receipt_number}</p>
         </DialogHeader>
 
         {/* 基本資訊 */}
@@ -173,11 +176,15 @@ export function ReceiptConfirmDialog({
           </div>
           <div>
             <span className="text-muted-foreground">{RECEIPT_CONFIRM_LABELS.STATUS}</span>
-            <span className={cn(
-              'font-medium',
-              isConfirmed ? 'text-morandi-green' : 'text-morandi-gold'
-            )}>
-              {isConfirmed ? RECEIPT_CONFIRM_DIALOG_LABELS.已確認 : RECEIPT_CONFIRM_DIALOG_LABELS.待確認}
+            <span
+              className={cn(
+                'font-medium',
+                isConfirmed ? 'text-morandi-green' : 'text-morandi-gold'
+              )}
+            >
+              {isConfirmed
+                ? RECEIPT_CONFIRM_DIALOG_LABELS.已確認
+                : RECEIPT_CONFIRM_DIALOG_LABELS.待確認}
             </span>
           </div>
         </div>
@@ -187,16 +194,45 @@ export function ReceiptConfirmDialog({
           <table className="w-full border-collapse">
             <thead>
               <tr className="text-xs text-morandi-primary font-medium bg-morandi-container/50">
-                <th className="text-left py-2.5 px-3 border-b border-r border-border" style={{ width: '100px' }}>{RECEIPT_CONFIRM_LABELS.PAYMENT_METHOD}</th>
-                <th className="text-left py-2.5 px-3 border-b border-r border-border" style={{ width: '120px' }}>{RECEIPT_CONFIRM_LABELS.TRANSACTION_DATE}</th>
-                <th className="text-left py-2.5 px-3 border-b border-r border-border">{RECEIPT_CONFIRM_LABELS.PAYER}</th>
-                <th className="text-left py-2.5 px-3 border-b border-r border-border">{RECEIPT_CONFIRM_LABELS.REMARKS}</th>
-                <th className="text-right py-2.5 px-3 border-b border-r border-border" style={{ width: '120px' }}>{RECEIPT_CONFIRM_LABELS.RECEIVABLE}</th>
+                <th
+                  className="text-left py-2.5 px-3 border-b border-r border-border"
+                  style={{ width: '100px' }}
+                >
+                  {RECEIPT_CONFIRM_LABELS.PAYMENT_METHOD}
+                </th>
+                <th
+                  className="text-left py-2.5 px-3 border-b border-r border-border"
+                  style={{ width: '120px' }}
+                >
+                  {RECEIPT_CONFIRM_LABELS.TRANSACTION_DATE}
+                </th>
+                <th className="text-left py-2.5 px-3 border-b border-r border-border">
+                  {RECEIPT_CONFIRM_LABELS.PAYER}
+                </th>
+                <th className="text-left py-2.5 px-3 border-b border-r border-border">
+                  {RECEIPT_CONFIRM_LABELS.REMARKS}
+                </th>
+                <th
+                  className="text-right py-2.5 px-3 border-b border-r border-border"
+                  style={{ width: '120px' }}
+                >
+                  {RECEIPT_CONFIRM_LABELS.RECEIVABLE}
+                </th>
                 {!isConfirmed && (
-                  <th className="text-center py-2.5 px-3 border-b border-border" style={{ width: '100px' }}>{RECEIPT_CONFIRM_LABELS.CONFIRM}</th>
+                  <th
+                    className="text-center py-2.5 px-3 border-b border-border"
+                    style={{ width: '100px' }}
+                  >
+                    {RECEIPT_CONFIRM_LABELS.CONFIRM}
+                  </th>
                 )}
                 {isConfirmed && (
-                  <th className="text-right py-2.5 px-3 border-b border-border" style={{ width: '120px' }}>{RECEIPT_CONFIRM_LABELS.LABEL_8417}</th>
+                  <th
+                    className="text-right py-2.5 px-3 border-b border-border"
+                    style={{ width: '120px' }}
+                  >
+                    {RECEIPT_CONFIRM_LABELS.LABEL_8417}
+                  </th>
                 )}
               </tr>
             </thead>
@@ -244,10 +280,12 @@ export function ReceiptConfirmDialog({
                   </td>
                 )}
                 {isConfirmed && (
-                  <td className={cn(
-                    "py-3 px-3 border-b border-border text-sm text-right font-medium",
-                    receipt.actual_amount !== receipt.receipt_amount && "text-morandi-red"
-                  )}>
+                  <td
+                    className={cn(
+                      'py-3 px-3 border-b border-border text-sm text-right font-medium',
+                      receipt.actual_amount !== receipt.receipt_amount && 'text-morandi-red'
+                    )}
+                  >
                     NT$ {(receipt.actual_amount || 0).toLocaleString()}
                     {receipt.actual_amount !== receipt.receipt_amount && (
                       <AlertCircle size={14} className="inline ml-1" />
@@ -264,11 +302,15 @@ export function ReceiptConfirmDialog({
           <div className="bg-morandi-red/5 border border-morandi-red/20 rounded-lg p-4 mt-4">
             <div className="flex items-center gap-2 mb-3">
               <AlertCircle size={16} className="text-morandi-red" />
-              <span className="text-sm font-medium text-morandi-red">{RECEIPT_CONFIRM_LABELS.PLEASE_ENTER_6193}</span>
+              <span className="text-sm font-medium text-morandi-red">
+                {RECEIPT_CONFIRM_LABELS.PLEASE_ENTER_6193}
+              </span>
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 flex-1">
-                <span className="text-sm text-muted-foreground">{RECEIPT_CONFIRM_LABELS.LABEL_8417}</span>
+                <span className="text-sm text-muted-foreground">
+                  {RECEIPT_CONFIRM_LABELS.LABEL_8417}
+                </span>
                 <Input
                   type="number"
                   value={abnormalAmount}

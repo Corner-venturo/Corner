@@ -29,9 +29,7 @@ export function useDesigns() {
       if (docsError) throw docsError
 
       // 取得有 tour_id 的文件的團資料
-      const tourIds = (docs || [])
-        .map(d => d.tour_id)
-        .filter((id): id is string => !!id)
+      const tourIds = (docs || []).map(d => d.tour_id).filter((id): id is string => !!id)
 
       let tourMap: Record<string, { name: string | null; code: string | null }> = {}
 
@@ -42,9 +40,7 @@ export function useDesigns() {
           .in('id', tourIds)
 
         if (tours) {
-          tourMap = Object.fromEntries(
-            tours.map(t => [t.id, { name: t.name, code: t.code }])
-          )
+          tourMap = Object.fromEntries(tours.map(t => [t.id, { name: t.name, code: t.code }]))
         }
       }
 
@@ -89,25 +85,18 @@ export function useDesigns() {
     if (error) throw error
 
     // 樂觀更新
-    await mutate((current) => [data as Design, ...(current || [])], false)
+    await mutate(current => [data as Design, ...(current || [])], false)
 
     return data as Design
   }
 
   const updateDesign = async (id: string, updates: Partial<Design>) => {
-    const { error } = await supabase
-      .from('brochure_documents')
-      .update(updates)
-      .eq('id', id)
+    const { error } = await supabase.from('brochure_documents').update(updates).eq('id', id)
 
     if (error) throw error
 
     // 樂觀更新
-    await mutate(
-      (current) =>
-        current?.map((d) => (d.id === id ? { ...d, ...updates } : d)),
-      false
-    )
+    await mutate(current => current?.map(d => (d.id === id ? { ...d, ...updates } : d)), false)
   }
 
   const deleteDesign = async (id: string) => {
@@ -142,7 +131,11 @@ export function useDesigns() {
         }
         // 也檢查 templateData 中的封面圖片
         const templateData = versionData?.templateData as Record<string, unknown> | undefined
-        if (templateData?.coverImage && typeof templateData.coverImage === 'string' && templateData.coverImage.includes('brochure-images')) {
+        if (
+          templateData?.coverImage &&
+          typeof templateData.coverImage === 'string' &&
+          templateData.coverImage.includes('brochure-images')
+        ) {
           imageUrls.push(templateData.coverImage)
         }
       }
@@ -162,7 +155,9 @@ export function useDesigns() {
         .filter((path, index, self) => self.indexOf(path) === index)
 
       if (filePaths.length > 0) {
-        const { error: storageError } = await supabase.storage.from('brochure-images').remove(filePaths)
+        const { error: storageError } = await supabase.storage
+          .from('brochure-images')
+          .remove(filePaths)
         if (storageError) {
           logger.warn('Failed to delete storage images:', storageError)
         }
@@ -202,7 +197,7 @@ export function useDesigns() {
     }
 
     // 樂觀更新
-    await mutate((current) => current?.filter((d) => d.id !== id), false)
+    await mutate(current => current?.filter(d => d.id !== id), false)
     logger.log('Design deleted successfully:', id)
   }
 

@@ -131,9 +131,7 @@ describe('DisbursementOrderService', () => {
         createMockOrder({ id: 'order-2', status: 'pending' }),
       ]
 
-      mockFromImplementation.mockReturnValue(
-        createMockChain({ data: mockOrders, error: null })
-      )
+      mockFromImplementation.mockReturnValue(createMockChain({ data: mockOrders, error: null }))
 
       const result = await disbursementOrderService.getPendingOrdersAsync()
 
@@ -146,20 +144,15 @@ describe('DisbursementOrderService', () => {
         createMockChain({ data: null, error: { message: '資料庫錯誤' } })
       )
 
-      await expect(disbursementOrderService.getPendingOrdersAsync())
-        .rejects.toThrow('資料庫錯誤')
+      await expect(disbursementOrderService.getPendingOrdersAsync()).rejects.toThrow('資料庫錯誤')
     })
   })
 
   describe('getConfirmedOrdersAsync', () => {
     it('should return confirmed orders', async () => {
-      const mockOrders = [
-        createMockOrder({ id: 'order-1', status: 'confirmed' }),
-      ]
+      const mockOrders = [createMockOrder({ id: 'order-1', status: 'confirmed' })]
 
-      mockFromImplementation.mockReturnValue(
-        createMockChain({ data: mockOrders, error: null })
-      )
+      mockFromImplementation.mockReturnValue(createMockChain({ data: mockOrders, error: null }))
 
       const result = await disbursementOrderService.getConfirmedOrdersAsync()
 
@@ -169,13 +162,9 @@ describe('DisbursementOrderService', () => {
 
   describe('getOrdersByDateAsync', () => {
     it('should return orders for a specific date', async () => {
-      const mockOrders = [
-        createMockOrder({ id: 'order-1', disbursement_date: '2025-01-16' }),
-      ]
+      const mockOrders = [createMockOrder({ id: 'order-1', disbursement_date: '2025-01-16' })]
 
-      mockFromImplementation.mockReturnValue(
-        createMockChain({ data: mockOrders, error: null })
-      )
+      mockFromImplementation.mockReturnValue(createMockChain({ data: mockOrders, error: null }))
 
       const result = await disbursementOrderService.getOrdersByDateAsync('2025-01-16')
 
@@ -184,9 +173,7 @@ describe('DisbursementOrderService', () => {
     })
 
     it('should return empty array when no orders found', async () => {
-      mockFromImplementation.mockReturnValue(
-        createMockChain({ data: [], error: null })
-      )
+      mockFromImplementation.mockReturnValue(createMockChain({ data: [], error: null }))
 
       const result = await disbursementOrderService.getOrdersByDateAsync('2025-12-25')
 
@@ -203,9 +190,7 @@ describe('DisbursementOrderService', () => {
         status: 'pending',
       })
 
-      mockFromImplementation.mockReturnValue(
-        createMockChain({ data: mockOrder, error: null })
-      )
+      mockFromImplementation.mockReturnValue(createMockChain({ data: mockOrder, error: null }))
 
       const result = await disbursementOrderService.getCurrentWeekOrderAsync()
 

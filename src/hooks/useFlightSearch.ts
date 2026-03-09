@@ -88,21 +88,29 @@ export function useFlightSearch({
     } finally {
       setLoadingOutboundFlight(false)
     }
-  }, [outboundFlight?.flightNumber, outboundFlight?.departureDate, departureDate, setOutboundFlight])
+  }, [
+    outboundFlight?.flightNumber,
+    outboundFlight?.departureDate,
+    departureDate,
+    setOutboundFlight,
+  ])
 
   // 選擇去程航段
-  const handleSelectOutboundSegment = useCallback((segment: FlightSegmentInfo) => {
-    setOutboundFlight({
-      flightNumber: segment.flightNumber,
-      airline: segment.airline,
-      departureAirport: segment.departureAirport,
-      arrivalAirport: segment.arrivalAirport,
-      departureTime: segment.departureTime,
-      arrivalTime: segment.arrivalTime,
-      departureDate: outboundFlight?.departureDate || '',
-    })
-    setOutboundSegments([])
-  }, [outboundFlight?.departureDate, setOutboundFlight])
+  const handleSelectOutboundSegment = useCallback(
+    (segment: FlightSegmentInfo) => {
+      setOutboundFlight({
+        flightNumber: segment.flightNumber,
+        airline: segment.airline,
+        departureAirport: segment.departureAirport,
+        arrivalAirport: segment.arrivalAirport,
+        departureTime: segment.departureTime,
+        arrivalTime: segment.arrivalTime,
+        departureDate: outboundFlight?.departureDate || '',
+      })
+      setOutboundSegments([])
+    },
+    [outboundFlight?.departureDate, setOutboundFlight]
+  )
 
   // Search return flight
   const handleSearchReturnFlight = useCallback(async () => {
@@ -155,21 +163,30 @@ export function useFlightSearch({
     } finally {
       setLoadingReturnFlight(false)
     }
-  }, [returnFlight?.flightNumber, returnFlight?.departureDate, departureDate, days, setReturnFlight])
+  }, [
+    returnFlight?.flightNumber,
+    returnFlight?.departureDate,
+    departureDate,
+    days,
+    setReturnFlight,
+  ])
 
   // 選擇回程航段
-  const handleSelectReturnSegment = useCallback((segment: FlightSegmentInfo) => {
-    setReturnFlight({
-      flightNumber: segment.flightNumber,
-      airline: segment.airline,
-      departureAirport: segment.departureAirport,
-      arrivalAirport: segment.arrivalAirport,
-      departureTime: segment.departureTime,
-      arrivalTime: segment.arrivalTime,
-      departureDate: returnFlight?.departureDate || '',
-    })
-    setReturnSegments([])
-  }, [returnFlight?.departureDate, setReturnFlight])
+  const handleSelectReturnSegment = useCallback(
+    (segment: FlightSegmentInfo) => {
+      setReturnFlight({
+        flightNumber: segment.flightNumber,
+        airline: segment.airline,
+        departureAirport: segment.departureAirport,
+        arrivalAirport: segment.arrivalAirport,
+        departureTime: segment.departureTime,
+        arrivalTime: segment.arrivalTime,
+        departureDate: returnFlight?.departureDate || '',
+      })
+      setReturnSegments([])
+    },
+    [returnFlight?.departureDate, setReturnFlight]
+  )
 
   // 清除航段選擇
   const clearOutboundSegments = useCallback(() => setOutboundSegments([]), [])

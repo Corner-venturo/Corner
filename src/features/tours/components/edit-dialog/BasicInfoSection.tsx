@@ -37,7 +37,9 @@ export function BasicInfoSection({
     <div className="space-y-4">
       {/* 旅遊團名稱 */}
       <div>
-        <label className="text-sm font-medium text-morandi-primary">{BASIC_INFO_SECTION_LABELS.旅遊團名稱_必填}</label>
+        <label className="text-sm font-medium text-morandi-primary">
+          {BASIC_INFO_SECTION_LABELS.旅遊團名稱_必填}
+        </label>
         <Input
           value={formData.name}
           onChange={e => onFieldChange('name', e.target.value)}
@@ -48,7 +50,9 @@ export function BasicInfoSection({
       {/* 目的地選擇 */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium text-morandi-primary">{BASIC_INFO_SECTION_LABELS.國家地區}</label>
+          <label className="text-sm font-medium text-morandi-primary">
+            {BASIC_INFO_SECTION_LABELS.國家地區}
+          </label>
           <Combobox
             value={formData.countryCode}
             onChange={onCountryChange}
@@ -66,7 +70,9 @@ export function BasicInfoSection({
         </div>
 
         <div>
-          <label className="text-sm font-medium text-morandi-primary">{BASIC_INFO_SECTION_LABELS.城市}</label>
+          <label className="text-sm font-medium text-morandi-primary">
+            {BASIC_INFO_SECTION_LABELS.城市}
+          </label>
           {formData.countryCode === '__custom__' ? (
             <Input
               value={formData.customLocation || ''}
@@ -95,7 +101,9 @@ export function BasicInfoSection({
       {/* 日期 */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium text-morandi-primary">{BASIC_INFO_SECTION_LABELS.出發日期_必填}</label>
+          <label className="text-sm font-medium text-morandi-primary">
+            {BASIC_INFO_SECTION_LABELS.出發日期_必填}
+          </label>
           <SimpleDateInput
             value={formData.departure_date}
             onChange={onDepartureDateChange}
@@ -103,7 +111,9 @@ export function BasicInfoSection({
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-morandi-primary">{BASIC_INFO_SECTION_LABELS.返回日期_必填}</label>
+          <label className="text-sm font-medium text-morandi-primary">
+            {BASIC_INFO_SECTION_LABELS.返回日期_必填}
+          </label>
           <SimpleDateInput
             value={formData.return_date}
             onChange={return_date => onFieldChange('return_date', return_date)}
@@ -115,7 +125,9 @@ export function BasicInfoSection({
 
       {/* 描述 */}
       <div>
-        <label className="text-sm font-medium text-morandi-primary">{BASIC_INFO_SECTION_LABELS.描述}</label>
+        <label className="text-sm font-medium text-morandi-primary">
+          {BASIC_INFO_SECTION_LABELS.描述}
+        </label>
         <Input
           value={formData.description}
           onChange={e => onFieldChange('description', e.target.value)}

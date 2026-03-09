@@ -3,7 +3,6 @@
  * FleetPage - 車隊管理頁面（含車輛、司機、維護記錄）
  */
 
-
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useCallback } from 'react'
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
@@ -146,24 +145,21 @@ export const FleetPage: React.FC = () => {
     setIsVehicleDialogOpen(true)
   }, [])
 
-  const handleDeleteVehicle = useCallback(
-    async (item: FleetVehicle) => {
-      const confirmed = await confirm(`確定要刪除車輛「${item.license_plate}」嗎？`, {
-        title: '刪除車輛',
-        type: 'warning',
-      })
-      if (!confirmed) return
+  const handleDeleteVehicle = useCallback(async (item: FleetVehicle) => {
+    const confirmed = await confirm(`確定要刪除車輛「${item.license_plate}」嗎？`, {
+      title: '刪除車輛',
+      type: 'warning',
+    })
+    if (!confirmed) return
 
-      try {
-        await deleteFleetVehicle(item.id)
-        await alert('車輛已刪除', 'success')
-      } catch (error) {
-        logger.error('Delete FleetVehicle Error:', error)
-        await alert('刪除失敗，請稍後再試', 'error')
-      }
-    },
-    []
-  )
+    try {
+      await deleteFleetVehicle(item.id)
+      await alert('車輛已刪除', 'success')
+    } catch (error) {
+      logger.error('Delete FleetVehicle Error:', error)
+      await alert('刪除失敗，請稍後再試', 'error')
+    }
+  }, [])
 
   const handleCloseVehicleDialog = useCallback(() => {
     setIsVehicleDialogOpen(false)
@@ -251,24 +247,21 @@ export const FleetPage: React.FC = () => {
     setIsDriverDialogOpen(true)
   }, [])
 
-  const handleDeleteDriver = useCallback(
-    async (item: FleetDriver) => {
-      const confirmed = await confirm(`確定要刪除司機「${item.name}」嗎？`, {
-        title: '刪除司機',
-        type: 'warning',
-      })
-      if (!confirmed) return
+  const handleDeleteDriver = useCallback(async (item: FleetDriver) => {
+    const confirmed = await confirm(`確定要刪除司機「${item.name}」嗎？`, {
+      title: '刪除司機',
+      type: 'warning',
+    })
+    if (!confirmed) return
 
-      try {
-        await deleteFleetDriver(item.id)
-        await alert('司機已刪除', 'success')
-      } catch (error) {
-        logger.error('Delete FleetDriver Error:', error)
-        await alert('刪除失敗，請稍後再試', 'error')
-      }
-    },
-    []
-  )
+    try {
+      await deleteFleetDriver(item.id)
+      await alert('司機已刪除', 'success')
+    } catch (error) {
+      logger.error('Delete FleetDriver Error:', error)
+      await alert('刪除失敗，請稍後再試', 'error')
+    }
+  }, [])
 
   const handleCloseDriverDialog = useCallback(() => {
     setIsDriverDialogOpen(false)
@@ -342,58 +335,58 @@ export const FleetPage: React.FC = () => {
       addLabel={addLabel}
       contentClassName="flex-1 overflow-hidden flex flex-col"
     >
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-          <div className="px-4 border-b border-border">
-            <TabsList className="bg-transparent h-auto p-0 gap-4">
-              <TabsTrigger
-                value="vehicles"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-morandi-gold rounded-none px-1 pb-2"
-              >
-                <Bus size={16} className="mr-2" />
-                車輛 ({vehicles.length})
-              </TabsTrigger>
-              <TabsTrigger
-                value="drivers"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-morandi-gold rounded-none px-1 pb-2"
-              >
-                <Users size={16} className="mr-2" />
-                司機 ({drivers.length})
-              </TabsTrigger>
-              <TabsTrigger
-                value="logs"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-morandi-gold rounded-none px-1 pb-2"
-              >
-                <Wrench size={16} className="mr-2" />
-                {FLEET_LABELS.LABEL_9547}
-              </TabsTrigger>
-            </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+        <div className="px-4 border-b border-border">
+          <TabsList className="bg-transparent h-auto p-0 gap-4">
+            <TabsTrigger
+              value="vehicles"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-morandi-gold rounded-none px-1 pb-2"
+            >
+              <Bus size={16} className="mr-2" />
+              車輛 ({vehicles.length})
+            </TabsTrigger>
+            <TabsTrigger
+              value="drivers"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-morandi-gold rounded-none px-1 pb-2"
+            >
+              <Users size={16} className="mr-2" />
+              司機 ({drivers.length})
+            </TabsTrigger>
+            <TabsTrigger
+              value="logs"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-morandi-gold rounded-none px-1 pb-2"
+            >
+              <Wrench size={16} className="mr-2" />
+              {FLEET_LABELS.LABEL_9547}
+            </TabsTrigger>
+          </TabsList>
+        </div>
+
+        <TabsContent value="vehicles" className="flex-1 overflow-auto mt-0 p-0">
+          <FleetVehicleList
+            items={filteredVehicles}
+            drivers={drivers}
+            loading={vehiclesLoading}
+            onEdit={handleEditVehicle}
+            onDelete={handleDeleteVehicle}
+          />
+        </TabsContent>
+
+        <TabsContent value="drivers" className="flex-1 overflow-auto mt-0 p-0">
+          <FleetDriverList
+            items={filteredDrivers}
+            loading={driversLoading}
+            onEdit={handleEditDriver}
+            onDelete={handleDeleteDriver}
+          />
+        </TabsContent>
+
+        <TabsContent value="logs" className="flex-1 overflow-auto mt-0 p-0">
+          <div className="flex items-center justify-center h-full text-morandi-secondary">
+            {FLEET_LABELS.LABEL_7181}
           </div>
-
-          <TabsContent value="vehicles" className="flex-1 overflow-auto mt-0 p-0">
-            <FleetVehicleList
-              items={filteredVehicles}
-              drivers={drivers}
-              loading={vehiclesLoading}
-              onEdit={handleEditVehicle}
-              onDelete={handleDeleteVehicle}
-            />
-          </TabsContent>
-
-          <TabsContent value="drivers" className="flex-1 overflow-auto mt-0 p-0">
-            <FleetDriverList
-              items={filteredDrivers}
-              loading={driversLoading}
-              onEdit={handleEditDriver}
-              onDelete={handleDeleteDriver}
-            />
-          </TabsContent>
-
-          <TabsContent value="logs" className="flex-1 overflow-auto mt-0 p-0">
-            <div className="flex items-center justify-center h-full text-morandi-secondary">
-              {FLEET_LABELS.LABEL_7181}
-            </div>
-          </TabsContent>
-        </Tabs>
+        </TabsContent>
+      </Tabs>
 
       {/* 車輛對話框 */}
       <FleetVehicleDialog

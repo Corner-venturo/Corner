@@ -3,7 +3,6 @@
  * QuickQuoteSummary - 金額統計摘要
  */
 
-
 import React from 'react'
 import { MORANDI_COLORS } from '../shared/print-styles'
 import { QUICK_QUOTE_LABELS } from './constants/labels'

@@ -9,11 +9,7 @@
 import { useState } from 'react'
 import { Check, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 import { DESIGNER_LABELS } from '../constants/labels'
 
@@ -80,7 +76,7 @@ export function FontPicker({
   const [fontOpen, setFontOpen] = useState(false)
   const [sizeOpen, setSizeOpen] = useState(false)
 
-  const currentFont = FONTS.find((f) => f.name === fontFamily) || FONTS[0]
+  const currentFont = FONTS.find(f => f.name === fontFamily) || FONTS[0]
 
   // 按類別分組字體
   const fontsByCategory = FONTS.reduce(
@@ -99,10 +95,7 @@ export function FontPicker({
       {/* 字體選擇 */}
       <Popover open={fontOpen} onOpenChange={setFontOpen}>
         <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className="w-[140px] justify-between h-8 text-xs"
-          >
+          <Button variant="outline" className="w-[140px] justify-between h-8 text-xs">
             <span className="truncate" style={{ fontFamily: currentFont.name }}>
               {currentFont.label}
             </span>
@@ -116,7 +109,7 @@ export function FontPicker({
                 <div className="px-2 py-1.5 text-xs font-medium text-morandi-secondary bg-morandi-container/30">
                   {category}
                 </div>
-                {fonts.map((font) => (
+                {fonts.map(font => (
                   <button
                     key={font.name}
                     className={cn(
@@ -143,17 +136,14 @@ export function FontPicker({
       {/* 字體大小選擇 */}
       <Popover open={sizeOpen} onOpenChange={setSizeOpen}>
         <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className="w-[70px] justify-between h-8 text-xs"
-          >
+          <Button variant="outline" className="w-[70px] justify-between h-8 text-xs">
             <span>{fontSize}px</span>
             <ChevronDown size={14} className="ml-1 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[80px] p-0" align="start">
           <div className="max-h-[200px] overflow-auto">
-            {FONT_SIZES.map((size) => (
+            {FONT_SIZES.map(size => (
               <button
                 key={size}
                 className={cn(
@@ -194,22 +184,19 @@ const FONT_WEIGHTS = [
 
 export function FontWeightPicker({ fontWeight, onChange }: FontWeightPickerProps) {
   const [open, setOpen] = useState(false)
-  const currentWeight = FONT_WEIGHTS.find((w) => w.value === fontWeight) || FONT_WEIGHTS[0]
+  const currentWeight = FONT_WEIGHTS.find(w => w.value === fontWeight) || FONT_WEIGHTS[0]
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          className="w-[80px] justify-between h-8 text-xs"
-        >
+        <Button variant="outline" className="w-[80px] justify-between h-8 text-xs">
           <span>{currentWeight.label}</span>
           <ChevronDown size={14} className="ml-1 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[100px] p-0" align="start">
         <div className="max-h-[200px] overflow-auto">
-          {FONT_WEIGHTS.map((weight) => (
+          {FONT_WEIGHTS.map(weight => (
             <button
               key={weight.value}
               className={cn(
@@ -248,7 +235,7 @@ export function TextAlignPicker({ textAlign, onChange }: TextAlignPickerProps) {
 
   return (
     <div className="flex items-center gap-0.5 border rounded-md">
-      {alignments.map((align) => (
+      {alignments.map(align => (
         <button
           key={align.value}
           className={cn(

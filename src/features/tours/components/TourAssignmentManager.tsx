@@ -68,9 +68,13 @@ export function TourAssignmentManager({
   const [activeTab, setActiveTab] = useState(defaultTab)
 
   // 計算旅遊天數
-  const tourNights = tour?.departure_date && tour?.return_date
-    ? Math.ceil((new Date(tour.return_date).getTime() - new Date(tour.departure_date).getTime()) / (1000 * 60 * 60 * 24))
-    : 1
+  const tourNights =
+    tour?.departure_date && tour?.return_date
+      ? Math.ceil(
+          (new Date(tour.return_date).getTime() - new Date(tour.departure_date).getTime()) /
+            (1000 * 60 * 60 * 24)
+        )
+      : 1
 
   // 處理對話框關閉
   const handleOpenChange = (newOpen: boolean) => {
@@ -94,7 +98,11 @@ export function TourAssignmentManager({
           </DialogTitle>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)} className="flex-1 flex flex-col overflow-hidden">
+        <Tabs
+          value={activeTab}
+          onValueChange={v => setActiveTab(v as typeof activeTab)}
+          className="flex-1 flex flex-col overflow-hidden"
+        >
           <TabsList className="grid w-full grid-cols-3 flex-shrink-0">
             <TabsTrigger value="room" className="flex items-center gap-2">
               <Hotel className="h-4 w-4" />

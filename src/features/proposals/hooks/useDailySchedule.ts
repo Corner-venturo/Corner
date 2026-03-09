@@ -46,68 +46,67 @@ export function useDailySchedule({ initialDays = 0 }: UseDailyScheduleOptions = 
   }
 
   // 從行程表或版本記錄載入每日行程
-  const loadFromItinerary = useCallback((
-    itinerary: Itinerary,
-    versionIndex: number,
-    days: number
-  ) => {
-    const versionRecordsData = (itinerary.version_records || []) as ItineraryVersionRecord[]
+  const loadFromItinerary = useCallback(
+    (itinerary: Itinerary, versionIndex: number, days: number) => {
+      const versionRecordsData = (itinerary.version_records || []) as ItineraryVersionRecord[]
 
-    type DailyData = Array<{
-      title?: string
-      meals?: { breakfast?: string; lunch?: string; dinner?: string }
-      accommodation?: string
-      activities?: Array<{ id?: string; title?: string; startTime?: string; endTime?: string }>
-    }>
+      type DailyData = Array<{
+        title?: string
+        meals?: { breakfast?: string; lunch?: string; dinner?: string }
+        accommodation?: string
+        activities?: Array<{ id?: string; title?: string; startTime?: string; endTime?: string }>
+      }>
 
-    let dailyData: DailyData | null = null
+      let dailyData: DailyData | null = null
 
-    if (versionIndex === -1) {
-      // 主版本：從行程表的 daily_itinerary 讀取
-      dailyData = (itinerary.daily_itinerary || []) as unknown as DailyData
-    } else if (versionRecordsData[versionIndex]) {
-      // 特定版本：從版本記錄讀取
-      dailyData = (versionRecordsData[versionIndex].daily_itinerary || []) as unknown as DailyData
-    }
-
-    if (dailyData && dailyData.length > 0) {
-      const loadedSchedule = dailyData.map((day, idx) => {
-        const isHotelBreakfast = day.meals?.breakfast === '飯店早餐'
-        let sameAsPrevious = false
-        if (idx > 0 && dailyData![idx - 1]?.accommodation) {
-          sameAsPrevious = day.accommodation === dailyData![idx - 1].accommodation
-        }
-        // 載入活動（如果有的話）
-        const activities = (day.activities || []).map((act, actIdx) => ({
-          id: act.id || `activity-${idx}-${actIdx}`,
-          title: act.title || '',
-          startTime: act.startTime || '',
-          endTime: act.endTime || '',
-        }))
-        return {
-          day: idx + 1,
-          route: day.title || '',
-          meals: {
-            breakfast: isHotelBreakfast ? '' : (day.meals?.breakfast || ''),
-            lunch: day.meals?.lunch || '',
-            dinner: day.meals?.dinner || '',
-          },
-          accommodation: sameAsPrevious ? '' : (day.accommodation || ''),
-          sameAsPrevious,
-          hotelBreakfast: isHotelBreakfast,
-          activities: activities.length > 0 ? activities : undefined,
-        }
-      })
-      setDailySchedule(loadedSchedule)
-      // 如果有任何一天有活動，自動開啟時間軸模式
-      if (loadedSchedule.some(d => d.activities && d.activities.length > 0)) {
-        setIsTimelineMode(true)
+      if (versionIndex === -1) {
+        // 主版本：從行程表的 daily_itinerary 讀取
+        dailyData = (itinerary.daily_itinerary || []) as unknown as DailyData
+      } else if (versionRecordsData[versionIndex]) {
+        // 特定版本：從版本記錄讀取
+        dailyData = (versionRecordsData[versionIndex].daily_itinerary || []) as unknown as DailyData
       }
-    } else {
-      // 使用傳入的天數初始化
-      setDailySchedule(createEmptySchedule(days))
-    }
-  }, [])
+
+      if (dailyData && dailyData.length > 0) {
+        const loadedSchedule = dailyData.map((day, idx) => {
+          const isHotelBreakfast = day.meals?.breakfast === '飯店早餐'
+          let sameAsPrevious = false
+          if (idx > 0 && dailyData![idx - 1]?.accommodation) {
+            sameAsPrevious = day.accommodation === dailyData![idx - 1].accommodation
+          }
+          // 載入活動（如果有的話）
+          const activities = (day.activities || []).map((act, actIdx) => ({
+            id: act.id || `activity-${idx}-${actIdx}`,
+            title: act.title || '',
+            startTime: act.startTime || '',
+            endTime: act.endTime || '',
+          }))
+          return {
+            day: idx + 1,
+            route: day.title || '',
+            meals: {
+              breakfast: isHotelBreakfast ? '' : day.meals?.breakfast || '',
+              lunch: day.meals?.lunch || '',
+              dinner: day.meals?.dinner || '',
+            },
+            accommodation: sameAsPrevious ? '' : day.accommodation || '',
+            sameAsPrevious,
+            hotelBreakfast: isHotelBreakfast,
+            activities: activities.length > 0 ? activities : undefined,
+          }
+        })
+        setDailySchedule(loadedSchedule)
+        // 如果有任何一天有活動，自動開啟時間軸模式
+        if (loadedSchedule.some(d => d.activities && d.activities.length > 0)) {
+          setIsTimelineMode(true)
+        }
+      } else {
+        // 使用傳入的天數初始化
+        setDailySchedule(createEmptySchedule(days))
+      }
+    },
+    []
+  )
 
   // 初始化空的行程表
   const initialize = useCallback((days: number) => {
@@ -117,11 +116,7 @@ export function useDailySchedule({ initialDays = 0 }: UseDailyScheduleOptions = 
   }, [])
 
   // 更新每日行程
-  const updateDay = useCallback((
-    index: number,
-    field: string,
-    value: string | boolean
-  ) => {
+  const updateDay = useCallback((index: number, field: string, value: string | boolean) => {
     setDailySchedule(prev => {
       const newSchedule = [...prev]
       if (field === 'route' || field === 'accommodation') {
@@ -173,23 +168,21 @@ export function useDailySchedule({ initialDays = 0 }: UseDailyScheduleOptions = 
   }, [])
 
   // 更新活動
-  const updateActivity = useCallback((
-    dayIndex: number,
-    activityIndex: number,
-    field: keyof SimpleActivity,
-    value: string
-  ) => {
-    setDailySchedule(prev => {
-      const newSchedule = [...prev]
-      const activities = [...(newSchedule[dayIndex].activities || [])]
-      activities[activityIndex] = { ...activities[activityIndex], [field]: value }
-      newSchedule[dayIndex] = {
-        ...newSchedule[dayIndex],
-        activities,
-      }
-      return newSchedule
-    })
-  }, [])
+  const updateActivity = useCallback(
+    (dayIndex: number, activityIndex: number, field: keyof SimpleActivity, value: string) => {
+      setDailySchedule(prev => {
+        const newSchedule = [...prev]
+        const activities = [...(newSchedule[dayIndex].activities || [])]
+        activities[activityIndex] = { ...activities[activityIndex], [field]: value }
+        newSchedule[dayIndex] = {
+          ...newSchedule[dayIndex],
+          activities,
+        }
+        return newSchedule
+      })
+    },
+    []
+  )
 
   // 取得住宿狀態（AI 排行程前置條件）
   const getAccommodationStatus = useCallback(() => {

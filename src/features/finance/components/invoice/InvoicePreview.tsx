@@ -28,7 +28,11 @@ export function InvoicePreview({ totalAmount, currentOrder }: InvoicePreviewProp
       {/* 超開提醒 */}
       {isOverpaid && (
         <div className="p-3 bg-status-warning-bg border border-status-warning/30 rounded-md text-sm text-status-warning">
-          ⚠️ 發票金額超過已收款金額！已收款：<CurrencyCell amount={currentOrder.paid_amount ?? 0} className="inline text-sm text-status-warning" />
+          ⚠️ 發票金額超過已收款金額！已收款：
+          <CurrencyCell
+            amount={currentOrder.paid_amount ?? 0}
+            className="inline text-sm text-status-warning"
+          />
         </div>
       )}
     </div>

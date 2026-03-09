@@ -53,24 +53,26 @@ export function tourDataToBlocks(data: TourFormData): AnyBlock[] {
   let order = 0
 
   // 1. 封面區塊（必要）
-  blocks.push(createBlock('COVER', order++, {
-    tagline: data.tagline,
-    title: data.title,
-    subtitle: data.subtitle,
-    description: data.description,
-    departureDate: data.departureDate,
-    tourCode: data.tourCode,
-    country: data.country,
-    city: data.city,
-    countries: data.countries,
-    coverImage: data.coverImage,
-    coverImagePosition: data.coverImagePosition,
-    coverStyle: data.coverStyle,
-    price: data.price,
-    priceNote: data.priceNote,
-    heroStatCard2: data.heroStatCard2,
-    heroStatCard3: data.heroStatCard3,
-  } as CoverBlockData))
+  blocks.push(
+    createBlock('COVER', order++, {
+      tagline: data.tagline,
+      title: data.title,
+      subtitle: data.subtitle,
+      description: data.description,
+      departureDate: data.departureDate,
+      tourCode: data.tourCode,
+      country: data.country,
+      city: data.city,
+      countries: data.countries,
+      coverImage: data.coverImage,
+      coverImagePosition: data.coverImagePosition,
+      coverStyle: data.coverStyle,
+      price: data.price,
+      priceNote: data.priceNote,
+      heroStatCard2: data.heroStatCard2,
+      heroStatCard3: data.heroStatCard3,
+    } as CoverBlockData)
+  )
 
   // 2. 航班區塊
   const flightBlock = createBlock('FLIGHT', order++, {
@@ -115,11 +117,13 @@ export function tourDataToBlocks(data: TourFormData): AnyBlock[] {
   blocks.push(hotelsBlock)
 
   // 7. 每日行程區塊（必要）
-  blocks.push(createBlock('DAILY_ITINERARY', order++, {
-    itinerarySubtitle: data.itinerarySubtitle,
-    dailyItinerary: data.dailyItinerary,
-    itineraryStyle: data.itineraryStyle,
-  } as DailyItineraryBlockData))
+  blocks.push(
+    createBlock('DAILY_ITINERARY', order++, {
+      itinerarySubtitle: data.itinerarySubtitle,
+      dailyItinerary: data.dailyItinerary,
+      itineraryStyle: data.itineraryStyle,
+    } as DailyItineraryBlockData)
+  )
 
   // 8. 團費明細區塊
   if (data.pricingDetails) {
@@ -321,11 +325,14 @@ export function createDefaultBlocks(): AnyBlock[] {
  * 重新排序區塊
  */
 export function reorderBlocks(blocks: AnyBlock[]): AnyBlock[] {
-  return blocks.map((block, index) => ({
-    ...block,
-    meta: {
-      ...block.meta,
-      order: index,
-    },
-  } as AnyBlock))
+  return blocks.map(
+    (block, index) =>
+      ({
+        ...block,
+        meta: {
+          ...block.meta,
+          order: index,
+        },
+      }) as AnyBlock
+  )
 }

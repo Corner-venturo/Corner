@@ -38,7 +38,11 @@ const getTierColorClass = (label: string, index: number): string => {
   return 'bg-morandi-primary'
 }
 
-export function TourPriceTiersSection({ data, viewMode = 'desktop', coverStyle = 'original' }: TourPriceTiersSectionProps) {
+export function TourPriceTiersSection({
+  data,
+  viewMode = 'desktop',
+  coverStyle = 'original',
+}: TourPriceTiersSectionProps) {
   const priceTiers = data.priceTiers
 
   if (!data.showPriceTiers || !priceTiers || priceTiers.length === 0) {
@@ -51,21 +55,21 @@ export function TourPriceTiersSection({ data, viewMode = 'desktop', coverStyle =
   return (
     <section className={cn('py-12 bg-card', isMobile && 'py-8')}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <SectionTitle
-          title={TOURS_LABELS.LABEL_1385}
-          coverStyle={coverStyle}
-          className="mb-8"
-        />
+        <SectionTitle title={TOURS_LABELS.LABEL_1385} coverStyle={coverStyle} className="mb-8" />
 
         {/* 根據數量自適應版面 */}
-        <div className={cn(
-          'grid gap-4',
-          isMobile ? 'grid-cols-1' : cn(
-            count === 1 && 'grid-cols-1 max-w-md mx-auto',
-            count === 2 && 'grid-cols-2 max-w-2xl mx-auto',
-            count >= 3 && 'grid-cols-2 lg:grid-cols-3'
-          )
-        )}>
+        <div
+          className={cn(
+            'grid gap-4',
+            isMobile
+              ? 'grid-cols-1'
+              : cn(
+                  count === 1 && 'grid-cols-1 max-w-md mx-auto',
+                  count === 2 && 'grid-cols-2 max-w-2xl mx-auto',
+                  count >= 3 && 'grid-cols-2 lg:grid-cols-3'
+                )
+          )}
+        >
           {priceTiers.map((tier, index) => (
             <div
               key={index}
@@ -76,26 +80,26 @@ export function TourPriceTiersSection({ data, viewMode = 'desktop', coverStyle =
               )}
             >
               {/* 標籤頭部 - 根據方案類型顯示不同顏色 */}
-              <div className={cn(getTierColorClass(tier.label, index), 'text-white py-3 px-4 text-center')}>
-                <h3 className={cn(
-                  'font-bold',
-                  isMobile ? 'text-lg' : 'text-xl'
-                )}>
-                  {tier.label}
-                </h3>
-                {tier.sublabel && (
-                  <span className="text-sm text-white/80">{tier.sublabel}</span>
+              <div
+                className={cn(
+                  getTierColorClass(tier.label, index),
+                  'text-white py-3 px-4 text-center'
                 )}
+              >
+                <h3 className={cn('font-bold', isMobile ? 'text-lg' : 'text-xl')}>{tier.label}</h3>
+                {tier.sublabel && <span className="text-sm text-white/80">{tier.sublabel}</span>}
               </div>
 
               {/* 價格內容 */}
               <div className="p-6 text-center">
                 <div className="mb-2">
                   <span className="text-sm text-morandi-secondary">NT$</span>
-                  <span className={cn(
-                    'font-bold text-morandi-gold',
-                    isMobile ? 'text-3xl' : 'text-4xl'
-                  )}>
+                  <span
+                    className={cn(
+                      'font-bold text-morandi-gold',
+                      isMobile ? 'text-3xl' : 'text-4xl'
+                    )}
+                  >
                     {formatPrice(tier.price) || '---'}
                   </span>
                   {tier.priceNote && (
@@ -105,11 +109,13 @@ export function TourPriceTiersSection({ data, viewMode = 'desktop', coverStyle =
 
                 {/* 加購說明 */}
                 {tier.addon && (
-                  <div className={cn(
-                    'mt-4 pt-4 border-t border-morandi-container/50',
-                    'text-morandi-secondary',
-                    isMobile ? 'text-xs' : 'text-sm'
-                  )}>
+                  <div
+                    className={cn(
+                      'mt-4 pt-4 border-t border-morandi-container/50',
+                      'text-morandi-secondary',
+                      isMobile ? 'text-xs' : 'text-sm'
+                    )}
+                  >
                     {tier.addon}
                   </div>
                 )}

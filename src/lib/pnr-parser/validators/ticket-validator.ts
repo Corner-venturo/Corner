@@ -12,11 +12,19 @@ export interface TicketNumberValidation {
 
 // 航空公司票號前綴對照表
 const AIRLINE_TICKET_PREFIX: Record<string, string> = {
-  'BR': '695', 'CI': '297', 'JX': '241',
-  'JL': '131', 'NH': '205',
-  'KE': '180', 'OZ': '988',
-  'TG': '217', 'SQ': '618',
-  'CX': '160', 'CA': '999', 'MU': '781', 'CZ': '784'
+  BR: '695',
+  CI: '297',
+  JX: '241',
+  JL: '131',
+  NH: '205',
+  KE: '180',
+  OZ: '988',
+  TG: '217',
+  SQ: '618',
+  CX: '160',
+  CA: '999',
+  MU: '781',
+  CZ: '784',
 }
 
 /**
@@ -42,7 +50,9 @@ export function validateTicketNumber(
     const expectedPrefix = AIRLINE_TICKET_PREFIX[expectedAirlineCode]
 
     if (expectedPrefix && airlineCode !== expectedPrefix) {
-      warnings.push(`票號前綴 ${airlineCode} 與航空公司 ${expectedAirlineCode} 不符（應為 ${expectedPrefix}）`)
+      warnings.push(
+        `票號前綴 ${airlineCode} 與航空公司 ${expectedAirlineCode} 不符（應為 ${expectedPrefix}）`
+      )
     }
   }
 
@@ -51,7 +61,7 @@ export function validateTicketNumber(
     passengerName,
     isValid: errors.length === 0,
     errors,
-    warnings
+    warnings,
   }
 }
 
@@ -62,7 +72,7 @@ export function validateTicketNumbers(
   tickets: Array<{ number: string; passenger: string }>,
   expectedAirlineCode?: string
 ): TicketNumberValidation[] {
-  return tickets.map(ticket => 
+  return tickets.map(ticket =>
     validateTicketNumber(ticket.number, ticket.passenger, expectedAirlineCode)
   )
 }

@@ -24,32 +24,42 @@ export function CheckinSettings({ enableCheckin, onToggle, stats }: CheckinSetti
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* 報到設定 */}
       <div className="bg-card rounded-lg border border-border p-4">
-        <h3 className="text-sm font-medium text-morandi-secondary mb-3">{CHECKIN_SETTINGS_LABELS.報到設定}</h3>
+        <h3 className="text-sm font-medium text-morandi-secondary mb-3">
+          {CHECKIN_SETTINGS_LABELS.報到設定}
+        </h3>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className={cn(
-              'w-10 h-10 rounded-full flex items-center justify-center',
-              enableCheckin ? 'bg-morandi-green/20' : 'bg-morandi-muted/20'
-            )}>
-              <UserCheck size={20} className={enableCheckin ? 'text-morandi-green' : 'text-morandi-muted'} />
+            <div
+              className={cn(
+                'w-10 h-10 rounded-full flex items-center justify-center',
+                enableCheckin ? 'bg-morandi-green/20' : 'bg-morandi-muted/20'
+              )}
+            >
+              <UserCheck
+                size={20}
+                className={enableCheckin ? 'text-morandi-green' : 'text-morandi-muted'}
+              />
             </div>
             <div>
-              <p className="font-medium text-morandi-primary">{CHECKIN_SETTINGS_LABELS.啟用報到功能}</p>
+              <p className="font-medium text-morandi-primary">
+                {CHECKIN_SETTINGS_LABELS.啟用報到功能}
+              </p>
               <p className="text-xs text-morandi-secondary">
-                {enableCheckin ? COMP_TOURS_LABELS.旅客可掃描_QR_Code_報到 : COMP_TOURS_LABELS.報到功能已關閉}
+                {enableCheckin
+                  ? COMP_TOURS_LABELS.旅客可掃描_QR_Code_報到
+                  : COMP_TOURS_LABELS.報到功能已關閉}
               </p>
             </div>
           </div>
-          <Switch
-            checked={enableCheckin}
-            onCheckedChange={onToggle}
-          />
+          <Switch checked={enableCheckin} onCheckedChange={onToggle} />
         </div>
       </div>
 
       {/* 報到統計 */}
       <div className="bg-card rounded-lg border border-border p-4">
-        <h3 className="text-sm font-medium text-morandi-secondary mb-3">{CHECKIN_SETTINGS_LABELS.報到統計}</h3>
+        <h3 className="text-sm font-medium text-morandi-secondary mb-3">
+          {CHECKIN_SETTINGS_LABELS.報到統計}
+        </h3>
         <div className="space-y-3">
           {/* 進度條 */}
           <div className="flex items-center gap-3">

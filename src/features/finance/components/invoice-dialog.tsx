@@ -78,7 +78,9 @@ export function InvoiceDialog({
           <DialogTitle className="flex items-center gap-2">
             <FileText size={20} />
             {FINANCE_LABELS.LABEL_953}
-            {customNo && <span className="text-sm font-normal text-muted-foreground">（{customNo}）</span>}
+            {customNo && (
+              <span className="text-sm font-normal text-muted-foreground">（{customNo}）</span>
+            )}
           </DialogTitle>
         </DialogHeader>
 
@@ -117,7 +119,11 @@ export function InvoiceDialog({
 
           {/* 按鈕 */}
           <div className="flex justify-center gap-4 pt-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)} className="min-w-[100px] gap-1">
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              className="min-w-[100px] gap-1"
+            >
               <X size={16} />
               {FINANCE_LABELS.CANCEL}
             </Button>

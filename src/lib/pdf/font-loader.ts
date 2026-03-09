@@ -87,7 +87,7 @@ const FONT_MAP: Record<string, FontInfo> = {
     },
   },
   // === 英文字體 ===
-  'Inter': {
+  Inter: {
     pdfName: 'Inter',
     files: {
       normal: '/assets/fonts/Inter-Regular.ttf',
@@ -102,14 +102,14 @@ const FONT_MAP: Record<string, FontInfo> = {
       italic: '/assets/fonts/PlayfairDisplay-Italic.ttf',
     },
   },
-  'Roboto': {
+  Roboto: {
     pdfName: 'Roboto',
     files: {
       normal: '/assets/fonts/Roboto-Regular.ttf',
       bold: '/assets/fonts/Roboto-Bold.ttf',
     },
   },
-  'Montserrat': {
+  Montserrat: {
     pdfName: 'Montserrat',
     files: {
       normal: '/assets/fonts/Montserrat-Regular.ttf',
@@ -117,7 +117,7 @@ const FONT_MAP: Record<string, FontInfo> = {
     },
   },
   // === 預設/備用字體 ===
-  'ChironHeiHK': {
+  ChironHeiHK: {
     pdfName: 'ChironHeiHK',
     files: {
       normal: '/assets/fonts/ChironHeiHK-N.ttf',
@@ -185,11 +185,7 @@ async function loadFontFile(path: string): Promise<string | null> {
 /**
  * 將字體添加到 jsPDF
  */
-async function addFontToDoc(
-  doc: jsPDF,
-  fontFamily: string,
-  fontInfo: FontInfo
-): Promise<boolean> {
+async function addFontToDoc(doc: jsPDF, fontFamily: string, fontInfo: FontInfo): Promise<boolean> {
   const cacheKey = `${fontFamily}`
 
   // 檢查是否已載入
@@ -230,10 +226,7 @@ async function addFontToDoc(
  * @param doc - jsPDF 實例
  * @param fontFamilies - 需要的字體列表
  */
-export async function loadFontsForPDF(
-  doc: jsPDF,
-  fontFamilies: string[]
-): Promise<void> {
+export async function loadFontsForPDF(doc: jsPDF, fontFamilies: string[]): Promise<void> {
   // 確保預設字體一定會載入
   const fontsToLoad = new Set([DEFAULT_FONT, ...fontFamilies])
 

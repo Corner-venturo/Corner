@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = 'https://pfqvdacxowpgfamuvnsn.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxMDgzMjAsImV4cCI6MjA3NDY4NDMyMH0.LIMG0qmHixTPcbdzJrh4h0yTp8mh3FlggeZ6Bi_NwtI'
+const supabaseKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxMDgzMjAsImV4cCI6MjA3NDY4NDMyMH0.LIMG0qmHixTPcbdzJrh4h0yTp8mh3FlggeZ6Bi_NwtI'
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
@@ -23,7 +24,9 @@ async function check() {
     for (const e of employees) {
       const name = e.display_name || e.chinese_name || 'Unknown'
       const wsId = e.workspace_id ? e.workspace_id.substring(0, 8) : 'null'
-      console.log('  ' + e.employee_number + ': ' + name + ' (' + e.status + ') - workspace: ' + wsId + '...')
+      console.log(
+        '  ' + e.employee_number + ': ' + name + ' (' + e.status + ') - workspace: ' + wsId + '...'
+      )
     }
   }
 

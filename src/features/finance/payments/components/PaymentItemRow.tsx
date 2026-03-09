@@ -19,7 +19,11 @@ import {
 import { cn } from '@/lib/utils'
 import type { PaymentItem, ReceiptType } from '../types'
 import { RECEIPT_TYPES, RECEIPT_TYPE_OPTIONS, BANK_ACCOUNTS } from '../types'
-import { ADD_RECEIPT_DIALOG_LABELS, BATCH_RECEIPT_DIALOG_LABELS, PAYMENT_ITEM_ROW_LABELS } from '../../constants/labels';
+import {
+  ADD_RECEIPT_DIALOG_LABELS,
+  BATCH_RECEIPT_DIALOG_LABELS,
+  PAYMENT_ITEM_ROW_LABELS,
+} from '../../constants/labels'
 
 interface PaymentItemRowProps {
   item: PaymentItem
@@ -52,7 +56,8 @@ export function PaymentItemRow({
   const [copied, setCopied] = useState(false)
 
   const receiptTypeLabel =
-    RECEIPT_TYPE_OPTIONS.find(opt => opt.value === item.receipt_type)?.label || BATCH_RECEIPT_DIALOG_LABELS.現金
+    RECEIPT_TYPE_OPTIONS.find(opt => opt.value === item.receipt_type)?.label ||
+    BATCH_RECEIPT_DIALOG_LABELS.現金
 
   // 產生 LinkPay 連結
   const handleGenerateLink = async () => {
@@ -168,7 +173,7 @@ export function PaymentItemRow({
         <td className="py-2 px-3 border-b border-r border-border">
           <DatePicker
             value={item.transaction_date}
-            onChange={(date) => onUpdate(item.id, { transaction_date: date })}
+            onChange={date => onUpdate(item.id, { transaction_date: date })}
             placeholder={PAYMENT_ITEM_ROW_LABELS.選擇日期}
             buttonClassName="h-auto p-0 border-0 shadow-none bg-transparent"
           />
@@ -181,9 +186,11 @@ export function PaymentItemRow({
             value={item.receipt_account || ''}
             onChange={e => {
               // LinkPay 限制五字內，匯款限制五碼
-              const value = (item.receipt_type === RECEIPT_TYPES.LINK_PAY || item.receipt_type === RECEIPT_TYPES.BANK_TRANSFER)
-                ? e.target.value.slice(0, 5)
-                : e.target.value
+              const value =
+                item.receipt_type === RECEIPT_TYPES.LINK_PAY ||
+                item.receipt_type === RECEIPT_TYPES.BANK_TRANSFER
+                  ? e.target.value.slice(0, 5)
+                  : e.target.value
               onUpdate(item.id, { receipt_account: value })
             }}
             placeholder={
@@ -199,7 +206,12 @@ export function PaymentItemRow({
                         ? PAYMENT_ITEM_ROW_LABELS.收款人
                         : ''
             }
-            maxLength={item.receipt_type === RECEIPT_TYPES.LINK_PAY || item.receipt_type === RECEIPT_TYPES.BANK_TRANSFER ? 5 : undefined}
+            maxLength={
+              item.receipt_type === RECEIPT_TYPES.LINK_PAY ||
+              item.receipt_type === RECEIPT_TYPES.BANK_TRANSFER
+                ? 5
+                : undefined
+            }
             className="input-no-focus w-full bg-transparent text-sm"
           />
         </td>
@@ -244,8 +256,12 @@ export function PaymentItemRow({
       {item.receipt_type === RECEIPT_TYPES.LINK_PAY && (
         <tr className="text-xs text-morandi-primary font-medium bg-card">
           <th className="text-left py-2.5 px-3 border-b border-r border-border">Email *</th>
-          <th className="text-left py-2.5 px-3 border-b border-r border-border">{PAYMENT_ITEM_ROW_LABELS.LABEL_6186}</th>
-          <th className="text-left py-2.5 px-3 border-b border-r border-border" colSpan={2}>{PAYMENT_ITEM_ROW_LABELS.LABEL_4673}</th>
+          <th className="text-left py-2.5 px-3 border-b border-r border-border">
+            {PAYMENT_ITEM_ROW_LABELS.LABEL_6186}
+          </th>
+          <th className="text-left py-2.5 px-3 border-b border-r border-border" colSpan={2}>
+            {PAYMENT_ITEM_ROW_LABELS.LABEL_4673}
+          </th>
           <th className="border-b border-border" colSpan={2}></th>
         </tr>
       )}
@@ -265,7 +281,7 @@ export function PaymentItemRow({
           <td className="py-2 px-3 border-b border-r border-border">
             <DatePicker
               value={item.pay_dateline || ''}
-              onChange={(date) => onUpdate(item.id, { pay_dateline: date })}
+              onChange={date => onUpdate(item.id, { pay_dateline: date })}
               placeholder={PAYMENT_ITEM_ROW_LABELS.選擇日期}
               buttonClassName="h-auto p-0 border-0 shadow-none bg-transparent"
             />
@@ -306,7 +322,9 @@ export function PaymentItemRow({
       {/* LinkPay 產生的連結 */}
       {item.receipt_type === RECEIPT_TYPES.LINK_PAY && generatedLink && (
         <tr className="bg-morandi-gold/10">
-          <td className="py-2 px-3 border-b border-r border-border text-xs text-morandi-secondary">{PAYMENT_ITEM_ROW_LABELS.LABEL_1487}</td>
+          <td className="py-2 px-3 border-b border-r border-border text-xs text-morandi-secondary">
+            {PAYMENT_ITEM_ROW_LABELS.LABEL_1487}
+          </td>
           <td className="py-2 px-3 border-b border-r border-border" colSpan={3}>
             <input
               type="text"

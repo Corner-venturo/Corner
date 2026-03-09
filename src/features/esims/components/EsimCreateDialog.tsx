@@ -7,7 +7,13 @@ import { Button } from '@/components/ui/button'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { Combobox } from '@/components/ui/combobox'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useEsims, createEsim, createOrder, invalidateTours } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { useTours } from '@/features/tours/hooks/useTours'
@@ -173,10 +179,42 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
 
       // 🧪 臨時使用 Mock 資料測試
       const productList = [
-        { wmproduct_id: 'JP-7D-UNLIM', product_id: 'JP-7D-UNLIM', product_name: '日本 7天無限流量', product_region: 'JPN', product_price: 500, product_type: 1, le_sim: false },
-        { wmproduct_id: 'JP-14D-UNLIM', product_id: 'JP-14D-UNLIM', product_name: '日本 14天無限流量', product_region: 'JPN', product_price: 800, product_type: 1, le_sim: false },
-        { wmproduct_id: 'KR-7D-UNLIM', product_id: 'KR-7D-UNLIM', product_name: '韓國 7天無限流量', product_region: 'KOR', product_price: 450, product_type: 1, le_sim: false },
-        { wmproduct_id: 'TH-7D-UNLIM', product_id: 'TH-7D-UNLIM', product_name: '泰國 7天無限流量', product_region: 'THI', product_price: 350, product_type: 1, le_sim: false },
+        {
+          wmproduct_id: 'JP-7D-UNLIM',
+          product_id: 'JP-7D-UNLIM',
+          product_name: '日本 7天無限流量',
+          product_region: 'JPN',
+          product_price: 500,
+          product_type: 1,
+          le_sim: false,
+        },
+        {
+          wmproduct_id: 'JP-14D-UNLIM',
+          product_id: 'JP-14D-UNLIM',
+          product_name: '日本 14天無限流量',
+          product_region: 'JPN',
+          product_price: 800,
+          product_type: 1,
+          le_sim: false,
+        },
+        {
+          wmproduct_id: 'KR-7D-UNLIM',
+          product_id: 'KR-7D-UNLIM',
+          product_name: '韓國 7天無限流量',
+          product_region: 'KOR',
+          product_price: 450,
+          product_type: 1,
+          le_sim: false,
+        },
+        {
+          wmproduct_id: 'TH-7D-UNLIM',
+          product_id: 'TH-7D-UNLIM',
+          product_name: '泰國 7天無限流量',
+          product_region: 'THI',
+          product_price: 350,
+          product_type: 1,
+          le_sim: false,
+        },
       ]
 
       setProducts(productList)
@@ -394,7 +432,8 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="text-sm font-medium text-morandi-primary">
-              {LABELS.selectTourCode} <span className="text-xs text-morandi-secondary">{LABELS.autoSelectEsimTour}</span>
+              {LABELS.selectTourCode}{' '}
+              <span className="text-xs text-morandi-secondary">{LABELS.autoSelectEsimTour}</span>
             </label>
             <Combobox
               value={selectedTourId}
@@ -426,7 +465,9 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium text-morandi-primary">{LABELS.contactPerson}</label>
+            <label className="text-sm font-medium text-morandi-primary">
+              {LABELS.contactPerson}
+            </label>
             <Input
               value={contactPerson}
               onChange={e => setContactPerson(e.target.value)}
@@ -435,7 +476,9 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-morandi-primary">{LABELS.contactPhone}</label>
+            <label className="text-sm font-medium text-morandi-primary">
+              {LABELS.contactPhone}
+            </label>
             <Input
               value={contactPhone}
               onChange={e => setContactPhone(e.target.value)}

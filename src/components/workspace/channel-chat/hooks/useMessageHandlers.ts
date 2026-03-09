@@ -18,7 +18,12 @@ export function useMessageHandlers(
   currentMessages: Message[],
   uploadFiles: (channelId: string) => Promise<MessageAttachment[] | undefined>,
   clearFiles: () => void,
-  handleSendMessage: (channelId: string, text: string, attachments?: MessageAttachment[], parentMessageId?: string) => Promise<void>,
+  handleSendMessage: (
+    channelId: string,
+    text: string,
+    attachments?: MessageAttachment[],
+    parentMessageId?: string
+  ) => Promise<void>,
   handleReaction: (messageId: string, emoji: string, messages: Message[]) => void,
   handleDeleteMessage: (messageId: string) => Promise<void>,
   parentMessageId?: string | null

@@ -86,7 +86,8 @@ export function useProposalOperations(): UseProposalOperationsReturn {
         .eq('proposal_id', proposal.id)
 
       const packageCount = packages?.length || 0
-      const packageInfo = packageCount > 0 ? `\n\n注意：此提案有 ${packageCount} 個版本，將一併刪除` : ''
+      const packageInfo =
+        packageCount > 0 ? `\n\n注意：此提案有 ${packageCount} 個版本，將一併刪除` : ''
 
       const confirmed = await confirm(`確定要刪除提案「${proposal.title}」嗎？${packageInfo}`, {
         type: 'warning',
@@ -125,7 +126,10 @@ export function useProposalOperations(): UseProposalOperationsReturn {
         const proposalWithPackage = data as CreateProposalWithPackageData
         const { firstPackage, ...proposalData } = proposalWithPackage
 
-        logger.log('[useProposalOperations] 開始建立提案, proposalData:', JSON.stringify(proposalData))
+        logger.log(
+          '[useProposalOperations] 開始建立提案, proposalData:',
+          JSON.stringify(proposalData)
+        )
         logger.log('[useProposalOperations] firstPackage:', JSON.stringify(firstPackage))
 
         // 1. 建立提案
@@ -137,13 +141,18 @@ export function useProposalOperations(): UseProposalOperationsReturn {
           const packageData = {
             proposal_id: newProposal.id,
             version_name: firstPackage.version_name,
-            destination: firstPackage.country ? `${firstPackage.country}${firstPackage.airport_code ? ` (${firstPackage.airport_code})` : ''}` : undefined,
+            destination: firstPackage.country
+              ? `${firstPackage.country}${firstPackage.airport_code ? ` (${firstPackage.airport_code})` : ''}`
+              : undefined,
             start_date: firstPackage.start_date || undefined,
             end_date: firstPackage.end_date || undefined,
             group_size: firstPackage.group_size || undefined,
             notes: firstPackage.notes || undefined,
           }
-          logger.log('[useProposalOperations] 開始建立版本, packageData:', JSON.stringify(packageData))
+          logger.log(
+            '[useProposalOperations] 開始建立版本, packageData:',
+            JSON.stringify(packageData)
+          )
           logger.log('[useProposalOperations] userId:', user.id, 'workspaceId:', user.workspace_id)
           await createPackage(packageData, user.id)
           logger.log('[useProposalOperations] 版本建立成功')
@@ -159,8 +168,14 @@ export function useProposalOperations(): UseProposalOperationsReturn {
         }
       } catch (error) {
         logger.error('[useProposalOperations] 建立提案失敗:', error)
-        logger.error('[useProposalOperations] 錯誤詳情:', JSON.stringify(error, Object.getOwnPropertyNames(error as object)))
-        await alert(`建立提案失敗: ${error instanceof Error ? error.message : JSON.stringify(error)}`, 'error')
+        logger.error(
+          '[useProposalOperations] 錯誤詳情:',
+          JSON.stringify(error, Object.getOwnPropertyNames(error as object))
+        )
+        await alert(
+          `建立提案失敗: ${error instanceof Error ? error.message : JSON.stringify(error)}`,
+          'error'
+        )
       }
     },
     [user?.id, refreshProposals]

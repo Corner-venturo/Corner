@@ -37,7 +37,10 @@ export function useAttractionForm({ attraction, initialFormData, open }: UseAttr
   }
 
   // 將圖片位置資訊合併到 notes
-  const mergePositionsToNotes = (notes: string, positions: Record<string, ImagePosition>): string => {
+  const mergePositionsToNotes = (
+    notes: string,
+    positions: Record<string, ImagePosition>
+  ): string => {
     const cleanNotes = notes.replace(/\[IMAGE_POSITIONS:.*?\]/g, '').trim()
     if (Object.keys(positions).length === 0) return cleanNotes
     const positionStr = `[IMAGE_POSITIONS:${JSON.stringify(positions)}]`
@@ -154,8 +157,11 @@ export function useAttractionForm({ attraction, initialFormData, open }: UseAttr
     const handleGlobalDragOver = (e: DragEvent) => {
       if (dropZoneRef.current) {
         const rect = dropZoneRef.current.getBoundingClientRect()
-        const isInside = e.clientX >= rect.left && e.clientX <= rect.right &&
-                         e.clientY >= rect.top && e.clientY <= rect.bottom
+        const isInside =
+          e.clientX >= rect.left &&
+          e.clientX <= rect.right &&
+          e.clientY >= rect.top &&
+          e.clientY <= rect.bottom
         if (isInside) {
           e.preventDefault()
           setIsDragOver(true)
@@ -173,8 +179,11 @@ export function useAttractionForm({ attraction, initialFormData, open }: UseAttr
       if (!dropZoneRef.current) return
 
       const rect = dropZoneRef.current.getBoundingClientRect()
-      const isInside = e.clientX >= rect.left && e.clientX <= rect.right &&
-                       e.clientY >= rect.top && e.clientY <= rect.bottom
+      const isInside =
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom
 
       if (!isInside) return
 

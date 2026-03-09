@@ -45,12 +45,13 @@ export function ImagePreview({
       onDragLeave={onDragLeave}
       onDrop={onDrop}
       className={cn(
-        "relative rounded-lg overflow-hidden border-2 group transition-all",
-        isDragOver ? "border-morandi-gold bg-morandi-gold/20" : "border-morandi-gold"
+        'relative rounded-lg overflow-hidden border-2 group transition-all',
+        isDragOver ? 'border-morandi-gold bg-morandi-gold/20' : 'border-morandi-gold'
       )}
       style={{ height: previewHeight }}
     >
-      <img src={value}
+      <img
+        src={value}
         alt={IMAGE_UPLOADER_LABELS.PREVIEW}
         className="w-full h-full object-cover"
         style={getImagePositionStyle(position)}

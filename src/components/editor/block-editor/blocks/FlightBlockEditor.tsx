@@ -5,10 +5,15 @@
  * 編輯去程和回程航班資訊
  */
 
-
 import { useCallback } from 'react'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Plane, ArrowRight } from 'lucide-react'
 import type { FlightBlockData } from '../types'
 import type { FlightInfo, FlightStyleType } from '@/components/editor/tour-form/types'
@@ -20,23 +25,19 @@ interface FlightBlockEditorProps {
 }
 
 export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
-  const updateFlight = useCallback((
-    type: 'outboundFlight' | 'returnFlight',
-    field: keyof FlightInfo,
-    value: string
-  ) => {
-    onChange({
-      [type]: {
-        ...data[type],
-        [field]: value,
-      },
-    })
-  }, [data, onChange])
+  const updateFlight = useCallback(
+    (type: 'outboundFlight' | 'returnFlight', field: keyof FlightInfo, value: string) => {
+      onChange({
+        [type]: {
+          ...data[type],
+          [field]: value,
+        },
+      })
+    },
+    [data, onChange]
+  )
 
-  const renderFlightInputs = (
-    type: 'outboundFlight' | 'returnFlight',
-    label: string
-  ) => {
+  const renderFlightInputs = (type: 'outboundFlight' | 'returnFlight', label: string) => {
     const flight = data[type] || {}
     return (
       <div className="space-y-2">
@@ -47,7 +48,9 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
 
         <div className="grid grid-cols-3 gap-2">
           <div>
-            <label className="block text-xs text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_7827}</label>
+            <label className="block text-xs text-morandi-primary mb-1">
+              {COMP_EDITOR_LABELS.LABEL_7827}
+            </label>
             <Input
               value={flight.airline || ''}
               onChange={e => updateFlight(type, 'airline', e.target.value)}
@@ -56,7 +59,9 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
             />
           </div>
           <div>
-            <label className="block text-xs text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_6261}</label>
+            <label className="block text-xs text-morandi-primary mb-1">
+              {COMP_EDITOR_LABELS.LABEL_6261}
+            </label>
             <Input
               value={flight.flightNumber || ''}
               onChange={e => updateFlight(type, 'flightNumber', e.target.value)}
@@ -65,7 +70,9 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
             />
           </div>
           <div>
-            <label className="block text-xs text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_7552}</label>
+            <label className="block text-xs text-morandi-primary mb-1">
+              {COMP_EDITOR_LABELS.LABEL_7552}
+            </label>
             <Input
               value={flight.duration || ''}
               onChange={e => updateFlight(type, 'duration', e.target.value)}
@@ -77,7 +84,9 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
 
         <div className="flex items-center gap-2">
           <div className="flex-1">
-            <label className="block text-xs text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_6488}</label>
+            <label className="block text-xs text-morandi-primary mb-1">
+              {COMP_EDITOR_LABELS.LABEL_6488}
+            </label>
             <Input
               value={flight.departureAirport || ''}
               onChange={e => updateFlight(type, 'departureAirport', e.target.value)}
@@ -86,7 +95,9 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
             />
           </div>
           <div className="flex-1">
-            <label className="block text-xs text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_2614}</label>
+            <label className="block text-xs text-morandi-primary mb-1">
+              {COMP_EDITOR_LABELS.LABEL_2614}
+            </label>
             <Input
               value={flight.departureTime || ''}
               onChange={e => updateFlight(type, 'departureTime', e.target.value)}
@@ -96,7 +107,9 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
           </div>
           <ArrowRight size={16} className="text-morandi-secondary mt-4" />
           <div className="flex-1">
-            <label className="block text-xs text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_1689}</label>
+            <label className="block text-xs text-morandi-primary mb-1">
+              {COMP_EDITOR_LABELS.LABEL_1689}
+            </label>
             <Input
               value={flight.arrivalAirport || ''}
               onChange={e => updateFlight(type, 'arrivalAirport', e.target.value)}
@@ -105,7 +118,9 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
             />
           </div>
           <div className="flex-1">
-            <label className="block text-xs text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_749}</label>
+            <label className="block text-xs text-morandi-primary mb-1">
+              {COMP_EDITOR_LABELS.LABEL_749}
+            </label>
             <Input
               value={flight.arrivalTime || ''}
               onChange={e => updateFlight(type, 'arrivalTime', e.target.value)}
@@ -122,10 +137,12 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
     <div className="space-y-4">
       {/* 航班風格 */}
       <div>
-        <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_3684}</label>
+        <label className="block text-xs font-medium text-morandi-primary mb-1">
+          {COMP_EDITOR_LABELS.LABEL_3684}
+        </label>
         <Select
           value={data.flightStyle || 'original'}
-          onValueChange={(value) => onChange({ flightStyle: value as FlightStyleType })}
+          onValueChange={value => onChange({ flightStyle: value as FlightStyleType })}
         >
           <SelectTrigger className="h-8 text-sm w-48">
             <SelectValue placeholder={COMP_EDITOR_LABELS.選擇風格} />

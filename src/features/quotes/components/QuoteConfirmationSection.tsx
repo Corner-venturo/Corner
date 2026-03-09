@@ -1,7 +1,17 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Send, UserCheck, Copy, Check, Clock, AlertCircle, ExternalLink, History, X } from 'lucide-react'
+import {
+  Send,
+  UserCheck,
+  Copy,
+  Check,
+  Clock,
+  AlertCircle,
+  ExternalLink,
+  History,
+  X,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -21,9 +31,13 @@ import {
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
-import type { QuoteConfirmationStatus, QuoteConfirmationLog, ConfirmationResult } from '@/types/quote.types'
+import type {
+  QuoteConfirmationStatus,
+  QuoteConfirmationLog,
+  ConfirmationResult,
+} from '@/types/quote.types'
 import { DateCell } from '@/components/table-cells'
-import { QUOTE_CONFIRMATION_SECTION_LABELS } from '../constants/labels';
+import { QUOTE_CONFIRMATION_SECTION_LABELS } from '../constants/labels'
 import { QUOTE_COMPONENT_LABELS } from '../constants/labels'
 
 interface QuoteConfirmationSectionProps {
@@ -41,12 +55,35 @@ interface QuoteConfirmationSectionProps {
 }
 
 // 確認狀態配置
-const confirmationStatusConfig: Record<QuoteConfirmationStatus, { label: string; color: string; bgColor: string }> = {
-  draft: { label: QUOTE_CONFIRMATION_SECTION_LABELS.未確認, color: 'text-morandi-secondary', bgColor: 'bg-morandi-container' },
-  pending: { label: QUOTE_CONFIRMATION_SECTION_LABELS.待確認, color: 'text-status-warning', bgColor: 'bg-status-warning-bg' },
-  customer_confirmed: { label: QUOTE_CONFIRMATION_SECTION_LABELS.客戶已確認, color: 'text-status-success', bgColor: 'bg-status-success-bg' },
-  staff_confirmed: { label: QUOTE_CONFIRMATION_SECTION_LABELS.業務已確認, color: 'text-morandi-gold', bgColor: 'bg-morandi-gold/10' },
-  closed: { label: QUOTE_CONFIRMATION_SECTION_LABELS.已成交, color: 'text-morandi-green', bgColor: 'bg-morandi-green/10' },
+const confirmationStatusConfig: Record<
+  QuoteConfirmationStatus,
+  { label: string; color: string; bgColor: string }
+> = {
+  draft: {
+    label: QUOTE_CONFIRMATION_SECTION_LABELS.未確認,
+    color: 'text-morandi-secondary',
+    bgColor: 'bg-morandi-container',
+  },
+  pending: {
+    label: QUOTE_CONFIRMATION_SECTION_LABELS.待確認,
+    color: 'text-status-warning',
+    bgColor: 'bg-status-warning-bg',
+  },
+  customer_confirmed: {
+    label: QUOTE_CONFIRMATION_SECTION_LABELS.客戶已確認,
+    color: 'text-status-success',
+    bgColor: 'bg-status-success-bg',
+  },
+  staff_confirmed: {
+    label: QUOTE_CONFIRMATION_SECTION_LABELS.業務已確認,
+    color: 'text-morandi-gold',
+    bgColor: 'bg-morandi-gold/10',
+  },
+  closed: {
+    label: QUOTE_CONFIRMATION_SECTION_LABELS.已成交,
+    color: 'text-morandi-green',
+    bgColor: 'bg-morandi-green/10',
+  },
 }
 
 export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> = ({
@@ -71,7 +108,10 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
   const [logsLoading, setLogsLoading] = useState(false)
 
   const statusConfig = confirmationStatusConfig[confirmationStatus]
-  const isConfirmed = confirmationStatus === 'customer_confirmed' || confirmationStatus === 'staff_confirmed' || confirmationStatus === 'closed'
+  const isConfirmed =
+    confirmationStatus === 'customer_confirmed' ||
+    confirmationStatus === 'staff_confirmed' ||
+    confirmationStatus === 'closed'
 
   // 生成確認連結
   const confirmationUrl = confirmationToken
@@ -237,15 +277,28 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
             {isConfirmed && confirmedAt && (
               <>
                 <div className="px-2 py-2 text-sm">
-                  <div className="text-morandi-secondary">{QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRM_9119}</div>
-                  <DateCell date={confirmedAt} format="time" showIcon={false} className="font-medium" />
+                  <div className="text-morandi-secondary">
+                    {QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRM_9119}
+                  </div>
+                  <DateCell
+                    date={confirmedAt}
+                    format="time"
+                    showIcon={false}
+                    className="font-medium"
+                  />
                   {confirmedByName && (
                     <>
-                      <div className="text-morandi-secondary mt-1">{QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRM_1673}</div>
+                      <div className="text-morandi-secondary mt-1">
+                        {QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRM_1673}
+                      </div>
                       <div className="font-medium">
                         {confirmedByName}
                         <span className="text-xs text-morandi-secondary ml-1">
-                          ({confirmedByType === 'customer' ? QUOTE_CONFIRMATION_SECTION_LABELS.客戶 : QUOTE_CONFIRMATION_SECTION_LABELS.業務})
+                          (
+                          {confirmedByType === 'customer'
+                            ? QUOTE_CONFIRMATION_SECTION_LABELS.客戶
+                            : QUOTE_CONFIRMATION_SECTION_LABELS.業務}
+                          )
                         </span>
                       </div>
                     </>
@@ -259,8 +312,15 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
             {confirmationStatus === 'pending' && confirmationTokenExpiresAt && (
               <>
                 <div className="px-2 py-2 text-sm">
-                  <div className="text-morandi-secondary">{QUOTE_CONFIRMATION_SECTION_LABELS.LABEL_1799}</div>
-                  <div className={cn('font-medium flex items-center gap-1', isTokenExpired && 'text-status-danger')}>
+                  <div className="text-morandi-secondary">
+                    {QUOTE_CONFIRMATION_SECTION_LABELS.LABEL_1799}
+                  </div>
+                  <div
+                    className={cn(
+                      'font-medium flex items-center gap-1',
+                      isTokenExpired && 'text-status-danger'
+                    )}
+                  >
                     <DateCell date={confirmationTokenExpiresAt} format="time" showIcon={false} />
                     {isTokenExpired && <span>{QUOTE_CONFIRMATION_SECTION_LABELS.EXPIRED}</span>}
                   </div>
@@ -277,7 +337,9 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
                   className={cn('gap-2', isLoading && 'opacity-50 cursor-not-allowed')}
                 >
                   <Send size={14} />
-                  {confirmationStatus === 'pending' ? QUOTE_CONFIRMATION_SECTION_LABELS.重新發送連結 : QUOTE_CONFIRMATION_SECTION_LABELS.發送確認連結}
+                  {confirmationStatus === 'pending'
+                    ? QUOTE_CONFIRMATION_SECTION_LABELS.重新發送連結
+                    : QUOTE_CONFIRMATION_SECTION_LABELS.發送確認連結}
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
@@ -334,9 +396,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
               <UserCheck size={20} className="text-morandi-gold" />
               {QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRM_9516}
             </DialogTitle>
-            <DialogDescription>
-              {QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRM_4324}
-            </DialogDescription>
+            <DialogDescription>{QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRM_4324}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
@@ -359,7 +419,11 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
           </div>
 
           <DialogFooter>
-            <Button variant="outline" className="gap-2" onClick={() => setShowStaffConfirmDialog(false)}>
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => setShowStaffConfirmDialog(false)}
+            >
               <X size={16} />
               {QUOTE_CONFIRMATION_SECTION_LABELS.CANCEL}
             </Button>
@@ -369,7 +433,9 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
             >
               <Check size={16} />
-              {isLoading ? QUOTE_CONFIRMATION_SECTION_LABELS.確認中 : QUOTE_CONFIRMATION_SECTION_LABELS.確認報價}
+              {isLoading
+                ? QUOTE_CONFIRMATION_SECTION_LABELS.確認中
+                : QUOTE_CONFIRMATION_SECTION_LABELS.確認報價}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -396,15 +462,10 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
               </div>
             ) : (
               <div className="space-y-3">
-                {logs.map((log) => (
-                  <div
-                    key={log.id}
-                    className="border border-border rounded-lg p-3 text-sm"
-                  >
+                {logs.map(log => (
+                  <div key={log.id} className="border border-border rounded-lg p-3 text-sm">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium">
-                        {actionLabels[log.action] || log.action}
-                      </span>
+                      <span className="font-medium">{actionLabels[log.action] || log.action}</span>
                       <DateCell
                         date={log.created_at}
                         format="time"
@@ -414,14 +475,18 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
                     </div>
                     {log.confirmed_by_name && (
                       <div className="text-morandi-secondary">
-                        {log.confirmed_by_type === 'customer' ? QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRMED_BY_CUSTOMER : QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRMED_BY_STAFF}{QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRMED_BY_SUFFIX}
+                        {log.confirmed_by_type === 'customer'
+                          ? QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRMED_BY_CUSTOMER
+                          : QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRMED_BY_STAFF}
+                        {QUOTE_CONFIRMATION_SECTION_LABELS.CONFIRMED_BY_SUFFIX}
                         {log.confirmed_by_name}
                         {log.confirmed_by_email && ` (${log.confirmed_by_email})`}
                       </div>
                     )}
                     {log.notes && (
                       <div className="text-morandi-secondary mt-1">
-                        {QUOTE_CONFIRMATION_SECTION_LABELS.NOTES_PREFIX}{log.notes}
+                        {QUOTE_CONFIRMATION_SECTION_LABELS.NOTES_PREFIX}
+                        {log.notes}
                       </div>
                     )}
                   </div>

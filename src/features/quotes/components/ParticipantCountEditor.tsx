@@ -13,7 +13,7 @@ import {
   generateUniqueId,
   calculateIdentityProfits,
 } from '../utils/priceCalculations'
-import { PARTICIPANT_COUNT_EDITOR_LABELS } from '../constants/labels';
+import { PARTICIPANT_COUNT_EDITOR_LABELS } from '../constants/labels'
 
 interface ParticipantCountEditorProps {
   participantCounts: ParticipantCounts

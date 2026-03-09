@@ -6,7 +6,7 @@ import { PnrForm } from './pnr/PnrForm'
 import { PnrPreview } from './pnr/PnrPreview'
 import { usePnrQuickAction } from './pnr/hooks/usePnrQuickAction'
 import type { Todo } from '@/stores/types'
-import { QUICK_ACTIONS_LABELS } from "./constants/labels"
+import { QUICK_ACTIONS_LABELS } from './constants/labels'
 
 interface QuickPNRProps {
   todo?: Todo
@@ -37,7 +37,9 @@ export function QuickPNR({ todo, onUpdate, onClose }: QuickPNRProps) {
           <Plane size={16} className="text-morandi-sky" />
         </div>
         <div>
-          <h5 className="text-sm font-semibold text-morandi-primary">{QUICK_ACTIONS_LABELS.LABEL_7480}</h5>
+          <h5 className="text-sm font-semibold text-morandi-primary">
+            {QUICK_ACTIONS_LABELS.LABEL_7480}
+          </h5>
           <p className="text-xs text-morandi-secondary">{QUICK_ACTIONS_LABELS.LABEL_3355}</p>
         </div>
       </div>

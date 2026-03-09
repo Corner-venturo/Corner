@@ -6,7 +6,13 @@ import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Combobox } from '@/components/ui/combobox'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { VisaApplicant } from '../hooks/useVisasDialog'
 import type { Visa } from '@/stores/types'
@@ -44,7 +50,7 @@ interface AddVisaDialogProps {
   tourOptions: TourOption[]
   calculateFee: (country: string) => number
   addApplicant: () => void
-  addApplicantForSame: (parentId: string, parentName: string) => void  // 追加同一人的其他簽證
+  addApplicantForSame: (parentId: string, parentName: string) => void // 追加同一人的其他簽證
   removeApplicant: (id: string) => void
   updateApplicant: (id: string, field: keyof VisaApplicant, value: unknown) => void
   canSubmit: boolean
@@ -88,7 +94,7 @@ export function AddVisaDialog({
           // 2. 取得或建立簽證專用團
           const visaTour = await tourService.getOrCreateVisaTour()
           if (visaTour && !contact_info.tour_id) {
-            setContactInfo((prev) => ({ ...prev, tour_id: visaTour.id }))
+            setContactInfo(prev => ({ ...prev, tour_id: visaTour.id }))
             setHasInitialized(true)
           }
         } catch (error: unknown) {
@@ -198,7 +204,7 @@ export function AddVisaDialog({
               <Combobox
                 value={contact_info.tour_id}
                 onChange={value => {
-                  setContactInfo((prev) => ({ ...prev, tour_id: value, order_id: '' }))
+                  setContactInfo(prev => ({ ...prev, tour_id: value, order_id: '' }))
                 }}
                 options={tourOptions}
                 placeholder={L.placeholder_tour}
@@ -214,9 +220,11 @@ export function AddVisaDialog({
               </label>
               <Combobox
                 value={contact_info.order_id}
-                onChange={value => setContactInfo((prev) => ({ ...prev, order_id: value }))}
+                onChange={value => setContactInfo(prev => ({ ...prev, order_id: value }))}
                 options={orderOptions}
-                placeholder={contact_info.tour_id ? L.placeholder_order_ready : L.placeholder_order_disabled}
+                placeholder={
+                  contact_info.tour_id ? L.placeholder_order_ready : L.placeholder_order_disabled
+                }
                 className="mt-1"
                 disabled={!contact_info.tour_id}
                 showSearchIcon
@@ -232,7 +240,7 @@ export function AddVisaDialog({
             <Input
               value={contact_info.contact_person}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setContactInfo((prev) => ({ ...prev, contact_person: e.target.value }))
+                setContactInfo(prev => ({ ...prev, contact_person: e.target.value }))
               }
               className="mt-1"
               placeholder={L.placeholder_contact}
@@ -243,7 +251,7 @@ export function AddVisaDialog({
             <Input
               value={contact_info.contact_phone}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setContactInfo((prev) => ({ ...prev, contact_phone: e.target.value }))
+                setContactInfo(prev => ({ ...prev, contact_phone: e.target.value }))
               }
               className="mt-1"
               placeholder={L.placeholder_phone}
@@ -267,7 +275,9 @@ export function AddVisaDialog({
             <th className="text-center py-2 px-3 border border-border">{L.th_fee}</th>
             <th className="text-center py-2 px-3 border border-border">{L.th_urgent_fee}</th>
             <th className="text-center py-2 px-3 border border-border">{L.th_total_fee}</th>
-            {!isEditMode && <th className="text-center py-2 px-3 border border-border">{L.th_add_more}</th>}
+            {!isEditMode && (
+              <th className="text-center py-2 px-3 border border-border">{L.th_add_more}</th>
+            )}
             {!isEditMode && <th className="border border-border w-10"></th>}
           </tr>
         </thead>
@@ -302,7 +312,7 @@ export function AddVisaDialog({
                     <input
                       type="text"
                       value={applicant.name}
-                      onChange={(e) => updateApplicant(applicant.id, 'name', e.target.value)}
+                      onChange={e => updateApplicant(applicant.id, 'name', e.target.value)}
                       placeholder={L.placeholder_applicant}
                       className="w-full bg-transparent outline-none text-sm"
                     />
@@ -313,22 +323,32 @@ export function AddVisaDialog({
                 <td className="py-2 px-3 border border-border">
                   <Select
                     value={applicant.country}
-                    onValueChange={(value) => updateApplicant(applicant.id, 'country', value)}
+                    onValueChange={value => updateApplicant(applicant.id, 'country', value)}
                   >
                     <SelectTrigger className="h-auto p-0 border-0 shadow-none bg-transparent text-sm">
                       <SelectValue placeholder={L.placeholder_type} />
                     </SelectTrigger>
                     <SelectContent>
-                      <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary">{L.group_passport}</div>
+                      <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary">
+                        {L.group_passport}
+                      </div>
                       <SelectItem value={L.type_passport_adult}>{L.type_passport_adult}</SelectItem>
                       <SelectItem value={L.type_passport_child}>{L.type_passport_child}</SelectItem>
-                      <SelectItem value={L.type_passport_adult_lost}>{L.type_passport_adult_lost}</SelectItem>
-                      <SelectItem value={L.type_passport_child_lost}>{L.type_passport_child_lost}</SelectItem>
-                      <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">{L.group_taiwan}</div>
+                      <SelectItem value={L.type_passport_adult_lost}>
+                        {L.type_passport_adult_lost}
+                      </SelectItem>
+                      <SelectItem value={L.type_passport_child_lost}>
+                        {L.type_passport_child_lost}
+                      </SelectItem>
+                      <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">
+                        {L.group_taiwan}
+                      </div>
                       <SelectItem value={L.type_taiwan}>{L.type_taiwan}</SelectItem>
                       <SelectItem value={L.type_taiwan_lost}>{L.type_taiwan_lost}</SelectItem>
                       <SelectItem value={L.type_taiwan_first}>{L.type_taiwan_first}</SelectItem>
-                      <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">{L.group_usa}</div>
+                      <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">
+                        {L.group_usa}
+                      </div>
                       <SelectItem value={L.type_usa_esta}>{L.type_usa_esta}</SelectItem>
                     </SelectContent>
                   </Select>
@@ -338,7 +358,9 @@ export function AddVisaDialog({
                 <td className="py-2 px-3 border border-border text-center">
                   <Checkbox
                     checked={applicant.is_urgent}
-                    onCheckedChange={(checked) => updateApplicant(applicant.id, 'is_urgent', checked as boolean)}
+                    onCheckedChange={checked =>
+                      updateApplicant(applicant.id, 'is_urgent', checked as boolean)
+                    }
                   />
                 </td>
 
@@ -346,7 +368,7 @@ export function AddVisaDialog({
                 <td className="py-2 px-3 border border-border">
                   <DatePicker
                     value={applicant.received_date}
-                    onChange={(date) => updateApplicant(applicant.id, 'received_date', date)}
+                    onChange={date => updateApplicant(applicant.id, 'received_date', date)}
                     placeholder={L.placeholder_received}
                     buttonClassName="h-auto p-0 border-0 shadow-none bg-transparent"
                   />
@@ -356,7 +378,7 @@ export function AddVisaDialog({
                 <td className="py-2 px-3 border border-border">
                   <DatePicker
                     value={applicant.expected_issue_date}
-                    onChange={(date) => updateApplicant(applicant.id, 'expected_issue_date', date)}
+                    onChange={date => updateApplicant(applicant.id, 'expected_issue_date', date)}
                     placeholder={L.placeholder_return}
                     buttonClassName="h-auto p-0 border-0 shadow-none bg-transparent"
                   />
@@ -367,7 +389,7 @@ export function AddVisaDialog({
                   <input
                     type="number"
                     value={baseFee}
-                    onChange={(e) => updateApplicant(applicant.id, 'fee', Number(e.target.value))}
+                    onChange={e => updateApplicant(applicant.id, 'fee', Number(e.target.value))}
                     className="w-full bg-transparent outline-none text-sm text-center"
                   />
                 </td>
@@ -473,25 +495,35 @@ export function AddVisaDialog({
           {/* 日期資訊 */}
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{L.label_submit_date}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {L.label_submit_date}
+              </label>
               <DatePicker
                 value={applicants[0].actual_submission_date || ''}
-                onChange={date => updateApplicant(applicants[0].id, 'actual_submission_date', date || '')}
+                onChange={date =>
+                  updateApplicant(applicants[0].id, 'actual_submission_date', date || '')
+                }
                 className="mt-1"
                 placeholder={L.placeholder_date}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{L.label_doc_return}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {L.label_doc_return}
+              </label>
               <DatePicker
                 value={applicants[0].documents_returned_date || ''}
-                onChange={date => updateApplicant(applicants[0].id, 'documents_returned_date', date || '')}
+                onChange={date =>
+                  updateApplicant(applicants[0].id, 'documents_returned_date', date || '')
+                }
                 className="mt-1"
                 placeholder={L.placeholder_date}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{L.label_pickup_date}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {L.label_pickup_date}
+              </label>
               <DatePicker
                 value={applicants[0].pickup_date || ''}
                 onChange={date => updateApplicant(applicants[0].id, 'pickup_date', date || '')}

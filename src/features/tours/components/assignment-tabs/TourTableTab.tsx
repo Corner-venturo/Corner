@@ -97,14 +97,34 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
 
     if (effectiveSchedule.length > 0) {
       effectiveSchedule.forEach(day => {
-        if (day.meals?.breakfast && day.meals.breakfast !== COMP_TOURS_LABELS.飯店內 && day.meals.breakfast !== COMP_TOURS_LABELS.機上) {
-          meals.push({ day_number: day.day, meal_type: 'breakfast', restaurant_name: day.meals.breakfast })
+        if (
+          day.meals?.breakfast &&
+          day.meals.breakfast !== COMP_TOURS_LABELS.飯店內 &&
+          day.meals.breakfast !== COMP_TOURS_LABELS.機上
+        ) {
+          meals.push({
+            day_number: day.day,
+            meal_type: 'breakfast',
+            restaurant_name: day.meals.breakfast,
+          })
         }
-        if (day.meals?.lunch && day.meals.lunch !== COMP_TOURS_LABELS.敬請自理 && day.meals.lunch !== COMP_TOURS_LABELS.機上) {
+        if (
+          day.meals?.lunch &&
+          day.meals.lunch !== COMP_TOURS_LABELS.敬請自理 &&
+          day.meals.lunch !== COMP_TOURS_LABELS.機上
+        ) {
           meals.push({ day_number: day.day, meal_type: 'lunch', restaurant_name: day.meals.lunch })
         }
-        if (day.meals?.dinner && day.meals.dinner !== COMP_TOURS_LABELS.敬請自理 && day.meals.dinner !== COMP_TOURS_LABELS.機上) {
-          meals.push({ day_number: day.day, meal_type: 'dinner', restaurant_name: day.meals.dinner })
+        if (
+          day.meals?.dinner &&
+          day.meals.dinner !== COMP_TOURS_LABELS.敬請自理 &&
+          day.meals.dinner !== COMP_TOURS_LABELS.機上
+        ) {
+          meals.push({
+            day_number: day.day,
+            meal_type: 'dinner',
+            restaurant_name: day.meals.dinner,
+          })
         }
       })
     }
@@ -113,9 +133,13 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
   }, [effectiveSchedule])
 
   // 計算旅遊天數
-  const tourDays = tour?.departure_date && tour?.return_date
-    ? Math.ceil((new Date(tour.return_date).getTime() - new Date(tour.departure_date).getTime()) / (1000 * 60 * 60 * 24)) + 1
-    : 1
+  const tourDays =
+    tour?.departure_date && tour?.return_date
+      ? Math.ceil(
+          (new Date(tour.return_date).getTime() - new Date(tour.departure_date).getTime()) /
+            (1000 * 60 * 60 * 24)
+        ) + 1
+      : 1
 
   useEffect(() => {
     loadData()
@@ -233,9 +257,7 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
 
       if (error) throw error
 
-      setMealSettings(prev =>
-        prev.map(s => s.id === settingId ? { ...s, enabled } : s)
-      )
+      setMealSettings(prev => prev.map(s => (s.id === settingId ? { ...s, enabled } : s)))
 
       if (enabled) {
         setExpandedMeals(prev => new Set([...prev, settingId]))
@@ -280,10 +302,7 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
     if (!confirmed) return
 
     try {
-      const { error } = await supabase
-        .from('tour_tables')
-        .delete()
-        .eq('id', tableId)
+      const { error } = await supabase.from('tour_tables').delete().eq('id', tableId)
 
       if (error) throw error
 
@@ -337,16 +356,10 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
         <div className="text-sm text-morandi-secondary">
           {enabledCount > 0
             ? `已啟用 ${enabledCount} 餐分桌，共 ${totalTables} 桌`
-            : COMP_TOURS_LABELS.請勾選需要分桌的餐食
-          }
+            : COMP_TOURS_LABELS.請勾選需要分桌的餐食}
         </div>
         {mealsFromSchedule.length > 0 && mealSettings.length === 0 && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={syncMealsFromSchedule}
-            className="gap-1"
-          >
+          <Button variant="outline" size="sm" onClick={syncMealsFromSchedule} className="gap-1">
             <Plus className="h-4 w-4" />
             {COMP_TOURS_LABELS.LABEL_869}
           </Button>
@@ -376,9 +389,7 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
         ) : (
           Object.entries(settingsByDay).map(([dayNum, daySettings]) => (
             <div key={dayNum} className="space-y-2">
-              <div className="text-xs font-medium text-morandi-muted px-1">
-                第 {dayNum} 天
-              </div>
+              <div className="text-xs font-medium text-morandi-muted px-1">第 {dayNum} 天</div>
               {daySettings.map(setting => {
                 const isExpanded = expandedMeals.has(setting.id)
                 const mealTables = tables.filter(t => t.meal_setting_id === setting.id)
@@ -389,31 +400,32 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
                   <div
                     key={setting.id}
                     className={cn(
-                      "rounded-lg border transition-all",
+                      'rounded-lg border transition-all',
                       setting.enabled
-                        ? "border-morandi-gold/50 bg-morandi-gold/5"
-                        : "border-border bg-card"
+                        ? 'border-morandi-gold/50 bg-morandi-gold/5'
+                        : 'border-border bg-card'
                     )}
                   >
                     {/* 餐食標題列 */}
                     <div className="flex items-center gap-3 p-3">
                       <Checkbox
                         checked={setting.enabled}
-                        onCheckedChange={(checked) => toggleMealEnabled(setting.id, !!checked)}
+                        onCheckedChange={checked => toggleMealEnabled(setting.id, !!checked)}
                       />
                       <button
                         onClick={() => setting.enabled && toggleExpand(setting.id)}
                         disabled={!setting.enabled}
                         className={cn(
-                          "flex-1 flex items-center gap-2 text-left",
-                          !setting.enabled && "opacity-60"
+                          'flex-1 flex items-center gap-2 text-left',
+                          !setting.enabled && 'opacity-60'
                         )}
                       >
-                        {setting.enabled && (
-                          isExpanded
-                            ? <ChevronDown className="h-4 w-4 text-morandi-muted" />
-                            : <ChevronRight className="h-4 w-4 text-morandi-muted" />
-                        )}
+                        {setting.enabled &&
+                          (isExpanded ? (
+                            <ChevronDown className="h-4 w-4 text-morandi-muted" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4 text-morandi-muted" />
+                          ))}
                         <span className="text-sm font-medium text-morandi-primary">
                           {MEAL_TYPE_LABELS[setting.meal_type]}
                         </span>
@@ -438,20 +450,20 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
                             <div
                               key={table.id}
                               className={cn(
-                                "flex items-center justify-between px-3 py-2 rounded-md",
-                                table.is_full
-                                  ? "bg-morandi-green/10"
-                                  : "bg-morandi-container/50"
+                                'flex items-center justify-between px-3 py-2 rounded-md',
+                                table.is_full ? 'bg-morandi-green/10' : 'bg-morandi-container/50'
                               )}
                             >
                               <span className="text-sm text-morandi-primary">
                                 {table.table_number} 桌
                               </span>
                               <div className="flex items-center gap-3">
-                                <span className={cn(
-                                  "text-xs",
-                                  table.is_full ? "text-morandi-green" : "text-morandi-secondary"
-                                )}>
+                                <span
+                                  className={cn(
+                                    'text-xs',
+                                    table.is_full ? 'text-morandi-green' : 'text-morandi-secondary'
+                                  )}
+                                >
                                   {table.assigned_count}/{table.capacity} 人
                                 </span>
                                 <Button
@@ -503,10 +515,10 @@ export function TourTableTab({ tourId, tour, members }: TourTableTabProps) {
                     key={cap}
                     onClick={() => setNewTableCapacity(cap)}
                     className={cn(
-                      "flex-1 py-2 rounded-md border text-sm transition-all",
+                      'flex-1 py-2 rounded-md border text-sm transition-all',
                       newTableCapacity === cap
-                        ? "border-morandi-gold bg-morandi-gold/10 text-morandi-gold"
-                        : "border-border text-morandi-secondary hover:border-morandi-gold"
+                        ? 'border-morandi-gold bg-morandi-gold/10 text-morandi-gold'
+                        : 'border-border text-morandi-secondary hover:border-morandi-gold'
                     )}
                   >
                     {cap}人

@@ -3,7 +3,13 @@
 import { X } from 'lucide-react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { DatePicker } from '@/components/ui/date-picker'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { AddEventDialogState, NewEventForm } from '../types'
 import { CALENDAR_LABELS } from '../constants/labels'
 
@@ -19,7 +25,7 @@ interface AddEventDialogProps {
 // 全形轉半形
 const toHalfWidth = (str: string): string => {
   return str
-    .replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
+    .replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xfee0))
     .replace(/[－]/g, '-')
     .replace(/[～]/g, '~')
     .replace(/[：]/g, ':')
@@ -68,7 +74,8 @@ const parseTimeRange = (value: string): { start: string; end: string | null } =>
 }
 
 // 輸入框樣式
-const inputClassName = "w-full px-4 py-2.5 rounded-lg border border-[#E8E4E0] bg-card text-[var(--morandi-primary)] placeholder:text-[var(--morandi-primary)]/30 focus:outline-none focus:ring-1 focus:ring-[#B8A99A] focus:border-[#B8A99A] transition-shadow text-sm shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]"
+const inputClassName =
+  'w-full px-4 py-2.5 rounded-lg border border-[#E8E4E0] bg-card text-[var(--morandi-primary)] placeholder:text-[var(--morandi-primary)]/30 focus:outline-none focus:ring-1 focus:ring-[#B8A99A] focus:border-[#B8A99A] transition-shadow text-sm shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]'
 
 export function AddEventDialog({
   dialog,
@@ -78,13 +85,17 @@ export function AddEventDialog({
   onSubmit,
   onClose,
 }: AddEventDialogProps) {
-
   return (
     <Dialog open={dialog.open} onOpenChange={open => !open && onClose()}>
-      <DialogContent level={1} className="max-w-[600px] p-0 rounded-2xl border-[#E8E4E0] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] overflow-hidden [&>button:last-child]:hidden">
+      <DialogContent
+        level={1}
+        className="max-w-[600px] p-0 rounded-2xl border-[#E8E4E0] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] overflow-hidden [&>button:last-child]:hidden"
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 pb-2">
-          <h2 className="text-2xl font-bold tracking-tight text-[var(--morandi-primary)]">{CALENDAR_LABELS.ADD_DIALOG_TITLE}</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-[var(--morandi-primary)]">
+            {CALENDAR_LABELS.ADD_DIALOG_TITLE}
+          </h2>
           <button
             onClick={onClose}
             className="text-[var(--morandi-primary)]/40 hover:text-[var(--morandi-primary)] transition-colors"
@@ -106,18 +117,22 @@ export function AddEventDialog({
           {/* 日期欄位 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-[var(--morandi-primary)]/80">{CALENDAR_LABELS.START_DATE}</label>
+              <label className="block text-sm font-semibold text-[var(--morandi-primary)]/80">
+                {CALENDAR_LABELS.START_DATE}
+              </label>
               <DatePicker
                 value={dialog.selectedDate}
-                onChange={(date) => onDialogChange({ ...dialog, selectedDate: date })}
+                onChange={date => onDialogChange({ ...dialog, selectedDate: date })}
                 placeholder={CALENDAR_LABELS.PLACEHOLDER_SELECT_DATE}
               />
             </div>
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-[var(--morandi-primary)]/80">{CALENDAR_LABELS.END_DATE_OPTIONAL}</label>
+              <label className="block text-sm font-semibold text-[var(--morandi-primary)]/80">
+                {CALENDAR_LABELS.END_DATE_OPTIONAL}
+              </label>
               <DatePicker
                 value={newEvent.end_date}
-                onChange={(date) => onNewEventChange({ ...newEvent, end_date: date })}
+                onChange={date => onNewEventChange({ ...newEvent, end_date: date })}
                 placeholder={CALENDAR_LABELS.PLACEHOLDER_SELECT_DATE}
               />
             </div>
@@ -125,7 +140,9 @@ export function AddEventDialog({
 
           {/* 標題 */}
           <div className="space-y-2">
-            <label className="block text-sm font-semibold text-[var(--morandi-primary)]/80">{CALENDAR_LABELS.TITLE_LABEL}</label>
+            <label className="block text-sm font-semibold text-[var(--morandi-primary)]/80">
+              {CALENDAR_LABELS.TITLE_LABEL}
+            </label>
             <input
               type="text"
               value={newEvent.title}
@@ -138,7 +155,9 @@ export function AddEventDialog({
           {/* 類型與時間 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-[var(--morandi-primary)]/80">{CALENDAR_LABELS.EVENT_TYPE}</label>
+              <label className="block text-sm font-semibold text-[var(--morandi-primary)]/80">
+                {CALENDAR_LABELS.EVENT_TYPE}
+              </label>
               <Select
                 value={newEvent.visibility}
                 onValueChange={(value: 'personal' | 'company') =>
@@ -159,7 +178,9 @@ export function AddEventDialog({
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-[var(--morandi-primary)]/80">{CALENDAR_LABELS.START_TIME_OPTIONAL}</label>
+              <label className="block text-sm font-semibold text-[var(--morandi-primary)]/80">
+                {CALENDAR_LABELS.START_TIME_OPTIONAL}
+              </label>
               <input
                 type="text"
                 value={newEvent.start_time}
@@ -169,7 +190,7 @@ export function AddEventDialog({
                   onNewEventChange({
                     ...newEvent,
                     start_time: start,
-                    end_time: end || newEvent.end_time
+                    end_time: end || newEvent.end_time,
                   })
                 }}
                 placeholder={CALENDAR_LABELS.PLACEHOLDER_TIME_RANGE}
@@ -180,7 +201,9 @@ export function AddEventDialog({
 
           {/* 說明 */}
           <div className="space-y-2">
-            <label className="block text-sm font-semibold text-[var(--morandi-primary)]/80">{CALENDAR_LABELS.DESCRIPTION_OPTIONAL}</label>
+            <label className="block text-sm font-semibold text-[var(--morandi-primary)]/80">
+              {CALENDAR_LABELS.DESCRIPTION_OPTIONAL}
+            </label>
             <textarea
               value={newEvent.description}
               onChange={e => onNewEventChange({ ...newEvent, description: e.target.value })}

@@ -6,7 +6,10 @@ const SUPABASE_ACCESS_TOKEN = 'sbp_94746ae5e9ecc9d270d27006ba5ed1d0da0bbaf0'
 const PROJECT_REF = 'pfqvdacxowpgfamuvnsn'
 
 // Read the migration file
-const SQL = fs.readFileSync('./supabase/migrations/20251119090000_fix_missing_audit_fields.sql', 'utf8')
+const SQL = fs.readFileSync(
+  './supabase/migrations/20251119090000_fix_missing_audit_fields.sql',
+  'utf8'
+)
 
 async function executeSQL() {
   console.log('🔄 正在執行 SQL...\n')
@@ -18,17 +21,17 @@ async function executeSQL() {
       path: `/v1/projects/${PROJECT_REF}/database/query`,
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${SUPABASE_ACCESS_TOKEN}`,
-        'Content-Type': 'application/json'
-      }
+        Authorization: `Bearer ${SUPABASE_ACCESS_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
     }
 
     const postData = JSON.stringify({ query: SQL })
 
-    const req = https.request(options, (res) => {
+    const req = https.request(options, res => {
       let data = ''
 
-      res.on('data', (chunk) => {
+      res.on('data', chunk => {
         data += chunk
       })
 
@@ -49,7 +52,7 @@ async function executeSQL() {
       })
     })
 
-    req.on('error', (error) => {
+    req.on('error', error => {
       console.error('❌ 請求錯誤:', error)
       reject(error)
     })

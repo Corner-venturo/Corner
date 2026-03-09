@@ -7,7 +7,13 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
@@ -60,7 +66,13 @@ const statusFilters = [
 
 export default function TodosPage() {
   // ✅ 使用純雲端 SWR hook（不再使用 IndexedDB）
-  const { todos, create: addTodo, update: updateTodo, delete: deleteTodo, isLoading: isTodosLoading } = useTodos()
+  const {
+    todos,
+    create: addTodo,
+    update: updateTodo,
+    delete: deleteTodo,
+    isLoading: isTodosLoading,
+  } = useTodos()
   const { user } = useAuthStore() // 取得當前登入用戶
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -89,7 +101,9 @@ export default function TodosPage() {
       // ✅ 可見性篩選 - 只顯示當前用戶相關的待辦 或 公開待辦
       // 如果使用者尚未登入，暫時顯示所有待辦（等登入後再過濾）
       if (currentUserId) {
-        const isCreator = (todo.creator || (todo as unknown as Record<string, unknown>).created_by_legacy) === currentUserId
+        const isCreator =
+          (todo.creator || (todo as unknown as Record<string, unknown>).created_by_legacy) ===
+          currentUserId
         const isAssignee = todo.assignee === currentUserId
         const inVisibility = todo.visibility?.includes(currentUserId)
         const isPublic = todo.is_public === true
@@ -223,7 +237,9 @@ export default function TodosPage() {
         <div onClick={e => e.stopPropagation()}>
           <StarRating
             value={todo.priority}
-            onChange={newPriority => updateTodo(todo.id, { priority: newPriority as 1 | 2 | 3 | 4 | 5 })}
+            onChange={newPriority =>
+              updateTodo(todo.id, { priority: newPriority as 1 | 2 | 3 | 4 | 5 })
+            }
             size="sm"
           />
         </div>
@@ -360,7 +376,10 @@ export default function TodosPage() {
           related_items: [] as Todo['related_items'],
           sub_tasks: [] as Todo['sub_tasks'],
           notes: [] as Todo['notes'],
-          enabled_quick_actions: (formData.enabled_quick_actions || ['receipt', 'quote']) as Todo['enabled_quick_actions'],
+          enabled_quick_actions: (formData.enabled_quick_actions || [
+            'receipt',
+            'quote',
+          ]) as Todo['enabled_quick_actions'],
         }
 
         await addTodo(newTodoData)
@@ -454,16 +473,20 @@ export default function TodosPage() {
         </div>
       }
     >
-
       {/* 待辦事項列表 */}
       <div className="h-full overflow-hidden">
-          <EnhancedTable
-            columns={columns as unknown as Parameters<typeof EnhancedTable>[0]['columns']}
-            data={filteredTodos as unknown as Parameters<typeof EnhancedTable>[0]['data']}
-            onRowClick={handleRowClick as unknown as Parameters<typeof EnhancedTable>[0]['onRowClick']}
-            striped
-            rowClassName={getPriorityRowClass as unknown as Parameters<typeof EnhancedTable>[0]['rowClassName']}
-            actions={((todo: Todo) => (
+        <EnhancedTable
+          columns={columns as unknown as Parameters<typeof EnhancedTable>[0]['columns']}
+          data={filteredTodos as unknown as Parameters<typeof EnhancedTable>[0]['data']}
+          onRowClick={
+            handleRowClick as unknown as Parameters<typeof EnhancedTable>[0]['onRowClick']
+          }
+          striped
+          rowClassName={
+            getPriorityRowClass as unknown as Parameters<typeof EnhancedTable>[0]['rowClassName']
+          }
+          actions={
+            ((todo: Todo) => (
               <div className="flex items-center gap-1">
                 <button
                   onClick={e => {
@@ -480,7 +503,9 @@ export default function TodosPage() {
                       ? 'text-status-success hover:text-status-success hover:bg-status-success-bg'
                       : 'text-morandi-secondary hover:text-status-success hover:bg-status-success-bg'
                   )}
-                  title={todo.status === 'completed' ? LABELS.UNMARK_COMPLETE : LABELS.MARK_COMPLETE}
+                  title={
+                    todo.status === 'completed' ? LABELS.UNMARK_COMPLETE : LABELS.MARK_COMPLETE
+                  }
                 >
                   <CheckCircle size={14} />
                 </button>
@@ -502,12 +527,13 @@ export default function TodosPage() {
                   <Trash2 size={14} />
                 </button>
               </div>
-            )) as unknown as Parameters<typeof EnhancedTable>[0]['actions']}
-            searchableFields={['title']}
-            searchTerm={searchTerm}
-            showFilters={false}
-            initialPageSize={15}
-          />
+            )) as unknown as Parameters<typeof EnhancedTable>[0]['actions']
+          }
+          searchableFields={['title']}
+          searchTerm={searchTerm}
+          showFilters={false}
+          initialPageSize={15}
+        />
       </div>
 
       {/* 展開的待辦事項視圖 */}
@@ -584,7 +610,9 @@ function AddTodoForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">{LABELS.TASK_TITLE}</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">
+          {LABELS.TASK_TITLE}
+        </label>
         <Input
           value={formData.title}
           onChange={e => setFormData({ ...formData, title: e.target.value })}
@@ -594,7 +622,9 @@ function AddTodoForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">{LABELS.URGENCY}</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">
+          {LABELS.URGENCY}
+        </label>
         <StarRating
           value={formData.priority}
           onChange={value => setFormData({ ...formData, priority: value as 1 | 2 | 3 | 4 | 5 })}
@@ -602,7 +632,9 @@ function AddTodoForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">{LABELS.DEADLINE}</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">
+          {LABELS.DEADLINE}
+        </label>
         <DatePicker
           value={formData.deadline}
           onChange={date => setFormData({ ...formData, deadline: date })}
@@ -616,11 +648,15 @@ function AddTodoForm({
         </label>
         <Select
           value={formData.assignee || '__none__'}
-          onValueChange={value => setFormData({ ...formData, assignee: value === '__none__' ? '' : value })}
+          onValueChange={value =>
+            setFormData({ ...formData, assignee: value === '__none__' ? '' : value })
+          }
           disabled={isLoadingUsers}
         >
           <SelectTrigger className="w-full">
-            <SelectValue placeholder={isLoadingUsers ? LABELS.LOADING_EMPLOYEES : LABELS.NO_ASSIGN} />
+            <SelectValue
+              placeholder={isLoadingUsers ? LABELS.LOADING_EMPLOYEES : LABELS.NO_ASSIGN}
+            />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__none__">{LABELS.NO_ASSIGN}</SelectItem>
@@ -640,15 +676,18 @@ function AddTodoForm({
             checked={formData.is_public}
             onCheckedChange={checked => setFormData({ ...formData, is_public: checked as boolean })}
           />
-          <span className="text-sm font-medium text-morandi-primary">{LABELS.PUBLIC_TO_COMPANY}</span>
+          <span className="text-sm font-medium text-morandi-primary">
+            {LABELS.PUBLIC_TO_COMPANY}
+          </span>
         </label>
-        <p className="text-xs text-morandi-secondary mt-1 ml-6">
-          {LABELS.EDIT_8913}
-        </p>
+        <p className="text-xs text-morandi-secondary mt-1 ml-6">{LABELS.EDIT_8913}</p>
       </div>
 
       <div className="flex gap-2 pt-4">
-        <Button type="submit" className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+        <Button
+          type="submit"
+          className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
+        >
           <Plus size={16} />
           {LABELS.LABEL_1974}
         </Button>

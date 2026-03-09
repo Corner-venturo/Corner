@@ -43,7 +43,9 @@ export function MemberManagementDialog({
         </DialogHeader>
         <p className="text-sm text-morandi-secondary">
           {COMP_WORKSPACE_LABELS.CONFIRM_9167}
-          {memberToRemove?.profile?.displayName || memberToRemove?.profile?.englishName || COMP_WORKSPACE_LABELS.此成員}
+          {memberToRemove?.profile?.displayName ||
+            memberToRemove?.profile?.englishName ||
+            COMP_WORKSPACE_LABELS.此成員}
           」移出頻道嗎？
         </p>
         <DialogFooter className="mt-4">
@@ -51,7 +53,12 @@ export function MemberManagementDialog({
             <X size={16} />
             {COMP_WORKSPACE_LABELS.CANCEL}
           </Button>
-          <Button variant="destructive" onClick={onRemove} disabled={isRemovingMember} className="gap-2">
+          <Button
+            variant="destructive"
+            onClick={onRemove}
+            disabled={isRemovingMember}
+            className="gap-2"
+          >
             <Trash2 size={16} />
             {isRemovingMember ? COMP_WORKSPACE_LABELS.移除中 : COMP_WORKSPACE_LABELS.移除}
           </Button>
@@ -87,7 +94,9 @@ export function ChannelDeleteDialog({
     >
       <DialogContent level={1}>
         <DialogHeader>
-          <DialogTitle className="text-morandi-primary">{COMP_WORKSPACE_LABELS.刪除頻道}</DialogTitle>
+          <DialogTitle className="text-morandi-primary">
+            {COMP_WORKSPACE_LABELS.刪除頻道}
+          </DialogTitle>
         </DialogHeader>
         <p className="text-sm text-morandi-secondary">
           確定要刪除頻道「{channelToDelete?.name}」嗎？此操作無法復原。
@@ -102,11 +111,7 @@ export function ChannelDeleteDialog({
             <X size={16} />
             {COMP_WORKSPACE_LABELS.CANCEL}
           </Button>
-          <Button
-            variant="destructive"
-            onClick={onDelete}
-            disabled={isDeletingChannel}
-          >
+          <Button variant="destructive" onClick={onDelete} disabled={isDeletingChannel}>
             {isDeletingChannel ? COMP_WORKSPACE_LABELS.刪除中 : COMP_WORKSPACE_LABELS.刪除}
           </Button>
         </DialogFooter>
@@ -149,15 +154,15 @@ export function GroupDeleteDialog({
     >
       <DialogContent level={1}>
         <DialogHeader>
-          <DialogTitle className="text-morandi-primary">{COMP_WORKSPACE_LABELS.刪除群組}</DialogTitle>
+          <DialogTitle className="text-morandi-primary">
+            {COMP_WORKSPACE_LABELS.刪除群組}
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-2">
           <p className="text-sm text-morandi-secondary">
             確定要刪除群組「{groupToDelete?.name}」嗎？
           </p>
-          <p className="text-sm text-morandi-secondary">
-            {COMP_WORKSPACE_LABELS.LABEL_8875}
-          </p>
+          <p className="text-sm text-morandi-secondary">{COMP_WORKSPACE_LABELS.LABEL_8875}</p>
         </div>
         <DialogFooter className="mt-4">
           <Button

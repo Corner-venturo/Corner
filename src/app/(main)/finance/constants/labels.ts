@@ -61,7 +61,7 @@ export const FinanceLabels = {
   actions: '操作',
   edit: '編輯',
   createReceiptFailedPrefix: '建立收款單失敗',
-  createReceiptFailedTitle: '建立收款單失敗'
+  createReceiptFailedTitle: '建立收款單失敗',
 }
 export const FINANCE_PAGE_LABELS = {
   LOADING_DATA: '正在載入財務資料...',
@@ -96,7 +96,8 @@ export const FINANCE_PAGE_LABELS = {
   MODULE_REPORTS_STATS: '即時財務分析',
 
   // Pagination
-  PAGINATION_SUMMARY: (total: number, page: number, totalPages: number) => `共 ${total} 筆交易，目前在第 ${page} / ${totalPages} 頁`,
+  PAGINATION_SUMMARY: (total: number, page: number, totalPages: number) =>
+    `共 ${total} 筆交易，目前在第 ${page} / ${totalPages} 頁`,
 }
 
 export const BATCH_CONFIRM_LABELS = {
@@ -118,7 +119,8 @@ export const BATCH_CONFIRM_LABELS = {
   UNKNOWN_ERROR: '未知錯誤',
   CONFIRM_SUCCESS: (count: number) => `成功確認 ${count} 筆收款品項`,
   CONFIRM_FAILED: (numbers: string) => `確認失敗：${numbers}`,
-  CONFIRM_PARTIAL: (success: number, failed: number, numbers: string) => `成功確認 ${success} 筆\n失敗 ${failed} 筆：${numbers}`,
+  CONFIRM_PARTIAL: (success: number, failed: number, numbers: string) =>
+    `成功確認 ${success} 筆\n失敗 ${failed} 筆：${numbers}`,
   CONFIRMING: '確認中...',
   CONFIRM_N_RECEIPTS: (count: number) => `確認 ${count} 筆收款`,
   SELECTED_STATS: (selected: number, total: number) => `已選擇 ${selected} / ${total} 筆`,
@@ -300,7 +302,8 @@ export const PAYMENT_DATA_LABELS = {
   FILL_COMPLETE_INFO: '請填寫完整資訊',
   CANNOT_GET_TOUR_CODE: '無法取得團號，請確認訂單已關聯旅遊團',
   PLEASE_LOGIN: '請先登入',
-  AMOUNT_ABNORMAL_NOTE: (expected: string, actual: string) => `[金額異常] 應收 NT$ ${expected}，實收 NT$ ${actual}`,
+  AMOUNT_ABNORMAL_NOTE: (expected: string, actual: string) =>
+    `[金額異常] 應收 NT$ ${expected}，實收 NT$ ${actual}`,
   ACCOUNTANT: '會計',
   CONFIRMED_CANNOT_DELETE: '已確認的收款單無法刪除',
 }
@@ -365,7 +368,6 @@ export const TRAVEL_INVOICE_DETAIL_LABELS = {
   PLEASE_ENTER_7085: '請輸入作廢原因',
   CANCEL: '取消',
   CONFIRM_8486: '確認作廢',
-
 }
 
 export const PAYMENT_METHOD_MAP: Record<string, string> = {

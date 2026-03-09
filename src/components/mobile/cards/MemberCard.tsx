@@ -33,14 +33,12 @@ export function MemberCard({
   className,
 }: MemberCardProps) {
   const genderIcon = member.gender === 'M' ? '♂' : member.gender === 'F' ? '♀' : ''
-  const genderColor = member.gender === 'M' ? 'text-blue-500' : member.gender === 'F' ? 'text-pink-500' : ''
+  const genderColor =
+    member.gender === 'M' ? 'text-blue-500' : member.gender === 'F' ? 'text-pink-500' : ''
 
   return (
     <div
-      className={cn(
-        'bg-card rounded-xl border border-border shadow-sm overflow-hidden',
-        className
-      )}
+      className={cn('bg-card rounded-xl border border-border shadow-sm overflow-hidden', className)}
     >
       {/* 主要內容 */}
       <Link href={`/m/members/${member.id}`} className="block p-4">
@@ -64,9 +62,7 @@ export function MemberCard({
               <span className="font-bold text-morandi-primary">
                 {member.chinese_name || '未命名'}
               </span>
-              {genderIcon && (
-                <span className={cn('text-sm', genderColor)}>{genderIcon}</span>
-              )}
+              {genderIcon && <span className={cn('text-sm', genderColor)}>{genderIcon}</span>}
               {member.checked_in && (
                 <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">
                   {CARDS_LABELS.LABEL_3499}
@@ -75,9 +71,7 @@ export function MemberCard({
             </div>
 
             {/* 團號 */}
-            {tourCode && (
-              <div className="text-sm text-morandi-secondary mb-2">{tourCode}</div>
-            )}
+            {tourCode && <div className="text-sm text-morandi-secondary mb-2">{tourCode}</div>}
 
             {/* 分房分車資訊 */}
             <div className="flex items-center gap-4 text-sm text-morandi-secondary">
@@ -120,7 +114,7 @@ export function MemberCard({
             <span>{CARDS_LABELS.LABEL_6702}</span>
           </Link>
           <button
-            onClick={(e) => {
+            onClick={e => {
               e.preventDefault()
               onCheckin?.()
             }}

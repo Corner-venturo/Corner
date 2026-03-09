@@ -129,9 +129,7 @@ export function useCustomerMatch() {
         return
       }
 
-      const { data: urlData } = supabase.storage
-        .from('workspace-files')
-        .getPublicUrl(filePath)
+      const { data: urlData } = supabase.storage.from('workspace-files').getPublicUrl(filePath)
 
       updateNewCustomerForm('passport_image_url', urlData.publicUrl)
       toast.success('護照圖片上傳成功')

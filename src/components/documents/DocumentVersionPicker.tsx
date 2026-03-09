@@ -22,12 +22,7 @@ import { DEFAULT_CATEGORIES } from '@/features/quotes/constants'
 import type { Tour, Quote } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 import { confirm } from '@/lib/ui/alert-dialog'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { DOCUMENTS_LABELS } from './constants/labels'
 
 // 取得報價單顯示名稱
@@ -37,10 +32,12 @@ function getQuoteDisplayName(quote: Quote): string {
 
 // 判斷是否為已確認版本
 function isConfirmedQuote(quote: Quote): boolean {
-  return quote.confirmation_status === 'customer_confirmed' ||
-         quote.confirmation_status === 'staff_confirmed' ||
-         quote.confirmation_status === 'closed' ||
-         quote.status === 'approved'
+  return (
+    quote.confirmation_status === 'customer_confirmed' ||
+    quote.confirmation_status === 'staff_confirmed' ||
+    quote.confirmation_status === 'closed' ||
+    quote.status === 'approved'
+  )
 }
 
 // 取得確認狀態文字
@@ -96,7 +93,8 @@ export function DocumentVersionPicker({
 
   const linkedQuotes = quotes.filter(q => {
     // 檢查是否關聯到這個團（任一方向都算）
-    const isLinked = q.tour_id === tour.id ||
+    const isLinked =
+      q.tour_id === tour.id ||
       (tourQuoteId && q.id === tourQuoteId) ||
       (tourLockedQuoteId && q.id === tourLockedQuoteId)
 
@@ -336,7 +334,10 @@ export function DocumentVersionPicker({
           {/* 金額 */}
           {quote.total_amount ? (
             <span className="text-xs text-morandi-secondary shrink-0 ml-auto mr-2">
-              <CurrencyCell amount={quote.total_amount} className="text-xs text-morandi-secondary" />
+              <CurrencyCell
+                amount={quote.total_amount}
+                className="text-xs text-morandi-secondary"
+              />
             </span>
           ) : null}
         </div>
@@ -381,9 +382,7 @@ export function DocumentVersionPicker({
             disabled={deletingId === quote.id || isLocked}
             className={cn(
               'p-1.5 rounded-lg transition-colors',
-              isLocked
-                ? 'opacity-30 cursor-not-allowed'
-                : 'hover:bg-morandi-red/10'
+              isLocked ? 'opacity-30 cursor-not-allowed' : 'hover:bg-morandi-red/10'
             )}
             title={isLocked ? '已確認的報價單無法刪除' : '刪除報價單'}
           >
@@ -415,10 +414,12 @@ export function DocumentVersionPicker({
           <div className="flex items-center gap-4">
             <div>
               <span className="text-morandi-secondary">{DOCUMENTS_LABELS.LABEL_7626}</span>
-              <span className={cn(
-                'ml-1 font-medium',
-                isConfirmedQuote(previewQuote) ? 'text-morandi-green' : 'text-morandi-secondary'
-              )}>
+              <span
+                className={cn(
+                  'ml-1 font-medium',
+                  isConfirmedQuote(previewQuote) ? 'text-morandi-green' : 'text-morandi-secondary'
+                )}
+              >
                 {isConfirmedQuote(previewQuote) ? getConfirmStatusText(previewQuote) : '草稿'}
               </span>
             </div>
@@ -432,7 +433,9 @@ export function DocumentVersionPicker({
             <span className="text-morandi-gold font-medium ml-1">
               {previewQuote.total_amount ? (
                 <CurrencyCell amount={previewQuote.total_amount} />
-              ) : '-'}
+              ) : (
+                '-'
+              )}
             </span>
           </div>
         </div>
@@ -454,32 +457,46 @@ export function DocumentVersionPicker({
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
-                {categories.flatMap((cat, catIdx) =>
-                  cat.items?.map((item, itemIdx) => (
-                    <tr key={`${catIdx}-${itemIdx}`}>
-                      <td className="py-1.5 text-morandi-secondary">{itemIdx === 0 ? cat.name : ''}</td>
-                      <td className="py-1.5 text-morandi-primary">
-                        {item.name}
-                        {(item.quantity || 1) > 1 && <span className="text-morandi-muted ml-1">x{item.quantity}</span>}
-                      </td>
-                      <td className="py-1.5 text-right">
-                        <CurrencyCell amount={item.total || (item.unit_price || 0) * (item.quantity || 1)} />
-                      </td>
-                    </tr>
-                  )) || []
+                {categories.flatMap(
+                  (cat, catIdx) =>
+                    cat.items?.map((item, itemIdx) => (
+                      <tr key={`${catIdx}-${itemIdx}`}>
+                        <td className="py-1.5 text-morandi-secondary">
+                          {itemIdx === 0 ? cat.name : ''}
+                        </td>
+                        <td className="py-1.5 text-morandi-primary">
+                          {item.name}
+                          {(item.quantity || 1) > 1 && (
+                            <span className="text-morandi-muted ml-1">x{item.quantity}</span>
+                          )}
+                        </td>
+                        <td className="py-1.5 text-right">
+                          <CurrencyCell
+                            amount={item.total || (item.unit_price || 0) * (item.quantity || 1)}
+                          />
+                        </td>
+                      </tr>
+                    )) || []
                 )}
               </tbody>
               <tfoot>
                 <tr className="border-t border-morandi-gold/30 bg-morandi-gold/5">
-                  <td colSpan={2} className="py-2 font-medium text-morandi-primary">{DOCUMENTS_LABELS.TOTAL_2585}</td>
+                  <td colSpan={2} className="py-2 font-medium text-morandi-primary">
+                    {DOCUMENTS_LABELS.TOTAL_2585}
+                  </td>
                   <td className="py-2 text-right">
                     <CurrencyCell
                       amount={categories.reduce((sum, cat) => {
                         // 如果分類有 total 就用，否則計算 items
                         if (cat.total) return sum + cat.total
-                        return sum + (cat.items?.reduce((catSum, item) => {
-                          return catSum + (item.total || (item.unit_price || 0) * (item.quantity || 1))
-                        }, 0) || 0)
+                        return (
+                          sum +
+                          (cat.items?.reduce((catSum, item) => {
+                            return (
+                              catSum + (item.total || (item.unit_price || 0) * (item.quantity || 1))
+                            )
+                          }, 0) || 0)
+                        )
                       }, 0)}
                       className="font-bold text-morandi-gold"
                     />
@@ -501,7 +518,10 @@ export function DocumentVersionPicker({
     <>
       {/* 主對話框：使用 level={2}（作為 TourDetailDialog 的子 Dialog） */}
       <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-        <DialogContent level={2} className="h-[70vh] max-h-[800px] max-w-[500px] flex flex-col overflow-hidden">
+        <DialogContent
+          level={2}
+          className="h-[70vh] max-h-[800px] max-w-[500px] flex flex-col overflow-hidden"
+        >
           {/* 標題區 */}
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -518,7 +538,9 @@ export function DocumentVersionPicker({
               <div className="flex-shrink-0 px-4 py-3">
                 <div className="flex items-center gap-2">
                   <Calculator className="w-4 h-4 text-morandi-primary" />
-                  <span className="text-sm font-medium text-morandi-primary">{DOCUMENTS_LABELS.LABEL_5683}</span>
+                  <span className="text-sm font-medium text-morandi-primary">
+                    {DOCUMENTS_LABELS.LABEL_5683}
+                  </span>
                 </div>
                 <p className="text-xs text-morandi-secondary mt-1">{DOCUMENTS_LABELS.LABEL_1674}</p>
               </div>
@@ -608,9 +630,7 @@ export function DocumentVersionPicker({
             </DialogTitle>
           </DialogHeader>
 
-          <div>
-            {renderPreviewContent()}
-          </div>
+          <div>{renderPreviewContent()}</div>
 
           {/* 底部按鈕 */}
           <div className="flex gap-3 pt-4 border-t border-border">

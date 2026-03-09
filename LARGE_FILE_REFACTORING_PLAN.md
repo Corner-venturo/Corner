@@ -9,42 +9,42 @@
 
 ### 🔴 極度超大 (>900 行) - 4 個檔案
 
-| 檔案 | 行數 | 類型 | 優先級 |
-|------|------|------|--------|
-| `lib/supabase/types.ts` | 4993 | 自動生成 | ⏸️ 不處理 |
-| `features/quotes/PrintableQuotation.tsx` | 973 | UI 組件 | 🔴 高 |
-| `features/quotes/PrintableQuickQuote.tsx` | 922 | UI 組件 | 🔴 高 |
-| `lib/db/schemas.ts` | 778 | Schema 定義 | ⏸️ 不處理 |
+| 檔案                                      | 行數 | 類型        | 優先級    |
+| ----------------------------------------- | ---- | ----------- | --------- |
+| `lib/supabase/types.ts`                   | 4993 | 自動生成    | ⏸️ 不處理 |
+| `features/quotes/PrintableQuotation.tsx`  | 973  | UI 組件     | 🔴 高     |
+| `features/quotes/PrintableQuickQuote.tsx` | 922  | UI 組件     | 🔴 高     |
+| `lib/db/schemas.ts`                       | 778  | Schema 定義 | ⏸️ 不處理 |
 
 ### 🟡 非常大 (700-900 行) - 6 個檔案
 
-| 檔案 | 行數 | 類型 | 優先級 |
-|------|------|------|--------|
-| `components/orders/OrderMembersExpandable.tsx` | 770 | UI 組件 | 🟡 中 |
-| `stores/types.ts` | 760 | 型別定義 | ⏸️ 不處理 |
-| `components/layout/sidebar.tsx` | 746 | UI 組件 | 🟡 中 |
-| `features/quotes/SellingPriceSection.tsx` | 701 | UI 組件 | 🟡 中 |
-| `features/quotes/QuickQuoteDetail.tsx` | 688 | UI 組件 | 🟡 中 |
-| `components/tours/tour-members.tsx` | 674 | UI 組件 | 🟡 中 |
+| 檔案                                           | 行數 | 類型     | 優先級    |
+| ---------------------------------------------- | ---- | -------- | --------- |
+| `components/orders/OrderMembersExpandable.tsx` | 770  | UI 組件  | 🟡 中     |
+| `stores/types.ts`                              | 760  | 型別定義 | ⏸️ 不處理 |
+| `components/layout/sidebar.tsx`                | 746  | UI 組件  | 🟡 中     |
+| `features/quotes/SellingPriceSection.tsx`      | 701  | UI 組件  | 🟡 中     |
+| `features/quotes/QuickQuoteDetail.tsx`         | 688  | UI 組件  | 🟡 中     |
+| `components/tours/tour-members.tsx`            | 674  | UI 組件  | 🟡 中     |
 
 ### 🟢 大型 (500-700 行) - 14 個檔案
 
-| 檔案 | 行數 | 類型 | 優先級 |
-|------|------|------|--------|
-| `stores/auth-store.ts` | 671 | Store | 🟢 低 |
-| `app/itinerary/new/page.tsx` | 620 | 頁面 | 🟢 低 |
-| `app/todos/page.tsx` | 615 | 頁面 | 🟢 低 |
-| `confirmations/.../PrintableConfirmation.tsx` | 600 | UI 組件 | 🟢 低 |
-| `dashboard/components/flight-widget.tsx` | 598 | UI 組件 | 🟢 低 |
-| `todos/quick-actions/quick-disbursement.tsx` | 590 | UI 組件 | 🟢 低 |
-| `app/customers/page.tsx` | 543 | 頁面 | 🟢 低 |
-| `esims/components/EsimCreateDialog.tsx` | 534 | UI 組件 | 🟢 低 |
-| `tours/tour-members-advanced.tsx` | 531 | UI 組件 | 🟢 低 |
-| `workspace/.../ChannelSidebar.tsx` | 524 | UI 組件 | 🟢 低 |
-| `features/tours/ToursPage.tsx` | 516 | UI 組件 | 🟢 低 |
-| `app/itinerary/[slug]/page.tsx` | 516 | 頁面 | 🟢 低 |
-| `stores/timebox-store.ts` | 515 | Store | 🟢 低 |
-| `app/accounting/page.tsx` | 514 | 頁面 | 🟢 低 |
+| 檔案                                          | 行數 | 類型    | 優先級 |
+| --------------------------------------------- | ---- | ------- | ------ |
+| `stores/auth-store.ts`                        | 671  | Store   | 🟢 低  |
+| `app/itinerary/new/page.tsx`                  | 620  | 頁面    | 🟢 低  |
+| `app/todos/page.tsx`                          | 615  | 頁面    | 🟢 低  |
+| `confirmations/.../PrintableConfirmation.tsx` | 600  | UI 組件 | 🟢 低  |
+| `dashboard/components/flight-widget.tsx`      | 598  | UI 組件 | 🟢 低  |
+| `todos/quick-actions/quick-disbursement.tsx`  | 590  | UI 組件 | 🟢 低  |
+| `app/customers/page.tsx`                      | 543  | 頁面    | 🟢 低  |
+| `esims/components/EsimCreateDialog.tsx`       | 534  | UI 組件 | 🟢 低  |
+| `tours/tour-members-advanced.tsx`             | 531  | UI 組件 | 🟢 低  |
+| `workspace/.../ChannelSidebar.tsx`            | 524  | UI 組件 | 🟢 低  |
+| `features/tours/ToursPage.tsx`                | 516  | UI 組件 | 🟢 低  |
+| `app/itinerary/[slug]/page.tsx`               | 516  | 頁面    | 🟢 低  |
+| `stores/timebox-store.ts`                     | 515  | Store   | 🟢 低  |
+| `app/accounting/page.tsx`                     | 514  | 頁面    | 🟢 低  |
 
 ---
 
@@ -73,11 +73,13 @@
 ### 1. PrintableQuotation.tsx (973 行)
 
 **問題**:
+
 - 單一組件包含完整報價單的所有區塊
 - 重複的樣式定義
 - 難以維護和測試
 
 **重構方案**:
+
 ```
 PrintableQuotation.tsx (主組件，100 行)
 ├── components/
@@ -102,10 +104,12 @@ PrintableQuotation.tsx (主組件，100 行)
 ### 2. PrintableQuickQuote.tsx (922 行)
 
 **問題**:
+
 - 與 PrintableQuotation 類似結構
 - 可共用部分組件
 
 **重構方案**:
+
 ```
 PrintableQuickQuote.tsx (主組件，100 行)
 ├── components/ (共用 QuotationHeader, QuotationFooter)
@@ -127,6 +131,7 @@ PrintableQuickQuote.tsx (主組件，100 行)
 ### 3. OrderMembersExpandable.tsx (770 行)
 
 **重構方案**:
+
 - 拆分為 `OrderMembersList.tsx` (主組件)
 - 提取 `MemberEditDialog.tsx` (編輯對話框)
 - 提取 `MemberRow.tsx` (單行組件)
@@ -139,6 +144,7 @@ PrintableQuickQuote.tsx (主組件，100 行)
 ### 4. sidebar.tsx (746 行)
 
 **重構方案**:
+
 - 拆分為 `Sidebar.tsx` (主組件)
 - 提取 `SidebarMenu.tsx` (選單項目)
 - 提取 `SidebarWorkspaceSelector.tsx` (工作區選擇器)
@@ -151,6 +157,7 @@ PrintableQuickQuote.tsx (主組件，100 行)
 ### 5. SellingPriceSection.tsx (701 行)
 
 **重構方案**:
+
 - 拆分為 `SellingPriceSection.tsx` (主組件)
 - 提取 `PriceCalculator.tsx` (計算邏輯)
 - 提取 `PriceBreakdown.tsx` (明細顯示)
@@ -163,6 +170,7 @@ PrintableQuickQuote.tsx (主組件，100 行)
 ### 6. QuickQuoteDetail.tsx (688 行)
 
 **重構方案**:
+
 - 拆分為 `QuickQuoteDetail.tsx` (主組件)
 - 提取 `QuoteItemsList.tsx` (項目列表)
 - 提取 `QuoteItemForm.tsx` (新增/編輯表單)
@@ -175,6 +183,7 @@ PrintableQuickQuote.tsx (主組件，100 行)
 ### 7. tour-members.tsx (674 行)
 
 **重構方案**:
+
 - 拆分為 `TourMembers.tsx` (主組件)
 - 提取 `MemberTable.tsx` (表格顯示)
 - 提取 `MemberFilters.tsx` (篩選器)
@@ -187,6 +196,7 @@ PrintableQuickQuote.tsx (主組件，100 行)
 ### 8. auth-store.ts (671 行)
 
 **重構方案**:
+
 - 拆分為 `auth-store.ts` (主 store)
 - 提取 `auth-validators.ts` (驗證邏輯)
 - 提取 `auth-helpers.ts` (輔助函數)
@@ -210,13 +220,14 @@ PrintableQuickQuote.tsx (主組件，100 行)
 
 ### 立即處理 (高優先級 2 個)
 
-| 項目 | 原始行數 | 預期行數 | 檔案數 | 可維護性 |
-|------|----------|----------|--------|----------|
-| PrintableQuotation | 973 | 100 | 11 | ⬆️ 大幅提升 |
-| PrintableQuickQuote | 922 | 100 | 7 | ⬆️ 大幅提升 |
-| **總計** | **1895** | **200** | **18** | - |
+| 項目                | 原始行數 | 預期行數 | 檔案數 | 可維護性    |
+| ------------------- | -------- | -------- | ------ | ----------- |
+| PrintableQuotation  | 973      | 100      | 11     | ⬆️ 大幅提升 |
+| PrintableQuickQuote | 922      | 100      | 7      | ⬆️ 大幅提升 |
+| **總計**            | **1895** | **200**  | **18** | -           |
 
 **效益**:
+
 - ✅ 元件可重用性提升
 - ✅ 測試更容易撰寫
 - ✅ 樣式管理集中化
@@ -224,11 +235,12 @@ PrintableQuickQuote.tsx (主組件，100 行)
 
 ### 中期處理 (中優先級 6 個)
 
-| 項目 | 原始行數 | 預期行數 | 檔案數 | 可維護性 |
-|------|----------|----------|--------|----------|
-| 6 個中優先級檔案 | 4250 | ~2960 | 24 | ⬆️ 提升 |
+| 項目             | 原始行數 | 預期行數 | 檔案數 | 可維護性 |
+| ---------------- | -------- | -------- | ------ | -------- |
+| 6 個中優先級檔案 | 4250     | ~2960    | 24     | ⬆️ 提升  |
 
 **效益**:
+
 - ✅ 降低單檔複雜度
 - ✅ 提升程式碼可讀性
 - ✅ 便於團隊協作
@@ -238,11 +250,13 @@ PrintableQuickQuote.tsx (主組件，100 行)
 ## 🗓️ 執行時程建議
 
 ### Week 1: 高優先級 (2 個檔案)
+
 - Day 1-2: 重構 PrintableQuotation.tsx
 - Day 3-4: 重構 PrintableQuickQuote.tsx
 - Day 5: 測試和驗證
 
 ### Week 2: 中優先級 (6 個檔案)
+
 - Day 1: OrderMembersExpandable.tsx
 - Day 2: sidebar.tsx
 - Day 3: SellingPriceSection.tsx
@@ -250,6 +264,7 @@ PrintableQuickQuote.tsx (主組件，100 行)
 - Day 5: tour-members.tsx + auth-store.ts
 
 ### Week 3+: 低優先級 (視需要)
+
 - 根據實際開發需求決定是否處理
 
 ---
@@ -265,6 +280,7 @@ PrintableQuickQuote.tsx (主組件，100 行)
 ---
 
 **結論**:
+
 - 總計 24 個超大檔案
 - 3 個不需處理（自動生成/型別定義）
 - 2 個高優先級（列印組件）

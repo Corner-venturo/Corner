@@ -16,7 +16,7 @@ export async function applyTransformToImage(
   // 如果沒有變換，直接返回原圖
   if (rotation === 0 && !flipH) return src
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const img = new Image()
     img.crossOrigin = 'anonymous'
     img.onload = () => {
@@ -55,10 +55,10 @@ export async function applyAdjustmentsToImage(
   adjustments: ImageAdjustments
 ): Promise<string> {
   // 如果沒有調整，直接返回原圖
-  const hasChanges = Object.values(adjustments).some((v) => v !== 0)
+  const hasChanges = Object.values(adjustments).some(v => v !== 0)
   if (!hasChanges) return src
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const img = new Image()
     img.crossOrigin = 'anonymous'
     img.onload = () => {
@@ -228,20 +228,10 @@ export async function cropImage(
       canvas.width = cropWidth
       canvas.height = cropHeight
 
-      ctx.drawImage(
-        tempCanvas,
-        cropX,
-        cropY,
-        cropWidth,
-        cropHeight,
-        0,
-        0,
-        cropWidth,
-        cropHeight
-      )
+      ctx.drawImage(tempCanvas, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight)
 
       canvas.toBlob(
-        (blob) => {
+        blob => {
           if (blob) {
             resolve(blob)
           } else {

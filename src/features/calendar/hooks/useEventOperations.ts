@@ -2,7 +2,12 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { EventClickArg, EventDropArg } from '@fullcalendar/core'
 import { DateClickArg } from '@fullcalendar/interaction'
-import { useCalendarEvents, createCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from '@/data'
+import {
+  useCalendarEvents,
+  createCalendarEvent,
+  updateCalendarEvent,
+  deleteCalendarEvent,
+} from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
 import { FullCalendarEvent } from '@/features/calendar/types'
@@ -49,7 +54,8 @@ export function useEventOperations() {
 
   const [newEvent, setNewEvent] = useState<NewEventForm>(initialNewEventState)
 
-  const [editEventDialog, setEditEventDialog] = useState<EditEventDialogState>(initialEditEventState)
+  const [editEventDialog, setEditEventDialog] =
+    useState<EditEventDialogState>(initialEditEventState)
 
   // 處理日期點擊 - 直接開啟新增個人事項
   const handleDateClick = (info: DateClickArg) => {

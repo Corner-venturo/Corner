@@ -15,7 +15,13 @@ import { ContentContainer } from '@/components/layout/content-container'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useTravelInvoiceStore } from '@/stores/travel-invoice-store'
@@ -40,7 +46,7 @@ export default function InvoiceDetailPage() {
         setHasLoaded(true)
       }
     }
-    loadInvoice().catch((err) => logger.error('[loadInvoice]', err))
+    loadInvoice().catch(err => logger.error('[loadInvoice]', err))
   }, [params.id, fetchInvoiceById])
 
   useEffect(() => {
@@ -63,12 +69,18 @@ export default function InvoiceDetailPage() {
       setShowVoidDialog(false)
       setVoidReason('')
     } catch (error) {
-      await alert(error instanceof Error ? error.message : TRAVEL_INVOICE_LABELS.UNKNOWN_ERROR, 'error')
+      await alert(
+        error instanceof Error ? error.message : TRAVEL_INVOICE_LABELS.UNKNOWN_ERROR,
+        'error'
+      )
     }
   }
 
   const getStatusBadge = (status: string) => {
-    const statusMap: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+    const statusMap: Record<
+      string,
+      { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+    > = {
       pending: { label: TRAVEL_INVOICE_LABELS.STATUS_PENDING, variant: 'secondary' },
       issued: { label: TRAVEL_INVOICE_LABELS.STATUS_ISSUED, variant: 'default' },
       voided: { label: TRAVEL_INVOICE_LABELS.STATUS_VOIDED, variant: 'destructive' },
@@ -105,12 +117,12 @@ export default function InvoiceDetailPage() {
         onBack={() => router.push('/finance/travel-invoice')}
         contentClassName="flex-1 flex items-center justify-center"
       >
-          <NotFoundState
-            title={TRAVEL_INVOICE_DETAIL_LABELS.NOT_FOUND_6549}
-            description={TRAVEL_INVOICE_DETAIL_LABELS.DELETE_4958}
-            backButtonLabel={TRAVEL_INVOICE_LABELS.BACK_TO_LIST}
-            backHref="/finance/travel-invoice"
-          />
+        <NotFoundState
+          title={TRAVEL_INVOICE_DETAIL_LABELS.NOT_FOUND_6549}
+          description={TRAVEL_INVOICE_DETAIL_LABELS.DELETE_4958}
+          backButtonLabel={TRAVEL_INVOICE_LABELS.BACK_TO_LIST}
+          backHref="/finance/travel-invoice"
+        />
       </ContentPageLayout>
     )
   }
@@ -125,9 +137,7 @@ export default function InvoiceDetailPage() {
       icon={FileText}
       showBackButton={true}
       onBack={() => router.push('/finance/travel-invoice')}
-      badge={
-        <span className="ml-2">{getStatusBadge(currentInvoice.status)}</span>
-      }
+      badge={<span className="ml-2">{getStatusBadge(currentInvoice.status)}</span>}
       headerActions={
         currentInvoice.status === 'issued' ? (
           <Button
@@ -151,7 +161,9 @@ export default function InvoiceDetailPage() {
             </CardHeader>
             <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div>
-                <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.INVOICE_NUMBER}</p>
+                <p className="text-sm text-morandi-secondary">
+                  {TRAVEL_INVOICE_LABELS.INVOICE_NUMBER}
+                </p>
                 <p className="font-medium text-morandi-primary">
                   {currentInvoice.invoice_number || TRAVEL_INVOICE_LABELS.NOT_OBTAINED}
                 </p>
@@ -171,9 +183,14 @@ export default function InvoiceDetailPage() {
                 </p>
               </div>
               <div>
-                <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_LABELS.TOTAL_AMOUNT}</p>
+                <p className="text-sm text-morandi-secondary">
+                  {TRAVEL_INVOICE_LABELS.TOTAL_AMOUNT}
+                </p>
                 <p className="font-medium text-lg text-morandi-gold">
-                  <CurrencyCell amount={currentInvoice.total_amount} className="font-medium text-lg text-morandi-gold" />
+                  <CurrencyCell
+                    amount={currentInvoice.total_amount}
+                    className="font-medium text-lg text-morandi-gold"
+                  />
                 </p>
               </div>
             </CardContent>
@@ -215,7 +232,9 @@ export default function InvoiceDetailPage() {
           {/* 商品明細 */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">{TRAVEL_INVOICE_DETAIL_LABELS.PRODUCT_DETAILS}</CardTitle>
+              <CardTitle className="text-base">
+                {TRAVEL_INVOICE_DETAIL_LABELS.PRODUCT_DETAILS}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="border border-border/60 rounded-lg overflow-hidden">
@@ -250,10 +269,16 @@ export default function InvoiceDetailPage() {
                           {item.item_unit}
                         </td>
                         <td className="py-3 px-4 text-sm text-morandi-primary text-right">
-                          <CurrencyCell amount={item.item_price} className="text-sm text-morandi-primary" />
+                          <CurrencyCell
+                            amount={item.item_price}
+                            className="text-sm text-morandi-primary"
+                          />
                         </td>
                         <td className="py-3 px-4 text-sm text-morandi-primary text-right font-medium">
-                          <CurrencyCell amount={item.itemAmt} className="text-sm text-morandi-primary font-medium" />
+                          <CurrencyCell
+                            amount={item.itemAmt}
+                            className="text-sm text-morandi-primary font-medium"
+                          />
                         </td>
                       </tr>
                     ))}
@@ -267,17 +292,23 @@ export default function InvoiceDetailPage() {
           {currentInvoice.status === 'issued' && currentInvoice.randomNum && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">{TRAVEL_INVOICE_DETAIL_LABELS.INVOICE_INFO}</CardTitle>
+                <CardTitle className="text-base">
+                  {TRAVEL_INVOICE_DETAIL_LABELS.INVOICE_INFO}
+                </CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-2 gap-6">
                 <div>
-                  <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_DETAIL_LABELS.RANDOM_CODE}</p>
+                  <p className="text-sm text-morandi-secondary">
+                    {TRAVEL_INVOICE_DETAIL_LABELS.RANDOM_CODE}
+                  </p>
                   <p className="font-medium font-mono text-morandi-primary">
                     {currentInvoice.randomNum}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_DETAIL_LABELS.BARCODE}</p>
+                  <p className="text-sm text-morandi-secondary">
+                    {TRAVEL_INVOICE_DETAIL_LABELS.BARCODE}
+                  </p>
                   <p className="font-medium font-mono text-sm text-morandi-primary">
                     {currentInvoice.barcode || '-'}
                   </p>
@@ -290,19 +321,32 @@ export default function InvoiceDetailPage() {
           {currentInvoice.status === 'voided' && (
             <Card className="border-status-danger/30">
               <CardHeader>
-                <CardTitle className="text-base text-status-danger">{TRAVEL_INVOICE_DETAIL_LABELS.VOID_INFO}</CardTitle>
+                <CardTitle className="text-base text-status-danger">
+                  {TRAVEL_INVOICE_DETAIL_LABELS.VOID_INFO}
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div>
-                  <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_DETAIL_LABELS.VOID_TIME}</p>
+                  <p className="text-sm text-morandi-secondary">
+                    {TRAVEL_INVOICE_DETAIL_LABELS.VOID_TIME}
+                  </p>
                   <p className="font-medium text-morandi-primary">
-                    {currentInvoice.voidDate
-                      ? <DateCell date={currentInvoice.voidDate} format="time" showIcon={false} className="font-medium text-morandi-primary" />
-                      : '-'}
+                    {currentInvoice.voidDate ? (
+                      <DateCell
+                        date={currentInvoice.voidDate}
+                        format="time"
+                        showIcon={false}
+                        className="font-medium text-morandi-primary"
+                      />
+                    ) : (
+                      '-'
+                    )}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-morandi-secondary">{TRAVEL_INVOICE_DETAIL_LABELS.VOID_REASON}</p>
+                  <p className="text-sm text-morandi-secondary">
+                    {TRAVEL_INVOICE_DETAIL_LABELS.VOID_REASON}
+                  </p>
                   <p className="font-medium text-morandi-primary">
                     {currentInvoice.voidReason || '-'}
                   </p>
@@ -321,7 +365,9 @@ export default function InvoiceDetailPage() {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="voidReason">{TRAVEL_INVOICE_DETAIL_LABELS.VOID_REASON_REQUIRED}</Label>
+              <Label htmlFor="voidReason">
+                {TRAVEL_INVOICE_DETAIL_LABELS.VOID_REASON_REQUIRED}
+              </Label>
               <Input
                 id="voidReason"
                 value={voidReason}

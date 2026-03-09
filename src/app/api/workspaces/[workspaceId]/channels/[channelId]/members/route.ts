@@ -32,7 +32,8 @@ export async function GET(_request: Request, { params }: RouteParams) {
   try {
     const supabase = getSupabaseAdminClient()
 
-    const { data, error } = await supabase.from('channel_members')
+    const { data, error } = await supabase
+      .from('channel_members')
       .select(
         `
           id,
@@ -62,7 +63,6 @@ export async function GET(_request: Request, { params }: RouteParams) {
       return ApiError.database(error.message)
     }
 
-     
     const members = (data || []).map((member: Record<string, any>) => ({
       id: member.id as string,
       workspaceId: member.workspace_id as string,
@@ -110,7 +110,9 @@ export async function POST(request: Request, { params }: RouteParams) {
   const body = await request.json().catch(() => ({}))
   const parsed = addChannelMembersSchema.safeParse(body)
   if (!parsed.success) {
-    return ApiError.validation(parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; '))
+    return ApiError.validation(
+      parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; ')
+    )
   }
   const { employeeIds, role } = parsed.data
 

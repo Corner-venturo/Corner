@@ -126,7 +126,9 @@ export async function POST(request: NextRequest) {
             }
           } catch (err) {
             results.customers.failed++
-            results.customers.errors.push(`${customer.id}: ${err instanceof Error ? err.message : '未知錯誤'}`)
+            results.customers.errors.push(
+              `${customer.id}: ${err instanceof Error ? err.message : '未知錯誤'}`
+            )
           }
         }
       }
@@ -179,7 +181,9 @@ export async function POST(request: NextRequest) {
             }
           } catch (err) {
             results.order_members.failed++
-            results.order_members.errors.push(`${member.id}: ${err instanceof Error ? err.message : '未知錯誤'}`)
+            results.order_members.errors.push(
+              `${member.id}: ${err instanceof Error ? err.message : '未知錯誤'}`
+            )
           }
         }
       }
@@ -240,7 +244,7 @@ async function callOcrSpace(base64Image: string): Promise<string | null> {
     const response = await fetch('https://api.ocr.space/parse/image', {
       method: 'POST',
       headers: {
-        'apikey': OCR_SPACE_API_KEY!,
+        apikey: OCR_SPACE_API_KEY!,
       },
       body: formData,
     })

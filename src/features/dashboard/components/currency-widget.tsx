@@ -3,7 +3,13 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { DollarSign, ArrowRightLeft, TrendingUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { DASHBOARD_LABELS } from '@/features/dashboard/constants/labels'
 
 export function CurrencyWidget() {
@@ -117,7 +123,6 @@ export function CurrencyWidget() {
   // 初始化外幣金額
   useEffect(() => {
     setForeignAmount(calculateForeign(twdAmount))
-     
   }, []) // 只在組件掛載時執行一次
 
   const currencyInfo = DEFAULT_RATES[selectedCurrency]
@@ -165,7 +170,7 @@ export function CurrencyWidget() {
             </label>
             <Select
               value={selectedCurrency}
-              onValueChange={(value) => {
+              onValueChange={value => {
                 setSelectedCurrency(value as keyof typeof DEFAULT_RATES)
                 setUseCustomRate(false)
               }}
@@ -189,7 +194,9 @@ export function CurrencyWidget() {
               {/* Left Input - 根據 direction 決定顯示哪個貨幣 */}
               <div className="flex-1">
                 <label className="text-xs font-semibold text-morandi-primary mb-2 block">
-                  {direction === 'twd-to-foreign' ? `${DASHBOARD_LABELS.twd} (TWD)` : `${currencyInfo.name} (${selectedCurrency})`}
+                  {direction === 'twd-to-foreign'
+                    ? `${DASHBOARD_LABELS.twd} (TWD)`
+                    : `${currencyInfo.name} (${selectedCurrency})`}
                 </label>
                 <div className="relative group">
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-morandi-secondary/70 text-xs font-semibold">
@@ -198,7 +205,11 @@ export function CurrencyWidget() {
                   <input
                     type="number"
                     value={direction === 'twd-to-foreign' ? twdAmount : foreignAmount}
-                    onChange={e => direction === 'twd-to-foreign' ? handleTwdChange(e.target.value) : handleForeignChange(e.target.value)}
+                    onChange={e =>
+                      direction === 'twd-to-foreign'
+                        ? handleTwdChange(e.target.value)
+                        : handleForeignChange(e.target.value)
+                    }
                     className="w-full px-3.5 py-2.5 pl-[46px] border border-border/60 rounded-xl font-mono text-sm font-medium bg-card/90 hover:bg-card hover:shadow-sm focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm"
                     placeholder={direction === 'twd-to-foreign' ? '10000' : '0.00'}
                   />
@@ -211,16 +222,20 @@ export function CurrencyWidget() {
                 className="p-2.5 hover:bg-card/80 rounded-xl transition-all group mb-0.5 shadow-sm hover:shadow-md border border-transparent hover:border-border/60"
                 title={DASHBOARD_LABELS.exchangePositions}
               >
-                <ArrowRightLeft className={cn(
-                  "h-4 w-4 text-morandi-gold group-hover:scale-110 transition-all duration-300",
-                  direction === 'foreign-to-twd' && "rotate-180"
-                )} />
+                <ArrowRightLeft
+                  className={cn(
+                    'h-4 w-4 text-morandi-gold group-hover:scale-110 transition-all duration-300',
+                    direction === 'foreign-to-twd' && 'rotate-180'
+                  )}
+                />
               </button>
 
               {/* Right Input - 根據 direction 決定顯示哪個貨幣 */}
               <div className="flex-1">
                 <label className="text-xs font-semibold text-morandi-primary mb-2 block">
-                  {direction === 'twd-to-foreign' ? `${currencyInfo.name} (${selectedCurrency})` : `${DASHBOARD_LABELS.twd} (TWD)`}
+                  {direction === 'twd-to-foreign'
+                    ? `${currencyInfo.name} (${selectedCurrency})`
+                    : `${DASHBOARD_LABELS.twd} (TWD)`}
                 </label>
                 <div className="relative group">
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-morandi-secondary/70 text-xs font-semibold">
@@ -229,7 +244,11 @@ export function CurrencyWidget() {
                   <input
                     type="number"
                     value={direction === 'twd-to-foreign' ? foreignAmount : twdAmount}
-                    onChange={e => direction === 'twd-to-foreign' ? handleForeignChange(e.target.value) : handleTwdChange(e.target.value)}
+                    onChange={e =>
+                      direction === 'twd-to-foreign'
+                        ? handleForeignChange(e.target.value)
+                        : handleTwdChange(e.target.value)
+                    }
                     className="w-full px-3.5 py-2.5 pl-[46px] border border-border/60 rounded-xl font-mono text-sm font-medium bg-card/90 hover:bg-card hover:shadow-sm focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm"
                     placeholder={direction === 'twd-to-foreign' ? '0.00' : '10000'}
                   />
@@ -242,7 +261,9 @@ export function CurrencyWidget() {
           <div className="rounded-xl bg-card/70 p-3.5 shadow-md border border-border/40 space-y-2.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-semibold text-morandi-primary">
-                {DASHBOARD_LABELS.EXCHANGE_RATE_PREFIX}{selectedCurrency}{DASHBOARD_LABELS.EXCHANGE_RATE_SUFFIX}
+                {DASHBOARD_LABELS.EXCHANGE_RATE_PREFIX}
+                {selectedCurrency}
+                {DASHBOARD_LABELS.EXCHANGE_RATE_SUFFIX}
               </label>
               <button
                 onClick={() => {
@@ -268,7 +289,9 @@ export function CurrencyWidget() {
             <div className="flex items-center gap-1.5 text-xs text-morandi-secondary/90 bg-card/40 px-2.5 py-1.5 rounded-lg">
               <TrendingUp className="w-3.5 h-3.5 text-morandi-gold" />
               <span className="font-medium">
-                {useCustomRate ? DASHBOARD_LABELS.CUSTOM_RATE : `${DASHBOARD_LABELS.DEFAULT_RATE_PREFIX}${DEFAULT_RATES[selectedCurrency].rate}`}
+                {useCustomRate
+                  ? DASHBOARD_LABELS.CUSTOM_RATE
+                  : `${DASHBOARD_LABELS.DEFAULT_RATE_PREFIX}${DEFAULT_RATES[selectedCurrency].rate}`}
               </span>
             </div>
           </div>

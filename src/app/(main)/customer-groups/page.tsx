@@ -6,8 +6,13 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { Users, Edit2, Trash2, Plus, UserPlus, ChevronDown, ChevronRight } from 'lucide-react'
 import {
-  useCustomerGroups, createCustomerGroup, updateCustomerGroup, deleteCustomerGroup,
-  useCustomerGroupMembers, createCustomerGroupMember, deleteCustomerGroupMember,
+  useCustomerGroups,
+  createCustomerGroup,
+  updateCustomerGroup,
+  deleteCustomerGroup,
+  useCustomerGroupMembers,
+  createCustomerGroupMember,
+  deleteCustomerGroupMember,
   useCustomers,
 } from '@/data'
 import { useAuthStore } from '@/stores'
@@ -18,11 +23,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { FormDialog } from '@/components/dialog'
 import { Combobox } from '@/components/ui/combobox'
-import type {
-  CustomerGroup,
-  CustomerGroupMember,
-  CustomerGroupType,
-} from '@/stores/types'
+import type { CustomerGroup, CustomerGroupMember, CustomerGroupType } from '@/stores/types'
 
 const GROUP_TYPE_LABELS: Record<CustomerGroupType, string> = {
   family: LABELS.TYPE_FAMILY,
@@ -133,14 +134,20 @@ export default function CustomerGroupsPage() {
     async (group: CustomerGroup) => {
       const members = getGroupMembers(group.id)
       if (members.length > 0) {
-        await alert(`${LABELS.HAS_MEMBERS_PREFIX}${members.length}${LABELS.HAS_MEMBERS_SUFFIX}`, 'warning')
+        await alert(
+          `${LABELS.HAS_MEMBERS_PREFIX}${members.length}${LABELS.HAS_MEMBERS_SUFFIX}`,
+          'warning'
+        )
         return
       }
 
-      const confirmed = await confirm(`${LABELS.CONFIRM_DELETE_PREFIX}${group.name}${LABELS.CONFIRM_DELETE_SUFFIX}`, {
-        type: 'warning',
-        title: LABELS.DELETE_GROUP_TITLE,
-      })
+      const confirmed = await confirm(
+        `${LABELS.CONFIRM_DELETE_PREFIX}${group.name}${LABELS.CONFIRM_DELETE_SUFFIX}`,
+        {
+          type: 'warning',
+          title: LABELS.DELETE_GROUP_TITLE,
+        }
+      )
 
       if (confirmed) {
         try {
@@ -201,10 +208,13 @@ export default function CustomerGroupsPage() {
   const handleRemoveMember = useCallback(
     async (member: CustomerGroupMember) => {
       const customerName = getCustomerName(member.customer_id)
-      const confirmed = await confirm(`${LABELS.CONFIRM_REMOVE_PREFIX}${customerName}${LABELS.CONFIRM_REMOVE_SUFFIX}`, {
-        type: 'warning',
-        title: LABELS.REMOVE_MEMBER_TITLE,
-      })
+      const confirmed = await confirm(
+        `${LABELS.CONFIRM_REMOVE_PREFIX}${customerName}${LABELS.CONFIRM_REMOVE_SUFFIX}`,
+        {
+          type: 'warning',
+          title: LABELS.REMOVE_MEMBER_TITLE,
+        }
+      )
 
       if (confirmed) {
         try {
@@ -259,9 +269,7 @@ export default function CustomerGroupsPage() {
         key: 'name',
         label: LABELS.COL_GROUP_NAME,
         sortable: true,
-        render: (_, group) => (
-          <div className="font-medium text-morandi-primary">{group.name}</div>
-        ),
+        render: (_, group) => <div className="font-medium text-morandi-primary">{group.name}</div>,
       },
       {
         key: 'type',
@@ -340,7 +348,9 @@ export default function CustomerGroupsPage() {
 
       return (
         <div className="p-4 bg-morandi-container/20">
-          <div className="text-sm font-medium text-morandi-primary mb-2">{LABELS.GROUP_MEMBERS}</div>
+          <div className="text-sm font-medium text-morandi-primary mb-2">
+            {LABELS.GROUP_MEMBERS}
+          </div>
           <div className="flex flex-wrap gap-2">
             {members.map(member => {
               const customerName = getCustomerName(member.customer_id)
@@ -433,9 +443,7 @@ export default function CustomerGroupsPage() {
             </label>
             <Combobox
               value={formData.type}
-              onChange={type =>
-                setFormData(prev => ({ ...prev, type: type as CustomerGroupType }))
-              }
+              onChange={type => setFormData(prev => ({ ...prev, type: type as CustomerGroupType }))}
               options={Object.entries(GROUP_TYPE_LABELS).map(([value, label]) => ({
                 value,
                 label,
@@ -444,7 +452,9 @@ export default function CustomerGroupsPage() {
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">{LABELS.REMARKS}</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">
+              {LABELS.REMARKS}
+            </label>
             <Input
               value={formData.notes}
               onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
@@ -479,9 +489,7 @@ export default function CustomerGroupsPage() {
             </label>
             <Combobox
               value={formData.type}
-              onChange={type =>
-                setFormData(prev => ({ ...prev, type: type as CustomerGroupType }))
-              }
+              onChange={type => setFormData(prev => ({ ...prev, type: type as CustomerGroupType }))}
               options={Object.entries(GROUP_TYPE_LABELS).map(([value, label]) => ({
                 value,
                 label,
@@ -490,7 +498,9 @@ export default function CustomerGroupsPage() {
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">{LABELS.REMARKS}</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">
+              {LABELS.REMARKS}
+            </label>
             <Input
               value={formData.notes}
               onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
@@ -526,9 +536,7 @@ export default function CustomerGroupsPage() {
             />
           </div>
           {availableCustomers.length === 0 && (
-            <p className="text-sm text-morandi-secondary">
-              {LABELS.NOT_FOUND_6103}
-            </p>
+            <p className="text-sm text-morandi-secondary">{LABELS.NOT_FOUND_6103}</p>
           )}
         </div>
       </FormDialog>

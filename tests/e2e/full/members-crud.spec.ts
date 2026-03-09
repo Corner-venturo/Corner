@@ -48,8 +48,14 @@ test.describe('團員 CRUD 測試', () => {
     console.log('✅ 團員名單分頁已開啟')
 
     // 檢查是否有成員表格或空狀態
-    const hasTable = await dialog.locator('table').isVisible({ timeout: 3000 }).catch(() => false)
-    const hasEmptyState = await dialog.locator('text=尚無').isVisible().catch(() => false)
+    const hasTable = await dialog
+      .locator('table')
+      .isVisible({ timeout: 3000 })
+      .catch(() => false)
+    const hasEmptyState = await dialog
+      .locator('text=尚無')
+      .isVisible()
+      .catch(() => false)
 
     if (hasTable) {
       const memberCount = await dialog.locator('table tbody tr').count()
@@ -101,7 +107,10 @@ test.describe('團員 CRUD 測試', () => {
 
     // 或者檢查是否有新增成員按鈕
     const addMemberButton = dialog.locator('button').filter({ hasText: /新增成員|新增/ })
-    const hasAddButton = await addMemberButton.first().isVisible({ timeout: 3000 }).catch(() => false)
+    const hasAddButton = await addMemberButton
+      .first()
+      .isVisible({ timeout: 3000 })
+      .catch(() => false)
 
     if (hasAddButton) {
       console.log('✅ 找到新增成員按鈕')
@@ -116,9 +125,18 @@ test.describe('團員 CRUD 測試', () => {
         console.log('✅ 新增成員對話框已開啟')
 
         // 檢查有哪些新增方式
-        const hasManualAdd = await addDialog.locator('text=手動').isVisible().catch(() => false)
-        const hasOcrAdd = await addDialog.locator('text=護照').isVisible().catch(() => false)
-        const hasSearchAdd = await addDialog.locator('text=搜尋').isVisible().catch(() => false)
+        const hasManualAdd = await addDialog
+          .locator('text=手動')
+          .isVisible()
+          .catch(() => false)
+        const hasOcrAdd = await addDialog
+          .locator('text=護照')
+          .isVisible()
+          .catch(() => false)
+        const hasSearchAdd = await addDialog
+          .locator('text=搜尋')
+          .isVisible()
+          .catch(() => false)
 
         console.log(`新增方式 - 手動: ${hasManualAdd}, OCR: ${hasOcrAdd}, 搜尋: ${hasSearchAdd}`)
 
@@ -160,7 +178,10 @@ test.describe('團員 CRUD 測試', () => {
     await page.waitForTimeout(1000)
 
     // 找新增成員按鈕
-    const addMemberButton = dialog.locator('button').filter({ hasText: /新增成員/ }).first()
+    const addMemberButton = dialog
+      .locator('button')
+      .filter({ hasText: /新增成員/ })
+      .first()
     if (!(await addMemberButton.isVisible({ timeout: 3000 }).catch(() => false))) {
       console.log('⚠️ 找不到新增成員按鈕')
       await page.keyboard.press('Escape')
@@ -190,7 +211,12 @@ test.describe('團員 CRUD 測試', () => {
 
       // 點擊新增按鈕
       const submitButton = addDialog.locator('button').filter({ hasText: /新增|確認/ })
-      if (await submitButton.first().isEnabled({ timeout: 2000 }).catch(() => false)) {
+      if (
+        await submitButton
+          .first()
+          .isEnabled({ timeout: 2000 })
+          .catch(() => false)
+      ) {
         await submitButton.first().click()
         await page.waitForTimeout(1000)
         console.log('✅ 已點擊新增按鈕')

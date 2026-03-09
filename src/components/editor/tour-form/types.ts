@@ -133,7 +133,14 @@ export interface TourCountry {
 // - art: 藝術雜誌風格（全螢幕大圖 + 高對比 + 不規則佈局）
 // - dreamscape: 夢幻漫遊風格（blob 遮罩 + 玻璃擬態 + 浮動動畫）
 // - collage: 互動拼貼風格（Pop Art + 拍立得 + 登機證）
-export type CoverStyleType = 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
+export type CoverStyleType =
+  | 'original'
+  | 'gemini'
+  | 'nature'
+  | 'luxury'
+  | 'art'
+  | 'dreamscape'
+  | 'collage'
 
 // 航班卡片風格類型：
 // - original: 經典莫蘭迪金色風格
@@ -144,7 +151,15 @@ export type CoverStyleType = 'original' | 'gemini' | 'nature' | 'luxury' | 'art'
 // - none: 國內無航班（台灣行程不需要航班）
 // - dreamscape: 夢幻漫遊風格（節點路徑圖 + 玻璃卡片）
 // - collage: 互動拼貼風格（登機證 + Pop Art）
-export type FlightStyleType = 'original' | 'chinese' | 'japanese' | 'luxury' | 'art' | 'none' | 'dreamscape' | 'collage'
+export type FlightStyleType =
+  | 'original'
+  | 'chinese'
+  | 'japanese'
+  | 'luxury'
+  | 'art'
+  | 'none'
+  | 'dreamscape'
+  | 'collage'
 
 // 每日行程風格類型：
 // - original: 經典時間軸風格

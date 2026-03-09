@@ -10,7 +10,8 @@ export const COMP_TOURS_LABELS = {
   _1小時30分: '1小時30分',
   _8_碼數字: '8 碼數字',
   div_class_no_flight_尚無航班資訊_div: '<div class="no-flight">尚無航班資訊</div>',
-  tr_td_colspan_3_style_padding_20px_text_align_center_color_999_尚未設定住宿資訊_td_tr: '<tr><td colspan="3" style="padding: 20px; text-align: center; color: #999;">尚未設定住宿資訊</td></tr>',
+  tr_td_colspan_3_style_padding_20px_text_align_center_color_999_尚未設定住宿資訊_td_tr:
+    '<tr><td colspan="3" style="padding: 20px; text-align: center; color: #999;">尚未設定住宿資訊</td></tr>',
   OP_獎金: 'OP 獎金',
   PNR_覆蓋確認: 'PNR 覆蓋確認',
   QR_Code_已下載: 'QR Code 已下載',
@@ -464,7 +465,8 @@ export const COMP_TOURS_LABELS = {
   INCREASE_PREFIX: '增加',
   DECREASE_PREFIX: '減少',
   SELECT_DAYS_TO_REMOVE: '請選擇要移除的',
-  SELECT_EXACT_DAYS: (required: number, selected: number) => `請選擇剛好 ${required} 天（目前已選 ${selected} 天）`,
+  SELECT_EXACT_DAYS: (required: number, selected: number) =>
+    `請選擇剛好 ${required} 天（目前已選 ${selected} 天）`,
   APPEND_BLANK_DAYS: '將在行程表末尾新增',
 
   MANAGE_972: '分配管理',
@@ -578,7 +580,8 @@ export const COMP_TOURS_LABELS = {
     `共 ${rooms} 間房，容量 ${capacity} 人，已分配 ${assigned} 人`,
   ADD_ROOM_NIGHT: (night: number) => `新增房間（第${night}晚）`,
   MOVE_ITEM: (source: string, target: string) => `移動 ${source} 到 ${target}`,
-  TABLE_ADDED: (tableNumber: number, capacity: number) => `已新增 ${tableNumber} 桌 (${capacity}人)`,
+  TABLE_ADDED: (tableNumber: number, capacity: number) =>
+    `已新增 ${tableNumber} 桌 (${capacity}人)`,
   TABLE_ENABLED_SUMMARY: (enabled: number, total: number) =>
     `已啟用 ${enabled} 餐分桌，共 ${total} 桌`,
   IMPORT_MEALS: (count: number) => `從行程帶入 ${count} 筆餐食`,
@@ -593,7 +596,7 @@ export const COMP_TOURS_LABELS = {
   CREATE_PACKAGE_FAILED_LOG: '建立 proposal_package 失敗:',
   UPDATE_TOUR_LINK_FAILED_LOG: '更新旅遊團關聯失敗:',
   CREATE_PACKAGE_ERROR_LOG: '建立 package 錯誤:',
-};
+}
 
 // CheckinSettings 模組的 UI 標籤
 export const CHECKIN_SETTINGS_LABELS = {
@@ -604,7 +607,7 @@ export const CHECKIN_SETTINGS_LABELS = {
   總人數: '總人數',
   已報到_簡稱: '已報到',
   未報到: '未報到',
-};
+}
 
 // CheckinMemberList 模組的 UI 標籤
 export const CHECKIN_MEMBER_LIST_LABELS = {
@@ -616,7 +619,7 @@ export const CHECKIN_MEMBER_LIST_LABELS = {
   已報到_狀態標籤: '已報到',
   取消: '取消',
   報到: '報到',
-};
+}
 
 // CheckinQRCode 模組的 UI 標籤
 export const CHECKIN_QR_CODE_LABELS = {
@@ -631,7 +634,7 @@ export const CHECKIN_QR_CODE_LABELS = {
   使用手機掃描上方_QR_Code: '使用手機掃描上方 QR Code',
   輸入您的姓名和身分證末4碼: '輸入您的姓名和身分證末4碼',
   確認資訊後點擊確認報到: '確認資訊後點擊「確認報到」',
-};
+}
 
 // BasicInfoSection 模組的 UI 標籤
 export const BASIC_INFO_SECTION_LABELS = {
@@ -643,7 +646,7 @@ export const BASIC_INFO_SECTION_LABELS = {
   描述: '描述',
   特殊團: '特殊團',
   開啟報到功能: '開啟報到功能',
-};
+}
 
 // TourOrders 模組的 UI 標籤
 export const TOUR_ORDERS_LABELS = {
@@ -652,7 +655,7 @@ export const TOUR_ORDERS_LABELS = {
   新增訂單成功: '訂單已建立',
   新增訂單失敗: '新增訂單失敗，請稍後再試',
   請款成功: '請款單已建立',
-};
+}
 
 // TourPrintDialog 模組的 UI 標籤
 export const TOUR_PRINT_DIALOG_LABELS = {
@@ -682,7 +685,8 @@ export const TOUR_PRINT_DIALOG_LABELS = {
   電子機票: (code: string) => `電子機票 - ${code}`,
   第_航廈: (terminal: string) => `第${terminal}航廈`,
   經濟艙_Economy: '經濟艙 Economy',
-  此文件資訊僅供參考_實際資訊以航空公司及相關旅遊供應商為準: '**** 此文件資訊僅供參考，實際資訊以航空公司及相關旅遊供應商為準 ****',
+  此文件資訊僅供參考_實際資訊以航空公司及相關旅遊供應商為準:
+    '**** 此文件資訊僅供參考，實際資訊以航空公司及相關旅遊供應商為準 ****',
   住宿確認單: '住宿確認單',
   台北市大同區重慶北路一段67號八樓之二: '台北市大同區重慶北路一段67號八樓之二',
   團號: (code: string) => `團號: ${code}`,
@@ -691,12 +695,14 @@ export const TOUR_PRINT_DIALOG_LABELS = {
   飯店名稱: '飯店名稱',
   入住日期: '入住日期',
   退房日期: '退房日期',
-  此確認單僅供參考_實際訂房資訊以飯店確認為準: '**** 此確認單僅供參考，實際訂房資訊以飯店確認為準 ****',
+  此確認單僅供參考_實際訂房資訊以飯店確認為準:
+    '**** 此確認單僅供參考，實際訂房資訊以飯店確認為準 ****',
   取消: '取消',
   票號_冒號: '票號:',
   div_class_no_flight_尚無航班資訊_div: '<div class="no-flight">尚無航班資訊</div>',
-  tr_td_colspan_3_style_padding_20px_text_align_center_color_999_尚未設定住宿資訊_td_tr: '<tr><td colspan="3" style="padding: 20px; text-align: center; color: #999;">尚未設定住宿資訊</td></tr>',
-};
+  tr_td_colspan_3_style_padding_20px_text_align_center_color_999_尚未設定住宿資訊_td_tr:
+    '<tr><td colspan="3" style="padding: 20px; text-align: center; color: #999;">尚未設定住宿資訊</td></tr>',
+}
 
 // TourPnrToolDialog 模組的 UI 標籤
 export const TOUR_PNR_TOOL_DIALOG_LABELS = {
@@ -730,7 +736,8 @@ export const TOUR_PNR_TOOL_DIALOG_LABELS = {
   以下乘客未比對到團員_需手動選擇或新增團員: '以下乘客未比對到團員（需手動選擇或新增團員）：',
   PNR_已存在_已更新資料: (pnr: string) => `PNR ${pnr} 已存在，已更新資料`,
   開始更新_位團員的_PNR: (count: number, pnr: string) => `開始更新 ${count} 位團員的 PNR: ${pnr}`,
-  已更新_pnr: (name: string, pnr: string, ticketInfo: string) => `${name} 已更新: pnr=${pnr}${ticketInfo}`,
+  已更新_pnr: (name: string, pnr: string, ticketInfo: string) =>
+    `${name} 已更新: pnr=${pnr}${ticketInfo}`,
   票號: (ticket: string) => `, 票號=${ticket}`,
   更新失敗: (errors: string) => `更新失敗: ${errors}`,
   找不到該團員: (name: string, id: string) => `${name}: 找不到該團員(${id})`,
@@ -758,7 +765,7 @@ export const TOUR_PNR_TOOL_DIALOG_LABELS = {
   新增團員失敗: '新增團員失敗',
   團員label: '團員',
   人label: '人',
-};
+}
 
 // TourItineraryTab 模組的 UI 標籤
 export const TOUR_ITINERARY_TAB_LABELS = {
@@ -878,7 +885,7 @@ export const TOUR_ITINERARY_TAB_LABELS = {
   SEARCH_8458: '輸入航班號搜尋，或直接新增空白列',
   SEARCH_3338: '搜尋航班',
   ADD_9636: '新增空白列',
-};
+}
 
 // TourCosts 模組的 UI 標籤
 export const TOUR_COSTS_LABELS = {
@@ -946,9 +953,9 @@ export const TOUR_COSTS_LABELS = {
   CAT_GUIDE: '導遊',
   CAT_OTHER: '其他',
   UPLOADED: '已上傳',
-};
+}
 
-// FlightInfoSection 模組的 UI 標籤  
+// FlightInfoSection 模組的 UI 標籤
 export const FLIGHT_INFO_SECTION_LABELS = {
   航班資訊_選填: '航班資訊（選填）',
   去程航班: '去程航班',
@@ -969,8 +976,7 @@ export const FLIGHT_INFO_SECTION_LABELS = {
   _23_45: '23:45',
   _1h_30m: '1h 30m',
   _2h_15m: '2h 15m',
-};
-
+}
 
 export const INVOICE_LABELS = {
   ISSUE_DATE: '開立日期',
@@ -1044,7 +1050,8 @@ export const TOUR_SERVICE_LABELS = {
   STATUS_ACTIVE: '待出發',
   STATUS_CANCELLED: '取消',
   STATUS_SPECIAL: '特殊團',
-  INVALID_STATUS_TRANSITION: (from: string, to: string) => `不允許的狀態轉換：無法從 "${from}" 更新為 "${to}"`,
+  INVALID_STATUS_TRANSITION: (from: string, to: string) =>
+    `不允許的狀態轉換：無法從 "${from}" 更新為 "${to}"`,
   YEAR_TOUR_NAME: (year: number, name: string) => `${year}年度${name}`,
   VISA_TOUR_NAME: '簽證專用團',
   VISA_TOUR_LOCATION: '簽證專用',
@@ -1065,7 +1072,8 @@ export const TOUR_PAYMENTS_LABELS = {
   CREATE_RECEIPT_FAILED: '建立收款單失敗',
   ENTER_BUYER_NAME: '請輸入買受人名稱',
   FILL_PRODUCT_INFO: '請完整填寫商品資訊',
-  AMOUNT_EXCEED_CONFIRM: (invoiceAmount: string, paidAmount: string) => `發票金額 NT$ ${invoiceAmount} 超過已收款金額 NT$ ${paidAmount}，確定要開立嗎？`,
+  AMOUNT_EXCEED_CONFIRM: (invoiceAmount: string, paidAmount: string) =>
+    `發票金額 NT$ ${invoiceAmount} 超過已收款金額 NT$ ${paidAmount}，確定要開立嗎？`,
   AMOUNT_EXCEED_TITLE: '金額超開提醒',
   INVOICE_SUCCESS: '代轉發票開立成功',
   INVOICE_FAILED: '開立發票失敗',
@@ -1082,7 +1090,8 @@ export const TOUR_OPERATIONS_LABELS = {
   SELECT_CITY_OR_SET_AIRPORT: '請選擇城市，或在「系統設定 > 地區管理」中為該城市設定機場代碼',
   CREATE_TOUR_FAILED: '建立旅遊團失敗',
   INVALID_TOUR: '無效的旅遊團',
-  CANNOT_DELETE_HAS_DEPS: (blockers: string) => `無法刪除：此旅遊團有 ${blockers}，請先刪除相關資料`,
+  CANNOT_DELETE_HAS_DEPS: (blockers: string) =>
+    `無法刪除：此旅遊團有 ${blockers}，請先刪除相關資料`,
   CANNOT_DELETE_PAID_ORDERS: (count: number) => `此團有 ${count} 筆已付款訂單，無法刪除`,
   DELETE_TOUR_FAILED: '刪除旅遊團失敗',
 }
@@ -1100,7 +1109,8 @@ export const TOURS_ADVANCED_LABELS = {
 // ============================================================
 export const TOUR_FORM_LABELS = {
   ENTER_FLIGHT_NUMBER: '請先輸入航班號碼',
-  FLIGHT_FOUND: (airline: string, flightNumber: string) => `已查詢到航班: ${airline} ${flightNumber}`,
+  FLIGHT_FOUND: (airline: string, flightNumber: string) =>
+    `已查詢到航班: ${airline} ${flightNumber}`,
   FLIGHT_QUERY_ERROR: '查詢航班時發生錯誤',
 }
 
@@ -1110,7 +1120,8 @@ export const TOUR_FORM_LABELS = {
 export const TOUR_CLOSING_LABELS = {
   SALES_BONUS: '業務獎金',
   OP_BONUS: 'OP獎金',
-  SALES_BONUS_DESC: (tourCode: string, percent: number) => `${tourCode} 結案獎金 - 業務 ${percent}%`,
+  SALES_BONUS_DESC: (tourCode: string, percent: number) =>
+    `${tourCode} 結案獎金 - 業務 ${percent}%`,
   OP_BONUS_DESC: (tourCode: string, percent: number) => `${tourCode} 結案獎金 - OP ${percent}%`,
   CLOSING_SUCCESS: '結案完成，獎金請款單已產生',
   CLOSING_FAILED: '結案失敗',
@@ -1133,7 +1144,8 @@ export const TOUR_CONFIRMATION_LABELS = {
 // Tour Channel Operations
 // ============================================================
 export const TOUR_CHANNEL_LABELS = {
-  CREATE_CONFIRM: (tourName: string, channelName: string) => `是否要為「${tourName}」建立工作頻道？\n\n頻道名稱：${channelName}\n\n建立後可在工作空間中與團隊成員討論此旅遊團事宜。`,
+  CREATE_CONFIRM: (tourName: string, channelName: string) =>
+    `是否要為「${tourName}」建立工作頻道？\n\n頻道名稱：${channelName}\n\n建立後可在工作空間中與團隊成員討論此旅遊團事宜。`,
   CREATE_CHANNEL: '建立頻道',
   CREATING: '正在建立頻道...',
   WORKSPACE_NOT_FOUND: '找不到工作空間',
@@ -1160,7 +1172,8 @@ export const LINK_DOCUMENTS_LABELS = {
 // Tour Webpage Tab
 // ============================================================
 export const TOUR_WEBPAGE_TAB_LABELS = {
-  SAVE_LEADER_CONFIRM: (name: string) => `要將「${name}」新增到領隊資料庫嗎？\n下次可以直接搜尋選用。`,
+  SAVE_LEADER_CONFIRM: (name: string) =>
+    `要將「${name}」新增到領隊資料庫嗎？\n下次可以直接搜尋選用。`,
   SAVE_LEADER_TITLE: '儲存領隊資料',
   AUTO_SAVE_FAILED: '自動存檔失敗，請手動儲存',
   ITINERARY_CREATED: '行程表已建立',
@@ -1215,7 +1228,8 @@ export const PNR_TOOL_LABELS = {
   PNR_EXISTS_UPDATED: (pnr: string) => `PNR ${pnr} 已存在，已更新資料`,
   UPDATE_START: (count: number, pnr: string) => `開始更新 ${count} 位團員的 PNR: ${pnr}`,
   TICKET_INFO: (ticketNumber: string) => `, 票號=${ticketNumber}`,
-  MEMBER_UPDATED: (name: string, pnr: string, ticketInfo: string) => `${name} 已更新: pnr=${pnr}${ticketInfo}`,
+  MEMBER_UPDATED: (name: string, pnr: string, ticketInfo: string) =>
+    `${name} 已更新: pnr=${pnr}${ticketInfo}`,
   MEMBER_NOT_FOUND: (name: string, memberId: string) => `${name}: 找不到該團員(${memberId})`,
   UPDATE_FAILED: (errors: string) => `更新失敗: ${errors}`,
   PNR_SAVED: (pnr: string, count: number) => `PNR ${pnr} 已儲存，更新 ${count} 位團員`,
@@ -1246,7 +1260,7 @@ export const TOUR_DETAIL_PAGE_LABELS = {
 export const TOUR_HEALTH_LABELS = {
   團況健康度: '團況健康度',
   需求單狀態: '需求單狀態',
-  護照資料: '護照資料', 
+  護照資料: '護照資料',
   機票狀態: '機票狀態',
   飯店確認: '飯店確認',
   團員人數: '團員人數',
@@ -1258,7 +1272,7 @@ export const TOUR_HEALTH_LABELS = {
   人滿團: '人（滿團）',
   尚未開團: '尚未開團',
   載入中: '載入中...',
-  載入失敗: '載入失敗，請稍後再試'
+  載入失敗: '載入失敗，請稍後再試',
 } as const
 
 // Add missing tab labels used by TourTabs

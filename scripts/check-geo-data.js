@@ -7,10 +7,7 @@ const supabase = createClient(
 
 async function check() {
   // 查看 countries 表
-  const { data: countries, error: e1 } = await supabase
-    .from('countries')
-    .select('*')
-    .order('name')
+  const { data: countries, error: e1 } = await supabase.from('countries').select('*').order('name')
 
   console.log('=== 國家資料表 (countries) ===')
   if (e1) {
@@ -42,18 +39,18 @@ async function check() {
       byCountry[c.country_id].push(c)
     })
 
-    Object.keys(byCountry).sort().forEach(countryId => {
-      console.log(`\n【${countryId}】${byCountry[countryId].length} 個城市`)
-      byCountry[countryId].forEach(c => {
-        console.log(`  ${c.id} | ${c.name} | ${c.name_en || '-'}`)
+    Object.keys(byCountry)
+      .sort()
+      .forEach(countryId => {
+        console.log(`\n【${countryId}】${byCountry[countryId].length} 個城市`)
+        byCountry[countryId].forEach(c => {
+          console.log(`  ${c.id} | ${c.name} | ${c.name_en || '-'}`)
+        })
       })
-    })
   }
 
   // 檢查 attractions 用到的 country_id 和 city_id
-  const { data: attractions } = await supabase
-    .from('attractions')
-    .select('country_id, city_id')
+  const { data: attractions } = await supabase.from('attractions').select('country_id, city_id')
 
   const usedCountries = new Set()
   const usedCities = new Set()

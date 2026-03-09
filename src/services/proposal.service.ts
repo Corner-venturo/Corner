@@ -32,13 +32,9 @@ const itinerariesDb = () => dynamicFrom('itineraries')
 /**
  * 建立提案
  */
-export async function createProposal(
-  data: CreateProposalData,
-  userId: string
-): Promise<Proposal> {
+export async function createProposal(data: CreateProposalData, userId: string): Promise<Proposal> {
   // 1. 取得現有提案以生成編號（RLS 自動過濾 workspace）
-  const { data: existingProposals } = await proposalsDb()
-    .select('code')
+  const { data: existingProposals } = await proposalsDb().select('code')
 
   const code = generateProposalCode((existingProposals || []) as { code?: string }[])
 
@@ -51,10 +47,7 @@ export async function createProposal(
     updated_by: userId,
   }
 
-  const { data: proposal, error } = await proposalsDb()
-    .insert(proposalData)
-    .select()
-    .single()
+  const { data: proposal, error } = await proposalsDb().insert(proposalData).select().single()
 
   if (error) {
     logger.error('建立提案失敗:', error)
@@ -143,7 +136,9 @@ export async function deleteProposal(proposal: Proposal): Promise<void> {
     .eq('proposal_id' as string, proposal.id)
   if (tourUnlinkError) {
     logger.error('[deleteProposal] 解除旅遊團關聯失敗:', tourUnlinkError)
-    throw new Error(`解除旅遊團關聯失敗: ${tourUnlinkError.message || tourUnlinkError.code || JSON.stringify(tourUnlinkError)}`)
+    throw new Error(
+      `解除旅遊團關聯失敗: ${tourUnlinkError.message || tourUnlinkError.code || JSON.stringify(tourUnlinkError)}`
+    )
   }
 
   // 3. 清除提案的 selected_package_id（避免外鍵衝突）
@@ -182,12 +177,12 @@ export async function deleteProposal(proposal: Proposal): Promise<void> {
 
     // 4c. 刪除相關套件
     logger.log('[deleteProposal] 正在刪除套件...', packageIds.length)
-    const { error: pkgError } = await packagesDb()
-      .delete()
-      .eq('proposal_id', proposal.id)
+    const { error: pkgError } = await packagesDb().delete().eq('proposal_id', proposal.id)
     if (pkgError) {
       logger.error('[deleteProposal] 刪除套件失敗:', pkgError)
-      throw new Error(`刪除套件失敗: ${pkgError.message || pkgError.code || JSON.stringify(pkgError)}`)
+      throw new Error(
+        `刪除套件失敗: ${pkgError.message || pkgError.code || JSON.stringify(pkgError)}`
+      )
     }
   }
 
@@ -207,10 +202,12 @@ export async function deleteProposal(proposal: Proposal): Promise<void> {
  */
 export async function getProposalWithPackages(id: string): Promise<Proposal | null> {
   const { data: proposal, error } = await proposalsDb()
-    .select(`
+    .select(
+      `
       *,
       packages:proposal_packages(*)
-    `)
+    `
+    )
     .eq('id', id)
     .single()
 
@@ -241,9 +238,7 @@ export async function createPackage(
     .limit(1)
 
   const packages = existingPackages as { version_number: number }[] | null
-  const versionNumber = packages && packages.length > 0
-    ? packages[0].version_number + 1
-    : 1
+  const versionNumber = packages && packages.length > 0 ? packages[0].version_number + 1 : 1
 
   // 2. 計算天數和晚數
   let days = data.days
@@ -269,14 +264,18 @@ export async function createPackage(
 
   logger.log('[createPackage] 插入資料:', JSON.stringify(packageData))
 
-  const { data: pkg, error } = await packagesDb()
-    .insert(packageData)
-    .select()
-    .single()
+  const { data: pkg, error } = await packagesDb().insert(packageData).select().single()
 
   if (error) {
     logger.error('[createPackage] 建立套件失敗:', JSON.stringify(error))
-    logger.error('[createPackage] 錯誤碼:', error.code, '訊息:', error.message, '詳情:', error.details)
+    logger.error(
+      '[createPackage] 錯誤碼:',
+      error.code,
+      '訊息:',
+      error.message,
+      '詳情:',
+      error.details
+    )
     throw new Error(`建立套件失敗: ${error.message} (code: ${error.code})`)
   }
 
@@ -358,10 +357,7 @@ export async function deletePackage(id: string): Promise<void> {
   logger.log('開始刪除套件:', id)
 
   // 刪除關聯的報價單（用 proposal_package_id 關聯）
-  const { error: quoteError } = await supabase
-    .from('quotes')
-    .delete()
-    .eq('proposal_package_id', id)
+  const { error: quoteError } = await supabase.from('quotes').delete().eq('proposal_package_id', id)
 
   if (quoteError) {
     logger.warn('刪除關聯報價單時發生錯誤:', quoteError.message)
@@ -382,9 +378,7 @@ export async function deletePackage(id: string): Promise<void> {
   }
 
   // 刪除套件
-  const { error } = await packagesDb()
-    .delete()
-    .eq('id', id)
+  const { error } = await packagesDb().delete().eq('id', id)
 
   if (error) {
     logger.error('刪除套件失敗:', error.message)
@@ -445,10 +439,7 @@ export async function convertToTour(
 /**
  * 為套件建立報價單
  */
-export async function createQuoteForPackage(
-  packageId: string,
-  userId: string
-): Promise<string> {
+export async function createQuoteForPackage(packageId: string, userId: string): Promise<string> {
   logger.log('createQuoteForPackage called with:', { packageId, userId })
 
   // 取得套件資訊（明確指定外鍵關聯）
@@ -470,9 +461,7 @@ export async function createQuoteForPackage(
   const pkg = pkgData as unknown as ProposalPackage & { proposal?: Proposal }
 
   // 生成報價單編號
-  const { data: existingQuotes } = await supabase
-    .from('quotes')
-    .select('code')
+  const { data: existingQuotes } = await supabase.from('quotes').select('code')
 
   // 使用現有的報價單生成邏輯...
   // 這裡簡化處理，實際應該調用 generateCode
@@ -503,9 +492,7 @@ export async function createQuoteForPackage(
   }
 
   // 更新套件關聯
-  await packagesDb()
-    .update({ quote_id: quote.id })
-    .eq('id', packageId)
+  await packagesDb().update({ quote_id: quote.id }).eq('id', packageId)
 
   return quote.id
 }
@@ -538,7 +525,7 @@ export async function createItineraryForPackage(
     .insert({
       id: crypto.randomUUID(),
       title: pkg.proposal?.title || pkg.version_name,
-      tour_code: '',  // 提案階段沒有團號
+      tour_code: '', // 提案階段沒有團號
       status: '開團',
       departure_date: pkg.start_date || pkg.proposal?.expected_start_date || '',
       country: pkg.destination || pkg.proposal?.destination || '',
@@ -554,9 +541,7 @@ export async function createItineraryForPackage(
   }
 
   // 更新套件關聯
-  await packagesDb()
-    .update({ itinerary_id: itinerary.id })
-    .eq('id', packageId)
+  await packagesDb().update({ itinerary_id: itinerary.id }).eq('id', packageId)
 
   return itinerary.id
 }

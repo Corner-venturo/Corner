@@ -21,10 +21,7 @@ export interface AuthContext {
   supabase: SupabaseClient
 }
 
-type AuthenticatedHandler = (
-  request: NextRequest,
-  context: AuthContext
-) => Promise<NextResponse>
+type AuthenticatedHandler = (request: NextRequest, context: AuthContext) => Promise<NextResponse>
 
 type AuthenticatedHandlerWithParams = (
   request: NextRequest,
@@ -41,10 +38,20 @@ type AuthenticatedHandlerWithParams = (
  * - 驗證成功把 user + supabase 傳給 handler
  * - 捕捉未預期的錯誤回 500
  */
-export function withAuth(handler: AuthenticatedHandler): (request: NextRequest) => Promise<NextResponse>
-export function withAuth(handler: AuthenticatedHandlerWithParams): (request: NextRequest, routeContext: { params: Promise<Record<string, string>> }) => Promise<NextResponse>
+export function withAuth(
+  handler: AuthenticatedHandler
+): (request: NextRequest) => Promise<NextResponse>
+export function withAuth(
+  handler: AuthenticatedHandlerWithParams
+): (
+  request: NextRequest,
+  routeContext: { params: Promise<Record<string, string>> }
+) => Promise<NextResponse>
 export function withAuth(handler: AuthenticatedHandler | AuthenticatedHandlerWithParams) {
-  return async (request: NextRequest, routeContext?: { params: Promise<Record<string, string>> }) => {
+  return async (
+    request: NextRequest,
+    routeContext?: { params: Promise<Record<string, string>> }
+  ) => {
     try {
       const supabase = await createSupabaseServerClient()
 
@@ -59,7 +66,11 @@ export function withAuth(handler: AuthenticatedHandler | AuthenticatedHandlerWit
 
       if (routeContext?.params) {
         const params = await routeContext.params
-        return await (handler as AuthenticatedHandlerWithParams)(request, { user, supabase }, params)
+        return await (handler as AuthenticatedHandlerWithParams)(
+          request,
+          { user, supabase },
+          params
+        )
       }
 
       return await (handler as AuthenticatedHandler)(request, { user, supabase })

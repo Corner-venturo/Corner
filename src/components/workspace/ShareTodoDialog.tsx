@@ -132,7 +132,9 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
             <div className="border border-morandi-gold/20 rounded-lg max-h-64 overflow-y-auto">
               {pendingTodos.length === 0 ? (
                 <div className="p-4 text-center text-morandi-secondary text-sm">
-                  {searchQuery ? COMP_WORKSPACE_LABELS.沒有符合的代辦事項 : COMP_WORKSPACE_LABELS.沒有待處理的代辦事項}
+                  {searchQuery
+                    ? COMP_WORKSPACE_LABELS.沒有符合的代辦事項
+                    : COMP_WORKSPACE_LABELS.沒有待處理的代辦事項}
                 </div>
               ) : (
                 <div className="divide-y divide-morandi-gold/10">
@@ -162,7 +164,11 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
                             </span>
                             {todo.deadline && (
                               <span className="text-xs text-morandi-secondary flex items-center gap-1">
-                                <DateCell date={todo.deadline} showIcon={false} className="text-xs text-morandi-secondary" />
+                                <DateCell
+                                  date={todo.deadline}
+                                  showIcon={false}
+                                  className="text-xs text-morandi-secondary"
+                                />
                               </span>
                             )}
                             {todo.assignee && (
@@ -185,7 +191,9 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
           {/* 指派對象（可選） */}
           {selectedTodo && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-morandi-primary">{COMP_WORKSPACE_LABELS.LABEL_2777}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {COMP_WORKSPACE_LABELS.LABEL_2777}
+              </label>
               <div className="border border-morandi-gold/20 rounded-lg max-h-48 overflow-y-auto">
                 {employees.length === 0 ? (
                   <div className="p-4 text-center text-morandi-secondary text-sm">
@@ -200,7 +208,9 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
                         !selectedAssignee && 'bg-morandi-gold/10'
                       )}
                     >
-                      <span className="text-sm text-morandi-secondary">{COMP_WORKSPACE_LABELS.LABEL_802}</span>
+                      <span className="text-sm text-morandi-secondary">
+                        {COMP_WORKSPACE_LABELS.LABEL_802}
+                      </span>
                     </button>
                     {employees.map(employee => (
                       <button
@@ -233,7 +243,9 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
           {/* 預覽 */}
           {selectedTodo && (
             <div className="bg-morandi-gold/5 border border-morandi-gold/20 rounded-lg p-4 space-y-2">
-              <p className="text-xs font-semibold text-morandi-secondary uppercase">{COMP_WORKSPACE_LABELS.PREVIEW}</p>
+              <p className="text-xs font-semibold text-morandi-secondary uppercase">
+                {COMP_WORKSPACE_LABELS.PREVIEW}
+              </p>
               <div className="space-y-1 text-sm">
                 <p className="font-medium text-morandi-primary">{selectedTodo.title}</p>
                 <p className="text-morandi-secondary">
@@ -245,7 +257,11 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
                 {selectedTodo.deadline && (
                   <div className="text-morandi-secondary flex items-center gap-1">
                     <span>{COMP_WORKSPACE_LABELS.LABEL_2566}</span>
-                    <DateCell date={selectedTodo.deadline} showIcon={false} className="text-morandi-secondary" />
+                    <DateCell
+                      date={selectedTodo.deadline}
+                      showIcon={false}
+                      className="text-morandi-secondary"
+                    />
                   </div>
                 )}
                 {selectedAssignee && (

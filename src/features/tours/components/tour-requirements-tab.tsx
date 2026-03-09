@@ -17,8 +17,17 @@ import type { Tour } from '@/stores/types'
 import type { ProposalPackage } from '@/types/proposal.types'
 
 const TourConfirmationSheetPage = dynamic(
-  () => import('@/features/tour-confirmation/components/TourConfirmationSheetPage').then(m => m.TourConfirmationSheetPage),
-  { loading: () => <div className="flex items-center justify-center py-12"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div> }
+  () =>
+    import('@/features/tour-confirmation/components/TourConfirmationSheetPage').then(
+      m => m.TourConfirmationSheetPage
+    ),
+  {
+    loading: () => (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="animate-spin text-muted-foreground" size={24} />
+      </div>
+    ),
+  }
 )
 
 interface TourRequirementsTabProps {
@@ -35,7 +44,12 @@ interface TourRequirementsTabProps {
   }) => void
 }
 
-export function TourRequirementsTab({ tourId, quoteId, tour, onOpenRequestDialog }: TourRequirementsTabProps) {
+export function TourRequirementsTab({
+  tourId,
+  quoteId,
+  tour,
+  onOpenRequestDialog,
+}: TourRequirementsTabProps) {
   const [showConfirmationSheet, setShowConfirmationSheet] = useState(false)
 
   return (

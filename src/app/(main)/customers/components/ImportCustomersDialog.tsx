@@ -7,8 +7,22 @@
  */
 
 import React, { useState, useCallback, useRef, useMemo } from 'react'
-import { Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle2, AlertTriangle, ArrowLeft } from 'lucide-react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import {
+  Upload,
+  Download,
+  FileSpreadsheet,
+  AlertCircle,
+  CheckCircle2,
+  AlertTriangle,
+  ArrowLeft,
+} from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'
 import { toast } from 'sonner'
@@ -56,7 +70,12 @@ const CUSTOMER_COLUMNS: ColumnMapping[] = [
   { header: L.tpl_phone, field: 'phone', width: 15 },
   { header: L.tpl_email, field: 'email', width: 25 },
   { header: L.tpl_passport_number, field: 'passport_number', width: 15 },
-  { header: L.tpl_passport_expiry, field: 'passport_expiry', width: 15, transform: normalizeDateValue },
+  {
+    header: L.tpl_passport_expiry,
+    field: 'passport_expiry',
+    width: 15,
+    transform: normalizeDateValue,
+  },
   { header: L.tpl_birth_date, field: 'birth_date', width: 15, transform: normalizeDateValue },
   { header: L.tpl_gender, field: 'gender', width: 8, transform: normalizeGenderValue },
   { header: L.tpl_notes, field: 'notes', width: 30 },
@@ -127,18 +146,14 @@ export function ImportCustomersDialog({ open, onOpenChange }: ImportCustomersDia
         const phone = row.data.phone
 
         if (passport) {
-          const dup = existing_customers.find(
-            (c: Customer) => c.passport_number === passport,
-          )
+          const dup = existing_customers.find((c: Customer) => c.passport_number === passport)
           if (dup) {
             warnings.push(L.msg_duplicate_passport(passport))
           }
         }
 
         if (phone) {
-          const dup = existing_customers.find(
-            (c: Customer) => c.phone === phone,
-          )
+          const dup = existing_customers.find((c: Customer) => c.phone === phone)
           if (dup) {
             warnings.push(L.msg_duplicate_phone(phone))
           }
@@ -147,7 +162,7 @@ export function ImportCustomersDialog({ open, onOpenChange }: ImportCustomersDia
         return { ...row, warnings }
       })
     },
-    [existing_customers],
+    [existing_customers]
   )
 
   // 解析檔案
@@ -166,7 +181,7 @@ export function ImportCustomersDialog({ open, onOpenChange }: ImportCustomersDia
         toast.error(L.error_parse_failed)
       }
     },
-    [checkDuplicates],
+    [checkDuplicates]
   )
 
   // 檔案選擇
@@ -179,7 +194,7 @@ export function ImportCustomersDialog({ open, onOpenChange }: ImportCustomersDia
       // 清空 input 讓同一個檔案可以再選
       if (e.target) e.target.value = ''
     },
-    [handleFileParse],
+    [handleFileParse]
   )
 
   // 拖放
@@ -191,7 +206,7 @@ export function ImportCustomersDialog({ open, onOpenChange }: ImportCustomersDia
         void handleFileParse(file)
       }
     },
-    [handleFileParse],
+    [handleFileParse]
   )
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -289,12 +304,12 @@ export function ImportCustomersDialog({ open, onOpenChange }: ImportCustomersDia
 
   const error_count = useMemo(
     () => parsed_rows.filter(r => Object.keys(r.errors).length > 0).length,
-    [parsed_rows],
+    [parsed_rows]
   )
 
   const valid_count = useMemo(
     () => parsed_rows.filter(r => Object.keys(r.errors).length === 0).length,
-    [parsed_rows],
+    [parsed_rows]
   )
 
   // 表格欄位
@@ -315,7 +330,10 @@ export function ImportCustomersDialog({ open, onOpenChange }: ImportCustomersDia
         render: (_value: unknown, row: PreviewTableRow) => {
           if (row.status === 'error') {
             return (
-              <span className="inline-flex items-center gap-1 text-xs text-red-600" title={Object.values(row.errors).join('\n')}>
+              <span
+                className="inline-flex items-center gap-1 text-xs text-red-600"
+                title={Object.values(row.errors).join('\n')}
+              >
                 <AlertCircle size={12} />
                 {row.status_text}
               </span>
@@ -323,7 +341,10 @@ export function ImportCustomersDialog({ open, onOpenChange }: ImportCustomersDia
           }
           if (row.status === 'warning') {
             return (
-              <span className="inline-flex items-center gap-1 text-xs text-amber-600" title={row.warnings.join('\n')}>
+              <span
+                className="inline-flex items-center gap-1 text-xs text-amber-600"
+                title={row.warnings.join('\n')}
+              >
                 <AlertTriangle size={12} />
                 {row.status_text}
               </span>
@@ -341,7 +362,9 @@ export function ImportCustomersDialog({ open, onOpenChange }: ImportCustomersDia
         key: 'name',
         label: L.col_name,
         render: (_value: unknown, row: PreviewTableRow) => (
-          <span className={`text-sm ${row.errors['name'] ? 'text-red-600 font-medium' : 'text-morandi-primary'}`}>
+          <span
+            className={`text-sm ${row.errors['name'] ? 'text-red-600 font-medium' : 'text-morandi-primary'}`}
+          >
             {row.name || '-'}
           </span>
         ),
@@ -357,7 +380,9 @@ export function ImportCustomersDialog({ open, onOpenChange }: ImportCustomersDia
         key: 'phone',
         label: L.col_phone,
         render: (_value: unknown, row: PreviewTableRow) => (
-          <span className={`text-xs ${row.errors['phone'] ? 'text-red-600' : 'text-morandi-primary'}`}>
+          <span
+            className={`text-xs ${row.errors['phone'] ? 'text-red-600' : 'text-morandi-primary'}`}
+          >
             {row.phone || '-'}
           </span>
         ),
@@ -366,7 +391,9 @@ export function ImportCustomersDialog({ open, onOpenChange }: ImportCustomersDia
         key: 'email',
         label: L.col_email,
         render: (_value: unknown, row: PreviewTableRow) => (
-          <span className={`text-xs ${row.errors['email'] ? 'text-red-600' : 'text-morandi-primary'}`}>
+          <span
+            className={`text-xs ${row.errors['email'] ? 'text-red-600' : 'text-morandi-primary'}`}
+          >
             {row.email || '-'}
           </span>
         ),
@@ -375,14 +402,18 @@ export function ImportCustomersDialog({ open, onOpenChange }: ImportCustomersDia
         key: 'passport_number',
         label: L.col_passport_number,
         render: (_value: unknown, row: PreviewTableRow) => (
-          <span className="text-xs font-mono text-morandi-primary">{row.passport_number || '-'}</span>
+          <span className="text-xs font-mono text-morandi-primary">
+            {row.passport_number || '-'}
+          </span>
         ),
       },
       {
         key: 'passport_expiry',
         label: L.col_passport_expiry,
         render: (_value: unknown, row: PreviewTableRow) => (
-          <span className={`text-xs ${row.errors['passport_expiry'] ? 'text-red-600' : 'text-morandi-secondary'}`}>
+          <span
+            className={`text-xs ${row.errors['passport_expiry'] ? 'text-red-600' : 'text-morandi-secondary'}`}
+          >
             {row.passport_expiry || '-'}
           </span>
         ),
@@ -391,7 +422,9 @@ export function ImportCustomersDialog({ open, onOpenChange }: ImportCustomersDia
         key: 'birth_date',
         label: L.col_birth_date,
         render: (_value: unknown, row: PreviewTableRow) => (
-          <span className={`text-xs ${row.errors['birth_date'] ? 'text-red-600' : 'text-morandi-secondary'}`}>
+          <span
+            className={`text-xs ${row.errors['birth_date'] ? 'text-red-600' : 'text-morandi-secondary'}`}
+          >
             {row.birth_date || '-'}
           </span>
         ),
@@ -404,7 +437,7 @@ export function ImportCustomersDialog({ open, onOpenChange }: ImportCustomersDia
         ),
       },
     ],
-    [],
+    []
   )
 
   return (
@@ -504,12 +537,7 @@ export function ImportCustomersDialog({ open, onOpenChange }: ImportCustomersDia
         <div className="flex justify-between gap-2 pt-4 border-t">
           <div>
             {step === 'preview' && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={resetState}
-                className="gap-2"
-              >
+              <Button variant="outline" size="sm" onClick={resetState} className="gap-2">
                 <ArrowLeft size={16} />
                 {L.btn_back}
               </Button>

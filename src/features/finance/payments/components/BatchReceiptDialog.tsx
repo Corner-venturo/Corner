@@ -3,12 +3,7 @@
 import { getTodayString } from '@/lib/utils/format-date'
 
 import { useState, useMemo, useEffect } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -26,7 +21,12 @@ import { useAuthStore } from '@/stores'
 import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator'
 import { logger } from '@/lib/utils/logger'
 import { PaymentMethod } from '@/stores/types'
-import { ADD_RECEIPT_DIALOG_LABELS, BATCH_RECEIPT_DIALOG_LABELS, BATCH_RECEIPT_FORM_LABELS, BATCH_RECEIPT_TOAST_LABELS } from '../../constants/labels';
+import {
+  ADD_RECEIPT_DIALOG_LABELS,
+  BATCH_RECEIPT_DIALOG_LABELS,
+  BATCH_RECEIPT_FORM_LABELS,
+  BATCH_RECEIPT_TOAST_LABELS,
+} from '../../constants/labels'
 
 // 擴展 OrderAllocation 加入備註
 interface OrderAllocationWithNote {
@@ -96,8 +96,26 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
       setPaymentMethod('transfer')
       setTotalAmount(0)
       setOrderAllocations([
-        { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, notes: '' },
-        { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, notes: '' },
+        {
+          order_id: '',
+          order_number: '',
+          tour_id: '',
+          code: '',
+          tour_name: '',
+          contact_person: '',
+          allocated_amount: 0,
+          notes: '',
+        },
+        {
+          order_id: '',
+          order_number: '',
+          tour_id: '',
+          code: '',
+          tour_name: '',
+          contact_person: '',
+          allocated_amount: 0,
+          notes: '',
+        },
       ])
     }
   }, [open])
@@ -106,7 +124,16 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
   const addOrderAllocation = () => {
     setOrderAllocations(prev => [
       ...prev,
-      { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, notes: '' },
+      {
+        order_id: '',
+        order_number: '',
+        tour_id: '',
+        code: '',
+        tour_name: '',
+        contact_person: '',
+        allocated_amount: 0,
+        notes: '',
+      },
     ])
   }
 
@@ -146,12 +173,14 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
     const remainder = totalAmount - amountPerOrder * validAllocations.length
 
     let validIndex = 0
-    setOrderAllocations(prev => prev.map(allocation => {
-      if (!allocation.order_id) return allocation
-      const amount = amountPerOrder + (validIndex === 0 ? remainder : 0)
-      validIndex++
-      return { ...allocation, allocated_amount: amount }
-    }))
+    setOrderAllocations(prev =>
+      prev.map(allocation => {
+        if (!allocation.order_id) return allocation
+        const amount = amountPerOrder + (validIndex === 0 ? remainder : 0)
+        validIndex++
+        return { ...allocation, allocated_amount: amount }
+      })
+    )
   }
 
   // 重置表單
@@ -160,8 +189,26 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
     setPaymentMethod('transfer')
     setTotalAmount(0)
     setOrderAllocations([
-      { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, notes: '' },
-      { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, notes: '' },
+      {
+        order_id: '',
+        order_number: '',
+        tour_id: '',
+        code: '',
+        tour_name: '',
+        contact_person: '',
+        allocated_amount: 0,
+        notes: '',
+      },
+      {
+        order_id: '',
+        order_number: '',
+        tour_id: '',
+        code: '',
+        tour_name: '',
+        contact_person: '',
+        allocated_amount: 0,
+        notes: '',
+      },
     ])
   }
 
@@ -183,7 +230,15 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
     }
 
     if (unallocatedAmount !== 0) {
-      void alert(BATCH_RECEIPT_FORM_LABELS.還有NT金額未分配(Math.abs(unallocatedAmount), unallocatedAmount > 0 ? BATCH_RECEIPT_FORM_LABELS.未分配 : BATCH_RECEIPT_DIALOG_LABELS.超出), 'warning')
+      void alert(
+        BATCH_RECEIPT_FORM_LABELS.還有NT金額未分配(
+          Math.abs(unallocatedAmount),
+          unallocatedAmount > 0
+            ? BATCH_RECEIPT_FORM_LABELS.未分配
+            : BATCH_RECEIPT_DIALOG_LABELS.超出
+        ),
+        'warning'
+      )
       return
     }
 
@@ -284,15 +339,22 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
           <div className="grid grid-cols-3 gap-4">
             <div>
               <Label>{BATCH_RECEIPT_FORM_LABELS.收款日期}</Label>
-              <DatePicker value={receiptDate} onChange={(date) => setReceiptDate(date)} />
+              <DatePicker value={receiptDate} onChange={date => setReceiptDate(date)} />
             </div>
             <div>
               <Label>{BATCH_RECEIPT_FORM_LABELS.收款方式}</Label>
-              <Select value={paymentMethod} onValueChange={value => setPaymentMethod(value as PaymentMethod)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={paymentMethod}
+                onValueChange={value => setPaymentMethod(value as PaymentMethod)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {paymentMethods.map(method => (
-                    <SelectItem key={method.value} value={method.value}>{method.label}</SelectItem>
+                    <SelectItem key={method.value} value={method.value}>
+                      {method.label}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -310,13 +372,17 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
           {/* 訂單分配表格 */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-base font-semibold">{BATCH_RECEIPT_FORM_LABELS.訂單分配}</Label>
+              <Label className="text-base font-semibold">
+                {BATCH_RECEIPT_FORM_LABELS.訂單分配}
+              </Label>
               <div className="flex gap-2">
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={distributeEvenly}
-                  disabled={orderAllocations.filter(a => a.order_id).length === 0 || totalAmount === 0}
+                  disabled={
+                    orderAllocations.filter(a => a.order_id).length === 0 || totalAmount === 0
+                  }
                 >
                   {BATCH_RECEIPT_FORM_LABELS.LABEL_2869}
                 </Button>
@@ -331,17 +397,28 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
               <table className="w-full">
                 <thead>
                   <tr className="text-xs text-morandi-primary font-medium bg-morandi-container/40">
-                    <th className="text-left py-2.5 px-3 border-b border-r border-border">{BATCH_RECEIPT_FORM_LABELS.訂單}</th>
-                    <th className="text-left py-2.5 px-3 border-b border-r border-border w-40">{BATCH_RECEIPT_FORM_LABELS.團名}</th>
-                    <th className="text-right py-2.5 px-3 border-b border-r border-border w-32">{BATCH_RECEIPT_FORM_LABELS.分配金額}</th>
-                    <th className="text-left py-2.5 px-3 border-b border-r border-border w-48">{BATCH_RECEIPT_FORM_LABELS.備註}</th>
+                    <th className="text-left py-2.5 px-3 border-b border-r border-border">
+                      {BATCH_RECEIPT_FORM_LABELS.訂單}
+                    </th>
+                    <th className="text-left py-2.5 px-3 border-b border-r border-border w-40">
+                      {BATCH_RECEIPT_FORM_LABELS.團名}
+                    </th>
+                    <th className="text-right py-2.5 px-3 border-b border-r border-border w-32">
+                      {BATCH_RECEIPT_FORM_LABELS.分配金額}
+                    </th>
+                    <th className="text-left py-2.5 px-3 border-b border-r border-border w-48">
+                      {BATCH_RECEIPT_FORM_LABELS.備註}
+                    </th>
                     <th className="text-center py-2.5 px-3 border-b border-border w-14"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {orderAllocations.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="text-center py-6 text-morandi-secondary text-sm bg-card">
+                      <td
+                        colSpan={5}
+                        className="text-center py-6 text-morandi-secondary text-sm bg-card"
+                      >
                         {BATCH_RECEIPT_FORM_LABELS.ADD_8367}
                       </td>
                     </tr>
@@ -351,10 +428,12 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
                         <td className="py-2 px-3 border-b border-r border-border">
                           <Combobox
                             options={availableOrders
-                              .filter(o => !selectedOrderIds.has(o.id) || o.id === allocation.order_id)
+                              .filter(
+                                o => !selectedOrderIds.has(o.id) || o.id === allocation.order_id
+                              )
                               .map(order => ({
                                 value: order.id,
-                                label: `${order.code} - ${order.contact_person || ADD_RECEIPT_DIALOG_LABELS.無聯絡人} (${order.tour_name})`
+                                label: `${order.code} - ${order.contact_person || ADD_RECEIPT_DIALOG_LABELS.無聯絡人} (${order.tour_name})`,
                               }))}
                             value={allocation.order_id}
                             onChange={value => selectOrder(index, value)}
@@ -368,7 +447,11 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
                           <input
                             type="number"
                             value={allocation.allocated_amount || ''}
-                            onChange={e => updateOrderAllocation(index, { allocated_amount: parseFloat(e.target.value) || 0 })}
+                            onChange={e =>
+                              updateOrderAllocation(index, {
+                                allocated_amount: parseFloat(e.target.value) || 0,
+                              })
+                            }
                             className="input-no-focus w-full bg-transparent text-sm text-right"
                           />
                         </td>
@@ -395,7 +478,9 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
                   {/* 總計行 */}
                   <tr className="bg-morandi-container/20 font-medium">
                     <td className="py-2.5 px-3 border-r border-border text-sm text-morandi-primary">
-                      {BATCH_RECEIPT_FORM_LABELS.共N筆總金額(orderAllocations.filter(a => a.order_id).length).slice(0, -3)}
+                      {BATCH_RECEIPT_FORM_LABELS.共N筆總金額(
+                        orderAllocations.filter(a => a.order_id).length
+                      ).slice(0, -3)}
                     </td>
                     <td className="py-2.5 px-3 border-r border-border"></td>
                     <td className="py-2.5 px-3 border-r border-border text-right">
@@ -410,27 +495,39 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
 
             {/* 未分配提示 */}
             {unallocatedAmount !== 0 && totalAmount > 0 && (
-              <div className={cn(
-                'flex items-center justify-between px-3 py-2 rounded-lg text-sm',
-                unallocatedAmount > 0 ? 'bg-morandi-gold/10 text-morandi-gold' : 'bg-morandi-red/10 text-morandi-red'
-              )}>
+              <div
+                className={cn(
+                  'flex items-center justify-between px-3 py-2 rounded-lg text-sm',
+                  unallocatedAmount > 0
+                    ? 'bg-morandi-gold/10 text-morandi-gold'
+                    : 'bg-morandi-red/10 text-morandi-red'
+                )}
+              >
                 <div className="flex items-center gap-2">
                   <AlertCircle className="h-4 w-4 shrink-0" />
-                  <span>{unallocatedAmount > 0 ? BATCH_RECEIPT_FORM_LABELS.還有金額未分配 : BATCH_RECEIPT_DIALOG_LABELS.分配金額超過總金額}</span>
+                  <span>
+                    {unallocatedAmount > 0
+                      ? BATCH_RECEIPT_FORM_LABELS.還有金額未分配
+                      : BATCH_RECEIPT_DIALOG_LABELS.分配金額超過總金額}
+                  </span>
                 </div>
                 <div className="font-medium">
-                  未分配：<CurrencyCell amount={Math.abs(unallocatedAmount)} className="inline" />
+                  未分配：
+                  <CurrencyCell amount={Math.abs(unallocatedAmount)} className="inline" />
                 </div>
               </div>
             )}
           </div>
-
         </div>
 
         {/* 操作按鈕 */}
         <div className="flex items-center gap-4 pt-4 border-t border-border">
           <div className="flex items-center text-sm">
-            <span className="text-morandi-secondary">{BATCH_RECEIPT_FORM_LABELS.共N筆總金額(orderAllocations.filter(a => a.order_id).length)}</span>
+            <span className="text-morandi-secondary">
+              {BATCH_RECEIPT_FORM_LABELS.共N筆總金額(
+                orderAllocations.filter(a => a.order_id).length
+              )}
+            </span>
             <span className="inline-block min-w-[100px] text-right font-semibold text-morandi-gold ml-2">
               NT$ {totalAmount.toLocaleString()}
             </span>
@@ -444,7 +541,12 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
             <Button
               onClick={handleSave}
               className="bg-morandi-gold hover:bg-morandi-gold-hover gap-1"
-              disabled={isSubmitting || unallocatedAmount !== 0 || orderAllocations.filter(a => a.order_id).length === 0 || totalAmount === 0}
+              disabled={
+                isSubmitting ||
+                unallocatedAmount !== 0 ||
+                orderAllocations.filter(a => a.order_id).length === 0 ||
+                totalAmount === 0
+              }
             >
               <Check size={16} />
               {BATCH_RECEIPT_FORM_LABELS.LABEL_7330}

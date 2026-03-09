@@ -2,12 +2,7 @@
 
 import React, { useState } from 'react'
 import { Upload, ImageIcon } from 'lucide-react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ImageUploader } from './index'
 import { UnsplashSearch } from './UnsplashSearch'
@@ -66,13 +61,9 @@ export function ImagePickerDialog({
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
 
-        {description && (
-          <p className="text-sm text-morandi-secondary -mt-2 mb-2">
-            {description}
-          </p>
-        )}
+        {description && <p className="text-sm text-morandi-secondary -mt-2 mb-2">{description}</p>}
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'upload' | 'unsplash')}>
+        <Tabs value={activeTab} onValueChange={v => setActiveTab(v as 'upload' | 'unsplash')}>
           <TabsList className="grid grid-cols-2 w-full">
             <TabsTrigger value="upload" className="gap-2">
               <Upload size={14} />

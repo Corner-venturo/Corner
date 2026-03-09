@@ -18,8 +18,7 @@ export const DISBURSEMENT_PDF_LABELS = {
   TOTAL: '總計 TOTAL',
   UNSPECIFIED_SUPPLIER: '未指定供應商',
   COMPANY_SLOGAN: '─ 如果可以，讓我們一起探索世界的每個角落 ─',
-  PAGE_NUMBER: (current: number, total: number) =>
-    `第 ${current} 頁 / 共 ${total} 頁`,
+  PAGE_NUMBER: (current: number, total: number) => `第 ${current} 頁 / 共 ${total} 頁`,
 }
 
 // ============================================================
@@ -58,8 +57,7 @@ export const CLOSING_REPORT_PDF_LABELS = {
   SECTION_PROFIT: '利潤計算',
   RECEIPT_TOTAL: '收款總額（進項）',
   EXPENSE_TOTAL: '付款總額（銷項）',
-  ADMIN_COST: (perPerson: number, count: number) =>
-    `行政費用（$${perPerson}/人 × ${count}人）`,
+  ADMIN_COST: (perPerson: number, count: number) => `行政費用（$${perPerson}/人 × ${count}人）`,
   PROFIT_BEFORE_TAX: '營收（未扣稅）',
   PROFIT_TAX: (rate: number) => `營收稅額（${rate}%）`,
   NET_PROFIT: '淨利',
@@ -73,7 +71,6 @@ export const CLOSING_REPORT_PDF_LABELS = {
   NO_BONUS: '淨利為負，無獎金分配',
 
   // 頁尾
-  PAGE_NUMBER: (current: number, total: number) =>
-    `第 ${current} 頁 / 共 ${total} 頁`,
+  PAGE_NUMBER: (current: number, total: number) => `第 ${current} 頁 / 共 ${total} 頁`,
   GENERATED_AT: (dateStr: string) => `列印日期：${dateStr}`,
 }

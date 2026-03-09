@@ -66,21 +66,24 @@ export function SingleImageLayout({
         <div
           className="relative overflow-hidden aspect-[4/5] cursor-pointer group/img"
           style={{ filter: 'grayscale(100%)' }}
-          onMouseEnter={(e) => { e.currentTarget.style.filter = 'grayscale(0%)' }}
-          onMouseLeave={(e) => { e.currentTarget.style.filter = 'grayscale(100%)' }}
+          onMouseEnter={e => {
+            e.currentTarget.style.filter = 'grayscale(0%)'
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.filter = 'grayscale(100%)'
+          }}
           onClick={() => onImageClick(allImages, 0, day.title)}
         >
           {hasImage ? (
             <>
-              <img src={mainImage}
+              <img
+                src={mainImage}
                 alt={day.title || ''}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
               <div className="absolute bottom-6 left-6">
-                <span
-                  className="text-xs border border-white/30 px-2 py-1 uppercase tracking-widest bg-black/30 backdrop-blur-md text-white"
-                >
+                <span className="text-xs border border-white/30 px-2 py-1 uppercase tracking-widest bg-black/30 backdrop-blur-md text-white">
                   {day.locationLabel || day.title?.split('→')[0]?.trim() || 'Destination'}
                 </span>
               </div>
@@ -111,7 +114,9 @@ export function SingleImageLayout({
             <span key={i}>
               {i > 0 && <span className="text-white/40"> → </span>}
               {i === arr.length - 1 ? (
-                <span style={{ color: ART.clay }} className="italic">{part.trim()}</span>
+                <span style={{ color: ART.clay }} className="italic">
+                  {part.trim()}
+                </span>
               ) : (
                 part.trim()
               )}

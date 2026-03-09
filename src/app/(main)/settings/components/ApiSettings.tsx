@@ -76,20 +76,25 @@ export function ApiSettings() {
   }
 
   // 按類別分組
-  const groupedConfigs = apiConfigs.reduce((acc, config) => {
-    if (!acc[config.category]) {
-      acc[config.category] = []
-    }
-    acc[config.category].push(config)
-    return acc
-  }, {} as Record<string, ApiConfig[]>)
+  const groupedConfigs = apiConfigs.reduce(
+    (acc, config) => {
+      if (!acc[config.category]) {
+        acc[config.category] = []
+      }
+      acc[config.category].push(config)
+      return acc
+    },
+    {} as Record<string, ApiConfig[]>
+  )
 
   if (loading) {
     return (
       <section className="bg-card rounded-lg border border-border p-6">
         <div className="flex items-center gap-3 mb-4">
           <Key className="h-5 w-5 text-morandi-gold" />
-          <h2 className="text-lg font-semibold text-morandi-primary">{API_SETTINGS_LABELS.TITLE}</h2>
+          <h2 className="text-lg font-semibold text-morandi-primary">
+            {API_SETTINGS_LABELS.TITLE}
+          </h2>
         </div>
         <div className="text-sm text-morandi-secondary">{API_SETTINGS_LABELS.LOADING}</div>
       </section>
@@ -101,7 +106,9 @@ export function ApiSettings() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Key className="h-5 w-5 text-morandi-gold" />
-          <h2 className="text-lg font-semibold text-morandi-primary">{API_SETTINGS_LABELS.TITLE}</h2>
+          <h2 className="text-lg font-semibold text-morandi-primary">
+            {API_SETTINGS_LABELS.TITLE}
+          </h2>
         </div>
         <div className="flex items-center gap-2 text-xs text-status-warning bg-status-warning-bg px-3 py-1.5 rounded-lg">
           <AlertTriangle size={14} />
@@ -118,7 +125,7 @@ export function ApiSettings() {
             </h3>
 
             <div className="space-y-2">
-              {configs.map((config) => (
+              {configs.map(config => (
                 <div
                   key={config.envKey}
                   className="bg-morandi-background rounded-lg p-4 border border-morandi-border"
@@ -135,9 +142,7 @@ export function ApiSettings() {
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-morandi-secondary mb-2">
-                        {config.description}
-                      </p>
+                      <p className="text-xs text-morandi-secondary mb-2">{config.description}</p>
 
                       {/* 環境變數名稱 */}
                       <div className="flex items-center gap-2 mb-2">
@@ -159,13 +164,13 @@ export function ApiSettings() {
                               size="sm"
                               className="h-7 w-7 p-0"
                               onClick={() => toggleShowKey(config.envKey)}
-                              title={showKeys[config.envKey] ? API_SETTINGS_LABELS.HIDE : API_SETTINGS_LABELS.SHOW}
+                              title={
+                                showKeys[config.envKey]
+                                  ? API_SETTINGS_LABELS.HIDE
+                                  : API_SETTINGS_LABELS.SHOW
+                              }
                             >
-                              {showKeys[config.envKey] ? (
-                                <EyeOff size={14} />
-                              ) : (
-                                <Eye size={14} />
-                              )}
+                              {showKeys[config.envKey] ? <EyeOff size={14} /> : <Eye size={14} />}
                             </Button>
                             <Button
                               variant="ghost"
@@ -186,9 +191,7 @@ export function ApiSettings() {
 
                       {/* 使用量資訊 */}
                       {config.usageInfo && (
-                        <p className="text-xs text-status-info mt-2">
-                          {config.usageInfo}
-                        </p>
+                        <p className="text-xs text-status-info mt-2">{config.usageInfo}</p>
                       )}
                     </div>
 
@@ -225,12 +228,16 @@ export function ApiSettings() {
 
       {/* .env.local 說明 */}
       <div className="mt-6 p-4 bg-status-info-bg rounded-lg border border-status-info/30">
-        <h4 className="text-sm font-medium text-morandi-primary mb-2">{API_SETTINGS_LABELS.SETUP_GUIDE}</h4>
+        <h4 className="text-sm font-medium text-morandi-primary mb-2">
+          {API_SETTINGS_LABELS.SETUP_GUIDE}
+        </h4>
         <p className="text-xs text-morandi-secondary mb-2">
-          {API_SETTINGS_LABELS.ENV_FILE_PREFIX} <code className="bg-morandi-container px-1 rounded">.env.local</code> {API_SETTINGS_LABELS.LABEL_4474}
+          {API_SETTINGS_LABELS.ENV_FILE_PREFIX}{' '}
+          <code className="bg-morandi-container px-1 rounded">.env.local</code>{' '}
+          {API_SETTINGS_LABELS.LABEL_4474}
         </p>
         <pre className="text-xs bg-morandi-container p-3 rounded overflow-x-auto">
-{`# Supabase
+          {`# Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJxxx...
 SUPABASE_SERVICE_ROLE_KEY=eyJxxx...

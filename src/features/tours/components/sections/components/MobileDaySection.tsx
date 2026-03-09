@@ -41,10 +41,7 @@ export function MobileDaySection({
           className="w-14 h-14 flex flex-col items-center justify-center"
           style={{ backgroundColor: ART.clay }}
         >
-          <span
-            className="text-xl font-black text-white"
-            style={{ fontFamily: "'Cinzel', serif" }}
-          >
+          <span className="text-xl font-black text-white" style={{ fontFamily: "'Cinzel', serif" }}>
             {String(numericDay).padStart(2, '0')}
           </span>
         </div>
@@ -69,10 +66,7 @@ export function MobileDaySection({
           className="relative aspect-[16/9] mb-4 cursor-pointer"
           onClick={() => onImageClick(allImages, 0, day.title)}
         >
-          <img src={mainImage}
-            alt=""
-            className="w-full h-full object-cover"
-          />
+          <img src={mainImage} alt="" className="w-full h-full object-cover" />
           {allImages.length > 1 && (
             <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white text-xs">
               +{allImages.length - 1}
@@ -83,19 +77,14 @@ export function MobileDaySection({
 
       {/* 描述 */}
       {day.description && (
-        <p className="text-sm text-white/60 mb-4 leading-relaxed">
-          {day.description}
-        </p>
+        <p className="text-sm text-white/60 mb-4 leading-relaxed">{day.description}</p>
       )}
 
       {/* 景點 */}
       {day.activities && day.activities.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-4">
           {day.activities.slice(0, 3).map((activity, actIdx) => (
-            <span
-              key={actIdx}
-              className="px-2 py-1 text-xs border border-white/20 text-white/60"
-            >
+            <span key={actIdx} className="px-2 py-1 text-xs border border-white/20 text-white/60">
               {activity.title}
             </span>
           ))}

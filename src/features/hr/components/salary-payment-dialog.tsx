@@ -7,7 +7,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Employee } from '@/stores/types'
 import { cn } from '@/lib/utils'
@@ -35,7 +41,12 @@ export interface SalaryPaymentData {
   notes: string
 }
 
-export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }: SalaryPaymentDialogProps) {
+export function SalaryPaymentDialog({
+  open,
+  onOpenChange,
+  employees,
+  onSubmit,
+}: SalaryPaymentDialogProps) {
   const currentUser = useAuthStore(state => state.user)
   const [requestDate, setRequestDate] = useState('')
   const [isSpecialBilling, setIsSpecialBilling] = useState(false)
@@ -135,7 +146,9 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
         <div className="space-y-6">
           {/* Request Date */}
           <div className="border border-border rounded-lg p-4">
-            <h3 className="text-sm font-medium text-morandi-primary mb-4">{COMP_HR_LABELS.LABEL_6907}</h3>
+            <h3 className="text-sm font-medium text-morandi-primary mb-4">
+              {COMP_HR_LABELS.LABEL_6907}
+            </h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <div className="flex items-center justify-between mb-1">
@@ -152,7 +165,10 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
                       }}
                       className="rounded border-border"
                     />
-                    <label htmlFor="isSpecialBilling" className="text-xs text-morandi-primary cursor-pointer">
+                    <label
+                      htmlFor="isSpecialBilling"
+                      className="text-xs text-morandi-primary cursor-pointer"
+                    >
                       {COMP_HR_LABELS.LABEL_297}
                     </label>
                   </div>
@@ -182,7 +198,9 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
               </div>
 
               <div>
-                <label className="text-sm font-medium text-morandi-primary">{COMP_HR_LABELS.LABEL_8278}</label>
+                <label className="text-sm font-medium text-morandi-primary">
+                  {COMP_HR_LABELS.LABEL_8278}
+                </label>
                 <Input
                   value={note}
                   onChange={e => setNote(e.target.value)}
@@ -208,7 +226,9 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
                     key={employee.id}
                     className={cn(
                       'flex items-center gap-3 p-3 rounded border transition-colors',
-                      isSelected ? 'bg-morandi-gold/10 border-morandi-gold' : 'bg-card border-border'
+                      isSelected
+                        ? 'bg-morandi-gold/10 border-morandi-gold'
+                        : 'bg-card border-border'
                     )}
                   >
                     <Checkbox
@@ -221,16 +241,24 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
                         {employee.display_name || employee.chinese_name}
                       </div>
                       <div className="text-xs text-morandi-secondary flex items-center gap-1">
-                        {employee.personal_info?.email || 'N/A'} · 預設薪資: <CurrencyCell amount={employee.monthly_salary ?? 30000} />
+                        {employee.personal_info?.email || 'N/A'} · 預設薪資:{' '}
+                        <CurrencyCell amount={employee.monthly_salary ?? 30000} />
                       </div>
                     </div>
                     {isSelected && (
                       <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-sm text-morandi-secondary whitespace-nowrap">{COMP_HR_LABELS.LABEL_6620}</span>
+                        <span className="text-sm text-morandi-secondary whitespace-nowrap">
+                          {COMP_HR_LABELS.LABEL_6620}
+                        </span>
                         <Input
                           type="number"
                           value={amount}
-                          onChange={e => setCustomAmounts(prev => ({ ...prev, [employee.id]: Number(e.target.value) }))}
+                          onChange={e =>
+                            setCustomAmounts(prev => ({
+                              ...prev,
+                              [employee.id]: Number(e.target.value),
+                            }))
+                          }
                           className="w-32 h-9 text-right"
                           placeholder="0"
                         />
@@ -249,7 +277,9 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
                 <span className="text-sm font-medium text-morandi-primary">
                   總計（{selectedEmployeeIds.length} 人）：
                 </span>
-                <span className="text-xl font-bold text-morandi-gold"><CurrencyCell amount={totalAmount} /></span>
+                <span className="text-xl font-bold text-morandi-gold">
+                  <CurrencyCell amount={totalAmount} />
+                </span>
               </div>
             </div>
           )}
@@ -265,7 +295,8 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
               disabled={!requestDate || selectedEmployeeIds.length === 0}
               className="bg-morandi-primary hover:bg-morandi-primary/90 text-white"
             >
-              建立請款單（{selectedEmployeeIds.length} 人，<CurrencyCell amount={totalAmount} />）
+              建立請款單（{selectedEmployeeIds.length} 人，
+              <CurrencyCell amount={totalAmount} />）
             </Button>
           </div>
         </div>

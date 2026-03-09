@@ -3,7 +3,6 @@
  * RatesDetailDialog - 國家車資詳細表格懸浮視窗
  */
 
-
 import { logger } from '@/lib/utils/logger'
 import React, { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -117,7 +116,9 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
               className="gap-2"
             >
               {hideKKDAYColumns ? <Eye size={16} /> : <EyeOff size={16} />}
-              {hideKKDAYColumns ? TRANSPORTATION_RATES_LABELS.顯示_KKDAY_欄位 : TRANSPORTATION_RATES_LABELS.隱藏_KKDAY_欄位}
+              {hideKKDAYColumns
+                ? TRANSPORTATION_RATES_LABELS.顯示_KKDAY_欄位
+                : TRANSPORTATION_RATES_LABELS.隱藏_KKDAY_欄位}
             </Button>
           </div>
         </DialogHeader>

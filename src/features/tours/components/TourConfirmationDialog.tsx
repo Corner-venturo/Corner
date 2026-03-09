@@ -23,20 +23,14 @@ interface TourConfirmationDialogProps {
   onClose: () => void
 }
 
-export function TourConfirmationDialog({
-  open,
-  tour,
-  onClose,
-}: TourConfirmationDialogProps) {
+export function TourConfirmationDialog({ open, tour, onClose }: TourConfirmationDialogProps) {
   if (!tour) return null
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+    <Dialog open={open} onOpenChange={o => !o && onClose()}>
       <DialogContent level={2} className="max-w-[95vw] w-[1400px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {TOUR_CONFIRMATION.title(tour.code, tour.name)}
-          </DialogTitle>
+          <DialogTitle>{TOUR_CONFIRMATION.title(tour.code, tour.name)}</DialogTitle>
         </DialogHeader>
         <TourConfirmationSheetPage tour={tour} />
       </DialogContent>

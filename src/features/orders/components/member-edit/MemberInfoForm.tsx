@@ -4,7 +4,6 @@
  * 從 MemberEditDialog.tsx 拆分
  */
 
-
 import React from 'react'
 import type { EditFormData } from '../MemberEditDialog'
 import { MEMBER_EDIT_LABELS } from './constants/labels'
@@ -15,8 +14,9 @@ interface MemberInfoFormProps {
 }
 
 export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
-  const inputClass = "w-full px-3 py-1.5 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
-  const labelClass = "block text-xs font-medium text-morandi-primary mb-1"
+  const inputClass =
+    'w-full px-3 py-1.5 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold'
+  const labelClass = 'block text-xs font-medium text-morandi-primary mb-1'
 
   return (
     <div className="space-y-2">

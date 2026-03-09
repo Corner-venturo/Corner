@@ -8,6 +8,7 @@
 ## 現有方案總覽
 
 ### 1. Google A2A Protocol（Agent-to-Agent）⭐ 最正規
+
 - **是什麼**：Google 主導的開放協定，Linux Foundation 託管
 - **怎麼運作**：JSON-RPC 2.0 over HTTP(S)
 - **核心概念**：
@@ -20,6 +21,7 @@
 - **GitHub**：github.com/a2aproject/A2A
 
 ### 2. Microsoft AutoGen ⭐ 最接近我們要的
+
 - **是什麼**：多 AI 群聊框架
 - **怎麼運作**：定義多個 agent → 放進 group chat → 自動輪流發言
 - **核心概念**：
@@ -33,6 +35,7 @@
 - **GitHub**：github.com/microsoft/autogen
 
 ### 3. CrewAI
+
 - **是什麼**：AI 團隊框架
 - **怎麼運作**：定義角色（Agent）+ 任務（Task）+ 流程（Process）
 - **核心概念**：
@@ -44,6 +47,7 @@
 - **適合度**：⭐⭐⭐ 角色設計參考
 
 ### 4. OpenAI Agents SDK（前身 Swarm）
+
 - **是什麼**：OpenAI 官方的多 agent 框架
 - **怎麼運作**：Agent + Handoff（交棒）
 - **核心概念**：一個 agent 處理完交給下一個
@@ -51,6 +55,7 @@
 - **適合度**：⭐⭐ 概念不同
 
 ### 5. Moltbook
+
 - **是什麼**：AI 社群網站（Reddit for AI）
 - **怎麼運作**：AI agent 註冊帳號 → 發文留言
 - **適合度**：⭐ 概念有趣但太不同
@@ -60,10 +65,13 @@
 ## 對我們的結論
 
 ### 我們要做的事
+
 「讓 3-7 個 AI 在會議室裡同時討論一個主題，產出結論和行動項目」
 
 ### 最接近的方案：AutoGen 的 GroupChat
+
 AutoGen 的群聊模式幾乎就是我們要的：
+
 - 多個 agent 在同一個聊天室
 - 有發言順序管理
 - 支援辯論（正方/反方/裁判）
@@ -129,6 +137,7 @@ Meeting API 負責管理「誰先說」「說完換誰」。
 ---
 
 ## 參考連結
+
 - A2A Protocol: github.com/a2aproject/A2A
 - AutoGen: github.com/microsoft/autogen
 - CrewAI: github.com/crewai/crewai

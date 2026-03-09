@@ -3,10 +3,9 @@
  * QuotationInfo - 報價單基本資訊區
  */
 
-
 import React from 'react'
 import { formatDateTW } from '@/lib/utils/format-date'
-import { QUOTATION_INFO_LABELS } from '../../../constants/labels';
+import { QUOTATION_INFO_LABELS } from '../../../constants/labels'
 
 interface QuotationInfoProps {
   quoteName: string

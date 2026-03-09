@@ -18,9 +18,7 @@ export function useImageUpload(dayIndex: number) {
 
   // 上傳多張圖片
   const handleMultipleUpload = async (files: FileList | File[]) => {
-    const imageFiles = Array.from(files).filter((file) =>
-      file.type.startsWith('image/')
-    )
+    const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'))
 
     if (imageFiles.length === 0) {
       return []
@@ -48,9 +46,7 @@ export function useImageUpload(dayIndex: number) {
           continue
         }
 
-        const { data } = supabase.storage
-          .from('workspace-files')
-          .getPublicUrl(filePath)
+        const { data } = supabase.storage.from('workspace-files').getPublicUrl(filePath)
 
         newImages.push(createDailyImage(data.publicUrl))
         completed++
@@ -60,7 +56,9 @@ export function useImageUpload(dayIndex: number) {
       return newImages
     } catch (error) {
       logger.error(COMP_EDITOR_LABELS.DailyImagesUploader_意外錯誤, error)
-      toast.error(`上傳過程發生錯誤: ${error instanceof Error ? error.message : COMP_EDITOR_LABELS.未知錯誤}`)
+      toast.error(
+        `上傳過程發生錯誤: ${error instanceof Error ? error.message : COMP_EDITOR_LABELS.未知錯誤}`
+      )
       return []
     } finally {
       setIsUploading(false)
@@ -129,9 +127,7 @@ export function useImageUpload(dayIndex: number) {
 
       setUploadProgress(90)
 
-      const { data } = supabase.storage
-        .from('workspace-files')
-        .getPublicUrl(filePath)
+      const { data } = supabase.storage.from('workspace-files').getPublicUrl(filePath)
 
       setUploadProgress(100)
       return data.publicUrl

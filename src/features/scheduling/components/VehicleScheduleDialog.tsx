@@ -3,13 +3,18 @@
  * VehicleScheduleDialog - 車輛調度新增/編輯對話框
  */
 
-
 import React from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui/date-picker'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import type { FleetScheduleFormData, FleetVehicle } from '@/types/fleet.types'
 import { getVehicleTypeLabel } from '@/types/fleet.types'
 import { SCHEDULING_LABELS } from '../constants/labels'
@@ -43,7 +48,11 @@ export const VehicleScheduleDialog: React.FC<VehicleScheduleDialogProps> = ({
       open={isOpen}
       onOpenChange={open => !open && onClose()}
       title={isEditMode ? SCHEDULING_LABELS.編輯車輛調度 : SCHEDULING_LABELS.新增車輛調度}
-      subtitle={selectedVehicle ? `${selectedVehicle.license_plate} - ${getVehicleTypeLabel(selectedVehicle.vehicle_type)}` : SCHEDULING_LABELS.選擇車輛}
+      subtitle={
+        selectedVehicle
+          ? `${selectedVehicle.license_plate} - ${getVehicleTypeLabel(selectedVehicle.vehicle_type)}`
+          : SCHEDULING_LABELS.選擇車輛
+      }
       onSubmit={onSubmit}
       submitLabel={isEditMode ? SCHEDULING_LABELS.儲存變更 : SCHEDULING_LABELS.新增調度}
       submitDisabled={!formData.vehicle_id || !formData.start_date || !formData.end_date}
@@ -52,7 +61,9 @@ export const VehicleScheduleDialog: React.FC<VehicleScheduleDialogProps> = ({
       <div className="space-y-6">
         {/* 車輛選擇 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{SCHEDULING_LABELS.車輛資訊}</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">
+            {SCHEDULING_LABELS.車輛資訊}
+          </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary">
@@ -74,11 +85,14 @@ export const VehicleScheduleDialog: React.FC<VehicleScheduleDialogProps> = ({
                   <SelectValue placeholder={SCHEDULING_LABELS.選擇車輛} />
                 </SelectTrigger>
                 <SelectContent>
-                  {vehicles.filter(v => v.status === 'available').map(vehicle => (
-                    <SelectItem key={vehicle.id} value={vehicle.id}>
-                      {vehicle.license_plate} - {vehicle.vehicle_name || getVehicleTypeLabel(vehicle.vehicle_type)}
-                    </SelectItem>
-                  ))}
+                  {vehicles
+                    .filter(v => v.status === 'available')
+                    .map(vehicle => (
+                      <SelectItem key={vehicle.id} value={vehicle.id}>
+                        {vehicle.license_plate} -{' '}
+                        {vehicle.vehicle_name || getVehicleTypeLabel(vehicle.vehicle_type)}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>
@@ -87,7 +101,9 @@ export const VehicleScheduleDialog: React.FC<VehicleScheduleDialogProps> = ({
 
         {/* 日期範圍 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{SCHEDULING_LABELS.調度日期}</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">
+            {SCHEDULING_LABELS.調度日期}
+          </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary">
@@ -116,10 +132,14 @@ export const VehicleScheduleDialog: React.FC<VehicleScheduleDialogProps> = ({
 
         {/* 客戶/團資訊 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{SCHEDULING_LABELS.客戶團資訊}</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">
+            {SCHEDULING_LABELS.客戶團資訊}
+          </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.客戶名稱}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {SCHEDULING_LABELS.客戶名稱}
+              </label>
               <Input
                 value={formData.client_name}
                 onChange={e => onFormFieldChange('client_name', e.target.value)}
@@ -128,7 +148,9 @@ export const VehicleScheduleDialog: React.FC<VehicleScheduleDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.團號}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {SCHEDULING_LABELS.團號}
+              </label>
               <Input
                 value={formData.tour_code}
                 onChange={e => onFormFieldChange('tour_code', e.target.value)}
@@ -137,7 +159,9 @@ export const VehicleScheduleDialog: React.FC<VehicleScheduleDialogProps> = ({
               />
             </div>
             <div className="md:col-span-2">
-              <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.行程名稱}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {SCHEDULING_LABELS.行程名稱}
+              </label>
               <Input
                 value={formData.tour_name}
                 onChange={e => onFormFieldChange('tour_name', e.target.value)}
@@ -146,7 +170,9 @@ export const VehicleScheduleDialog: React.FC<VehicleScheduleDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.聯絡人}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {SCHEDULING_LABELS.聯絡人}
+              </label>
               <Input
                 value={formData.contact_person}
                 onChange={e => onFormFieldChange('contact_person', e.target.value)}
@@ -155,7 +181,9 @@ export const VehicleScheduleDialog: React.FC<VehicleScheduleDialogProps> = ({
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.聯絡電話}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {SCHEDULING_LABELS.聯絡電話}
+              </label>
               <Input
                 value={formData.contact_phone}
                 onChange={e => onFormFieldChange('contact_phone', e.target.value)}
@@ -168,20 +196,28 @@ export const VehicleScheduleDialog: React.FC<VehicleScheduleDialogProps> = ({
 
         {/* 司機資訊 */}
         <div>
-          <h4 className="text-sm font-semibold text-morandi-primary mb-3">{SCHEDULING_LABELS.司機資訊}</h4>
+          <h4 className="text-sm font-semibold text-morandi-primary mb-3">
+            {SCHEDULING_LABELS.司機資訊}
+          </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.司機姓名}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {SCHEDULING_LABELS.司機姓名}
+              </label>
               <Input
                 value={formData.driver_name}
                 onChange={e => onFormFieldChange('driver_name', e.target.value)}
                 placeholder={SCHEDULING_LABELS.輸入司機姓名}
                 className="mt-1"
               />
-              <p className="text-xs text-morandi-secondary mt-1">{SCHEDULING_LABELS.留空則使用車輛預設司機}</p>
+              <p className="text-xs text-morandi-secondary mt-1">
+                {SCHEDULING_LABELS.留空則使用車輛預設司機}
+              </p>
             </div>
             <div>
-              <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.司機電話}</label>
+              <label className="text-sm font-medium text-morandi-primary">
+                {SCHEDULING_LABELS.司機電話}
+              </label>
               <Input
                 value={formData.driver_phone}
                 onChange={e => onFormFieldChange('driver_phone', e.target.value)}
@@ -194,7 +230,9 @@ export const VehicleScheduleDialog: React.FC<VehicleScheduleDialogProps> = ({
 
         {/* 備註 */}
         <div>
-          <label className="text-sm font-medium text-morandi-primary">{SCHEDULING_LABELS.備註}</label>
+          <label className="text-sm font-medium text-morandi-primary">
+            {SCHEDULING_LABELS.備註}
+          </label>
           <Textarea
             value={formData.notes}
             onChange={e => onFormFieldChange('notes', e.target.value)}

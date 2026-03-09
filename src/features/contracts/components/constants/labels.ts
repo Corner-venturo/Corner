@@ -2,7 +2,8 @@
 
 export const COMP_CONTRACTS_LABELS = {
   _1_人: '1 人',
-  p_class_text_status_danger_載入合約範本失敗_請稍後再試_p: '<p class="text-status-danger">載入合約範本失敗，請稍後再試</p>',
+  p_class_text_status_danger_載入合約範本失敗_請稍後再試_p:
+    '<p class="text-status-danger">載入合約範本失敗，請稍後再試</p>',
   中華航空: '中華航空',
   亞洲航空: '亞洲航空',
   儲存: '儲存',
@@ -68,8 +69,7 @@ export const COMP_CONTRACTS_LABELS = {
   SAVING_238: '此旅遊團尚未儲存合約資料。',
   LOADING_2471: '載入合約中...',
   CLOSE: '關閉',
-};
-
+}
 
 export const CONTRACT_DIALOG_LABELS = {
   MANAGEMENT: '合約管理',

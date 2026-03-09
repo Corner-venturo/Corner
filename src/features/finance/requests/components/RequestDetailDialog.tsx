@@ -1,19 +1,25 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Combobox } from '@/components/ui/combobox'
 import { Trash2, Plus, Pencil, X, Save, Layers } from 'lucide-react'
-import { useToursSlim, useSuppliersSlim, usePaymentRequestItems, deletePaymentRequest as deletePaymentRequestApi } from '@/data'
+import {
+  useToursSlim,
+  useSuppliersSlim,
+  usePaymentRequestItems,
+  deletePaymentRequest as deletePaymentRequestApi,
+} from '@/data'
 import { PaymentRequest, PaymentRequestItem, PaymentItemCategory } from '@/stores/types'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { statusLabels, statusColors, categoryOptions } from '../types'
@@ -23,7 +29,13 @@ import { logger } from '@/lib/utils/logger'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
-import { ADD_REQUEST_DIALOG_LABELS, REQUEST_DETAIL_DIALOG_LABELS, REQUEST_DETAIL_FORM_LABELS, REQUEST_LABELS, REQUEST_TYPE_LABELS } from '../../constants/labels';
+import {
+  ADD_REQUEST_DIALOG_LABELS,
+  REQUEST_DETAIL_DIALOG_LABELS,
+  REQUEST_DETAIL_FORM_LABELS,
+  REQUEST_LABELS,
+  REQUEST_TYPE_LABELS,
+} from '../../constants/labels'
 
 interface RequestDetailDialogProps {
   request: PaymentRequest | null
@@ -86,7 +98,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
       setSelectedRequestId(request.id)
     }
 
-    loadBatchRequests().catch((err) => logger.error('[loadBatchRequests]', err))
+    loadBatchRequests().catch(err => logger.error('[loadBatchRequests]', err))
   }, [open, request])
 
   // 載入請款項目
@@ -313,17 +325,30 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                 {isBatch && (
                   <Badge variant="outline" className="text-xs font-normal">
                     <Layers size={12} className="mr-1" />
-                    批次 {batchRequests.findIndex(r => r.id === currentRequest.id) + 1}/{batchRequests.length}
+                    批次 {batchRequests.findIndex(r => r.id === currentRequest.id) + 1}/
+                    {batchRequests.length}
                   </Badge>
                 )}
               </DialogTitle>
               <p className="text-sm text-morandi-muted mt-1">
-                {currentRequest.tour_code ? `團號：${currentRequest.tour_code}` : REQUEST_DETAIL_DIALOG_LABELS.無關聯團號}
+                {currentRequest.tour_code
+                  ? `團號：${currentRequest.tour_code}`
+                  : REQUEST_DETAIL_DIALOG_LABELS.無關聯團號}
                 {currentRequest.order_number && REQUEST_LABELS.訂單(currentRequest.order_number)}
               </p>
             </div>
-            <Badge className={statusColors[(currentRequest.status || 'pending') as 'pending' | 'confirmed' | 'billed']}>
-              {statusLabels[(currentRequest.status || 'pending') as 'pending' | 'confirmed' | 'billed']}
+            <Badge
+              className={
+                statusColors[
+                  (currentRequest.status || 'pending') as 'pending' | 'confirmed' | 'billed'
+                ]
+              }
+            >
+              {
+                statusLabels[
+                  (currentRequest.status || 'pending') as 'pending' | 'confirmed' | 'billed'
+                ]
+              }
             </Badge>
           </div>
         </DialogHeader>
@@ -333,10 +358,16 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
           <div className="mt-2 mb-4">
             <div className="flex items-center gap-2 mb-2">
               <Layers size={14} className="text-morandi-muted" />
-              <span className="text-xs text-morandi-muted">{REQUEST_DETAIL_FORM_LABELS.同批次請款單N張共金額(batchRequests.length, batchTotalAmount)}<CurrencyCell amount={batchTotalAmount} className="inline text-xs" />)</span>
+              <span className="text-xs text-morandi-muted">
+                {REQUEST_DETAIL_FORM_LABELS.同批次請款單N張共金額(
+                  batchRequests.length,
+                  batchTotalAmount
+                )}
+                <CurrencyCell amount={batchTotalAmount} className="inline text-xs" />)
+              </span>
             </div>
             <div className="flex flex-wrap gap-1">
-              {batchRequests.map((br) => (
+              {batchRequests.map(br => (
                 <Button
                   key={br.id}
                   variant="outline"
@@ -363,17 +394,34 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
           {/* 基本資訊 */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-morandi-background/50 rounded-lg">
             <InfoItem label={REQUEST_DETAIL_DIALOG_LABELS.請款單號} value={currentRequest.code} />
-            <InfoItem label={REQUEST_DETAIL_DIALOG_LABELS.團號} value={currentRequest.tour_code || '-'} />
-            <InfoItem label={REQUEST_DETAIL_DIALOG_LABELS.團名} value={currentRequest.tour_name || tour?.name || '-'} />
-            <InfoItem label={REQUEST_DETAIL_DIALOG_LABELS.訂單編號} value={currentRequest.order_number || '-'} />
-            <InfoItem label={REQUEST_DETAIL_DIALOG_LABELS.請款人} value={currentRequest.created_by_name || '-'} />
+            <InfoItem
+              label={REQUEST_DETAIL_DIALOG_LABELS.團號}
+              value={currentRequest.tour_code || '-'}
+            />
+            <InfoItem
+              label={REQUEST_DETAIL_DIALOG_LABELS.團名}
+              value={currentRequest.tour_name || tour?.name || '-'}
+            />
+            <InfoItem
+              label={REQUEST_DETAIL_DIALOG_LABELS.訂單編號}
+              value={currentRequest.order_number || '-'}
+            />
+            <InfoItem
+              label={REQUEST_DETAIL_DIALOG_LABELS.請款人}
+              value={currentRequest.created_by_name || '-'}
+            />
             <div>
-              <p className="text-xs text-morandi-muted mb-1">{REQUEST_DETAIL_FORM_LABELS.請款日期}</p>
+              <p className="text-xs text-morandi-muted mb-1">
+                {REQUEST_DETAIL_FORM_LABELS.請款日期}
+              </p>
               <DateCell date={currentRequest.created_at} showIcon={false} />
             </div>
             <div>
               <p className="text-xs text-morandi-muted mb-1">{REQUEST_DETAIL_FORM_LABELS.總金額}</p>
-              <CurrencyCell amount={currentRequest.amount || 0} className="font-semibold text-morandi-gold" />
+              <CurrencyCell
+                amount={currentRequest.amount || 0}
+                className="font-semibold text-morandi-gold"
+              />
             </div>
           </div>
 
@@ -399,14 +447,32 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
             <div className="border border-morandi-container/20 rounded-lg overflow-hidden">
               {/* 表頭 */}
               <div className="bg-morandi-background/50 border-b border-morandi-container/20">
-                <div className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_96px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_96px]'} px-3 py-2.5`}>
-                  <span className="text-xs font-medium text-morandi-muted">{REQUEST_DETAIL_FORM_LABELS.類別}</span>
-                  <span className="text-xs font-medium text-morandi-muted">{REQUEST_DETAIL_FORM_LABELS.付款對象}</span>
-                  <span className="text-xs font-medium text-morandi-muted">{REQUEST_DETAIL_FORM_LABELS.說明}</span>
-                  <span className="text-xs font-medium text-morandi-muted text-right">{REQUEST_DETAIL_FORM_LABELS.單價}</span>
-                  <span className="text-xs font-medium text-morandi-muted text-center">{REQUEST_DETAIL_FORM_LABELS.數量}</span>
-                  <span className="text-xs font-medium text-morandi-muted text-right">{REQUEST_DETAIL_FORM_LABELS.小計}</span>
-                  {canEdit && <span className="text-xs font-medium text-morandi-muted text-center">{REQUEST_DETAIL_FORM_LABELS.操作}</span>}
+                <div
+                  className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_96px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_96px]'} px-3 py-2.5`}
+                >
+                  <span className="text-xs font-medium text-morandi-muted">
+                    {REQUEST_DETAIL_FORM_LABELS.類別}
+                  </span>
+                  <span className="text-xs font-medium text-morandi-muted">
+                    {REQUEST_DETAIL_FORM_LABELS.付款對象}
+                  </span>
+                  <span className="text-xs font-medium text-morandi-muted">
+                    {REQUEST_DETAIL_FORM_LABELS.說明}
+                  </span>
+                  <span className="text-xs font-medium text-morandi-muted text-right">
+                    {REQUEST_DETAIL_FORM_LABELS.單價}
+                  </span>
+                  <span className="text-xs font-medium text-morandi-muted text-center">
+                    {REQUEST_DETAIL_FORM_LABELS.數量}
+                  </span>
+                  <span className="text-xs font-medium text-morandi-muted text-right">
+                    {REQUEST_DETAIL_FORM_LABELS.小計}
+                  </span>
+                  {canEdit && (
+                    <span className="text-xs font-medium text-morandi-muted text-center">
+                      {REQUEST_DETAIL_FORM_LABELS.操作}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -414,18 +480,27 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
               <div className="max-h-[280px] overflow-y-auto">
                 {/* 新增項目表單 */}
                 {isAddingItem && (
-                  <div className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_96px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_96px]'} px-2 py-1.5 border-b border-morandi-container/10 bg-morandi-gold/5 items-center`}>
+                  <div
+                    className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_96px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_96px]'} px-2 py-1.5 border-b border-morandi-container/10 bg-morandi-gold/5 items-center`}
+                  >
                     <div>
                       <Select
                         value={newItem.category}
-                        onValueChange={(value) => setNewItem({ ...newItem, category: value as PaymentRequestItem['category'] })}
+                        onValueChange={value =>
+                          setNewItem({
+                            ...newItem,
+                            category: value as PaymentRequestItem['category'],
+                          })
+                        }
                       >
                         <SelectTrigger className="h-8 text-xs border-0 shadow-none bg-transparent">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           {categoryOptions.map(opt => (
-                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -434,7 +509,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                       <Combobox
                         options={supplierOptions}
                         value={newItem.supplier_id}
-                        onChange={(value) => setNewItem({ ...newItem, supplier_id: value })}
+                        onChange={value => setNewItem({ ...newItem, supplier_id: value })}
                         placeholder={REQUEST_DETAIL_DIALOG_LABELS.選擇付款對象}
                         className="[&_input]:h-8 [&_input]:text-xs [&_input]:bg-transparent"
                       />
@@ -442,7 +517,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                     <div>
                       <Input
                         value={newItem.description}
-                        onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                        onChange={e => setNewItem({ ...newItem, description: e.target.value })}
                         placeholder={REQUEST_DETAIL_DIALOG_LABELS.說明}
                         className="h-8 text-xs border-0 shadow-none bg-transparent"
                       />
@@ -452,7 +527,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                         type="text"
                         inputMode="decimal"
                         value={newItem.unit_price || ''}
-                        onChange={(e) => {
+                        onChange={e => {
                           const num = parseFloat(e.target.value) || 0
                           setNewItem({ ...newItem, unit_price: num })
                         }}
@@ -464,7 +539,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                         type="text"
                         inputMode="numeric"
                         value={newItem.quantity || ''}
-                        onChange={(e) => {
+                        onChange={e => {
                           const num = parseInt(e.target.value) || 0
                           setNewItem({ ...newItem, quantity: num })
                         }}
@@ -472,14 +547,29 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                       />
                     </div>
                     <div className="text-right pr-2">
-                      <CurrencyCell amount={newItem.unit_price * newItem.quantity} className="text-morandi-gold text-sm" />
+                      <CurrencyCell
+                        amount={newItem.unit_price * newItem.quantity}
+                        className="text-morandi-gold text-sm"
+                      />
                     </div>
                     {canEdit && (
                       <div className="flex items-center justify-center gap-1">
-                        <Button size="icon" aria-label="Close" variant="ghost" className="h-6 w-6" onClick={handleAddItem}>
+                        <Button
+                          size="icon"
+                          aria-label="Close"
+                          variant="ghost"
+                          className="h-6 w-6"
+                          onClick={handleAddItem}
+                        >
                           <Save size={14} className="text-status-success" />
                         </Button>
-                        <Button size="icon" aria-label="Close" variant="ghost" className="h-6 w-6" onClick={() => setIsAddingItem(false)}>
+                        <Button
+                          size="icon"
+                          aria-label="Close"
+                          variant="ghost"
+                          className="h-6 w-6"
+                          onClick={() => setIsAddingItem(false)}
+                        >
                           <X size={14} className="text-status-danger" />
                         </Button>
                       </div>
@@ -492,22 +582,32 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                     {REQUEST_DETAIL_FORM_LABELS.EMPTY_9932}
                   </div>
                 ) : (
-                  items.map((item) => (
-                    <div key={item.id} className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_96px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_96px]'} px-2 py-1.5 border-b border-morandi-container/10 items-center hover:bg-morandi-container/5`}>
+                  items.map(item => (
+                    <div
+                      key={item.id}
+                      className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_96px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_96px]'} px-2 py-1.5 border-b border-morandi-container/10 items-center hover:bg-morandi-container/5`}
+                    >
                       {editingItemId === item.id ? (
                         /* 編輯模式 */
                         <>
                           <div>
                             <Select
                               value={editItem.category || ''}
-                              onValueChange={(value) => setEditItem({ ...editItem, category: value as PaymentRequestItem['category'] })}
+                              onValueChange={value =>
+                                setEditItem({
+                                  ...editItem,
+                                  category: value as PaymentRequestItem['category'],
+                                })
+                              }
                             >
                               <SelectTrigger className="h-8 text-xs border-0 shadow-none bg-transparent">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
                                 {categoryOptions.map(opt => (
-                                  <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                                  <SelectItem key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                  </SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
@@ -516,7 +616,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                             <Combobox
                               options={supplierOptions}
                               value={editItem.supplier_id || ''}
-                              onChange={(value) => setEditItem({ ...editItem, supplier_id: value })}
+                              onChange={value => setEditItem({ ...editItem, supplier_id: value })}
                               placeholder={REQUEST_DETAIL_DIALOG_LABELS.選擇付款對象}
                               className="[&_input]:h-8 [&_input]:text-xs [&_input]:bg-transparent"
                             />
@@ -524,7 +624,9 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                           <div>
                             <Input
                               value={editItem.description || ''}
-                              onChange={(e) => setEditItem({ ...editItem, description: e.target.value })}
+                              onChange={e =>
+                                setEditItem({ ...editItem, description: e.target.value })
+                              }
                               className="h-8 text-xs border-0 shadow-none bg-transparent"
                             />
                           </div>
@@ -533,7 +635,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                               type="text"
                               inputMode="decimal"
                               value={editItem.unit_price || ''}
-                              onChange={(e) => {
+                              onChange={e => {
                                 const num = parseFloat(e.target.value) || 0
                                 setEditItem({ ...editItem, unit_price: num })
                               }}
@@ -545,7 +647,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                               type="text"
                               inputMode="numeric"
                               value={editItem.quantity || ''}
-                              onChange={(e) => {
+                              onChange={e => {
                                 const num = parseInt(e.target.value) || 0
                                 setEditItem({ ...editItem, quantity: num })
                               }}
@@ -553,13 +655,28 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                             />
                           </div>
                           <div className="text-right pr-2">
-                            <CurrencyCell amount={(editItem.unit_price || 0) * (editItem.quantity || 0)} className="text-morandi-gold text-sm" />
+                            <CurrencyCell
+                              amount={(editItem.unit_price || 0) * (editItem.quantity || 0)}
+                              className="text-morandi-gold text-sm"
+                            />
                           </div>
                           <div className="flex items-center justify-center gap-1">
-                            <Button size="icon" aria-label="Close" variant="ghost" className="h-6 w-6" onClick={() => handleSaveEdit(item.id)}>
+                            <Button
+                              size="icon"
+                              aria-label="Close"
+                              variant="ghost"
+                              className="h-6 w-6"
+                              onClick={() => handleSaveEdit(item.id)}
+                            >
                               <Save size={14} className="text-status-success" />
                             </Button>
-                            <Button size="icon" aria-label="Close" variant="ghost" className="h-6 w-6" onClick={() => setEditingItemId(null)}>
+                            <Button
+                              size="icon"
+                              aria-label="Close"
+                              variant="ghost"
+                              className="h-6 w-6"
+                              onClick={() => setEditingItemId(null)}
+                            >
                               <X size={14} className="text-status-danger" />
                             </Button>
                           </div>
@@ -568,23 +685,46 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                         /* 顯示模式 */
                         <>
                           <div className="text-sm px-1">
-                            {categoryOptions.find(c => c.value === item.category)?.label || item.category}
+                            {categoryOptions.find(c => c.value === item.category)?.label ||
+                              item.category}
                           </div>
                           <div className="text-sm px-1">{item.supplier_name || '-'}</div>
                           <div className="text-sm px-1">{item.description || '-'}</div>
                           <div className="text-right pr-2">
-                            <CurrencyCell amount={(item as unknown as { unitprice?: number }).unitprice ?? item.unit_price ?? 0} className="text-sm" />
+                            <CurrencyCell
+                              amount={
+                                (item as unknown as { unitprice?: number }).unitprice ??
+                                item.unit_price ??
+                                0
+                              }
+                              className="text-sm"
+                            />
                           </div>
                           <div className="text-sm text-center">{item.quantity}</div>
                           <div className="text-right pr-2">
-                            <CurrencyCell amount={item.subtotal || 0} className="text-morandi-gold text-sm" />
+                            <CurrencyCell
+                              amount={item.subtotal || 0}
+                              className="text-morandi-gold text-sm"
+                            />
                           </div>
                           {canEdit && (
                             <div className="flex items-center justify-center gap-1">
-                              <Button size="icon" aria-label="Delete" variant="ghost" className="h-6 w-6" onClick={() => startEditItem(item)}>
+                              <Button
+                                size="icon"
+                                aria-label="Delete"
+                                variant="ghost"
+                                className="h-6 w-6"
+                                onClick={() => startEditItem(item)}
+                              >
                                 <Pencil size={14} className="text-morandi-secondary" />
                               </Button>
-                              <Button size="icon" aria-label="Delete" variant="ghost" className="h-6 w-6" onClick={() => handleDeleteItem(item.id)}>
+                              <Button
+                                size="icon"
+                                aria-label="Delete"
+                                variant="ghost"
+                                className="h-6 w-6"
+                                onClick={() => handleDeleteItem(item.id)}
+                              >
                                 <Trash2 size={14} className="text-status-danger" />
                               </Button>
                             </div>
@@ -598,14 +738,21 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
 
               {/* 合計 */}
               <div className="bg-morandi-background/50 border-t border-morandi-container/20">
-                <div className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_96px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_96px]'} px-3 py-3`}>
+                <div
+                  className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_96px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_96px]'} px-3 py-3`}
+                >
                   <div></div>
                   <div></div>
                   <div></div>
                   <div></div>
-                  <div className="text-right font-semibold text-sm">{REQUEST_DETAIL_FORM_LABELS.合計}</div>
+                  <div className="text-right font-semibold text-sm">
+                    {REQUEST_DETAIL_FORM_LABELS.合計}
+                  </div>
                   <div className="text-right pr-2">
-                    <CurrencyCell amount={currentRequest.amount || 0} className="font-bold text-morandi-gold" />
+                    <CurrencyCell
+                      amount={currentRequest.amount || 0}
+                      className="font-bold text-morandi-gold"
+                    />
                   </div>
                   {canEdit && <div></div>}
                 </div>
@@ -616,8 +763,12 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
           {/* 備註 */}
           {currentRequest.notes && (
             <div className="p-4 bg-morandi-background/50 rounded-lg">
-              <h3 className="text-sm font-semibold text-morandi-primary mb-2">{REQUEST_DETAIL_FORM_LABELS.備註}</h3>
-              <p className="text-sm text-morandi-secondary whitespace-pre-wrap">{currentRequest.notes}</p>
+              <h3 className="text-sm font-semibold text-morandi-primary mb-2">
+                {REQUEST_DETAIL_FORM_LABELS.備註}
+              </h3>
+              <p className="text-sm text-morandi-secondary whitespace-pre-wrap">
+                {currentRequest.notes}
+              </p>
             </div>
           )}
 
@@ -653,7 +804,9 @@ function InfoItem({
   return (
     <div>
       <p className="text-xs text-morandi-muted mb-1">{label}</p>
-      <p className={`text-sm ${highlight ? 'font-semibold text-morandi-gold' : 'text-morandi-primary'}`}>
+      <p
+        className={`text-sm ${highlight ? 'font-semibold text-morandi-gold' : 'text-morandi-primary'}`}
+      >
         {value}
       </p>
     </div>

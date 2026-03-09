@@ -30,13 +30,15 @@ export function useItineraryFilters({
       case '開團':
         // 提案狀態不受出發日期影響，只檢查 closed_at
         filtered = filtered.filter(
-          item => item.status === '開團' && !item.closed_at && !item.archived_at && !item.is_template
+          item =>
+            item.status === '開團' && !item.closed_at && !item.archived_at && !item.is_template
         )
         break
       case '待出發':
         // 進行中狀態不受出發日期影響，只檢查 closed_at
         filtered = filtered.filter(
-          item => item.status === '待出發' && !item.closed_at && !item.archived_at && !item.is_template
+          item =>
+            item.status === '待出發' && !item.closed_at && !item.archived_at && !item.is_template
         )
         break
       case '公司範例':
@@ -55,9 +57,12 @@ export function useItineraryFilters({
     }
 
     if (isSuperAdmin) {
-      const workspaceFilter = typeof window !== 'undefined' ? localStorage.getItem('itinerary_workspace_filter') : null
+      const workspaceFilter =
+        typeof window !== 'undefined' ? localStorage.getItem('itinerary_workspace_filter') : null
       if (workspaceFilter && workspaceFilter !== 'all') {
-        filtered = filtered.filter(item => (item as Itinerary & { workspace_id?: string }).workspace_id === workspaceFilter)
+        filtered = filtered.filter(
+          item => (item as Itinerary & { workspace_id?: string }).workspace_id === workspaceFilter
+        )
       }
     }
 

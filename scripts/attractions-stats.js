@@ -26,14 +26,10 @@ async function showStats() {
   const attractions = allAttractions
 
   // 取得國家資料
-  const { data: countries } = await supabase
-    .from('countries')
-    .select('id, name, name_en, region')
+  const { data: countries } = await supabase.from('countries').select('id, name, name_en, region')
 
   // 取得城市資料
-  const { data: cities } = await supabase
-    .from('cities')
-    .select('id, name, country_id')
+  const { data: cities } = await supabase.from('cities').select('id, name, country_id')
 
   const countryMap = {}
   countries.forEach(c => {
@@ -82,7 +78,7 @@ async function showStats() {
       regionGroups[region].push({
         id: countryId,
         name: country.name,
-        count: countryStats[countryId]
+        count: countryStats[countryId],
       })
     }
   })
@@ -115,7 +111,7 @@ async function showStats() {
       id: cityId,
       name: cityMap[cityId]?.name || cityId,
       country: countryMap[data.country_id]?.name || data.country_id,
-      count: data.count
+      count: data.count,
     }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 20)
@@ -123,7 +119,18 @@ async function showStats() {
   topCities.forEach((city, i) => {
     const rank = String(i + 1).padStart(2)
     const bar = '▓'.repeat(Math.floor(city.count / 2))
-    console.log('  ' + rank + '. ' + city.name.padEnd(12) + '(' + city.country.padEnd(6) + ') ' + String(city.count).padStart(3) + ' 個 ' + bar)
+    console.log(
+      '  ' +
+        rank +
+        '. ' +
+        city.name.padEnd(12) +
+        '(' +
+        city.country.padEnd(6) +
+        ') ' +
+        String(city.count).padStart(3) +
+        ' 個 ' +
+        bar
+    )
   })
 
   console.log('')

@@ -47,7 +47,7 @@ export function CalendarGrid({
         locale="zh-tw"
         // 🔧 修正：明確指定台灣時區，避免時間跳動問題
         timeZone="Asia/Taipei"
-        dayCellContent={(arg) => arg.dayNumberText.replace('日', '')}
+        dayCellContent={arg => arg.dayNumberText.replace('日', '')}
         height="100%"
         dayMaxEvents={7}
         eventMinHeight={20}

@@ -37,11 +37,13 @@ export const TablePagination = React.memo(function TablePagination({
     <div className="p-3 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border/40 bg-morandi-container/10">
       {/* 左側：資料統計 */}
       <div className="text-sm text-morandi-secondary">
-        顯示第 <span className="font-medium text-morandi-primary">{startIndex + 1}</span> {ENHANCED_TABLE_LABELS.LABEL_6376}{' '}
+        顯示第 <span className="font-medium text-morandi-primary">{startIndex + 1}</span>{' '}
+        {ENHANCED_TABLE_LABELS.LABEL_6376}{' '}
         <span className="font-medium text-morandi-primary">
           {Math.min(startIndex + pageSize, totalItems)}
         </span>{' '}
-        筆， 共 <span className="font-medium text-morandi-primary">{totalItems}</span> {ENHANCED_TABLE_LABELS.LABEL_7043}
+        筆， 共 <span className="font-medium text-morandi-primary">{totalItems}</span>{' '}
+        {ENHANCED_TABLE_LABELS.LABEL_7043}
       </div>
 
       {/* 右側：分頁控制 */}

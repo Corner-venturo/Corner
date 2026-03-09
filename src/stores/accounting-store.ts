@@ -97,7 +97,10 @@ interface AccountingStore {
   createCategory: (
     category: Omit<TransactionCategory, 'id' | 'created_at'>
   ) => Promise<TransactionCategory | null>
-  updateCategory: (id: string, category: Partial<TransactionCategory>) => Promise<TransactionCategory | null>
+  updateCategory: (
+    id: string,
+    category: Partial<TransactionCategory>
+  ) => Promise<TransactionCategory | null>
   deleteCategory: (id: string) => Promise<boolean>
 
   // 交易記錄
@@ -312,7 +315,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
       .range(from, to)
 
     if (!error && data) {
-      set({ 
+      set({
         transactions: data as Transaction[],
         transactionsPage: page,
         transactionsCount: count || 0,
@@ -344,10 +347,10 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
     // A more advanced implementation could optimistically update the UI.
     await get().fetchTransactions()
     await get().fetchAccounts()
-    
+
     // Since the RPC function doesn't return the new transaction ID,
     // we return a success indicator instead. The UI will update on refetch.
-    return 'success';
+    return 'success'
   },
 
   updateTransaction: async (id, transactionData) => {
@@ -409,7 +412,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
     const totalDebt = accounts
       .filter(account => account.type === 'credit')
       .reduce((sum, account) => sum + Math.abs(account.balance), 0)
-      
+
     const netWorth = totalAssets - totalDebt
 
     const totalIncome = transactions

@@ -15,7 +15,7 @@ import { DESIGNER_LABELS } from '../constants/labels'
 export function PageThumbnail({ page, scale }: { page: CanvasPage; scale: number }) {
   return (
     <div className="w-full h-full relative">
-      {page.elements.map((element) => {
+      {page.elements.map(element => {
         const style: React.CSSProperties = {
           position: 'absolute',
           left: element.x * scale,
@@ -37,7 +37,8 @@ export function PageThumbnail({ page, scale }: { page: CanvasPage; scale: number
                 style={{
                   ...style,
                   backgroundColor: element.fill || '#c9aa7c',
-                  borderRadius: element.variant === 'circle' ? '50%' : (element.cornerRadius || 0) * scale,
+                  borderRadius:
+                    element.variant === 'circle' ? '50%' : (element.cornerRadius || 0) * scale,
                 }}
               />
             )
@@ -119,7 +120,11 @@ export function DualPagePreview({
   const leftPage = leftIndex !== null ? pages[leftIndex] : null
   const rightPage = rightIndex !== null ? pages[rightIndex] : null
 
-  const renderPagePreview = (page: CanvasPage | null, index: number | null, side: 'left' | 'right') => {
+  const renderPagePreview = (
+    page: CanvasPage | null,
+    index: number | null,
+    side: 'left' | 'right'
+  ) => {
     const isCurrentPage = index === currentPageIndex
 
     if (!page) {
@@ -157,7 +162,8 @@ export function DualPagePreview({
         </div>
 
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-2 py-1 rounded">
-          {index !== null ? `${DESIGNER_LABELS.第}${index + 1}${DESIGNER_LABELS.頁}` : ''} - {page.name}
+          {index !== null ? `${DESIGNER_LABELS.第}${index + 1}${DESIGNER_LABELS.頁}` : ''} -{' '}
+          {page.name}
         </div>
 
         {isCurrentPage && (

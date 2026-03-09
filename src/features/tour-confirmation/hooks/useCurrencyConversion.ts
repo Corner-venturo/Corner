@@ -1,12 +1,12 @@
 import { useState, useCallback } from 'react'
 import { useToast } from '@/components/ui/use-toast'
 import { logger } from '@/lib/utils/logger'
-import {
-  getCurrencyName,
-  getCurrencySymbol,
-} from '../constants/currency'
+import { getCurrencyName, getCurrencySymbol } from '../constants/currency'
 import { TOUR_CONFIRMATION_SHEET_PAGE_LABELS } from '../constants/labels'
-import type { TourConfirmationItem, GroupedConfirmationItems } from '@/types/tour-confirmation-sheet.types'
+import type {
+  TourConfirmationItem,
+  GroupedConfirmationItems,
+} from '@/types/tour-confirmation-sheet.types'
 import type { MutableRefObject } from 'react'
 
 interface UseCurrencyConversionOptions {
@@ -55,7 +55,7 @@ export function useCurrencyConversion({
 
       const item = Object.values(groupedItems)
         .flat()
-        .find((i) => i.id === itemId)
+        .find(i => i.id === itemId)
       if (!item) return
 
       const twdSubtotal = (item.unit_price || 0) * (item.quantity || 1)
@@ -151,7 +151,7 @@ export function useCurrencyConversion({
     if (pendingItemId) {
       const item = Object.values(groupedItems)
         .flat()
-        .find((i) => i.id === pendingItemId)
+        .find(i => i.id === pendingItemId)
       if (item?.expected_cost) {
         const convertedAmount = Math.round(item.expected_cost / rate)
         toast({

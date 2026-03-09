@@ -48,8 +48,20 @@ describe('priceCalculations', () => {
 
   describe('calculateIdentityProfits', () => {
     it('calculates profits for all identities', () => {
-      const prices = { adult: 10000, child_with_bed: 8000, child_no_bed: 6000, single_room: 12000, infant: 1000 }
-      const costs = { adult: 7000, child_with_bed: 6000, child_no_bed: 4000, single_room: 9000, infant: 500 }
+      const prices = {
+        adult: 10000,
+        child_with_bed: 8000,
+        child_no_bed: 6000,
+        single_room: 12000,
+        infant: 1000,
+      }
+      const costs = {
+        adult: 7000,
+        child_with_bed: 6000,
+        child_no_bed: 4000,
+        single_room: 9000,
+        infant: 500,
+      }
       const result = calculateIdentityProfits(prices, costs)
       expect(result.adult).toBe(3000)
       expect(result.child_with_bed).toBe(2000)
@@ -90,7 +102,13 @@ describe('priceCalculations', () => {
       { name: 'standard', total_cost: 1000, averageCost: 500, days: 2, capacity: 2 },
       { name: 'deluxe', total_cost: 2000, averageCost: 1000, days: 2, capacity: 2 },
     ]
-    const identityCosts = { adult: 5000, child_with_bed: 4000, child_no_bed: 2000, single_room: 6000, infant: 500 }
+    const identityCosts = {
+      adult: 5000,
+      child_with_bed: 4000,
+      child_no_bed: 2000,
+      single_room: 6000,
+      infant: 500,
+    }
 
     it('returns 0 for non-existent room', () => {
       expect(getRoomTypeCost('nonexistent', 'adult', accommodationSummary, identityCosts)).toBe(0)
@@ -119,18 +137,61 @@ describe('priceCalculations', () => {
         { name: 'standard', total_cost: 1000, averageCost: 500, days: 2, capacity: 2 },
         { name: 'deluxe', total_cost: 2000, averageCost: 1000, days: 2, capacity: 2 },
       ]
-      const identityCosts = { adult: 5000, child_with_bed: 4000, child_no_bed: 2000, single_room: 6000, infant: 500 }
-      const sellingPrices = { adult: 10000, child_with_bed: 8000, child_no_bed: 6000, single_room: 12000, infant: 1000, room_types: { deluxe: { adult: 12000, child: 10000 } } }
+      const identityCosts = {
+        adult: 5000,
+        child_with_bed: 4000,
+        child_no_bed: 2000,
+        single_room: 6000,
+        infant: 500,
+      }
+      const sellingPrices = {
+        adult: 10000,
+        child_with_bed: 8000,
+        child_no_bed: 6000,
+        single_room: 12000,
+        infant: 1000,
+        room_types: { deluxe: { adult: 12000, child: 10000 } },
+      }
       // cost = 6000, price = 12000, profit = 6000
-      expect(getRoomTypeProfit('deluxe', 'adult', sellingPrices as any, accommodationSummary, identityCosts)).toBe(6000)
+      expect(
+        getRoomTypeProfit(
+          'deluxe',
+          'adult',
+          sellingPrices as any,
+          accommodationSummary,
+          identityCosts
+        )
+      ).toBe(6000)
     })
 
     it('returns negative when no selling price set', () => {
-      const accommodationSummary: import('../../types').AccommodationSummaryItem[] = [{ name: 'standard', total_cost: 1000, averageCost: 500, days: 2, capacity: 2 }]
-      const identityCosts = { adult: 5000, child_with_bed: 4000, child_no_bed: 2000, single_room: 6000, infant: 500 }
-      const sellingPrices = { adult: 10000, child_with_bed: 8000, child_no_bed: 6000, single_room: 12000, infant: 1000 }
+      const accommodationSummary: import('../../types').AccommodationSummaryItem[] = [
+        { name: 'standard', total_cost: 1000, averageCost: 500, days: 2, capacity: 2 },
+      ]
+      const identityCosts = {
+        adult: 5000,
+        child_with_bed: 4000,
+        child_no_bed: 2000,
+        single_room: 6000,
+        infant: 500,
+      }
+      const sellingPrices = {
+        adult: 10000,
+        child_with_bed: 8000,
+        child_no_bed: 6000,
+        single_room: 12000,
+        infant: 1000,
+      }
       // price = 0 (no room_types), cost = 5000, profit = -5000
-      expect(getRoomTypeProfit('standard', 'adult', sellingPrices as any, accommodationSummary, identityCosts)).toBe(-5000)
+      expect(
+        getRoomTypeProfit(
+          'standard',
+          'adult',
+          sellingPrices as any,
+          accommodationSummary,
+          identityCosts
+        )
+      ).toBe(-5000)
     })
   })
 

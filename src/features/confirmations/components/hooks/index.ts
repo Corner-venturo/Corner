@@ -3,10 +3,5 @@
  */
 
 export { useRequirementsData } from './useRequirementsData'
-export type {
-  TourRequest,
-  QuoteItem,
-  ChangeTrackItem,
-  CategoryKey,
-} from './useRequirementsData'
+export type { TourRequest, QuoteItem, ChangeTrackItem, CategoryKey } from './useRequirementsData'
 export { CATEGORIES } from './useRequirementsData'

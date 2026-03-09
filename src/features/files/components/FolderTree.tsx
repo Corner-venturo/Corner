@@ -94,7 +94,7 @@ function FolderNode({ node, level = 0 }: FolderNodeProps) {
             <DropdownMenuTrigger asChild>
               <button
                 className="w-5 h-5 flex items-center justify-center rounded hover:bg-background"
-                onClick={(e) => e.stopPropagation()}
+                onClick={e => e.stopPropagation()}
               >
                 <MoreHorizontal className="w-3.5 h-3.5" />
               </button>
@@ -103,7 +103,9 @@ function FolderNode({ node, level = 0 }: FolderNodeProps) {
               <DropdownMenuItem>{LABELS.newSubfolder}</DropdownMenuItem>
               <DropdownMenuItem>{LABELS.rename}</DropdownMenuItem>
               {!node.is_system && (
-                <DropdownMenuItem className="text-destructive">{LABELS.deleteFolder}</DropdownMenuItem>
+                <DropdownMenuItem className="text-destructive">
+                  {LABELS.deleteFolder}
+                </DropdownMenuItem>
               )}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -113,7 +115,7 @@ function FolderNode({ node, level = 0 }: FolderNodeProps) {
       {/* 子資料夾 */}
       {isExpanded && hasChildren && (
         <div>
-          {node.children.map((child) => (
+          {node.children.map(child => (
             <FolderNode key={child.id} node={child} level={level + 1} />
           ))}
         </div>
@@ -123,13 +125,8 @@ function FolderNode({ node, level = 0 }: FolderNodeProps) {
 }
 
 export function FolderTree() {
-  const {
-    folderTree,
-    loadingFolders,
-    selectedFolderId,
-    selectFolder,
-    setCreateFolderDialogOpen,
-  } = useFileSystemStore()
+  const { folderTree, loadingFolders, selectedFolderId, selectFolder, setCreateFolderDialogOpen } =
+    useFileSystemStore()
 
   const handleAllFilesClick = () => {
     selectFolder(null)
@@ -142,7 +139,8 @@ export function FolderTree() {
         <h2 className="font-medium text-sm">{LABELS.fileManager}</h2>
         <Button
           variant="ghost"
-          size="icon" aria-label="Add"
+          size="icon"
+          aria-label="Add"
           className="h-7 w-7"
           onClick={() => setCreateFolderDialogOpen(true)}
         >
@@ -172,12 +170,10 @@ export function FolderTree() {
               {LABELS.loadingEllipsis}
             </div>
           ) : folderTree.length === 0 ? (
-            <div className="py-8 text-center text-sm text-muted-foreground">
-              {LABELS.noFolders}
-            </div>
+            <div className="py-8 text-center text-sm text-muted-foreground">{LABELS.noFolders}</div>
           ) : (
             <div className="mt-2">
-              {folderTree.map((node) => (
+              {folderTree.map(node => (
                 <FolderNode key={node.id} node={node} />
               ))}
             </div>

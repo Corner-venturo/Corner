@@ -3,9 +3,14 @@
  * ScheduleCalendar - 甘特圖式調度日曆
  */
 
-
 import React, { useMemo } from 'react'
-import { format as formatDate, eachDayOfInterval, isWithinInterval, isSameDay, isWeekend } from 'date-fns'
+import {
+  format as formatDate,
+  eachDayOfInterval,
+  isWithinInterval,
+  isSameDay,
+  isWeekend,
+} from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 import { parseLocalDate, startOfDay } from '@/lib/utils/format-date'
 
@@ -52,7 +57,9 @@ function generateDays(dateRange: { start: Date; end: Date } | null | undefined):
     const end = dateRange.end instanceof Date ? dateRange.end : new Date(dateRange.end)
     if (isNaN(start.getTime()) || isNaN(end.getTime())) return []
     const interval = eachDayOfInterval({ start, end })
-    return Array.isArray(interval) ? interval.filter((d): d is Date => d instanceof Date && !isNaN(d.getTime())) : []
+    return Array.isArray(interval)
+      ? interval.filter((d): d is Date => d instanceof Date && !isNaN(d.getTime()))
+      : []
   } catch {
     return []
   }
@@ -78,9 +85,10 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
     if (!schedules) return map
 
     schedules.forEach(schedule => {
-      const resourceId = type === 'vehicle'
-        ? (schedule as FleetSchedule).vehicle_id
-        : (schedule as LeaderSchedule).leader_id
+      const resourceId =
+        type === 'vehicle'
+          ? (schedule as FleetSchedule).vehicle_id
+          : (schedule as LeaderSchedule).leader_id
 
       if (!map.has(resourceId)) {
         map.set(resourceId, [])
@@ -149,7 +157,10 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
     const startDate = parseLocalDate(schedule.start_date)
     const endDate = parseLocalDate(schedule.end_date)
     if (!startDate || !endDate) return false
-    return isWithinInterval(startOfDay(date), { start: startOfDay(startDate), end: startOfDay(endDate) })
+    return isWithinInterval(startOfDay(date), {
+      start: startOfDay(startDate),
+      end: startOfDay(endDate),
+    })
   }
 
   // 過濾在當前視圖範圍內的調度
@@ -161,8 +172,14 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
       if (!startDate || !endDate) return false
       // 調度與視圖範圍有重疊
       return (
-        isWithinInterval(startOfDay(startDate), { start: startOfDay(dateRange.start), end: startOfDay(dateRange.end) }) ||
-        isWithinInterval(startOfDay(endDate), { start: startOfDay(dateRange.start), end: startOfDay(dateRange.end) }) ||
+        isWithinInterval(startOfDay(startDate), {
+          start: startOfDay(dateRange.start),
+          end: startOfDay(dateRange.end),
+        }) ||
+        isWithinInterval(startOfDay(endDate), {
+          start: startOfDay(dateRange.start),
+          end: startOfDay(dateRange.end),
+        }) ||
         (startDate <= dateRange.start && endDate >= dateRange.end)
       )
     })
@@ -178,48 +195,60 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
         {/* 表頭：日期 */}
         <div
           className="grid sticky top-0 z-10 bg-morandi-container/60 border-b border-border"
-          style={{ gridTemplateColumns: `200px repeat(${days.length}, minmax(${viewMode === 'week' ? '100px' : '40px'}, 1fr))` }}
+          style={{
+            gridTemplateColumns: `200px repeat(${days.length}, minmax(${viewMode === 'week' ? '100px' : '40px'}, 1fr))`,
+          }}
         >
-          <div className={cn('px-4 flex items-center font-medium text-morandi-primary border-r border-border', headerHeight)}>
+          <div
+            className={cn(
+              'px-4 flex items-center font-medium text-morandi-primary border-r border-border',
+              headerHeight
+            )}
+          >
             {SCHEDULING_LABELS.LABEL_1014}
           </div>
-          {Array.isArray(days) && days.map((day, i) => {
-            if (!(day instanceof Date)) return null
-            const isToday = isSameDay(day, new Date())
-            const isWeekendDay = isWeekend(day)
-            return (
-              <div
-                key={i}
-                className={cn(
-                  'px-2 flex flex-col items-center justify-center text-sm border-r border-border last:border-r-0',
-                  headerHeight,
-                  isWeekendDay ? 'bg-morandi-red/5' : '',
-                  isToday ? 'bg-morandi-gold/10' : ''
-                )}
-              >
-                {viewMode === 'week' ? (
-                  <>
-                    <span className="text-morandi-secondary text-xs">
-                      {safeFormat(day, 'EEE')}
-                    </span>
-                    <span className={cn(
-                      'font-medium',
-                      isToday ? 'text-morandi-gold' : 'text-morandi-primary'
-                    )}>
+          {Array.isArray(days) &&
+            days.map((day, i) => {
+              if (!(day instanceof Date)) return null
+              const isToday = isSameDay(day, new Date())
+              const isWeekendDay = isWeekend(day)
+              return (
+                <div
+                  key={i}
+                  className={cn(
+                    'px-2 flex flex-col items-center justify-center text-sm border-r border-border last:border-r-0',
+                    headerHeight,
+                    isWeekendDay ? 'bg-morandi-red/5' : '',
+                    isToday ? 'bg-morandi-gold/10' : ''
+                  )}
+                >
+                  {viewMode === 'week' ? (
+                    <>
+                      <span className="text-morandi-secondary text-xs">
+                        {safeFormat(day, 'EEE')}
+                      </span>
+                      <span
+                        className={cn(
+                          'font-medium',
+                          isToday ? 'text-morandi-gold' : 'text-morandi-primary'
+                        )}
+                      >
+                        {safeFormat(day, 'd')}
+                      </span>
+                    </>
+                  ) : (
+                    <span
+                      className={cn(
+                        'font-medium',
+                        isToday ? 'text-morandi-gold' : 'text-morandi-primary'
+                      )}
+                    >
                       {safeFormat(day, 'd')}
                     </span>
-                  </>
-                ) : (
-                  <span className={cn(
-                    'font-medium',
-                    isToday ? 'text-morandi-gold' : 'text-morandi-primary'
-                  )}>
-                    {safeFormat(day, 'd')}
-                  </span>
-                )}
-              </div>
-            )
-          })}
+                  )}
+                </div>
+              )
+            })}
         </div>
 
         {/* 資源行 */}
@@ -235,10 +264,17 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
               <div
                 key={resource.id}
                 className="grid border-b border-border last:border-b-0 hover:bg-morandi-container/20"
-                style={{ gridTemplateColumns: `200px repeat(${days.length}, minmax(${viewMode === 'week' ? '100px' : '40px'}, 1fr))` }}
+                style={{
+                  gridTemplateColumns: `200px repeat(${days.length}, minmax(${viewMode === 'week' ? '100px' : '40px'}, 1fr))`,
+                }}
               >
                 {/* 資源名稱 */}
-                <div className={cn('px-4 flex flex-col justify-center border-r border-border bg-card sticky left-0 z-[5]', rowHeight)}>
+                <div
+                  className={cn(
+                    'px-4 flex flex-col justify-center border-r border-border bg-card sticky left-0 z-[5]',
+                    rowHeight
+                  )}
+                >
                   <span className="font-medium text-morandi-primary truncate">
                     {getResourceName(resource)}
                   </span>
@@ -248,70 +284,84 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
                 </div>
 
                 {/* 日期格子 */}
-                {Array.isArray(days) && days.map((day, dayIndex) => {
-                  if (!(day instanceof Date)) return null
-                  // 檢查這一天是否被任何調度覆蓋
-                  const coveringSchedule = visibleSchedules.find(s => isDateInSchedule(s, day))
-                  // 只在調度開始日顯示調度條
-                  const startDateParsed = coveringSchedule ? parseLocalDate(coveringSchedule.start_date) : null
-                  const startsHere = coveringSchedule && startDateParsed && isSameDay(startOfDay(startDateParsed), startOfDay(day))
-                  const isToday = isSameDay(day, new Date())
-                  const isWeekendDay = isWeekend(day)
+                {Array.isArray(days) &&
+                  days.map((day, dayIndex) => {
+                    if (!(day instanceof Date)) return null
+                    // 檢查這一天是否被任何調度覆蓋
+                    const coveringSchedule = visibleSchedules.find(s => isDateInSchedule(s, day))
+                    // 只在調度開始日顯示調度條
+                    const startDateParsed = coveringSchedule
+                      ? parseLocalDate(coveringSchedule.start_date)
+                      : null
+                    const startsHere =
+                      coveringSchedule &&
+                      startDateParsed &&
+                      isSameDay(startOfDay(startDateParsed), startOfDay(day))
+                    const isToday = isSameDay(day, new Date())
+                    const isWeekendDay = isWeekend(day)
 
-                  return (
-                    <div
-                      key={dayIndex}
-                      className={cn(
-                        'relative border-r border-border last:border-r-0 group',
-                        rowHeight,
-                        isWeekendDay ? 'bg-morandi-red/5' : '',
-                        isToday ? 'bg-morandi-gold/5' : ''
-                      )}
-                    >
-                      {/* 調度條 - 只在開始日渲染 */}
-                      {startsHere && coveringSchedule && (
-                        <div
-                          className={cn(
-                            'absolute top-2 left-1 right-1 h-12 rounded-md border px-2 py-1 cursor-pointer z-[2]',
-                            'flex flex-col justify-center overflow-hidden',
-                            'hover:shadow-md transition-shadow',
-                            SCHEDULE_COLORS[coveringSchedule.status as keyof typeof SCHEDULE_COLORS] || SCHEDULE_COLORS.confirmed
-                          )}
-                          style={{
-                            width: `calc(${(() => {
-                              const endDate = parseLocalDate(coveringSchedule.end_date)
-                              if (!endDate) return 1
-                              const endIndex = days.findIndex(d => d && isSameDay(startOfDay(d), startOfDay(endDate)))
-                              return (endIndex >= 0 ? endIndex : days.length - 1) - dayIndex + 1
-                            })() * 100}% - 8px)`,
-                          }}
-                          onClick={() => onEditSchedule(coveringSchedule)}
-                        >
-                          <span className="text-xs font-medium truncate">
-                            {coveringSchedule.tour_name || coveringSchedule.tour_code || '未命名'}
-                          </span>
-                          <span className="text-[10px] opacity-80 truncate">
-                            {type === 'vehicle'
-                              ? (coveringSchedule as FleetSchedule).client_name || ''
-                              : (coveringSchedule as LeaderSchedule).destination || ''}
-                          </span>
-                        </div>
-                      )}
+                    return (
+                      <div
+                        key={dayIndex}
+                        className={cn(
+                          'relative border-r border-border last:border-r-0 group',
+                          rowHeight,
+                          isWeekendDay ? 'bg-morandi-red/5' : '',
+                          isToday ? 'bg-morandi-gold/5' : ''
+                        )}
+                      >
+                        {/* 調度條 - 只在開始日渲染 */}
+                        {startsHere && coveringSchedule && (
+                          <div
+                            className={cn(
+                              'absolute top-2 left-1 right-1 h-12 rounded-md border px-2 py-1 cursor-pointer z-[2]',
+                              'flex flex-col justify-center overflow-hidden',
+                              'hover:shadow-md transition-shadow',
+                              SCHEDULE_COLORS[
+                                coveringSchedule.status as keyof typeof SCHEDULE_COLORS
+                              ] || SCHEDULE_COLORS.confirmed
+                            )}
+                            style={{
+                              width: `calc(${
+                                (() => {
+                                  const endDate = parseLocalDate(coveringSchedule.end_date)
+                                  if (!endDate) return 1
+                                  const endIndex = days.findIndex(
+                                    d => d && isSameDay(startOfDay(d), startOfDay(endDate))
+                                  )
+                                  return (endIndex >= 0 ? endIndex : days.length - 1) - dayIndex + 1
+                                })() * 100
+                              }% - 8px)`,
+                            }}
+                            onClick={() => onEditSchedule(coveringSchedule)}
+                          >
+                            <span className="text-xs font-medium truncate">
+                              {coveringSchedule.tour_name || coveringSchedule.tour_code || '未命名'}
+                            </span>
+                            <span className="text-[10px] opacity-80 truncate">
+                              {type === 'vehicle'
+                                ? (coveringSchedule as FleetSchedule).client_name || ''
+                                : (coveringSchedule as LeaderSchedule).destination || ''}
+                            </span>
+                          </div>
+                        )}
 
-                      {/* 新增按鈕 - 只在沒有調度的日子顯示 */}
-                      {!coveringSchedule && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="absolute inset-1 opacity-0 group-hover:opacity-100 transition-opacity text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10"
-                          onClick={() => onAddSchedule(resource.id, safeFormat(day, 'yyyy-MM-dd'))}
-                        >
-                          <Plus size={16} />
-                        </Button>
-                      )}
-                    </div>
-                  )
-                })}
+                        {/* 新增按鈕 - 只在沒有調度的日子顯示 */}
+                        {!coveringSchedule && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="absolute inset-1 opacity-0 group-hover:opacity-100 transition-opacity text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10"
+                            onClick={() =>
+                              onAddSchedule(resource.id, safeFormat(day, 'yyyy-MM-dd'))
+                            }
+                          >
+                            <Plus size={16} />
+                          </Button>
+                        )}
+                      </div>
+                    )
+                  })}
               </div>
             )
           })

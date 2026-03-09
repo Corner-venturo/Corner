@@ -17,16 +17,14 @@ import {
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { useDragSort } from '@/hooks/useDragSort'
-import {
-  ChevronDown,
-  ChevronRight,
-  Plus,
-  Trash2,
-  Bus,
-  Users,
-} from 'lucide-react'
+import { ChevronDown, ChevronRight, Plus, Trash2, Bus, Users } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
-import type { GroupType, VehicleData, VehicleMemberData, VehicleColumnSettings } from '../../templates/definitions/types'
+import type {
+  GroupType,
+  VehicleData,
+  VehicleMemberData,
+  VehicleColumnSettings,
+} from '../../templates/definitions/types'
 import { DESIGNER_LABELS } from './constants/labels'
 
 /**
@@ -54,19 +52,22 @@ export function VehicleEditor({
   const currentVehicle = vehicles[currentVehicleIndex]
 
   // 欄位顯示設定（預設：座位顯示、訂單不顯示、目的地顯示、司機不顯示）
-  const columnSettings: VehicleColumnSettings = (templateData.vehicleColumnSettings as VehicleColumnSettings) || {
-    showSeatNumber: true,
-    showOrderCode: false,
-    showDestination: true,
-    showDriverInfo: false,
-  }
+  const columnSettings: VehicleColumnSettings =
+    (templateData.vehicleColumnSettings as VehicleColumnSettings) || {
+      showSeatNumber: true,
+      showOrderCode: false,
+      showDestination: true,
+      showDriverInfo: false,
+    }
 
   // 當前分組類型（優先從資料取得，否則從頁面類型決定）
   const groupType: GroupType = vehicles[0]?.groupType || pageType
   const isTable = groupType === 'table'
 
   // 展開的車輛/桌次（記錄哪些是展開的）
-  const [expandedVehicles, setExpandedVehicles] = useState<Set<string>>(new Set(vehicles.map(v => v.id)))
+  const [expandedVehicles, setExpandedVehicles] = useState<Set<string>>(
+    new Set(vehicles.map(v => v.id))
+  )
   // 快速新增成員輸入（每個車輛一個）
   const [newMemberNames, setNewMemberNames] = useState<Record<string, string>>({})
 
@@ -102,7 +103,9 @@ export function VehicleEditor({
     const newVehicle: VehicleData = {
       id: `vehicle-${Date.now()}`,
       groupType: type,
-      vehicleName: isNewTable ? `${sameTypeCount + 1}${DESIGNER_LABELS.TABLE_SUFFIX}` : `${sameTypeCount + 1}${DESIGNER_LABELS.VEHICLE_SUFFIX}`,
+      vehicleName: isNewTable
+        ? `${sameTypeCount + 1}${DESIGNER_LABELS.TABLE_SUFFIX}`
+        : `${sameTypeCount + 1}${DESIGNER_LABELS.VEHICLE_SUFFIX}`,
       vehicleType: '',
       capacity: isNewTable ? 10 : 43,
       driverName: '',
@@ -163,7 +166,10 @@ export function VehicleEditor({
   const addMembersBatchToVehicle = (vehicleIdx: number, text: string) => {
     const vehicle = vehicles[vehicleIdx]
     if (!vehicle) return
-    const names = text.split(/[\n,，、]/).map(n => n.trim()).filter(n => n.length > 0)
+    const names = text
+      .split(/[\n,，、]/)
+      .map(n => n.trim())
+      .filter(n => n.length > 0)
     if (names.length === 0) return
     const existingCount = vehicle.members?.length || 0
     const newMembers = names.map((name, idx) => ({
@@ -180,7 +186,12 @@ export function VehicleEditor({
   }
 
   // 更新指定車輛的成員
-  const updateMemberInVehicle = (vehicleIdx: number, memberIdx: number, field: keyof VehicleMemberData, value: unknown) => {
+  const updateMemberInVehicle = (
+    vehicleIdx: number,
+    memberIdx: number,
+    field: keyof VehicleMemberData,
+    value: unknown
+  ) => {
     const vehicle = vehicles[vehicleIdx]
     if (!vehicle) return
     const newMembers = vehicle.members.map((m, i) => {
@@ -239,7 +250,7 @@ export function VehicleEditor({
         <div className="space-y-2">
           <Label className="text-xs">{DESIGNER_LABELS.SELECT_3424}</Label>
           <div className="flex gap-2">
-            {GROUP_TYPE_OPTIONS.map((opt) => (
+            {GROUP_TYPE_OPTIONS.map(opt => (
               <button
                 key={opt.value}
                 type="button"
@@ -248,8 +259,14 @@ export function VehicleEditor({
                   const newVehicle: VehicleData = {
                     id: `vehicle-${Date.now()}`,
                     groupType: opt.value,
-                    vehicleName: opt.value === 'table' ? `1${DESIGNER_LABELS.TABLE_SUFFIX}` : `1${DESIGNER_LABELS.VEHICLE_SUFFIX}`,
-                    vehicleType: opt.value === 'table' ? DESIGNER_LABELS.DEFAULT_TABLE_TYPE : DESIGNER_LABELS.DEFAULT_VEHICLE_TYPE,
+                    vehicleName:
+                      opt.value === 'table'
+                        ? `1${DESIGNER_LABELS.TABLE_SUFFIX}`
+                        : `1${DESIGNER_LABELS.VEHICLE_SUFFIX}`,
+                    vehicleType:
+                      opt.value === 'table'
+                        ? DESIGNER_LABELS.DEFAULT_TABLE_TYPE
+                        : DESIGNER_LABELS.DEFAULT_VEHICLE_TYPE,
                     capacity: opt.value === 'table' ? 10 : 43,
                     driverName: '',
                     driverPhone: '',
@@ -321,7 +338,7 @@ export function VehicleEditor({
             <span className="text-xs">{DESIGNER_LABELS.LABEL_8436}</span>
             <Select
               value={String(columnSettings.columnsPerRow || 2)}
-              onValueChange={(v) => {
+              onValueChange={v => {
                 onTemplateDataChange({
                   ...templateData,
                   vehicleColumnSettings: {
@@ -346,7 +363,7 @@ export function VehicleEditor({
           <label className="flex items-center gap-2 cursor-pointer">
             <Checkbox
               checked={columnSettings.showDriverInfo}
-              onCheckedChange={(checked) => updateColumnSetting('showDriverInfo', !!checked)}
+              onCheckedChange={checked => updateColumnSetting('showDriverInfo', !!checked)}
             />
             <span className="text-xs">{DESIGNER_LABELS.LABEL_5378}</span>
           </label>
@@ -357,62 +374,152 @@ export function VehicleEditor({
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Bus size={14} className="text-morandi-secondary" />
-          <span className="text-xs font-medium text-morandi-secondary">{DESIGNER_LABELS.LABEL_2119}</span>
+          <span className="text-xs font-medium text-morandi-secondary">
+            {DESIGNER_LABELS.LABEL_2119}
+          </span>
         </div>
         {vehicles.map((vehicle, vehicleIdx) => {
           if (vehicle.groupType === 'table') return null
           const isExpanded = expandedVehicles.has(vehicle.id)
           const memberCount = vehicle.members?.length || 0
           const inputValue = newMemberNames[vehicle.id] || ''
-          const vehicleNumber = vehicles.slice(0, vehicleIdx + 1).filter(v => v.groupType !== 'table').length
+          const vehicleNumber = vehicles
+            .slice(0, vehicleIdx + 1)
+            .filter(v => v.groupType !== 'table').length
 
           return (
             <div key={vehicle.id} className="rounded-lg border border-border/50 overflow-hidden">
               <div className="flex items-center gap-2 p-2 bg-morandi-container/20">
-                <button type="button" onClick={() => toggleVehicleExpanded(vehicle.id)} className="p-0.5 hover:bg-morandi-container/50 rounded">
-                  {isExpanded ? <ChevronDown size={14} className="text-morandi-secondary" /> : <ChevronRight size={14} className="text-morandi-secondary" />}
+                <button
+                  type="button"
+                  onClick={() => toggleVehicleExpanded(vehicle.id)}
+                  className="p-0.5 hover:bg-morandi-container/50 rounded"
+                >
+                  {isExpanded ? (
+                    <ChevronDown size={14} className="text-morandi-secondary" />
+                  ) : (
+                    <ChevronRight size={14} className="text-morandi-secondary" />
+                  )}
                 </button>
                 <Input
                   value={vehicle.vehicleName || ''}
-                  onChange={(e) => updateVehicleField(vehicleIdx, 'vehicleName', e.target.value)}
+                  onChange={e => updateVehicleField(vehicleIdx, 'vehicleName', e.target.value)}
                   placeholder={`${vehicleNumber}${DESIGNER_LABELS.VEHICLE_SUFFIX}`}
                   className="h-7 text-xs font-medium flex-1"
                 />
-                <span className="text-[10px] text-morandi-secondary whitespace-nowrap">{memberCount} 人</span>
-                <button type="button" onClick={() => deleteVehicle(vehicleIdx)} className="p-1 rounded text-morandi-muted hover:text-morandi-red hover:bg-morandi-red/10 transition-colors">
+                <span className="text-[10px] text-morandi-secondary whitespace-nowrap">
+                  {memberCount} 人
+                </span>
+                <button
+                  type="button"
+                  onClick={() => deleteVehicle(vehicleIdx)}
+                  className="p-1 rounded text-morandi-muted hover:text-morandi-red hover:bg-morandi-red/10 transition-colors"
+                >
                   <Trash2 size={12} />
                 </button>
               </div>
               {isExpanded && (
                 <div className="p-2 space-y-2 border-t border-border/30">
                   <div className="flex gap-2">
-                    <Input value={vehicle.vehicleType || ''} onChange={(e) => updateVehicleField(vehicleIdx, 'vehicleType', e.target.value)} placeholder={DESIGNER_LABELS.LABEL_3072} className="h-7 text-xs flex-1" />
-                    <Input value={vehicle.notes || ''} onChange={(e) => updateVehicleField(vehicleIdx, 'notes', e.target.value)} placeholder={DESIGNER_LABELS.REMARKS} className="h-7 text-xs flex-1" />
+                    <Input
+                      value={vehicle.vehicleType || ''}
+                      onChange={e => updateVehicleField(vehicleIdx, 'vehicleType', e.target.value)}
+                      placeholder={DESIGNER_LABELS.LABEL_3072}
+                      className="h-7 text-xs flex-1"
+                    />
+                    <Input
+                      value={vehicle.notes || ''}
+                      onChange={e => updateVehicleField(vehicleIdx, 'notes', e.target.value)}
+                      placeholder={DESIGNER_LABELS.REMARKS}
+                      className="h-7 text-xs flex-1"
+                    />
                   </div>
                   {vehicle.members?.map((member, memberIdx) => (
-                    <div key={member.id} className="flex items-center gap-1.5 p-1.5 rounded bg-morandi-container/10">
-                      <span className="text-[10px] text-morandi-secondary w-5 text-center">{memberIdx + 1}.</span>
-                      <Input value={member.chineseName || ''} onChange={(e) => updateMemberInVehicle(vehicleIdx, memberIdx, 'chineseName', e.target.value)} placeholder={DESIGNER_LABELS.LABEL_658} className="flex-1 h-6 text-xs" />
-                      <button type="button" onClick={() => deleteMemberFromVehicle(vehicleIdx, memberIdx)} className="p-1 rounded text-morandi-muted hover:text-morandi-red hover:bg-morandi-red/10 transition-colors"><Trash2 size={10} /></button>
+                    <div
+                      key={member.id}
+                      className="flex items-center gap-1.5 p-1.5 rounded bg-morandi-container/10"
+                    >
+                      <span className="text-[10px] text-morandi-secondary w-5 text-center">
+                        {memberIdx + 1}.
+                      </span>
+                      <Input
+                        value={member.chineseName || ''}
+                        onChange={e =>
+                          updateMemberInVehicle(
+                            vehicleIdx,
+                            memberIdx,
+                            'chineseName',
+                            e.target.value
+                          )
+                        }
+                        placeholder={DESIGNER_LABELS.LABEL_658}
+                        className="flex-1 h-6 text-xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => deleteMemberFromVehicle(vehicleIdx, memberIdx)}
+                        className="p-1 rounded text-morandi-muted hover:text-morandi-red hover:bg-morandi-red/10 transition-colors"
+                      >
+                        <Trash2 size={10} />
+                      </button>
                     </div>
                   ))}
                   <div className="flex gap-1">
                     <Input
                       value={inputValue}
-                      onChange={(e) => setNewMemberNames(prev => ({ ...prev, [vehicle.id]: e.target.value }))}
-                      onKeyDown={(e) => { if (e.key === 'Enter' && inputValue.trim()) { if (inputValue.includes('\n') || inputValue.includes(',') || inputValue.includes('，')) { addMembersBatchToVehicle(vehicleIdx, inputValue) } else { addMemberToVehicle(vehicleIdx, inputValue) } } }}
-                      onPaste={(e) => { const text = e.clipboardData.getData('text'); if (text.includes('\n')) { e.preventDefault(); addMembersBatchToVehicle(vehicleIdx, text) } }}
+                      onChange={e =>
+                        setNewMemberNames(prev => ({ ...prev, [vehicle.id]: e.target.value }))
+                      }
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' && inputValue.trim()) {
+                          if (
+                            inputValue.includes('\n') ||
+                            inputValue.includes(',') ||
+                            inputValue.includes('，')
+                          ) {
+                            addMembersBatchToVehicle(vehicleIdx, inputValue)
+                          } else {
+                            addMemberToVehicle(vehicleIdx, inputValue)
+                          }
+                        }
+                      }}
+                      onPaste={e => {
+                        const text = e.clipboardData.getData('text')
+                        if (text.includes('\n')) {
+                          e.preventDefault()
+                          addMembersBatchToVehicle(vehicleIdx, text)
+                        }
+                      }}
                       placeholder={DESIGNER_LABELS.LABEL_794}
                       className="h-7 text-xs flex-1"
                     />
-                    <Button variant="outline" size="sm" onClick={() => { if (inputValue.includes('\n') || inputValue.includes(',')) { addMembersBatchToVehicle(vehicleIdx, inputValue) } else { addMemberToVehicle(vehicleIdx, inputValue) } }} disabled={!inputValue.trim()} className="h-7 px-2"><Plus size={14} /></Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        if (inputValue.includes('\n') || inputValue.includes(',')) {
+                          addMembersBatchToVehicle(vehicleIdx, inputValue)
+                        } else {
+                          addMemberToVehicle(vehicleIdx, inputValue)
+                        }
+                      }}
+                      disabled={!inputValue.trim()}
+                      className="h-7 px-2"
+                    >
+                      <Plus size={14} />
+                    </Button>
                   </div>
                 </div>
               )}
             </div>
           )
         })}
-        <Button variant="outline" size="sm" onClick={() => addVehicle('vehicle')} className="w-full h-7 text-xs gap-1.5 border-dashed">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => addVehicle('vehicle')}
+          className="w-full h-7 text-xs gap-1.5 border-dashed"
+        >
           <Plus size={12} /> {DESIGNER_LABELS.ADD_2744}
         </Button>
       </div>
@@ -421,62 +528,152 @@ export function VehicleEditor({
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Users size={14} className="text-morandi-secondary" />
-          <span className="text-xs font-medium text-morandi-secondary">{DESIGNER_LABELS.LABEL_1736}</span>
+          <span className="text-xs font-medium text-morandi-secondary">
+            {DESIGNER_LABELS.LABEL_1736}
+          </span>
         </div>
         {vehicles.map((vehicle, vehicleIdx) => {
           if (vehicle.groupType !== 'table') return null
           const isExpanded = expandedVehicles.has(vehicle.id)
           const memberCount = vehicle.members?.length || 0
           const inputValue = newMemberNames[vehicle.id] || ''
-          const tableNumber = vehicles.slice(0, vehicleIdx + 1).filter(v => v.groupType === 'table').length
+          const tableNumber = vehicles
+            .slice(0, vehicleIdx + 1)
+            .filter(v => v.groupType === 'table').length
 
           return (
             <div key={vehicle.id} className="rounded-lg border border-border/50 overflow-hidden">
               <div className="flex items-center gap-2 p-2 bg-morandi-container/20">
-                <button type="button" onClick={() => toggleVehicleExpanded(vehicle.id)} className="p-0.5 hover:bg-morandi-container/50 rounded">
-                  {isExpanded ? <ChevronDown size={14} className="text-morandi-secondary" /> : <ChevronRight size={14} className="text-morandi-secondary" />}
+                <button
+                  type="button"
+                  onClick={() => toggleVehicleExpanded(vehicle.id)}
+                  className="p-0.5 hover:bg-morandi-container/50 rounded"
+                >
+                  {isExpanded ? (
+                    <ChevronDown size={14} className="text-morandi-secondary" />
+                  ) : (
+                    <ChevronRight size={14} className="text-morandi-secondary" />
+                  )}
                 </button>
                 <Input
                   value={vehicle.vehicleName || ''}
-                  onChange={(e) => updateVehicleField(vehicleIdx, 'vehicleName', e.target.value)}
+                  onChange={e => updateVehicleField(vehicleIdx, 'vehicleName', e.target.value)}
                   placeholder={`${tableNumber}${DESIGNER_LABELS.TABLE_SUFFIX}`}
                   className="h-7 text-xs font-medium flex-1"
                 />
-                <span className="text-[10px] text-morandi-secondary whitespace-nowrap">{memberCount} 人</span>
-                <button type="button" onClick={() => deleteVehicle(vehicleIdx)} className="p-1 rounded text-morandi-muted hover:text-morandi-red hover:bg-morandi-red/10 transition-colors">
+                <span className="text-[10px] text-morandi-secondary whitespace-nowrap">
+                  {memberCount} 人
+                </span>
+                <button
+                  type="button"
+                  onClick={() => deleteVehicle(vehicleIdx)}
+                  className="p-1 rounded text-morandi-muted hover:text-morandi-red hover:bg-morandi-red/10 transition-colors"
+                >
                   <Trash2 size={12} />
                 </button>
               </div>
               {isExpanded && (
                 <div className="p-2 space-y-2 border-t border-border/30">
                   <div className="flex gap-2">
-                    <Input value={vehicle.vehicleType || ''} onChange={(e) => updateVehicleField(vehicleIdx, 'vehicleType', e.target.value)} placeholder={DESIGNER_LABELS.LABEL_4403} className="h-7 text-xs flex-1" />
-                    <Input value={vehicle.notes || ''} onChange={(e) => updateVehicleField(vehicleIdx, 'notes', e.target.value)} placeholder={DESIGNER_LABELS.PLACEHOLDER_NOTES} className="h-7 text-xs flex-1" />
+                    <Input
+                      value={vehicle.vehicleType || ''}
+                      onChange={e => updateVehicleField(vehicleIdx, 'vehicleType', e.target.value)}
+                      placeholder={DESIGNER_LABELS.LABEL_4403}
+                      className="h-7 text-xs flex-1"
+                    />
+                    <Input
+                      value={vehicle.notes || ''}
+                      onChange={e => updateVehicleField(vehicleIdx, 'notes', e.target.value)}
+                      placeholder={DESIGNER_LABELS.PLACEHOLDER_NOTES}
+                      className="h-7 text-xs flex-1"
+                    />
                   </div>
                   {vehicle.members?.map((member, memberIdx) => (
-                    <div key={member.id} className="flex items-center gap-1.5 p-1.5 rounded bg-morandi-container/10">
-                      <span className="text-[10px] text-morandi-secondary w-5 text-center">{memberIdx + 1}.</span>
-                      <Input value={member.chineseName || ''} onChange={(e) => updateMemberInVehicle(vehicleIdx, memberIdx, 'chineseName', e.target.value)} placeholder={DESIGNER_LABELS.PLACEHOLDER_NAME} className="flex-1 h-6 text-xs" />
-                      <button type="button" onClick={() => deleteMemberFromVehicle(vehicleIdx, memberIdx)} className="p-1 rounded text-morandi-muted hover:text-morandi-red hover:bg-morandi-red/10 transition-colors"><Trash2 size={10} /></button>
+                    <div
+                      key={member.id}
+                      className="flex items-center gap-1.5 p-1.5 rounded bg-morandi-container/10"
+                    >
+                      <span className="text-[10px] text-morandi-secondary w-5 text-center">
+                        {memberIdx + 1}.
+                      </span>
+                      <Input
+                        value={member.chineseName || ''}
+                        onChange={e =>
+                          updateMemberInVehicle(
+                            vehicleIdx,
+                            memberIdx,
+                            'chineseName',
+                            e.target.value
+                          )
+                        }
+                        placeholder={DESIGNER_LABELS.PLACEHOLDER_NAME}
+                        className="flex-1 h-6 text-xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => deleteMemberFromVehicle(vehicleIdx, memberIdx)}
+                        className="p-1 rounded text-morandi-muted hover:text-morandi-red hover:bg-morandi-red/10 transition-colors"
+                      >
+                        <Trash2 size={10} />
+                      </button>
                     </div>
                   ))}
                   <div className="flex gap-1">
                     <Input
                       value={inputValue}
-                      onChange={(e) => setNewMemberNames(prev => ({ ...prev, [vehicle.id]: e.target.value }))}
-                      onKeyDown={(e) => { if (e.key === 'Enter' && inputValue.trim()) { if (inputValue.includes('\n') || inputValue.includes(',') || inputValue.includes('，')) { addMembersBatchToVehicle(vehicleIdx, inputValue) } else { addMemberToVehicle(vehicleIdx, inputValue) } } }}
-                      onPaste={(e) => { const text = e.clipboardData.getData('text'); if (text.includes('\n')) { e.preventDefault(); addMembersBatchToVehicle(vehicleIdx, text) } }}
+                      onChange={e =>
+                        setNewMemberNames(prev => ({ ...prev, [vehicle.id]: e.target.value }))
+                      }
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' && inputValue.trim()) {
+                          if (
+                            inputValue.includes('\n') ||
+                            inputValue.includes(',') ||
+                            inputValue.includes('，')
+                          ) {
+                            addMembersBatchToVehicle(vehicleIdx, inputValue)
+                          } else {
+                            addMemberToVehicle(vehicleIdx, inputValue)
+                          }
+                        }
+                      }}
+                      onPaste={e => {
+                        const text = e.clipboardData.getData('text')
+                        if (text.includes('\n')) {
+                          e.preventDefault()
+                          addMembersBatchToVehicle(vehicleIdx, text)
+                        }
+                      }}
                       placeholder={DESIGNER_LABELS.PLACEHOLDER_NAME_LIST}
                       className="h-7 text-xs flex-1"
                     />
-                    <Button variant="outline" size="sm" onClick={() => { if (inputValue.includes('\n') || inputValue.includes(',')) { addMembersBatchToVehicle(vehicleIdx, inputValue) } else { addMemberToVehicle(vehicleIdx, inputValue) } }} disabled={!inputValue.trim()} className="h-7 px-2"><Plus size={14} /></Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        if (inputValue.includes('\n') || inputValue.includes(',')) {
+                          addMembersBatchToVehicle(vehicleIdx, inputValue)
+                        } else {
+                          addMemberToVehicle(vehicleIdx, inputValue)
+                        }
+                      }}
+                      disabled={!inputValue.trim()}
+                      className="h-7 px-2"
+                    >
+                      <Plus size={14} />
+                    </Button>
                   </div>
                 </div>
               )}
             </div>
           )
         })}
-        <Button variant="outline" size="sm" onClick={() => addVehicle('table')} className="w-full h-7 text-xs gap-1.5 border-dashed">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => addVehicle('table')}
+          className="w-full h-7 text-xs gap-1.5 border-dashed"
+        >
           <Plus size={12} /> {DESIGNER_LABELS.ADD_4177}
         </Button>
       </div>

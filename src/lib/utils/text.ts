@@ -12,27 +12,29 @@
 export function toHalfWidth(str: string): string {
   if (!str) return str
 
-  return str
-    // 只轉換全形數字 ０-９ (0xFF10-0xFF19) → 0-9
-    .replace(/[０-９]/g, char => String.fromCharCode(char.charCodeAt(0) - 0xfee0))
-    // 只轉換全形大寫英文 Ａ-Ｚ (0xFF21-0xFF3A) → A-Z
-    .replace(/[Ａ-Ｚ]/g, char => String.fromCharCode(char.charCodeAt(0) - 0xfee0))
-    // 只轉換全形小寫英文 ａ-ｚ (0xFF41-0xFF5A) → a-z
-    .replace(/[ａ-ｚ]/g, char => String.fromCharCode(char.charCodeAt(0) - 0xfee0))
-    // 全形冒號轉半形冒號
-    .replace(/：/g, ':')
-    // 全形空格轉半形空格
-    .replace(/　/g, ' ')
-    // 全形運算符號轉半形（用於數學計算）
-    .replace(/＋/g, '+')
-    .replace(/－/g, '-')
-    .replace(/×/g, '*')
-    .replace(/÷/g, '/')
-    .replace(/＊/g, '*')
-    .replace(/（/g, '(')
-    .replace(/）/g, ')')
-    .replace(/％/g, '%')
-    .replace(/＝/g, '=')
+  return (
+    str
+      // 只轉換全形數字 ０-９ (0xFF10-0xFF19) → 0-9
+      .replace(/[０-９]/g, char => String.fromCharCode(char.charCodeAt(0) - 0xfee0))
+      // 只轉換全形大寫英文 Ａ-Ｚ (0xFF21-0xFF3A) → A-Z
+      .replace(/[Ａ-Ｚ]/g, char => String.fromCharCode(char.charCodeAt(0) - 0xfee0))
+      // 只轉換全形小寫英文 ａ-ｚ (0xFF41-0xFF5A) → a-z
+      .replace(/[ａ-ｚ]/g, char => String.fromCharCode(char.charCodeAt(0) - 0xfee0))
+      // 全形冒號轉半形冒號
+      .replace(/：/g, ':')
+      // 全形空格轉半形空格
+      .replace(/　/g, ' ')
+      // 全形運算符號轉半形（用於數學計算）
+      .replace(/＋/g, '+')
+      .replace(/－/g, '-')
+      .replace(/×/g, '*')
+      .replace(/÷/g, '/')
+      .replace(/＊/g, '*')
+      .replace(/（/g, '(')
+      .replace(/）/g, ')')
+      .replace(/％/g, '%')
+      .replace(/＝/g, '=')
+  )
 }
 
 /**

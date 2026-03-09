@@ -18,7 +18,10 @@ import {
 import { Employee } from '@/stores/types'
 import { EmployeeExpandedView } from '@/features/hr/components/employee-expanded-view'
 import { AddEmployeeForm } from '@/features/hr/components/add-employee'
-import { SalaryPaymentDialog, SalaryPaymentData } from '@/features/hr/components/salary-payment-dialog'
+import {
+  SalaryPaymentDialog,
+  SalaryPaymentData,
+} from '@/features/hr/components/salary-payment-dialog'
 import { Users, Edit2, Trash2, UserX, DollarSign, Bot } from 'lucide-react'
 import { getRoleConfig, type UserRole } from '@/lib/rbac-config'
 import { TableColumn } from '@/components/ui/enhanced-table'
@@ -71,8 +74,16 @@ export default function HRPage() {
 
   const tabOptions = useMemo(() => {
     const baseTabs: { value: EmployeeTab; label: string; count: number }[] = [
-      { value: 'active', label: LABELS.TAB_ACTIVE, count: users.filter(e => e.employee_type !== 'bot' && e.status !== 'terminated').length },
-      { value: 'terminated', label: LABELS.TAB_TERMINATED, count: users.filter(e => e.employee_type !== 'bot' && e.status === 'terminated').length },
+      {
+        value: 'active',
+        label: LABELS.TAB_ACTIVE,
+        count: users.filter(e => e.employee_type !== 'bot' && e.status !== 'terminated').length,
+      },
+      {
+        value: 'terminated',
+        label: LABELS.TAB_TERMINATED,
+        count: users.filter(e => e.employee_type !== 'bot' && e.status === 'terminated').length,
+      },
     ]
     if (isSuperAdmin) {
       baseTabs.push({
@@ -187,14 +198,16 @@ export default function HRPage() {
         key: 'employee_number',
         label: LABELS.COL_EMPLOYEE_NUMBER,
         sortable: true,
-        render: (value) => <span className="font-mono text-sm">{String(value || '')}</span>,
+        render: value => <span className="font-mono text-sm">{String(value || '')}</span>,
       },
       {
         key: 'display_name',
         label: LABELS.COL_NAME,
         sortable: true,
         render: (value, employee: Employee) => (
-          <span className="font-medium">{String(value || employee.chinese_name || LABELS.UNNAMED_EMPLOYEE)}</span>
+          <span className="font-medium">
+            {String(value || employee.chinese_name || LABELS.UNNAMED_EMPLOYEE)}
+          </span>
         ),
       },
       {
@@ -246,10 +259,15 @@ export default function HRPage() {
         label: LABELS.COL_CONTACT,
         sortable: false,
         render: (_value, employee: Employee) => {
-          const info = employee.personal_info as { phone?: string | string[]; email?: string } | null
+          const info = employee.personal_info as {
+            phone?: string | string[]
+            email?: string
+          } | null
           return (
             <div className="text-sm">
-              <div>{Array.isArray(info?.phone) ? info.phone[0] : info?.phone || LABELS.NOT_PROVIDED}</div>
+              <div>
+                {Array.isArray(info?.phone) ? info.phone[0] : info?.phone || LABELS.NOT_PROVIDED}
+              </div>
               <div className="text-morandi-muted text-xs truncate max-w-[200px]">
                 {info?.email || LABELS.NOT_PROVIDED}
               </div>
@@ -355,7 +373,9 @@ export default function HRPage() {
       }
 
       await invalidatePaymentRequests()
-      toast.success(`${LABELS.SALARY_SUCCESS_PREFIX}${data.employee_salaries.length}${LABELS.SALARY_SUCCESS_MID}${totalAmount.toLocaleString()}${LABELS.SALARY_SUCCESS_SUFFIX}`)
+      toast.success(
+        `${LABELS.SALARY_SUCCESS_PREFIX}${data.employee_salaries.length}${LABELS.SALARY_SUCCESS_MID}${totalAmount.toLocaleString()}${LABELS.SALARY_SUCCESS_SUFFIX}`
+      )
       logger.log('建立薪資請款成功：', data)
     } catch (error) {
       logger.error('建立薪資請款失敗：', error)
@@ -394,11 +414,13 @@ export default function HRPage() {
                 >
                   {tab.value === 'bot' && <Bot className="w-4 h-4" />}
                   {tab.label}
-                  <span className={`px-1.5 py-0.5 rounded text-xs ${
-                    activeTab === tab.value
-                      ? 'bg-morandi-gold/20 text-morandi-gold'
-                      : 'bg-morandi-container text-morandi-secondary'
-                  }`}>
+                  <span
+                    className={`px-1.5 py-0.5 rounded text-xs ${
+                      activeTab === tab.value
+                        ? 'bg-morandi-gold/20 text-morandi-gold'
+                        : 'bg-morandi-container text-morandi-secondary'
+                    }`}
+                  >
                     {tab.count}
                   </span>
                 </button>
@@ -420,7 +442,12 @@ export default function HRPage() {
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center"
             >
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
               </svg>
               {LABELS.ADD_EMPLOYEE}
             </Button>

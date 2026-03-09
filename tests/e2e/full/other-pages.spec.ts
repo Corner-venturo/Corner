@@ -30,8 +30,17 @@ test.describe('其他頁面基本測試', () => {
     await expect(mainContent.first()).toBeVisible({ timeout: 5000 })
 
     // 設定頁面通常有多個設定區塊
-    const hasSettings = await page.locator('text=設定').first().isVisible().catch(() => false) ||
-                        await page.locator('text=Settings').first().isVisible().catch(() => false)
+    const hasSettings =
+      (await page
+        .locator('text=設定')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await page
+        .locator('text=Settings')
+        .first()
+        .isVisible()
+        .catch(() => false))
     console.log(`✅ 設定頁面載入正常 (有設定內容: ${hasSettings})`)
   })
 
@@ -47,9 +56,22 @@ test.describe('其他頁面基本測試', () => {
     await expect(mainContent.first()).toBeVisible({ timeout: 5000 })
 
     // HR 頁面可能有員工列表
-    const hasContent = await page.locator('text=員工').first().isVisible().catch(() => false) ||
-                       await page.locator('text=人事').first().isVisible().catch(() => false) ||
-                       await page.locator('table').first().isVisible().catch(() => false)
+    const hasContent =
+      (await page
+        .locator('text=員工')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await page
+        .locator('text=人事')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await page
+        .locator('table')
+        .first()
+        .isVisible()
+        .catch(() => false))
     console.log(`✅ HR 人事頁面載入正常 (有內容: ${hasContent})`)
   })
 
@@ -64,9 +86,22 @@ test.describe('其他頁面基本測試', () => {
     const mainContent = page.locator('main, [role="main"], .flex-1')
     await expect(mainContent.first()).toBeVisible({ timeout: 5000 })
 
-    const hasContent = await page.locator('text=排程').first().isVisible().catch(() => false) ||
-                       await page.locator('text=調度').first().isVisible().catch(() => false) ||
-                       await page.locator('table').first().isVisible().catch(() => false)
+    const hasContent =
+      (await page
+        .locator('text=排程')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await page
+        .locator('text=調度')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await page
+        .locator('table')
+        .first()
+        .isVisible()
+        .catch(() => false))
     console.log(`✅ 排程頁面載入正常 (有內容: ${hasContent})`)
   })
 
@@ -81,9 +116,22 @@ test.describe('其他頁面基本測試', () => {
     const mainContent = page.locator('main, [role="main"], .flex-1')
     await expect(mainContent.first()).toBeVisible({ timeout: 5000 })
 
-    const hasContent = await page.locator('text=車隊').first().isVisible().catch(() => false) ||
-                       await page.locator('text=車輛').first().isVisible().catch(() => false) ||
-                       await page.locator('table').first().isVisible().catch(() => false)
+    const hasContent =
+      (await page
+        .locator('text=車隊')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await page
+        .locator('text=車輛')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await page
+        .locator('table')
+        .first()
+        .isVisible()
+        .catch(() => false))
     console.log(`✅ 車隊管理頁面載入正常 (有內容: ${hasContent})`)
   })
 
@@ -98,9 +146,22 @@ test.describe('其他頁面基本測試', () => {
     const mainContent = page.locator('main, [role="main"], .flex-1')
     await expect(mainContent.first()).toBeVisible({ timeout: 5000 })
 
-    const hasContent = await page.locator('text=eSIM').first().isVisible().catch(() => false) ||
-                       await page.locator('text=SIM').first().isVisible().catch(() => false) ||
-                       await page.locator('table').first().isVisible().catch(() => false)
+    const hasContent =
+      (await page
+        .locator('text=eSIM')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await page
+        .locator('text=SIM')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await page
+        .locator('table')
+        .first()
+        .isVisible()
+        .catch(() => false))
     console.log(`✅ eSIM 頁面載入正常 (有內容: ${hasContent})`)
   })
 
@@ -115,10 +176,27 @@ test.describe('其他頁面基本測試', () => {
     const mainContent = page.locator('main, [role="main"], .flex-1')
     await expect(mainContent.first()).toBeVisible({ timeout: 5000 })
 
-    const hasContent = await page.locator('text=會計').first().isVisible().catch(() => false) ||
-                       await page.locator('text=傳票').first().isVisible().catch(() => false) ||
-                       await page.locator('text=請款').first().isVisible().catch(() => false) ||
-                       await page.locator('table').first().isVisible().catch(() => false)
+    const hasContent =
+      (await page
+        .locator('text=會計')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await page
+        .locator('text=傳票')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await page
+        .locator('text=請款')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await page
+        .locator('table')
+        .first()
+        .isVisible()
+        .catch(() => false))
     console.log(`✅ 會計頁面載入正常 (有內容: ${hasContent})`)
   })
 
@@ -133,9 +211,22 @@ test.describe('其他頁面基本測試', () => {
     const mainContent = page.locator('main, [role="main"], .flex-1')
     await expect(mainContent.first()).toBeVisible({ timeout: 5000 })
 
-    const hasContent = await page.locator('text=Timebox').first().isVisible().catch(() => false) ||
-                       await page.locator('text=時間').first().isVisible().catch(() => false) ||
-                       await page.locator('text=排程').first().isVisible().catch(() => false)
+    const hasContent =
+      (await page
+        .locator('text=Timebox')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await page
+        .locator('text=時間')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await page
+        .locator('text=排程')
+        .first()
+        .isVisible()
+        .catch(() => false))
     console.log(`✅ Timebox 頁面載入正常 (有內容: ${hasContent})`)
   })
 
@@ -150,9 +241,22 @@ test.describe('其他頁面基本測試', () => {
     const mainContent = page.locator('main, [role="main"], .flex-1')
     await expect(mainContent.first()).toBeVisible({ timeout: 5000 })
 
-    const hasContent = await page.locator('text=設計').first().isVisible().catch(() => false) ||
-                       await page.locator('text=手冊').first().isVisible().catch(() => false) ||
-                       await page.locator('table').first().isVisible().catch(() => false)
+    const hasContent =
+      (await page
+        .locator('text=設計')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await page
+        .locator('text=手冊')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await page
+        .locator('table')
+        .first()
+        .isVisible()
+        .catch(() => false))
     console.log(`✅ 設計頁面載入正常 (有內容: ${hasContent})`)
   })
 
@@ -167,9 +271,22 @@ test.describe('其他頁面基本測試', () => {
     const mainContent = page.locator('main, [role="main"], .flex-1')
     await expect(mainContent.first()).toBeVisible({ timeout: 5000 })
 
-    const hasContent = await page.locator('text=頻道').first().isVisible().catch(() => false) ||
-                       await page.locator('text=訊息').first().isVisible().catch(() => false) ||
-                       await page.locator('text=Channel').first().isVisible().catch(() => false)
+    const hasContent =
+      (await page
+        .locator('text=頻道')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await page
+        .locator('text=訊息')
+        .first()
+        .isVisible()
+        .catch(() => false)) ||
+      (await page
+        .locator('text=Channel')
+        .first()
+        .isVisible()
+        .catch(() => false))
     console.log(`✅ 工作區頁面載入正常 (有內容: ${hasContent})`)
   })
 })

@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { Attraction } from '../types'
 import type { Country, City } from '@/stores/region-store'
-import { ATTRACTIONS_LIST_LABELS, SORTABLE_ATTRACTIONS_LIST_LABELS } from '../constants/labels';
+import { ATTRACTIONS_LIST_LABELS, SORTABLE_ATTRACTIONS_LIST_LABELS } from '../constants/labels'
 
 // ============================================
 // 可拖拽的景點項目組件
@@ -44,14 +44,9 @@ function SortableAttractionItem({
   onToggleStatus,
   onDelete,
 }: SortableAttractionItemProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: attraction.id })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: attraction.id,
+  })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -105,9 +100,7 @@ function SortableAttractionItem({
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <h3 className="font-medium text-morandi-primary line-clamp-1">
-                {attraction.name}
-              </h3>
+              <h3 className="font-medium text-morandi-primary line-clamp-1">{attraction.name}</h3>
               {attraction.english_name && (
                 <p className="text-sm text-morandi-muted line-clamp-1 mt-0.5">
                   {attraction.english_name}
@@ -221,25 +214,28 @@ export function SortableAttractionsList({
     })
   )
 
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    const { active, over } = event
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event
 
-    if (over && active.id !== over.id) {
-      const oldIndex = items.findIndex(item => item.id === active.id)
-      const newIndex = items.findIndex(item => item.id === over.id)
+      if (over && active.id !== over.id) {
+        const oldIndex = items.findIndex(item => item.id === active.id)
+        const newIndex = items.findIndex(item => item.id === over.id)
 
-      const newItems = arrayMove(items, oldIndex, newIndex)
+        const newItems = arrayMove(items, oldIndex, newIndex)
 
-      // 更新 display_order
-      const reorderedItems = newItems.map((item, index) => ({
-        ...item,
-        display_order: index,
-      }))
+        // 更新 display_order
+        const reorderedItems = newItems.map((item, index) => ({
+          ...item,
+          display_order: index,
+        }))
 
-      setItems(reorderedItems)
-      onReorder(reorderedItems)
-    }
-  }, [items, onReorder])
+        setItems(reorderedItems)
+        onReorder(reorderedItems)
+      }
+    },
+    [items, onReorder]
+  )
 
   if (loading) {
     return (
@@ -271,11 +267,7 @@ export function SortableAttractionsList({
   }
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={items} strategy={verticalListSortingStrategy}>
         <div className="space-y-3">
           {items.map(attraction => (

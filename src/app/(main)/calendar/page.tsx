@@ -27,7 +27,14 @@ import {
 
 const CalendarGrid = dynamic(
   () => import('@/features/calendar/components/CalendarGrid').then(m => m.CalendarGrid),
-  { ssr: false, loading: () => <div className="flex items-center justify-center h-96"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-morandi-gold" /></div> }
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-96">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-morandi-gold" />
+      </div>
+    ),
+  }
 )
 import {
   useCalendarEvents,
@@ -91,156 +98,156 @@ export default function CalendarPage() {
           { label: CALENDAR_LABELS.BREADCRUMB_CALENDAR, href: '/calendar' },
         ]}
         headerActions={
-            <div className="flex items-center gap-3">
-              {/* 月份切換 */}
-              <div className="flex items-center gap-2 bg-card border border-border rounded-lg shadow-sm">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handlePrevMonth}
-                  className="h-9 w-9 p-0 hover:bg-morandi-container/50 hover:text-morandi-gold transition-all rounded-l-lg"
-                >
-                  ←
-                </Button>
-                <span className="text-sm font-semibold text-morandi-primary min-w-[120px] text-center px-2">
-                  {getCurrentMonthYear()}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleNextMonth}
-                  className="h-9 w-9 p-0 hover:bg-morandi-container/50 hover:text-morandi-gold transition-all rounded-r-lg"
-                >
-                  →
-                </Button>
-              </div>
-
+          <div className="flex items-center gap-3">
+            {/* 月份切換 */}
+            <div className="flex items-center gap-2 bg-card border border-border rounded-lg shadow-sm">
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                onClick={handleToday}
-                className="h-9 border-morandi-gold/30 bg-card text-morandi-gold hover:bg-morandi-gold hover:border-morandi-gold hover:text-white transition-all shadow-sm font-medium rounded-lg"
+                onClick={handlePrevMonth}
+                className="h-9 w-9 p-0 hover:bg-morandi-container/50 hover:text-morandi-gold transition-all rounded-l-lg"
               >
-                {CALENDAR_LABELS.TODAY}
+                ←
               </Button>
-
-              {/* 視圖切換按鈕 */}
-              <div className="flex items-center bg-card border border-border rounded-lg shadow-sm overflow-hidden">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setCurrentView('dayGridMonth')
-                    calendarRef.current?.getApi().changeView('dayGridMonth')
-                  }}
-                  className={`h-9 px-3 rounded-none border-r border-border ${
-                    currentView === 'dayGridMonth'
-                      ? 'bg-morandi-gold/10 text-morandi-gold'
-                      : 'hover:bg-morandi-container/50'
-                  }`}
-                  title={CALENDAR_LABELS.MONTH_VIEW}
-                >
-                  <Calendar size={16} />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setCurrentView('timeGridWeek')
-                    calendarRef.current?.getApi().changeView('timeGridWeek')
-                  }}
-                  className={`h-9 px-3 rounded-none border-r border-border ${
-                    currentView === 'timeGridWeek'
-                      ? 'bg-morandi-gold/10 text-morandi-gold'
-                      : 'hover:bg-morandi-container/50'
-                  }`}
-                  title={CALENDAR_LABELS.WEEK_VIEW}
-                >
-                  <CalendarDays size={16} />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setCurrentView('timeGridDay')
-                    calendarRef.current?.getApi().changeView('timeGridDay')
-                  }}
-                  className={`h-9 px-3 rounded-none ${
-                    currentView === 'timeGridDay'
-                      ? 'bg-morandi-gold/10 text-morandi-gold'
-                      : 'hover:bg-morandi-container/50'
-                  }`}
-                  title={CALENDAR_LABELS.DAY_VIEW}
-                >
-                  <CalendarClock size={16} />
-                </Button>
-              </div>
-
-              {/* 超級管理員專用：Workspace 篩選器 */}
-              {isSuperAdmin && workspaces && workspaces.length > 0 && (
-                <Select
-                  value={selectedWorkspaceId || 'all'}
-                  onValueChange={(value) => onWorkspaceFilterChange(value === 'all' ? null : value)}
-                >
-                  <SelectTrigger className="h-9 w-[140px] shadow-sm">
-                    <Building2 size={14} className="mr-1.5 text-morandi-blue" />
-                    <SelectValue placeholder={CALENDAR_LABELS.ALL_WORKSPACES} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{CALENDAR_LABELS.ALL_WORKSPACES}</SelectItem>
-                    {workspaces.map((ws: { id: string; name: string }) => (
-                      <SelectItem key={ws.id} value={ws.id}>
-                        {ws.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-
-              {/* 生日名單按鈕 */}
+              <span className="text-sm font-semibold text-morandi-primary min-w-[120px] text-center px-2">
+                {getCurrentMonthYear()}
+              </span>
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                onClick={() => setBirthdayDialogOpen(true)}
-                className="h-9 px-3 gap-1.5 border-border hover:bg-morandi-container/50 hover:border-morandi-gold/50 transition-all rounded-lg text-morandi-secondary hover:text-morandi-gold"
-                title={CALENDAR_LABELS.VIEW_BIRTHDAY_LIST}
+                onClick={handleNextMonth}
+                className="h-9 w-9 p-0 hover:bg-morandi-container/50 hover:text-morandi-gold transition-all rounded-r-lg"
               >
-                <Cake size={16} />
-                <span className="text-xs">{CALENDAR_LABELS.BIRTHDAY}</span>
+                →
               </Button>
+            </div>
 
-              <CalendarSettingsDialog />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleToday}
+              className="h-9 border-morandi-gold/30 bg-card text-morandi-gold hover:bg-morandi-gold hover:border-morandi-gold hover:text-white transition-all shadow-sm font-medium rounded-lg"
+            >
+              {CALENDAR_LABELS.TODAY}
+            </Button>
 
+            {/* 視圖切換按鈕 */}
+            <div className="flex items-center bg-card border border-border rounded-lg shadow-sm overflow-hidden">
               <Button
+                variant="ghost"
                 size="sm"
                 onClick={() => {
-                  const today = getTodayString()
-                  setAddEventDialog({ open: true, selectedDate: today })
+                  setCurrentView('dayGridMonth')
+                  calendarRef.current?.getApi().changeView('dayGridMonth')
                 }}
-                className="h-9 bg-morandi-gold hover:bg-morandi-gold-hover text-white shadow-sm hover:shadow-md transition-all font-medium rounded-lg"
+                className={`h-9 px-3 rounded-none border-r border-border ${
+                  currentView === 'dayGridMonth'
+                    ? 'bg-morandi-gold/10 text-morandi-gold'
+                    : 'hover:bg-morandi-container/50'
+                }`}
+                title={CALENDAR_LABELS.MONTH_VIEW}
               >
-                <Plus size={16} className="mr-1.5" />
-                {CALENDAR_LABELS.ADD_EVENT}
+                <Calendar size={16} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setCurrentView('timeGridWeek')
+                  calendarRef.current?.getApi().changeView('timeGridWeek')
+                }}
+                className={`h-9 px-3 rounded-none border-r border-border ${
+                  currentView === 'timeGridWeek'
+                    ? 'bg-morandi-gold/10 text-morandi-gold'
+                    : 'hover:bg-morandi-container/50'
+                }`}
+                title={CALENDAR_LABELS.WEEK_VIEW}
+              >
+                <CalendarDays size={16} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setCurrentView('timeGridDay')
+                  calendarRef.current?.getApi().changeView('timeGridDay')
+                }}
+                className={`h-9 px-3 rounded-none ${
+                  currentView === 'timeGridDay'
+                    ? 'bg-morandi-gold/10 text-morandi-gold'
+                    : 'hover:bg-morandi-container/50'
+                }`}
+                title={CALENDAR_LABELS.DAY_VIEW}
+              >
+                <CalendarClock size={16} />
               </Button>
             </div>
-          }
+
+            {/* 超級管理員專用：Workspace 篩選器 */}
+            {isSuperAdmin && workspaces && workspaces.length > 0 && (
+              <Select
+                value={selectedWorkspaceId || 'all'}
+                onValueChange={value => onWorkspaceFilterChange(value === 'all' ? null : value)}
+              >
+                <SelectTrigger className="h-9 w-[140px] shadow-sm">
+                  <Building2 size={14} className="mr-1.5 text-morandi-blue" />
+                  <SelectValue placeholder={CALENDAR_LABELS.ALL_WORKSPACES} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{CALENDAR_LABELS.ALL_WORKSPACES}</SelectItem>
+                  {workspaces.map((ws: { id: string; name: string }) => (
+                    <SelectItem key={ws.id} value={ws.id}>
+                      {ws.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+
+            {/* 生日名單按鈕 */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setBirthdayDialogOpen(true)}
+              className="h-9 px-3 gap-1.5 border-border hover:bg-morandi-container/50 hover:border-morandi-gold/50 transition-all rounded-lg text-morandi-secondary hover:text-morandi-gold"
+              title={CALENDAR_LABELS.VIEW_BIRTHDAY_LIST}
+            >
+              <Cake size={16} />
+              <span className="text-xs">{CALENDAR_LABELS.BIRTHDAY}</span>
+            </Button>
+
+            <CalendarSettingsDialog />
+
+            <Button
+              size="sm"
+              onClick={() => {
+                const today = getTodayString()
+                setAddEventDialog({ open: true, selectedDate: today })
+              }}
+              className="h-9 bg-morandi-gold hover:bg-morandi-gold-hover text-white shadow-sm hover:shadow-md transition-all font-medium rounded-lg"
+            >
+              <Plus size={16} className="mr-1.5" />
+              {CALENDAR_LABELS.ADD_EVENT}
+            </Button>
+          </div>
+        }
         contentClassName="flex-1 overflow-hidden"
       >
-          <div className="h-full bg-card rounded-lg border border-border shadow-sm flex flex-col overflow-hidden">
-            {/* 日曆主體 */}
-            <div className="flex-1 overflow-hidden">
-              <CalendarGrid
-                calendarRef={calendarRef}
-                events={filteredEvents}
-                currentView={currentView}
-                onDateClick={handleDateClick}
-                onEventClick={handleEventClick}
-                onMoreLinkClick={info => handleMoreLinkClick(info, filteredEvents)}
-                onEventDrop={handleEventDrop}
-                onDatesSet={onDatesChange}
-              />
-            </div>
+        <div className="h-full bg-card rounded-lg border border-border shadow-sm flex flex-col overflow-hidden">
+          {/* 日曆主體 */}
+          <div className="flex-1 overflow-hidden">
+            <CalendarGrid
+              calendarRef={calendarRef}
+              events={filteredEvents}
+              currentView={currentView}
+              onDateClick={handleDateClick}
+              onEventClick={handleEventClick}
+              onMoreLinkClick={info => handleMoreLinkClick(info, filteredEvents)}
+              onEventDrop={handleEventDrop}
+              onDatesSet={onDatesChange}
+            />
           </div>
+        </div>
       </ContentPageLayout>
 
       {/* 新增行事曆事項對話框 */}
@@ -279,10 +286,7 @@ export default function CalendarPage() {
       />
 
       {/* 生日名單對話框 */}
-      <BirthdayListDialog
-        open={birthdayDialogOpen}
-        onClose={() => setBirthdayDialogOpen(false)}
-      />
+      <BirthdayListDialog open={birthdayDialogOpen} onClose={() => setBirthdayDialogOpen(false)} />
 
       <CalendarStyles />
     </>

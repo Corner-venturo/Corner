@@ -24,10 +24,7 @@ import { useDocumentStore, type BrochureEntityType } from '@/stores/document-sto
 import { useAuthStore } from '@/stores/auth-store'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
-import {
-  SIDEBAR_WIDTH_EXPANDED_PX,
-  SIDEBAR_WIDTH_COLLAPSED_PX,
-} from '@/lib/constants/layout'
+import { SIDEBAR_WIDTH_EXPANDED_PX, SIDEBAR_WIDTH_COLLAPSED_PX } from '@/lib/constants/layout'
 
 // Designer 元件
 import { useBrochureEditorV2 } from '@/features/designer/hooks/useBrochureEditorV2'
@@ -40,7 +37,11 @@ import { ContextMenu } from '@/features/designer/components/ContextMenu'
 import { LayerPanel } from '@/features/designer/components/LayerPanel'
 import { TemplateSelector } from '@/features/designer/components/TemplateSelector'
 import { PageListSidebar } from '@/features/designer/components/PageListSidebar'
-import { DesignTypeSelector, DESIGN_TYPES, type DesignType } from '@/features/designer/components/DesignTypeSelector'
+import {
+  DesignTypeSelector,
+  DESIGN_TYPES,
+  type DesignType,
+} from '@/features/designer/components/DesignTypeSelector'
 import { STICKER_PATHS } from '@/features/designer/components/core/sticker-paths'
 
 // Designer 工具和類型
@@ -96,7 +97,10 @@ export default function DesignerPageContent() {
   const itineraryId = urlItineraryId || manualItineraryId
 
   // 決定使用哪個 entity
-  const { entityId, entityType } = useMemo((): { entityId: string | null; entityType: BrochureEntityType } => {
+  const { entityId, entityType } = useMemo((): {
+    entityId: string | null
+    entityType: BrochureEntityType
+  } => {
     if (tourId) return { entityId: tourId, entityType: 'tour' }
     if (packageId) return { entityId: packageId, entityType: 'package' }
     if (itineraryId) return { entityId: itineraryId, entityType: 'itinerary' }
@@ -146,64 +150,80 @@ export default function DesignerPageContent() {
   const canvasHeight = selectedDesignType?.height ?? 794
 
   // 文字編輯雙向綁定：Canvas → templateData
-  const handleTextEdit = useCallback((event: { elementId: string; elementName: string; newContent: string }) => {
-    const { elementId, elementName, newContent } = event
+  const handleTextEdit = useCallback(
+    (event: { elementId: string; elementName: string; newContent: string }) => {
+      const { elementId, elementName, newContent } = event
 
-    const dayContentMatch = (elementId || elementName).match(/el-day-(\d+)-content/)
-    if (dayContentMatch) {
-      const dayIndex = parseInt(dayContentMatch[1], 10) - 1
-      setTemplateData(prev => {
-        if (!prev) return prev
-        const dailyItineraries = [...((prev.dailyItineraries as Array<Record<string, unknown>>) || [])]
-        const dailyDetails = [...((prev.dailyDetails as Array<Record<string, unknown>>) || [])]
-        if (dailyItineraries[dayIndex]) {
-          dailyItineraries[dayIndex] = { ...dailyItineraries[dayIndex], title: newContent }
-        }
-        if (dailyDetails[dayIndex]) {
-          dailyDetails[dayIndex] = { ...dailyDetails[dayIndex], title: newContent }
-        }
-        return { ...prev, dailyItineraries, dailyDetails }
-      })
-      return
-    }
+      const dayContentMatch = (elementId || elementName).match(/el-day-(\d+)-content/)
+      if (dayContentMatch) {
+        const dayIndex = parseInt(dayContentMatch[1], 10) - 1
+        setTemplateData(prev => {
+          if (!prev) return prev
+          const dailyItineraries = [
+            ...((prev.dailyItineraries as Array<Record<string, unknown>>) || []),
+          ]
+          const dailyDetails = [...((prev.dailyDetails as Array<Record<string, unknown>>) || [])]
+          if (dailyItineraries[dayIndex]) {
+            dailyItineraries[dayIndex] = { ...dailyItineraries[dayIndex], title: newContent }
+          }
+          if (dailyDetails[dayIndex]) {
+            dailyDetails[dayIndex] = { ...dailyDetails[dayIndex], title: newContent }
+          }
+          return { ...prev, dailyItineraries, dailyDetails }
+        })
+        return
+      }
 
-    const mealMatch = (elementId || elementName).match(/el-day-(\d+)-meal-(breakfast|lunch|dinner)-text/)
-    if (mealMatch) {
-      const dayIndex = parseInt(mealMatch[1], 10) - 1
-      const mealType = mealMatch[2] as 'breakfast' | 'lunch' | 'dinner'
-      setTemplateData(prev => {
-        if (!prev) return prev
-        const dailyItineraries = [...((prev.dailyItineraries as Array<Record<string, unknown>>) || [])]
-        const dailyDetails = [...((prev.dailyDetails as Array<Record<string, unknown>>) || [])]
-        if (dailyItineraries[dayIndex]) {
-          const meals = { ...((dailyItineraries[dayIndex].meals as Record<string, string>) || {}) }
-          meals[mealType] = newContent
-          dailyItineraries[dayIndex] = { ...dailyItineraries[dayIndex], meals }
-        }
-        if (dailyDetails[dayIndex]) {
-          const meals = { ...((dailyDetails[dayIndex].meals as Record<string, string>) || {}) }
-          meals[mealType] = newContent
-          dailyDetails[dayIndex] = { ...dailyDetails[dayIndex], meals }
-        }
-        return { ...prev, dailyItineraries, dailyDetails }
-      })
-      return
-    }
+      const mealMatch = (elementId || elementName).match(
+        /el-day-(\d+)-meal-(breakfast|lunch|dinner)-text/
+      )
+      if (mealMatch) {
+        const dayIndex = parseInt(mealMatch[1], 10) - 1
+        const mealType = mealMatch[2] as 'breakfast' | 'lunch' | 'dinner'
+        setTemplateData(prev => {
+          if (!prev) return prev
+          const dailyItineraries = [
+            ...((prev.dailyItineraries as Array<Record<string, unknown>>) || []),
+          ]
+          const dailyDetails = [...((prev.dailyDetails as Array<Record<string, unknown>>) || [])]
+          if (dailyItineraries[dayIndex]) {
+            const meals = {
+              ...((dailyItineraries[dayIndex].meals as Record<string, string>) || {}),
+            }
+            meals[mealType] = newContent
+            dailyItineraries[dayIndex] = { ...dailyItineraries[dayIndex], meals }
+          }
+          if (dailyDetails[dayIndex]) {
+            const meals = { ...((dailyDetails[dayIndex].meals as Record<string, string>) || {}) }
+            meals[mealType] = newContent
+            dailyDetails[dayIndex] = { ...dailyDetails[dayIndex], meals }
+          }
+          return { ...prev, dailyItineraries, dailyDetails }
+        })
+        return
+      }
 
-    const accommodationMatch = (elementId || elementName).match(/el-day-(\d+)-accommodation/)
-    if (accommodationMatch) {
-      const dayIndex = parseInt(accommodationMatch[1], 10) - 1
-      setTemplateData(prev => {
-        if (!prev) return prev
-        const dailyItineraries = [...((prev.dailyItineraries as Array<Record<string, unknown>>) || [])]
-        if (dailyItineraries[dayIndex]) {
-          dailyItineraries[dayIndex] = { ...dailyItineraries[dayIndex], accommodation: newContent }
-        }
-        return { ...prev, dailyItineraries }
-      })
-      return
-    }
-  }, [])
+      const accommodationMatch = (elementId || elementName).match(/el-day-(\d+)-accommodation/)
+      if (accommodationMatch) {
+        const dayIndex = parseInt(accommodationMatch[1], 10) - 1
+        setTemplateData(prev => {
+          if (!prev) return prev
+          const dailyItineraries = [
+            ...((prev.dailyItineraries as Array<Record<string, unknown>>) || []),
+          ]
+          if (dailyItineraries[dayIndex]) {
+            dailyItineraries[dayIndex] = {
+              ...dailyItineraries[dayIndex],
+              accommodation: newContent,
+            }
+          }
+          return { ...prev, dailyItineraries }
+        })
+        return
+      }
+    },
+    []
+  )
 
   const {
     canvasRef,
@@ -322,11 +342,7 @@ export default function DesignerPageContent() {
     addImage,
   })
 
-  const {
-    handleSelectDesignType,
-    handleBrochureStart,
-    handleTemplateComplete,
-  } = useDesignerSetup({
+  const { handleSelectDesignType, handleBrochureStart, handleTemplateComplete } = useDesignerSetup({
     entityId,
     entityType,
     workspaceId,
@@ -402,21 +418,33 @@ export default function DesignerPageContent() {
 
         if (loadedVersion) {
           const versionData = loadedVersion.data as Record<string, unknown>
-          const pages = versionData.pages as Array<{ width?: number; height?: number; templateKey?: string }> | undefined
+          const pages = versionData.pages as
+            | Array<{ width?: number; height?: number; templateKey?: string }>
+            | undefined
           const firstPage = pages?.[0]
 
           let matchedType: DesignType | undefined
 
           if (firstPage?.width && firstPage?.height) {
-            matchedType = DESIGN_TYPES.find(dt =>
-              dt.width === firstPage.width &&
-              dt.height === firstPage.height
+            matchedType = DESIGN_TYPES.find(
+              dt => dt.width === firstPage.width && dt.height === firstPage.height
             )
           }
 
           if (!matchedType) {
-            const isBrochureDocument = pages?.some(p =>
-              p.templateKey && ['cover', 'toc', 'daily', 'itinerary', 'memo', 'hotel', 'vehicle', 'table'].includes(p.templateKey)
+            const isBrochureDocument = pages?.some(
+              p =>
+                p.templateKey &&
+                [
+                  'cover',
+                  'toc',
+                  'daily',
+                  'itinerary',
+                  'memo',
+                  'hotel',
+                  'vehicle',
+                  'table',
+                ].includes(p.templateKey)
             )
             matchedType = isBrochureDocument
               ? DESIGN_TYPES.find(dt => dt.id === 'brochure-a5') || DESIGN_TYPES[0]
@@ -474,7 +502,16 @@ export default function DesignerPageContent() {
     if (!currentVersion) {
       setLoadingStage('idle', 100)
     }
-  }, [showTemplateSelector, selectedDesignType, storeDocument, isLoading, initCanvas, currentVersion, setLoadingStage, entityId])
+  }, [
+    showTemplateSelector,
+    selectedDesignType,
+    storeDocument,
+    isLoading,
+    initCanvas,
+    currentVersion,
+    setLoadingStage,
+    entityId,
+  ])
 
   // ============================================
   // 自動適應畫布縮放
@@ -547,21 +584,40 @@ export default function DesignerPageContent() {
         dbDesignType
       )
       // 清除 localStorage 備份
-      try { localStorage.removeItem('designer-backup') } catch { /* ignore */ }
+      try {
+        localStorage.removeItem('designer-backup')
+      } catch {
+        /* ignore */
+      }
     } catch (saveError) {
       // 儲存失敗時備份到 localStorage
       try {
-        localStorage.setItem('designer-backup', JSON.stringify({
-          timestamp: Date.now(),
-          data: documentData,
-        }))
+        localStorage.setItem(
+          'designer-backup',
+          JSON.stringify({
+            timestamp: Date.now(),
+            data: documentData,
+          })
+        )
         toast.error('儲存失敗，資料已暫存到本地。請檢查網路連線後重試。')
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
       throw saveError
     }
 
     setGeneratedPages(updatedPages as CanvasPage[])
-  }, [isCanvasReady, isSaving, exportCanvasData, saveVersion, generatedPages, currentPageIndex, templateData, selectedStyle, selectedDesignType])
+  }, [
+    isCanvasReady,
+    isSaving,
+    exportCanvasData,
+    saveVersion,
+    generatedPages,
+    currentPageIndex,
+    templateData,
+    selectedStyle,
+    selectedDesignType,
+  ])
 
   // ============================================
   // PDF Export Handler
@@ -635,7 +691,7 @@ export default function DesignerPageContent() {
     const input = document.createElement('input')
     input.type = 'file'
     input.accept = 'image/*'
-    input.onchange = async (e) => {
+    input.onchange = async e => {
       const file = (e.target as HTMLInputElement).files?.[0]
       if (!file) return
 
@@ -695,20 +751,21 @@ export default function DesignerPageContent() {
   const handleApplyToc = useCallback(async () => {
     if (!selectedStyle || !templateData) return
 
-    const tocPageIndex = generatedPages.findIndex((p) => p.templateKey === 'toc')
+    const tocPageIndex = generatedPages.findIndex(p => p.templateKey === 'toc')
     if (tocPageIndex < 0) return
 
-    const tocItems = (templateData.tocItems as Array<{
-      pageId: string
-      displayName: string
-      icon: string
-      enabled: boolean
-      pageNumber: number
-    }>) || []
+    const tocItems =
+      (templateData.tocItems as Array<{
+        pageId: string
+        displayName: string
+        icon: string
+        enabled: boolean
+        pageNumber: number
+      }>) || []
 
-    const enabledItems = tocItems.filter((item) => item.enabled)
+    const enabledItems = tocItems.filter(item => item.enabled)
 
-    const tocContent = enabledItems.map((item) => ({
+    const tocContent = enabledItems.map(item => ({
       name: item.displayName,
       page: item.pageNumber,
       icon: item.icon,
@@ -720,7 +777,10 @@ export default function DesignerPageContent() {
     const templateId = selectedStyle.templates.toc
     if (!templateId) return
 
-    const newTocPage = generatePageFromTemplate(templateId, newTemplateData as Parameters<typeof generatePageFromTemplate>[1])
+    const newTocPage = generatePageFromTemplate(
+      templateId,
+      newTemplateData as Parameters<typeof generatePageFromTemplate>[1]
+    )
 
     const newPages = [...generatedPages]
     newPages[tocPageIndex] = newTocPage
@@ -773,7 +833,9 @@ export default function DesignerPageContent() {
           setShowTemplateSelector(false)
           setSelectedDesignType(null)
         }}
-        onComplete={(pages, itinData, style) => handleTemplateComplete(pages, itinData as Record<string, unknown> | null, style)}
+        onComplete={(pages, itinData, style) =>
+          handleTemplateComplete(pages, itinData as Record<string, unknown> | null, style)
+        }
         sidebarWidth={sidebarWidth}
       />
     )
@@ -890,23 +952,25 @@ export default function DesignerPageContent() {
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Page List Sidebar */}
-        {showPageList && selectedDesignType?.id.startsWith('brochure-') && generatedPages.length > 0 && (
-          <PageListSidebar
-            pages={generatedPages}
-            currentPageIndex={currentPageIndex}
-            selectedStyle={selectedStyle}
-            totalDays={(templateData as TemplateData | null)?.dailyItineraries?.length || 0}
-            memoSettings={pageManagement.memoSettings}
-            usedMemoItemIds={pageManagement.usedMemoItemIds}
-            onSelectPage={pageManagement.handleSelectPage}
-            onAddPage={pageManagement.handleAddPage}
-            onAddMemoPage={pageManagement.handleAddMemoPage}
-            onAddDailyPages={pageManagement.handleAddDailyPages}
-            onDeletePage={pageManagement.handleDeletePage}
-            onDuplicatePage={pageManagement.handleDuplicatePage}
-            onReorderPages={pageManagement.handleReorderPages}
-          />
-        )}
+        {showPageList &&
+          selectedDesignType?.id.startsWith('brochure-') &&
+          generatedPages.length > 0 && (
+            <PageListSidebar
+              pages={generatedPages}
+              currentPageIndex={currentPageIndex}
+              selectedStyle={selectedStyle}
+              totalDays={(templateData as TemplateData | null)?.dailyItineraries?.length || 0}
+              memoSettings={pageManagement.memoSettings}
+              usedMemoItemIds={pageManagement.usedMemoItemIds}
+              onSelectPage={pageManagement.handleSelectPage}
+              onAddPage={pageManagement.handleAddPage}
+              onAddMemoPage={pageManagement.handleAddMemoPage}
+              onAddDailyPages={pageManagement.handleAddDailyPages}
+              onDeletePage={pageManagement.handleDeletePage}
+              onDuplicatePage={pageManagement.handleDuplicatePage}
+              onReorderPages={pageManagement.handleReorderPages}
+            />
+          )}
 
         {/* Left Panel - Component Library or Element Library */}
         {showLeftPanel && leftPanelMode === 'components' && (
@@ -921,12 +985,12 @@ export default function DesignerPageContent() {
         {showLeftPanel && leftPanelMode === 'elements' && (
           <ElementLibrary
             onAddLine={addLine}
-            onAddShape={(type) => {
+            onAddShape={type => {
               if (type === 'rectangle') addRectangle()
               else if (type === 'circle') addCircle()
             }}
             onAddText={addText}
-            onAddSticker={(stickerId) => {
+            onAddSticker={stickerId => {
               const sticker = STICKER_PATHS[stickerId]
               if (sticker) {
                 addSticker(sticker.path, {
@@ -935,23 +999,24 @@ export default function DesignerPageContent() {
                 })
               }
             }}
-            onAddIcon={(iconName) => {
+            onAddIcon={iconName => {
               addIcon(iconName)
             }}
-            onAddImage={(imageUrl) => {
+            onAddImage={imageUrl => {
               addImage(imageUrl)
             }}
-            onAddColorfulIcon={(iconName) => {
+            onAddColorfulIcon={iconName => {
               addIcon(iconName, { size: 80, keepOriginalColor: true })
             }}
-            onAddQRCode={(dataUrl) => {
+            onAddQRCode={dataUrl => {
               addImage(dataUrl)
             }}
             onAddTimeline={addTimeline}
             onAddTimelinePoint={addTimelinePoint}
             isTimelineSelected={
               selectedObject != null &&
-              (selectedObject as unknown as { data?: { timelineId?: string } }).data?.timelineId != null
+              (selectedObject as unknown as { data?: { timelineId?: string } }).data?.timelineId !=
+                null
             }
           />
         )}
@@ -988,9 +1053,13 @@ export default function DesignerPageContent() {
             onAdjustDailyCoverPosition={dailyImageHandlers.handleAdjustDailyCoverPosition}
             currentPageType={generatedPages[currentPageIndex]?.templateKey}
             currentDayIndex={pageManagement.currentDayIndex}
-            pages={generatedPages.map(p => ({ id: p.id, name: p.name, templateKey: p.templateKey }))}
+            pages={generatedPages.map(p => ({
+              id: p.id,
+              name: p.name,
+              templateKey: p.templateKey,
+            }))}
             onApplyToc={handleApplyToc}
-            onImageFill={(obj) => {
+            onImageFill={obj => {
               setMaskTargetShape(obj)
               setShowImageMaskFill(true)
             }}
@@ -1026,7 +1095,9 @@ export default function DesignerPageContent() {
         setShowDailyCoverUpload={dailyImageHandlers.setShowDailyCoverUpload}
         dailyCoverImage={
           pageManagement.currentDayIndex !== undefined
-            ? ((templateData?.dailyDetails as Array<{ coverImage?: string }>) || [])[pageManagement.currentDayIndex]?.coverImage
+            ? ((templateData?.dailyDetails as Array<{ coverImage?: string }>) || [])[
+                pageManagement.currentDayIndex
+              ]?.coverImage
             : undefined
         }
         onDailyCoverImageSelect={dailyImageHandlers.handleDailyImageUploaded}
@@ -1034,7 +1105,9 @@ export default function DesignerPageContent() {
         dailyPendingImageUrl={dailyImageHandlers.dailyPendingImageUrl}
         dailyCoverImagePosition={
           pageManagement.currentDayIndex !== undefined
-            ? ((templateData?.dailyDetails as Array<{ coverImagePosition?: ImageEditorSettings }>) || [])[pageManagement.currentDayIndex]?.coverImagePosition
+            ? ((templateData?.dailyDetails as Array<{
+                coverImagePosition?: ImageEditorSettings
+              }>) || [])[pageManagement.currentDayIndex]?.coverImagePosition
             : undefined
         }
         onCloseDailyImageEditor={dailyImageHandlers.handleCloseDailyImageEditor}

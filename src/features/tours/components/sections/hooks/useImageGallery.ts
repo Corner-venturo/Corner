@@ -23,9 +23,10 @@ export function useImageGallery() {
     if (!imageGallery) return
     setImageGallery({
       ...imageGallery,
-      currentIndex: imageGallery.currentIndex > 0
-        ? imageGallery.currentIndex - 1
-        : imageGallery.images.length - 1
+      currentIndex:
+        imageGallery.currentIndex > 0
+          ? imageGallery.currentIndex - 1
+          : imageGallery.images.length - 1,
     })
   }
 
@@ -33,9 +34,10 @@ export function useImageGallery() {
     if (!imageGallery) return
     setImageGallery({
       ...imageGallery,
-      currentIndex: imageGallery.currentIndex < imageGallery.images.length - 1
-        ? imageGallery.currentIndex + 1
-        : 0
+      currentIndex:
+        imageGallery.currentIndex < imageGallery.images.length - 1
+          ? imageGallery.currentIndex + 1
+          : 0,
     })
   }
 

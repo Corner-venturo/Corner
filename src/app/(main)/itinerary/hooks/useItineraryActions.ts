@@ -56,12 +56,15 @@ export function useItineraryActions({
   } = pageState
 
   // 打開複製行程對話框 - 只依賴穩定的 setters
-  const handleOpenDuplicateDialog = useCallback((itinerary: Itinerary) => {
-    setDuplicateSource(itinerary)
-    setDuplicateTourCode('')
-    setDuplicateTitle('')
-    setIsDuplicateDialogOpen(true)
-  }, [setDuplicateSource, setDuplicateTourCode, setDuplicateTitle, setIsDuplicateDialogOpen])
+  const handleOpenDuplicateDialog = useCallback(
+    (itinerary: Itinerary) => {
+      setDuplicateSource(itinerary)
+      setDuplicateTourCode('')
+      setDuplicateTitle('')
+      setIsDuplicateDialogOpen(true)
+    },
+    [setDuplicateSource, setDuplicateTourCode, setDuplicateTitle, setIsDuplicateDialogOpen]
+  )
 
   // 執行複製行程 - 使用穩定的 getters 和 setters
   const handleDuplicateSubmit = useCallback(async () => {
@@ -135,9 +138,10 @@ export function useItineraryActions({
         quoteCopiedCount++
       }
 
-      const successMsg = quoteCopiedCount > 0
-        ? ITINERARY_ACTIONS_LABELS.COPY_WITH_QUOTES(quoteCopiedCount)
-        : ITINERARY_ACTIONS_LABELS.COPY_SUCCESS
+      const successMsg =
+        quoteCopiedCount > 0
+          ? ITINERARY_ACTIONS_LABELS.COPY_WITH_QUOTES(quoteCopiedCount)
+          : ITINERARY_ACTIONS_LABELS.COPY_SUCCESS
       await alertSuccess(successMsg)
       setIsDuplicateDialogOpen(false)
       setDuplicateSource(null)
@@ -149,10 +153,19 @@ export function useItineraryActions({
       setIsDuplicating(false)
     }
   }, [
-    getDuplicateSource, getDuplicateTourCode, getDuplicateTitle,
-    setIsDuplicating, setIsDuplicateDialogOpen, setDuplicateSource,
-    setDuplicateTourCode, setDuplicateTitle,
-    createItinerary, createQuote, quotes, userId, userName
+    getDuplicateSource,
+    getDuplicateTourCode,
+    getDuplicateTitle,
+    setIsDuplicating,
+    setIsDuplicateDialogOpen,
+    setDuplicateSource,
+    setDuplicateTourCode,
+    setDuplicateTitle,
+    createItinerary,
+    createQuote,
+    quotes,
+    userId,
+    userName,
   ])
 
   // 封存行程
@@ -338,29 +351,32 @@ export function useItineraryActions({
   }, [])
 
   // 使用 useMemo 確保返回的物件穩定
-  return useMemo(() => ({
-    handleOpenDuplicateDialog,
-    handleDuplicateSubmit,
-    handleArchive,
-    handleUnarchive,
-    handleDelete,
-    handleSetTemplate,
-    handleClose,
-    handleReopen,
-    handleRowClick,
-    handlePasswordSubmit,
-    isItineraryClosed,
-  }), [
-    handleOpenDuplicateDialog,
-    handleDuplicateSubmit,
-    handleArchive,
-    handleUnarchive,
-    handleDelete,
-    handleSetTemplate,
-    handleClose,
-    handleReopen,
-    handleRowClick,
-    handlePasswordSubmit,
-    isItineraryClosed,
-  ])
+  return useMemo(
+    () => ({
+      handleOpenDuplicateDialog,
+      handleDuplicateSubmit,
+      handleArchive,
+      handleUnarchive,
+      handleDelete,
+      handleSetTemplate,
+      handleClose,
+      handleReopen,
+      handleRowClick,
+      handlePasswordSubmit,
+      isItineraryClosed,
+    }),
+    [
+      handleOpenDuplicateDialog,
+      handleDuplicateSubmit,
+      handleArchive,
+      handleUnarchive,
+      handleDelete,
+      handleSetTemplate,
+      handleClose,
+      handleReopen,
+      handleRowClick,
+      handlePasswordSubmit,
+      isItineraryClosed,
+    ]
+  )
 }

@@ -154,7 +154,11 @@ export function useQuoteLoader(
         const category = item.category?.toLowerCase() || ''
         const itemType = item.item_type?.toLowerCase() || ''
 
-        if (itemType === 'meals' || category.includes(COMP_TOURS_LABELS.餐) || category.includes('meal')) {
+        if (
+          itemType === 'meals' ||
+          category.includes(COMP_TOURS_LABELS.餐) ||
+          category.includes('meal')
+        ) {
           mealItems.push({
             id: `meal-${index}`,
             departure_data_id: data?.id || '',
@@ -167,7 +171,12 @@ export function useQuoteLoader(
             notes: item.notes,
             display_order: index,
           })
-        } else if (itemType === 'accommodation' || category.includes(COMP_TOURS_LABELS.住宿) || category.includes(COMP_TOURS_LABELS.飯店) || category.includes('hotel')) {
+        } else if (
+          itemType === 'accommodation' ||
+          category.includes(COMP_TOURS_LABELS.住宿) ||
+          category.includes(COMP_TOURS_LABELS.飯店) ||
+          category.includes('hotel')
+        ) {
           accomItems.push({
             id: `accom-${index}`,
             departure_data_id: data?.id || '',
@@ -180,7 +189,13 @@ export function useQuoteLoader(
             notes: item.notes,
             display_order: index,
           })
-        } else if (itemType === 'tickets' || itemType === 'activity' || category.includes(COMP_TOURS_LABELS.活動) || category.includes(COMP_TOURS_LABELS.門票) || category.includes('ticket')) {
+        } else if (
+          itemType === 'tickets' ||
+          itemType === 'activity' ||
+          category.includes(COMP_TOURS_LABELS.活動) ||
+          category.includes(COMP_TOURS_LABELS.門票) ||
+          category.includes('ticket')
+        ) {
           activityItems.push({
             id: `activity-${index}`,
             departure_data_id: data?.id || '',
@@ -236,7 +251,11 @@ export function useQuoteLoader(
               notes: item.notes || '',
               display_order: mealItems.length,
             })
-          } else if (desc.includes(COMP_TOURS_LABELS.住) || desc.includes('hotel') || desc.includes(COMP_TOURS_LABELS.飯店)) {
+          } else if (
+            desc.includes(COMP_TOURS_LABELS.住) ||
+            desc.includes('hotel') ||
+            desc.includes(COMP_TOURS_LABELS.飯店)
+          ) {
             accomItems.push({
               id: `quick-accom-${index}`,
               departure_data_id: data?.id || '',
@@ -249,7 +268,11 @@ export function useQuoteLoader(
               notes: item.notes || '',
               display_order: accomItems.length,
             })
-          } else if (desc.includes(COMP_TOURS_LABELS.門票) || desc.includes(COMP_TOURS_LABELS.活動) || desc.includes('ticket')) {
+          } else if (
+            desc.includes(COMP_TOURS_LABELS.門票) ||
+            desc.includes(COMP_TOURS_LABELS.活動) ||
+            desc.includes('ticket')
+          ) {
             activityItems.push({
               id: `quick-activity-${index}`,
               departure_data_id: data?.id || '',
@@ -292,12 +315,15 @@ export function useQuoteLoader(
       toast.success(COMP_TOURS_LABELS.已從報價單帶入資料)
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : JSON.stringify(error)
-      const errorDetails = error && typeof error === 'object' ? {
-        message: (error as { message?: string }).message,
-        code: (error as { code?: string }).code,
-        details: (error as { details?: string }).details,
-        hint: (error as { hint?: string }).hint,
-      } : error
+      const errorDetails =
+        error && typeof error === 'object'
+          ? {
+              message: (error as { message?: string }).message,
+              code: (error as { code?: string }).code,
+              details: (error as { details?: string }).details,
+              hint: (error as { hint?: string }).hint,
+            }
+          : error
       logger.error(COMP_TOURS_LABELS.從報價單載入失敗, errorDetails, '| quoteId:', quoteId)
       toast.error(`載入失敗: ${errorMessage || COMP_TOURS_LABELS.未知錯誤}`)
     } finally {

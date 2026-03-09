@@ -20,9 +20,8 @@ export async function POST(request: NextRequest) {
     const { token, name, email, phone, notes } = validation.data
 
     // 取得客戶端資訊（稽核用）
-    const ip = request.headers.get('x-forwarded-for') ||
-               request.headers.get('x-real-ip') ||
-               'unknown'
+    const ip =
+      request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
     const userAgent = request.headers.get('user-agent') || 'unknown'
 
     const supabase = getSupabaseAdminClient()
@@ -79,7 +78,8 @@ export async function GET(request: NextRequest) {
     // 查詢報價單資訊（只回傳必要資訊，不洩露敏感資料）
     const { data, error } = await supabase
       .from('quotes')
-      .select(`
+      .select(
+        `
         id,
         code,
         name,
@@ -92,7 +92,8 @@ export async function GET(request: NextRequest) {
         total_amount,
         confirmation_status,
         confirmation_token_expires_at
-      `)
+      `
+      )
       .eq('confirmation_token', token)
       .single()
 
@@ -123,8 +124,9 @@ export async function GET(request: NextRequest) {
     if (data.confirmation_status !== 'pending') {
       return successResponse({
         error: '此報價單狀態不允許確認',
-        already_confirmed: data.confirmation_status === 'customer_confirmed' ||
-                          data.confirmation_status === 'staff_confirmed',
+        already_confirmed:
+          data.confirmation_status === 'customer_confirmed' ||
+          data.confirmation_status === 'staff_confirmed',
       })
     }
 

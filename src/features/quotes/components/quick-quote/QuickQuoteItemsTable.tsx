@@ -23,7 +23,11 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
-import { ACCOMMODATION_ITEM_ROW_LABELS, QUICK_QUOTE_DIALOG_LABELS, QUICK_QUOTE_ITEMS_TABLE_LABELS } from '../../constants/labels';
+import {
+  ACCOMMODATION_ITEM_ROW_LABELS,
+  QUICK_QUOTE_DIALOG_LABELS,
+  QUICK_QUOTE_ITEMS_TABLE_LABELS,
+} from '../../constants/labels'
 import { QUOTE_COMPONENT_LABELS } from '../../constants/labels'
 
 interface QuickQuoteItemsTableProps {
@@ -31,7 +35,11 @@ interface QuickQuoteItemsTableProps {
   isEditing: boolean
   onAddItem: () => void
   onRemoveItem: (id: string) => void
-  onUpdateItem: <K extends keyof QuickQuoteItem>(id: string, field: K, value: QuickQuoteItem[K]) => void
+  onUpdateItem: <K extends keyof QuickQuoteItem>(
+    id: string,
+    field: K,
+    value: QuickQuoteItem[K]
+  ) => void
   onReorderItems?: (oldIndex: number, newIndex: number) => void
 }
 
@@ -41,12 +49,24 @@ interface SortableRowProps {
   isEditing: boolean
   cellClass: string
   inputClass: string
-  onUpdateItem: <K extends keyof QuickQuoteItem>(id: string, field: K, value: QuickQuoteItem[K]) => void
+  onUpdateItem: <K extends keyof QuickQuoteItem>(
+    id: string,
+    field: K,
+    value: QuickQuoteItem[K]
+  ) => void
   onRemoveItem: (id: string) => void
-  handleTextChange: (id: string, field: 'description' | 'notes', e: React.ChangeEvent<HTMLInputElement>) => void
+  handleTextChange: (
+    id: string,
+    field: 'description' | 'notes',
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => void
   handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void
   handleCompositionStart: () => void
-  handleCompositionEnd: (id: string, field: 'description' | 'notes', e: React.CompositionEvent<HTMLInputElement>) => void
+  handleCompositionEnd: (
+    id: string,
+    field: 'description' | 'notes',
+    e: React.CompositionEvent<HTMLInputElement>
+  ) => void
   normalizeNumber: (val: string) => string
   cleanExpressionInput: (val: string) => string
 }
@@ -76,14 +96,10 @@ const SortableRow: React.FC<SortableRowProps> = ({
     item.quantity === 0 ? '' : String(item.quantity)
   )
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: item.id, disabled: !isEditing })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: item.id,
+    disabled: !isEditing,
+  })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -95,7 +111,10 @@ const SortableRow: React.FC<SortableRowProps> = ({
     field: 'cost' | 'unit_price' | 'quantity',
     setExpr: (val: string) => void
   ) => {
-    const formulaField = `${field}_formula` as 'cost_formula' | 'unit_price_formula' | 'quantity_formula'
+    const formulaField = `${field}_formula` as
+      | 'cost_formula'
+      | 'unit_price_formula'
+      | 'quantity_formula'
     const formula = item[formulaField]
     if (formula) {
       setExpr(formula)
@@ -109,7 +128,10 @@ const SortableRow: React.FC<SortableRowProps> = ({
     setExpr: (val: string) => void
   ) => {
     const cleaned = cleanExpressionInput(expr)
-    const formulaField = `${field}_formula` as 'cost_formula' | 'unit_price_formula' | 'quantity_formula'
+    const formulaField = `${field}_formula` as
+      | 'cost_formula'
+      | 'unit_price_formula'
+      | 'quantity_formula'
 
     if (!cleaned || cleaned === '-') {
       onUpdateItem(item.id, field, 0)
@@ -144,10 +166,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
     <tr
       ref={setNodeRef}
       style={style}
-      className={cn(
-        'hover:bg-morandi-container/10',
-        isDragging && 'opacity-50 bg-morandi-gold/10'
-      )}
+      className={cn('hover:bg-morandi-container/10', isDragging && 'opacity-50 bg-morandi-gold/10')}
     >
       {/* 拖曳把手 */}
       {isEditing && (
@@ -192,11 +211,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
           onBlur={() => handleExpressionCommit('quantity', quantityExpr, setQuantityExpr)}
           disabled={!isEditing}
           placeholder={QUICK_QUOTE_ITEMS_TABLE_LABELS.可輸入算式}
-          className={cn(
-            inputClass,
-            'text-center',
-            item.quantity_formula && '!text-blue-600'
-          )}
+          className={cn(inputClass, 'text-center', item.quantity_formula && '!text-blue-600')}
           title={item.quantity_formula ? `公式: ${item.quantity_formula}` : undefined}
         />
       </td>
@@ -219,11 +234,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
             onFocus={() => handleFocus('cost', setCostExpr)}
             onBlur={() => handleExpressionCommit('cost', costExpr, setCostExpr)}
             placeholder={QUICK_QUOTE_ITEMS_TABLE_LABELS.可輸入算式}
-            className={cn(
-              inputClass,
-              'text-right',
-              item.cost_formula && '!text-blue-600'
-            )}
+            className={cn(inputClass, 'text-right', item.cost_formula && '!text-blue-600')}
             title={item.cost_formula ? `公式: ${item.cost_formula}` : undefined}
           />
         </td>
@@ -247,20 +258,20 @@ const SortableRow: React.FC<SortableRowProps> = ({
           onBlur={() => handleExpressionCommit('unit_price', unitPriceExpr, setUnitPriceExpr)}
           disabled={!isEditing}
           placeholder={QUICK_QUOTE_ITEMS_TABLE_LABELS.可輸入算式}
-          className={cn(
-            inputClass,
-            'text-right',
-            item.unit_price_formula && '!text-blue-600'
-          )}
+          className={cn(inputClass, 'text-right', item.unit_price_formula && '!text-blue-600')}
           title={item.unit_price_formula ? `公式: ${item.unit_price_formula}` : undefined}
         />
       </td>
-      <td className={`${cellClass} text-right font-medium`}>
-        {item.amount.toLocaleString()}
-      </td>
+      <td className={`${cellClass} text-right font-medium`}>{item.amount.toLocaleString()}</td>
       {isEditing && (
         <td className={`${cellClass} text-right font-medium`}>
-          <span className={((item.unit_price - (item.cost || 0)) * item.quantity) >= 0 ? 'text-morandi-green' : 'text-morandi-red'}>
+          <span
+            className={
+              (item.unit_price - (item.cost || 0)) * item.quantity >= 0
+                ? 'text-morandi-green'
+                : 'text-morandi-red'
+            }
+          >
             {((item.unit_price - (item.cost || 0)) * item.quantity).toLocaleString()}
           </span>
         </td>
@@ -365,7 +376,10 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
       '．': '.',
       '。': '.',
     }
-    result = result.split('').map(char => fullToHalf[char] || char).join('')
+    result = result
+      .split('')
+      .map(char => fullToHalf[char] || char)
+      .join('')
 
     // 移除所有空白
     result = result.replace(/\s/g, '')
@@ -378,47 +392,45 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
 
   const normalizeNumber = (val: string): string => {
     // 全形轉半形
-    val = val.replace(/[０-９]/g, s =>
-      String.fromCharCode(s.charCodeAt(0) - 0xfee0)
-    )
+    val = val.replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xfee0))
     val = val.replace(/[．]/g, '.')
     val = val.replace(/[－]/g, '-')
     return val
   }
 
   // 處理文字欄位變更
-  const handleTextChange = useCallback((
-    id: string,
-    field: 'description' | 'notes',
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    // 直接更新，不阻擋 IME 輸入
-    onUpdateItem(id, field, e.target.value)
-  }, [onUpdateItem])
+  const handleTextChange = useCallback(
+    (id: string, field: 'description' | 'notes', e: React.ChangeEvent<HTMLInputElement>) => {
+      // 直接更新，不阻擋 IME 輸入
+      onUpdateItem(id, field, e.target.value)
+    },
+    [onUpdateItem]
+  )
 
   // 組合輸入結束時更新
-  const handleCompositionEnd = useCallback((
-    id: string,
-    field: 'description' | 'notes',
-    e: React.CompositionEvent<HTMLInputElement>
-  ) => {
-    isComposingRef.current = false
-    onUpdateItem(id, field, e.currentTarget.value)
-  }, [onUpdateItem])
+  const handleCompositionEnd = useCallback(
+    (id: string, field: 'description' | 'notes', e: React.CompositionEvent<HTMLInputElement>) => {
+      isComposingRef.current = false
+      onUpdateItem(id, field, e.currentTarget.value)
+    },
+    [onUpdateItem]
+  )
 
   const handleCompositionStart = useCallback(() => {
     isComposingRef.current = true
   }, [])
 
   // 儲存格樣式（簡潔版，參考請款單）
-  const cellClass = "px-2 py-1.5"
-  const headerCellClass = "px-2 py-2 text-left font-medium text-morandi-secondary text-xs"
-  const inputClass = "input-no-focus w-full h-7 px-1 bg-transparent text-sm"
+  const cellClass = 'px-2 py-1.5'
+  const headerCellClass = 'px-2 py-2 text-left font-medium text-morandi-secondary text-xs'
+  const inputClass = 'input-no-focus w-full h-7 px-1 bg-transparent text-sm'
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-morandi-primary">{QUICK_QUOTE_ITEMS_TABLE_LABELS.LABEL_728}</h2>
+        <h2 className="text-lg font-semibold text-morandi-primary">
+          {QUICK_QUOTE_ITEMS_TABLE_LABELS.LABEL_728}
+        </h2>
         {isEditing && (
           <Button onClick={onAddItem} size="sm" variant="outline" className="gap-2">
             <Plus className="h-4 w-4" />
@@ -427,22 +439,34 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
         )}
       </div>
       <div className="bg-card rounded-lg border border-morandi-gold/20 overflow-hidden">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-morandi-container/60">
                 {isEditing && <th className={`${headerCellClass} w-8`}></th>}
                 <th className={headerCellClass}>{QUICK_QUOTE_ITEMS_TABLE_LABELS.LABEL_466}</th>
-                <th className={`${headerCellClass} text-center w-20`}>{QUICK_QUOTE_ITEMS_TABLE_LABELS.QUANTITY}</th>
-                {isEditing && <th className={`${headerCellClass} text-center w-24`}>{QUICK_QUOTE_ITEMS_TABLE_LABELS.LABEL_7178}</th>}
-                <th className={`${headerCellClass} text-center w-28`}>{QUICK_QUOTE_ITEMS_TABLE_LABELS.LABEL_9413}</th>
-                <th className={`${headerCellClass} text-center w-28`}>{QUICK_QUOTE_ITEMS_TABLE_LABELS.AMOUNT}</th>
-                {isEditing && <th className={`${headerCellClass} text-center w-24`}>{QUICK_QUOTE_ITEMS_TABLE_LABELS.LABEL_7705}</th>}
-                <th className={`${headerCellClass} w-32`}>{QUICK_QUOTE_ITEMS_TABLE_LABELS.REMARKS}</th>
+                <th className={`${headerCellClass} text-center w-20`}>
+                  {QUICK_QUOTE_ITEMS_TABLE_LABELS.QUANTITY}
+                </th>
+                {isEditing && (
+                  <th className={`${headerCellClass} text-center w-24`}>
+                    {QUICK_QUOTE_ITEMS_TABLE_LABELS.LABEL_7178}
+                  </th>
+                )}
+                <th className={`${headerCellClass} text-center w-28`}>
+                  {QUICK_QUOTE_ITEMS_TABLE_LABELS.LABEL_9413}
+                </th>
+                <th className={`${headerCellClass} text-center w-28`}>
+                  {QUICK_QUOTE_ITEMS_TABLE_LABELS.AMOUNT}
+                </th>
+                {isEditing && (
+                  <th className={`${headerCellClass} text-center w-24`}>
+                    {QUICK_QUOTE_ITEMS_TABLE_LABELS.LABEL_7705}
+                  </th>
+                )}
+                <th className={`${headerCellClass} w-32`}>
+                  {QUICK_QUOTE_ITEMS_TABLE_LABELS.REMARKS}
+                </th>
                 {isEditing && <th className={`${headerCellClass} text-center w-12`}></th>}
               </tr>
             </thead>
@@ -451,7 +475,7 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
                 items={items.map(item => item.id)}
                 strategy={verticalListSortingStrategy}
               >
-                {items.map((item) => (
+                {items.map(item => (
                   <SortableRow
                     key={item.id}
                     item={item}

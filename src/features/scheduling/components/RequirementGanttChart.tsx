@@ -6,13 +6,22 @@
  * 右側：可展開資源庫存面板（車輛/領隊）
  */
 
-
 import React, { useMemo, useState } from 'react'
 import { format, eachDayOfInterval, isSameDay, isWeekend, isWithinInterval } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 import { cn } from '@/lib/utils'
 import { parseLocalDate, startOfDay } from '@/lib/utils/format-date'
-import { Bus, Users, Package, ChevronRight, ChevronLeft, Check, Truck, UserCheck, Building2 } from 'lucide-react'
+import {
+  Bus,
+  Users,
+  Package,
+  ChevronRight,
+  ChevronLeft,
+  Check,
+  Truck,
+  UserCheck,
+  Building2,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import type { FleetVehicle } from '@/types/fleet.types'
@@ -47,7 +56,7 @@ interface TourRequest {
 
 // 展開後的需求列（每個數量一列）
 interface RequirementRow {
-  id: string  // `${request.id}-${index}`
+  id: string // `${request.id}-${index}`
   requestId: string
   tourName: string
   tourCode: string | null
@@ -56,8 +65,8 @@ interface RequirementRow {
   serviceDate: string | null
   serviceDateEnd: string | null
   quantity: number
-  index: number  // 第幾個（1-based）
-  totalCount: number  // 總數
+  index: number // 第幾個（1-based）
+  totalCount: number // 總數
   status: string
   category: string
   assignedVehicleId: string | null
@@ -71,7 +80,10 @@ interface RequirementRow {
 const RESPONSE_STATUS_COLORS: Record<string, { label: string; color: string }> = {
   pending: { label: '待回覆', color: 'bg-morandi-gold/20 text-morandi-gold border-morandi-gold' },
   responded: { label: '已回覆', color: 'bg-morandi-blue/20 text-morandi-blue border-morandi-blue' },
-  accepted: { label: '已接受', color: 'bg-morandi-green/20 text-morandi-green border-morandi-green' },
+  accepted: {
+    label: '已接受',
+    color: 'bg-morandi-green/20 text-morandi-green border-morandi-green',
+  },
   rejected: { label: '已拒絕', color: 'bg-morandi-red/20 text-morandi-red border-morandi-red' },
 }
 
@@ -244,7 +256,7 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
   const getResourceName = (row: RequirementRow): string | null => {
     if (type === 'vehicle' && row.assignedVehicleId) {
       const vehicle = vehicles.find(v => v.id === row.assignedVehicleId)
-      return vehicle ? (vehicle.vehicle_name || vehicle.license_plate) : null
+      return vehicle ? vehicle.vehicle_name || vehicle.license_plate : null
     }
     if (type === 'leader' && row.assignedLeaderId) {
       const leader = leaders.find(l => l.id === row.assignedLeaderId)
@@ -272,7 +284,11 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
   }
 
   // 計算甘特條的起始位置和寬度
-  const getBarStyle = (row: RequirementRow, dayIndex: number, day: Date): { show: boolean; isStart: boolean; isEnd: boolean } => {
+  const getBarStyle = (
+    row: RequirementRow,
+    dayIndex: number,
+    day: Date
+  ): { show: boolean; isStart: boolean; isEnd: boolean } => {
     const start = parseLocalDate(row.serviceDate)
     if (!start) return { show: false, isStart: false, isEnd: false }
     const end = parseLocalDate(row.serviceDateEnd) || start
@@ -308,7 +324,9 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
           {/* 表頭 */}
           <div
             className="grid sticky top-0 z-10 bg-morandi-container/60 border-b border-border"
-            style={{ gridTemplateColumns: `220px repeat(${days.length}, minmax(${viewMode === 'week' ? '80px' : '35px'}, 1fr))` }}
+            style={{
+              gridTemplateColumns: `220px repeat(${days.length}, minmax(${viewMode === 'week' ? '80px' : '35px'}, 1fr))`,
+            }}
           >
             <div className="px-4 h-12 flex items-center font-medium text-morandi-primary border-r border-border gap-2">
               <Icon size={16} className="text-morandi-gold" />
@@ -331,18 +349,22 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
                       <span className="text-morandi-secondary text-[10px]">
                         {safeFormat(day, 'EEE')}
                       </span>
-                      <span className={cn(
-                        'font-medium',
-                        isToday ? 'text-morandi-gold' : 'text-morandi-primary'
-                      )}>
+                      <span
+                        className={cn(
+                          'font-medium',
+                          isToday ? 'text-morandi-gold' : 'text-morandi-primary'
+                        )}
+                      >
                         {safeFormat(day, 'd')}
                       </span>
                     </>
                   ) : (
-                    <span className={cn(
-                      'font-medium',
-                      isToday ? 'text-morandi-gold' : 'text-morandi-primary'
-                    )}>
+                    <span
+                      className={cn(
+                        'font-medium',
+                        isToday ? 'text-morandi-gold' : 'text-morandi-primary'
+                      )}
+                    >
                       {safeFormat(day, 'd')}
                     </span>
                   )}
@@ -357,7 +379,7 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
               尚無{type === 'vehicle' ? '交通' : '領隊'}需求
             </div>
           ) : (
-            rows.map((row) => {
+            rows.map(row => {
               const assignedName = getResourceName(row)
               const isSelected = selectedRowId === row.id
 
@@ -368,7 +390,9 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
                     'grid border-b border-border last:border-b-0 cursor-pointer transition-colors',
                     isSelected ? 'bg-morandi-gold/10' : 'hover:bg-morandi-container/20'
                   )}
-                  style={{ gridTemplateColumns: `220px repeat(${days.length}, minmax(${viewMode === 'week' ? '80px' : '35px'}, 1fr))` }}
+                  style={{
+                    gridTemplateColumns: `220px repeat(${days.length}, minmax(${viewMode === 'week' ? '80px' : '35px'}, 1fr))`,
+                  }}
                   onClick={() => {
                     setSelectedRowId(isSelected ? null : row.id)
                     onRowClick?.(row)
@@ -399,10 +423,13 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
                       )}
                       {/* 跨公司需求的回覆狀態 */}
                       {row.recipientWorkspaceId && row.responseStatus && (
-                        <span className={cn(
-                          'px-1.5 py-0.5 rounded text-[10px] border',
-                          RESPONSE_STATUS_COLORS[row.responseStatus]?.color || 'bg-gray-100 text-gray-600'
-                        )}>
+                        <span
+                          className={cn(
+                            'px-1.5 py-0.5 rounded text-[10px] border',
+                            RESPONSE_STATUS_COLORS[row.responseStatus]?.color ||
+                              'bg-gray-100 text-gray-600'
+                          )}
+                        >
                           {RESPONSE_STATUS_COLORS[row.responseStatus]?.label || row.responseStatus}
                         </span>
                       )}
@@ -416,7 +443,8 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
                     const isWeekendDay = isWeekend(day)
                     const statusColor = assignedName
                       ? 'bg-morandi-green/70 border-morandi-green'
-                      : (STATUS_COLORS[row.status as keyof typeof STATUS_COLORS] || STATUS_COLORS.draft)
+                      : STATUS_COLORS[row.status as keyof typeof STATUS_COLORS] ||
+                        STATUS_COLORS.draft
 
                     return (
                       <div
@@ -454,10 +482,12 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
       </div>
 
       {/* 右側：資源庫存面板 */}
-      <div className={cn(
-        'border border-border rounded-lg bg-card shadow-sm transition-all overflow-hidden flex-shrink-0 flex flex-col',
-        showResourcePanel ? 'w-[240px]' : 'w-[40px]'
-      )}>
+      <div
+        className={cn(
+          'border border-border rounded-lg bg-card shadow-sm transition-all overflow-hidden flex-shrink-0 flex flex-col',
+          showResourcePanel ? 'w-[240px]' : 'w-[40px]'
+        )}
+      >
         {/* 面板標題 */}
         <div
           className="h-12 px-2 flex items-center justify-between border-b border-border bg-morandi-container/60 cursor-pointer flex-shrink-0"
@@ -467,7 +497,9 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
             <>
               <div className="flex items-center gap-2">
                 <Package size={16} className="text-morandi-gold" />
-                <span className="font-medium text-morandi-primary text-sm">{SCHEDULING_LABELS.LABEL_7348}</span>
+                <span className="font-medium text-morandi-primary text-sm">
+                  {SCHEDULING_LABELS.LABEL_7348}
+                </span>
               </div>
               <ChevronRight size={16} className="text-morandi-secondary" />
             </>
@@ -537,21 +569,26 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
                     尚無{type === 'vehicle' ? '車輛' : '領隊'}
                   </div>
                 ) : (
-                  resources.map((resource) => {
+                  resources.map(resource => {
                     const resourceId = resource.id
-                    const resourceName = type === 'vehicle'
-                      ? ((resource as FleetVehicle).vehicle_name || (resource as FleetVehicle).license_plate)
-                      : (resource as TourLeader).name
-                    const resourceSubtitle = type === 'vehicle'
-                      ? (resource as FleetVehicle).license_plate
-                      : (resource as TourLeader).phone
+                    const resourceName =
+                      type === 'vehicle'
+                        ? (resource as FleetVehicle).vehicle_name ||
+                          (resource as FleetVehicle).license_plate
+                        : (resource as TourLeader).name
+                    const resourceSubtitle =
+                      type === 'vehicle'
+                        ? (resource as FleetVehicle).license_plate
+                        : (resource as TourLeader).phone
 
                     return (
                       <div
                         key={resourceId}
                         className={cn(
                           'px-3 py-2 border-b border-border/50 transition-colors',
-                          selectedRowId ? 'hover:bg-morandi-gold/20 cursor-pointer' : 'hover:bg-morandi-container/20'
+                          selectedRowId
+                            ? 'hover:bg-morandi-gold/20 cursor-pointer'
+                            : 'hover:bg-morandi-container/20'
                         )}
                         onClick={() => selectedRowId && handleAssign(resourceId)}
                       >
@@ -588,12 +625,14 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
                     {SCHEDULING_LABELS.LABEL_2370}
                   </div>
                 ) : (
-                  availableLeadersForRange.map((item) => (
+                  availableLeadersForRange.map(item => (
                     <div
                       key={item.leader.id}
                       className={cn(
                         'px-3 py-2 border-b border-border/50 transition-colors',
-                        selectedRowId ? 'hover:bg-morandi-green/20 cursor-pointer' : 'hover:bg-morandi-container/20'
+                        selectedRowId
+                          ? 'hover:bg-morandi-green/20 cursor-pointer'
+                          : 'hover:bg-morandi-container/20'
                       )}
                       onClick={() => selectedRowId && handleAssign(item.leader.id)}
                     >
@@ -608,7 +647,9 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
                               variant="outline"
                               className={cn(
                                 'text-[10px] px-1 py-0',
-                                item.status === 'available' ? 'border-morandi-green text-morandi-green' : 'border-morandi-gold text-morandi-gold'
+                                item.status === 'available'
+                                  ? 'border-morandi-green text-morandi-green'
+                                  : 'border-morandi-gold text-morandi-gold'
                               )}
                             >
                               {item.status === 'available' ? '可用' : '暫定'}
@@ -638,12 +679,14 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
                     {SCHEDULING_LABELS.EMPTY_1509}
                   </div>
                 ) : (
-                  filteredSupplierResources.map((resource) => (
+                  filteredSupplierResources.map(resource => (
                     <div
                       key={resource.id}
                       className={cn(
                         'px-3 py-2 border-b border-border/50 transition-colors',
-                        selectedRowId ? 'hover:bg-morandi-blue/20 cursor-pointer' : 'hover:bg-morandi-container/20'
+                        selectedRowId
+                          ? 'hover:bg-morandi-blue/20 cursor-pointer'
+                          : 'hover:bg-morandi-container/20'
                       )}
                       onClick={() => {
                         if (selectedRowId && onSelectSupplierResource) {
@@ -673,7 +716,9 @@ export const RequirementGanttChart: React.FC<RequirementGanttChartProps> = ({
                           variant="outline"
                           className={cn(
                             'text-[10px] px-1 py-0',
-                            resource.status === 'accepted' ? 'border-morandi-green text-morandi-green' : 'border-morandi-blue text-morandi-blue'
+                            resource.status === 'accepted'
+                              ? 'border-morandi-green text-morandi-green'
+                              : 'border-morandi-blue text-morandi-blue'
                           )}
                         >
                           {resource.status === 'accepted' ? '已接受' : '待確認'}

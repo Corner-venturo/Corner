@@ -23,16 +23,22 @@ export async function checkTourDependencies(tourId: string): Promise<TourDepende
     supabase.from('orders').select('id', { count: 'exact', head: true }).eq('tour_id', tourId),
     // receipt_orders 沒有 tour_id，用 receipts 表（有 tour_id）
     supabase.from('receipts').select('id', { count: 'exact', head: true }).eq('tour_id', tourId),
-    supabase.from('payment_requests').select('id', { count: 'exact', head: true }).eq('tour_id', tourId),
+    supabase
+      .from('payment_requests')
+      .select('id', { count: 'exact', head: true })
+      .eq('tour_id', tourId),
     supabase.from('pnrs').select('id', { count: 'exact', head: true }).eq('tour_id', tourId),
   ])
 
   const [orders, receipts, payments, pnrs] = checks
   const blockers: string[] = []
 
-  if (orders.count && orders.count > 0) blockers.push(TOUR_DEPENDENCY_LABELS.MEMBERS_COUNT(orders.count))
-  if (receipts.count && receipts.count > 0) blockers.push(TOUR_DEPENDENCY_LABELS.RECEIPTS_COUNT(receipts.count))
-  if (payments.count && payments.count > 0) blockers.push(TOUR_DEPENDENCY_LABELS.PAYMENTS_COUNT(payments.count))
+  if (orders.count && orders.count > 0)
+    blockers.push(TOUR_DEPENDENCY_LABELS.MEMBERS_COUNT(orders.count))
+  if (receipts.count && receipts.count > 0)
+    blockers.push(TOUR_DEPENDENCY_LABELS.RECEIPTS_COUNT(receipts.count))
+  if (payments.count && payments.count > 0)
+    blockers.push(TOUR_DEPENDENCY_LABELS.PAYMENTS_COUNT(payments.count))
   if (pnrs.count && pnrs.count > 0) blockers.push(TOUR_DEPENDENCY_LABELS.PNRS_COUNT(pnrs.count))
 
   return { blockers, hasBlockers: blockers.length > 0 }
@@ -41,7 +47,9 @@ export async function checkTourDependencies(tourId: string): Promise<TourDepende
 /**
  * 檢查旅遊團是否有已付款訂單
  */
-export async function checkTourPaidOrders(tourId: string): Promise<{ hasPaidOrders: boolean; count: number }> {
+export async function checkTourPaidOrders(
+  tourId: string
+): Promise<{ hasPaidOrders: boolean; count: number }> {
   const { data: paidOrders, error } = await supabase
     .from('orders')
     .select('id, payment_status')
@@ -115,7 +123,12 @@ export async function unlinkTourItineraries(tourId: string): Promise<number> {
   if (linkedItineraries && linkedItineraries.length > 0) {
     const { error } = await supabase
       .from('itineraries')
-      .update({ tour_id: null, tour_code: null, status: 'draft', updated_at: new Date().toISOString() })
+      .update({
+        tour_id: null,
+        tour_code: null,
+        status: 'draft',
+        updated_at: new Date().toISOString(),
+      })
       .eq('tour_id', tourId)
     if (error) {
       logger.error('斷開行程表失敗:', error.message)
@@ -130,8 +143,7 @@ export async function unlinkTourItineraries(tourId: string): Promise<number> {
  * 取得旅遊團的 PNR 資料
  */
 export async function fetchTourPnrs(tourId: string): Promise<unknown[]> {
-  const { data, error } = await supabase.from('pnrs').select('*').eq('tour_id', tourId)
-  .limit(500)
+  const { data, error } = await supabase.from('pnrs').select('*').eq('tour_id', tourId).limit(500)
   if (error) {
     logger.error('查詢團 PNR 失敗:', error)
     throw error
@@ -144,8 +156,11 @@ export async function fetchTourPnrs(tourId: string): Promise<unknown[]> {
  */
 export async function fetchPnrsByLocators(locators: string[]): Promise<unknown[]> {
   if (locators.length === 0) return []
-  const { data, error } = await supabase.from('pnrs').select('*').in('record_locator', locators)
-  .limit(500)
+  const { data, error } = await supabase
+    .from('pnrs')
+    .select('*')
+    .in('record_locator', locators)
+    .limit(500)
   if (error) {
     logger.error('查詢 PNR 失敗:', error)
     throw error
@@ -160,7 +175,9 @@ export async function fetchProposalConvertData(proposalId: string, packageId: st
   const [proposalRes, packageRes, itineraryRes] = await Promise.all([
     supabase.from('proposals').select('*').eq('id', proposalId).single(),
     supabase.from('proposal_packages').select('*').eq('id', packageId).single(),
-    supabase.from('itineraries').select('outbound_flight, return_flight')
+    supabase
+      .from('itineraries')
+      .select('outbound_flight, return_flight')
       .eq('proposal_package_id', packageId)
       .order('created_at', { ascending: false })
       .limit(1)

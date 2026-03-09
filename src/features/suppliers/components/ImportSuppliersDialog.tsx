@@ -7,8 +7,22 @@
  */
 
 import React, { useState, useCallback, useRef, useMemo } from 'react'
-import { Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle2, AlertTriangle, ArrowLeft } from 'lucide-react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import {
+  Upload,
+  Download,
+  FileSpreadsheet,
+  AlertCircle,
+  CheckCircle2,
+  AlertTriangle,
+  ArrowLeft,
+} from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'
 import { toast } from 'sonner'
@@ -56,14 +70,14 @@ const SUPPLIER_TYPE_MAP: Record<string, SupplierType> = {
   [L.type_ticketing]: 'ticketing',
   [L.type_other]: 'other',
   // Also support English values
-  'hotel': 'hotel',
-  'restaurant': 'restaurant',
-  'transport': 'transport',
-  'attraction': 'attraction',
-  'guide': 'guide',
-  'agency': 'agency',
-  'ticketing': 'ticketing',
-  'other': 'other',
+  hotel: 'hotel',
+  restaurant: 'restaurant',
+  transport: 'transport',
+  attraction: 'attraction',
+  guide: 'guide',
+  agency: 'agency',
+  ticketing: 'ticketing',
+  other: 'other',
 }
 
 function normalizeSupplierType(value: string): string | null {
@@ -145,9 +159,7 @@ export function ImportSuppliersDialog({ open, onOpenChange }: ImportSuppliersDia
         const name = row.data.name
 
         if (name) {
-          const dup = existing_suppliers.find(
-            (s: Supplier) => s.name === name,
-          )
+          const dup = existing_suppliers.find((s: Supplier) => s.name === name)
           if (dup) {
             warnings.push(L.msg_duplicate_name(name))
           }
@@ -156,7 +168,7 @@ export function ImportSuppliersDialog({ open, onOpenChange }: ImportSuppliersDia
         return { ...row, warnings }
       })
     },
-    [existing_suppliers],
+    [existing_suppliers]
   )
 
   // 解析檔案
@@ -175,7 +187,7 @@ export function ImportSuppliersDialog({ open, onOpenChange }: ImportSuppliersDia
         toast.error(L.error_parse_failed)
       }
     },
-    [checkDuplicates],
+    [checkDuplicates]
   )
 
   // 檔案選擇
@@ -187,7 +199,7 @@ export function ImportSuppliersDialog({ open, onOpenChange }: ImportSuppliersDia
       }
       if (e.target) e.target.value = ''
     },
-    [handleFileParse],
+    [handleFileParse]
   )
 
   // 拖放
@@ -199,7 +211,7 @@ export function ImportSuppliersDialog({ open, onOpenChange }: ImportSuppliersDia
         void handleFileParse(file)
       }
     },
-    [handleFileParse],
+    [handleFileParse]
   )
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -291,12 +303,12 @@ export function ImportSuppliersDialog({ open, onOpenChange }: ImportSuppliersDia
 
   const error_count = useMemo(
     () => parsed_rows.filter(r => Object.keys(r.errors).length > 0).length,
-    [parsed_rows],
+    [parsed_rows]
   )
 
   const valid_count = useMemo(
     () => parsed_rows.filter(r => Object.keys(r.errors).length === 0).length,
-    [parsed_rows],
+    [parsed_rows]
   )
 
   // 表格欄位
@@ -317,7 +329,10 @@ export function ImportSuppliersDialog({ open, onOpenChange }: ImportSuppliersDia
         render: (_value: unknown, row: PreviewTableRow) => {
           if (row.status === 'error') {
             return (
-              <span className="inline-flex items-center gap-1 text-xs text-red-600" title={Object.values(row.errors).join('\n')}>
+              <span
+                className="inline-flex items-center gap-1 text-xs text-red-600"
+                title={Object.values(row.errors).join('\n')}
+              >
                 <AlertCircle size={12} />
                 {row.status_text}
               </span>
@@ -325,7 +340,10 @@ export function ImportSuppliersDialog({ open, onOpenChange }: ImportSuppliersDia
           }
           if (row.status === 'warning') {
             return (
-              <span className="inline-flex items-center gap-1 text-xs text-amber-600" title={row.warnings.join('\n')}>
+              <span
+                className="inline-flex items-center gap-1 text-xs text-amber-600"
+                title={row.warnings.join('\n')}
+              >
                 <AlertTriangle size={12} />
                 {row.status_text}
               </span>
@@ -343,7 +361,9 @@ export function ImportSuppliersDialog({ open, onOpenChange }: ImportSuppliersDia
         key: 'name',
         label: L.col_name,
         render: (_value: unknown, row: PreviewTableRow) => (
-          <span className={`text-sm ${row.errors['name'] ? 'text-red-600 font-medium' : 'text-morandi-primary'}`}>
+          <span
+            className={`text-sm ${row.errors['name'] ? 'text-red-600 font-medium' : 'text-morandi-primary'}`}
+          >
             {row.name || '-'}
           </span>
         ),
@@ -366,7 +386,9 @@ export function ImportSuppliersDialog({ open, onOpenChange }: ImportSuppliersDia
         key: 'phone',
         label: L.col_phone,
         render: (_value: unknown, row: PreviewTableRow) => (
-          <span className={`text-xs ${row.errors['phone'] ? 'text-red-600' : 'text-morandi-primary'}`}>
+          <span
+            className={`text-xs ${row.errors['phone'] ? 'text-red-600' : 'text-morandi-primary'}`}
+          >
             {row.phone || '-'}
           </span>
         ),
@@ -375,7 +397,9 @@ export function ImportSuppliersDialog({ open, onOpenChange }: ImportSuppliersDia
         key: 'email',
         label: L.col_email,
         render: (_value: unknown, row: PreviewTableRow) => (
-          <span className={`text-xs ${row.errors['email'] ? 'text-red-600' : 'text-morandi-primary'}`}>
+          <span
+            className={`text-xs ${row.errors['email'] ? 'text-red-600' : 'text-morandi-primary'}`}
+          >
             {row.email || '-'}
           </span>
         ),
@@ -388,7 +412,7 @@ export function ImportSuppliersDialog({ open, onOpenChange }: ImportSuppliersDia
         ),
       },
     ],
-    [],
+    []
   )
 
   return (
@@ -488,12 +512,7 @@ export function ImportSuppliersDialog({ open, onOpenChange }: ImportSuppliersDia
         <div className="flex justify-between gap-2 pt-4 border-t">
           <div>
             {step === 'preview' && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={resetState}
-                className="gap-2"
-              >
+              <Button variant="outline" size="sm" onClick={resetState} className="gap-2">
                 <ArrowLeft size={16} />
                 {L.btn_back}
               </Button>

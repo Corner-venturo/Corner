@@ -68,7 +68,16 @@ class QuoteService extends BaseService<Quote> {
     if (!original) return undefined
 
     // 排除不應該傳入的欄位
-    const { id: _id, created_at: _created, updated_at: _updated, version: _ver, versions: _vers, code: _code, is_pinned: _pinned, ...rest } = original
+    const {
+      id: _id,
+      created_at: _created,
+      updated_at: _updated,
+      version: _ver,
+      versions: _vers,
+      code: _code,
+      is_pinned: _pinned,
+      ...rest
+    } = original
 
     // 複製時不保留 code（讓系統自動生成新編號）和 is_pinned（不自動置頂）
     const duplicated = await store.create({

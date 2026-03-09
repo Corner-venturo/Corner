@@ -15,8 +15,24 @@ interface DailyScheduleItem {
 
 interface FlightOption {
   airline: string
-  outbound: { code: string; from: string; fromCode: string; time: string; to: string; toCode: string; arrivalTime: string }
-  return: { code: string; from: string; fromCode: string; time: string; to: string; toCode: string; arrivalTime: string }
+  outbound: {
+    code: string
+    from: string
+    fromCode: string
+    time: string
+    to: string
+    toCode: string
+    arrivalTime: string
+  }
+  return: {
+    code: string
+    from: string
+    fromCode: string
+    time: string
+    to: string
+    toCode: string
+    arrivalTime: string
+  }
 }
 
 interface HighlightSpot {
@@ -69,7 +85,12 @@ export function PrintItineraryPreview({ data }: PrintItineraryPreviewProps) {
   return (
     <div className={styles.wrapper}>
       {/* --- Hero Section --- */}
-      <header className={styles.hero} style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.4)), url('${safeData.coverImage || '/placeholder.jpg'}')` }}>
+      <header
+        className={styles.hero}
+        style={{
+          backgroundImage: `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.4)), url('${safeData.coverImage || '/placeholder.jpg'}')`,
+        }}
+      >
         <div className={styles.container}>
           <div className={styles.heroContent}>
             <h2>{safeData.tagline}</h2>
@@ -85,11 +106,11 @@ export function PrintItineraryPreview({ data }: PrintItineraryPreviewProps) {
         <div className={styles.highlightsGrid}>
           {safeData.highlightSpots.map((spot, index) => (
             <div key={index}>
-              <Image 
-                src={spot.imageUrl || '/placeholder.jpg'} 
-                alt={spot.name} 
-                width={600} 
-                height={400} 
+              <Image
+                src={spot.imageUrl || '/placeholder.jpg'}
+                alt={spot.name}
+                width={600}
+                height={400}
                 className={styles.highlightCardImage}
               />
               <h3 className={styles.highlightTitle}>{spot.name}</h3>
@@ -152,10 +173,8 @@ export function PrintItineraryPreview({ data }: PrintItineraryPreviewProps) {
               <div className={styles.dayContent}>
                 <p className={styles.dayRoute}>{day.route}</p>
                 <p className={styles.dayDetails}>
-                  <strong>{ITINERARY_LABELS.LABEL_9046}</strong>
-                  早 {day.meals.breakfast} / 
-                  午 {day.meals.lunch} / 
-                  晚 {day.meals.dinner}
+                  <strong>{ITINERARY_LABELS.LABEL_9046}</strong>早 {day.meals.breakfast} / 午{' '}
+                  {day.meals.lunch} / 晚 {day.meals.dinner}
                 </p>
                 <p className={styles.dayHotel}>
                   <strong>{ITINERARY_LABELS.LABEL_8648}</strong>

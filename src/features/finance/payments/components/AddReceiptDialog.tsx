@@ -4,7 +4,6 @@
  * 新增收款單對話框（表格式輸入，參考請款管理風格）
  */
 
-
 import { logger } from '@/lib/utils/logger'
 import { getTodayString } from '@/lib/utils/format-date'
 import { useEffect, useState } from 'react'
@@ -27,7 +26,7 @@ import { useReceiptMutations, type LinkPayResult } from '../hooks/useReceiptMuta
 import { PaymentItemRow } from './PaymentItemRow'
 import { Input } from '@/components/ui/input'
 import type { Receipt } from '@/stores'
-import { ADD_RECEIPT_DIALOG_LABELS, ADD_RECEIPT_TOAST_LABELS } from '../../constants/labels';
+import { ADD_RECEIPT_DIALOG_LABELS, ADD_RECEIPT_TOAST_LABELS } from '../../constants/labels'
 
 interface AddReceiptDialogProps {
   open: boolean
@@ -195,7 +194,7 @@ export function AddReceiptDialog({
       }
     }
 
-    initialize().catch((err) => logger.error('[initialize]', err))
+    initialize().catch(err => logger.error('[initialize]', err))
   }, [open, defaultTourId, defaultOrderId, resetForm, setFormData, editingReceipt, setPaymentItems])
 
   // 如果只有一個訂單，自動帶入（編輯模式除外）
@@ -251,7 +250,10 @@ export function AddReceiptDialog({
 
         toast({
           title: ADD_RECEIPT_DIALOG_LABELS.收款單更新成功,
-          description: ADD_RECEIPT_TOAST_LABELS.UPDATED(editingReceipt.receipt_number, result.itemCount),
+          description: ADD_RECEIPT_TOAST_LABELS.UPDATED(
+            editingReceipt.receipt_number,
+            result.itemCount
+          ),
         })
         resetForm()
         onOpenChange(false)
@@ -289,7 +291,10 @@ export function AddReceiptDialog({
         setLinkPayResults(result.linkPayResults)
         toast({
           title: ADD_RECEIPT_DIALOG_LABELS.收款單建立成功,
-          description: ADD_RECEIPT_TOAST_LABELS.CREATED_WITH_LINKPAY(result.itemCount, result.linkPayResults.length),
+          description: ADD_RECEIPT_TOAST_LABELS.CREATED_WITH_LINKPAY(
+            result.itemCount,
+            result.linkPayResults.length
+          ),
         })
         resetForm()
         onSuccess?.()
@@ -297,7 +302,10 @@ export function AddReceiptDialog({
       } else {
         toast({
           title: ADD_RECEIPT_TOAST_LABELS.CREATE_SUCCESS,
-          description: ADD_RECEIPT_TOAST_LABELS.CREATED(result.itemCount, result.totalAmount.toLocaleString()),
+          description: ADD_RECEIPT_TOAST_LABELS.CREATED(
+            result.itemCount,
+            result.totalAmount.toLocaleString()
+          ),
         })
         resetForm()
         onOpenChange(false)
@@ -379,7 +387,9 @@ export function AddReceiptDialog({
       <DialogContent level={2} className="max-w-[95vw] w-[95vw] h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {isEditMode ? ADD_RECEIPT_DIALOG_LABELS.編輯收款單 : ADD_RECEIPT_DIALOG_LABELS.新增收款單}
+            {isEditMode
+              ? ADD_RECEIPT_DIALOG_LABELS.編輯收款單
+              : ADD_RECEIPT_DIALOG_LABELS.新增收款單}
             {isConfirmed && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-morandi-green/20 text-morandi-green text-xs font-medium">
                 <Lock size={12} />
@@ -400,7 +410,9 @@ export function AddReceiptDialog({
         <div className="flex items-end gap-4">
           {/* 選擇團體 */}
           <div className="w-[300px]">
-            <Label className="text-sm font-medium text-muted-foreground">{ADD_RECEIPT_DIALOG_LABELS.LABEL_3406}</Label>
+            <Label className="text-sm font-medium text-muted-foreground">
+              {ADD_RECEIPT_DIALOG_LABELS.LABEL_3406}
+            </Label>
             <Combobox
               options={tours.map(tour => ({
                 value: tour.id,
@@ -422,7 +434,9 @@ export function AddReceiptDialog({
 
           {/* 選擇訂單 */}
           <div className="w-[350px]">
-            <Label className="text-sm font-medium text-muted-foreground">{ADD_RECEIPT_DIALOG_LABELS.LABEL_3874}</Label>
+            <Label className="text-sm font-medium text-muted-foreground">
+              {ADD_RECEIPT_DIALOG_LABELS.LABEL_3874}
+            </Label>
             <Select
               disabled={!formData.tour_id || filteredOrders.length === 0}
               value={formData.order_id}
@@ -442,7 +456,8 @@ export function AddReceiptDialog({
               <SelectContent>
                 {filteredOrders.map(order => (
                   <SelectItem key={order.id} value={order.id}>
-                    {order.order_number} - {order.contact_person || ADD_RECEIPT_DIALOG_LABELS.無聯絡人}
+                    {order.order_number} -{' '}
+                    {order.contact_person || ADD_RECEIPT_DIALOG_LABELS.無聯絡人}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -453,7 +468,9 @@ export function AddReceiptDialog({
         {/* 收款項目 - 文青風表格 */}
         <div className="flex-1 flex flex-col overflow-hidden pt-4 border-t border-morandi-container/30">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-medium text-morandi-primary">{ADD_RECEIPT_DIALOG_LABELS.LABEL_4595}</h3>
+            <h3 className="text-sm font-medium text-morandi-primary">
+              {ADD_RECEIPT_DIALOG_LABELS.LABEL_4595}
+            </h3>
             {/* 未確認的收款單都可以新增/刪除項目 */}
             {!isConfirmed && (
               <Button
@@ -492,7 +509,9 @@ export function AddReceiptDialog({
                     >
                       {ADD_RECEIPT_DIALOG_LABELS.LABEL_6465}
                     </th>
-                    <th className="text-left py-2.5 px-3 border-b border-r border-border">{ADD_RECEIPT_DIALOG_LABELS.REMARKS}</th>
+                    <th className="text-left py-2.5 px-3 border-b border-r border-border">
+                      {ADD_RECEIPT_DIALOG_LABELS.REMARKS}
+                    </th>
                     <th
                       className="text-right py-2.5 px-3 border-b border-r border-border"
                       style={{ width: '120px' }}
@@ -595,7 +614,9 @@ export function AddReceiptDialog({
           {/* 左側：總金額 + 刪除按鈕 */}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-morandi-secondary">{ADD_RECEIPT_DIALOG_LABELS.TOTAL_6550}</span>
+              <span className="text-sm text-morandi-secondary">
+                {ADD_RECEIPT_DIALOG_LABELS.TOTAL_6550}
+              </span>
               <span className="text-lg font-semibold text-morandi-gold w-[120px]">
                 NT$ {totalAmount.toLocaleString()}
               </span>
@@ -618,7 +639,11 @@ export function AddReceiptDialog({
           <div className="flex space-x-2">
             <Button variant="outline" onClick={handleCancel} className="gap-2">
               <X size={16} />
-              {linkPayResults.length > 0 ? ADD_RECEIPT_DIALOG_LABELS.關閉 : isConfirmed ? ADD_RECEIPT_DIALOG_LABELS.關閉 : ADD_RECEIPT_DIALOG_LABELS.取消}
+              {linkPayResults.length > 0
+                ? ADD_RECEIPT_DIALOG_LABELS.關閉
+                : isConfirmed
+                  ? ADD_RECEIPT_DIALOG_LABELS.關閉
+                  : ADD_RECEIPT_DIALOG_LABELS.取消}
             </Button>
             {linkPayResults.length === 0 && !isConfirmed && (
               <Button

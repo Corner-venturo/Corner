@@ -28,7 +28,12 @@ import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
-import { findBestMatch, normalizeName, splitPassportName, calculateSimilarity } from './pnr-name-matcher'
+import {
+  findBestMatch,
+  normalizeName,
+  splitPassportName,
+  calculateSimilarity,
+} from './pnr-name-matcher'
 import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 interface TourMember {
@@ -105,80 +110,87 @@ export function PnrMatchDialog({
    * 從客戶資料庫搜尋符合護照拼音的客戶
    * 優化：只搜尋姓氏匹配的客戶，而不是載入全部
    */
-  const searchCustomersForPassengers = useCallback(async (
-    pnrNames: string[]
-  ): Promise<Record<string, SuggestedCustomer[]>> => {
-    if (pnrNames.length === 0) {
-      return {}
-    }
-
-    try {
-      // 提取所有旅客的姓氏
-      const surnames = [...new Set(pnrNames.map(name => {
-        const parts = splitPassportName(name)
-        return parts.surname
-      }).filter(Boolean))]
-
-      if (surnames.length === 0) {
+  const searchCustomersForPassengers = useCallback(
+    async (pnrNames: string[]): Promise<Record<string, SuggestedCustomer[]>> => {
+      if (pnrNames.length === 0) {
         return {}
       }
 
-      // 只查詢姓氏匹配的客戶（使用 ilike 模糊查詢）
-      // 構建姓氏條件：passport_name like 'SURNAME/%' OR passport_name like 'SURNAME2/%' ...
-      const surnameConditions = surnames.map(s => `passport_name.ilike.${s}/%`).join(',')
+      try {
+        // 提取所有旅客的姓氏
+        const surnames = [
+          ...new Set(
+            pnrNames
+              .map(name => {
+                const parts = splitPassportName(name)
+                return parts.surname
+              })
+              .filter(Boolean)
+          ),
+        ]
 
-      const { data: customers, error } = await supabase
-        .from('customers')
-        .select('id, name, passport_name, passport_number, passport_expiry, passport_image_url, national_id, birth_date, gender')
-        .not('passport_name', 'is', null)
-        .or(surnameConditions)
-        .limit(200) // 限制結果數量
-
-      if (error) throw error
-
-      // 為每個旅客搜尋相似的客戶
-      const suggestions: Record<string, SuggestedCustomer[]> = {}
-
-      for (const pnrName of pnrNames) {
-        const normalizedPnr = normalizeName(pnrName)
-        const pnrParts = splitPassportName(pnrName)
-        const matchedCustomers: SuggestedCustomer[] = []
-
-        for (const customer of customers || []) {
-          if (!customer.passport_name) continue
-
-          const normalizedCustomer = normalizeName(customer.passport_name)
-          const customerParts = splitPassportName(customer.passport_name)
-
-          // 完全相符
-          if (normalizedPnr === normalizedCustomer) {
-            matchedCustomers.push({ ...customer, score: 100 })
-            continue
-          }
-
-          // 姓氏必須完全相同才考慮
-          if (pnrParts.surname !== customerParts.surname) continue
-
-          // 姓氏相同，計算名字相似度
-          const givenNameScore = calculateSimilarity(pnrParts.givenName, customerParts.givenName)
-
-          if (givenNameScore >= 50) {
-            matchedCustomers.push({ ...customer, score: givenNameScore })
-          }
+        if (surnames.length === 0) {
+          return {}
         }
 
-        // 按分數排序，取前 5 個
-        suggestions[pnrName] = matchedCustomers
-          .sort((a, b) => b.score - a.score)
-          .slice(0, 5)
-      }
+        // 只查詢姓氏匹配的客戶（使用 ilike 模糊查詢）
+        // 構建姓氏條件：passport_name like 'SURNAME/%' OR passport_name like 'SURNAME2/%' ...
+        const surnameConditions = surnames.map(s => `passport_name.ilike.${s}/%`).join(',')
 
-      return suggestions
-    } catch (error) {
-      logger.error(COMP_ORDERS_LABELS.搜尋客戶失敗, error)
-      return {}
-    }
-  }, [])
+        const { data: customers, error } = await supabase
+          .from('customers')
+          .select(
+            'id, name, passport_name, passport_number, passport_expiry, passport_image_url, national_id, birth_date, gender'
+          )
+          .not('passport_name', 'is', null)
+          .or(surnameConditions)
+          .limit(200) // 限制結果數量
+
+        if (error) throw error
+
+        // 為每個旅客搜尋相似的客戶
+        const suggestions: Record<string, SuggestedCustomer[]> = {}
+
+        for (const pnrName of pnrNames) {
+          const normalizedPnr = normalizeName(pnrName)
+          const pnrParts = splitPassportName(pnrName)
+          const matchedCustomers: SuggestedCustomer[] = []
+
+          for (const customer of customers || []) {
+            if (!customer.passport_name) continue
+
+            const normalizedCustomer = normalizeName(customer.passport_name)
+            const customerParts = splitPassportName(customer.passport_name)
+
+            // 完全相符
+            if (normalizedPnr === normalizedCustomer) {
+              matchedCustomers.push({ ...customer, score: 100 })
+              continue
+            }
+
+            // 姓氏必須完全相同才考慮
+            if (pnrParts.surname !== customerParts.surname) continue
+
+            // 姓氏相同，計算名字相似度
+            const givenNameScore = calculateSimilarity(pnrParts.givenName, customerParts.givenName)
+
+            if (givenNameScore >= 50) {
+              matchedCustomers.push({ ...customer, score: givenNameScore })
+            }
+          }
+
+          // 按分數排序，取前 5 個
+          suggestions[pnrName] = matchedCustomers.sort((a, b) => b.score - a.score).slice(0, 5)
+        }
+
+        return suggestions
+      } catch (error) {
+        logger.error(COMP_ORDERS_LABELS.搜尋客戶失敗, error)
+        return {}
+      }
+    },
+    []
+  )
 
   // 解析 PNR 並進行配對
   const handleParse = useCallback(async () => {
@@ -192,7 +204,7 @@ export function PnrMatchDialog({
     setParsedPnr(parsed)
 
     // 進行成員配對
-    const memberResults = parsed.passengerNames.map((pnrName) => ({
+    const memberResults = parsed.passengerNames.map(pnrName => ({
       pnrName,
       match: findBestMatch(pnrName, members),
     }))
@@ -231,16 +243,24 @@ export function PnrMatchDialog({
     const suggestedCount = results.filter(r => r.suggestedCustomers.length > 0).length
 
     if (noneCount === 0 && partialCount === 0) {
-      toast.success(`${COMP_ORDERS_LABELS.全部配對成功}${results.length}${COMP_ORDERS_LABELS.位旅客}`)
+      toast.success(
+        `${COMP_ORDERS_LABELS.全部配對成功}${results.length}${COMP_ORDERS_LABELS.位旅客}`
+      )
     } else if (suggestedCount > 0) {
-      toast.info(`${COMP_ORDERS_LABELS.配對完成}${exactCount} ${COMP_ORDERS_LABELS.完全符合}, ${partialCount} ${COMP_ORDERS_LABELS.部分符合}, ${noneCount} ${COMP_ORDERS_LABELS.未配對}${COMP_ORDERS_LABELS.找到}${suggestedCount}${COMP_ORDERS_LABELS.位可能的客戶建議}`)
+      toast.info(
+        `${COMP_ORDERS_LABELS.配對完成}${exactCount} ${COMP_ORDERS_LABELS.完全符合}, ${partialCount} ${COMP_ORDERS_LABELS.部分符合}, ${noneCount} ${COMP_ORDERS_LABELS.未配對}${COMP_ORDERS_LABELS.找到}${suggestedCount}${COMP_ORDERS_LABELS.位可能的客戶建議}`
+      )
     } else {
-      toast.info(`${COMP_ORDERS_LABELS.配對完成}${exactCount} ${COMP_ORDERS_LABELS.完全符合}, ${partialCount} ${COMP_ORDERS_LABELS.部分符合}, ${noneCount} ${COMP_ORDERS_LABELS.未配對}`)
+      toast.info(
+        `${COMP_ORDERS_LABELS.配對完成}${exactCount} ${COMP_ORDERS_LABELS.完全符合}, ${partialCount} ${COMP_ORDERS_LABELS.部分符合}, ${noneCount} ${COMP_ORDERS_LABELS.未配對}`
+      )
     }
 
     // 顯示票價解析結果（僅機票訂單明細格式）
     if (parsed.fareData && parsed.sourceFormat === 'ticket_order_detail') {
-      toast.success(`${COMP_ORDERS_LABELS.已解析機票金額}${parsed.fareData.totalFare.toLocaleString()}${COMP_ORDERS_LABELS.元_人}`)
+      toast.success(
+        `${COMP_ORDERS_LABELS.已解析機票金額}${parsed.fareData.totalFare.toLocaleString()}${COMP_ORDERS_LABELS.元_人}`
+      )
     } else if (parsed.sourceFormat === 'ticket_order_detail' && !parsed.fareData) {
       toast.warning(COMP_ORDERS_LABELS.機票訂單明細格式但未能解析金額_請檢查格式)
     }
@@ -263,16 +283,18 @@ export function PnrMatchDialog({
       setManualMatches(prev => ({ ...prev, [pnrPassenger]: memberId }))
     }
     // 清除該旅客的客戶選擇
-    setMatchResults(prev => prev.map(r =>
-      r.pnrPassenger === pnrPassenger ? { ...r, selectedCustomerId: null } : r
-    ))
+    setMatchResults(prev =>
+      prev.map(r => (r.pnrPassenger === pnrPassenger ? { ...r, selectedCustomerId: null } : r))
+    )
   }
 
   // 選擇建議客戶
   const handleSelectCustomer = (pnrPassenger: string, customerId: string) => {
-    setMatchResults(prev => prev.map(r =>
-      r.pnrPassenger === pnrPassenger ? { ...r, selectedCustomerId: customerId || null } : r
-    ))
+    setMatchResults(prev =>
+      prev.map(r =>
+        r.pnrPassenger === pnrPassenger ? { ...r, selectedCustomerId: customerId || null } : r
+      )
+    )
     // 選擇客戶時，同時取消成員配對（設為 __NONE__）
     // 這樣 finalResults 才會正確顯示為「已選客戶」而不是原本的成員配對
     if (customerId) {
@@ -331,7 +353,7 @@ export function PnrMatchDialog({
         return {
           ...result,
           matchedMember: manualMember,
-          confidence: manualMember ? 'exact' as const : 'none' as const,
+          confidence: manualMember ? ('exact' as const) : ('none' as const),
         }
       }
       return result
@@ -359,7 +381,9 @@ export function PnrMatchDialog({
       if (isTourMode) {
         const missingOrders = selectedCustomers.filter(r => !selectedOrderIds[r.pnrPassenger])
         if (missingOrders.length > 0) {
-          toast.error(`${COMP_ORDERS_LABELS.請為}${missingOrders.length}${COMP_ORDERS_LABELS.位旅客選擇所屬訂單}`)
+          toast.error(
+            `${COMP_ORDERS_LABELS.請為}${missingOrders.length}${COMP_ORDERS_LABELS.位旅客選擇所屬訂單}`
+          )
           return
         }
       } else if (!orderId) {
@@ -391,11 +415,10 @@ export function PnrMatchDialog({
         const updates = matchedMembers.map((r, idx) => {
           // 嘗試從解析結果找到該旅客的機票號碼
           // 1. 先嘗試用旅客姓名匹配
-          let ticketInfo = parsedPnr.ticketNumbers.find(t =>
-            t.passenger && (
-              t.passenger === r.pnrPassenger ||
-              t.passenger.includes(r.pnrPassenger.split('/')[0])
-            )
+          let ticketInfo = parsedPnr.ticketNumbers.find(
+            t =>
+              t.passenger &&
+              (t.passenger === r.pnrPassenger || t.passenger.includes(r.pnrPassenger.split('/')[0]))
           )
           // 2. 如果沒找到，且票號數量與旅客數量相符，按順序配對
           if (!ticketInfo && parsedPnr.ticketNumbers.length === matchedMembers.length) {
@@ -413,7 +436,12 @@ export function PnrMatchDialog({
         })
 
         for (const update of updates) {
-          const updateData: { pnr: string; ticket_number?: string | null; flight_cost?: number | null; ticketing_deadline?: string | null } = { pnr: update.pnr }
+          const updateData: {
+            pnr: string
+            ticket_number?: string | null
+            flight_cost?: number | null
+            ticketing_deadline?: string | null
+          } = { pnr: update.pnr }
           if (update.ticket_number) {
             updateData.ticket_number = update.ticket_number
           }
@@ -425,10 +453,7 @@ export function PnrMatchDialog({
           if (parsedPnr.ticketingDeadline) {
             updateData.ticketing_deadline = parsedPnr.ticketingDeadline.toISOString().split('T')[0]
           }
-          await supabase
-            .from('order_members')
-            .update(updateData)
-            .eq('id', update.id)
+          await supabase.from('order_members').update(updateData).eq('id', update.id)
         }
         updatedCount = matchedMembers.length
       }
@@ -441,19 +466,17 @@ export function PnrMatchDialog({
           if (!customer) continue
 
           // 決定使用的 orderId：團體模式用選擇的訂單，否則用傳入的 orderId
-          const targetOrderId = isTourMode
-            ? selectedOrderIds[result.pnrPassenger]
-            : orderId
+          const targetOrderId = isTourMode ? selectedOrderIds[result.pnrPassenger] : orderId
 
           if (!targetOrderId) continue
 
           // 嘗試從解析結果找到該旅客的機票號碼
           // 1. 先嘗試用旅客姓名匹配
-          let ticketInfo = parsedPnr.ticketNumbers.find(t =>
-            t.passenger && (
-              t.passenger === result.pnrPassenger ||
-              t.passenger.includes(result.pnrPassenger.split('/')[0])
-            )
+          let ticketInfo = parsedPnr.ticketNumbers.find(
+            t =>
+              t.passenger &&
+              (t.passenger === result.pnrPassenger ||
+                t.passenger.includes(result.pnrPassenger.split('/')[0]))
           )
           // 2. 如果沒找到，且票號數量與旅客數量相符，按順序配對
           if (!ticketInfo && parsedPnr.ticketNumbers.length === selectedCustomers.length) {
@@ -472,7 +495,7 @@ export function PnrMatchDialog({
             passport_name: customer.passport_name,
             passport_number: customer.passport_number,
             passport_expiry: customer.passport_expiry,
-            passport_image_url: customer.passport_image_url,  // 同步護照圖片
+            passport_image_url: customer.passport_image_url, // 同步護照圖片
             id_number: customer.national_id,
             birth_date: customer.birth_date,
             gender: customer.gender,
@@ -484,9 +507,7 @@ export function PnrMatchDialog({
             identity: COMP_ORDERS_LABELS.大人,
           }
 
-          const { error } = await supabase
-            .from('order_members')
-            .insert(newMember)
+          const { error } = await supabase.from('order_members').insert(newMember)
 
           if (error) {
             logger.error(COMP_ORDERS_LABELS.建立成員失敗, error)
@@ -518,7 +539,7 @@ export function PnrMatchDialog({
             arrivalTime: seg.arrivalTime || null,
             status: seg.status,
             class: seg.class,
-            via: seg.via || [],  // 保留經停資訊
+            via: seg.via || [], // 保留經停資訊
             isDirect: seg.isDirect,
           }))
 
@@ -537,18 +558,16 @@ export function PnrMatchDialog({
             logger.info(`PNR ${recordLocator} 已更新`)
           } else {
             // PNR 不存在，新建
-            await supabase
-              .from('pnrs')
-              .insert({
-                record_locator: recordLocator,
-                workspace_id: workspaceId,
-                raw_pnr: rawPnr,
-                passenger_names: parsedPnr.passengerNames,
-                segments: segmentsData,
-                tour_id: tourId || null,
-                status: 'active',
-                ticketing_deadline: parsedPnr.ticketingDeadline?.toISOString() || null,
-              })
+            await supabase.from('pnrs').insert({
+              record_locator: recordLocator,
+              workspace_id: workspaceId,
+              raw_pnr: rawPnr,
+              passenger_names: parsedPnr.passengerNames,
+              segments: segmentsData,
+              tour_id: tourId || null,
+              status: 'active',
+              ticketing_deadline: parsedPnr.ticketingDeadline?.toISOString() || null,
+            })
             logger.info(`PNR ${recordLocator} 已建立`)
           }
         } catch (pnrError) {
@@ -588,8 +607,12 @@ export function PnrMatchDialog({
     const exact = finalResults.filter(r => r.confidence === 'exact').length
     const partial = finalResults.filter(r => r.confidence === 'partial').length
     const none = finalResults.filter(r => r.confidence === 'none').length
-    const withSuggestions = finalResults.filter(r => r.suggestedCustomers.length > 0 && !r.matchedMember).length
-    const selectedCustomers = finalResults.filter(r => r.selectedCustomerId && !r.matchedMember).length
+    const withSuggestions = finalResults.filter(
+      r => r.suggestedCustomers.length > 0 && !r.matchedMember
+    ).length
+    const selectedCustomers = finalResults.filter(
+      r => r.selectedCustomerId && !r.matchedMember
+    ).length
     return { exact, partial, none, withSuggestions, selectedCustomers, total: finalResults.length }
   }, [finalResults])
 
@@ -607,7 +630,7 @@ export function PnrMatchDialog({
   }, [members, finalResults])
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+    <Dialog open={isOpen} onOpenChange={open => !open && handleClose()}>
       <DialogContent level={2} className="max-w-3xl max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -624,18 +647,24 @@ export function PnrMatchDialog({
             </label>
             <Textarea
               value={rawPnr}
-              onChange={(e) => setRawPnr(e.target.value)}
+              onChange={e => setRawPnr(e.target.value)}
               placeholder={COMP_ORDERS_LABELS.貼上_PNR_電報_placeholder}
               className="min-h-[120px] font-mono text-xs"
             />
             <div className="flex gap-2">
               <Button onClick={handleParse} disabled={!rawPnr.trim() || isSearchingCustomers}>
-                <RefreshCw size={16} className={cn("mr-1", isSearchingCustomers && "animate-spin")} />
-                {isSearchingCustomers ? COMP_ORDERS_LABELS.搜尋客戶中 : COMP_ORDERS_LABELS.解析並配對}
+                <RefreshCw
+                  size={16}
+                  className={cn('mr-1', isSearchingCustomers && 'animate-spin')}
+                />
+                {isSearchingCustomers
+                  ? COMP_ORDERS_LABELS.搜尋客戶中
+                  : COMP_ORDERS_LABELS.解析並配對}
               </Button>
               {parsedPnr && (
                 <span className="text-sm text-morandi-secondary self-center">
-                  {COMP_ORDERS_LABELS.訂位代號} <strong>{parsedPnr.recordLocator || COMP_ORDERS_LABELS.未識別}</strong>
+                  {COMP_ORDERS_LABELS.訂位代號}{' '}
+                  <strong>{parsedPnr.recordLocator || COMP_ORDERS_LABELS.未識別}</strong>
                 </span>
               )}
             </div>
@@ -670,7 +699,8 @@ export function PnrMatchDialog({
                 )}
                 {stats.selectedCustomers > 0 && (
                   <span className="flex items-center gap-1 text-sm text-purple-600">
-                    <UserPlus size={14} /> {stats.selectedCustomers} {COMP_ORDERS_LABELS.位已選擇客戶}
+                    <UserPlus size={14} /> {stats.selectedCustomers}{' '}
+                    {COMP_ORDERS_LABELS.位已選擇客戶}
                   </span>
                 )}
               </div>
@@ -693,13 +723,15 @@ export function PnrMatchDialog({
               {/* 團體模式：快速設定所有人的訂單 */}
               {isTourMode && stats.withSuggestions > 0 && (
                 <div className="flex items-center gap-2 p-2 bg-morandi-container/20 rounded-lg">
-                  <span className="text-xs text-morandi-secondary">{COMP_ORDERS_LABELS.快速設定所有人訂單}</span>
+                  <span className="text-xs text-morandi-secondary">
+                    {COMP_ORDERS_LABELS.快速設定所有人訂單}
+                  </span>
                   <select
-                    onChange={(e) => handleSetAllOrders(e.target.value)}
+                    onChange={e => handleSetAllOrders(e.target.value)}
                     className="text-xs border rounded px-2 py-1"
                   >
                     <option value="">{COMP_ORDERS_LABELS.請選擇}</option>
-                    {orders.map((o) => (
+                    {orders.map(o => (
                       <option key={o.id} value={o.id}>
                         {o.order_number} - {o.contact_person || COMP_ORDERS_LABELS.無聯絡人}
                       </option>
@@ -713,14 +745,28 @@ export function PnrMatchDialog({
                 <table className="w-full text-sm">
                   <thead className="bg-morandi-container/40">
                     <tr>
-                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">{COMP_ORDERS_LABELS.PNR_旅客}</th>
-                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">{COMP_ORDERS_LABELS.配對狀態}</th>
-                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">{COMP_ORDERS_LABELS.團員護照拼音}</th>
-                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">{COMP_ORDERS_LABELS.中文姓名}</th>
-                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">{COMP_ORDERS_LABELS.手動選擇}</th>
-                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">{COMP_ORDERS_LABELS.建議客戶}</th>
+                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">
+                        {COMP_ORDERS_LABELS.PNR_旅客}
+                      </th>
+                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">
+                        {COMP_ORDERS_LABELS.配對狀態}
+                      </th>
+                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">
+                        {COMP_ORDERS_LABELS.團員護照拼音}
+                      </th>
+                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">
+                        {COMP_ORDERS_LABELS.中文姓名}
+                      </th>
+                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">
+                        {COMP_ORDERS_LABELS.手動選擇}
+                      </th>
+                      <th className="px-3 py-2 text-left font-medium whitespace-nowrap">
+                        {COMP_ORDERS_LABELS.建議客戶}
+                      </th>
                       {isTourMode && (
-                        <th className="px-3 py-2 text-left font-medium whitespace-nowrap">{COMP_ORDERS_LABELS.選擇訂單}</th>
+                        <th className="px-3 py-2 text-left font-medium whitespace-nowrap">
+                          {COMP_ORDERS_LABELS.選擇訂單}
+                        </th>
                       )}
                     </tr>
                   </thead>
@@ -732,10 +778,14 @@ export function PnrMatchDialog({
                           'border-t',
                           result.selectedCustomerId && 'bg-purple-50',
                           !result.selectedCustomerId && result.confidence === 'none' && 'bg-red-50',
-                          !result.selectedCustomerId && result.confidence === 'partial' && 'bg-amber-50'
+                          !result.selectedCustomerId &&
+                            result.confidence === 'partial' &&
+                            'bg-amber-50'
                         )}
                       >
-                        <td className="px-3 py-2 font-mono whitespace-nowrap">{result.pnrPassenger}</td>
+                        <td className="px-3 py-2 font-mono whitespace-nowrap">
+                          {result.pnrPassenger}
+                        </td>
                         <td className="px-3 py-2 whitespace-nowrap">
                           {result.selectedCustomerId ? (
                             <span className="flex items-center gap-1 text-purple-600">
@@ -766,15 +816,17 @@ export function PnrMatchDialog({
                             value={
                               manualMatches[result.pnrPassenger] === '__NONE__'
                                 ? '__NONE__'
-                                : manualMatches[result.pnrPassenger] || result.matchedMember?.id || ''
+                                : manualMatches[result.pnrPassenger] ||
+                                  result.matchedMember?.id ||
+                                  ''
                             }
-                            onChange={(e) => handleManualMatch(result.pnrPassenger, e.target.value)}
+                            onChange={e => handleManualMatch(result.pnrPassenger, e.target.value)}
                             className="text-xs border rounded px-2 py-1 w-full max-w-[150px]"
                             disabled={!!result.selectedCustomerId}
                           >
                             <option value="">{COMP_ORDERS_LABELS.自動配對}</option>
                             <option value="__NONE__">{COMP_ORDERS_LABELS.取消配對}</option>
-                            {members.map((m) => (
+                            {members.map(m => (
                               <option key={m.id} value={m.id}>
                                 {m.chinese_name || m.passport_name}
                               </option>
@@ -785,38 +837,44 @@ export function PnrMatchDialog({
                           {result.suggestedCustomers.length > 0 ? (
                             <select
                               value={result.selectedCustomerId || ''}
-                              onChange={(e) => handleSelectCustomer(result.pnrPassenger, e.target.value)}
+                              onChange={e =>
+                                handleSelectCustomer(result.pnrPassenger, e.target.value)
+                              }
                               className={cn(
-                                "text-xs border rounded px-2 py-1 w-full max-w-[180px]",
-                                result.selectedCustomerId && "border-purple-400 bg-purple-50"
+                                'text-xs border rounded px-2 py-1 w-full max-w-[180px]',
+                                result.selectedCustomerId && 'border-purple-400 bg-purple-50'
                               )}
                               disabled={!!result.matchedMember && !result.selectedCustomerId}
                             >
                               <option value="">{COMP_ORDERS_LABELS.選擇客戶}</option>
-                              {result.suggestedCustomers.map((c) => (
+                              {result.suggestedCustomers.map(c => (
                                 <option key={c.id} value={c.id}>
                                   {c.name} ({c.passport_name}) {c.score}%
                                 </option>
                               ))}
                             </select>
                           ) : (
-                            <span className="text-xs text-morandi-muted">{COMP_ORDERS_LABELS.無建議}</span>
+                            <span className="text-xs text-morandi-muted">
+                              {COMP_ORDERS_LABELS.無建議}
+                            </span>
                           )}
                         </td>
                         {isTourMode && (
                           <td className="px-3 py-2">
                             <select
                               value={selectedOrderIds[result.pnrPassenger] || ''}
-                              onChange={(e) => handleSelectOrder(result.pnrPassenger, e.target.value)}
+                              onChange={e => handleSelectOrder(result.pnrPassenger, e.target.value)}
                               className={cn(
-                                "text-xs border rounded px-2 py-1 w-full max-w-[150px]",
-                                selectedOrderIds[result.pnrPassenger] && "border-blue-400 bg-blue-50"
+                                'text-xs border rounded px-2 py-1 w-full max-w-[150px]',
+                                selectedOrderIds[result.pnrPassenger] &&
+                                  'border-blue-400 bg-blue-50'
                               )}
                             >
                               <option value="">{COMP_ORDERS_LABELS.選擇訂單_placeholder}</option>
-                              {orders.map((o) => (
+                              {orders.map(o => (
                                 <option key={o.id} value={o.id}>
-                                  {o.order_number} - {o.contact_person || COMP_ORDERS_LABELS.無聯絡人}
+                                  {o.order_number} -{' '}
+                                  {o.contact_person || COMP_ORDERS_LABELS.無聯絡人}
                                 </option>
                               ))}
                             </select>
@@ -832,10 +890,11 @@ export function PnrMatchDialog({
               {unmatchedMembers.length > 0 && (
                 <div className="p-3 bg-amber-50 rounded-lg">
                   <p className="text-sm font-medium text-amber-700 mb-2">
-                    {COMP_ORDERS_LABELS.未在PNR中的團員} ({unmatchedMembers.length} {COMP_ORDERS_LABELS.人})：
+                    {COMP_ORDERS_LABELS.未在PNR中的團員} ({unmatchedMembers.length}{' '}
+                    {COMP_ORDERS_LABELS.人})：
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {unmatchedMembers.map((m) => (
+                    {unmatchedMembers.map(m => (
                       <span
                         key={m.id}
                         className="px-2 py-1 bg-card rounded text-xs border border-amber-200"
@@ -850,14 +909,23 @@ export function PnrMatchDialog({
               {/* 航班資訊 */}
               {parsedPnr && parsedPnr.segments.length > 0 && (
                 <div className="p-3 bg-blue-50 rounded-lg">
-                  <p className="text-sm font-medium text-blue-700 mb-2">{COMP_ORDERS_LABELS.航班資訊}</p>
+                  <p className="text-sm font-medium text-blue-700 mb-2">
+                    {COMP_ORDERS_LABELS.航班資訊}
+                  </p>
                   <div className="space-y-1">
                     {parsedPnr.segments.map((seg, i) => (
                       <div key={i} className="text-xs font-mono text-blue-600">
-                        <span>{seg.airline}{seg.flightNumber} {seg.origin}→{seg.destination} {seg.departureDate} {seg.departureTime}</span>
+                        <span>
+                          {seg.airline}
+                          {seg.flightNumber} {seg.origin}→{seg.destination} {seg.departureDate}{' '}
+                          {seg.departureTime}
+                        </span>
                         {seg.via && seg.via.length > 0 && (
                           <span className="ml-2 text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded">
-                            {COMP_ORDERS_LABELS.經停} {seg.via.map(v => `${v.city}${v.duration ? ` (${v.duration})` : ''}`).join(', ')}
+                            {COMP_ORDERS_LABELS.經停}{' '}
+                            {seg.via
+                              .map(v => `${v.city}${v.duration ? ` (${v.duration})` : ''}`)
+                              .join(', ')}
                           </span>
                         )}
                       </div>
@@ -880,7 +948,9 @@ export function PnrMatchDialog({
             className="bg-morandi-gold hover:bg-morandi-gold-hover"
           >
             <Save size={16} className="mr-1" />
-            {isSaving ? COMP_ORDERS_LABELS.儲存中 : `${COMP_ORDERS_LABELS.儲存配對} (${savableCount} ${COMP_ORDERS_LABELS.人})`}
+            {isSaving
+              ? COMP_ORDERS_LABELS.儲存中
+              : `${COMP_ORDERS_LABELS.儲存配對} (${savableCount} ${COMP_ORDERS_LABELS.人})`}
           </Button>
         </DialogFooter>
       </DialogContent>

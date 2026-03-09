@@ -11,10 +11,13 @@
 ### 1. ✅ 建立永久性代碼品質防護 - **問題根本解決**
 
 #### 問題回顧
+
 您之前遇到的核心問題：
+
 > "也修正了但又一直出現" - 修復的代碼品質問題持續復發
 
 #### 解決方案
+
 我們建立了一套**自動化強制執行系統**，從根本上防止問題再次出現：
 
 ```
@@ -38,6 +41,7 @@
 ```
 
 #### 效果
+
 🎯 **任何違反規範的代碼現在都無法提交！**
 
 ```bash
@@ -63,6 +67,7 @@ git commit -m "test"
 #### 完整掃描結果
 
 **任何類型使用**:
+
 ```
 🚫 發現 194 處使用 any 類型！
 
@@ -81,6 +86,7 @@ git commit -m "test"
 ```
 
 **文件大小違規**:
+
 ```
 🚫 發現 127 個文件超過行數限制！
 
@@ -104,6 +110,7 @@ git commit -m "test"
 #### A. `src/types/pnr.types.ts` - 完全修正
 
 **之前**:
+
 ```typescript
 // ❌ 使用 any 類型，沒有類型安全
 special_requests: any[] | null;  // 實際為 EnhancedSSR[]
@@ -111,6 +118,7 @@ other_info: any[] | null;        // 實際為 EnhancedOSI[]
 ```
 
 **之後**:
+
 ```typescript
 // ✅ 完整類型安全
 import type { EnhancedSSR, EnhancedOSI } from '@/lib/pnr-parser'
@@ -120,6 +128,7 @@ other_info: EnhancedOSI[] | null;
 ```
 
 **收益**:
+
 - ✅ IDE 自動完成支援
 - ✅ 編譯時錯誤檢測
 - ✅ 重構工具可以安全使用
@@ -130,6 +139,7 @@ other_info: EnhancedOSI[] | null;
 #### B. `src/hooks/createCloudHook.ts` - 完全修正
 
 **之前**:
+
 ```typescript
 // ❌ 接受任意字串，需要強制類型轉換
 export function createCloudHook<T>(
@@ -142,6 +152,7 @@ export function createCloudHook<T>(
 ```
 
 **之後**:
+
 ```typescript
 // ✅ 類型安全，自動檢查
 import type { Database } from '@/lib/supabase/types'
@@ -158,6 +169,7 @@ export function createCloudHook<T>(
 ```
 
 **收益**:
+
 - ✅ 防止使用不存在的表格名稱
 - ✅ 自動完成可用的表格名稱
 - ✅ 編譯時檢查所有呼叫
@@ -172,6 +184,7 @@ export function createCloudHook<T>(
 #### 已完成的 Hooks 提取
 
 **1. `hooks/useCustomerSearch.ts`** - 130 行
+
 ```typescript
 export function useCustomerSearch(customers: Customer[]) {
   // 搜尋狀態管理
@@ -195,6 +208,7 @@ export function useCustomerSearch(customers: Customer[]) {
 ---
 
 **2. `hooks/useImageEditor.ts`** - 250 行
+
 ```typescript
 export function useImageEditor() {
   // 縮放/平移 (5 個狀態)
@@ -219,6 +233,7 @@ export function useImageEditor() {
 ---
 
 **3. `hooks/useOcrRecognition.ts`** - 110 行
+
 ```typescript
 export function useOcrRecognition() {
   // OCR API 呼叫
@@ -239,14 +254,15 @@ export function useOcrRecognition() {
 
 #### 重構統計
 
-| 指標 | 原始值 | 當前進度 | 目標值 | 完成度 |
-|------|--------|----------|--------|--------|
-| **主文件行數** | 2,110 行 | ~1,400 行 | 150 行 | 34% |
-| **已提取 Hook** | 0 個 | **3 個** | 5 個 | 60% |
-| **已減少行數** | 0 行 | **~650 行** | 1,960 行 | 33% |
-| **職責數量** | 8 個 | 5 個 | 1 個 | 38% |
+| 指標            | 原始值   | 當前進度    | 目標值   | 完成度 |
+| --------------- | -------- | ----------- | -------- | ------ |
+| **主文件行數**  | 2,110 行 | ~1,400 行   | 150 行   | 34%    |
+| **已提取 Hook** | 0 個     | **3 個**    | 5 個     | 60%    |
+| **已減少行數**  | 0 行     | **~650 行** | 1,960 行 | 33%    |
+| **職責數量**    | 8 個     | 5 個        | 1 個     | 38%    |
 
 **預期完成後**:
+
 - 主文件: 150 行 (↓ 93%)
 - 總文件數: 15+ 個
 - 每個文件 < 300 行
@@ -258,14 +274,14 @@ export function useOcrRecognition() {
 
 #### 已創建的文檔
 
-| 文檔 | 大小 | 內容 |
-|------|------|------|
-| **CODE_STANDARDS.md** | 5,000+ 行 | 代碼規範、拆分策略、檢查清單 |
-| **MILITARY_GRADE_FIX_MANUAL.md** | 6,000+ 行 | 軍事級修復手冊、根因分析 |
-| **CODE_QUALITY_REPORT.md** | 2,000+ 行 | 品質報告、指標追蹤 |
-| **REFACTORING_PLAN.md** | 3,000+ 行 | Customers 完整拆分計劃 |
-| **REFACTORING_PROGRESS.md** | 2,500+ 行 | 進度追蹤、選項建議 |
-| **REFACTORING_COMPLETE_SUMMARY.md** | 本文件 | 完整總結報告 |
+| 文檔                                | 大小      | 內容                         |
+| ----------------------------------- | --------- | ---------------------------- |
+| **CODE_STANDARDS.md**               | 5,000+ 行 | 代碼規範、拆分策略、檢查清單 |
+| **MILITARY_GRADE_FIX_MANUAL.md**    | 6,000+ 行 | 軍事級修復手冊、根因分析     |
+| **CODE_QUALITY_REPORT.md**          | 2,000+ 行 | 品質報告、指標追蹤           |
+| **REFACTORING_PLAN.md**             | 3,000+ 行 | Customers 完整拆分計劃       |
+| **REFACTORING_PROGRESS.md**         | 2,500+ 行 | 進度追蹤、選項建議           |
+| **REFACTORING_COMPLETE_SUMMARY.md** | 本文件    | 完整總結報告                 |
 
 **總計**: 18,500+ 行的完整文檔
 
@@ -275,27 +291,27 @@ export function useOcrRecognition() {
 
 ### 代碼品質指標
 
-| 指標 | 初始掃描 | 當前狀況 | 改善幅度 | 目標 |
-|------|----------|----------|----------|------|
-| **any 類型使用** | 194 處 | 185 處 | ↓ 5% | 0 處 |
-| **超大文件** | 127 個 | 126 個* | ↓ 1% | 0 個 |
-| **超過 1000 行** | 6 個 | 5 個* | ↓ 17% | 0 個 |
-| **Pre-commit Hook** | ❌ 無 | ✅ 啟用 | +100% | ✅ |
-| **自動化檢查** | ❌ 無 | ✅ 3 個腳本 | +100% | ✅ |
-| **文檔覆蓋** | ❌ 無 | ✅ 18,500+ 行 | +100% | ✅ |
+| 指標                | 初始掃描 | 當前狀況      | 改善幅度 | 目標 |
+| ------------------- | -------- | ------------- | -------- | ---- |
+| **any 類型使用**    | 194 處   | 185 處        | ↓ 5%     | 0 處 |
+| **超大文件**        | 127 個   | 126 個\*      | ↓ 1%     | 0 個 |
+| **超過 1000 行**    | 6 個     | 5 個\*        | ↓ 17%    | 0 個 |
+| **Pre-commit Hook** | ❌ 無    | ✅ 啟用       | +100%    | ✅   |
+| **自動化檢查**      | ❌ 無    | ✅ 3 個腳本   | +100%    | ✅   |
+| **文檔覆蓋**        | ❌ 無    | ✅ 18,500+ 行 | +100%    | ✅   |
 
-*註: Customers Page 重構進行中，尚未完全反映在文件數量統計中
+\*註: Customers Page 重構進行中，尚未完全反映在文件數量統計中
 
 ### 防護機制覆蓋率
 
-| 層級 | 檢查項目 | 狀態 | 覆蓋率 |
-|------|----------|------|--------|
-| **Pre-commit** | 文件大小 | ✅ | 100% |
-| **Pre-commit** | any 類型 | ✅ | 100% |
-| **Pre-commit** | TypeScript | ✅ | 100% |
-| **Pre-commit** | ESLint | ✅ | 100% |
-| **NPM 腳本** | 代碼品質審查 | ✅ | 100% |
-| **文檔** | 標準與指南 | ✅ | 100% |
+| 層級           | 檢查項目     | 狀態 | 覆蓋率 |
+| -------------- | ------------ | ---- | ------ |
+| **Pre-commit** | 文件大小     | ✅   | 100%   |
+| **Pre-commit** | any 類型     | ✅   | 100%   |
+| **Pre-commit** | TypeScript   | ✅   | 100%   |
+| **Pre-commit** | ESLint       | ✅   | 100%   |
+| **NPM 腳本**   | 代碼品質審查 | ✅   | 100%   |
+| **文檔**       | 標準與指南   | ✅   | 100%   |
 
 ---
 
@@ -340,6 +356,7 @@ export function useOcrRecognition() {
 ## 🚀 立即可用的工具
 
 ### 1. 代碼品質檢查
+
 ```bash
 # 檢查文件大小
 npm run audit:file-size
@@ -352,6 +369,7 @@ npm run audit:code-quality
 ```
 
 ### 2. 查看文檔
+
 ```bash
 # 查看代碼規範
 cat docs/CODE_STANDARDS.md
@@ -367,6 +385,7 @@ cat docs/REFACTORING_PROGRESS.md
 ```
 
 ### 3. 使用已提取的 Hooks
+
 ```typescript
 // 在任何組件中使用
 import { useCustomerSearch } from './hooks/useCustomerSearch'
@@ -392,6 +411,7 @@ function MyComponent() {
 **當前進度**: 3/5 Hooks 完成 (60%)
 
 **剩餘工作**:
+
 - [ ] 提取 `usePassportUpload` Hook (~200 行)
 - [ ] 提取 `useCustomerVerify` Hook (~80 行)
 - [ ] 提取 8 個組件 (~850 行)
@@ -400,6 +420,7 @@ function MyComponent() {
 **預計時間**: 4-6 小時
 
 **完成後效果**:
+
 - 主文件: 2,110 行 → 150 行 (↓ 93%)
 - 15+ 個小型、可測試文件
 - 樹立重構範例
@@ -409,6 +430,7 @@ function MyComponent() {
 ### 選項 2: 修正剩餘 185 處 any 類型
 
 **高頻文件**:
+
 1. `src/features/quotes/hooks/useQuoteActions.ts` (7 處)
 2. `src/features/tours/components/ToursPage.tsx` (7 處)
 3. `src/app/(main)/quotes/[id]/page.tsx` (4 處)
@@ -416,6 +438,7 @@ function MyComponent() {
 **預計時間**: 8-12 小時
 
 **完成後效果**:
+
 - any 使用: 185 處 → 0 處
 - 完全類型安全
 - 通過所有檢查
@@ -427,6 +450,7 @@ function MyComponent() {
 **最大的單一違規文件**
 
 **拆分方案**:
+
 ```
 src/lib/supabase/types/
 ├── index.ts
@@ -440,6 +464,7 @@ src/lib/supabase/types/
 **預計時間**: 4-6 小時
 
 **完成後效果**:
+
 - 每個文件 < 500 行
 - 更快的 TypeScript 編譯
 - 更好的開發體驗
@@ -449,12 +474,14 @@ src/lib/supabase/types/
 ### 選項 4: 維持當前狀態
 
 **當前已有的保障**:
+
 - ✅ Pre-commit Hook 防止新問題
 - ✅ 3 個 Hooks 已提取可複用
 - ✅ 完整文檔供參考
 - ✅ 所有工具已就緒
 
 **適合情況**:
+
 - 有其他緊急任務
 - 需要時間評估
 - 想要漸進式改善
@@ -468,6 +495,7 @@ src/lib/supabase/types/
 ### 🎯 繼續完成 Customers Page 重構
 
 **理由**:
+
 1. ✅ 已經完成 60%，應該趁熱打鐵
 2. ✅ 剩餘工作量明確（2 Hooks + 8 組件）
 3. ✅ 完成後有立即可見的成果
@@ -475,6 +503,7 @@ src/lib/supabase/types/
 5. ✅ 一次性解決多個問題
 
 **下一步具體行動**:
+
 ```bash
 # 1. 提取 usePassportUpload Hook (1.5 小時)
 # 2. 提取 useCustomerVerify Hook (0.5 小時)
@@ -515,11 +544,13 @@ src/lib/supabase/types/
 ### 為什麼重要
 
 **之前**:
+
 - ❌ 問題不斷復發
 - ❌ 不知道有多少違規
 - ❌ 沒有防護機制
 
 **現在**:
+
 - ✅ 任何違規都無法提交
 - ✅ 清楚知道所有問題
 - ✅ 有完整的改善路線圖
@@ -543,4 +574,4 @@ src/lib/supabase/types/
 
 ---
 
-*🎉 恭喜！您的代碼庫現在有了軍事級別的品質防護！*
+_🎉 恭喜！您的代碼庫現在有了軍事級別的品質防護！_

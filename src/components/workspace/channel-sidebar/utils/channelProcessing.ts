@@ -27,9 +27,7 @@ export function processChannels(
 
   // 2. 我的最愛（獨立群組）
   const favoriteChannels = sortChannels(
-    filteredChannels.filter(
-      ch => ch.is_favorite && !ch.is_archived && checkIsMember(ch.id)
-    )
+    filteredChannels.filter(ch => ch.is_favorite && !ch.is_archived && checkIsMember(ch.id))
   )
   const favoriteChannelIds = new Set(favoriteChannels.map(ch => ch.id))
 
@@ -66,15 +64,11 @@ export function processChannels(
 
   // 5. 未加入的公開頻道
   const unjoinedChannels = sortChannels(
-    filteredChannels.filter(
-      ch => ch.type === 'public' && !ch.is_archived && !checkIsMember(ch.id)
-    )
+    filteredChannels.filter(ch => ch.type === 'public' && !ch.is_archived && !checkIsMember(ch.id))
   )
 
   // 6. 封存群組
-  const archivedGroup = channelGroups.find(
-    g => g.is_system && g.system_type === 'archived'
-  )
+  const archivedGroup = channelGroups.find(g => g.is_system && g.system_type === 'archived')
   const archivedChannels = archivedGroup
     ? sortChannels(
         filteredChannels.filter(ch => ch.is_archived || ch.group_id === archivedGroup.id)

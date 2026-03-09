@@ -75,13 +75,15 @@ export function TooltipContent({
   if (!open) return null
 
   // 統一顯示在下方，帶箭頭
-  const positionClasses = side === 'top'
-    ? 'bottom-full left-1/2 -translate-x-1/2 mb-2'
-    : 'top-full left-1/2 -translate-x-1/2 mt-2'
+  const positionClasses =
+    side === 'top'
+      ? 'bottom-full left-1/2 -translate-x-1/2 mb-2'
+      : 'top-full left-1/2 -translate-x-1/2 mt-2'
 
-  const arrowClasses = side === 'top'
-    ? 'top-full left-1/2 -translate-x-1/2 border-t-morandi-primary border-l-transparent border-r-transparent border-b-transparent'
-    : 'bottom-full left-1/2 -translate-x-1/2 border-b-morandi-primary border-l-transparent border-r-transparent border-t-transparent'
+  const arrowClasses =
+    side === 'top'
+      ? 'top-full left-1/2 -translate-x-1/2 border-t-morandi-primary border-l-transparent border-r-transparent border-b-transparent'
+      : 'bottom-full left-1/2 -translate-x-1/2 border-b-morandi-primary border-l-transparent border-r-transparent border-t-transparent'
 
   return (
     <div
@@ -95,12 +97,7 @@ export function TooltipContent({
     >
       {children}
       {/* 箭頭 */}
-      <div
-        className={cn(
-          'absolute w-0 h-0 border-[5px]',
-          arrowClasses
-        )}
-      />
+      <div className={cn('absolute w-0 h-0 border-[5px]', arrowClasses)} />
     </div>
   )
 }

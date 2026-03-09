@@ -3,25 +3,32 @@
  * TimelineEditor - 時間軸模式編輯器
  */
 
-
 import { useState } from 'react'
 import { Plus, X, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AttractionSelector } from '@/components/editor/attraction-selector'
 import type { DailyScheduleItem, SimpleActivity } from './types'
-import { DAILY_SCHEDULE_EDITOR_LABELS, ITINERARY_DIALOG_LABELS } from '../../constants/labels';
+import { DAILY_SCHEDULE_EDITOR_LABELS, ITINERARY_DIALOG_LABELS } from '../../constants/labels'
 
 interface TimelineEditorProps {
   dailySchedule: DailyScheduleItem[]
   selectedDayIndex: number
   startDate: string | null
-  tourCountryName?: string  // 行程國家名稱，用於景點庫篩選
+  tourCountryName?: string // 行程國家名稱，用於景點庫篩選
   onSelectDay: (index: number) => void
   onUpdateDay: (index: number, field: string, value: string | boolean) => void
   onAddActivity: (dayIndex: number) => void
   onRemoveActivity: (dayIndex: number, activityIndex: number) => void
-  onUpdateActivity: (dayIndex: number, activityIndex: number, field: keyof SimpleActivity, value: string) => void
-  onAddActivitiesFromAttractions?: (dayIndex: number, attractions: { name: string; id?: string }[]) => void
+  onUpdateActivity: (
+    dayIndex: number,
+    activityIndex: number,
+    field: keyof SimpleActivity,
+    value: string
+  ) => void
+  onAddActivitiesFromAttractions?: (
+    dayIndex: number,
+    attractions: { name: string; id?: string }[]
+  ) => void
   getPreviousAccommodation: (index: number) => string
 }
 
@@ -53,7 +60,15 @@ export function TimelineEditor({
   if (startDate) {
     const date = new Date(startDate)
     date.setDate(date.getDate() + idx)
-    const weekdays = [ITINERARY_DIALOG_LABELS.日, ITINERARY_DIALOG_LABELS.一, ITINERARY_DIALOG_LABELS.二, ITINERARY_DIALOG_LABELS.三, ITINERARY_DIALOG_LABELS.四, ITINERARY_DIALOG_LABELS.五, ITINERARY_DIALOG_LABELS.六]
+    const weekdays = [
+      ITINERARY_DIALOG_LABELS.日,
+      ITINERARY_DIALOG_LABELS.一,
+      ITINERARY_DIALOG_LABELS.二,
+      ITINERARY_DIALOG_LABELS.三,
+      ITINERARY_DIALOG_LABELS.四,
+      ITINERARY_DIALOG_LABELS.五,
+      ITINERARY_DIALOG_LABELS.六,
+    ]
     dateLabel = `${date.getMonth() + 1}/${date.getDate()} (${weekdays[date.getDay()]})`
   }
 
@@ -77,7 +92,9 @@ export function TimelineEditor({
             >
               Day {d.day}
               {hasActivities && (
-                <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-morandi-gold'}`} />
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-morandi-gold'}`}
+                />
               )}
             </button>
           )
@@ -122,7 +139,13 @@ export function TimelineEditor({
             type="text"
             value={day.route || ''}
             onChange={e => onUpdateDay(idx, 'route', e.target.value)}
-            placeholder={idx === 0 ? DAILY_SCHEDULE_EDITOR_LABELS.抵達目的地 : idx === dailySchedule.length - 1 ? DAILY_SCHEDULE_EDITOR_LABELS.返回台灣 : DAILY_SCHEDULE_EDITOR_LABELS.今日行程標題}
+            placeholder={
+              idx === 0
+                ? DAILY_SCHEDULE_EDITOR_LABELS.抵達目的地
+                : idx === dailySchedule.length - 1
+                  ? DAILY_SCHEDULE_EDITOR_LABELS.返回台灣
+                  : DAILY_SCHEDULE_EDITOR_LABELS.今日行程標題
+            }
             className="w-full h-8 px-3 text-xs border border-border rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold"
           />
 
@@ -132,7 +155,11 @@ export function TimelineEditor({
             <div className="relative">
               <input
                 type="text"
-                value={day.hotelBreakfast ? DAILY_SCHEDULE_EDITOR_LABELS.飯店早餐 : (day.meals.breakfast || '')}
+                value={
+                  day.hotelBreakfast
+                    ? DAILY_SCHEDULE_EDITOR_LABELS.飯店早餐
+                    : day.meals.breakfast || ''
+                }
                 onChange={e => onUpdateDay(idx, 'meals.breakfast', e.target.value)}
                 placeholder={ITINERARY_DIALOG_LABELS.早餐}
                 disabled={day.hotelBreakfast}
@@ -152,7 +179,9 @@ export function TimelineEditor({
             <div className="relative">
               <input
                 type="text"
-                value={day.lunchSelf ? DAILY_SCHEDULE_EDITOR_LABELS.敬請自理 : (day.meals.lunch || '')}
+                value={
+                  day.lunchSelf ? DAILY_SCHEDULE_EDITOR_LABELS.敬請自理 : day.meals.lunch || ''
+                }
                 onChange={e => onUpdateDay(idx, 'meals.lunch', e.target.value)}
                 placeholder={ITINERARY_DIALOG_LABELS.午餐}
                 disabled={day.lunchSelf}
@@ -170,7 +199,7 @@ export function TimelineEditor({
             <div className="relative">
               <input
                 type="text"
-                value={day.dinnerSelf ? '敬請自理' : (day.meals.dinner || '')}
+                value={day.dinnerSelf ? '敬請自理' : day.meals.dinner || ''}
                 onChange={e => onUpdateDay(idx, 'meals.dinner', e.target.value)}
                 placeholder={ITINERARY_DIALOG_LABELS.晚餐}
                 disabled={day.dinnerSelf}
@@ -191,7 +220,11 @@ export function TimelineEditor({
             <div className="relative">
               <input
                 type="text"
-                value={day.sameAsPrevious ? `同上 (${getPreviousAccommodation(idx) || ''})` : (day.accommodation || '')}
+                value={
+                  day.sameAsPrevious
+                    ? `同上 (${getPreviousAccommodation(idx) || ''})`
+                    : day.accommodation || ''
+                }
                 onChange={e => onUpdateDay(idx, 'accommodation', e.target.value)}
                 placeholder={DAILY_SCHEDULE_EDITOR_LABELS.住宿飯店}
                 disabled={day.sameAsPrevious}
@@ -214,12 +247,14 @@ export function TimelineEditor({
         <div className="border border-border rounded-lg overflow-hidden">
           {/* 表頭 */}
           <div className="flex items-center bg-morandi-container/30 text-[10px] text-morandi-secondary font-medium">
-            <div className="w-[100px] px-2 py-1.5 text-center border-r border-morandi-container/50">{ITINERARY_DIALOG_LABELS.TIME}</div>
+            <div className="w-[100px] px-2 py-1.5 text-center border-r border-morandi-container/50">
+              {ITINERARY_DIALOG_LABELS.TIME}
+            </div>
             <div className="flex-1 px-2 py-1.5">{ITINERARY_DIALOG_LABELS.LABEL_7032}</div>
           </div>
 
           {/* 活動列表 */}
-          {(day.activities && day.activities.length > 0) ? (
+          {day.activities && day.activities.length > 0 ? (
             day.activities.map((activity, actIdx) => (
               <div
                 key={activity.id}
@@ -230,7 +265,11 @@ export function TimelineEditor({
                   <input
                     type="text"
                     maxLength={5}
-                    value={activity.startTime ? `${activity.startTime.slice(0, 2)}:${activity.startTime.slice(2)}` : ''}
+                    value={
+                      activity.startTime
+                        ? `${activity.startTime.slice(0, 2)}:${activity.startTime.slice(2)}`
+                        : ''
+                    }
                     onChange={e => {
                       const val = e.target.value.replace(/[^0-9]/g, '').slice(0, 4)
                       onUpdateActivity(idx, actIdx, 'startTime', val)
@@ -242,7 +281,11 @@ export function TimelineEditor({
                   <input
                     type="text"
                     maxLength={5}
-                    value={activity.endTime ? `${activity.endTime.slice(0, 2)}:${activity.endTime.slice(2)}` : ''}
+                    value={
+                      activity.endTime
+                        ? `${activity.endTime.slice(0, 2)}:${activity.endTime.slice(2)}`
+                        : ''
+                    }
                     onChange={e => {
                       const val = e.target.value.replace(/[^0-9]/g, '').slice(0, 4)
                       onUpdateActivity(idx, actIdx, 'endTime', val)
@@ -292,12 +335,15 @@ export function TimelineEditor({
         tourCountryName={tourCountryName}
         dayTitle={day.route || ''}
         existingIds={existingAttractionIds}
-        onSelect={(attractions) => {
+        onSelect={attractions => {
           if (onAddActivitiesFromAttractions) {
-            onAddActivitiesFromAttractions(idx, attractions.map(a => ({
-              name: a.name,
-              id: a.id?.startsWith('manual_') ? undefined : a.id,
-            })))
+            onAddActivitiesFromAttractions(
+              idx,
+              attractions.map(a => ({
+                name: a.name,
+                id: a.id?.startsWith('manual_') ? undefined : a.id,
+              }))
+            )
           } else {
             // fallback: 一個一個加
             for (const attraction of attractions) {

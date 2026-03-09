@@ -8,7 +8,13 @@
  * - 可選顯示司機資訊
  */
 import type { PageTemplate, TemplateData, VehicleData, VehicleColumnSettings } from './types'
-import type { CanvasElement, ShapeElement, TextElement, IconElement, TextStyle } from '@/features/designer/components/types'
+import type {
+  CanvasElement,
+  ShapeElement,
+  TextElement,
+  IconElement,
+  TextStyle,
+} from '@/features/designer/components/types'
 
 // A5 尺寸（像素，96 DPI）
 const A5_WIDTH = 559
@@ -136,7 +142,11 @@ export const japaneseStyleV1Vehicle: PageTemplate = {
 
     // === 頁面標題（根據類型調整） ===
     const titleText = hasBoth ? '分組名單' : isTableOnly ? '分桌名單' : '分車名單'
-    const subtitleText = hasBoth ? 'GROUP ASSIGNMENT' : isTableOnly ? 'TABLE ASSIGNMENT' : 'BUS ASSIGNMENT'
+    const subtitleText = hasBoth
+      ? 'GROUP ASSIGNMENT'
+      : isTableOnly
+        ? 'TABLE ASSIGNMENT'
+        : 'BUS ASSIGNMENT'
 
     const titleElement: TextElement = {
       ...createBaseElement('vehicle-title', '頁面標題'),
@@ -193,11 +203,7 @@ export const japaneseStyleV1Vehicle: PageTemplate = {
       const tableItems = vehicles.filter(v => v.groupType === 'table')
 
       // 渲染一組項目的 Grid 表格
-      const renderGridSection = (
-        items: VehicleData[],
-        prefix: string,
-        sectionLabel?: string
-      ) => {
+      const renderGridSection = (items: VehicleData[], prefix: string, sectionLabel?: string) => {
         if (items.length === 0) return
 
         const gridColumnWidth = contentWidth / items.length
@@ -242,7 +248,7 @@ export const japaneseStyleV1Vehicle: PageTemplate = {
         elements.push(headerBg)
 
         items.forEach((item, itemIdx) => {
-          const colX = contentX + (itemIdx * gridColumnWidth)
+          const colX = contentX + itemIdx * gridColumnWidth
           const headerText: TextElement = {
             ...createBaseElement(`${prefix}-header-${itemIdx}`, `${item.vehicleName}`),
             type: 'text',
@@ -266,7 +272,7 @@ export const japaneseStyleV1Vehicle: PageTemplate = {
         // --- 成員列表 ---
         const displayRows = Math.min(maxMemberCount, maxRows)
         for (let rowIdx = 0; rowIdx < displayRows; rowIdx++) {
-          const rowY = currentY + (rowIdx * memberRowHeight)
+          const rowY = currentY + rowIdx * memberRowHeight
 
           // 淡淡的分隔線（除了第一行之外）
           if (rowIdx > 0) {
@@ -290,14 +296,17 @@ export const japaneseStyleV1Vehicle: PageTemplate = {
             const member = item.members?.[rowIdx]
             if (!member) return
 
-            const colX = contentX + (itemIdx * gridColumnWidth)
+            const colX = contentX + itemIdx * gridColumnWidth
 
             const seqNumber = rowIdx + 1
             const memberName = member.chineseName || member.passportName || '-'
 
             // 序號（靠左）
             const seqElement: TextElement = {
-              ...createBaseElement(`${prefix}-seq-${itemIdx}-${rowIdx}`, `${item.vehicleName}序號${seqNumber}`),
+              ...createBaseElement(
+                `${prefix}-seq-${itemIdx}-${rowIdx}`,
+                `${item.vehicleName}序號${seqNumber}`
+              ),
               type: 'text',
               x: colX + 4,
               y: rowY + 2,
@@ -314,7 +323,10 @@ export const japaneseStyleV1Vehicle: PageTemplate = {
 
             // 姓名（居中）
             const nameElement: TextElement = {
-              ...createBaseElement(`${prefix}-name-${itemIdx}-${rowIdx}`, `${item.vehicleName}成員${seqNumber}`),
+              ...createBaseElement(
+                `${prefix}-name-${itemIdx}-${rowIdx}`,
+                `${item.vehicleName}成員${seqNumber}`
+              ),
               type: 'text',
               x: colX + 20,
               y: rowY + 2,
@@ -332,7 +344,7 @@ export const japaneseStyleV1Vehicle: PageTemplate = {
         }
 
         // 更新 currentY
-        currentY += (displayRows * memberRowHeight) + sectionSpacing
+        currentY += displayRows * memberRowHeight + sectionSpacing
       }
 
       // 渲染車輛區（如果有）
@@ -359,7 +371,7 @@ export const japaneseStyleV1Vehicle: PageTemplate = {
       vehicles.forEach((vehicle, vehicleIdx) => {
         const members = vehicle.members || []
         const rowsNeeded = Math.max(1, Math.ceil(members.length / columnsPerRow))
-        const vehicleBlockHeight = vehicleTitleHeight + (rowsNeeded * memberHeight) + vehicleSpacing
+        const vehicleBlockHeight = vehicleTitleHeight + rowsNeeded * memberHeight + vehicleSpacing
 
         if (currentY + vehicleBlockHeight > maxY) return
 
@@ -450,8 +462,8 @@ export const japaneseStyleV1Vehicle: PageTemplate = {
         members.forEach((member, memberIdx) => {
           const colIndex = memberIdx % columnsPerRow
           const rowIndex = Math.floor(memberIdx / columnsPerRow)
-          const memberX = contentX + (colIndex * columnWidth)
-          const memberY = currentY + (rowIndex * memberHeight)
+          const memberX = contentX + colIndex * columnWidth
+          const memberY = currentY + rowIndex * memberHeight
 
           const seqNumber = memberIdx + 1
           const memberName = member.chineseName || member.passportName || '-'
@@ -474,7 +486,7 @@ export const japaneseStyleV1Vehicle: PageTemplate = {
         })
 
         const rowsUsed = Math.ceil(members.length / columnsPerRow)
-        currentY += (rowsUsed * memberHeight) + vehicleSpacing
+        currentY += rowsUsed * memberHeight + vehicleSpacing
       })
     }
 

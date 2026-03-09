@@ -1,7 +1,17 @@
 'use client'
 
 import { useMemo, useCallback } from 'react'
-import { MapPin, Eye, Copy, Archive, Trash2, RotateCcw, Building2, CheckCircle2, Link2 } from 'lucide-react'
+import {
+  MapPin,
+  Eye,
+  Copy,
+  Archive,
+  Trash2,
+  RotateCcw,
+  Building2,
+  CheckCircle2,
+  Link2,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TableColumn } from '@/components/ui/enhanced-table'
 import { DateCell } from '@/components/table-cells'
@@ -39,18 +49,24 @@ export function useItineraryTableColumns({
   // 🔧 優化：移除 getCountryName/getCityName，Itinerary 的 country/city 欄位已是名稱字串
 
   // 根據 created_by ID 查找員工名稱
-  const getEmployeeName = useCallback((employeeId?: string) => {
-    if (!employeeId) return '-'
-    const employee = employees.find(e => e.id === employeeId)
-    return employee?.display_name || employee?.chinese_name || '-'
-  }, [employees])
+  const getEmployeeName = useCallback(
+    (employeeId?: string) => {
+      if (!employeeId) return '-'
+      const employee = employees.find(e => e.id === employeeId)
+      return employee?.display_name || employee?.chinese_name || '-'
+    },
+    [employees]
+  )
 
   // 根據 tour_id 查找綁定的團號
-  const getLinkedTourCode = useCallback((tourId?: string | null) => {
-    if (!tourId) return null
-    const tour = tours.find(t => t.id === tourId)
-    return tour?.code || null
-  }, [tours])
+  const getLinkedTourCode = useCallback(
+    (tourId?: string | null) => {
+      if (!tourId) return null
+      const tour = tours.find(t => t.id === tourId)
+      return tour?.code || null
+    },
+    [tours]
+  )
 
   const tableColumns: TableColumn<Itinerary>[] = useMemo(
     () => [
@@ -63,14 +79,14 @@ export function useItineraryTableColumns({
           const isLinked = !!linkedTourCode
           return (
             <div className="flex items-center gap-1.5">
-              {isLinked && (
-                <Link2 size={12} className="text-morandi-blue flex-shrink-0" />
-              )}
-              <span className={cn(
-                "text-sm font-mono",
-                isLinked ? "text-morandi-blue font-medium" : "text-morandi-secondary"
-              )}>
-                {isLinked ? linkedTourCode : (itinerary.tour_code || '-')}
+              {isLinked && <Link2 size={12} className="text-morandi-blue flex-shrink-0" />}
+              <span
+                className={cn(
+                  'text-sm font-mono',
+                  isLinked ? 'text-morandi-blue font-medium' : 'text-morandi-secondary'
+                )}
+              >
+                {isLinked ? linkedTourCode : itinerary.tour_code || '-'}
               </span>
             </div>
           )
@@ -114,11 +130,14 @@ export function useItineraryTableColumns({
         label: ITINERARY_LABELS.COL_DAYS,
         sortable: true,
         render: (_value, itinerary) => {
-          const dailyItinerary = itinerary.daily_itinerary as Array<{ isAlternative?: boolean }> | undefined
+          const dailyItinerary = itinerary.daily_itinerary as
+            | Array<{ isAlternative?: boolean }>
+            | undefined
           const mainDays = dailyItinerary?.filter(d => !d.isAlternative).length || 0
           return (
             <span className="text-sm text-morandi-secondary">
-              {mainDays} {ITINERARY_LABELS.DAY_UNIT} {Math.max(0, mainDays - 1)} {ITINERARY_LABELS.NIGHT_UNIT}
+              {mainDays} {ITINERARY_LABELS.DAY_UNIT} {Math.max(0, mainDays - 1)}{' '}
+              {ITINERARY_LABELS.NIGHT_UNIT}
             </span>
           )
         },
@@ -237,8 +256,8 @@ export function useItineraryTableColumns({
                 </button>
               )}
 
-              {!isTemplate && (
-                isClosed ? (
+              {!isTemplate &&
+                (isClosed ? (
                   <button
                     onClick={e => {
                       e.stopPropagation()
@@ -273,8 +292,7 @@ export function useItineraryTableColumns({
                       <CheckCircle2 size={14} />
                     </button>
                   </>
-                )
-              )}
+                ))}
 
               {isArchived ? (
                 <>
@@ -316,7 +334,18 @@ export function useItineraryTableColumns({
         },
       },
     ],
-    [handleDelete, handleOpenDuplicateDialog, handleArchive, handleUnarchive, handleSetTemplate, handleClose, handleReopen, isItineraryClosed, getEmployeeName, getLinkedTourCode]
+    [
+      handleDelete,
+      handleOpenDuplicateDialog,
+      handleArchive,
+      handleUnarchive,
+      handleSetTemplate,
+      handleClose,
+      handleReopen,
+      isItineraryClosed,
+      getEmployeeName,
+      getLinkedTourCode,
+    ]
   )
 
   return {

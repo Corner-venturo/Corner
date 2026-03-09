@@ -20,7 +20,7 @@ import { SortableAttractionsList } from '../SortableAttractionsList'
 import { useCountries, useRegions, useCities } from '@/data'
 import { Button } from '@/components/ui/button'
 import { ArrowUpDown, List, SortAsc, Loader2 } from 'lucide-react'
-import { ATTRACTIONS_TAB_LABELS } from '../../constants/labels';
+import { ATTRACTIONS_TAB_LABELS } from '../../constants/labels'
 
 // Dynamic import for large dialog component (807 lines)
 const AttractionsDialog = dynamic(
@@ -140,9 +140,7 @@ export default function AttractionsTab({
     setIsSorting(true)
     try {
       // 按名稱排序（使用 localeCompare 支援中文排序）
-      const sorted = [...attractions].sort((a, b) =>
-        a.name.localeCompare(b.name, 'zh-TW')
-      )
+      const sorted = [...attractions].sort((a, b) => a.name.localeCompare(b.name, 'zh-TW'))
 
       // 批量更新 display_order
       await reorderAttractions(sorted)
@@ -177,7 +175,7 @@ export default function AttractionsTab({
         {/* 右側：檢視切換 */}
         <div className="flex items-center gap-2">
           <Button
-            variant={isReorderMode ? "outline" : "default"}
+            variant={isReorderMode ? 'outline' : 'default'}
             size="sm"
             onClick={() => setIsReorderMode(false)}
             className="h-8"
@@ -186,7 +184,7 @@ export default function AttractionsTab({
             {ATTRACTIONS_TAB_LABELS.LABEL_6756}
           </Button>
           <Button
-            variant={isReorderMode ? "default" : "outline"}
+            variant={isReorderMode ? 'default' : 'outline'}
             size="sm"
             onClick={() => setIsReorderMode(true)}
             className="h-8"
@@ -220,8 +218,8 @@ export default function AttractionsTab({
             onToggleStatus={toggleStatus}
             onDelete={deleteAttraction}
             onAddNew={openAdd}
-            onMoveUp={(attraction) => moveUp(attraction, sortedAttractions)}
-            onMoveDown={(attraction) => moveDown(attraction, sortedAttractions)}
+            onMoveUp={attraction => moveUp(attraction, sortedAttractions)}
+            onMoveDown={attraction => moveDown(attraction, sortedAttractions)}
           />
         )}
       </div>

@@ -40,14 +40,14 @@ export function ThreeDPhotoWall({ images, onClose, className, open = true }: Pho
 
   // 確保每欄至少有一些圖片（重複填充）
   const minPerColumn = 8
-  columnImages.forEach((col) => {
+  columnImages.forEach(col => {
     while (col.length < minPerColumn && images.length > 0) {
       col.push(images[col.length % images.length])
     }
   })
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Dialog open={open} onOpenChange={isOpen => !isOpen && onClose()}>
       <DialogPortal>
         <DialogOverlay className="bg-black z-[99999]" />
         <DialogContent
@@ -83,7 +83,7 @@ export function ThreeDPhotoWall({ images, onClose, className, open = true }: Pho
               perspective: '1200px',
               perspectiveOrigin: 'center center',
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             <div
               className="flex items-center justify-center"
@@ -123,7 +123,7 @@ export function ThreeDPhotoWall({ images, onClose, className, open = true }: Pho
 function MarqueeColumn({
   images,
   direction = 'up',
-  duration = 60
+  duration = 60,
 }: {
   images: string[]
   direction?: 'up' | 'down'
@@ -137,15 +137,15 @@ function MarqueeColumn({
       <motion.div
         className="flex flex-col gap-6"
         animate={{
-          y: direction === 'up' ? ['0%', '-50%'] : ['-50%', '0%']
+          y: direction === 'up' ? ['0%', '-50%'] : ['-50%', '0%'],
         }}
         transition={{
           y: {
             duration: duration,
             repeat: Infinity,
             ease: 'linear',
-            repeatType: 'loop'
-          }
+            repeatType: 'loop',
+          },
         }}
       >
         {duplicatedImages.map((image, index) => (
@@ -155,15 +155,11 @@ function MarqueeColumn({
             whileHover={{
               scale: 1.08,
               zIndex: 10,
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)'
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)',
             }}
             transition={{ duration: 0.2 }}
           >
-            <img src={image}
-              alt=""
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
+            <img src={image} alt="" className="w-full h-full object-cover" loading="lazy" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
           </motion.div>
         ))}

@@ -8,16 +8,16 @@
 
 ## 📊 總覽
 
-| 類別 | 問題數 | 嚴重度 | 預估總工時 |
-|------|--------|--------|-----------|
-| API Route 品質 | 3 | 🟡 中 | 8-12h |
-| TypeScript 型別 | 2 | 🟡 中 | 4-6h |
-| 效能 | 3 | 🟢 低 | 4-6h |
-| 資料庫查詢 | 1 | 🟢 低（已做得好） | 0h |
-| 程式碼風格 | 2 | 🟡 中 | 6-8h |
-| 安全性 | 2 | 🟠 中高 | 3-4h |
-| 可維護性 | 1 | 🟢 低 | 2-3h |
-| 無障礙 | 1 | 🟢 低 | 4-6h |
+| 類別            | 問題數 | 嚴重度            | 預估總工時 |
+| --------------- | ------ | ----------------- | ---------- |
+| API Route 品質  | 3      | 🟡 中             | 8-12h      |
+| TypeScript 型別 | 2      | 🟡 中             | 4-6h       |
+| 效能            | 3      | 🟢 低             | 4-6h       |
+| 資料庫查詢      | 1      | 🟢 低（已做得好） | 0h         |
+| 程式碼風格      | 2      | 🟡 中             | 6-8h       |
+| 安全性          | 2      | 🟠 中高           | 3-4h       |
+| 可維護性        | 1      | 🟢 低             | 2-3h       |
+| 無障礙          | 1      | 🟢 低             | 4-6h       |
 
 ---
 
@@ -48,10 +48,13 @@
 **目標**：建立 `withAuth` 等 API middleware wrapper，自動處理認證和錯誤。
 
 **做法**：
+
 ```typescript
 // 現在每個 route 都要寫：
 const supabase = createClient()
-const { data: { user } } = await supabase.auth.getUser()
+const {
+  data: { user },
+} = await supabase.auth.getUser()
 if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
 // 改成：
@@ -69,6 +72,7 @@ export const POST = withAuth(async (req, { user, supabase }) => {
 ### 1.3 超大 Route 需要拆分
 
 **現狀**：
+
 - `bot/ticket-status/route.ts` — **693 行**
 - `ai/edit-image/route.ts` — **430 行**
 - `itineraries/generate/route.ts` — **416 行**
@@ -91,6 +95,7 @@ export const POST = withAuth(async (req, { user, supabase }) => {
 ### 2.1 過多的 `as unknown` 型別斷言
 
 **現狀**：有 **20+ 處** 使用 `as unknown as SomeType`，主要集中在：
+
 - `customers/page.tsx`（4 處）
 - `todos/page.tsx`（4 處）
 - `quotes/[id]/page.tsx`（3 處）
@@ -101,6 +106,7 @@ export const POST = withAuth(async (req, { user, supabase }) => {
 **目標**：消除非必要的 `as unknown`，改用正確的泛型或 type guard。
 
 **做法**：
+
 - `customers/page.tsx` 的 `updateCustomer as unknown as ...` → 修正 hook 的回傳型別定義
 - `todos/page.tsx` 的 `columns as unknown as ...` → 修正 `EnhancedTable` 的泛型
 - Supabase RPC 的 `as unknown as ConfirmationResult` → 在 typed-client 加回傳型別
@@ -120,6 +126,7 @@ export const POST = withAuth(async (req, { user, supabase }) => {
 **目標**：對高頻使用的 Record 定義更具體的型別。
 
 **做法**：
+
 - `Record<string, any>`（`members/route.ts:65`）→ 定義 `ChannelMember` 型別
 - PNR 的 `raw_fare_data`、`metadata` 等 → 如果結構穩定，定義專用型別
 
@@ -187,7 +194,7 @@ export const POST = withAuth(async (req, { user, supabase }) => {
 
 **白話文**：資料庫查詢寫得很好，沒有「問一百次資料庫才拿到一百筆資料」的低效問題。
 
-### 4.2 select('*') — 未發現 ✅
+### 4.2 select('\*') — 未發現 ✅
 
 **現狀**：沒有找到 `select('*')` 的使用。查詢都有指定需要的欄位。
 
@@ -204,6 +211,7 @@ export const POST = withAuth(async (req, { user, supabase }) => {
 **目標**：統一命名規範。**建議**：hooks 允許 camelCase（因為 React 社群慣例），但在規範文件中明確寫出例外。
 
 **做法**：更新 `CLAUDE.md` / `CODE_STANDARDS.md`，明確寫出：
+
 - `.tsx` 組件檔：camelCase（React 慣例）
 - hooks（`use*.ts`）：camelCase（React 慣例）
 - 其他 `.ts` 檔：snake_case
@@ -235,6 +243,7 @@ export const POST = withAuth(async (req, { user, supabase }) => {
 ### 6.1 dangerouslySetInnerHTML 使用（XSS 風險）
 
 **現狀**：有 **10 處** 使用 `dangerouslySetInnerHTML`，主要在：
+
 - Tour Hero 系列組件（7 處）— 顯示 AI 生成的 HTML
 - `SaveVersionDialog` — 顯示快捷鍵提示
 - `DisbursementPrintDialog` / `PrintableQuickQuote` — 列印用 `innerHTML`
@@ -244,6 +253,7 @@ export const POST = withAuth(async (req, { user, supabase }) => {
 **目標**：確保所有 `dangerouslySetInnerHTML` 的內容都經過 `DOMPurify` 消毒。
 
 **做法**：
+
 - Tour Hero 系列：已經叫 `cleanHtml`，需確認是否有經過 `DOMPurify.sanitize()`
 - `SaveVersionDialog`：靜態內容，風險低，但建議改用 JSX
 - 列印用 `innerHTML`：風險低（內部資料），但建議加註解說明
@@ -257,6 +267,7 @@ export const POST = withAuth(async (req, { user, supabase }) => {
 ### 6.2 API Key 硬編碼風險
 
 **現狀**：
+
 - `gemini/generate-image/route.ts` 從 `process.env` 讀取多把 API key（這是正確的）
 - `settings/env/route.ts` 列出環境變數名稱（用於管理介面）
 - `CLAUDE.md` 中有 **Supabase Access Token 明文**（`sbp_94746...`）
@@ -264,6 +275,7 @@ export const POST = withAuth(async (req, { user, supabase }) => {
 **白話文**：API 金鑰在程式碼裡的處理大致正確（從環境變數讀取）。但 `CLAUDE.md` 裡寫了 Supabase token 明文，如果這個檔案被公開（例如放到 GitHub），任何人都能操作你的資料庫。
 
 **目標**：
+
 - 確認 `.claude/` 在 `.gitignore` 中
 - 考慮把 token 移到環境變數
 
@@ -307,24 +319,24 @@ export const POST = withAuth(async (req, { user, supabase }) => {
 
 依照「投入少 × 效益高」排序：
 
-| 優先序 | 項目 | 工時 | 為什麼先做 |
-|--------|------|------|-----------|
-| **P1** | 6.2 確認 `.claude/` 在 gitignore | 0.5h | 安全隱患，一分鐘就能確認 |
-| **P2** | 3.2 SWR 全域配置 | 1h | 一行設定，全站效能提升 |
-| **P3** | 1.2 API middleware（withAuth） | 3-4h | 減少重複程式碼，未來開發更快 |
-| **P4** | 1.1 統一 API 錯誤格式 | 3-4h | 前端錯誤處理更簡單 |
-| **P5** | 2.1 消除 `as unknown` | 3-4h | 型別安全，減少潛在 bug |
-| **P6** | 6.1 檢查 dangerouslySetInnerHTML | 2h | 安全性，確認已有消毒 |
-| **P7** | 1.3 拆分超大 route | 4-6h | 可維護性，但不急 |
-| **P8** | 5.1 命名規範文件化 | 1h | 寫清楚規範就好 |
-| **P9** | 5.2 統一 export 風格 | 2-3h | 一致性，可慢慢改 |
-| **P10** | 3.1 確認大型套件 dynamic import | 2h | 效能優化，不急 |
-| **P11** | 8.1 Accessibility | 4-6h | 內部系統，最低優先 |
+| 優先序  | 項目                             | 工時 | 為什麼先做                   |
+| ------- | -------------------------------- | ---- | ---------------------------- |
+| **P1**  | 6.2 確認 `.claude/` 在 gitignore | 0.5h | 安全隱患，一分鐘就能確認     |
+| **P2**  | 3.2 SWR 全域配置                 | 1h   | 一行設定，全站效能提升       |
+| **P3**  | 1.2 API middleware（withAuth）   | 3-4h | 減少重複程式碼，未來開發更快 |
+| **P4**  | 1.1 統一 API 錯誤格式            | 3-4h | 前端錯誤處理更簡單           |
+| **P5**  | 2.1 消除 `as unknown`            | 3-4h | 型別安全，減少潛在 bug       |
+| **P6**  | 6.1 檢查 dangerouslySetInnerHTML | 2h   | 安全性，確認已有消毒         |
+| **P7**  | 1.3 拆分超大 route               | 4-6h | 可維護性，但不急             |
+| **P8**  | 5.1 命名規範文件化               | 1h   | 寫清楚規範就好               |
+| **P9**  | 5.2 統一 export 風格             | 2-3h | 一致性，可慢慢改             |
+| **P10** | 3.1 確認大型套件 dynamic import  | 2h   | 效能優化，不急               |
+| **P11** | 8.1 Accessibility                | 4-6h | 內部系統，最低優先           |
 
 ### 做得好的地方 👏
 
 - ✅ **零 N+1 查詢** — 資料庫查詢效能很好
-- ✅ **零 select('*')** — 查詢都有指定欄位
+- ✅ **零 select('\*')** — 查詢都有指定欄位
 - ✅ **僅 6 處 as any** — 且全部集中管理
 - ✅ **已有統一 API response 工具** — 只是還沒全面採用
 - ✅ **console.log 控管良好** — 幾乎沒有 debug log 殘留

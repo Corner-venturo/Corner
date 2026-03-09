@@ -16,6 +16,7 @@
 ### 2. 啟用 API
 
 在 Google Cloud Console 中：
+
 1. 導航到「API 和服務」→「程式庫」
 2. 搜尋並啟用：
    - Gmail API
@@ -49,11 +50,13 @@ python3 scripts/google-auth-init.py
 ```
 
 這會開啟瀏覽器要求授權，完成後會產生：
+
 - `~/Projects/venturo-erp/.credentials/google-token.json`
 
 ### 6. 建立 Google Sheet 並授權
 
 1. 執行建立 Sheet 的腳本：
+
    ```bash
    python3 scripts/create-trip-sheet.py
    ```

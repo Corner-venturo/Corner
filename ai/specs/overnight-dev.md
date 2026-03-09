@@ -3,6 +3,7 @@
 ## Status: Skill 85% 完成，未實戰測試
 
 ## 設計日期
+
 2026-03-05
 
 ---
@@ -24,15 +25,15 @@
 
 ## 已完成
 
-| 檔案 | 功能 | 狀態 |
-|------|------|------|
-| SKILL.md | Skill 說明 | ✅ |
-| scripts/schedule.js | 排程任務 | ✅ |
-| scripts/executor.js | 執行開發 | ⚠️ 待整合 Claude CLI |
-| scripts/morning-report.js | 產生晨報 | ✅ |
-| lib/task-parser.js | 解析 YAML | ✅ |
-| lib/code-generator.js | 呼叫 coding agent | ⚠️ 待測試 |
-| templates/overnight-tasks.yaml | 任務範本 | ✅ |
+| 檔案                           | 功能              | 狀態                 |
+| ------------------------------ | ----------------- | -------------------- |
+| SKILL.md                       | Skill 說明        | ✅                   |
+| scripts/schedule.js            | 排程任務          | ✅                   |
+| scripts/executor.js            | 執行開發          | ⚠️ 待整合 Claude CLI |
+| scripts/morning-report.js      | 產生晨報          | ✅                   |
+| lib/task-parser.js             | 解析 YAML         | ✅                   |
+| lib/code-generator.js          | 呼叫 coding agent | ⚠️ 待測試            |
+| templates/overnight-tasks.yaml | 任務範本          | ✅                   |
 
 位置：`~/.openclaw/workspace-william/skills/overnight-dev/`
 
@@ -54,6 +55,7 @@
 ## 與 /ai 系統的整合
 
 Overnight Dev 執行時：
+
 1. 讀 `ai/maps/` + `ai/rules/` 了解系統
 2. 讀 `ai/tasks/CURRENT_TASK.md` 知道要做什麼
 3. 完成後寫 `ai/reports/OPENCLAW_REPORT.md`

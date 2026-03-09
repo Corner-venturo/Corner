@@ -3,7 +3,6 @@
  * FleetVehicleList - 車輛列表
  */
 
-
 import React from 'react'
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'
 import { Badge } from '@/components/ui/badge'
@@ -22,7 +21,10 @@ interface FleetVehicleListProps {
   onDelete?: (item: FleetVehicle) => void
 }
 
-const STATUS_CONFIG: Record<VehicleStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const STATUS_CONFIG: Record<
+  VehicleStatus,
+  { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   available: { label: '可用', variant: 'default' },
   in_use: { label: '使用中', variant: 'outline' },
   maintenance: { label: '維修中', variant: 'destructive' },
@@ -62,7 +64,9 @@ export const FleetVehicleList: React.FC<FleetVehicleListProps> = ({
           <div className="flex items-center gap-2">
             <span className="text-lg">{VEHICLE_TYPE_ICONS[item.vehicle_type] || '🚌'}</span>
             <div>
-              <span className="font-mono font-medium text-morandi-primary">{String(value || '-')}</span>
+              <span className="font-mono font-medium text-morandi-primary">
+                {String(value || '-')}
+              </span>
               {item.vehicle_name && (
                 <div className="text-xs text-morandi-secondary">{item.vehicle_name}</div>
               )}
@@ -81,7 +85,9 @@ export const FleetVehicleList: React.FC<FleetVehicleListProps> = ({
           <div>
             <span className="text-morandi-primary">{getVehicleTypeLabel(item.vehicle_type)}</span>
             {item.brand && (
-              <div className="text-xs text-morandi-secondary">{item.brand} {item.model}</div>
+              <div className="text-xs text-morandi-secondary">
+                {item.brand} {item.model}
+              </div>
             )}
           </div>
         )
@@ -92,14 +98,12 @@ export const FleetVehicleList: React.FC<FleetVehicleListProps> = ({
       label: '座位',
       sortable: true,
       width: '80px',
-      render: value => (
-        <span className="text-morandi-primary">{value ? `${value}人` : '-'}</span>
-      ),
+      render: value => <span className="text-morandi-primary">{value ? `${value}人` : '-'}</span>,
     },
     {
       key: 'default_driver_id',
       label: '預設司機',
-      render: (value) => {
+      render: value => {
         const driverName = getDriverName(value as string | null)
         if (!driverName) return <span className="text-morandi-muted">-</span>
         return <span className="text-morandi-primary">{driverName}</span>
@@ -109,15 +113,13 @@ export const FleetVehicleList: React.FC<FleetVehicleListProps> = ({
       key: 'inspection_due_date',
       label: '驗車到期',
       sortable: true,
-      render: (value) => {
+      render: value => {
         if (!value) return <span className="text-morandi-muted">-</span>
         const days = getDaysUntilDue(value as string)
         const colorClass = getDueStatusColor(days)
         return (
           <div className="flex items-center gap-1">
-            {days !== null && days <= 30 && (
-              <AlertTriangle size={14} className={colorClass} />
-            )}
+            {days !== null && days <= 30 && <AlertTriangle size={14} className={colorClass} />}
             <span className={colorClass}>{formatDate(value as string)}</span>
             {days !== null && (
               <span className={`text-xs ${colorClass}`}>
@@ -132,15 +134,13 @@ export const FleetVehicleList: React.FC<FleetVehicleListProps> = ({
       key: 'insurance_due_date',
       label: '保險到期',
       sortable: true,
-      render: (value) => {
+      render: value => {
         if (!value) return <span className="text-morandi-muted">-</span>
         const days = getDaysUntilDue(value as string)
         const colorClass = getDueStatusColor(days)
         return (
           <div className="flex items-center gap-1">
-            {days !== null && days <= 30 && (
-              <Calendar size={14} className={colorClass} />
-            )}
+            {days !== null && days <= 30 && <Calendar size={14} className={colorClass} />}
             <span className={colorClass}>{formatDate(value as string)}</span>
           </div>
         )

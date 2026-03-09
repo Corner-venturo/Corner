@@ -8,13 +8,13 @@
 
 ## 📊 執行摘要
 
-| 維度 | 發現問題數 | 嚴重性 | 狀態 |
-|------|-----------|--------|------|
-| **P** - Performance | 143 處過度載入, 4 處高複雜度計算 | 🟡 中 | 需優化 |
-| **R** - Redundancy | 35 處重複工具函數, 919 處 try-catch | 🟠 高 | 需統一 |
-| **I** - Integrity | 4 個高風險 API, 10 個中風險 API | 🔴 緊急 | 需修復 |
-| **M** - Modularity | 0 循環依賴, 94.7% 資料層已遷移 | 🟢 良好 | 維持 |
-| **E** - Error-handling | 12+ 靜默失敗, ErrorLogger 已禁用 | 🔴 緊急 | 需修復 |
+| 維度                   | 發現問題數                          | 嚴重性  | 狀態   |
+| ---------------------- | ----------------------------------- | ------- | ------ |
+| **P** - Performance    | 143 處過度載入, 4 處高複雜度計算    | 🟡 中   | 需優化 |
+| **R** - Redundancy     | 35 處重複工具函數, 919 處 try-catch | 🟠 高   | 需統一 |
+| **I** - Integrity      | 4 個高風險 API, 10 個中風險 API     | 🔴 緊急 | 需修復 |
+| **M** - Modularity     | 0 循環依賴, 94.7% 資料層已遷移      | 🟢 良好 | 維持   |
+| **E** - Error-handling | 12+ 靜默失敗, ErrorLogger 已禁用    | 🔴 緊急 | 需修復 |
 
 ---
 
@@ -22,11 +22,11 @@
 
 ### 🔴 最嚴重的效能熱點
 
-| 檔案 | 問題 | 載入的表 |
-|------|------|---------|
+| 檔案                      | 問題                | 載入的表                                     |
+| ------------------------- | ------------------- | -------------------------------------------- |
 | `useCalendarTransform.ts` | 同時載入 5 個完整表 | tours, orders, members, customers, employees |
-| `/itinerary/page.tsx` | 同時載入 4 個完整表 | itineraries, quotes, employees, tours |
-| `use-stats-data.ts` | 前端重度計算 | tours, orders |
+| `/itinerary/page.tsx`     | 同時載入 4 個完整表 | itineraries, quotes, employees, tours        |
+| `use-stats-data.ts`       | 前端重度計算        | tours, orders                                |
 
 ### 📊 載入全部資料的統計
 
@@ -37,6 +37,7 @@
 ### 🎯 LOCA 快取候選
 
 適合未來 Local-first 快取的資料表：
+
 - `tours` - 最頻繁載入
 - `orders` - 次頻繁載入
 - `members` - 資料量最大
@@ -49,23 +50,23 @@
 
 ### 🔴 重複的工具函數 (35 處)
 
-| 類型 | 重複數 | 位置 |
-|------|--------|------|
-| 日期格式化 | 18 處 | 各 features, components |
-| 金額格式化 | 9 處 | accounting, visas, pdf |
-| 狀態轉換 | 4 處 | pdf, requests |
-| 驗證函數 | 4 處 | api, stores |
+| 類型       | 重複數 | 位置                    |
+| ---------- | ------ | ----------------------- |
+| 日期格式化 | 18 處  | 各 features, components |
+| 金額格式化 | 9 處   | accounting, visas, pdf  |
+| 狀態轉換   | 4 處   | pdf, requests           |
+| 驗證函數   | 4 處   | api, stores             |
 
 **建議**: 統一使用 `/lib/utils/format-date.ts` 和 `/lib/utils/format-currency.ts`
 
 ### 🟠 重複的組件邏輯
 
-| 邏輯類型 | 重複數 | 建議 |
-|---------|--------|------|
-| Dialog 開關 | 15+ 處 | 建立 `useDialogState` hook |
-| Loading/Error 狀態 | 20+ 處 | 建立 `useAsyncData` hook |
-| 列表搜尋過濾 | 8+ 處 | 建立 `useSearchFilters` hook |
-| 表單驗證 | 12+ 處 | 建立 `useFormValidation` hook |
+| 邏輯類型           | 重複數 | 建議                          |
+| ------------------ | ------ | ----------------------------- |
+| Dialog 開關        | 15+ 處 | 建立 `useDialogState` hook    |
+| Loading/Error 狀態 | 20+ 處 | 建立 `useAsyncData` hook      |
+| 列表搜尋過濾       | 8+ 處  | 建立 `useSearchFilters` hook  |
+| 表單驗證           | 12+ 處 | 建立 `useFormValidation` hook |
 
 ### 📋 try-catch 統計
 
@@ -78,14 +79,14 @@
 
 ### 🔴 高風險 API (必須立即修復)
 
-| API 路徑 | 問題 | 影響 |
-|---------|------|------|
-| `/api/travel-invoice/allowance` | 無認證 | 任何人可開折讓 |
-| `/api/travel-invoice/issue` | 無認證 | 任何人可開發票 |
-| `/api/travel-invoice/void` | 無認證 | 任何人可作廢發票 |
-| `/api/travel-invoice/query` | 無認證 | 任何人可查發票 |
-| `/api/workspaces/.../members` | 無 workspace 驗證 | 跨租戶存取 |
-| `/api/debug/*` (6個) | 完全開放 | 生產環境暴露 |
+| API 路徑                        | 問題              | 影響             |
+| ------------------------------- | ----------------- | ---------------- |
+| `/api/travel-invoice/allowance` | 無認證            | 任何人可開折讓   |
+| `/api/travel-invoice/issue`     | 無認證            | 任何人可開發票   |
+| `/api/travel-invoice/void`      | 無認證            | 任何人可作廢發票 |
+| `/api/travel-invoice/query`     | 無認證            | 任何人可查發票   |
+| `/api/workspaces/.../members`   | 無 workspace 驗證 | 跨租戶存取       |
+| `/api/debug/*` (6個)            | 完全開放          | 生產環境暴露     |
 
 ### 🟠 中風險 API (建議修復)
 
@@ -96,11 +97,11 @@
 
 ### 📊 類型安全統計
 
-| 類型 | 數量 | 需修復 |
-|------|------|--------|
-| `:any` 註解 | 5 | 4 處 |
-| `as any` 斷言 | 10 | 5 處 (Supabase 合理) |
-| `:unknown` | 150+ | ✅ 大部分合理 |
+| 類型          | 數量 | 需修復               |
+| ------------- | ---- | -------------------- |
+| `:any` 註解   | 5    | 4 處                 |
+| `as any` 斷言 | 10   | 5 處 (Supabase 合理) |
+| `:unknown`    | 150+ | ✅ 大部分合理        |
 
 ---
 
@@ -120,6 +121,7 @@
 ```
 
 **未遷移的模組**:
+
 - ERP Accounting (會計特殊)
 - Timebox (個人工具)
 - Leader Availability (垂直領域)
@@ -131,11 +133,11 @@
 
 ### 🔴 緊急問題
 
-| 問題 | 位置 | 影響 |
-|------|------|------|
-| **ErrorLogger 已禁用** | `ErrorLogger.tsx:7` | 生產環境全盲 |
-| Batch 操作靜默失敗 | `base.service.ts:176-192` | 部分資料遺失 |
-| Store JSON 解析靜默失敗 | `create-store.ts:72-112` | 認證降級 |
+| 問題                    | 位置                      | 影響         |
+| ----------------------- | ------------------------- | ------------ |
+| **ErrorLogger 已禁用**  | `ErrorLogger.tsx:7`       | 生產環境全盲 |
+| Batch 操作靜默失敗      | `base.service.ts:176-192` | 部分資料遺失 |
+| Store JSON 解析靜默失敗 | `create-store.ts:72-112`  | 認證降級     |
 
 ### 🟠 靜默失敗 (12+ 處)
 
@@ -145,11 +147,11 @@
 
 ### 📊 錯誤處理不一致
 
-| 模式 | 使用數 | 問題 |
-|------|--------|------|
-| Supabase update 無檢查 | 5+ | 資料可能未保存 |
-| API 回應格式不一 | 20+ | 前端無法統一處理 |
-| Store 拋出策略不一 | 6+ | 呼叫方難預測 |
+| 模式                   | 使用數 | 問題             |
+| ---------------------- | ------ | ---------------- |
+| Supabase update 無檢查 | 5+     | 資料可能未保存   |
+| API 回應格式不一       | 20+    | 前端無法統一處理 |
+| Store 拋出策略不一     | 6+     | 呼叫方難預測     |
 
 ---
 
@@ -177,11 +179,11 @@
 
 ## 📋 相關文件
 
-| 代號 | 名稱 | 說明 |
-|------|------|------|
-| **CARD** | Clean, Auth, Redundant, Dependencies | 功能模組審計 (已完成) |
+| 代號      | 名稱                                           | 說明                  |
+| --------- | ---------------------------------------------- | --------------------- |
+| **CARD**  | Clean, Auth, Redundant, Dependencies           | 功能模組審計 (已完成) |
 | **PRIME** | Perf, Redundancy, Integrity, Modularity, Error | 全站深度優化 (本報告) |
-| **LOCA** | Local-first Offline Cache Architecture | 離線快取架構 (未來) |
+| **LOCA**  | Local-first Offline Cache Architecture         | 離線快取架構 (未來)   |
 
 ---
 

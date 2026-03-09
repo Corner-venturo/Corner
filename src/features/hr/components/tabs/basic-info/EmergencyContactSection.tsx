@@ -25,7 +25,9 @@ export function EmergencyContactSection({
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">{BASIC_INFO_LABELS.LABEL_658}</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">
+            {BASIC_INFO_LABELS.LABEL_658}
+          </label>
           {isEditing ? (
             <Input
               value={formData.personal_info.emergency_contact.name}
@@ -50,7 +52,9 @@ export function EmergencyContactSection({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">{BASIC_INFO_LABELS.LABEL_6532}</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">
+            {BASIC_INFO_LABELS.LABEL_6532}
+          </label>
           {isEditing ? (
             <Input
               value={formData.personal_info.emergency_contact.relationship}
@@ -75,7 +79,9 @@ export function EmergencyContactSection({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">{BASIC_INFO_LABELS.LABEL_6280}</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">
+            {BASIC_INFO_LABELS.LABEL_6280}
+          </label>
           {isEditing ? (
             <Input
               value={formData.personal_info.emergency_contact.phone}

@@ -138,12 +138,9 @@ export async function generateDisbursementPDF(data: DisbursementPDFData): Promis
   // ========== 標題區 ==========
   doc.setFontSize(16)
   doc.setFont('ChironHeiHK', 'bold')
-  doc.text(
-    `${DISBURSEMENT_PDF_LABELS.TITLE} ${order.order_number || '-'}`,
-    pageWidth / 2,
-    18,
-    { align: 'center' }
-  )
+  doc.text(`${DISBURSEMENT_PDF_LABELS.TITLE} ${order.order_number || '-'}`, pageWidth / 2, 18, {
+    align: 'center',
+  })
 
   doc.setFontSize(10)
   doc.setFont('ChironHeiHK', 'normal')
@@ -157,12 +154,9 @@ export async function generateDisbursementPDF(data: DisbursementPDFData): Promis
 
   // 製表人（右）
   if (preparedBy) {
-    doc.text(
-      `${DISBURSEMENT_PDF_LABELS.PREPARED_BY}${preparedBy}`,
-      pageWidth - 15,
-      27,
-      { align: 'right' }
-    )
+    doc.text(`${DISBURSEMENT_PDF_LABELS.PREPARED_BY}${preparedBy}`, pageWidth - 15, 27, {
+      align: 'right',
+    })
   }
 
   // ========== 準備表格資料 ==========
@@ -196,21 +190,17 @@ export async function generateDisbursementPDF(data: DisbursementPDFData): Promis
   // ========== 繪製表格 ==========
   autoTable(doc, {
     startY: 33,
-    head: [[
-      DISBURSEMENT_PDF_LABELS.COL_PAYEE,
-      DISBURSEMENT_PDF_LABELS.COL_REQUEST_NO,
-      DISBURSEMENT_PDF_LABELS.COL_DESCRIPTION,
-      DISBURSEMENT_PDF_LABELS.COL_AMOUNT,
-      DISBURSEMENT_PDF_LABELS.COL_SUBTOTAL,
-    ]],
+    head: [
+      [
+        DISBURSEMENT_PDF_LABELS.COL_PAYEE,
+        DISBURSEMENT_PDF_LABELS.COL_REQUEST_NO,
+        DISBURSEMENT_PDF_LABELS.COL_DESCRIPTION,
+        DISBURSEMENT_PDF_LABELS.COL_AMOUNT,
+        DISBURSEMENT_PDF_LABELS.COL_SUBTOTAL,
+      ],
+    ],
     body: tableBody,
-    foot: [[
-      DISBURSEMENT_PDF_LABELS.TOTAL,
-      '',
-      '',
-      '',
-      (order.amount || 0).toLocaleString(),
-    ]],
+    foot: [[DISBURSEMENT_PDF_LABELS.TOTAL, '', '', '', (order.amount || 0).toLocaleString()]],
     theme: 'grid',
     styles: {
       font: 'ChironHeiHK',
@@ -257,18 +247,12 @@ export async function generateDisbursementPDF(data: DisbursementPDFData): Promis
 
     const pageHeight = doc.internal.pageSize.getHeight()
 
-    doc.text(
-      DISBURSEMENT_PDF_LABELS.COMPANY_SLOGAN,
-      pageWidth / 2,
-      pageHeight - 12,
-      { align: 'center' }
-    )
-    doc.text(
-      DISBURSEMENT_PDF_LABELS.PAGE_NUMBER(i, pageCount),
-      pageWidth - 18,
-      pageHeight - 12,
-      { align: 'center' }
-    )
+    doc.text(DISBURSEMENT_PDF_LABELS.COMPANY_SLOGAN, pageWidth / 2, pageHeight - 12, {
+      align: 'center',
+    })
+    doc.text(DISBURSEMENT_PDF_LABELS.PAGE_NUMBER(i, pageCount), pageWidth - 18, pageHeight - 12, {
+      align: 'center',
+    })
   }
 
   // ========== 儲存 PDF ==========

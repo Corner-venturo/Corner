@@ -7,7 +7,13 @@
  * 參考設計：五天行程總覽（和紙質感）
  */
 import type { PageTemplate, TemplateData } from './types'
-import type { CanvasElement, TextElement, ShapeElement, IconElement, MaterialIconName } from '@/features/designer/components/types'
+import type {
+  CanvasElement,
+  TextElement,
+  ShapeElement,
+  IconElement,
+  MaterialIconName,
+} from '@/features/designer/components/types'
 
 // A5 尺寸
 const A5_WIDTH = 559
@@ -18,24 +24,29 @@ const CHINESE_NUMERALS = ['壹', '貳', '參', '肆', '伍', '陸', '柒', '捌'
 
 // 顏色定義（日系配色）
 const COLORS = {
-  ink: '#3e3a36',        // 主要文字
-  inkLight: '#757068',   // 次要文字
-  primary: '#8e8070',    // 主題色（灰褐）
-  accent: '#b8a896',     // 強調色（淺褐）
+  ink: '#3e3a36', // 主要文字
+  inkLight: '#757068', // 次要文字
+  primary: '#8e8070', // 主題色（灰褐）
+  accent: '#b8a896', // 強調色（淺褐）
 }
 
 // 餐食圖標對應（返回 MaterialIconName 類型，用於 IconElement）
-function getMealIcon(mealType: 'breakfast' | 'lunch' | 'dinner', mealContent: string): MaterialIconName {
+function getMealIcon(
+  mealType: 'breakfast' | 'lunch' | 'dinner',
+  mealContent: string
+): MaterialIconName {
   const content = mealContent.toLowerCase()
 
   // 特定內容對應
   if (content.includes('溫暖的家') || content.includes('家')) return 'bakery_dining'
   if (content.includes('機上') || content.includes('飛機')) return 'flight_class'
   if (content.includes('自理')) return 'restaurant'
-  if (content.includes('拉麵') || content.includes('日式') || content.includes('定食')) return 'ramen_dining'
+  if (content.includes('拉麵') || content.includes('日式') || content.includes('定食'))
+    return 'ramen_dining'
   if (content.includes('湯') || content.includes('豆腐')) return 'soup_kitchen'
   if (content.includes('鍋') || content.includes('涮涮')) return 'skillet'
-  if (content.includes('便當') || content.includes('釜飯') || content.includes('bento')) return 'bento'
+  if (content.includes('便當') || content.includes('釜飯') || content.includes('bento'))
+    return 'bento'
   if (content.includes('飯') && !content.includes('飯店')) return 'rice_bowl'
 
   // 預設圖標（依餐食類型）
@@ -275,7 +286,9 @@ export const japaneseStyleV1Itinerary: PageTemplate = {
           opacity: 1,
           locked: false,
           visible: true,
-          content: data.leaderPhone ? `領隊 ${data.leaderName}  ${data.leaderPhone}` : `領隊 ${data.leaderName}`,
+          content: data.leaderPhone
+            ? `領隊 ${data.leaderName}  ${data.leaderPhone}`
+            : `領隊 ${data.leaderName}`,
           style: {
             fontFamily: 'Noto Serif TC',
             fontSize: 10,
@@ -616,7 +629,11 @@ export const japaneseStyleV1Itinerary: PageTemplate = {
       // 餐食資訊（使用 Material Symbols 圖標）
       const meals = dayData.meals || {}
       const mealIcons = dayData.mealIcons || {}
-      const mealTypes: Array<{ type: 'breakfast' | 'lunch' | 'dinner'; label: string; content: string | undefined }> = [
+      const mealTypes: Array<{
+        type: 'breakfast' | 'lunch' | 'dinner'
+        label: string
+        content: string | undefined
+      }> = [
         { type: 'breakfast', label: '早餐', content: meals.breakfast },
         { type: 'lunch', label: '午餐', content: meals.lunch },
         { type: 'dinner', label: '晚餐', content: meals.dinner },

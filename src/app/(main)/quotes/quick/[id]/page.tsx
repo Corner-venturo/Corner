@@ -43,10 +43,5 @@ export default function QuickQuoteDetailPage() {
     )
   }
 
-  return (
-    <QuickQuoteDetail
-      quote={quote}
-      onUpdate={(data) => updateQuote(quote.id, data)}
-    />
-  )
+  return <QuickQuoteDetail quote={quote} onUpdate={data => updateQuote(quote.id, data)} />
 }

@@ -48,12 +48,12 @@ export function ImageUploadZone({
           ? 'border-morandi-gold bg-morandi-gold/10'
           : 'border-morandi-container bg-morandi-container/10'
       }`}
-      onDragOver={(e) => {
+      onDragOver={e => {
         e.preventDefault()
         e.stopPropagation()
         onDragOver(true)
       }}
-      onDragLeave={(e) => {
+      onDragLeave={e => {
         e.preventDefault()
         e.stopPropagation()
         onDragOver(false)
@@ -72,9 +72,7 @@ export function ImageUploadZone({
         {isUploading ? (
           <>
             <Loader2 size={32} className="text-morandi-gold animate-spin mb-2" />
-            <span className="text-sm text-morandi-secondary">
-              上傳中... {uploadProgress}%
-            </span>
+            <span className="text-sm text-morandi-secondary">上傳中... {uploadProgress}%</span>
           </>
         ) : (
           <>

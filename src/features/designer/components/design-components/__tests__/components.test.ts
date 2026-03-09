@@ -8,7 +8,12 @@
  * 4. 資料綁定正確
  */
 import { describe, it, expect } from 'vitest'
-import { ALL_COMPONENTS, getComponentsByCategory, getComponentById, searchComponents } from '../registry'
+import {
+  ALL_COMPONENTS,
+  getComponentsByCategory,
+  getComponentById,
+  searchComponents,
+} from '../registry'
 
 const A5_WIDTH = 559
 const BLEED = 32

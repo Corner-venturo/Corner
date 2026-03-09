@@ -21,10 +21,7 @@ export interface ApiResponse<T> {
  * 統一的 fetch 封裝
  * 自動處理 JSON 解析和錯誤
  */
-export async function fetchApi<T>(
-  url: string,
-  options?: RequestInit
-): Promise<T> {
+export async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
   try {
     const response = await fetch(url, {
       headers: {

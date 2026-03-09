@@ -11,12 +11,20 @@ interface ItineraryEditorProps {
   autoSaveStatus: AutoSaveStatus
   isDirty: boolean
   quoteTierPricings?: TierPricing[]
-  hasLinkedQuote?: boolean  // 是否有關聯報價單（用於鎖定住宿編輯）
+  hasLinkedQuote?: boolean // 是否有關聯報價單（用於鎖定住宿編輯）
   className?: string
   onChange: (newData: LocalTourData) => void
 }
 
-export function ItineraryEditor({ tourData, autoSaveStatus, isDirty, quoteTierPricings, hasLinkedQuote, className, onChange }: ItineraryEditorProps) {
+export function ItineraryEditor({
+  tourData,
+  autoSaveStatus,
+  isDirty,
+  quoteTierPricings,
+  hasLinkedQuote,
+  className,
+  onChange,
+}: ItineraryEditorProps) {
   return (
     <div className={`w-1/2 bg-card border-r border-border flex flex-col ${className || ''}`}>
       <div className="h-14 bg-morandi-gold/90 text-white px-6 flex items-center justify-between border-b border-border">
@@ -45,8 +53,10 @@ export function ItineraryEditor({ tourData, autoSaveStatus, isDirty, quoteTierPr
           }}
           quoteTierPricings={quoteTierPricings}
           hasLinkedQuote={hasLinkedQuote}
-          onChange={(newData) => {
-            logger.log('[ItineraryEditor] TourForm onChange 收到:', { coverImage: newData.coverImage })
+          onChange={newData => {
+            logger.log('[ItineraryEditor] TourForm onChange 收到:', {
+              coverImage: newData.coverImage,
+            })
             const { meetingPoints, countries, ...restData } = newData
             const updatedData = {
               ...restData,
@@ -64,7 +74,9 @@ export function ItineraryEditor({ tourData, autoSaveStatus, isDirty, quoteTierPr
               cancellationPolicy: newData.cancellationPolicy ?? undefined,
               showCancellationPolicy: newData.showCancellationPolicy,
             }
-            logger.log('[ItineraryEditor] 傳給 parent onChange:', { coverImage: updatedData.coverImage })
+            logger.log('[ItineraryEditor] 傳給 parent onChange:', {
+              coverImage: updatedData.coverImage,
+            })
             onChange(updatedData)
           }}
         />

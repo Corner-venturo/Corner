@@ -2,14 +2,14 @@ export const DASHBOARD_LABELS = {
   // DashboardClient
   loading: '載入中...',
   home: '首頁',
-  
+
   // Calculator Widget
   calculator: '計算機',
   calculatorDescription: '快速運算，精準無誤',
   sequentialMode: '順序',
   inputExpression: '輸入算式',
   clear: '清除',
-  
+
   // Currency Widget
   exchangeRate: '匯率換算',
   currencyDescription: '輕鬆計算各國貨幣，掌握即時匯率',
@@ -20,7 +20,7 @@ export const DASHBOARD_LABELS = {
   inputRate: '輸入匯率',
   customRateSet: '已自訂匯率',
   defaultRate: '預設匯率',
-  
+
   // Currency names
   usd: '美金',
   jpy: '日幣',
@@ -29,7 +29,7 @@ export const DASHBOARD_LABELS = {
   vnd: '越南盾',
   idr: '印尼盾',
   twd: '台幣',
-  
+
   // Flight Widget
   flightQuery: '航班查詢',
   flightDescription: 'Amadeus 電報，自動提取資訊',
@@ -48,10 +48,10 @@ export const DASHBOARD_LABELS = {
   scheduled: '起飛',
   landing: '降落',
   estimated: '預計',
-  
+
   // Notes Widget
   notes: '便利貼',
-  
+
   // PNR Widget
   pnrManager: 'PNR 管理',
   pnrDescription: 'PNR 解析器',
@@ -69,20 +69,20 @@ export const DASHBOARD_LABELS = {
   days: '天',
   infant: '嬰兒',
   pnrNotes: '注意事項',
-  
+
   // Remittance Widget
   remittanceComparison: '匯款比較',
   exchangeRateShort: '匯率',
   fee: '手續費',
   actualReceived: '實收',
   workDaysShort: '工作天',
-  
+
   // Stats Widget
   statsInfo: '統計資訊',
   statsDescription: '選擇要顯示的統計項目',
   noStatsSelected: '尚未選擇任何統計項目',
   clickSettingsToSelect: '點擊右上角設定圖示選擇',
-  
+
   // Timer Widget
   timer: '計時器',
   running: '計時中...',
@@ -90,7 +90,7 @@ export const DASHBOARD_LABELS = {
   start: '開始',
   stop: '暫停',
   timerReset: '歸零',
-  
+
   // Visa Widget
   visaRequirement: '簽證需求',
   visaDescription: '查詢各國簽證要求（API 延遲）',
@@ -99,13 +99,13 @@ export const DASHBOARD_LABELS = {
   stayDuration: '停留期限',
   visaNotes: '注意事項',
   arrow: '→',
-  
+
   // Weather Widget
   weatherQuery: '天氣查詢',
   weatherDescription: '查詢歷史或預報天氣',
   selectCity: '選擇城市',
   selectDateLabel: '選擇日期',
-  
+
   // Weather Weekly Widget
   weeklyWeather: '7天天氣',
   weeklyWeatherDescription: '7天天氣預報',
@@ -113,12 +113,12 @@ export const DASHBOARD_LABELS = {
   loadingDays: '載入7天的資料',
   today: '今天',
   tomorrow: '明天',
-  
+
   // Widget Settings
   selectWidgets: '選擇要顯示的小工具',
   widgetDescription: '勾選你想在首頁顯示的小工具',
   settings: '設定',
-  
+
   // Stats Widget - stat labels
   statTodos: '待辦事項',
   statPaymentsThisWeek: '本週請款',
@@ -132,7 +132,8 @@ export const DASHBOARD_LABELS = {
   pnrFlightsPrefix: '航班',
   pnrSpecialRequestsPrefix: '特殊需求',
   pnrInfantPrefix: '嬰兒',
-  pnrPlaceholder: '貼上 Amadeus PNR 電報...\n\n範例:\nRP/TPEW123ML/...   FUM2GY\n1.CHEN/WILLIAM MR\n2  BR 116 Y 15JAN 4 TPECTS HK2  0930 1405\nTK TL20JAN/1200',
+  pnrPlaceholder:
+    '貼上 Amadeus PNR 電報...\n\n範例:\nRP/TPEW123ML/...   FUM2GY\n1.CHEN/WILLIAM MR\n2  BR 116 Y 15JAN 4 TPECTS HK2  0930 1405\nTK TL20JAN/1200',
 
   // Error messages
   errorFlightNumberRequired: '請輸入航班號碼',

@@ -8,7 +8,14 @@
  * - 地點資訊 + 設施標籤
  */
 import type { PageTemplate, TemplateData, HotelData } from './types'
-import type { CanvasElement, ShapeElement, TextElement, ImageElement, IconElement, TextStyle } from '@/features/designer/components/types'
+import type {
+  CanvasElement,
+  ShapeElement,
+  TextElement,
+  ImageElement,
+  IconElement,
+  TextStyle,
+} from '@/features/designer/components/types'
 
 // A5 尺寸（像素，96 DPI）
 const A5_WIDTH = 559
@@ -67,7 +74,8 @@ function getDefaultHotel(): HotelData {
     nameZh: '請從右側面板帶入飯店',
     nameEn: 'Import hotel from the right panel',
     location: '點擊「從行程帶入飯店」或「手動新增飯店」',
-    description: '此處將顯示您選擇的飯店介紹文字。您可以在右側面板中編輯飯店名稱、地點、描述和設施標籤等資訊。',
+    description:
+      '此處將顯示您選擇的飯店介紹文字。您可以在右側面板中編輯飯店名稱、地點、描述和設施標籤等資訊。',
     tags: ['設施標籤', '將顯示於此'],
     enabled: true,
   }

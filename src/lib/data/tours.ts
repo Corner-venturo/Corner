@@ -20,7 +20,7 @@ export interface GetPaginatedToursParams {
   page?: number
   limit?: number
   status?: string // 'all' | 'archived' | 'draft' | 'active' | 'pending_close' | etc.
-  workspaceId?: string  // 可選，若未提供則從 session 取得
+  workspaceId?: string // 可選，若未提供則從 session 取得
 }
 
 export interface PaginatedToursResult {
@@ -63,7 +63,7 @@ export async function getPaginatedTours({
   let query = supabase
     .from('tours')
     .select('*', { count: 'exact' })
-    .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
+    .eq('workspace_id', wsId) // 🔒 Workspace 過濾
     .order('departure_date', { ascending: false })
 
   // 狀態篩選
@@ -116,7 +116,7 @@ export async function getTourById(id: string, workspaceId?: string): Promise<Tou
     .from('tours')
     .select('*')
     .eq('id', id)
-    .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
+    .eq('workspace_id', wsId) // 🔒 Workspace 過濾
     .single()
 
   if (error) {
@@ -147,8 +147,10 @@ export async function getActiveToursForSelect(limit = 100, workspaceId?: string)
 
   const { data, error } = await supabase
     .from('tours')
-    .select('id, code, name, departure_date, return_date, location, status, closing_status, current_participants, max_participants, workspace_id')
-    .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
+    .select(
+      'id, code, name, departure_date, return_date, location, status, closing_status, current_participants, max_participants, workspace_id'
+    )
+    .eq('workspace_id', wsId) // 🔒 Workspace 過濾
     .neq('closing_status', 'closed')
     .order('departure_date', { ascending: false })
     .limit(limit)

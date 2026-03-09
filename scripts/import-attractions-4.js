@@ -32,10 +32,20 @@ const newCities = [
 // 景點 + 飯店資料
 const attractions = [
   // ========== 中國 - 北京 ==========
-  { name: '故宮博物院', city: 'beijing', type: 'heritage', description: '世界最大宮殿建築群，世界文化遺產' },
+  {
+    name: '故宮博物院',
+    city: 'beijing',
+    type: 'heritage',
+    description: '世界最大宮殿建築群，世界文化遺產',
+  },
   { name: '天安門廣場', city: 'beijing', type: 'landmark', description: '世界最大城市廣場' },
   { name: '長城-八達嶺', city: 'beijing', type: 'heritage', description: '萬里長城最著名段落' },
-  { name: '長城-慕田峪', city: 'beijing', type: 'heritage', description: '較少人的長城段落，景色優美' },
+  {
+    name: '長城-慕田峪',
+    city: 'beijing',
+    type: 'heritage',
+    description: '較少人的長城段落，景色優美',
+  },
   { name: '頤和園', city: 'beijing', type: 'heritage', description: '皇家園林，世界文化遺產' },
   { name: '天壇', city: 'beijing', type: 'heritage', description: '明清皇帝祭天之所' },
   { name: '圓明園', city: 'beijing', type: 'heritage', description: '萬園之園遺址' },
@@ -167,7 +177,12 @@ const attractions = [
   { name: '三下鍋', city: 'zhangjiajie', type: 'food', description: '土家族特色火鍋' },
 
   // ========== 中國 - 黃山 ==========
-  { name: '黃山風景區', city: 'huangshan', type: 'attraction', description: '五嶽歸來不看山，黃山歸來不看嶽' },
+  {
+    name: '黃山風景區',
+    city: 'huangshan',
+    type: 'attraction',
+    description: '五嶽歸來不看山，黃山歸來不看嶽',
+  },
   { name: '迎客松', city: 'huangshan', type: 'landmark', description: '黃山地標' },
   { name: '光明頂', city: 'huangshan', type: 'viewpoint', description: '黃山第二高峰' },
   { name: '西海大峽谷', city: 'huangshan', type: 'attraction', description: '夢幻峽谷' },
@@ -203,7 +218,12 @@ const attractions = [
   { name: '椰子雞', city: 'sanya', type: 'food', description: '海南特色火鍋' },
 
   // ========== 中國 - 九寨溝 ==========
-  { name: '九寨溝風景區', city: 'jiuzhaigou', type: 'attraction', description: '童話世界，世界自然遺產' },
+  {
+    name: '九寨溝風景區',
+    city: 'jiuzhaigou',
+    type: 'attraction',
+    description: '童話世界，世界自然遺產',
+  },
   { name: '五花海', city: 'jiuzhaigou', type: 'attraction', description: '九寨溝精華' },
   { name: '諾日朗瀑布', city: 'jiuzhaigou', type: 'attraction', description: '中國最寬瀑布' },
   { name: '長海', city: 'jiuzhaigou', type: 'attraction', description: '九寨溝最大湖泊' },
@@ -227,10 +247,20 @@ const attractions = [
   // ===============================================
 
   // ===== 日本 =====
-  { name: '安縵東京', city: 'tokyo', type: 'hotel', description: '大手町最頂級奢華酒店，日式極簡美學' },
+  {
+    name: '安縵東京',
+    city: 'tokyo',
+    type: 'hotel',
+    description: '大手町最頂級奢華酒店，日式極簡美學',
+  },
   { name: '東京柏悅酒店', city: 'tokyo', type: 'hotel', description: '新宿頂樓景觀，設計大師作品' },
   { name: '東京半島酒店', city: 'tokyo', type: 'hotel', description: '皇居旁頂級奢華酒店' },
-  { name: '虹夕諾雅東京', city: 'tokyo', type: 'hotel', description: '都市中的日式旅館，星野頂級品牌' },
+  {
+    name: '虹夕諾雅東京',
+    city: 'tokyo',
+    type: 'hotel',
+    description: '都市中的日式旅館，星野頂級品牌',
+  },
   { name: '安縵京都', city: 'kyoto', type: 'hotel', description: '洛北山林中的極致奢華' },
   { name: '虹夕諾雅京都', city: 'kyoto', type: 'hotel', description: '嵐山船隻才能抵達的秘境旅館' },
   { name: '翠嵐豪華精選', city: 'kyoto', type: 'hotel', description: '嵐山竹林旁的奢華旅館' },
@@ -248,7 +278,12 @@ const attractions = [
   { name: '斯攀瓦角', city: 'phuket', type: 'hotel', description: '懸崖上的設計酒店' },
   { name: '四季蘇梅島', city: 'koh-samui', type: 'hotel', description: '私人泳池Villa' },
   { name: '六善蘇梅島', city: 'koh-samui', type: 'hotel', description: 'Six Senses極致spa' },
-  { name: '安納塔拉金三角', city: 'chiang-rai', type: 'hotel', description: '與大象共處的野奢營地' },
+  {
+    name: '安納塔拉金三角',
+    city: 'chiang-rai',
+    type: 'hotel',
+    description: '與大象共處的野奢營地',
+  },
   { name: '四季清邁', city: 'chiang-mai', type: 'hotel', description: '蘭納風格田園Villa' },
   { name: '137柱府公館', city: 'chiang-mai', type: 'hotel', description: '殖民風格精品酒店' },
   { name: '曼谷文華東方', city: 'bangkok', type: 'hotel', description: '亞洲最傳奇酒店之一' },
@@ -271,7 +306,12 @@ const attractions = [
   { name: '四季蘭卡威', city: 'langkawi', type: 'hotel', description: '私人海灘Villa' },
   { name: '嘉佩樂沙巴', city: 'sabah', type: 'hotel', description: 'Gaya島上的頂級度假村' },
   { name: '六善沙巴', city: 'sabah', type: 'hotel', description: '雨林與海洋的野奢' },
-  { name: '文華東方吉隆坡', city: 'kuala-lumpur', type: 'hotel', description: '雙子塔景觀奢華酒店' },
+  {
+    name: '文華東方吉隆坡',
+    city: 'kuala-lumpur',
+    type: 'hotel',
+    description: '雙子塔景觀奢華酒店',
+  },
 
   // ===== 越南 =====
   { name: '安縵峴港', city: 'danang', type: 'hotel', description: '越南最奢華安縵' },
@@ -281,16 +321,36 @@ const attractions = [
   { name: 'JW萬豪富國島', city: 'phu-quoc', type: 'hotel', description: '翡翠灣絕美Villa' },
 
   // ===== 新加坡 =====
-  { name: '萊佛士酒店', city: 'singapore-city', type: 'hotel', description: '新加坡最經典傳奇酒店' },
-  { name: '嘉佩樂聖淘沙', city: 'singapore-city', type: 'hotel', description: '殖民建築頂級度假村' },
+  {
+    name: '萊佛士酒店',
+    city: 'singapore-city',
+    type: 'hotel',
+    description: '新加坡最經典傳奇酒店',
+  },
+  {
+    name: '嘉佩樂聖淘沙',
+    city: 'singapore-city',
+    type: 'hotel',
+    description: '殖民建築頂級度假村',
+  },
   { name: '濱海灣金沙', city: 'singapore-city', type: 'hotel', description: '無邊際泳池地標酒店' },
-  { name: '麗思卡爾頓新加坡', city: 'singapore-city', type: 'hotel', description: '濱海灣頂級奢華' },
+  {
+    name: '麗思卡爾頓新加坡',
+    city: 'singapore-city',
+    type: 'hotel',
+    description: '濱海灣頂級奢華',
+  },
 
   // ===== 中國 =====
   { name: '安縵頤和', city: 'beijing', type: 'hotel', description: '頤和園旁的極致奢華' },
   { name: '北京瑰麗', city: 'beijing', type: 'hotel', description: '王府井最頂級酒店' },
   { name: '北京寶格麗', city: 'beijing', type: 'hotel', description: '義式奢華精品酒店' },
-  { name: '上海外灘華爾道夫', city: 'shanghai', type: 'hotel', description: '外灘萬國建築群中的傳奇' },
+  {
+    name: '上海外灘華爾道夫',
+    city: 'shanghai',
+    type: 'hotel',
+    description: '外灘萬國建築群中的傳奇',
+  },
   { name: '上海璞麗', city: 'shanghai', type: 'hotel', description: '靜安寺旁的設計酒店' },
   { name: '安縵法雲', city: 'hangzhou', type: 'hotel', description: '靈隱寺旁的古村落酒店' },
   { name: '西湖國賓館', city: 'hangzhou', type: 'hotel', description: '西湖私人島嶼上的國賓館' },
@@ -318,18 +378,12 @@ async function importData() {
   // 1. 新增城市
   console.log('📍 新增城市...')
   for (const city of newCities) {
-    const { data: existing } = await supabase
-      .from('cities')
-      .select('id')
-      .eq('id', city.id)
-      .single()
+    const { data: existing } = await supabase.from('cities').select('id').eq('id', city.id).single()
 
     if (existing) {
       console.log(`  ⏭️ ${city.name} 已存在`)
     } else {
-      const { error } = await supabase
-        .from('cities')
-        .insert(city)
+      const { error } = await supabase.from('cities').insert(city)
       if (error) {
         console.log(`  ❌ ${city.name} 失敗: ${error.message}`)
       } else {
@@ -339,13 +393,11 @@ async function importData() {
   }
 
   // 2. 取得所有城市
-  const { data: cities } = await supabase
-    .from('cities')
-    .select('id, country_id')
+  const { data: cities } = await supabase.from('cities').select('id, country_id')
 
   const cityMap = {}
   if (cities) {
-    cities.forEach(c => cityMap[c.id] = { id: c.id, country_id: c.country_id })
+    cities.forEach(c => (cityMap[c.id] = { id: c.id, country_id: c.country_id }))
   }
 
   // 3. 導入景點
@@ -378,16 +430,14 @@ async function importData() {
       continue
     }
 
-    const { error } = await supabase
-      .from('attractions')
-      .insert({
-        name: attr.name,
-        description: attr.description,
-        type: attr.type,
-        city_id: cityInfo.id,
-        country_id: cityInfo.country_id,
-        workspace_id: WORKSPACE_ID
-      })
+    const { error } = await supabase.from('attractions').insert({
+      name: attr.name,
+      description: attr.description,
+      type: attr.type,
+      city_id: cityInfo.id,
+      country_id: cityInfo.country_id,
+      workspace_id: WORKSPACE_ID,
+    })
 
     if (error) {
       console.log(`❌ ${attr.name} 失敗: ${error.message}`)
@@ -407,9 +457,7 @@ async function importData() {
   console.log('========================================')
 
   // 顯示總數
-  const { count } = await supabase
-    .from('attractions')
-    .select('*', { count: 'exact', head: true })
+  const { count } = await supabase.from('attractions').select('*', { count: 'exact', head: true })
 
   console.log(`\n資料庫總景點數: ${count} 個`)
 }

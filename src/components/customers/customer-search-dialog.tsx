@@ -4,7 +4,6 @@
  * 整合舊專案 cornerERP 的進階搜尋功能 + Venturo 的 VIP 篩選
  */
 
-
 import { useState } from 'react'
 import {
   Dialog,
@@ -74,7 +73,10 @@ export function CustomerSearchDialog({
     onClose()
   }
 
-  const updateParam = (key: keyof CustomerSearchParams, value: CustomerSearchParams[keyof CustomerSearchParams]) => {
+  const updateParam = (
+    key: keyof CustomerSearchParams,
+    value: CustomerSearchParams[keyof CustomerSearchParams]
+  ) => {
     setSearchParams(prev => ({ ...prev, [key]: value }))
   }
 
@@ -94,9 +96,7 @@ export function CustomerSearchDialog({
             <h3 className="text-sm font-semibold text-morandi-primary mb-3">{L.section_basic}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm text-morandi-primary mb-2 block">
-                  {L.label_keyword}
-                </label>
+                <label className="text-sm text-morandi-primary mb-2 block">{L.label_keyword}</label>
                 <Input
                   value={searchParams.query || ''}
                   onChange={e => updateParam('query', e.target.value)}
@@ -136,7 +136,9 @@ export function CustomerSearchDialog({
 
           {/* 護照資訊 */}
           <div>
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">{L.section_passport}</h3>
+            <h3 className="text-sm font-semibold text-morandi-primary mb-3">
+              {L.section_passport}
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm text-morandi-primary mb-2 block">
@@ -150,16 +152,18 @@ export function CustomerSearchDialog({
               </div>
 
               <div className="col-span-1 md:col-span-2">
-                <label className="text-sm text-morandi-primary mb-2 block">{L.label_passport_expiry}</label>
+                <label className="text-sm text-morandi-primary mb-2 block">
+                  {L.label_passport_expiry}
+                </label>
                 <div className="grid grid-cols-2 gap-2">
                   <DatePicker
                     value={searchParams.passport_expiry_start || ''}
-                    onChange={(date) => updateParam('passport_expiry_start', date)}
+                    onChange={date => updateParam('passport_expiry_start', date)}
                     placeholder={L.placeholder_start}
                   />
                   <DatePicker
                     value={searchParams.passport_expiry_end || ''}
-                    onChange={(date) => updateParam('passport_expiry_end', date)}
+                    onChange={date => updateParam('passport_expiry_end', date)}
                     placeholder={L.placeholder_end}
                   />
                 </div>
@@ -169,7 +173,9 @@ export function CustomerSearchDialog({
 
           {/* VIP 與來源 */}
           <div>
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">{L.section_vip_source}</h3>
+            <h3 className="text-sm font-semibold text-morandi-primary mb-3">
+              {L.section_vip_source}
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="text-sm text-morandi-primary mb-2 block">{L.label_vip}</label>
@@ -191,7 +197,9 @@ export function CustomerSearchDialog({
               </div>
 
               <div>
-                <label className="text-sm text-morandi-primary mb-2 block">{L.label_vip_level}</label>
+                <label className="text-sm text-morandi-primary mb-2 block">
+                  {L.label_vip_level}
+                </label>
                 <Select
                   value={searchParams.vip_level || 'all'}
                   onValueChange={value =>

@@ -21,7 +21,7 @@ export interface GetPaginatedOrdersParams {
   limit?: number
   status?: string
   tourId?: string
-  workspaceId?: string  // 可選，若未提供則從 session 取得
+  workspaceId?: string // 可選，若未提供則從 session 取得
 }
 
 export interface PaginatedOrdersResult {
@@ -60,7 +60,7 @@ export async function getPaginatedOrders({
   let query = supabase
     .from('orders')
     .select('*', { count: 'exact' })
-    .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
+    .eq('workspace_id', wsId) // 🔒 Workspace 過濾
     .order('created_at', { ascending: false })
 
   // 可選篩選條件
@@ -110,7 +110,7 @@ export async function getOrderById(id: string, workspaceId?: string): Promise<Or
     .from('orders')
     .select('*')
     .eq('id', id)
-    .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
+    .eq('workspace_id', wsId) // 🔒 Workspace 過濾
     .single()
 
   if (error) {
@@ -143,7 +143,7 @@ export async function getOrdersByTourId(tourId: string, workspaceId?: string): P
     .from('orders')
     .select('*')
     .eq('tour_id', tourId)
-    .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
+    .eq('workspace_id', wsId) // 🔒 Workspace 過濾
     .order('created_at', { ascending: false })
     .limit(500)
 

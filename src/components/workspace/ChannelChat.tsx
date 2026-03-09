@@ -117,9 +117,10 @@ export function ChannelChat() {
 
     // Try dm_target_id first
     if (selectedChannel.dm_target_id) {
-      const targetId = selectedChannel.dm_target_id === user?.id
-        ? selectedChannel.created_by
-        : selectedChannel.dm_target_id
+      const targetId =
+        selectedChannel.dm_target_id === user?.id
+          ? selectedChannel.created_by
+          : selectedChannel.dm_target_id
       const target = slimEmployees.find(e => e.id === targetId)
       if (target) return target.display_name || target.chinese_name || fallbackName
     }
@@ -151,7 +152,10 @@ export function ChannelChat() {
 
   return (
     <div
-      className={cn('h-full flex overflow-hidden', travelerMode.mode === 'traveler' ? 'bg-[#1e1b2e]' : 'bg-card')}
+      className={cn(
+        'h-full flex overflow-hidden',
+        travelerMode.mode === 'traveler' ? 'bg-[#1e1b2e]' : 'bg-card'
+      )}
       data-chat-mode={travelerMode.mode}
     >
       <ChannelSidebar
@@ -189,7 +193,7 @@ export function ChannelChat() {
                   isLoading={travelerMode.isMessagesLoading}
                   conversationType={travelerMode.activeConversationType}
                   isConversationOpen={travelerMode.conversation?.is_open ?? false}
-                  onToggleOpen={async (isOpen) => {
+                  onToggleOpen={async isOpen => {
                     await travelerMode.toggleConversation(isOpen)
                   }}
                   currentUserId={user?.id}

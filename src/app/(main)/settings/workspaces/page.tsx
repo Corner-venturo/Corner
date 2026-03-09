@@ -8,7 +8,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Plus, Building2, Users, Shield, X, Copy, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { alert } from '@/lib/ui/alert-dialog'
@@ -41,7 +47,8 @@ interface LoginInfo {
  * 使用前端過濾實現資料隔離
  */
 export default function WorkspacesPage() {
-  const { workspaces, loadWorkspaces, createWorkspace, updateWorkspace, createChannel } = useWorkspaceChannels()
+  const { workspaces, loadWorkspaces, createWorkspace, updateWorkspace, createChannel } =
+    useWorkspaceChannels()
   const { items: employees } = useEmployeesSlim()
   const { user } = useAuthStore()
   const [showAddDialog, setShowAddDialog] = useState(false)
@@ -72,34 +79,39 @@ export default function WorkspacesPage() {
   // 載入 workspaces 資料（employees 由 SWR 自動載入）
   useEffect(() => {
     loadWorkspaces()
-
   }, [])
 
   // 計算每個 workspace 的員工數
-  const getEmployeeCount = useCallback((workspaceId: string) => {
-    return (employees || []).filter(emp => emp.workspace_id === workspaceId).length
-  }, [employees])
+  const getEmployeeCount = useCallback(
+    (workspaceId: string) => {
+      return (employees || []).filter(emp => emp.workspace_id === workspaceId).length
+    },
+    [employees]
+  )
 
   // 驗證公司代碼
-  const validateCode = useCallback((code: string) => {
-    if (!code) {
+  const validateCode = useCallback(
+    (code: string) => {
+      if (!code) {
+        setCodeError('')
+        return false
+      }
+      if (!/^[A-Z]+$/.test(code)) {
+        setCodeError(LABELS.WORKSPACE_CODE_INVALID)
+        return false
+      }
+      const isDuplicate = (workspaces || []).some(
+        ws => ws.code?.toUpperCase() === code.toUpperCase()
+      )
+      if (isDuplicate) {
+        setCodeError(LABELS.WORKSPACE_CODE_DUPLICATE)
+        return false
+      }
       setCodeError('')
-      return false
-    }
-    if (!/^[A-Z]+$/.test(code)) {
-      setCodeError(LABELS.WORKSPACE_CODE_INVALID)
-      return false
-    }
-    const isDuplicate = (workspaces || []).some(
-      ws => ws.code?.toUpperCase() === code.toUpperCase()
-    )
-    if (isDuplicate) {
-      setCodeError(LABELS.WORKSPACE_CODE_DUPLICATE)
-      return false
-    }
-    setCodeError('')
-    return true
-  }, [workspaces])
+      return true
+    },
+    [workspaces]
+  )
 
   const handleCodeChange = (value: string) => {
     const upper = value.toUpperCase()
@@ -160,7 +172,6 @@ export default function WorkspacesPage() {
         setAdminForm({ employeeNumber: 'E001', name: '', password: '12345678' })
         setShowAdminDialog(true)
       }
-
     } catch (error) {
       logger.error('Failed to create workspace or announcement channel:', error)
       toast.error(LABELS.CREATION_FAILED)
@@ -204,7 +215,7 @@ export default function WorkspacesPage() {
         }),
       })
 
-      const authResult = await authResponse.json() as {
+      const authResult = (await authResponse.json()) as {
         success: boolean
         data?: { user: { id: string } }
         message?: string
@@ -226,15 +237,13 @@ export default function WorkspacesPage() {
         .eq('id', employee.id)
 
       // 4. Insert profile
-      await supabase
-        .from('profiles')
-        .insert({
-          id: authUserId,
-          workspace_id: createdWorkspaceId,
-          employee_id: employee.id,
-          display_name: adminForm.name,
-          is_employee: true,
-        })
+      await supabase.from('profiles').insert({
+        id: authUserId,
+        workspace_id: createdWorkspaceId,
+        employee_id: employee.id,
+        display_name: adminForm.name,
+        is_employee: true,
+      })
 
       toast.success(LABELS.ADMIN_CREATED_SUCCESS)
 
@@ -246,7 +255,6 @@ export default function WorkspacesPage() {
         password: adminForm.password,
       })
       setShowLoginInfo(true)
-
     } catch (error) {
       logger.error('Failed to create admin:', error)
       toast.error(LABELS.ADMIN_CREATION_FAILED)
@@ -285,10 +293,10 @@ export default function WorkspacesPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-morandi-primary mb-2">{LABELS.WORKSPACE_MANAGEMENT}</h1>
-          <p className="text-morandi-secondary">
-            {LABELS.WORKSPACE_MANAGEMENT_DESC}
-          </p>
+          <h1 className="text-3xl font-bold text-morandi-primary mb-2">
+            {LABELS.WORKSPACE_MANAGEMENT}
+          </h1>
+          <p className="text-morandi-secondary">{LABELS.WORKSPACE_MANAGEMENT_DESC}</p>
         </div>
         <Button
           onClick={() => setShowAddDialog(true)}
@@ -304,10 +312,10 @@ export default function WorkspacesPage() {
         <div className="flex items-start gap-4">
           <Shield className="text-morandi-gold mt-1" size={24} />
           <div>
-            <h3 className="font-semibold text-morandi-primary mb-2">{LABELS.DATA_ISOLATION_TITLE}</h3>
-            <p className="text-sm text-morandi-secondary mb-3">
-              {LABELS.DATA_ISOLATION_DESC}
-            </p>
+            <h3 className="font-semibold text-morandi-primary mb-2">
+              {LABELS.DATA_ISOLATION_TITLE}
+            </h3>
+            <p className="text-sm text-morandi-secondary mb-3">{LABELS.DATA_ISOLATION_DESC}</p>
             <ul className="text-sm text-morandi-secondary space-y-1 ml-4">
               <li>{LABELS.DATA_ISOLATION_POINT1}</li>
               <li>{LABELS.DATA_ISOLATION_POINT2}</li>
@@ -346,7 +354,9 @@ export default function WorkspacesPage() {
                       </span>
                     )}
                   </h3>
-                  <p className="text-sm text-morandi-secondary">{workspace.description || LABELS.NO_DESCRIPTION}</p>
+                  <p className="text-sm text-morandi-secondary">
+                    {workspace.description || LABELS.NO_DESCRIPTION}
+                  </p>
                 </div>
               </div>
               <div
@@ -366,7 +376,12 @@ export default function WorkspacesPage() {
 
             <div className="flex items-center gap-2 text-sm text-morandi-secondary mb-4">
               <Users size={16} />
-              <span>{LABELS.EMPLOYEE_COUNT.replace('{count}', getEmployeeCount(workspace.id).toString())}</span>
+              <span>
+                {LABELS.EMPLOYEE_COUNT.replace(
+                  '{count}',
+                  getEmployeeCount(workspace.id).toString()
+                )}
+              </span>
             </div>
 
             <div className="flex gap-2">
@@ -395,13 +410,16 @@ export default function WorkspacesPage() {
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent level={1} className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-morandi-primary">{LABELS.ADD_WORKSPACE_TITLE}</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-morandi-primary">
+              {LABELS.ADD_WORKSPACE_TITLE}
+            </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                {LABELS.WORKSPACE_NAME_LABEL} <span className="text-morandi-red">{LABELS.WORKSPACE_NAME_REQUIRED}</span>
+                {LABELS.WORKSPACE_NAME_LABEL}{' '}
+                <span className="text-morandi-red">{LABELS.WORKSPACE_NAME_REQUIRED}</span>
               </label>
               <Input
                 value={newWorkspace.name}
@@ -413,7 +431,8 @@ export default function WorkspacesPage() {
 
             <div>
               <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                {LABELS.WORKSPACE_CODE_LABEL} <span className="text-morandi-red">{LABELS.WORKSPACE_CODE_REQUIRED}</span>
+                {LABELS.WORKSPACE_CODE_LABEL}{' '}
+                <span className="text-morandi-red">{LABELS.WORKSPACE_CODE_REQUIRED}</span>
               </label>
               <Input
                 value={newWorkspace.code}
@@ -421,9 +440,7 @@ export default function WorkspacesPage() {
                 placeholder={LABELS.WORKSPACE_CODE_PLACEHOLDER}
                 className={`border-morandi-container/30 font-mono ${codeError ? 'border-morandi-red' : ''}`}
               />
-              {codeError && (
-                <p className="text-xs text-morandi-red mt-1">{codeError}</p>
-              )}
+              {codeError && <p className="text-xs text-morandi-red mt-1">{codeError}</p>}
             </div>
 
             <div>
@@ -453,9 +470,7 @@ export default function WorkspacesPage() {
               </label>
               <Input
                 value={newWorkspace.description}
-                onChange={e =>
-                  setNewWorkspace(prev => ({ ...prev, description: e.target.value }))
-                }
+                onChange={e => setNewWorkspace(prev => ({ ...prev, description: e.target.value }))}
                 placeholder={LABELS.WORKSPACE_DESCRIPTION_PLACEHOLDER}
                 className="border-morandi-container/30"
               />
@@ -487,7 +502,9 @@ export default function WorkspacesPage() {
       <Dialog open={showAdminDialog} onOpenChange={setShowAdminDialog}>
         <DialogContent level={1} className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-morandi-primary">{LABELS.CREATE_ADMIN_TITLE}</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-morandi-primary">
+              {LABELS.CREATE_ADMIN_TITLE}
+            </DialogTitle>
           </DialogHeader>
           <p className="text-sm text-morandi-secondary">{LABELS.CREATE_ADMIN_DESC}</p>
 
@@ -505,7 +522,8 @@ export default function WorkspacesPage() {
 
             <div>
               <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                {LABELS.ADMIN_NAME_LABEL} <span className="text-morandi-red">{LABELS.ADMIN_NAME_REQUIRED}</span>
+                {LABELS.ADMIN_NAME_LABEL}{' '}
+                <span className="text-morandi-red">{LABELS.ADMIN_NAME_REQUIRED}</span>
               </label>
               <Input
                 value={adminForm.name}
@@ -552,7 +570,9 @@ export default function WorkspacesPage() {
       <Dialog open={showLoginInfo} onOpenChange={setShowLoginInfo}>
         <DialogContent level={1} className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-morandi-primary">{LABELS.LOGIN_INFO_TITLE}</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-morandi-primary">
+              {LABELS.LOGIN_INFO_TITLE}
+            </DialogTitle>
           </DialogHeader>
           <p className="text-sm text-morandi-secondary mb-4">{LABELS.LOGIN_INFO_DESC}</p>
 
@@ -560,15 +580,23 @@ export default function WorkspacesPage() {
             <Card className="bg-morandi-container/10 border-morandi-container/30 p-4 space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-morandi-secondary">{LABELS.LOGIN_INFO_CODE}</span>
-                <span className="font-mono font-semibold text-morandi-primary">{loginInfo.workspaceCode}</span>
+                <span className="font-mono font-semibold text-morandi-primary">
+                  {loginInfo.workspaceCode}
+                </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-morandi-secondary">{LABELS.LOGIN_INFO_EMPLOYEE_NUMBER}</span>
-                <span className="font-mono font-semibold text-morandi-primary">{loginInfo.employeeNumber}</span>
+                <span className="text-sm text-morandi-secondary">
+                  {LABELS.LOGIN_INFO_EMPLOYEE_NUMBER}
+                </span>
+                <span className="font-mono font-semibold text-morandi-primary">
+                  {loginInfo.employeeNumber}
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-morandi-secondary">{LABELS.LOGIN_INFO_PASSWORD}</span>
-                <span className="font-mono font-semibold text-morandi-primary">{loginInfo.password}</span>
+                <span className="font-mono font-semibold text-morandi-primary">
+                  {loginInfo.password}
+                </span>
               </div>
             </Card>
           )}
@@ -600,7 +628,9 @@ export default function WorkspacesPage() {
       {workspaces?.length === 0 && !showAddDialog && (
         <Card className="border-dashed border-2 border-morandi-container/30 p-12 text-center">
           <Building2 size={48} className="text-morandi-muted mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-morandi-primary mb-2">{LABELS.NO_WORKSPACE_TITLE}</h3>
+          <h3 className="text-lg font-semibold text-morandi-primary mb-2">
+            {LABELS.NO_WORKSPACE_TITLE}
+          </h3>
           <p className="text-morandi-secondary mb-4">{LABELS.NO_WORKSPACE_DESC}</p>
           <Button
             onClick={() => setShowAddDialog(true)}

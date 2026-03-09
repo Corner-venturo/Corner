@@ -87,7 +87,9 @@ describe('code-generator', () => {
 
     it('should increment within same month/type', () => {
       const existing = [{ code: 'SAL-202501-002' }]
-      expect(generateCompanyPaymentRequestCode('SAL', '2025-01-15', existing)).toBe('SAL-202501-003')
+      expect(generateCompanyPaymentRequestCode('SAL', '2025-01-15', existing)).toBe(
+        'SAL-202501-003'
+      )
     })
   })
 })

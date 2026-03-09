@@ -8,6 +8,7 @@
 ## ✅ 已完成 (79/547 = 14.4%)
 
 ### Session 1 - Realtime Hooks & Core Services & Stores
+
 - [x] src/lib/realtime/createRealtimeHook.ts (修正型別定義)
 - [x] src/hooks/use-realtime-hooks.ts (26個)
 - [x] src/features/confirmations/services/confirmation.service.ts (11個)
@@ -23,6 +24,7 @@
 ## 📋 待處理 (468/547)
 
 ### Phase 1: 核心層 Services
+
 - [ ] src/features/suppliers/services/supplier.service.ts (13個) - ⚠️ 需大規模重構
 - [ ] src/lib/sync/background-sync-service.ts (10個)
 - [ ] src/lib/supabase/api.ts (10個)
@@ -32,6 +34,7 @@
 - [ ] src/features/orders/services/order.service.ts (7個)
 
 ### Phase 3: UI 層 (~423個)
+
 - [ ] 所有頁面和組件
 
 ---
@@ -39,6 +42,7 @@
 ## 📝 修復筆記
 
 ### 常見模式：
+
 1. **Realtime Store**: `store: useTourStore as any` → 需要修正型別定義
 2. **Service 泛型**: `data as any` → 使用 `Partial<T>` 或具體型別
 3. **Supabase 查詢**: `supabase.from as any` → 型別斷言或擴充定義
@@ -47,6 +51,7 @@
 ---
 
 ## ⚠️ 注意事項
+
 - 每次修復後執行 `npm run build` 確認無錯誤
 - 測試關鍵功能（Tours, Orders, Quotes）
 - 如有編譯錯誤，記錄在此檔案

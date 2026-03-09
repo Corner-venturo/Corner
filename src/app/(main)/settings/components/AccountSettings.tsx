@@ -68,7 +68,9 @@ export function AccountSettings({
     try {
       // 自動壓縮圖片（最大 400px，目標 200KB）
       const compressedFile = await compressAvatarImage(file)
-      logger.log(`圖片壓縮完成: ${(file.size / 1024).toFixed(1)}KB → ${(compressedFile.size / 1024).toFixed(1)}KB`)
+      logger.log(
+        `圖片壓縮完成: ${(file.size / 1024).toFixed(1)}KB → ${(compressedFile.size / 1024).toFixed(1)}KB`
+      )
 
       const fileName = `${user.employee_number}_${Date.now()}.jpg`
       const filePath = `avatars/${fileName}`
@@ -101,7 +103,9 @@ export function AccountSettings({
       await alertSuccess(LABELS.AVATAR_UPLOAD_SUCCESS)
     } catch (error) {
       logger.error('頭像上傳失敗:', error)
-      await alertError(LABELS.AVATAR_UPLOAD_FAILED + (error instanceof Error ? error.message : '未知錯誤'))
+      await alertError(
+        LABELS.AVATAR_UPLOAD_FAILED + (error instanceof Error ? error.message : '未知錯誤')
+      )
     } finally {
       setAvatarUploading(false)
       if (fileInputRef.current) {
@@ -193,7 +197,8 @@ export function AccountSettings({
               <div className="relative">
                 <div className="w-20 h-20 rounded-full overflow-hidden bg-morandi-container flex items-center justify-center border-2 border-morandi-gold/20">
                   {currentAvatarUrl ? (
-                    <img src={currentAvatarUrl}
+                    <img
+                      src={currentAvatarUrl}
                       alt={LABELS.AVATAR}
                       className="w-full h-full object-cover"
                     />
@@ -236,7 +241,11 @@ export function AccountSettings({
               <h3 className="font-medium mb-1">{LABELS.CHANGE_PASSWORD}</h3>
               <p className="text-sm text-morandi-secondary">{LABELS.PASSWORD_SECURITY_TIP}</p>
             </div>
-            <Button variant="outline" onClick={() => setShowPasswordSection(!showPasswordSection)} className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowPasswordSection(!showPasswordSection)}
+              className="gap-2"
+            >
               {showPasswordSection ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
               {showPasswordSection ? LABELS.COLLAPSE : LABELS.CHANGE_PASSWORD}
             </Button>

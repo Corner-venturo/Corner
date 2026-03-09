@@ -23,57 +23,188 @@ interface ColorfulIconPickerProps {
 
 // 彩色圖標集（全部免費商用）
 const COLORFUL_ICON_SETS = {
-  'noto': { name: 'Noto Emoji', license: 'Apache 2.0' },
-  'twemoji': { name: 'Twitter Emoji', license: 'CC BY 4.0' },
+  noto: { name: 'Noto Emoji', license: 'Apache 2.0' },
+  twemoji: { name: 'Twitter Emoji', license: 'CC BY 4.0' },
   'fluent-emoji-flat': { name: 'Fluent Emoji', license: 'MIT' },
-  'openmoji': { name: 'OpenMoji', license: 'CC BY-SA 4.0' },
-  'fxemoji': { name: 'Firefox Emoji', license: 'CC BY 4.0' },
-  'emojione': { name: 'EmojiOne', license: 'CC BY 4.0' },
+  openmoji: { name: 'OpenMoji', license: 'CC BY-SA 4.0' },
+  fxemoji: { name: 'Firefox Emoji', license: 'CC BY 4.0' },
+  emojione: { name: 'EmojiOne', license: 'CC BY 4.0' },
 } as const
 
 type IconSetKey = keyof typeof COLORFUL_ICON_SETS
 
 // 預設分類和關鍵字
 const CATEGORIES = [
-  { id: 'travel', label: '旅遊', keywords: ['airplane', 'plane', 'train', 'bus', 'car', 'ship', 'luggage', 'passport', 'world', 'globe', 'map'] },
-  { id: 'food', label: '美食', keywords: ['food', 'sushi', 'ramen', 'pizza', 'burger', 'rice', 'noodle', 'fruit', 'drink', 'coffee', 'tea', 'cake'] },
-  { id: 'nature', label: '自然', keywords: ['sun', 'moon', 'star', 'cloud', 'rain', 'snow', 'tree', 'flower', 'mountain', 'beach', 'ocean', 'wave'] },
-  { id: 'animals', label: '動物', keywords: ['dog', 'cat', 'bird', 'fish', 'elephant', 'panda', 'monkey', 'rabbit', 'bear', 'tiger'] },
-  { id: 'flags', label: '國旗', keywords: ['flag', 'japan', 'korea', 'thailand', 'taiwan', 'usa', 'uk'] },
-  { id: 'places', label: '地標', keywords: ['building', 'house', 'temple', 'church', 'tower', 'castle', 'hotel', 'hospital'] },
-  { id: 'activities', label: '活動', keywords: ['camera', 'photo', 'swim', 'ski', 'surf', 'camp', 'hike', 'bike', 'golf', 'tennis'] },
-  { id: 'symbols', label: '符號', keywords: ['heart', 'star', 'check', 'cross', 'arrow', 'number', 'letter', 'warning', 'info'] },
+  {
+    id: 'travel',
+    label: '旅遊',
+    keywords: [
+      'airplane',
+      'plane',
+      'train',
+      'bus',
+      'car',
+      'ship',
+      'luggage',
+      'passport',
+      'world',
+      'globe',
+      'map',
+    ],
+  },
+  {
+    id: 'food',
+    label: '美食',
+    keywords: [
+      'food',
+      'sushi',
+      'ramen',
+      'pizza',
+      'burger',
+      'rice',
+      'noodle',
+      'fruit',
+      'drink',
+      'coffee',
+      'tea',
+      'cake',
+    ],
+  },
+  {
+    id: 'nature',
+    label: '自然',
+    keywords: [
+      'sun',
+      'moon',
+      'star',
+      'cloud',
+      'rain',
+      'snow',
+      'tree',
+      'flower',
+      'mountain',
+      'beach',
+      'ocean',
+      'wave',
+    ],
+  },
+  {
+    id: 'animals',
+    label: '動物',
+    keywords: [
+      'dog',
+      'cat',
+      'bird',
+      'fish',
+      'elephant',
+      'panda',
+      'monkey',
+      'rabbit',
+      'bear',
+      'tiger',
+    ],
+  },
+  {
+    id: 'flags',
+    label: '國旗',
+    keywords: ['flag', 'japan', 'korea', 'thailand', 'taiwan', 'usa', 'uk'],
+  },
+  {
+    id: 'places',
+    label: '地標',
+    keywords: ['building', 'house', 'temple', 'church', 'tower', 'castle', 'hotel', 'hospital'],
+  },
+  {
+    id: 'activities',
+    label: '活動',
+    keywords: ['camera', 'photo', 'swim', 'ski', 'surf', 'camp', 'hike', 'bike', 'golf', 'tennis'],
+  },
+  {
+    id: 'symbols',
+    label: '符號',
+    keywords: ['heart', 'star', 'check', 'cross', 'arrow', 'number', 'letter', 'warning', 'info'],
+  },
 ]
 
 // 熱門圖標（預設顯示）
 const POPULAR_ICONS = [
   // 🇯🇵🇹🇭🇰🇷 亞洲國旗
-  'twemoji:flag-japan', 'twemoji:flag-thailand', 'twemoji:flag-south-korea', 'twemoji:flag-taiwan',
-  'twemoji:flag-vietnam', 'twemoji:flag-singapore', 'twemoji:flag-malaysia', 'twemoji:flag-indonesia',
-  'twemoji:flag-philippines', 'twemoji:flag-china', 'twemoji:flag-hong-kong-sar-china', 'twemoji:flag-india',
+  'twemoji:flag-japan',
+  'twemoji:flag-thailand',
+  'twemoji:flag-south-korea',
+  'twemoji:flag-taiwan',
+  'twemoji:flag-vietnam',
+  'twemoji:flag-singapore',
+  'twemoji:flag-malaysia',
+  'twemoji:flag-indonesia',
+  'twemoji:flag-philippines',
+  'twemoji:flag-china',
+  'twemoji:flag-hong-kong-sar-china',
+  'twemoji:flag-india',
   // 🌏 其他熱門國旗
-  'twemoji:flag-united-states', 'twemoji:flag-united-kingdom', 'twemoji:flag-france', 'twemoji:flag-germany',
-  'twemoji:flag-italy', 'twemoji:flag-spain', 'twemoji:flag-australia', 'twemoji:flag-new-zealand',
-  'twemoji:flag-canada', 'twemoji:flag-switzerland', 'twemoji:flag-netherlands', 'twemoji:flag-turkey',
+  'twemoji:flag-united-states',
+  'twemoji:flag-united-kingdom',
+  'twemoji:flag-france',
+  'twemoji:flag-germany',
+  'twemoji:flag-italy',
+  'twemoji:flag-spain',
+  'twemoji:flag-australia',
+  'twemoji:flag-new-zealand',
+  'twemoji:flag-canada',
+  'twemoji:flag-switzerland',
+  'twemoji:flag-netherlands',
+  'twemoji:flag-turkey',
   // ✈️ 旅遊
-  'noto:airplane', 'noto:world-map', 'noto:luggage', 'noto:passport-control',
-  'noto:bullet-train', 'noto:bus', 'noto:automobile', 'noto:ship',
+  'noto:airplane',
+  'noto:world-map',
+  'noto:luggage',
+  'noto:passport-control',
+  'noto:bullet-train',
+  'noto:bus',
+  'noto:automobile',
+  'noto:ship',
   // 🍜 美食
-  'noto:sushi', 'noto:steaming-bowl', 'noto:curry-rice', 'noto:bento-box',
-  'noto:tropical-drink', 'noto:bubble-tea', 'noto:hot-beverage', 'noto:ice-cream',
+  'noto:sushi',
+  'noto:steaming-bowl',
+  'noto:curry-rice',
+  'noto:bento-box',
+  'noto:tropical-drink',
+  'noto:bubble-tea',
+  'noto:hot-beverage',
+  'noto:ice-cream',
   // 🌸 自然
-  'noto:sun', 'noto:full-moon', 'noto:star', 'noto:rainbow',
-  'noto:palm-tree', 'noto:cherry-blossom', 'noto:mount-fuji', 'noto:beach-with-umbrella',
+  'noto:sun',
+  'noto:full-moon',
+  'noto:star',
+  'noto:rainbow',
+  'noto:palm-tree',
+  'noto:cherry-blossom',
+  'noto:mount-fuji',
+  'noto:beach-with-umbrella',
   // 🐘 動物
-  'noto:elephant', 'noto:panda', 'noto:dog-face', 'noto:cat-face',
+  'noto:elephant',
+  'noto:panda',
+  'noto:dog-face',
+  'noto:cat-face',
   // 🏯 地標
-  'noto:shinto-shrine', 'noto:japanese-castle', 'noto:tokyo-tower', 'noto:statue-of-liberty',
+  'noto:shinto-shrine',
+  'noto:japanese-castle',
+  'noto:tokyo-tower',
+  'noto:statue-of-liberty',
   // 📸 活動
-  'noto:camera', 'noto:camera-with-flash', 'noto:person-swimming', 'noto:skier',
+  'noto:camera',
+  'noto:camera-with-flash',
+  'noto:person-swimming',
+  'noto:skier',
   // ❤️ 愛心符號
-  'noto:red-heart', 'noto:sparkling-heart', 'noto:growing-heart', 'noto:star-struck',
+  'noto:red-heart',
+  'noto:sparkling-heart',
+  'noto:growing-heart',
+  'noto:star-struck',
   // 🏳️‍🌈 彩虹相關
-  'noto:rainbow-flag', 'noto:unicorn', 'noto:performing-arts',
+  'noto:rainbow-flag',
+  'noto:unicorn',
+  'noto:performing-arts',
 ]
 
 // localStorage key for recent icons
@@ -118,80 +249,88 @@ export function ColorfulIconPicker({ onSelectIcon }: ColorfulIconPickerProps) {
   }, [])
 
   // 選擇圖標時記錄
-  const handleSelectIcon = useCallback((iconName: string) => {
-    saveRecentIcon(iconName)
-    setRecentIcons(getRecentIcons())
-    onSelectIcon(iconName)
-  }, [onSelectIcon])
+  const handleSelectIcon = useCallback(
+    (iconName: string) => {
+      saveRecentIcon(iconName)
+      setRecentIcons(getRecentIcons())
+      onSelectIcon(iconName)
+    },
+    [onSelectIcon]
+  )
 
   // 搜索圖標
-  const searchIcons = useCallback(async (query: string) => {
-    if (!query.trim()) {
-      setDisplayIcons(POPULAR_ICONS)
-      return
-    }
-
-    setIsLoading(true)
-    try {
-      // 構建搜索的圖標集列表
-      const prefixes = selectedSet === 'all'
-        ? Object.keys(COLORFUL_ICON_SETS).join(',')
-        : selectedSet
-
-      const response = await fetch(
-        `https://api.iconify.design/search?query=${encodeURIComponent(query)}&prefixes=${prefixes}&limit=64`
-      )
-      const data = await response.json()
-
-      if (data.icons && Array.isArray(data.icons)) {
-        setSearchResults(data.icons)
-        setDisplayIcons(data.icons)
-      } else {
-        setDisplayIcons([])
+  const searchIcons = useCallback(
+    async (query: string) => {
+      if (!query.trim()) {
+        setDisplayIcons(POPULAR_ICONS)
+        return
       }
-    } catch (error) {
-      logger.error('Failed to search icons:', error)
-      setDisplayIcons([])
-    } finally {
-      setIsLoading(false)
-    }
-  }, [selectedSet])
 
-  // 按分類搜索
-  const searchByCategory = useCallback(async (categoryId: string) => {
-    const category = CATEGORIES.find(c => c.id === categoryId)
-    if (!category) return
+      setIsLoading(true)
+      try {
+        // 構建搜索的圖標集列表
+        const prefixes =
+          selectedSet === 'all' ? Object.keys(COLORFUL_ICON_SETS).join(',') : selectedSet
 
-    setIsLoading(true)
-    setSelectedCategory(categoryId)
-    setSearch('')
-
-    try {
-      const prefixes = selectedSet === 'all'
-        ? Object.keys(COLORFUL_ICON_SETS).join(',')
-        : selectedSet
-
-      // 搜索該分類的所有關鍵字
-      const allResults: string[] = []
-      for (const keyword of category.keywords.slice(0, 3)) { // 只取前3個關鍵字避免太多請求
         const response = await fetch(
-          `https://api.iconify.design/search?query=${encodeURIComponent(keyword)}&prefixes=${prefixes}&limit=20`
+          `https://api.iconify.design/search?query=${encodeURIComponent(query)}&prefixes=${prefixes}&limit=64`
         )
         const data = await response.json()
-        if (data.icons) {
-          allResults.push(...data.icons)
-        }
-      }
 
-      // 去重
-      const uniqueResults = [...new Set(allResults)]
-      setDisplayIcons(uniqueResults.slice(0, 60))
-    } catch (error) {
-      logger.error('Failed to search by category:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [selectedSet])
+        if (data.icons && Array.isArray(data.icons)) {
+          setSearchResults(data.icons)
+          setDisplayIcons(data.icons)
+        } else {
+          setDisplayIcons([])
+        }
+      } catch (error) {
+        logger.error('Failed to search icons:', error)
+        setDisplayIcons([])
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [selectedSet]
+  )
+
+  // 按分類搜索
+  const searchByCategory = useCallback(
+    async (categoryId: string) => {
+      const category = CATEGORIES.find(c => c.id === categoryId)
+      if (!category) return
+
+      setIsLoading(true)
+      setSelectedCategory(categoryId)
+      setSearch('')
+
+      try {
+        const prefixes =
+          selectedSet === 'all' ? Object.keys(COLORFUL_ICON_SETS).join(',') : selectedSet
+
+        // 搜索該分類的所有關鍵字
+        const allResults: string[] = []
+        for (const keyword of category.keywords.slice(0, 3)) {
+          // 只取前3個關鍵字避免太多請求
+          const response = await fetch(
+            `https://api.iconify.design/search?query=${encodeURIComponent(keyword)}&prefixes=${prefixes}&limit=20`
+          )
+          const data = await response.json()
+          if (data.icons) {
+            allResults.push(...data.icons)
+          }
+        }
+
+        // 去重
+        const uniqueResults = [...new Set(allResults)]
+        setDisplayIcons(uniqueResults.slice(0, 60))
+      } catch (error) {
+        logger.error('Failed to search by category:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [selectedSet]
+  )
 
   // 搜索防抖
   useEffect(() => {
@@ -218,7 +357,7 @@ export function ColorfulIconPicker({ onSelectIcon }: ColorfulIconPickerProps) {
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-morandi-secondary" />
           <Input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
             placeholder={DESIGNER_LABELS.SEARCH_12}
             className="pl-8 pr-8 h-8 text-sm"
           />
@@ -251,20 +390,22 @@ export function ColorfulIconPicker({ onSelectIcon }: ColorfulIconPickerProps) {
           >
             {DESIGNER_LABELS.ALL}
           </Button>
-          {(Object.entries(COLORFUL_ICON_SETS) as [IconSetKey, { name: string }][]).map(([key, { name }]) => (
-            <Button
-              key={key}
-              variant={selectedSet === key ? 'default' : 'outline'}
-              size="sm"
-              className={cn(
-                'h-6 px-2 text-[10px] shrink-0',
-                selectedSet === key && 'bg-morandi-gold hover:bg-morandi-gold-hover'
-              )}
-              onClick={() => setSelectedSet(key)}
-            >
-              {name}
-            </Button>
-          ))}
+          {(Object.entries(COLORFUL_ICON_SETS) as [IconSetKey, { name: string }][]).map(
+            ([key, { name }]) => (
+              <Button
+                key={key}
+                variant={selectedSet === key ? 'default' : 'outline'}
+                size="sm"
+                className={cn(
+                  'h-6 px-2 text-[10px] shrink-0',
+                  selectedSet === key && 'bg-morandi-gold hover:bg-morandi-gold-hover'
+                )}
+                onClick={() => setSelectedSet(key)}
+              >
+                {name}
+              </Button>
+            )
+          )}
         </div>
       </div>
 
@@ -304,7 +445,7 @@ export function ColorfulIconPicker({ onSelectIcon }: ColorfulIconPickerProps) {
           >
             {DESIGNER_LABELS.LABEL_795}
           </Button>
-          {CATEGORIES.map((cat) => (
+          {CATEGORIES.map(cat => (
             <Button
               key={cat.id}
               variant={selectedCategory === cat.id ? 'default' : 'outline'}
@@ -329,17 +470,14 @@ export function ColorfulIconPicker({ onSelectIcon }: ColorfulIconPickerProps) {
           </div>
         ) : (
           <div className="grid grid-cols-5 gap-1 p-2">
-            {displayIcons.map((iconName) => (
+            {displayIcons.map(iconName => (
               <button
                 key={iconName}
                 onClick={() => handleSelectIcon(iconName)}
                 className="flex flex-col items-center justify-center p-2 rounded hover:bg-morandi-container/50 transition-colors group"
                 title={iconName}
               >
-                <Icon
-                  icon={iconName}
-                  className="w-8 h-8"
-                />
+                <Icon icon={iconName} className="w-8 h-8" />
               </button>
             ))}
           </div>

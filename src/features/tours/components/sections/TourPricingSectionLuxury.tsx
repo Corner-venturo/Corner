@@ -38,7 +38,7 @@ export function TourPricingSectionLuxury({ data, viewMode }: TourPricingSectionL
   const toggleSection = (section: string) => {
     setOpenSections(prev => ({
       ...prev,
-      [section]: !prev[section]
+      [section]: !prev[section],
     }))
   }
 
@@ -67,7 +67,7 @@ export function TourPricingSectionLuxury({ data, viewMode }: TourPricingSectionL
             style={{
               color: LUXURY.text,
               fontFamily: "'Noto Serif TC', serif",
-              borderLeft: `4px solid ${LUXURY.secondary}`
+              borderLeft: `4px solid ${LUXURY.secondary}`,
             }}
           >
             {TOURS_LABELS.LABEL_2102}
@@ -87,7 +87,10 @@ export function TourPricingSectionLuxury({ data, viewMode }: TourPricingSectionL
               iconColor={LUXURY.primary}
               isMobile={isMobile}
             >
-              <ul className="space-y-3 pt-6 text-sm leading-relaxed" style={{ color: LUXURY.muted }}>
+              <ul
+                className="space-y-3 pt-6 text-sm leading-relaxed"
+                style={{ color: LUXURY.muted }}
+              >
                 {includedItems.map((item, index) => (
                   <li key={index} className="flex gap-3">
                     <span
@@ -112,7 +115,10 @@ export function TourPricingSectionLuxury({ data, viewMode }: TourPricingSectionL
               iconColor={LUXURY.accent}
               isMobile={isMobile}
             >
-              <ul className="space-y-3 pt-6 text-sm leading-relaxed" style={{ color: LUXURY.muted }}>
+              <ul
+                className="space-y-3 pt-6 text-sm leading-relaxed"
+                style={{ color: LUXURY.muted }}
+              >
                 {excludedItems.map((item, index) => (
                   <li key={index} className="flex gap-3">
                     <span
@@ -137,7 +143,10 @@ export function TourPricingSectionLuxury({ data, viewMode }: TourPricingSectionL
               iconColor={LUXURY.secondary}
               isMobile={isMobile}
             >
-              <div className="pt-6 text-sm leading-relaxed space-y-4" style={{ color: LUXURY.muted }}>
+              <div
+                className="pt-6 text-sm leading-relaxed space-y-4"
+                style={{ color: LUXURY.muted }}
+              >
                 <p>{TOURS_LABELS.LABEL_6529}</p>
                 <ul className="list-disc pl-5 space-y-2">
                   {cancellationPolicy.map((policy, index) => (
@@ -162,7 +171,7 @@ function AccordionItem({
   iconBgColor,
   iconColor,
   isMobile,
-  children
+  children,
 }: {
   title: string
   isOpen: boolean
@@ -212,14 +221,12 @@ function AccordionItem({
         initial={false}
         animate={{
           height: isOpen ? 'auto' : 0,
-          opacity: isOpen ? 1 : 0
+          opacity: isOpen ? 1 : 0,
         }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         className="overflow-hidden"
       >
-        <div className="p-6 pt-0 border-t border-border bg-card">
-          {children}
-        </div>
+        <div className="p-6 pt-0 border-t border-border bg-card">{children}</div>
       </motion.div>
     </motion.div>
   )

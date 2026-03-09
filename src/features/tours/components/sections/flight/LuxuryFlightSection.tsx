@@ -2,7 +2,7 @@
 
 /**
  * Luxury 風格航班區塊 - 表格式布局
- * 
+ *
  * 特色：
  * - 左側強調線
  * - "Your Journey Begins" 斜體標題
@@ -36,7 +36,7 @@ function formatFlightDate(dateStr: string | undefined | null): { date: string; d
       if (month >= 1 && month <= 12 && dayOfMonth >= 1 && dayOfMonth <= 31) {
         return {
           date: `${month}.${dayOfMonth.toString().padStart(2, '0')}`,
-          day: '--' // 沒有年份無法計算星期幾
+          day: '--', // 沒有年份無法計算星期幾
         }
       }
     }
@@ -51,7 +51,7 @@ function formatFlightDate(dateStr: string | undefined | null): { date: string; d
       if (!isNaN(date.getTime())) {
         return {
           date: `${month + 1}.${dayOfMonth.toString().padStart(2, '0')}`,
-          day: days[date.getDay()]
+          day: days[date.getDay()],
         }
       }
     }
@@ -65,7 +65,7 @@ function formatFlightDate(dateStr: string | undefined | null): { date: string; d
       if (year >= 2020 && year <= 2100) {
         return {
           date: `${month + 1}.${dayOfMonth.toString().padStart(2, '0')}`,
-          day: days[date.getDay()]
+          day: days[date.getDay()],
         }
       }
     }
@@ -76,7 +76,11 @@ function formatFlightDate(dateStr: string | undefined | null): { date: string; d
   }
 }
 
-export function LuxuryFlightSection({ outboundFlight, returnFlight, viewMode }: LuxuryFlightSectionProps) {
+export function LuxuryFlightSection({
+  outboundFlight,
+  returnFlight,
+  viewMode,
+}: LuxuryFlightSectionProps) {
   const theme = getTheme('luxury')
   const isMobile = viewMode === 'mobile'
   const hasFlightInfo = outboundFlight || returnFlight
@@ -148,7 +152,7 @@ export function LuxuryFlightSection({ outboundFlight, returnFlight, viewMode }: 
                 style={{
                   color: theme.colors.secondary,
                   fontFamily: theme.fonts.heading,
-                  fontSize: '1.125rem'
+                  fontSize: '1.125rem',
                 }}
               >
                 Your Journey Begins
@@ -157,15 +161,26 @@ export function LuxuryFlightSection({ outboundFlight, returnFlight, viewMode }: 
                 className="font-bold text-3xl"
                 style={{
                   color: theme.colors.text,
-                  fontFamily: theme.fonts.heading
+                  fontFamily: theme.fonts.heading,
                 }}
               >
                 {FLIGHT_LABELS.LABEL_319}
               </h2>
             </div>
             <div className="flex items-center gap-2 text-sm" style={{ color: theme.colors.muted }}>
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: theme.colors.primary }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                style={{ color: theme.colors.primary }}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
               <span>{FLIGHT_LABELS.LABEL_6845}</span>
             </div>
@@ -176,17 +191,52 @@ export function LuxuryFlightSection({ outboundFlight, returnFlight, viewMode }: 
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr style={{ borderBottom: '1px solid #E5E7EB' }}>
-                  <th className="py-4 px-4 text-[10px] font-bold uppercase tracking-widest" style={{ color: theme.colors.muted }}>Type</th>
-                  <th className="py-4 px-4 text-[10px] font-bold uppercase tracking-widest" style={{ color: theme.colors.muted }}>Date</th>
-                  <th className="py-4 px-4 text-[10px] font-bold uppercase tracking-widest" style={{ color: theme.colors.muted }}>Airline</th>
-                  <th className="py-4 px-4 text-[10px] font-bold uppercase tracking-widest" style={{ color: theme.colors.muted }}>Flight No.</th>
-                  <th className="py-4 px-4 text-[10px] font-bold uppercase tracking-widest" style={{ color: theme.colors.muted }}>Schedule</th>
-                  <th className="py-4 px-4 text-[10px] font-bold uppercase tracking-widest text-right" style={{ color: theme.colors.muted }}>Class</th>
+                  <th
+                    className="py-4 px-4 text-[10px] font-bold uppercase tracking-widest"
+                    style={{ color: theme.colors.muted }}
+                  >
+                    Type
+                  </th>
+                  <th
+                    className="py-4 px-4 text-[10px] font-bold uppercase tracking-widest"
+                    style={{ color: theme.colors.muted }}
+                  >
+                    Date
+                  </th>
+                  <th
+                    className="py-4 px-4 text-[10px] font-bold uppercase tracking-widest"
+                    style={{ color: theme.colors.muted }}
+                  >
+                    Airline
+                  </th>
+                  <th
+                    className="py-4 px-4 text-[10px] font-bold uppercase tracking-widest"
+                    style={{ color: theme.colors.muted }}
+                  >
+                    Flight No.
+                  </th>
+                  <th
+                    className="py-4 px-4 text-[10px] font-bold uppercase tracking-widest"
+                    style={{ color: theme.colors.muted }}
+                  >
+                    Schedule
+                  </th>
+                  <th
+                    className="py-4 px-4 text-[10px] font-bold uppercase tracking-widest text-right"
+                    style={{ color: theme.colors.muted }}
+                  >
+                    Class
+                  </th>
                 </tr>
               </thead>
               <tbody className="text-sm">
                 {outboundFlight && (
-                  <FlightRow flight={outboundFlight} type="outbound" isMobile={false} theme={theme} />
+                  <FlightRow
+                    flight={outboundFlight}
+                    type="outbound"
+                    isMobile={false}
+                    theme={theme}
+                  />
                 )}
                 {returnFlight && (
                   <FlightRow flight={returnFlight} type="return" isMobile={false} theme={theme} />
@@ -260,7 +310,7 @@ function MobileFlightCard({
             strokeWidth="2"
             style={{ color: labelColor }}
           >
-            <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>
+            <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" />
           </svg>
           <div className="w-8 h-px" style={{ backgroundColor: theme.colors.muted }} />
         </div>
@@ -316,7 +366,7 @@ function FlightRow({
             strokeLinejoin="round"
             style={{ transform: 'rotate(0deg)' }}
           >
-            <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>
+            <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" />
           </svg>
         </div>
       </td>
@@ -350,24 +400,39 @@ function FlightRow({
       <td className="py-6 px-4">
         <div className="flex items-center gap-4 md:gap-6">
           <div>
-            <div className={`font-bold ${isMobile ? 'text-base' : 'text-xl'}`} style={{ color: theme.colors.text }}>
+            <div
+              className={`font-bold ${isMobile ? 'text-base' : 'text-xl'}`}
+              style={{ color: theme.colors.text }}
+            >
               {flight.departureTime || '--:--'}
             </div>
-            <div className="text-[10px] font-bold tracking-wider" style={{ color: theme.colors.muted }}>
+            <div
+              className="text-[10px] font-bold tracking-wider"
+              style={{ color: theme.colors.muted }}
+            >
               {flight.departureAirport || '--'}
             </div>
           </div>
 
           {/* 箭頭 */}
           <div className="h-px w-6 md:w-8 bg-border relative">
-            <div className="absolute -top-1 right-0 w-2 h-2 border-t border-r rotate-45" style={{ borderColor: '#d1d5db' }} />
+            <div
+              className="absolute -top-1 right-0 w-2 h-2 border-t border-r rotate-45"
+              style={{ borderColor: '#d1d5db' }}
+            />
           </div>
 
           <div>
-            <div className={`font-bold ${isMobile ? 'text-base' : 'text-xl'}`} style={{ color: theme.colors.text }}>
+            <div
+              className={`font-bold ${isMobile ? 'text-base' : 'text-xl'}`}
+              style={{ color: theme.colors.text }}
+            >
               {flight.arrivalTime || '--:--'}
             </div>
-            <div className="text-[10px] font-bold tracking-wider" style={{ color: theme.colors.muted }}>
+            <div
+              className="text-[10px] font-bold tracking-wider"
+              style={{ color: theme.colors.muted }}
+            >
               {flight.arrivalAirport || '--'}
             </div>
           </div>

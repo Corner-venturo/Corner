@@ -74,7 +74,9 @@ export function useMemberView({ order_id, departure_date, member_count }: UseMem
 
   // 初始化表格成員
   useEffect(() => {
-    const existingMembers: EditingMember[] = orderMembers.map(member => ({ ...member })) as unknown as EditingMember[]
+    const existingMembers: EditingMember[] = orderMembers.map(member => ({
+      ...member,
+    })) as unknown as EditingMember[]
 
     // 確保至少有member_count行
     while (existingMembers.length < member_count) {
@@ -110,7 +112,9 @@ export function useMemberView({ order_id, departure_date, member_count }: UseMem
       const timer = setTimeout(async () => {
         if (member.isNew && member.name?.trim()) {
           const { isNew, id, ...memberData } = member
-          const created = await createMember(memberData as Omit<Member, 'id' | 'created_at' | 'updated_at' | 'order_id'>)
+          const created = await createMember(
+            memberData as Omit<Member, 'id' | 'created_at' | 'updated_at' | 'order_id'>
+          )
           const newId = created?.id
 
           setTableMembers(prev => {
@@ -145,8 +149,8 @@ export function useMemberView({ order_id, departure_date, member_count }: UseMem
       if (!name || name.length < 2) return false
 
       // 模糊搜尋：姓名包含輸入的字串
-      const nameMatches = customers.filter(c =>
-        c.name?.includes(name) || name.includes(c.name || '')
+      const nameMatches = customers.filter(
+        c => c.name?.includes(name) || name.includes(c.name || '')
       )
 
       if (nameMatches.length === 0) {
@@ -171,9 +175,7 @@ export function useMemberView({ order_id, departure_date, member_count }: UseMem
       if (!idNumber || idNumber.length < 5) return false
 
       // 搜尋身分證字號相符的顧客
-      const idMatches = customers.filter(c =>
-        c.national_id === idNumber
-      )
+      const idMatches = customers.filter(c => c.national_id === idNumber)
 
       if (idMatches.length === 0) {
         return false
@@ -222,7 +224,7 @@ export function useMemberView({ order_id, departure_date, member_count }: UseMem
   const handleDataUpdate = useCallback(
     (newData: EditingMember[]) => {
       // 處理自動計算欄位
-      const processedData = newData.map((member) => {
+      const processedData = newData.map(member => {
         const processed = { ...member }
 
         // 從身分證號自動計算性別和年齡
@@ -230,14 +232,14 @@ export function useMemberView({ order_id, departure_date, member_count }: UseMem
           processed.gender = getGenderFromIdNumber(processed.id_number)
           const age = calculateAge(processed.id_number, departure_date)
           if (age !== null && 'age' in processed) {
-            (processed as EditingMember & { age: number }).age = age
+            ;(processed as EditingMember & { age: number }).age = age
           }
         }
         // 從生日計算年齡
         else if (processed.birth_date) {
           const age = calculateAge(String(processed.birth_date), departure_date)
           if (age !== null && 'age' in processed) {
-            (processed as EditingMember & { age: number }).age = age
+            ;(processed as EditingMember & { age: number }).age = age
           }
         }
 
@@ -251,7 +253,11 @@ export function useMemberView({ order_id, departure_date, member_count }: UseMem
         const oldMember = tableMembers[index]
 
         // 姓名有變更（2 字以上），檢查顧客匹配
-        if (member.name !== oldMember?.name && member.name?.trim() && member.name.trim().length >= 2) {
+        if (
+          member.name !== oldMember?.name &&
+          member.name?.trim() &&
+          member.name.trim().length >= 2
+        ) {
           const matched = checkCustomerMatchByName(member, index)
           if (!matched) {
             autoSaveMember(member, index)
@@ -260,7 +266,11 @@ export function useMemberView({ order_id, departure_date, member_count }: UseMem
         }
 
         // 身分證字號有變更（5 字以上），檢查顧客匹配
-        if (member.id_number !== oldMember?.id_number && member.id_number?.trim() && member.id_number.trim().length >= 5) {
+        if (
+          member.id_number !== oldMember?.id_number &&
+          member.id_number?.trim() &&
+          member.id_number.trim().length >= 5
+        ) {
           const matched = checkCustomerMatchByIdNumber(member, index)
           if (!matched) {
             autoSaveMember(member, index)
@@ -272,7 +282,13 @@ export function useMemberView({ order_id, departure_date, member_count }: UseMem
         autoSaveMember(member, index)
       })
     },
-    [departure_date, autoSaveMember, checkCustomerMatchByName, checkCustomerMatchByIdNumber, tableMembers]
+    [
+      departure_date,
+      autoSaveMember,
+      checkCustomerMatchByName,
+      checkCustomerMatchByIdNumber,
+      tableMembers,
+    ]
   )
 
   // 編輯模式下的欄位變更處理

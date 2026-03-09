@@ -101,7 +101,7 @@ export function TourDesignsTab({ tourId, proposalId }: TourDesignsTabProps) {
     }
 
     if (tourId) {
-      fetchDesigns().catch((err) => logger.error('[fetchDesigns]', err))
+      fetchDesigns().catch(err => logger.error('[fetchDesigns]', err))
     }
   }, [tourId, proposalId])
 
@@ -144,10 +144,12 @@ export function TourDesignsTab({ tourId, proposalId }: TourDesignsTabProps) {
             onClick={() => handleOpenDesign(design)}
           >
             <div className="flex items-center gap-3">
-              <div className={cn(
-                'p-2 rounded-lg',
-                design.type === 'itinerary' ? 'bg-morandi-green/10' : 'bg-morandi-blue/10'
-              )}>
+              <div
+                className={cn(
+                  'p-2 rounded-lg',
+                  design.type === 'itinerary' ? 'bg-morandi-green/10' : 'bg-morandi-blue/10'
+                )}
+              >
                 {design.type === 'itinerary' ? (
                   <Globe className="w-5 h-5 text-morandi-green" />
                 ) : (
@@ -169,7 +171,10 @@ export function TourDesignsTab({ tourId, proposalId }: TourDesignsTabProps) {
                   )}
                 </div>
                 <div className="text-sm text-morandi-secondary">
-                  {design.type === 'itinerary' ? COMP_TOURS_LABELS.網頁行程 : COMP_TOURS_LABELS.手冊} · {design.status}
+                  {design.type === 'itinerary'
+                    ? COMP_TOURS_LABELS.網頁行程
+                    : COMP_TOURS_LABELS.手冊}{' '}
+                  · {design.status}
                 </div>
               </div>
             </div>

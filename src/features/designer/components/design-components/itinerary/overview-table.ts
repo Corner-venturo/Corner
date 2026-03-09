@@ -20,19 +20,49 @@ export const overviewTable: DesignComponent = {
 
     // 標題
     elements.push({
-      id: `comp-ot-title-${ts}`, type: 'text', name: '總覽標題',
-      x, y, width: 200, height: 24,
-      zIndex: 2, rotation: 0, opacity: 1, locked: false, visible: true,
+      id: `comp-ot-title-${ts}`,
+      type: 'text',
+      name: '總覽標題',
+      x,
+      y,
+      width: 200,
+      height: 24,
+      zIndex: 2,
+      rotation: 0,
+      opacity: 1,
+      locked: false,
+      visible: true,
       content: '行程總覽 ITINERARY',
-      style: { fontFamily: p.fontFamily, fontSize: 16, fontWeight: '700', fontStyle: 'normal', color: p.primary, textAlign: 'left', lineHeight: 1.2, letterSpacing: 1.5 },
+      style: {
+        fontFamily: p.fontFamily,
+        fontSize: 16,
+        fontWeight: '700',
+        fontStyle: 'normal',
+        color: p.primary,
+        textAlign: 'left',
+        lineHeight: 1.2,
+        letterSpacing: 1.5,
+      },
     } as TextElement)
 
     // 表頭背景
     elements.push({
-      id: `comp-ot-header-bg-${ts}`, type: 'shape', name: '表頭背景', variant: 'rectangle',
-      x, y: y + 30, width, height: headerHeight,
-      zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
-      fill: p.accent, stroke: 'transparent', strokeWidth: 0,
+      id: `comp-ot-header-bg-${ts}`,
+      type: 'shape',
+      name: '表頭背景',
+      variant: 'rectangle',
+      x,
+      y: y + 30,
+      width,
+      height: headerHeight,
+      zIndex: 1,
+      rotation: 0,
+      opacity: 1,
+      locked: false,
+      visible: true,
+      fill: p.accent,
+      stroke: 'transparent',
+      strokeWidth: 0,
     } as ShapeElement)
 
     // 表頭文字
@@ -45,11 +75,29 @@ export const overviewTable: DesignComponent = {
     let colX = x
     cols.forEach((col, i) => {
       elements.push({
-        id: `comp-ot-hdr-${i}-${ts}`, type: 'text', name: `表頭-${col.label}`,
-        x: colX + 4, y: y + 34, width: col.w - 8, height: 20,
-        zIndex: 3, rotation: 0, opacity: 1, locked: false, visible: true,
+        id: `comp-ot-hdr-${i}-${ts}`,
+        type: 'text',
+        name: `表頭-${col.label}`,
+        x: colX + 4,
+        y: y + 34,
+        width: col.w - 8,
+        height: 20,
+        zIndex: 3,
+        rotation: 0,
+        opacity: 1,
+        locked: false,
+        visible: true,
         content: col.label,
-        style: { fontFamily: p.fontFamily, fontSize: 10, fontWeight: '600', fontStyle: 'normal', color: '#ffffff', textAlign: 'left', lineHeight: 1, letterSpacing: 0.5 },
+        style: {
+          fontFamily: p.fontFamily,
+          fontSize: 10,
+          fontWeight: '600',
+          fontStyle: 'normal',
+          color: '#ffffff',
+          textAlign: 'left',
+          lineHeight: 1,
+          letterSpacing: 0.5,
+        },
       } as TextElement)
       colX += col.w
     })
@@ -69,10 +117,22 @@ export const overviewTable: DesignComponent = {
       // 交替背景
       if (ri % 2 === 0) {
         elements.push({
-          id: `comp-ot-row-bg-${ri}-${ts}`, type: 'shape', name: `第${ri + 1}行背景`, variant: 'rectangle',
-          x, y: rowY, width, height: rowHeight,
-          zIndex: 1, rotation: 0, opacity: 1, locked: false, visible: true,
-          fill: p.lightBg, stroke: 'transparent', strokeWidth: 0,
+          id: `comp-ot-row-bg-${ri}-${ts}`,
+          type: 'shape',
+          name: `第${ri + 1}行背景`,
+          variant: 'rectangle',
+          x,
+          y: rowY,
+          width,
+          height: rowHeight,
+          zIndex: 1,
+          rotation: 0,
+          opacity: 1,
+          locked: false,
+          visible: true,
+          fill: p.lightBg,
+          stroke: 'transparent',
+          strokeWidth: 0,
         } as ShapeElement)
       }
 
@@ -80,11 +140,29 @@ export const overviewTable: DesignComponent = {
       let cx = x
       cols.forEach((col, ci) => {
         elements.push({
-          id: `comp-ot-cell-${ri}-${ci}-${ts}`, type: 'text', name: `${row.day}-${col.label}`,
-          x: cx + 4, y: rowY + 8, width: col.w - 8, height: 16,
-          zIndex: 2, rotation: 0, opacity: 1, locked: false, visible: true,
+          id: `comp-ot-cell-${ri}-${ci}-${ts}`,
+          type: 'text',
+          name: `${row.day}-${col.label}`,
+          x: cx + 4,
+          y: rowY + 8,
+          width: col.w - 8,
+          height: 16,
+          zIndex: 2,
+          rotation: 0,
+          opacity: 1,
+          locked: false,
+          visible: true,
           content: values[ci],
-          style: { fontFamily: p.fontFamily, fontSize: 10, fontWeight: '400', fontStyle: 'normal', color: p.primary, textAlign: 'left', lineHeight: 1.2, letterSpacing: 0.3 },
+          style: {
+            fontFamily: p.fontFamily,
+            fontSize: 10,
+            fontWeight: '400',
+            fontStyle: 'normal',
+            color: p.primary,
+            textAlign: 'left',
+            lineHeight: 1.2,
+            letterSpacing: 0.3,
+          },
         } as TextElement)
         cx += col.w
       })

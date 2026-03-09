@@ -8,7 +8,13 @@ import { Plus, Trash2, Sparkles, Loader2, ImageIcon } from 'lucide-react'
 import { useCountries, useCities } from '@/data'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { ITINERARY_LABELS } from '../constants/labels'
 
 // 型別定義
@@ -21,8 +27,24 @@ interface DailyScheduleItem {
 
 interface FlightOption {
   airline: string
-  outbound: { code: string; from: string; fromCode: string; time: string; to: string; toCode: string; arrivalTime: string }
-  return: { code: string; from: string; fromCode: string; time: string; to: string; toCode: string; arrivalTime: string }
+  outbound: {
+    code: string
+    from: string
+    fromCode: string
+    time: string
+    to: string
+    toCode: string
+    arrivalTime: string
+  }
+  return: {
+    code: string
+    from: string
+    fromCode: string
+    time: string
+    to: string
+    toCode: string
+    arrivalTime: string
+  }
 }
 
 interface HighlightSpot {
@@ -72,7 +94,10 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
 
   // SWR 自動載入國家和城市資料
 
-  const updateField = <K extends keyof GeminiItineraryData>(field: K, value: GeminiItineraryData[K]) => {
+  const updateField = <K extends keyof GeminiItineraryData>(
+    field: K,
+    value: GeminiItineraryData[K]
+  ) => {
     onChange({ ...data, [field]: value })
   }
 
@@ -94,12 +119,17 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
     await new Promise(resolve => setTimeout(resolve, 1500))
 
     const mockDescriptions: Record<string, string> = {
-      '清水寺': '清水寺是京都最具代表性的寺廟，建於 778 年，以懸空的木造舞台聞名。從這裡可以俯瞰京都市區的絕美景色，春天的櫻花和秋天的紅葉更是令人屏息。',
-      '金閣寺': '金閣寺正式名稱為鹿苑寺，因其外牆貼滿金箔而得名。建築倒映在鏡湖池中的景象，是京都最經典的畫面之一。',
-      '伏見稻荷大社': '以千本鳥居聞名於世，綿延數公里的橘紅色鳥居隧道，是攝影愛好者的朝聖地。這裡供奉著稻荷神，是日本全國稻荷神社的總本山。',
+      清水寺:
+        '清水寺是京都最具代表性的寺廟，建於 778 年，以懸空的木造舞台聞名。從這裡可以俯瞰京都市區的絕美景色，春天的櫻花和秋天的紅葉更是令人屏息。',
+      金閣寺:
+        '金閣寺正式名稱為鹿苑寺，因其外牆貼滿金箔而得名。建築倒映在鏡湖池中的景象，是京都最經典的畫面之一。',
+      伏見稻荷大社:
+        '以千本鳥居聞名於世，綿延數公里的橘紅色鳥居隧道，是攝影愛好者的朝聖地。這裡供奉著稻荷神，是日本全國稻荷神社的總本山。',
     }
 
-    const description = mockDescriptions[spot.name] || `${spot.name}是${data.city}著名的觀光景點，融合了自然美景與文化特色，非常值得一遊。`
+    const description =
+      mockDescriptions[spot.name] ||
+      `${spot.name}是${data.city}著名的觀光景點，融合了自然美景與文化特色，非常值得一遊。`
 
     const newSpots = [...data.highlightSpots]
     newSpots[index].description = description
@@ -212,8 +242,10 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
           {/* 國家和城市選擇 */}
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-xs font-medium text-morandi-primary mb-1">{ITINERARY_LABELS.LABEL_5040}</label>
-              <Select value={data.country} onValueChange={(value) => updateField('country', value)}>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">
+                {ITINERARY_LABELS.LABEL_5040}
+              </label>
+              <Select value={data.country} onValueChange={value => updateField('country', value)}>
                 <SelectTrigger className="h-9">
                   <SelectValue placeholder={ITINERARY_LABELS.選擇國家} />
                 </SelectTrigger>
@@ -223,14 +255,17 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                     .sort((a, b) => a.display_order - b.display_order)
                     .map(country => (
                       <SelectItem key={country.id} value={country.name}>
-                        {country.emoji ? `${country.emoji} ` : ''}{country.name}
+                        {country.emoji ? `${country.emoji} ` : ''}
+                        {country.name}
                       </SelectItem>
                     ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-morandi-primary mb-1">{ITINERARY_LABELS.LABEL_5461}</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">
+                {ITINERARY_LABELS.LABEL_5461}
+              </label>
               <Select value={data.city} onValueChange={handleCityChange} disabled={!data.country}>
                 <SelectTrigger className="h-9">
                   <SelectValue placeholder={ITINERARY_LABELS.選擇城市} />
@@ -254,7 +289,9 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
 
           {/* 封面圖片 with AI 生成 */}
           <div>
-            <label className="block text-xs font-medium text-morandi-primary mb-1">{ITINERARY_LABELS.封面圖片}</label>
+            <label className="block text-xs font-medium text-morandi-primary mb-1">
+              {ITINERARY_LABELS.封面圖片}
+            </label>
             <div className="flex gap-2">
               <InputIME
                 value={data.coverImage}
@@ -278,7 +315,9 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-morandi-primary mb-1">{ITINERARY_LABELS.TITLE}</label>
+            <label className="block text-xs font-medium text-morandi-primary mb-1">
+              {ITINERARY_LABELS.TITLE}
+            </label>
             <InputIME
               value={data.title}
               onChange={value => updateField('title', value)}
@@ -287,7 +326,9 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-morandi-primary mb-1">{ITINERARY_LABELS.LABEL_4322}</label>
+            <label className="block text-xs font-medium text-morandi-primary mb-1">
+              {ITINERARY_LABELS.LABEL_4322}
+            </label>
             <textarea
               value={data.subtitle}
               onChange={e => updateField('subtitle', e.target.value)}
@@ -297,7 +338,9 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-xs font-medium text-morandi-primary mb-1">{ITINERARY_LABELS.PRICE_LABEL_HINT}</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">
+                {ITINERARY_LABELS.PRICE_LABEL_HINT}
+              </label>
               <InputIME
                 value={data.price}
                 onChange={value => updateField('price', value)}
@@ -306,7 +349,9 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-morandi-primary mb-1">{ITINERARY_LABELS.LABEL_4452}</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">
+                {ITINERARY_LABELS.LABEL_4452}
+              </label>
               <InputIME
                 value={data.priceNote}
                 onChange={value => updateField('priceNote', value)}
@@ -426,7 +471,10 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
         </h3>
         <div className="space-y-4 text-xs">
           {data.flightOptions.map((option, idx) => (
-            <div key={idx} className="bg-status-warning-bg p-3 rounded border border-status-warning/30">
+            <div
+              key={idx}
+              className="bg-status-warning-bg p-3 rounded border border-status-warning/30"
+            >
               <div className="font-semibold text-morandi-primary mb-2">{option.airline}</div>
               <div className="space-y-2">
                 <div className="grid grid-cols-3 gap-1">
@@ -502,7 +550,9 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
       {/* 行程特色 with AI */}
       <section>
         <div className="flex items-center justify-between mb-3 pb-2 border-b border-morandi-container">
-          <h3 className="text-base font-bold text-morandi-primary">{ITINERARY_LABELS.LABEL_6890}</h3>
+          <h3 className="text-base font-bold text-morandi-primary">
+            {ITINERARY_LABELS.LABEL_6890}
+          </h3>
           <Button
             onClick={() => {
               updateField('highlightSpots', [
@@ -587,7 +637,13 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
               />
               {spot.imageUrl && (
                 <div className="mb-2">
-                  <NextImage src={spot.imageUrl} alt={spot.name} width={300} height={96} className="w-full h-24 object-cover rounded" />
+                  <NextImage
+                    src={spot.imageUrl}
+                    alt={spot.name}
+                    width={300}
+                    height={96}
+                    className="w-full h-24 object-cover rounded"
+                  />
                 </div>
               )}
               <textarea
@@ -608,7 +664,9 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
       {/* 景點介紹 with AI */}
       <section>
         <div className="flex items-center justify-between mb-3 pb-2 border-b border-morandi-container">
-          <h3 className="text-base font-bold text-morandi-primary">{ITINERARY_LABELS.LABEL_4014}</h3>
+          <h3 className="text-base font-bold text-morandi-primary">
+            {ITINERARY_LABELS.LABEL_4014}
+          </h3>
           <Button
             onClick={() => {
               updateField('sights', [
@@ -693,7 +751,13 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
               />
               {sight.imageUrl && (
                 <div className="mb-2">
-                  <NextImage src={sight.imageUrl} alt={sight.name} width={300} height={128} className="w-full h-32 object-cover rounded" />
+                  <NextImage
+                    src={sight.imageUrl}
+                    alt={sight.name}
+                    width={300}
+                    height={128}
+                    className="w-full h-32 object-cover rounded"
+                  />
                 </div>
               )}
               <textarea

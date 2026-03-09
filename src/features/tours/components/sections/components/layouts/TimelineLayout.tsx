@@ -51,16 +51,11 @@ export function TimelineLayout({
               >
                 {String(numericDay).padStart(2, '0')}
               </span>
-              <h4
-                className="text-xl text-white"
-                style={{ fontFamily: "'Noto Serif TC', serif" }}
-              >
+              <h4 className="text-xl text-white" style={{ fontFamily: "'Noto Serif TC', serif" }}>
                 {day.title || `第 ${index + 1} 天`}
               </h4>
             </div>
-            {day.description && (
-              <p className="text-sm text-white/50 pl-10">{day.description}</p>
-            )}
+            {day.description && <p className="text-sm text-white/50 pl-10">{day.description}</p>}
           </div>
 
           {/* 特殊回程卡片 */}
@@ -68,22 +63,14 @@ export function TimelineLayout({
             className="flex-1 p-6 flex flex-col justify-center relative overflow-hidden"
             style={{ backgroundColor: ART.clay, color: ART.ink }}
           >
-            <div
-              className="absolute -right-4 -bottom-4 text-8xl opacity-20 rotate-[-20deg]"
-            >
+            <div className="absolute -right-4 -bottom-4 text-8xl opacity-20 rotate-[-20deg]">
               <Plane className="w-24 h-24" />
             </div>
             <div className="flex items-center gap-4 mb-2 relative z-10">
-              <span
-                className="text-2xl font-black"
-                style={{ fontFamily: "'Cinzel', serif" }}
-              >
+              <span className="text-2xl font-black" style={{ fontFamily: "'Cinzel', serif" }}>
                 {String(numericDay).padStart(2, '0')}
               </span>
-              <h4
-                className="text-xl font-bold"
-                style={{ fontFamily: "'Noto Serif TC', serif" }}
-              >
+              <h4 className="text-xl font-bold" style={{ fontFamily: "'Noto Serif TC', serif" }}>
                 Homecoming
               </h4>
             </div>
@@ -132,9 +119,7 @@ export function TimelineLayout({
 
         {/* 描述 */}
         {day.description && (
-          <p className="text-sm text-white/60 mb-6 leading-relaxed">
-            {day.description}
-          </p>
+          <p className="text-sm text-white/60 mb-6 leading-relaxed">{day.description}</p>
         )}
 
         {/* 圖片 */}
@@ -142,14 +127,15 @@ export function TimelineLayout({
           <div
             className="h-40 overflow-hidden mb-6 cursor-pointer"
             style={{ filter: 'grayscale(100%)' }}
-            onMouseEnter={(e) => { e.currentTarget.style.filter = 'grayscale(0%)' }}
-            onMouseLeave={(e) => { e.currentTarget.style.filter = 'grayscale(100%)' }}
+            onMouseEnter={e => {
+              e.currentTarget.style.filter = 'grayscale(0%)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.filter = 'grayscale(100%)'
+            }}
             onClick={() => onImageClick(allImages, 0, day.title)}
           >
-            <img src={allImages[0]}
-              alt=""
-              className="w-full h-full object-cover"
-            />
+            <img src={allImages[0]} alt="" className="w-full h-full object-cover" />
           </div>
         )}
         {!hasImage && (

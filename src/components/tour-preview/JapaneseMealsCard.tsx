@@ -21,10 +21,7 @@ interface JapaneseMealsCardProps {
  * - 頂部浮動圖標
  * - hover 邊框變色效果
  */
-export function JapaneseMealsCard({
-  meals,
-  className,
-}: JapaneseMealsCardProps) {
+export function JapaneseMealsCard({ meals, className }: JapaneseMealsCardProps) {
   const primaryColor = '#5D4037'
 
   const mealItems = [
@@ -70,7 +67,7 @@ export function JapaneseMealsCard({
             className="text-[10px] sm:text-xs uppercase tracking-[0.1em] sm:tracking-[0.2em] mb-1.5 sm:mb-2 md:mb-3 border-b pb-0.5 sm:pb-1"
             style={{
               color: `${primaryColor}99`,
-              borderColor: `${primaryColor}33`
+              borderColor: `${primaryColor}33`,
             }}
           >
             {meal.label}

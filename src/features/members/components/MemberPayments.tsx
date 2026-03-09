@@ -32,7 +32,10 @@ export function MemberPayments({
           <DialogTitle className="text-base">
             {matchType === 'name'
               ? MEMBERS_LABELS.找到N位相似顧客(customers.length, pendingMemberData?.name || '')
-              : MEMBERS_LABELS.找到N位相同身分證(customers.length, pendingMemberData?.id_number || '')}
+              : MEMBERS_LABELS.找到N位相同身分證(
+                  customers.length,
+                  pendingMemberData?.id_number || ''
+                )}
           </DialogTitle>
         </DialogHeader>
 
@@ -41,16 +44,28 @@ export function MemberPayments({
           <table className="w-full text-sm">
             <thead className="bg-muted/50 border-y">
               <tr>
-                <th className="px-3 py-2 text-left font-medium text-muted-foreground">{MEMBERS_LABELS.LABEL_658}</th>
-                <th className="px-3 py-2 text-left font-medium text-muted-foreground">{MEMBERS_LABELS.LABEL_841}</th>
-                <th className="px-3 py-2 text-left font-medium text-muted-foreground">{MEMBERS_LABELS.LABEL_8408}</th>
-                <th className="px-3 py-2 text-left font-medium text-muted-foreground">{MEMBERS_LABELS.LABEL_5147}</th>
-                <th className="px-3 py-2 text-left font-medium text-muted-foreground">{MEMBERS_LABELS.LABEL_8658}</th>
-                <th className="px-3 py-2 text-left font-medium text-muted-foreground">{MEMBERS_LABELS.LABEL_2195}</th>
+                <th className="px-3 py-2 text-left font-medium text-muted-foreground">
+                  {MEMBERS_LABELS.LABEL_658}
+                </th>
+                <th className="px-3 py-2 text-left font-medium text-muted-foreground">
+                  {MEMBERS_LABELS.LABEL_841}
+                </th>
+                <th className="px-3 py-2 text-left font-medium text-muted-foreground">
+                  {MEMBERS_LABELS.LABEL_8408}
+                </th>
+                <th className="px-3 py-2 text-left font-medium text-muted-foreground">
+                  {MEMBERS_LABELS.LABEL_5147}
+                </th>
+                <th className="px-3 py-2 text-left font-medium text-muted-foreground">
+                  {MEMBERS_LABELS.LABEL_8658}
+                </th>
+                <th className="px-3 py-2 text-left font-medium text-muted-foreground">
+                  {MEMBERS_LABELS.LABEL_2195}
+                </th>
               </tr>
             </thead>
             <tbody>
-              {customers.map((customer) => (
+              {customers.map(customer => (
                 <tr
                   key={customer.id}
                   onClick={() => onSelectCustomer(customer)}
@@ -64,7 +79,11 @@ export function MemberPayments({
                   <td className="px-3 py-3 font-mono text-xs">{customer.passport_number || '-'}</td>
                   <td className="px-3 py-3">{customer.birth_date || '-'}</td>
                   <td className="px-3 py-3">
-                    {customer.gender === 'M' ? MEMBERS_LABELS.男 : customer.gender === 'F' ? MEMBERS_LABELS.女 : '-'}
+                    {customer.gender === 'M'
+                      ? MEMBERS_LABELS.男
+                      : customer.gender === 'F'
+                        ? MEMBERS_LABELS.女
+                        : '-'}
                   </td>
                 </tr>
               ))}

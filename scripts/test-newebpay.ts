@@ -79,7 +79,6 @@ async function testConnection() {
     const responseText = await response.text()
     console.log('\n📄 回應內容:')
     console.log(responseText)
-
   } catch (error: unknown) {
     if (error instanceof Error && error.name === 'AbortError') {
       console.error('❌ 請求超時（30秒）')

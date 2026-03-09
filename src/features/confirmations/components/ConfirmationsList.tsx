@@ -3,7 +3,6 @@
  * ConfirmationsList - 確認單列表組件（使用 EnhancedTable）
  */
 
-
 import React, { useMemo } from 'react'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
@@ -55,7 +54,9 @@ export const ConfirmationsList: React.FC<ConfirmationsListProps> = ({
         sortable: true,
         render: (_: unknown, row: unknown) => {
           const conf = row as Confirmation
-          return <span className="text-sm font-mono text-morandi-primary">{conf.booking_number}</span>
+          return (
+            <span className="text-sm font-mono text-morandi-primary">{conf.booking_number}</span>
+          )
         },
       },
       {
@@ -129,35 +130,36 @@ export const ConfirmationsList: React.FC<ConfirmationsListProps> = ({
       actions={(row: unknown) => {
         const conf = row as Confirmation
         return (
-        <div className="flex items-center gap-1">
-          <Button
-            type="button"
-            variant="ghost"
-            size="iconSm"
-            onClick={e => {
-              e.stopPropagation()
-              onEdit(conf.id)
-            }}
-            className="text-morandi-gold hover:bg-morandi-gold/10"
-            title={CONFIRMATIONS_LABELS.EDIT}
-          >
-            <Edit2 size={16} />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="iconSm"
-            onClick={e => {
-              e.stopPropagation()
-              onDelete(conf.id)
-            }}
-            className="text-morandi-red hover:bg-morandi-red/10"
-            title={CONFIRMATIONS_LABELS.DELETE}
-          >
-            <Trash2 size={16} />
-          </Button>
-        </div>
-      )}}
+          <div className="flex items-center gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="iconSm"
+              onClick={e => {
+                e.stopPropagation()
+                onEdit(conf.id)
+              }}
+              className="text-morandi-gold hover:bg-morandi-gold/10"
+              title={CONFIRMATIONS_LABELS.EDIT}
+            >
+              <Edit2 size={16} />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="iconSm"
+              onClick={e => {
+                e.stopPropagation()
+                onDelete(conf.id)
+              }}
+              className="text-morandi-red hover:bg-morandi-red/10"
+              title={CONFIRMATIONS_LABELS.DELETE}
+            >
+              <Trash2 size={16} />
+            </Button>
+          </div>
+        )
+      }}
     />
   )
 }

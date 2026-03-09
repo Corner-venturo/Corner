@@ -13,14 +13,22 @@ export function generateItineraryPrintHtml(data: TimelineItineraryData): string 
   const formatDate = (dateStr: string): string => {
     if (!dateStr) return ''
     const date = new Date(dateStr)
-    const weekdays = [ITINERARY_DIALOG_LABELS.日, ITINERARY_DIALOG_LABELS.一, ITINERARY_DIALOG_LABELS.二, ITINERARY_DIALOG_LABELS.三, ITINERARY_DIALOG_LABELS.四, ITINERARY_DIALOG_LABELS.五, ITINERARY_DIALOG_LABELS.六]
+    const weekdays = [
+      ITINERARY_DIALOG_LABELS.日,
+      ITINERARY_DIALOG_LABELS.一,
+      ITINERARY_DIALOG_LABELS.二,
+      ITINERARY_DIALOG_LABELS.三,
+      ITINERARY_DIALOG_LABELS.四,
+      ITINERARY_DIALOG_LABELS.五,
+      ITINERARY_DIALOG_LABELS.六,
+    ]
     return `${date.getMonth() + 1}/${date.getDate()} (${weekdays[date.getDay()]})`
   }
 
   const daysHtml = data.days
-    .map((day) => {
+    .map(day => {
       const rowsHtml = day.attractions
-        .map((attr) => {
+        .map(attr => {
           const timeStr =
             attr.startTime || attr.endTime
               ? `${formatTime(attr.startTime)} - ${formatTime(attr.endTime)}`
@@ -28,7 +36,7 @@ export function generateItineraryPrintHtml(data: TimelineItineraryData): string 
 
           const imagesHtml =
             attr.images.length > 0
-              ? `<div class="images">${attr.images.map((img) => `<img src="${img.url}" alt="" />`).join('')}</div>`
+              ? `<div class="images">${attr.images.map(img => `<img src="${img.url}" alt="" />`).join('')}</div>`
               : ''
 
           const colorStyle = attr.color ? `style="color: ${attr.color}"` : ''

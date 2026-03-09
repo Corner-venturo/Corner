@@ -4,8 +4,8 @@ import React, { forwardRef } from 'react'
 
 interface MemberData {
   id: string
-  passport_name?: string | null  // 格式: SURNAME/GIVENNAME
-  birth_date?: string | null     // 格式: YYYY-MM-DD
+  passport_name?: string | null // 格式: SURNAME/GIVENNAME
+  birth_date?: string | null // 格式: YYYY-MM-DD
   passport_number?: string | null
 }
 
@@ -28,7 +28,10 @@ function formatBirthDate(birthDate: string | null | undefined): string {
 }
 
 // 從 passport_name 分離姓和名
-function splitName(passportName: string | null | undefined): { surname: string; givenName: string } {
+function splitName(passportName: string | null | undefined): {
+  surname: string
+  givenName: string
+} {
   if (!passportName) return { surname: '', givenName: '' }
   const parts = passportName.split('/')
   return {
@@ -38,7 +41,17 @@ function splitName(passportName: string | null | undefined): { surname: string; 
 }
 
 export const JapanEntryCardPrint = forwardRef<HTMLDivElement, JapanEntryCardPrintProps>(
-  ({ members, flightNumber = 'BR-XXX', hotelName = '', hotelAddress = '', hotelPhone = '', stayDays = 5 }, ref) => {
+  (
+    {
+      members,
+      flightNumber = 'BR-XXX',
+      hotelName = '',
+      hotelAddress = '',
+      hotelPhone = '',
+      stayDays = 5,
+    },
+    ref
+  ) => {
     return (
       <div ref={ref} className="japan-entry-card-print">
         <style>{`
@@ -142,7 +155,9 @@ export const JapanEntryCardPrint = forwardRef<HTMLDivElement, JapanEntryCardPrin
                   {/* 第一行：姓 | 名 */}
                   <tr className="name-row">
                     <td style={{ width: '177.2pt' }}>{surname}</td>
-                    <td style={{ width: '205.55pt' }} colSpan={4}>{givenName}</td>
+                    <td style={{ width: '205.55pt' }} colSpan={4}>
+                      {givenName}
+                    </td>
                   </tr>
 
                   {/* 第二行：生日 | TAIWAN | TAIPEI */}
@@ -150,8 +165,12 @@ export const JapanEntryCardPrint = forwardRef<HTMLDivElement, JapanEntryCardPrin
                     <td>
                       <span className="date-cell">{birthDateFormatted}</span>
                     </td>
-                    <td colSpan={2} style={{ width: '106.3pt' }}>TAIWAN</td>
-                    <td colSpan={2} style={{ width: '99.25pt', textIndent: '18pt' }}>TAIPEI</td>
+                    <td colSpan={2} style={{ width: '106.3pt' }}>
+                      TAIWAN
+                    </td>
+                    <td colSpan={2} style={{ width: '99.25pt', textIndent: '18pt' }}>
+                      TAIPEI
+                    </td>
                   </tr>
 
                   {/* 第三行：V | (空) | 航班號碼 */}
@@ -165,7 +184,9 @@ export const JapanEntryCardPrint = forwardRef<HTMLDivElement, JapanEntryCardPrin
                   <tr style={{ height: '24.7pt' }}>
                     <td>&nbsp;</td>
                     <td colSpan={2}>&nbsp;</td>
-                    <td colSpan={2} style={{ paddingLeft: '12pt' }}>{stayDays} 日</td>
+                    <td colSpan={2} style={{ paddingLeft: '12pt' }}>
+                      {stayDays} 日
+                    </td>
                   </tr>
 
                   {/* 第五行：住宿地址 | 電話 */}
@@ -174,7 +195,9 @@ export const JapanEntryCardPrint = forwardRef<HTMLDivElement, JapanEntryCardPrin
                       <div style={{ lineHeight: '10pt' }}>{hotelAddress}</div>
                       <div style={{ lineHeight: '10pt' }}>{hotelName}</div>
                     </td>
-                    <td colSpan={3} style={{ width: '134.4pt', textAlign: 'center' }}>{hotelPhone}</td>
+                    <td colSpan={3} style={{ width: '134.4pt', textAlign: 'center' }}>
+                      {hotelPhone}
+                    </td>
                   </tr>
 
                   {/* 第六行：空白 */}

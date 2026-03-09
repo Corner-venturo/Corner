@@ -5,11 +5,16 @@
  * 編輯行程特色列表
  */
 
-
 import { useCallback } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Plus, Trash2, GripVertical } from 'lucide-react'
 import type { FeaturesBlockData } from '../types'
 import type { Feature, FeaturesStyleType } from '@/components/editor/tour-form/types'
@@ -29,24 +34,32 @@ export function FeaturesBlockEditor({ data, onChange }: FeaturesBlockEditorProps
     })
   }, [features, onChange])
 
-  const updateFeature = useCallback((index: number, field: keyof Feature, value: string | string[]) => {
-    const newFeatures = [...features]
-    newFeatures[index] = { ...newFeatures[index], [field]: value }
-    onChange({ features: newFeatures })
-  }, [features, onChange])
+  const updateFeature = useCallback(
+    (index: number, field: keyof Feature, value: string | string[]) => {
+      const newFeatures = [...features]
+      newFeatures[index] = { ...newFeatures[index], [field]: value }
+      onChange({ features: newFeatures })
+    },
+    [features, onChange]
+  )
 
-  const removeFeature = useCallback((index: number) => {
-    onChange({ features: features.filter((_, i) => i !== index) })
-  }, [features, onChange])
+  const removeFeature = useCallback(
+    (index: number) => {
+      onChange({ features: features.filter((_, i) => i !== index) })
+    },
+    [features, onChange]
+  )
 
   return (
     <div className="space-y-3">
       {/* 風格選擇 */}
       <div>
-        <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_9055}</label>
+        <label className="block text-xs font-medium text-morandi-primary mb-1">
+          {COMP_EDITOR_LABELS.LABEL_9055}
+        </label>
         <Select
           value={data.featuresStyle || 'original'}
-          onValueChange={(value) => onChange({ featuresStyle: value as FeaturesStyleType })}
+          onValueChange={value => onChange({ featuresStyle: value as FeaturesStyleType })}
         >
           <SelectTrigger className="h-8 text-sm w-40">
             <SelectValue placeholder={COMP_EDITOR_LABELS.選擇風格} />
@@ -94,7 +107,8 @@ export function FeaturesBlockEditor({ data, onChange }: FeaturesBlockEditorProps
 
             <Button
               variant="ghost"
-              size="icon" aria-label="Delete"
+              size="icon"
+              aria-label="Delete"
               className="h-8 w-8 text-status-danger hover:text-status-danger hover:bg-status-danger-bg"
               onClick={() => removeFeature(index)}
             >
@@ -105,12 +119,7 @@ export function FeaturesBlockEditor({ data, onChange }: FeaturesBlockEditorProps
       </div>
 
       {/* 新增按鈕 */}
-      <Button
-        variant="outline"
-        size="sm"
-        className="w-full gap-2"
-        onClick={addFeature}
-      >
+      <Button variant="outline" size="sm" className="w-full gap-2" onClick={addFeature}>
         <Plus size={14} />
         {COMP_EDITOR_LABELS.ADD_6408}
       </Button>

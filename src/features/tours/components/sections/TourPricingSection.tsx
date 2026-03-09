@@ -15,7 +15,11 @@ interface TourPricingSectionProps {
   coverStyle?: CoverStyleType
 }
 
-export function TourPricingSection({ data, viewMode = 'desktop', coverStyle = 'original' }: TourPricingSectionProps) {
+export function TourPricingSection({
+  data,
+  viewMode = 'desktop',
+  coverStyle = 'original',
+}: TourPricingSectionProps) {
   const pricingDetails = data.pricingDetails
 
   if (!data.showPricingDetails || !pricingDetails) {
@@ -37,22 +41,17 @@ export function TourPricingSection({ data, viewMode = 'desktop', coverStyle = 'o
   return (
     <section className={cn('py-12 bg-morandi-container/30', isMobile && 'py-8')}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <SectionTitle
-          title={TOURS_LABELS.LABEL_8454}
-          coverStyle={coverStyle}
-          className="mb-8"
-        />
+        <SectionTitle title={TOURS_LABELS.LABEL_8454} coverStyle={coverStyle} className="mb-8" />
 
-        <div className={cn(
-          'grid gap-6',
-          isMobile ? 'grid-cols-1' : 'grid-cols-2'
-        )}>
+        <div className={cn('grid gap-6', isMobile ? 'grid-cols-1' : 'grid-cols-2')}>
           {/* 費用包含 */}
           <div className="bg-card rounded-xl p-6 shadow-sm border border-morandi-container">
-            <h3 className={cn(
-              'font-semibold text-morandi-green mb-4 flex items-center gap-2',
-              isMobile ? 'text-base' : 'text-lg'
-            )}>
+            <h3
+              className={cn(
+                'font-semibold text-morandi-green mb-4 flex items-center gap-2',
+                isMobile ? 'text-base' : 'text-lg'
+              )}
+            >
               <div className="w-6 h-6 bg-morandi-green/20 rounded-full flex items-center justify-center">
                 <Check className="w-4 h-4 text-morandi-green" />
               </div>
@@ -78,10 +77,12 @@ export function TourPricingSection({ data, viewMode = 'desktop', coverStyle = 'o
 
           {/* 費用不含 */}
           <div className="bg-card rounded-xl p-6 shadow-sm border border-morandi-container">
-            <h3 className={cn(
-              'font-semibold text-morandi-red mb-4 flex items-center gap-2',
-              isMobile ? 'text-base' : 'text-lg'
-            )}>
+            <h3
+              className={cn(
+                'font-semibold text-morandi-red mb-4 flex items-center gap-2',
+                isMobile ? 'text-base' : 'text-lg'
+              )}
+            >
               <div className="w-6 h-6 bg-morandi-red/20 rounded-full flex items-center justify-center">
                 <X className="w-4 h-4 text-morandi-red" />
               </div>
@@ -109,10 +110,12 @@ export function TourPricingSection({ data, viewMode = 'desktop', coverStyle = 'o
         {/* 注意事項 */}
         {pricingDetails.notes && pricingDetails.notes.length > 0 && (
           <div className="mt-6 bg-morandi-gold/10 rounded-xl p-6 border border-morandi-gold/30">
-            <h3 className={cn(
-              'font-semibold text-morandi-gold mb-4 flex items-center gap-2',
-              isMobile ? 'text-base' : 'text-lg'
-            )}>
+            <h3
+              className={cn(
+                'font-semibold text-morandi-gold mb-4 flex items-center gap-2',
+                isMobile ? 'text-base' : 'text-lg'
+              )}
+            >
               <AlertTriangle className="w-5 h-5 text-morandi-gold" />
               {TOURS_LABELS.LABEL_8733}
             </h3>
@@ -120,10 +123,7 @@ export function TourPricingSection({ data, viewMode = 'desktop', coverStyle = 'o
               {pricingDetails.notes.map((note, index) => (
                 <li
                   key={index}
-                  className={cn(
-                    'text-morandi-primary',
-                    isMobile ? 'text-sm' : 'text-base'
-                  )}
+                  className={cn('text-morandi-primary', isMobile ? 'text-sm' : 'text-base')}
                 >
                   {note}
                 </li>

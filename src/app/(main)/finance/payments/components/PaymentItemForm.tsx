@@ -50,7 +50,9 @@ export function PaymentItemForm({
   return (
     <div className="border border-border rounded-lg p-4">
       <div className="flex items-center justify-between mb-4">
-        <h4 className="font-medium">{PAYMENT_ITEM_LABELS.ITEM_TITLE} {index + 1}</h4>
+        <h4 className="font-medium">
+          {PAYMENT_ITEM_LABELS.ITEM_TITLE} {index + 1}
+        </h4>
         {canRemove && (
           <Button
             variant="outline"
@@ -66,7 +68,9 @@ export function PaymentItemForm({
       {/* 第一排：基本欄位 */}
       <div className="grid grid-cols-12 gap-3 mb-3">
         <div className="col-span-2">
-          <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.PAYMENT_METHOD}</label>
+          <label className="text-sm font-medium text-morandi-primary mb-2 block">
+            {PAYMENT_ITEM_LABELS.PAYMENT_METHOD}
+          </label>
           <Select
             value={item.receipt_type.toString()}
             onValueChange={value => onUpdate(item.id, { receipt_type: Number(value) })}
@@ -85,7 +89,9 @@ export function PaymentItemForm({
         </div>
 
         <div className="col-span-2">
-          <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.AMOUNT}</label>
+          <label className="text-sm font-medium text-morandi-primary mb-2 block">
+            {PAYMENT_ITEM_LABELS.AMOUNT}
+          </label>
           <Input
             type="number"
             value={item.amount || ''}
@@ -95,7 +101,9 @@ export function PaymentItemForm({
         </div>
 
         <div className="col-span-2">
-          <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.TRANSACTION_DATE}</label>
+          <label className="text-sm font-medium text-morandi-primary mb-2 block">
+            {PAYMENT_ITEM_LABELS.TRANSACTION_DATE}
+          </label>
           <DateInput
             value={item.transaction_date}
             onChange={value => onUpdate(item.id, { transaction_date: value })}
@@ -103,7 +111,9 @@ export function PaymentItemForm({
         </div>
 
         <div className="col-span-3">
-          <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.PAYER_NAME}</label>
+          <label className="text-sm font-medium text-morandi-primary mb-2 block">
+            {PAYMENT_ITEM_LABELS.PAYER_NAME}
+          </label>
           <Input
             value={item.receipt_account || ''}
             onChange={e => onUpdate(item.id, { receipt_account: e.target.value })}
@@ -111,7 +121,9 @@ export function PaymentItemForm({
         </div>
 
         <div className="col-span-3">
-          <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.REMARKS}</label>
+          <label className="text-sm font-medium text-morandi-primary mb-2 block">
+            {PAYMENT_ITEM_LABELS.REMARKS}
+          </label>
           <Input
             value={item.notes || ''}
             onChange={e => onUpdate(item.id, { notes: e.target.value })}
@@ -160,7 +172,9 @@ export function PaymentItemForm({
       {item.receipt_type === ReceiptType.CASH && (
         <div className="grid grid-cols-12 gap-3 pt-3 border-t">
           <div className="col-span-4">
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.HANDLER}</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">
+              {PAYMENT_ITEM_LABELS.HANDLER}
+            </label>
             <Input
               value={item.handler_name || ''}
               onChange={e => onUpdate(item.id, { handler_name: e.target.value })}
@@ -195,7 +209,9 @@ export function PaymentItemForm({
           </div>
 
           <div className="col-span-4">
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.HANDLING_FEE}</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">
+              {PAYMENT_ITEM_LABELS.HANDLING_FEE}
+            </label>
             <Input
               type="number"
               value={item.fees || ''}
@@ -224,7 +240,9 @@ export function PaymentItemForm({
           </div>
 
           <div className="col-span-3">
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.AUTH_CODE}</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">
+              {PAYMENT_ITEM_LABELS.AUTH_CODE}
+            </label>
             <Input
               value={item.auth_code || ''}
               onChange={e => onUpdate(item.id, { auth_code: e.target.value })}
@@ -233,7 +251,9 @@ export function PaymentItemForm({
           </div>
 
           <div className="col-span-3">
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.HANDLING_FEE}</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">
+              {PAYMENT_ITEM_LABELS.HANDLING_FEE}
+            </label>
             <Input
               type="number"
               value={item.fees || ''}
@@ -248,7 +268,9 @@ export function PaymentItemForm({
       {item.receipt_type === ReceiptType.CHECK && (
         <div className="grid grid-cols-12 gap-3 pt-3 border-t">
           <div className="col-span-4">
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.LABEL_9924}</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">
+              {PAYMENT_ITEM_LABELS.LABEL_9924}
+            </label>
             <Input
               value={item.check_number || ''}
               onChange={e => onUpdate(item.id, { check_number: e.target.value })}
@@ -257,7 +279,9 @@ export function PaymentItemForm({
           </div>
 
           <div className="col-span-4">
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">{PAYMENT_ITEM_LABELS.LABEL_7421}</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">
+              {PAYMENT_ITEM_LABELS.LABEL_7421}
+            </label>
             <Input
               value={item.check_bank || ''}
               onChange={e => onUpdate(item.id, { check_bank: e.target.value })}

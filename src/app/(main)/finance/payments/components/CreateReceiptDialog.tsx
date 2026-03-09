@@ -125,10 +125,12 @@ export function CreateReceiptDialog({
                   {CREATE_RECEIPT_LABELS.SELECT_1269}
                 </label>
                 <Combobox
-                  options={tours.filter(t => t.id).map(tour => ({
-                    value: tour.id!,
-                    label: `${tour.code || ''} - ${tour.name || ''}`,
-                  }))}
+                  options={tours
+                    .filter(t => t.id)
+                    .map(tour => ({
+                      value: tour.id!,
+                      label: `${tour.code || ''} - ${tour.name || ''}`,
+                    }))}
                   value={selectedTourId}
                   onChange={value => {
                     setSelectedTourId(value)
@@ -167,7 +169,8 @@ export function CreateReceiptDialog({
                             {order.order_number} - {order.contact_person}
                           </div>
                           <div className="text-sm text-morandi-secondary flex items-center gap-1">
-                            {CREATE_RECEIPT_LABELS.REMAINING_PREFIX}<CurrencyCell amount={order.remaining_amount || 0} />
+                            {CREATE_RECEIPT_LABELS.REMAINING_PREFIX}
+                            <CurrencyCell amount={order.remaining_amount || 0} />
                           </div>
                         </div>
                       </SelectItem>
@@ -223,7 +226,12 @@ export function CreateReceiptDialog({
 
           {/* 操作按鈕 */}
           <div className="flex justify-end gap-4">
-            <Button variant="outline" onClick={handleClose} disabled={isSubmitting} className="gap-2">
+            <Button
+              variant="outline"
+              onClick={handleClose}
+              disabled={isSubmitting}
+              className="gap-2"
+            >
               <X size={16} />
               {CREATE_RECEIPT_LABELS.CANCEL}
             </Button>

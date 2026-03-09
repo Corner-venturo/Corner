@@ -67,21 +67,23 @@ export function TourEditDialog({ isOpen, onClose, tour, onSuccess }: TourEditDia
     setFormData(prev => ({
       ...prev,
       departure_date,
-      return_date: prev.return_date && prev.return_date < departure_date
-        ? departure_date
-        : prev.return_date,
+      return_date:
+        prev.return_date && prev.return_date < departure_date ? departure_date : prev.return_date,
     }))
   }
 
   return (
     <>
-      <Dialog open={isOpen && !syncDialogOpen} onOpenChange={open => {
-        // 只有在 syncDialogOpen 為 false 時，才允許關閉
-        // 避免切換到 sync dialog 時誤觸 onClose
-        if (!open && !syncDialogOpen) {
-          onClose()
-        }
-      }}>
+      <Dialog
+        open={isOpen && !syncDialogOpen}
+        onOpenChange={open => {
+          // 只有在 syncDialogOpen 為 false 時，才允許關閉
+          // 避免切換到 sync dialog 時誤觸 onClose
+          if (!open && !syncDialogOpen) {
+            onClose()
+          }
+        }}
+      >
         <DialogContent
           level={2}
           className="max-w-3xl max-h-[90vh] overflow-y-auto"
@@ -128,7 +130,12 @@ export function TourEditDialog({ isOpen, onClose, tour, onSuccess }: TourEditDia
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={submitting || !formData.name.trim() || !formData.departure_date || !formData.return_date}
+              disabled={
+                submitting ||
+                !formData.name.trim() ||
+                !formData.departure_date ||
+                !formData.return_date
+              }
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
               {submitting ? COMP_TOURS_LABELS.儲存中 : COMP_TOURS_LABELS.儲存變更}

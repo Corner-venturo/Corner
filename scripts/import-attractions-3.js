@@ -47,31 +47,71 @@ const newCities = [
 const attractions = [
   // ========== 日本 - 沖繩 ==========
   // 那霸
-  { name: '首里城', city: 'naha', type: 'heritage', description: '琉球王國的王城遺址，世界文化遺產' },
+  {
+    name: '首里城',
+    city: 'naha',
+    type: 'heritage',
+    description: '琉球王國的王城遺址，世界文化遺產',
+  },
   { name: '國際通', city: 'naha', type: 'shopping', description: '那霸最熱鬧的購物街，1.6公里長' },
-  { name: '牧志公設市場', city: 'naha', type: 'market', description: '沖繩的廚房，新鮮海產和當地美食' },
+  {
+    name: '牧志公設市場',
+    city: 'naha',
+    type: 'market',
+    description: '沖繩的廚房，新鮮海產和當地美食',
+  },
   { name: '波上宮', city: 'naha', type: 'temple', description: '沖繩最著名的神社，位於懸崖上' },
   { name: '波之上海灘', city: 'naha', type: 'beach', description: '那霸市區唯一的海灘' },
   { name: '壺屋陶器街', city: 'naha', type: 'shopping', description: '傳統沖繩陶器工藝品街' },
   { name: '玉陵', city: 'naha', type: 'heritage', description: '琉球王族的陵墓，世界文化遺產' },
   { name: '沖繩縣立博物館', city: 'naha', type: 'museum', description: '展示沖繩歷史與文化' },
   { name: '福州園', city: 'naha', type: 'garden', description: '紀念那霸與福州友好的中國式庭園' },
-  { name: '沖繩美食居酒屋', city: 'naha', type: 'food', description: '品嚐阿古豬、苦瓜炒蛋、沖繩麵' },
-  { name: '美麗海水族館', city: 'naha', type: 'attraction', description: '世界最大的水族館之一，黑潮之海' },
+  {
+    name: '沖繩美食居酒屋',
+    city: 'naha',
+    type: 'food',
+    description: '品嚐阿古豬、苦瓜炒蛋、沖繩麵',
+  },
+  {
+    name: '美麗海水族館',
+    city: 'naha',
+    type: 'attraction',
+    description: '世界最大的水族館之一，黑潮之海',
+  },
   { name: '古宇利島', city: 'naha', type: 'attraction', description: '心型岩和美麗海灘的浪漫島嶼' },
   { name: '萬座毛', city: 'naha', type: 'viewpoint', description: '象鼻岩和斷崖絕景' },
   { name: '美國村', city: 'naha', type: 'shopping', description: '美式風格的購物娛樂區' },
   { name: '殘波岬', city: 'naha', type: 'viewpoint', description: '沖繩最西端的海角與燈塔' },
   { name: '座喜味城跡', city: 'naha', type: 'heritage', description: '琉球王國時代的城堡遺跡' },
-  { name: '齋場御嶽', city: 'naha', type: 'heritage', description: '琉球王國最高聖地，世界文化遺產' },
+  {
+    name: '齋場御嶽',
+    city: 'naha',
+    type: 'heritage',
+    description: '琉球王國最高聖地，世界文化遺產',
+  },
   { name: '知念岬公園', city: 'naha', type: 'viewpoint', description: '眺望太平洋的絕美海角' },
-  { name: '玉泉洞', city: 'naha', type: 'attraction', description: '日本最大的鐘乳石洞，30萬年歷史' },
+  {
+    name: '玉泉洞',
+    city: 'naha',
+    type: 'attraction',
+    description: '日本最大的鐘乳石洞，30萬年歷史',
+  },
   { name: '琉球村', city: 'naha', type: 'experience', description: '體驗傳統琉球文化和工藝' },
 
   // 石垣島
   { name: '川平灣', city: 'ishigaki', type: 'beach', description: '日本百景之一，翡翠綠的海灣' },
-  { name: '石垣島鐘乳洞', city: 'ishigaki', type: 'attraction', description: '20萬年歷史的鐘乳石洞' },
-  { name: '玉取崎展望台', city: 'ishigaki', type: 'viewpoint', description: '眺望太平洋和東海的絕景' },
+  {
+    name: '石垣島鐘乳洞',
+    city: 'ishigaki',
+    type: 'attraction',
+    description: '20萬年歷史的鐘乳石洞',
+  },
+  {
+    name: '玉取崎展望台',
+    city: 'ishigaki',
+    type: 'viewpoint',
+    description: '眺望太平洋和東海的絕景',
+  },
   { name: '米原海灘', city: 'ishigaki', type: 'beach', description: '最佳浮潛地點，珊瑚礁生態' },
   { name: '平久保崎燈塔', city: 'ishigaki', type: 'viewpoint', description: '石垣島最北端的絕景' },
   { name: '竹富島', city: 'ishigaki', type: 'attraction', description: '水牛車遊覽傳統琉球村落' },
@@ -79,7 +119,12 @@ const attractions = [
   { name: '石垣牛燒肉', city: 'ishigaki', type: 'food', description: '頂級和牛，入口即化' },
 
   // 宮古島
-  { name: '與那霸前濱海灘', city: 'miyako', type: 'beach', description: '東洋第一美海灘，7公里白沙' },
+  {
+    name: '與那霸前濱海灘',
+    city: 'miyako',
+    type: 'beach',
+    description: '東洋第一美海灘，7公里白沙',
+  },
   { name: '池間大橋', city: 'miyako', type: 'viewpoint', description: '連接池間島的絕美跨海大橋' },
   { name: '伊良部大橋', city: 'miyako', type: 'viewpoint', description: '日本最長的免費跨海大橋' },
   { name: '下地島17END', city: 'miyako', type: 'beach', description: '夢幻透明海水，飛機起降觀賞' },
@@ -90,30 +135,65 @@ const attractions = [
 
   // ========== 日本 - 北海道 ==========
   // 札幌
-  { name: '札幌時計台', city: 'sapporo', type: 'landmark', description: '札幌象徵，北海道開拓時代建築' },
+  {
+    name: '札幌時計台',
+    city: 'sapporo',
+    type: 'landmark',
+    description: '札幌象徵，北海道開拓時代建築',
+  },
   { name: '大通公園', city: 'sapporo', type: 'park', description: '札幌市中心的綠洲，雪祭會場' },
   { name: '札幌電視塔', city: 'sapporo', type: 'viewpoint', description: '大通公園地標，夜景觀賞' },
   { name: '北海道神宮', city: 'sapporo', type: 'temple', description: '北海道總鎮守，圓山公園內' },
-  { name: '狸小路商店街', city: 'sapporo', type: 'shopping', description: '北海道最大的商店街，200多店舖' },
+  {
+    name: '狸小路商店街',
+    city: 'sapporo',
+    type: 'shopping',
+    description: '北海道最大的商店街，200多店舖',
+  },
   { name: '二條市場', city: 'sapporo', type: 'market', description: '百年歷史的海鮮市場' },
-  { name: '札幌啤酒博物館', city: 'sapporo', type: 'museum', description: '日本唯一啤酒博物館，免費參觀' },
+  {
+    name: '札幌啤酒博物館',
+    city: 'sapporo',
+    type: 'museum',
+    description: '日本唯一啤酒博物館，免費參觀',
+  },
   { name: '白色戀人公園', city: 'sapporo', type: 'attraction', description: '巧克力工廠主題公園' },
   { name: '藻岩山', city: 'sapporo', type: 'viewpoint', description: '日本新三大夜景之一' },
   { name: '北海道大學', city: 'sapporo', type: 'attraction', description: '銀杏大道和歷史建築' },
   { name: '中島公園', city: 'sapporo', type: 'park', description: '市區最大公園，日本庭園' },
-  { name: '札幌拉麵共和國', city: 'sapporo', type: 'food', description: '8家名店齊聚，味噌拉麵聖地' },
+  {
+    name: '札幌拉麵共和國',
+    city: 'sapporo',
+    type: 'food',
+    description: '8家名店齊聚，味噌拉麵聖地',
+  },
   { name: '成吉思汗烤羊肉', city: 'sapporo', type: 'food', description: '北海道代表美食' },
   { name: '札幌雪祭', city: 'sapporo', type: 'experience', description: '2月舉辦，世界級冰雪祭典' },
   { name: '場外市場', city: 'sapporo', type: 'market', description: '在地人愛去的海鮮市場' },
 
   // 函館
   { name: '函館山夜景', city: 'hakodate', type: 'viewpoint', description: '世界三大夜景之一' },
-  { name: '五稜郭', city: 'hakodate', type: 'heritage', description: '日本最大的西式城堡，星形要塞' },
+  {
+    name: '五稜郭',
+    city: 'hakodate',
+    type: 'heritage',
+    description: '日本最大的西式城堡，星形要塞',
+  },
   { name: '五稜郭塔', city: 'hakodate', type: 'viewpoint', description: '俯瞰星形城堡全景' },
   { name: '函館朝市', city: 'hakodate', type: 'market', description: '北海道最大朝市，活烏賊刺身' },
-  { name: '金森紅磚倉庫', city: 'hakodate', type: 'shopping', description: '明治時代倉庫群，購物餐飲' },
+  {
+    name: '金森紅磚倉庫',
+    city: 'hakodate',
+    type: 'shopping',
+    description: '明治時代倉庫群，購物餐飲',
+  },
   { name: '八幡坂', city: 'hakodate', type: 'viewpoint', description: '最美坡道，直通港口' },
-  { name: '元町教會群', city: 'hakodate', type: 'heritage', description: '東正教會、天主教會建築群' },
+  {
+    name: '元町教會群',
+    city: 'hakodate',
+    type: 'heritage',
+    description: '東正教會、天主教會建築群',
+  },
   { name: '舊函館區公會堂', city: 'hakodate', type: 'heritage', description: '藍黃色的明治洋館' },
   { name: '湯之川溫泉', city: 'hakodate', type: 'experience', description: '北海道三大溫泉之一' },
   { name: '幸運小丑漢堡', city: 'hakodate', type: 'food', description: '函館限定，超人氣漢堡店' },
@@ -134,15 +214,30 @@ const attractions = [
   { name: '彩香之里', city: 'furano', type: 'garden', description: '七彩花田，夏季限定' },
   { name: '四季彩之丘', city: 'furano', type: 'garden', description: '15公頃彩虹花田' },
   { name: '富良野起司工房', city: 'furano', type: 'experience', description: '起司製作體驗' },
-  { name: '富良野葡萄酒工廠', city: 'furano', type: 'experience', description: '葡萄酒試飲和工廠見學' },
+  {
+    name: '富良野葡萄酒工廠',
+    city: 'furano',
+    type: 'experience',
+    description: '葡萄酒試飲和工廠見學',
+  },
   { name: '富良野哈密瓜', city: 'furano', type: 'food', description: '夕張哈密瓜，甜度驚人' },
-  { name: '富良野滑雪場', city: 'furano', type: 'attraction', description: '粉雪天堂，冬季滑雪勝地' },
+  {
+    name: '富良野滑雪場',
+    city: 'furano',
+    type: 'attraction',
+    description: '粉雪天堂，冬季滑雪勝地',
+  },
 
   // 美瑛
   { name: '青池', city: 'biei', type: 'attraction', description: '夢幻蒂芬妮藍的神秘池塘' },
   { name: '拼布之路', city: 'biei', type: 'viewpoint', description: '丘陵田園風光，廣告取景地' },
   { name: '超廣角之路', city: 'biei', type: 'viewpoint', description: '360度全景丘陵' },
-  { name: 'Ken & Mary之樹', city: 'biei', type: 'landmark', description: '日產汽車廣告取景的白楊樹' },
+  {
+    name: 'Ken & Mary之樹',
+    city: 'biei',
+    type: 'landmark',
+    description: '日產汽車廣告取景的白楊樹',
+  },
   { name: '七星之樹', city: 'biei', type: 'landmark', description: '七星香菸廣告的柏樹' },
   { name: '親子之樹', city: 'biei', type: 'landmark', description: '三棵柏樹如親子相依' },
   { name: '白鬚瀑布', city: 'biei', type: 'attraction', description: '藍河源頭，地下水瀑布' },
@@ -151,9 +246,24 @@ const attractions = [
   { name: '地獄谷', city: 'noboribetsu', type: 'attraction', description: '火山噴氣口，溫泉源頭' },
   { name: '登別溫泉街', city: 'noboribetsu', type: 'experience', description: '北海道最大溫泉鄉' },
   { name: '大湯沼', city: 'noboribetsu', type: 'attraction', description: '天然足湯，火山湖' },
-  { name: '登別熊牧場', city: 'noboribetsu', type: 'attraction', description: '北海道棕熊近距離觀賞' },
-  { name: '登別伊達時代村', city: 'noboribetsu', type: 'theme_park', description: '江戶時代主題樂園' },
-  { name: '閻魔堂', city: 'noboribetsu', type: 'attraction', description: '閻羅王變臉機關，溫泉街地標' },
+  {
+    name: '登別熊牧場',
+    city: 'noboribetsu',
+    type: 'attraction',
+    description: '北海道棕熊近距離觀賞',
+  },
+  {
+    name: '登別伊達時代村',
+    city: 'noboribetsu',
+    type: 'theme_park',
+    description: '江戶時代主題樂園',
+  },
+  {
+    name: '閻魔堂',
+    city: 'noboribetsu',
+    type: 'attraction',
+    description: '閻羅王變臉機關，溫泉街地標',
+  },
 
   // 洞爺湖
   { name: '洞爺湖', city: 'toyako', type: 'attraction', description: '火山口湖，北海道三景之一' },
@@ -164,46 +274,166 @@ const attractions = [
   { name: '洞爺湖溫泉', city: 'toyako', type: 'experience', description: '湖畔溫泉旅館群' },
 
   // ========== 新加坡 ==========
-  { name: '濱海灣金沙', city: 'singapore-city', type: 'landmark', description: '世界最貴賭場酒店，無邊際泳池' },
-  { name: '魚尾獅公園', city: 'singapore-city', type: 'landmark', description: '新加坡象徵，必訪地標' },
+  {
+    name: '濱海灣金沙',
+    city: 'singapore-city',
+    type: 'landmark',
+    description: '世界最貴賭場酒店，無邊際泳池',
+  },
+  {
+    name: '魚尾獅公園',
+    city: 'singapore-city',
+    type: 'landmark',
+    description: '新加坡象徵，必訪地標',
+  },
   { name: '濱海灣花園', city: 'singapore-city', type: 'garden', description: '超級樹和雲霧森林' },
-  { name: '聖淘沙島', city: 'singapore-city', type: 'attraction', description: '度假島嶼，環球影城所在地' },
-  { name: '新加坡環球影城', city: 'singapore-city', type: 'theme_park', description: '東南亞唯一環球影城' },
-  { name: 'S.E.A.海洋館', city: 'singapore-city', type: 'attraction', description: '全球最大海洋館之一' },
-  { name: '牛車水', city: 'singapore-city', type: 'shopping', description: '新加坡唐人街，美食購物' },
-  { name: '小印度', city: 'singapore-city', type: 'attraction', description: '印度文化區，色彩繽紛' },
-  { name: '甘榜格南', city: 'singapore-city', type: 'attraction', description: '馬來文化區，蘇丹回教堂' },
-  { name: '克拉碼頭', city: 'singapore-city', type: 'attraction', description: '河畔酒吧餐廳區，夜生活' },
+  {
+    name: '聖淘沙島',
+    city: 'singapore-city',
+    type: 'attraction',
+    description: '度假島嶼，環球影城所在地',
+  },
+  {
+    name: '新加坡環球影城',
+    city: 'singapore-city',
+    type: 'theme_park',
+    description: '東南亞唯一環球影城',
+  },
+  {
+    name: 'S.E.A.海洋館',
+    city: 'singapore-city',
+    type: 'attraction',
+    description: '全球最大海洋館之一',
+  },
+  {
+    name: '牛車水',
+    city: 'singapore-city',
+    type: 'shopping',
+    description: '新加坡唐人街，美食購物',
+  },
+  {
+    name: '小印度',
+    city: 'singapore-city',
+    type: 'attraction',
+    description: '印度文化區，色彩繽紛',
+  },
+  {
+    name: '甘榜格南',
+    city: 'singapore-city',
+    type: 'attraction',
+    description: '馬來文化區，蘇丹回教堂',
+  },
+  {
+    name: '克拉碼頭',
+    city: 'singapore-city',
+    type: 'attraction',
+    description: '河畔酒吧餐廳區，夜生活',
+  },
   { name: '烏節路', city: 'singapore-city', type: 'shopping', description: '新加坡最大購物街' },
-  { name: '夜間野生動物園', city: 'singapore-city', type: 'attraction', description: '全球首座夜間動物園' },
-  { name: '新加坡動物園', city: 'singapore-city', type: 'attraction', description: '開放式動物園，與動物近距離' },
-  { name: '河川生態園', city: 'singapore-city', type: 'attraction', description: '亞洲首座河川主題動物園' },
-  { name: '裕廊飛禽公園', city: 'singapore-city', type: 'attraction', description: '亞洲最大鳥類公園' },
-  { name: '濱海藝術中心', city: 'singapore-city', type: 'landmark', description: '榴蓮造型的表演藝術中心' },
-  { name: '新加坡摩天觀景輪', city: 'singapore-city', type: 'viewpoint', description: '亞洲最高摩天輪' },
-  { name: '麥士威熟食中心', city: 'singapore-city', type: 'market', description: '天天海南雞飯所在地' },
-  { name: '老巴剎美食廣場', city: 'singapore-city', type: 'market', description: '維多利亞建築內的沙嗲街' },
-  { name: '天天海南雞飯', city: 'singapore-city', type: 'food', description: '米其林推薦，國民美食' },
+  {
+    name: '夜間野生動物園',
+    city: 'singapore-city',
+    type: 'attraction',
+    description: '全球首座夜間動物園',
+  },
+  {
+    name: '新加坡動物園',
+    city: 'singapore-city',
+    type: 'attraction',
+    description: '開放式動物園，與動物近距離',
+  },
+  {
+    name: '河川生態園',
+    city: 'singapore-city',
+    type: 'attraction',
+    description: '亞洲首座河川主題動物園',
+  },
+  {
+    name: '裕廊飛禽公園',
+    city: 'singapore-city',
+    type: 'attraction',
+    description: '亞洲最大鳥類公園',
+  },
+  {
+    name: '濱海藝術中心',
+    city: 'singapore-city',
+    type: 'landmark',
+    description: '榴蓮造型的表演藝術中心',
+  },
+  {
+    name: '新加坡摩天觀景輪',
+    city: 'singapore-city',
+    type: 'viewpoint',
+    description: '亞洲最高摩天輪',
+  },
+  {
+    name: '麥士威熟食中心',
+    city: 'singapore-city',
+    type: 'market',
+    description: '天天海南雞飯所在地',
+  },
+  {
+    name: '老巴剎美食廣場',
+    city: 'singapore-city',
+    type: 'market',
+    description: '維多利亞建築內的沙嗲街',
+  },
+  {
+    name: '天天海南雞飯',
+    city: 'singapore-city',
+    type: 'food',
+    description: '米其林推薦，國民美食',
+  },
   { name: '松發肉骨茶', city: 'singapore-city', type: 'food', description: '胡椒味肉骨茶名店' },
   { name: '亞坤咖椰吐司', city: 'singapore-city', type: 'food', description: '新加坡早餐代表' },
   { name: '珍寶海鮮', city: 'singapore-city', type: 'food', description: '辣椒螃蟹創始店' },
   { name: '328加東叻沙', city: 'singapore-city', type: 'food', description: '米其林推薦叻沙' },
-  { name: '了凡香港油雞飯麵', city: 'singapore-city', type: 'food', description: '全球最便宜米其林一星' },
+  {
+    name: '了凡香港油雞飯麵',
+    city: 'singapore-city',
+    type: 'food',
+    description: '全球最便宜米其林一星',
+  },
 
   // ========== 馬來西亞 ==========
   // 吉隆坡
-  { name: '雙子塔', city: 'kuala-lumpur', type: 'landmark', description: '世界最高雙塔，吉隆坡地標' },
-  { name: '吉隆坡塔', city: 'kuala-lumpur', type: 'viewpoint', description: '421米高塔，360度觀景台' },
+  {
+    name: '雙子塔',
+    city: 'kuala-lumpur',
+    type: 'landmark',
+    description: '世界最高雙塔，吉隆坡地標',
+  },
+  {
+    name: '吉隆坡塔',
+    city: 'kuala-lumpur',
+    type: 'viewpoint',
+    description: '421米高塔，360度觀景台',
+  },
   { name: '茨廠街', city: 'kuala-lumpur', type: 'market', description: '吉隆坡唐人街，小吃購物' },
   { name: '獨立廣場', city: 'kuala-lumpur', type: 'landmark', description: '馬來西亞獨立宣言地' },
   { name: '國家清真寺', city: 'kuala-lumpur', type: 'temple', description: '馬來西亞最大清真寺' },
-  { name: '黑風洞', city: 'kuala-lumpur', type: 'temple', description: '印度教聖地，272級彩虹階梯' },
+  {
+    name: '黑風洞',
+    city: 'kuala-lumpur',
+    type: 'temple',
+    description: '印度教聖地，272級彩虹階梯',
+  },
   { name: '中央藝術坊', city: 'kuala-lumpur', type: 'shopping', description: '傳統工藝品購物中心' },
   { name: '阿羅街', city: 'kuala-lumpur', type: 'market', description: '最熱鬧的夜市美食街' },
   { name: '十號胡同', city: 'kuala-lumpur', type: 'food', description: '老字號美食集中地' },
   { name: '武吉免登', city: 'kuala-lumpur', type: 'shopping', description: '吉隆坡購物天堂' },
-  { name: '雲頂高原', city: 'kuala-lumpur', type: 'attraction', description: '馬來西亞唯一賭場度假村' },
-  { name: '肉骨茶', city: 'kuala-lumpur', type: 'food', description: '藥材燉排骨，馬來西亞代表美食' },
+  {
+    name: '雲頂高原',
+    city: 'kuala-lumpur',
+    type: 'attraction',
+    description: '馬來西亞唯一賭場度假村',
+  },
+  {
+    name: '肉骨茶',
+    city: 'kuala-lumpur',
+    type: 'food',
+    description: '藥材燉排骨，馬來西亞代表美食',
+  },
   { name: '椰漿飯', city: 'kuala-lumpur', type: 'food', description: '馬來西亞國民早餐' },
 
   // 檳城
@@ -236,11 +466,26 @@ const attractions = [
   { name: '雞場街', city: 'malacca', type: 'shopping', description: '古城最熱鬧的老街' },
   { name: '荷蘭紅屋', city: 'malacca', type: 'heritage', description: '東南亞最古老的荷蘭建築' },
   { name: '基督堂', city: 'malacca', type: 'heritage', description: '粉紅色的荷蘭教堂' },
-  { name: '聖保羅教堂', city: 'malacca', type: 'heritage', description: '葡萄牙時代遺跡，山頂教堂' },
+  {
+    name: '聖保羅教堂',
+    city: 'malacca',
+    type: 'heritage',
+    description: '葡萄牙時代遺跡，山頂教堂',
+  },
   { name: '聖地牙哥城門', city: 'malacca', type: 'heritage', description: '葡萄牙要塞遺跡' },
   { name: '峇峇娘惹博物館', city: 'malacca', type: 'museum', description: '土生華人文化精華' },
-  { name: '馬六甲河遊船', city: 'malacca', type: 'experience', description: '遊覽兩岸壁畫和歷史建築' },
-  { name: '馬六甲海峽清真寺', city: 'malacca', type: 'temple', description: '水上清真寺，日落絕景' },
+  {
+    name: '馬六甲河遊船',
+    city: 'malacca',
+    type: 'experience',
+    description: '遊覽兩岸壁畫和歷史建築',
+  },
+  {
+    name: '馬六甲海峽清真寺',
+    city: 'malacca',
+    type: 'temple',
+    description: '水上清真寺，日落絕景',
+  },
   { name: '雞飯粒', city: 'malacca', type: 'food', description: '馬六甲特色，圓球狀雞飯' },
   { name: '娘惹糕點', city: 'malacca', type: 'food', description: '彩色傳統糕點' },
 
@@ -273,7 +518,12 @@ const attractions = [
   { name: '聖猴森林', city: 'bali', type: 'attraction', description: '猴群棲息的神聖森林' },
   { name: '德格拉朗梯田', city: 'bali', type: 'viewpoint', description: '世界遺產，壯觀梯田' },
   { name: '海神廟', city: 'bali', type: 'temple', description: '海上日落絕景，峇里島象徵' },
-  { name: '烏魯瓦圖斷崖廟', city: 'bali', type: 'temple', description: '懸崖上的古老寺廟，日落景觀' },
+  {
+    name: '烏魯瓦圖斷崖廟',
+    city: 'bali',
+    type: 'temple',
+    description: '懸崖上的古老寺廟，日落景觀',
+  },
   { name: '聖泉寺', city: 'bali', type: 'temple', description: '千年聖水湧出的寺廟' },
   { name: '百沙基母廟', city: 'bali', type: 'temple', description: '峇里島最大最神聖的寺廟' },
   { name: '水之宮殿', city: 'bali', type: 'heritage', description: '提爾塔甘加皇家水上花園' },
@@ -288,13 +538,18 @@ const attractions = [
   { name: '烹飪課程', city: 'bali', type: 'experience', description: '學做印尼傳統料理' },
   { name: '峇里島傳統舞蹈', city: 'bali', type: 'experience', description: '觀賞克差舞和雷貢舞' },
   { name: '髒鴨飯', city: 'bali', type: 'food', description: '烏布招牌，香酥鴨子' },
-  { name: '豬肋排', city: 'bali', type: 'food', description: 'Naughty Nuri\'s招牌' },
+  { name: '豬肋排', city: 'bali', type: 'food', description: "Naughty Nuri's招牌" },
   { name: '印尼炒飯', city: 'bali', type: 'food', description: 'Nasi Goreng國民美食' },
 
   // 雅加達
   { name: '獨立紀念碑', city: 'jakarta', type: 'landmark', description: '印尼獨立象徵，132米高塔' },
   { name: '伊斯蒂克拉爾清真寺', city: 'jakarta', type: 'temple', description: '東南亞最大清真寺' },
-  { name: '雅加達大教堂', city: 'jakarta', type: 'heritage', description: '荷蘭殖民時期新哥德式教堂' },
+  {
+    name: '雅加達大教堂',
+    city: 'jakarta',
+    type: 'heritage',
+    description: '荷蘭殖民時期新哥德式教堂',
+  },
   { name: '舊城區', city: 'jakarta', type: 'heritage', description: '荷蘭殖民建築群' },
   { name: '法塔希拉廣場', city: 'jakarta', type: 'heritage', description: '舊城中心，博物館群' },
   { name: '印尼國家博物館', city: 'jakarta', type: 'museum', description: '東南亞最豐富的博物館' },
@@ -302,20 +557,40 @@ const attractions = [
   { name: '千島群島', city: 'jakarta', type: 'beach', description: '雅加達近郊的海島度假' },
 
   // 日惹
-  { name: '婆羅浮屠', city: 'yogyakarta', type: 'heritage', description: '世界最大佛教遺跡，世界遺產' },
+  {
+    name: '婆羅浮屠',
+    city: 'yogyakarta',
+    type: 'heritage',
+    description: '世界最大佛教遺跡，世界遺產',
+  },
   { name: '普蘭巴南', city: 'yogyakarta', type: 'heritage', description: '世界最大印度教神廟群' },
   { name: '日惹蘇丹王宮', city: 'yogyakarta', type: 'heritage', description: '現存的蘇丹皇宮' },
   { name: '水宮', city: 'yogyakarta', type: 'heritage', description: '蘇丹的水上花園和浴場' },
-  { name: '馬里奧波羅大街', city: 'yogyakarta', type: 'shopping', description: '日惹最熱鬧的購物街' },
+  {
+    name: '馬里奧波羅大街',
+    city: 'yogyakarta',
+    type: 'shopping',
+    description: '日惹最熱鬧的購物街',
+  },
   { name: '婆羅浮屠日出', city: 'yogyakarta', type: 'experience', description: '清晨觀賞佛塔日出' },
-  { name: '爪哇傳統蠟染', city: 'yogyakarta', type: 'experience', description: 'Batik蠟染工藝體驗' },
+  {
+    name: '爪哇傳統蠟染',
+    city: 'yogyakarta',
+    type: 'experience',
+    description: 'Batik蠟染工藝體驗',
+  },
   { name: '皮影戲表演', city: 'yogyakarta', type: 'experience', description: '傳統爪哇皮影戲' },
   { name: '默拉皮火山', city: 'yogyakarta', type: 'attraction', description: '印尼最活躍的火山' },
 
   // 龍目島
   { name: '吉利群島', city: 'lombok', type: 'beach', description: '三座小島，潛水天堂' },
   { name: '吉利特拉旺安', city: 'lombok', type: 'beach', description: '派對島，夜生活熱鬧' },
-  { name: '林賈尼火山', city: 'lombok', type: 'attraction', description: '印尼第二高火山，登山挑戰' },
+  {
+    name: '林賈尼火山',
+    city: 'lombok',
+    type: 'attraction',
+    description: '印尼第二高火山，登山挑戰',
+  },
   { name: '庫塔龍目', city: 'lombok', type: 'beach', description: '衝浪勝地，未開發海灘' },
   { name: '粉紅海灘', city: 'lombok', type: 'beach', description: '世界僅有的粉紅色沙灘' },
   { name: '薩薩克村', city: 'lombok', type: 'heritage', description: '傳統龍目島原住民村落' },
@@ -339,9 +614,7 @@ async function importData() {
     if (existing) {
       console.log(`  ⏭️ ${country.name} 已存在`)
     } else {
-      const { error } = await supabase
-        .from('countries')
-        .insert(country)
+      const { error } = await supabase.from('countries').insert(country)
       if (error) {
         console.log(`  ❌ ${country.name} 失敗: ${error.message}`)
       } else {
@@ -353,18 +626,12 @@ async function importData() {
   // 2. 新增城市
   console.log('\n📍 新增城市...')
   for (const city of newCities) {
-    const { data: existing } = await supabase
-      .from('cities')
-      .select('id')
-      .eq('id', city.id)
-      .single()
+    const { data: existing } = await supabase.from('cities').select('id').eq('id', city.id).single()
 
     if (existing) {
       console.log(`  ⏭️ ${city.name} 已存在`)
     } else {
-      const { error } = await supabase
-        .from('cities')
-        .insert(city)
+      const { error } = await supabase.from('cities').insert(city)
       if (error) {
         console.log(`  ❌ ${city.name} 失敗: ${error.message}`)
       } else {
@@ -374,13 +641,11 @@ async function importData() {
   }
 
   // 3. 取得所有城市
-  const { data: cities } = await supabase
-    .from('cities')
-    .select('id, country_id')
+  const { data: cities } = await supabase.from('cities').select('id, country_id')
 
   const cityMap = {}
   if (cities) {
-    cities.forEach(c => cityMap[c.id] = { id: c.id, country_id: c.country_id })
+    cities.forEach(c => (cityMap[c.id] = { id: c.id, country_id: c.country_id }))
   }
 
   // 4. 導入景點
@@ -413,16 +678,14 @@ async function importData() {
       continue
     }
 
-    const { error } = await supabase
-      .from('attractions')
-      .insert({
-        name: attr.name,
-        description: attr.description,
-        type: attr.type,
-        city_id: cityInfo.id,
-        country_id: cityInfo.country_id,
-        workspace_id: WORKSPACE_ID
-      })
+    const { error } = await supabase.from('attractions').insert({
+      name: attr.name,
+      description: attr.description,
+      type: attr.type,
+      city_id: cityInfo.id,
+      country_id: cityInfo.country_id,
+      workspace_id: WORKSPACE_ID,
+    })
 
     if (error) {
       console.log(`❌ ${attr.name} 失敗: ${error.message}`)
@@ -442,9 +705,7 @@ async function importData() {
   console.log('========================================')
 
   // 顯示總數
-  const { count } = await supabase
-    .from('attractions')
-    .select('*', { count: 'exact', head: true })
+  const { count } = await supabase.from('attractions').select('*', { count: 'exact', head: true })
 
   console.log(`\n資料庫總景點數: ${count} 個`)
 }

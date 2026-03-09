@@ -21,7 +21,8 @@ export function useItineraryList() {
   const { items: cities } = useCities()
 
   // 檢查是否為超級管理員
-  const isSuperAdmin = user?.roles?.includes('super_admin') || user?.permissions?.includes('super_admin')
+  const isSuperAdmin =
+    user?.roles?.includes('super_admin') || user?.permissions?.includes('super_admin')
 
   // 篩選和搜尋狀態
   const [statusFilter, setStatusFilter] = useState<string>('全部')
@@ -38,32 +39,44 @@ export function useItineraryList() {
   // SWR 自動載入地區資料，不需要手動 fetchAll
 
   // 根據 ID 取得國家名稱
-  const getCountryName = useCallback((countryId?: string) => {
-    if (!countryId) return '-'
-    const country = countries.find(c => c.id === countryId)
-    return country?.name || countryId
-  }, [countries])
+  const getCountryName = useCallback(
+    (countryId?: string) => {
+      if (!countryId) return '-'
+      const country = countries.find(c => c.id === countryId)
+      return country?.name || countryId
+    },
+    [countries]
+  )
 
   // 根據 ID 取得城市名稱
-  const getCityName = useCallback((cityId?: string) => {
-    if (!cityId) return '-'
-    const city = cities.find(c => c.id === cityId)
-    return city?.name || cityId
-  }, [cities])
+  const getCityName = useCallback(
+    (cityId?: string) => {
+      if (!cityId) return '-'
+      const city = cities.find(c => c.id === cityId)
+      return city?.name || cityId
+    },
+    [cities]
+  )
 
   // 根據 created_by ID 查找員工名稱（優先使用 display_name）
-  const getEmployeeName = useCallback((employeeId?: string) => {
-    if (!employeeId) return '-'
-    const employee = employees.find(e => e.id === employeeId)
-    return employee?.display_name || employee?.chinese_name || '-'
-  }, [employees])
+  const getEmployeeName = useCallback(
+    (employeeId?: string) => {
+      if (!employeeId) return '-'
+      const employee = employees.find(e => e.id === employeeId)
+      return employee?.display_name || employee?.chinese_name || '-'
+    },
+    [employees]
+  )
 
   // 根據 tour_id 查找綁定的團號
-  const getLinkedTourCode = useCallback((tourId?: string | null) => {
-    if (!tourId) return null
-    const tour = tours.find(t => t.id === tourId)
-    return tour?.code || null
-  }, [tours])
+  const getLinkedTourCode = useCallback(
+    (tourId?: string | null) => {
+      if (!tourId) return null
+      const tour = tours.find(t => t.id === tourId)
+      return tour?.code || null
+    },
+    [tours]
+  )
 
   // 判斷行程是否已結案（手動結案或日期過期）
   const isItineraryClosed = useCallback((itinerary: Itinerary) => {
@@ -81,7 +94,6 @@ export function useItineraryList() {
     return false
   }, [])
 
-
   // 過濾資料
   const filteredItineraries = useMemo(() => {
     let filtered = itineraries
@@ -90,12 +102,20 @@ export function useItineraryList() {
     switch (statusFilter) {
       case '開團':
         filtered = filtered.filter(
-          item => item.status === '開團' && !isItineraryClosed(item) && !item.archived_at && !item.is_template
+          item =>
+            item.status === '開團' &&
+            !isItineraryClosed(item) &&
+            !item.archived_at &&
+            !item.is_template
         )
         break
       case '待出發':
         filtered = filtered.filter(
-          item => item.status === '待出發' && !isItineraryClosed(item) && !item.archived_at && !item.is_template
+          item =>
+            item.status === '待出發' &&
+            !isItineraryClosed(item) &&
+            !item.archived_at &&
+            !item.is_template
         )
         break
       case '公司範例':
@@ -117,9 +137,12 @@ export function useItineraryList() {
 
     // 超級管理員：分公司篩選
     if (isSuperAdmin) {
-      const workspaceFilter = typeof window !== 'undefined' ? localStorage.getItem('itinerary_workspace_filter') : null
+      const workspaceFilter =
+        typeof window !== 'undefined' ? localStorage.getItem('itinerary_workspace_filter') : null
       if (workspaceFilter && workspaceFilter !== 'all') {
-        filtered = filtered.filter(item => (item as Itinerary & { workspace_id?: string }).workspace_id === workspaceFilter)
+        filtered = filtered.filter(
+          item => (item as Itinerary & { workspace_id?: string }).workspace_id === workspaceFilter
+        )
       }
     }
 
@@ -147,7 +170,15 @@ export function useItineraryList() {
     })
 
     return filtered
-  }, [itineraries, statusFilter, searchTerm, isItineraryClosed, authorFilter, user?.id, isSuperAdmin])
+  }, [
+    itineraries,
+    statusFilter,
+    searchTerm,
+    isItineraryClosed,
+    authorFilter,
+    user?.id,
+    isSuperAdmin,
+  ])
 
   return {
     // 資料

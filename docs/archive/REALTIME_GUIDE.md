@@ -10,6 +10,7 @@
 ### 什麼是 Realtime 同步？
 
 Realtime 同步讓你的 Venturo 系統能夠：
+
 - 🔄 **多裝置同步**：公司刪除的資料，家裡立即消失
 - ⚡ **即時更新**：團隊成員的變更 < 100ms 同步
 - 📱 **離線支援**：斷網時可操作，網路恢復自動同步
@@ -40,6 +41,7 @@ Realtime 同步讓你的 Venturo 系統能夠：
 ### 為什麼要「按需訂閱」？
 
 **連線數限制**：
+
 ```
 目前: 20 個表格 × 40 使用者 = 800 個連線（如果全部訂閱）
 免費上限: 200 個連線
@@ -103,41 +105,41 @@ export default function ToursPage() {
 
 ### 業務實體（13 個）
 
-| Hook 名稱 | 對應表格 | 使用頁面 |
-|-----------|---------|---------|
-| `useRealtimeForTours()` | tours | 旅遊團頁面 |
-| `useRealtimeForOrders()` | orders | 訂單頁面 |
-| `useRealtimeForQuotes()` | quotes | 報價頁面 |
-| `useRealtimeForCustomers()` | customers | 客戶頁面 |
-| `useRealtimeForItineraries()` | itineraries | 行程表頁面 |
-| `useRealtimeForPaymentRequests()` | payment_requests | 請款頁面 |
-| `useRealtimeForDisbursementOrders()` | disbursement_orders | 出納頁面 |
-| `useRealtimeForReceiptOrders()` | receipt_orders | 收款頁面 |
-| `useRealtimeForVisas()` | visas | 簽證頁面 |
-| `useRealtimeForSuppliers()` | suppliers | 供應商頁面 |
-| `useRealtimeForRegions()` | regions | 地區頁面 |
-| `useRealtimeForCalendarEvents()` | calendar_events | 行事曆頁面 |
-| `useRealtimeForTodos()` | todos | 待辦事項頁面 |
+| Hook 名稱                            | 對應表格            | 使用頁面     |
+| ------------------------------------ | ------------------- | ------------ |
+| `useRealtimeForTours()`              | tours               | 旅遊團頁面   |
+| `useRealtimeForOrders()`             | orders              | 訂單頁面     |
+| `useRealtimeForQuotes()`             | quotes              | 報價頁面     |
+| `useRealtimeForCustomers()`          | customers           | 客戶頁面     |
+| `useRealtimeForItineraries()`        | itineraries         | 行程表頁面   |
+| `useRealtimeForPaymentRequests()`    | payment_requests    | 請款頁面     |
+| `useRealtimeForDisbursementOrders()` | disbursement_orders | 出納頁面     |
+| `useRealtimeForReceiptOrders()`      | receipt_orders      | 收款頁面     |
+| `useRealtimeForVisas()`              | visas               | 簽證頁面     |
+| `useRealtimeForSuppliers()`          | suppliers           | 供應商頁面   |
+| `useRealtimeForRegions()`            | regions             | 地區頁面     |
+| `useRealtimeForCalendarEvents()`     | calendar_events     | 行事曆頁面   |
+| `useRealtimeForTodos()`              | todos               | 待辦事項頁面 |
 
 ### 子實體（3 個）
 
-| Hook 名稱 | 對應表格 | 使用頁面 |
-|-----------|---------|---------|
-| `useRealtimeForMembers()` | members | 團員頁面 |
+| Hook 名稱                    | 對應表格    | 使用頁面     |
+| ---------------------------- | ----------- | ------------ |
+| `useRealtimeForMembers()`    | members     | 團員頁面     |
 | `useRealtimeForQuoteItems()` | quote_items | 報價項目頁面 |
 | `useRealtimeForTourAddons()` | tour_addons | 加購項目頁面 |
 
 ### Workspace 系統（2 個）
 
-| Hook 名稱 | 對應表格 | 使用頁面 |
-|-----------|---------|---------|
+| Hook 名稱               | 對應表格 | 使用頁面 |
+| ----------------------- | -------- | -------- |
 | `useChannelsRealtime()` | channels | 頻道頁面 |
-| `useChatRealtime()` | messages | 訊息頁面 |
+| `useChatRealtime()`     | messages | 訊息頁面 |
 
 ### 其他（2 個）
 
-| Hook 名稱 | 對應表格 | 使用頁面 |
-|-----------|---------|---------|
+| Hook 名稱                   | 對應表格  | 使用頁面 |
+| --------------------------- | --------- | -------- |
 | `useRealtimeForEmployees()` | employees | 員工頁面 |
 | `useRealtimeForTemplates()` | templates | 範本頁面 |
 
@@ -178,14 +180,14 @@ export function PermanentRealtimeSubscriptions() {
       filter: `user_id=eq.${user.id}`,
       subscriptionId: `user-role-${user.id}`,
       handlers: {
-        onUpdate: (newRole) => {
+        onUpdate: newRole => {
           toast({
             title: '你的權限已更新！',
             description: '請重新整理頁面以套用新權限。',
           })
           setTimeout(() => window.location.reload(), 2000)
-        }
-      }
+        },
+      },
     })
 
     // 訂閱 workspaces
@@ -193,11 +195,11 @@ export function PermanentRealtimeSubscriptions() {
       table: 'workspaces',
       subscriptionId: 'workspace-permanent',
       handlers: {
-        onUpdate: async (workspace) => {
+        onUpdate: async workspace => {
           await workspaceIndexedDB.put(workspace)
           useWorkspaceStore.setState({ currentWorkspace: workspace })
-        }
-      }
+        },
+      },
     })
 
     // 訂閱 employees
@@ -205,25 +207,25 @@ export function PermanentRealtimeSubscriptions() {
       table: 'employees',
       subscriptionId: 'employees-permanent',
       handlers: {
-        onInsert: async (employee) => {
+        onInsert: async employee => {
           await employeeIndexedDB.put(employee)
           useEmployeeStore.setState(state => ({
-            items: [...state.items, employee]
+            items: [...state.items, employee],
           }))
         },
-        onUpdate: async (employee) => {
+        onUpdate: async employee => {
           await employeeIndexedDB.put(employee)
           useEmployeeStore.setState(state => ({
-            items: state.items.map(e => e.id === employee.id ? employee : e)
+            items: state.items.map(e => (e.id === employee.id ? employee : e)),
           }))
         },
-        onDelete: async (oldEmployee) => {
+        onDelete: async oldEmployee => {
           await employeeIndexedDB.delete(oldEmployee.id)
           useEmployeeStore.setState(state => ({
-            items: state.items.filter(e => e.id !== oldEmployee.id)
+            items: state.items.filter(e => e.id !== oldEmployee.id),
           }))
-        }
-      }
+        },
+      },
     })
 
     return () => {
@@ -264,10 +266,10 @@ Step 3: 訂閱 Realtime（進入頁面時）→ 持續即時
 // LastWrite 策略：最後寫入者獲勝
 if (remoteItem.updated_at > localItem.updated_at) {
   // 使用遠端版本
-  await indexedDB.put(remoteItem);
+  await indexedDB.put(remoteItem)
 } else {
   // 保留本地版本，上傳到 Supabase
-  await supabase.update(localItem);
+  await supabase.update(localItem)
 }
 ```
 
@@ -279,16 +281,16 @@ if (remoteItem.updated_at > localItem.updated_at) {
 
 ```typescript
 // src/hooks/use-realtime-hooks.ts
-import { createRealtimeHook } from '@/lib/realtime/createRealtimeHook';
-import { IndexedDBAdapter } from '@/lib/indexeddb/indexeddb-adapter';
-import { useNotificationStore } from '@/stores/notification-store';
+import { createRealtimeHook } from '@/lib/realtime/createRealtimeHook'
+import { IndexedDBAdapter } from '@/lib/indexeddb/indexeddb-adapter'
+import { useNotificationStore } from '@/stores/notification-store'
 
 // 建立新的 Hook
 export const useRealtimeForNotifications = createRealtimeHook<Notification>({
   tableName: 'notifications',
   indexedDB: new IndexedDBAdapter<Notification>('notifications'),
-  store: useNotificationStore
-});
+  store: useNotificationStore,
+})
 ```
 
 ### Hook 工廠函數的內部邏輯
@@ -308,27 +310,25 @@ export function createRealtimeHook<T extends { id: string }>(
         table: tableName,
         subscriptionId,
         handlers: {
-          onInsert: async (record) => {
+          onInsert: async record => {
             await indexedDB.put(record)
             store.setState(state => ({
-              items: [...state.items, record]
+              items: [...state.items, record],
             }))
           },
-          onUpdate: async (record) => {
+          onUpdate: async record => {
             await indexedDB.put(record)
             store.setState(state => ({
-              items: state.items.map(item =>
-                item.id === record.id ? record : item
-              )
+              items: state.items.map(item => (item.id === record.id ? record : item)),
             }))
           },
-          onDelete: async (oldRecord) => {
+          onDelete: async oldRecord => {
             await indexedDB.delete(oldRecord.id)
             store.setState(state => ({
-              items: state.items.filter(item => item.id !== oldRecord.id)
+              items: state.items.filter(item => item.id !== oldRecord.id),
             }))
-          }
-        }
+          },
+        },
       })
 
       // 清理：離開頁面時取消訂閱
@@ -360,13 +360,13 @@ export function createRealtimeHook<T extends { id: string }>(
 
 ### 連線數估算
 
-| 情境 | 連線數 | 狀態 |
-|------|--------|------|
-| 單一使用者（1 個頁面） | 3-4 個 | ✅ 正常 |
-| 單一使用者（多個分頁） | 4-7 個 | ✅ 正常 |
-| 10 人同時在線 | 50-70 個 | ✅ 安全 |
-| 20 人同時在線 | 100-140 個 | ✅ 安全 |
-| 40 人同時在線 | 200-280 個 | ⚠️ 接近上限 |
+| 情境                   | 連線數     | 狀態        |
+| ---------------------- | ---------- | ----------- |
+| 單一使用者（1 個頁面） | 3-4 個     | ✅ 正常     |
+| 單一使用者（多個分頁） | 4-7 個     | ✅ 正常     |
+| 10 人同時在線          | 50-70 個   | ✅ 安全     |
+| 20 人同時在線          | 100-140 個 | ✅ 安全     |
+| 40 人同時在線          | 200-280 個 | ⚠️ 接近上限 |
 
 **免費上限**: 200 個連線
 **目標占用率**: 50% (100 個連線)
@@ -378,16 +378,19 @@ export function createRealtimeHook<T extends { id: string }>(
 ### 1. 多裝置同步測試
 
 #### Test Case 1: 新增資料
+
 - [ ] 公司電腦：新增旅遊團「北海道賞雪」
 - [ ] 家裡電腦：打開旅遊團頁面
 - [ ] 預期結果：立即看到「北海道賞雪」✅
 
 #### Test Case 2: 刪除資料
+
 - [ ] 公司電腦：刪除旅遊團「北海道賞雪」
 - [ ] 家裡電腦：旅遊團頁面已開啟
 - [ ] 預期結果：旅遊團立即消失 ✅
 
 #### Test Case 3: 更新資料
+
 - [ ] 公司電腦：修改旅遊團「北海道賞雪」→「北海道滑雪」
 - [ ] 家裡電腦：旅遊團頁面已開啟
 - [ ] 預期結果：名稱立即更新為「北海道滑雪」✅
@@ -395,6 +398,7 @@ export function createRealtimeHook<T extends { id: string }>(
 ### 2. 離線支援測試
 
 #### Test Case 4: 離線新增
+
 - [ ] 家裡電腦：斷網
 - [ ] 家裡電腦：新增旅遊團「沖繩陽光」
 - [ ] 家裡電腦：恢復網路
@@ -404,6 +408,7 @@ export function createRealtimeHook<T extends { id: string }>(
 ### 3. 權限即時更新測試
 
 #### Test Case 5: 新增權限
+
 - [ ] 威廉（管理員）：新增雅萍的「財務管理」權限
 - [ ] 雅萍：正在線上
 - [ ] 預期結果：雅萍立即收到通知，2 秒後頁面重新整理 ✅
@@ -415,17 +420,19 @@ export function createRealtimeHook<T extends { id: string }>(
 ### Q1: 為什麼我看不到即時更新？
 
 **可能原因**：
+
 1. 沒有在頁面中加入 Realtime Hook
 2. 網路連線問題
 3. Supabase Realtime 未啟用
 
 **解決方式**：
+
 ```typescript
 // 確認頁面中有加入 Hook
-useRealtimeForXXX();
+useRealtimeForXXX()
 
 // 檢查網路連線
-console.log(navigator.onLine); // true = 有網路
+console.log(navigator.onLine) // true = 有網路
 
 // 檢查 Supabase Dashboard
 // Database → Realtime → 確認表格已啟用
@@ -434,6 +441,7 @@ console.log(navigator.onLine); // true = 有網路
 ### Q2: 連線數超標怎麼辦？
 
 **解決方式**：
+
 1. 確認只訂閱當前頁面需要的表格
 2. 離開頁面時自動取消訂閱（Hook 已處理）
 3. 減少永久訂閱的表格數量
@@ -441,6 +449,7 @@ console.log(navigator.onLine); // true = 有網路
 ### Q3: 如何知道 Realtime 有沒有在運作？
 
 **驗證方式**：
+
 1. 開啟開發者工具 → Network → WS
 2. 看到 `wss://pfqvdacxowpgfamuvnsn.supabase.co/realtime/v1/websocket`
 3. 修改資料 → 觀察是否立即更新

@@ -8,4 +8,3 @@ export interface CacheInfo {
   dbExists: boolean
   tableCount: number
 }
-

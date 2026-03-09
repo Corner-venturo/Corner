@@ -1,7 +1,15 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Archive, RotateCcw, Trash2, Plane, FileText, FileQuestion, CheckCircle } from 'lucide-react'
+import {
+  Archive,
+  RotateCcw,
+  Trash2,
+  Plane,
+  FileText,
+  FileQuestion,
+  CheckCircle,
+} from 'lucide-react'
 import { toast } from 'sonner'
 
 import { ContentPageLayout } from '@/components/layout/content-page-layout'
@@ -12,7 +20,10 @@ import { supabase } from '@/lib/supabase/client'
 import { formatDate } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
 import { deleteTour as deleteTourEntity } from '@/data'
-import { checkTourDependencies, deleteTourEmptyOrders } from '@/features/tours/services/tour_dependency.service'
+import {
+  checkTourDependencies,
+  deleteTourEmptyOrders,
+} from '@/features/tours/services/tour_dependency.service'
 import { ARCHIVE_LABELS } from './constants/labels'
 
 interface ArchivedTour {
@@ -105,7 +116,9 @@ export default function ArchiveManagementPage() {
       // 載入結案的旅遊團（未封存的）
       const { data: closed, error: closedError } = await supabase
         .from('tours')
-        .select('id, code, name, location, departure_date, return_date, closing_date, closing_status')
+        .select(
+          'id, code, name, location, departure_date, return_date, closing_date, closing_status'
+        )
         .eq('closing_status', 'closed')
         .or('archived.is.null,archived.eq.false')
         .order('closing_date', { ascending: false })
@@ -133,10 +146,7 @@ export default function ArchiveManagementPage() {
     if (!confirmed) return
 
     try {
-      const { error } = await supabase
-        .from('tours')
-        .update({ archived: false })
-        .eq('id', tour.id)
+      const { error } = await supabase.from('tours').update({ archived: false }).eq('id', tour.id)
 
       if (error) throw error
       toast.success(ARCHIVE_LABELS.TOAST_TOUR_RESTORED(tour.code))
@@ -157,13 +167,10 @@ export default function ArchiveManagementPage() {
       return
     }
 
-    const confirmed = await confirm(
-      ARCHIVE_LABELS.CONFIRM_DELETE_TOUR(tour.code),
-      {
-        title: ARCHIVE_LABELS.CONFIRM_DELETE_TITLE,
-        type: 'warning',
-      }
-    )
+    const confirmed = await confirm(ARCHIVE_LABELS.CONFIRM_DELETE_TOUR(tour.code), {
+      title: ARCHIVE_LABELS.CONFIRM_DELETE_TITLE,
+      type: 'warning',
+    })
     if (!confirmed) return
 
     try {
@@ -180,13 +187,10 @@ export default function ArchiveManagementPage() {
   // 還原行程表
   const handleRestoreItinerary = async (itinerary: ArchivedItinerary) => {
     const itineraryName = itinerary.title || itinerary.tour_code || ARCHIVE_LABELS.UNNAMED
-    const confirmed = await confirm(
-      ARCHIVE_LABELS.CONFIRM_RESTORE_ITINERARY(itineraryName),
-      {
-        title: ARCHIVE_LABELS.CONFIRM_RESTORE_ITINERARY_TITLE,
-        type: 'warning',
-      }
-    )
+    const confirmed = await confirm(ARCHIVE_LABELS.CONFIRM_RESTORE_ITINERARY(itineraryName), {
+      title: ARCHIVE_LABELS.CONFIRM_RESTORE_ITINERARY_TITLE,
+      type: 'warning',
+    })
     if (!confirmed) return
 
     try {
@@ -207,20 +211,14 @@ export default function ArchiveManagementPage() {
   // 永久刪除行程表
   const handleDeleteItinerary = async (itinerary: ArchivedItinerary) => {
     const itineraryName = itinerary.title || itinerary.tour_code || ARCHIVE_LABELS.UNNAMED
-    const confirmed = await confirm(
-      ARCHIVE_LABELS.CONFIRM_DELETE_ITINERARY(itineraryName),
-      {
-        title: ARCHIVE_LABELS.CONFIRM_DELETE_TITLE,
-        type: 'warning',
-      }
-    )
+    const confirmed = await confirm(ARCHIVE_LABELS.CONFIRM_DELETE_ITINERARY(itineraryName), {
+      title: ARCHIVE_LABELS.CONFIRM_DELETE_TITLE,
+      type: 'warning',
+    })
     if (!confirmed) return
 
     try {
-      const { error } = await supabase
-        .from('itineraries')
-        .delete()
-        .eq('id', itinerary.id)
+      const { error } = await supabase.from('itineraries').delete().eq('id', itinerary.id)
 
       if (error) throw error
       toast.success(ARCHIVE_LABELS.TOAST_ITINERARY_DELETED)
@@ -233,20 +231,14 @@ export default function ArchiveManagementPage() {
 
   // 刪除未關聯的報價單
   const handleDeleteOrphanedQuote = async (quote: OrphanedQuote) => {
-    const confirmed = await confirm(
-      ARCHIVE_LABELS.CONFIRM_DELETE_QUOTE(quote.code || ''),
-      {
-        title: ARCHIVE_LABELS.CONFIRM_DELETE_QUOTE_TITLE,
-        type: 'warning',
-      }
-    )
+    const confirmed = await confirm(ARCHIVE_LABELS.CONFIRM_DELETE_QUOTE(quote.code || ''), {
+      title: ARCHIVE_LABELS.CONFIRM_DELETE_QUOTE_TITLE,
+      type: 'warning',
+    })
     if (!confirmed) return
 
     try {
-      const { error } = await supabase
-        .from('quotes')
-        .delete()
-        .eq('id', quote.id)
+      const { error } = await supabase.from('quotes').delete().eq('id', quote.id)
 
       if (error) throw error
       toast.success(ARCHIVE_LABELS.TOAST_QUOTE_DELETED(quote.code || ''))
@@ -259,13 +251,10 @@ export default function ArchiveManagementPage() {
 
   // 封存結案的旅遊團
   const handleArchiveClosedTour = async (tour: ClosedTour) => {
-    const confirmed = await confirm(
-      ARCHIVE_LABELS.CONFIRM_ARCHIVE_TOUR(tour.code),
-      {
-        title: ARCHIVE_LABELS.CONFIRM_ARCHIVE_TOUR_TITLE,
-        type: 'warning',
-      }
-    )
+    const confirmed = await confirm(ARCHIVE_LABELS.CONFIRM_ARCHIVE_TOUR(tour.code), {
+      title: ARCHIVE_LABELS.CONFIRM_ARCHIVE_TOUR_TITLE,
+      type: 'warning',
+    })
     if (!confirmed) return
 
     try {
@@ -361,13 +350,12 @@ export default function ArchiveManagementPage() {
       key: 'total_amount',
       label: ARCHIVE_LABELS.COL_AMOUNT,
       width: '120px',
-      render: (_: unknown, row: OrphanedQuote) => (
+      render: (_: unknown, row: OrphanedQuote) =>
         row.total_amount ? (
           <CurrencyCell amount={row.total_amount} className="text-sm text-morandi-secondary" />
         ) : (
           <span className="text-sm text-morandi-secondary">-</span>
-        )
-      ),
+        ),
     },
     {
       key: 'created_at',
@@ -512,10 +500,26 @@ export default function ArchiveManagementPage() {
 
   // 標籤頁定義
   const STATUS_TABS = [
-    { value: 'orphaned-quotes', label: `${ARCHIVE_LABELS.TAB_ORPHANED_QUOTES} (${orphanedQuotes.length})`, icon: FileQuestion },
-    { value: 'closed', label: `${ARCHIVE_LABELS.TAB_CLOSED_TOURS} (${closedTours.length})`, icon: CheckCircle },
-    { value: 'tours', label: `${ARCHIVE_LABELS.TAB_ARCHIVED_TOURS} (${archivedTours.length})`, icon: Plane },
-    { value: 'itineraries', label: `${ARCHIVE_LABELS.TAB_ARCHIVED_ITINERARIES} (${archivedItineraries.length})`, icon: FileText },
+    {
+      value: 'orphaned-quotes',
+      label: `${ARCHIVE_LABELS.TAB_ORPHANED_QUOTES} (${orphanedQuotes.length})`,
+      icon: FileQuestion,
+    },
+    {
+      value: 'closed',
+      label: `${ARCHIVE_LABELS.TAB_CLOSED_TOURS} (${closedTours.length})`,
+      icon: CheckCircle,
+    },
+    {
+      value: 'tours',
+      label: `${ARCHIVE_LABELS.TAB_ARCHIVED_TOURS} (${archivedTours.length})`,
+      icon: Plane,
+    },
+    {
+      value: 'itineraries',
+      label: `${ARCHIVE_LABELS.TAB_ARCHIVED_ITINERARIES} (${archivedItineraries.length})`,
+      icon: FileText,
+    },
   ]
 
   return (
@@ -532,73 +536,57 @@ export default function ArchiveManagementPage() {
       onTabChange={setActiveTab}
       contentClassName="flex-1 overflow-hidden"
     >
-        {isLoading ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-morandi-gold" />
-          </div>
-        ) : (
-          <>
-            {/* 未關聯報價單 */}
-            {activeTab === 'orphaned-quotes' && (
-              orphanedQuotes.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
-                  <FileQuestion className="h-12 w-12 mb-4 opacity-30" />
-                  <p>{ARCHIVE_LABELS.EMPTY_ORPHANED_QUOTES}</p>
-                </div>
-              ) : (
-                <EnhancedTable
-                  columns={orphanedQuotesColumns}
-                  data={orphanedQuotes}
-                />
-              )
-            )}
+      {isLoading ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-morandi-gold" />
+        </div>
+      ) : (
+        <>
+          {/* 未關聯報價單 */}
+          {activeTab === 'orphaned-quotes' &&
+            (orphanedQuotes.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
+                <FileQuestion className="h-12 w-12 mb-4 opacity-30" />
+                <p>{ARCHIVE_LABELS.EMPTY_ORPHANED_QUOTES}</p>
+              </div>
+            ) : (
+              <EnhancedTable columns={orphanedQuotesColumns} data={orphanedQuotes} />
+            ))}
 
-            {/* 已結團旅遊團 */}
-            {activeTab === 'closed' && (
-              closedTours.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
-                  <CheckCircle className="h-12 w-12 mb-4 opacity-30" />
-                  <p>{ARCHIVE_LABELS.EMPTY_CLOSED_TOURS}</p>
-                </div>
-              ) : (
-                <EnhancedTable
-                  columns={closedToursColumns}
-                  data={closedTours}
-                />
-              )
-            )}
+          {/* 已結團旅遊團 */}
+          {activeTab === 'closed' &&
+            (closedTours.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
+                <CheckCircle className="h-12 w-12 mb-4 opacity-30" />
+                <p>{ARCHIVE_LABELS.EMPTY_CLOSED_TOURS}</p>
+              </div>
+            ) : (
+              <EnhancedTable columns={closedToursColumns} data={closedTours} />
+            ))}
 
-            {/* 封存旅遊團 */}
-            {activeTab === 'tours' && (
-              archivedTours.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
-                  <Archive className="h-12 w-12 mb-4 opacity-30" />
-                  <p>{ARCHIVE_LABELS.EMPTY_ARCHIVED_TOURS}</p>
-                </div>
-              ) : (
-                <EnhancedTable
-                  columns={tourColumns}
-                  data={archivedTours}
-                />
-              )
-            )}
+          {/* 封存旅遊團 */}
+          {activeTab === 'tours' &&
+            (archivedTours.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
+                <Archive className="h-12 w-12 mb-4 opacity-30" />
+                <p>{ARCHIVE_LABELS.EMPTY_ARCHIVED_TOURS}</p>
+              </div>
+            ) : (
+              <EnhancedTable columns={tourColumns} data={archivedTours} />
+            ))}
 
-            {/* 封存行程表 */}
-            {activeTab === 'itineraries' && (
-              archivedItineraries.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
-                  <Archive className="h-12 w-12 mb-4 opacity-30" />
-                  <p>{ARCHIVE_LABELS.EMPTY_ARCHIVED_ITINERARIES}</p>
-                </div>
-              ) : (
-                <EnhancedTable
-                  columns={itineraryColumns}
-                  data={archivedItineraries}
-                />
-              )
-            )}
-          </>
-        )}
+          {/* 封存行程表 */}
+          {activeTab === 'itineraries' &&
+            (archivedItineraries.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
+                <Archive className="h-12 w-12 mb-4 opacity-30" />
+                <p>{ARCHIVE_LABELS.EMPTY_ARCHIVED_ITINERARIES}</p>
+              </div>
+            ) : (
+              <EnhancedTable columns={itineraryColumns} data={archivedItineraries} />
+            ))}
+        </>
+      )}
     </ContentPageLayout>
   )
 }

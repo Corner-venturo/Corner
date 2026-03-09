@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { cn } from '@/lib/utils'
-import { PAYMENT_ITEM_ROW_LABELS, REQUEST_DATE_INPUT_LABELS } from '../../constants/labels';
+import { PAYMENT_ITEM_ROW_LABELS, REQUEST_DATE_INPUT_LABELS } from '../../constants/labels'
 
 interface RequestDateInputProps {
   value: string
@@ -32,14 +32,18 @@ function getNextThursday(): string {
   return formatDate(nextThursday)
 }
 
-export function RequestDateInput({ value, onChange, label = REQUEST_DATE_INPUT_LABELS.請款日期 }: RequestDateInputProps) {
+export function RequestDateInput({
+  value,
+  onChange,
+  label = REQUEST_DATE_INPUT_LABELS.請款日期,
+}: RequestDateInputProps) {
   // 打開時自動帶入下一個週四
   useEffect(() => {
     if (!value) {
       const nextThursday = getNextThursday()
       onChange(nextThursday, false)
     }
-  }, [])  
+  }, [])
 
   const handleDateChange = (selectedDate: string) => {
     const isThursday = selectedDate ? new Date(selectedDate + 'T00:00:00').getDay() === 4 : false
@@ -53,11 +57,8 @@ export function RequestDateInput({ value, onChange, label = REQUEST_DATE_INPUT_L
       <label className="text-sm font-medium text-morandi-primary">{label}</label>
       <DatePicker
         value={value}
-        onChange={(date) => handleDateChange(date)}
-        className={cn(
-          'mt-1',
-          isSpecialBilling && 'bg-morandi-gold/10 border-morandi-gold/20'
-        )}
+        onChange={date => handleDateChange(date)}
+        className={cn('mt-1', isSpecialBilling && 'bg-morandi-gold/10 border-morandi-gold/20')}
         placeholder={PAYMENT_ITEM_ROW_LABELS.選擇日期}
       />
       {value && (

@@ -10,16 +10,29 @@ import { FLIGHT_LABELS } from './constants/labels'
 // 工具函數
 // ============================================
 
-const MONTHS_EN = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+const MONTHS_EN = [
+  'JAN',
+  'FEB',
+  'MAR',
+  'APR',
+  'MAY',
+  'JUN',
+  'JUL',
+  'AUG',
+  'SEP',
+  'OCT',
+  'NOV',
+  'DEC',
+]
 const DAYS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 interface FormattedDate {
-  full: string      // "21 OCT 2024"
-  short: string     // "10.21"
-  day: string       // "Mon"
-  month: string     // "OCT"
-  date: number      // 21
-  year: number      // 2024
+  full: string // "21 OCT 2024"
+  short: string // "10.21"
+  day: string // "Mon"
+  month: string // "OCT"
+  date: number // 21
+  year: number // 2024
 }
 
 function parseFlightDate(dateStr: string | undefined | null): FormattedDate | null {
@@ -120,17 +133,65 @@ export function UnifiedFlightCard({
   // 根據風格選擇渲染方式
   switch (style) {
     case 'art':
-      return <ArtFlightCard flight={flight} type={type} theme={theme} isMobile={isMobile} dateInfo={dateInfo} />
+      return (
+        <ArtFlightCard
+          flight={flight}
+          type={type}
+          theme={theme}
+          isMobile={isMobile}
+          dateInfo={dateInfo}
+        />
+      )
     case 'luxury':
-      return <LuxuryFlightCard flight={flight} type={type} theme={theme} isMobile={isMobile} dateInfo={dateInfo} />
+      return (
+        <LuxuryFlightCard
+          flight={flight}
+          type={type}
+          theme={theme}
+          isMobile={isMobile}
+          dateInfo={dateInfo}
+        />
+      )
     case 'dreamscape':
-      return <DreamscapeFlightCard flight={flight} type={type} theme={theme} isMobile={isMobile} dateInfo={dateInfo} />
+      return (
+        <DreamscapeFlightCard
+          flight={flight}
+          type={type}
+          theme={theme}
+          isMobile={isMobile}
+          dateInfo={dateInfo}
+        />
+      )
     case 'collage':
-      return <CollageFlightCard flight={flight} type={type} theme={theme} isMobile={isMobile} dateInfo={dateInfo} />
+      return (
+        <CollageFlightCard
+          flight={flight}
+          type={type}
+          theme={theme}
+          isMobile={isMobile}
+          dateInfo={dateInfo}
+        />
+      )
     case 'nature':
-      return <NatureFlightCard flight={flight} type={type} theme={theme} isMobile={isMobile} dateInfo={dateInfo} />
+      return (
+        <NatureFlightCard
+          flight={flight}
+          type={type}
+          theme={theme}
+          isMobile={isMobile}
+          dateInfo={dateInfo}
+        />
+      )
     default:
-      return <OriginalFlightCard flight={flight} type={type} theme={theme} isMobile={isMobile} dateInfo={dateInfo} />
+      return (
+        <OriginalFlightCard
+          flight={flight}
+          type={type}
+          theme={theme}
+          isMobile={isMobile}
+          dateInfo={dateInfo}
+        />
+      )
   }
 }
 
@@ -311,9 +372,7 @@ function LuxuryFlightCard({
             {flight.airline} · {flight.flightNumber}
           </span>
           {flight.duration && (
-            <span style={{ color: theme.colors.secondary }}>
-              {flight.duration}
-            </span>
+            <span style={{ color: theme.colors.secondary }}>{flight.duration}</span>
           )}
         </div>
       </div>
@@ -339,9 +398,10 @@ function ArtFlightCard({
   dateInfo: FormattedDate | null
 }) {
   // 取得機場代碼（用於浮水印）
-  const airportCode = flight.departureAirport?.match(/\(([A-Z]{3})\)/)?.[1] 
-    || flight.departureAirport?.slice(0, 3).toUpperCase() 
-    || 'TPE'
+  const airportCode =
+    flight.departureAirport?.match(/\(([A-Z]{3})\)/)?.[1] ||
+    flight.departureAirport?.slice(0, 3).toUpperCase() ||
+    'TPE'
 
   return (
     <motion.div
@@ -434,9 +494,9 @@ function ArtFlightCard({
                 color: theme.colors.primary,
               }}
             >
-              {flight.arrivalAirport?.match(/\(([A-Z]{3})\)/)?.[1] 
-                || flight.arrivalAirport?.slice(0, 3).toUpperCase() 
-                || 'NRT'}
+              {flight.arrivalAirport?.match(/\(([A-Z]{3})\)/)?.[1] ||
+                flight.arrivalAirport?.slice(0, 3).toUpperCase() ||
+                'NRT'}
             </div>
             <div
               className="text-sm mt-2 transition-colors duration-300 group-hover:text-morandi-secondary"
@@ -533,16 +593,10 @@ function DreamscapeFlightCard({
       {/* 航線 */}
       <div className="flex items-center justify-between">
         <div>
-          <div
-            className="text-3xl font-bold"
-            style={{ color: theme.colors.text }}
-          >
+          <div className="text-3xl font-bold" style={{ color: theme.colors.text }}>
             {extractCityName(flight.departureAirport)}
           </div>
-          <div
-            className="text-xl"
-            style={{ color: theme.colors.primary }}
-          >
+          <div className="text-xl" style={{ color: theme.colors.primary }}>
             {flight.departureTime || '--:--'}
           </div>
         </div>
@@ -562,16 +616,10 @@ function DreamscapeFlightCard({
         </div>
 
         <div className="text-right">
-          <div
-            className="text-3xl font-bold"
-            style={{ color: theme.colors.text }}
-          >
+          <div className="text-3xl font-bold" style={{ color: theme.colors.text }}>
             {extractCityName(flight.arrivalAirport)}
           </div>
-          <div
-            className="text-xl"
-            style={{ color: theme.colors.primary }}
-          >
+          <div className="text-xl" style={{ color: theme.colors.primary }}>
             {flight.arrivalTime || '--:--'}
           </div>
         </div>
@@ -586,9 +634,7 @@ function DreamscapeFlightCard({
           {flight.airline} {flight.flightNumber}
         </span>
         {flight.duration && (
-          <span style={{ color: theme.colors.secondary }}>
-            {flight.duration}
-          </span>
+          <span style={{ color: theme.colors.secondary }}>{flight.duration}</span>
         )}
       </div>
     </motion.div>
@@ -666,7 +712,9 @@ function CollageFlightCard({
           color: theme.colors.muted,
         }}
       >
-        <span>{flight.airline} {flight.flightNumber}</span>
+        <span>
+          {flight.airline} {flight.flightNumber}
+        </span>
         {dateInfo && <span>{dateInfo.short}</span>}
       </div>
     </motion.div>
@@ -726,7 +774,9 @@ function NatureFlightCard({
           }}
         >
           {extractCityName(flight.departureAirport)}
-          <span className="mx-4" style={{ color: theme.colors.primary }}>⟶</span>
+          <span className="mx-4" style={{ color: theme.colors.primary }}>
+            ⟶
+          </span>
           {extractCityName(flight.arrivalAirport)}
         </div>
       </div>

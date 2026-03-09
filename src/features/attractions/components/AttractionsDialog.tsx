@@ -14,7 +14,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { isFeatureAvailable } from '@/lib/feature-restrictions'
 import { Button } from '@/components/ui/button'
 import { Sparkles, Loader2 } from 'lucide-react'
-import { ATTRACTIONS_DIALOG_LABELS } from '../constants/labels';
+import { ATTRACTIONS_DIALOG_LABELS } from '../constants/labels'
 
 interface AttractionsDialogProps {
   open: boolean
@@ -118,13 +118,19 @@ export function AttractionsDialog({
         address: prev.address || suggestion.address,
         website: prev.website || suggestion.website,
         phone: prev.phone || suggestion.phone,
-        tags: prev.tags || (suggestion.tags?.join(', ') || ''),
+        tags: prev.tags || suggestion.tags?.join(', ') || '',
       }))
 
-      void alert(`${ATTRACTIONS_DIALOG_LABELS.已補充_PREFIX}${result.data.missingFields?.length || 0}${ATTRACTIONS_DIALOG_LABELS.已補充_SUFFIX}`, 'success')
+      void alert(
+        `${ATTRACTIONS_DIALOG_LABELS.已補充_PREFIX}${result.data.missingFields?.length || 0}${ATTRACTIONS_DIALOG_LABELS.已補充_SUFFIX}`,
+        'success'
+      )
     } catch (error) {
       logger.error('AI 補充失敗:', error)
-      void alert(error instanceof Error ? error.message : ATTRACTIONS_DIALOG_LABELS.AI_補充失敗, 'error')
+      void alert(
+        error instanceof Error ? error.message : ATTRACTIONS_DIALOG_LABELS.AI_補充失敗,
+        'error'
+      )
     } finally {
       setIsAiLoading(false)
     }
@@ -170,7 +176,7 @@ export function AttractionsDialog({
   const handlePositionChange = (url: string, position: 'top' | 'center' | 'bottom') => {
     setImagePositions(prev => ({
       ...prev,
-      [url]: position
+      [url]: position,
     }))
   }
 
@@ -298,11 +304,7 @@ export function AttractionsDialog({
           disabled={isAiLoading || !formData.name}
           className="h-7 text-xs gap-1.5 text-morandi-gold border-morandi-gold/50 hover:bg-morandi-gold/10"
         >
-          {isAiLoading ? (
-            <Loader2 size={14} className="animate-spin" />
-          ) : (
-            <Sparkles size={14} />
-          )}
+          {isAiLoading ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
           {ATTRACTIONS_DIALOG_LABELS.AI_補充}
         </Button>
       )}

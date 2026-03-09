@@ -3,14 +3,13 @@
  * FlightSection - 航班搜尋區塊
  */
 
-
 import { Plane, Search, Loader2, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { DatePicker } from '@/components/ui/date-picker'
 import type { FlightInfo, FlightSegmentInfo } from '@/types/flight.types'
-import { FLIGHT_SECTION_LABELS, TOUR_REQUEST_FORM_DIALOG_LABELS } from '../../constants/labels';
+import { FLIGHT_SECTION_LABELS, TOUR_REQUEST_FORM_DIALOG_LABELS } from '../../constants/labels'
 
 interface FlightSectionProps {
   // 去程
@@ -73,7 +72,9 @@ export function FlightSection({
       {/* 去程航班 */}
       <div className="border border-border rounded-lg p-3 space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-morandi-secondary">{TOUR_REQUEST_FORM_DIALOG_LABELS.LABEL_7790}</span>
+          <span className="text-xs text-morandi-secondary">
+            {TOUR_REQUEST_FORM_DIALOG_LABELS.LABEL_7790}
+          </span>
           {outboundFlight && (
             <button
               type="button"
@@ -90,9 +91,7 @@ export function FlightSection({
               <span className="font-bold text-sm text-morandi-primary">
                 {outboundFlight.flightNumber}
               </span>
-              <span className="text-xs text-morandi-secondary">
-                {outboundFlight.airline}
-              </span>
+              <span className="text-xs text-morandi-secondary">{outboundFlight.airline}</span>
             </div>
             <div className="text-xs text-morandi-secondary mt-1">
               {outboundFlight.departureAirport} → {outboundFlight.arrivalAirport}
@@ -103,7 +102,9 @@ export function FlightSection({
           </div>
         ) : outboundSegments.length > 0 ? (
           <div className="space-y-2">
-            <p className="text-xs text-morandi-secondary">{TOUR_REQUEST_FORM_DIALOG_LABELS.PLEASE_SELECT_4482}</p>
+            <p className="text-xs text-morandi-secondary">
+              {TOUR_REQUEST_FORM_DIALOG_LABELS.PLEASE_SELECT_4482}
+            </p>
             <div className="space-y-1">
               {outboundSegments.map((seg, i) => (
                 <button
@@ -153,7 +154,11 @@ export function FlightSection({
               disabled={searchingOutbound}
               className="h-8 px-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
-              {searchingOutbound ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
+              {searchingOutbound ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Search size={14} />
+              )}
             </Button>
           </div>
         )}
@@ -162,7 +167,9 @@ export function FlightSection({
       {/* 回程航班 */}
       <div className="border border-border rounded-lg p-3 space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-morandi-secondary">{TOUR_REQUEST_FORM_DIALOG_LABELS.LABEL_2327}</span>
+          <span className="text-xs text-morandi-secondary">
+            {TOUR_REQUEST_FORM_DIALOG_LABELS.LABEL_2327}
+          </span>
           {returnFlight && (
             <button
               type="button"
@@ -179,9 +186,7 @@ export function FlightSection({
               <span className="font-bold text-sm text-morandi-primary">
                 {returnFlight.flightNumber}
               </span>
-              <span className="text-xs text-morandi-secondary">
-                {returnFlight.airline}
-              </span>
+              <span className="text-xs text-morandi-secondary">{returnFlight.airline}</span>
             </div>
             <div className="text-xs text-morandi-secondary mt-1">
               {returnFlight.departureAirport} → {returnFlight.arrivalAirport}
@@ -192,7 +197,9 @@ export function FlightSection({
           </div>
         ) : returnSegments.length > 0 ? (
           <div className="space-y-2">
-            <p className="text-xs text-morandi-secondary">{TOUR_REQUEST_FORM_DIALOG_LABELS.PLEASE_SELECT_4482}</p>
+            <p className="text-xs text-morandi-secondary">
+              {TOUR_REQUEST_FORM_DIALOG_LABELS.PLEASE_SELECT_4482}
+            </p>
             <div className="space-y-1">
               {returnSegments.map((seg, i) => (
                 <button
@@ -242,7 +249,11 @@ export function FlightSection({
               disabled={searchingReturn}
               className="h-8 px-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
-              {searchingReturn ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
+              {searchingReturn ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Search size={14} />
+              )}
             </Button>
           </div>
         )}

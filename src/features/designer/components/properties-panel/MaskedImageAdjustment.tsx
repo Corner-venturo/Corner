@@ -18,7 +18,11 @@ interface MaskedImageAdjustmentProps {
   onUpdate: () => void
 }
 
-export function MaskedImageAdjustment({ canvas, selectedObject, onUpdate }: MaskedImageAdjustmentProps) {
+export function MaskedImageAdjustment({
+  canvas,
+  selectedObject,
+  onUpdate,
+}: MaskedImageAdjustmentProps) {
   // 讀取當前的調整值
   const obj = selectedObject as unknown as Record<string, unknown>
   const [zoom, setZoom] = useState((obj.__maskZoom as number) || 100)
@@ -38,41 +42,44 @@ export function MaskedImageAdjustment({ canvas, selectedObject, onUpdate }: Mask
   // - 縮放 100% = 原始大小，200% = 圖片在遮罩內放大顯示
   // - 為了讓圖片「看起來」放大，我們要縮小 clipPath（窗口變小=圖片看起來更大）
   // - 為了讓圖片「看起來」右移，我們要把 clipPath 左移（窗口左移=看到圖片右側）
-  const applyAdjustment = useCallback((zoomVal: number, offsetXVal: number, offsetYVal: number) => {
-    if (!selectedObject || !canvas || !selectedObject.clipPath) return
+  const applyAdjustment = useCallback(
+    (zoomVal: number, offsetXVal: number, offsetYVal: number) => {
+      if (!selectedObject || !canvas || !selectedObject.clipPath) return
 
-    const clipPath = selectedObject.clipPath
+      const clipPath = selectedObject.clipPath
 
-    // 反轉縮放：用戶縮放值越大，clipPath 要越小
-    // zoom 100% = clipPath scale 1.0, zoom 200% = clipPath scale 0.5
-    const clipScale = 100 / zoomVal
+      // 反轉縮放：用戶縮放值越大，clipPath 要越小
+      // zoom 100% = clipPath scale 1.0, zoom 200% = clipPath scale 0.5
+      const clipScale = 100 / zoomVal
 
-    // 取得圖片基準尺寸
-    const baseWidth = selectedObject.width || 100
-    const baseHeight = selectedObject.height || 100
+      // 取得圖片基準尺寸
+      const baseWidth = selectedObject.width || 100
+      const baseHeight = selectedObject.height || 100
 
-    // 反轉偏移：用戶想讓圖片右移 = clipPath 要左移
-    const actualOffsetX = -(offsetXVal / 100) * baseWidth * 0.5
-    const actualOffsetY = -(offsetYVal / 100) * baseHeight * 0.5
+      // 反轉偏移：用戶想讓圖片右移 = clipPath 要左移
+      const actualOffsetX = -(offsetXVal / 100) * baseWidth * 0.5
+      const actualOffsetY = -(offsetYVal / 100) * baseHeight * 0.5
 
-    // 調整 clipPath
-    clipPath.set({
-      scaleX: clipScale,
-      scaleY: clipScale,
-      left: actualOffsetX,
-      top: actualOffsetY,
-    })
+      // 調整 clipPath
+      clipPath.set({
+        scaleX: clipScale,
+        scaleY: clipScale,
+        left: actualOffsetX,
+        top: actualOffsetY,
+      })
 
-    // 儲存設定到物件
-    const obj = selectedObject as unknown as Record<string, unknown>
-    obj.__maskZoom = zoomVal
-    obj.__maskOffsetX = offsetXVal
-    obj.__maskOffsetY = offsetYVal
+      // 儲存設定到物件
+      const obj = selectedObject as unknown as Record<string, unknown>
+      obj.__maskZoom = zoomVal
+      obj.__maskOffsetX = offsetXVal
+      obj.__maskOffsetY = offsetYVal
 
-    selectedObject.setCoords()
-    canvas.renderAll()
-    onUpdate()
-  }, [canvas, selectedObject, onUpdate])
+      selectedObject.setCoords()
+      canvas.renderAll()
+      onUpdate()
+    },
+    [canvas, selectedObject, onUpdate]
+  )
 
   const handleZoomChange = (value: number) => {
     setZoom(value)
@@ -101,25 +108,24 @@ export function MaskedImageAdjustment({ canvas, selectedObject, onUpdate }: Mask
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-1">
           <ImageIcon size={12} className="text-morandi-secondary" />
-          <Label className="text-xs text-morandi-primary">{PROPERTIES_PANEL_LABELS.LABEL_3469}</Label>
+          <Label className="text-xs text-morandi-primary">
+            {PROPERTIES_PANEL_LABELS.LABEL_3469}
+          </Label>
         </div>
-        <button
-          onClick={handleReset}
-          className="text-[10px] text-morandi-gold hover:underline"
-        >
+        <button onClick={handleReset} className="text-[10px] text-morandi-gold hover:underline">
           {PROPERTIES_PANEL_LABELS.RESET}
         </button>
       </div>
 
-      <p className="text-[10px] text-morandi-muted mb-2">
-        {PROPERTIES_PANEL_LABELS.LABEL_950}
-      </p>
+      <p className="text-[10px] text-morandi-muted mb-2">{PROPERTIES_PANEL_LABELS.LABEL_950}</p>
 
       <div className="space-y-3">
         {/* 縮放 */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <Label className="text-[10px] text-morandi-muted">{PROPERTIES_PANEL_LABELS.LABEL_9571}</Label>
+            <Label className="text-[10px] text-morandi-muted">
+              {PROPERTIES_PANEL_LABELS.LABEL_9571}
+            </Label>
             <span className="text-[10px] text-morandi-muted">{zoom}%</span>
           </div>
           <Slider
@@ -134,8 +140,12 @@ export function MaskedImageAdjustment({ canvas, selectedObject, onUpdate }: Mask
         {/* 水平位移 */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <Label className="text-[10px] text-morandi-muted">{PROPERTIES_PANEL_LABELS.LABEL_8522}</Label>
-            <span className="text-[10px] text-morandi-muted">{offsetX > 0 ? '→' : offsetX < 0 ? '←' : ''} {Math.abs(offsetX)}%</span>
+            <Label className="text-[10px] text-morandi-muted">
+              {PROPERTIES_PANEL_LABELS.LABEL_8522}
+            </Label>
+            <span className="text-[10px] text-morandi-muted">
+              {offsetX > 0 ? '→' : offsetX < 0 ? '←' : ''} {Math.abs(offsetX)}%
+            </span>
           </div>
           <Slider
             value={[offsetX]}
@@ -149,8 +159,12 @@ export function MaskedImageAdjustment({ canvas, selectedObject, onUpdate }: Mask
         {/* 垂直位移 */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <Label className="text-[10px] text-morandi-muted">{PROPERTIES_PANEL_LABELS.LABEL_2412}</Label>
-            <span className="text-[10px] text-morandi-muted">{offsetY > 0 ? '↓' : offsetY < 0 ? '↑' : ''} {Math.abs(offsetY)}%</span>
+            <Label className="text-[10px] text-morandi-muted">
+              {PROPERTIES_PANEL_LABELS.LABEL_2412}
+            </Label>
+            <span className="text-[10px] text-morandi-muted">
+              {offsetY > 0 ? '↓' : offsetY < 0 ? '↑' : ''} {Math.abs(offsetY)}%
+            </span>
           </div>
           <Slider
             value={[offsetY]}

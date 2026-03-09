@@ -50,25 +50,25 @@ export const AI_ENDPOINTS: AIEndpoint[] = [
   {
     id: 'yuzuki',
     name: '悠月',
-    url: 'http://100.89.92.46:3067',  // William 的 Tailscale IP
+    url: 'http://100.89.92.46:3067', // William 的 Tailscale IP
     emoji: '🌙',
     triggers: ['@悠月', '@yuzuki', '查詢', '幫我'],
   },
   {
     id: 'carson-ai',
     name: 'Carson AI',
-    url: 'http://100.x.x.x:3067',  // Carson 的 Tailscale IP
+    url: 'http://100.x.x.x:3067', // Carson 的 Tailscale IP
     emoji: '💼',
     triggers: ['@Carson', '業務', '客戶', '報價'],
   },
   {
     id: 'accounting-ai',
     name: '會計 AI',
-    url: 'http://100.x.x.x:3067',  // 會計的 Tailscale IP
+    url: 'http://100.x.x.x:3067', // 會計的 Tailscale IP
     emoji: '💰',
     triggers: ['@會計', '財務', '預算', '成本', '收款'],
   },
-];
+]
 ```
 
 ### Step 4: 重啟 ERP
@@ -137,6 +137,7 @@ tailscale ip -4
 ### 公司內網
 
 如果已在同一個區域網路：
+
 - 查看 IP：`ipconfig` (Windows) 或 `ifconfig` (Mac/Linux)
 - 確認可以 ping 通其他電腦
 - 確認防火牆開放 port 3067
@@ -156,18 +157,22 @@ curl http://100.x.x.x:3067/api/sessions/send \
 每個 AI 可以有不同的權限（在各自的 OpenClaw workspace 設定）：
 
 **悠月（老闆助理）**：
+
 - 完整資料庫存取
 - 所有功能
 
 **Carson AI（業務助理）**：
+
 - 訂單、客戶、行程
 - 不能看財務
 
 **會計 AI**：
+
 - 財務、收款、成本
 - 不能看客戶聯絡方式
 
 **助理 AI**：
+
 - 待辦事項、提醒
 - 基本查詢
 
@@ -176,11 +181,13 @@ curl http://100.x.x.x:3067/api/sessions/send \
 ### AI 沒有回應
 
 1. 檢查 OpenClaw 是否運行：
+
    ```bash
    openclaw status
    ```
 
 2. 檢查網路連線：
+
    ```bash
    ping 100.x.x.x
    ```

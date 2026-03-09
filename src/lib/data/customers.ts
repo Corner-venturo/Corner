@@ -20,7 +20,7 @@ export interface GetPaginatedCustomersParams {
   page?: number
   limit?: number
   search?: string
-  workspaceId?: string  // 可選，若未提供則從 session 取得
+  workspaceId?: string // 可選，若未提供則從 session 取得
 }
 
 export interface PaginatedCustomersResult {
@@ -58,7 +58,7 @@ export async function getPaginatedCustomers({
   let query = supabase
     .from('customers')
     .select('*', { count: 'exact' })
-    .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
+    .eq('workspace_id', wsId) // 🔒 Workspace 過濾
     .order('created_at', { ascending: false })
 
   // 可選搜尋條件
@@ -104,7 +104,7 @@ export async function getCustomerById(id: string, workspaceId?: string): Promise
     .from('customers')
     .select('*')
     .eq('id', id)
-    .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
+    .eq('workspace_id', wsId) // 🔒 Workspace 過濾
     .single()
 
   if (error) {
@@ -119,7 +119,10 @@ export async function getCustomerById(id: string, workspaceId?: string): Promise
  * 根據護照號碼檢查客戶是否存在
  * 🔒 自動過濾 workspace_id
  */
-export async function checkCustomerByPassport(passportNumber: string, workspaceId?: string): Promise<Customer | null> {
+export async function checkCustomerByPassport(
+  passportNumber: string,
+  workspaceId?: string
+): Promise<Customer | null> {
   // 🔒 取得 workspace_id
   let wsId = workspaceId
   if (!wsId) {
@@ -137,7 +140,7 @@ export async function checkCustomerByPassport(passportNumber: string, workspaceI
     .from('customers')
     .select('*')
     .eq('passport_number', passportNumber)
-    .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
+    .eq('workspace_id', wsId) // 🔒 Workspace 過濾
     .maybeSingle()
 
   if (error) {

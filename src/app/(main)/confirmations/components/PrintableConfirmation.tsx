@@ -4,7 +4,6 @@
  * 參考 PrintableQuotation 的設計風格，支援 A4 列印
  */
 
-
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
@@ -75,7 +74,9 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
   if (!isOpen || !isMounted) return null
 
   const isFlightConfirmation = confirmation.type === 'flight'
-  const title = isFlightConfirmation ? LABELS.FLIGHT_CONFIRMATION_TITLE : LABELS.ACCOMMODATION_CONFIRMATION_TITLE
+  const title = isFlightConfirmation
+    ? LABELS.FLIGHT_CONFIRMATION_TITLE
+    : LABELS.ACCOMMODATION_CONFIRMATION_TITLE
 
   return createPortal(
     /* eslint-disable venturo/no-custom-modal -- 列印預覽需要使用 createPortal */
@@ -173,7 +174,10 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
             <X className="h-4 w-4" />
             {LABELS.CLOSE}
           </Button>
-          <Button onClick={onPrint} className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
+          <Button
+            onClick={onPrint}
+            className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+          >
             <Printer className="h-4 w-4" />
             {LABELS.PRINT}
           </Button>
@@ -186,17 +190,15 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
             <thead>
               <tr>
                 <td>
-                  <div
-                    className="relative pb-4 mb-6"
-                    style={{ borderBottom: '1px solid #B8A99A' }}
-                  >
+                  <div className="relative pb-4 mb-6" style={{ borderBottom: '1px solid #B8A99A' }}>
                     {/* Logo - 左上角 */}
                     {logoUrl ? (
                       <div
                         className="absolute left-0 top-0"
                         style={{ width: '120px', height: '40px' }}
                       >
-                        <img src={logoUrl}
+                        <img
+                          src={logoUrl}
                           alt="Company Logo"
                           style={{
                             width: '100%',
@@ -227,9 +229,13 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
 
                     {/* 確認單資訊 */}
                     <div className="text-sm text-morandi-secondary mt-2 flex justify-between">
-                      <span>{LABELS.BOOKING_CODE}: {confirmation.booking_number}</span>
+                      <span>
+                        {LABELS.BOOKING_CODE}: {confirmation.booking_number}
+                      </span>
                       {confirmation.confirmation_number && (
-                        <span>{LABELS.CONFIRMATION_CODE}: {confirmation.confirmation_number}</span>
+                        <span>
+                          {LABELS.CONFIRMATION_CODE}: {confirmation.confirmation_number}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -241,17 +247,22 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
             <tfoot>
               <tr>
                 <td>
-                  <div className="border-t border-border" style={{
-                    marginTop: '24px',
-                    paddingTop: '16px'
-                  }}>
+                  <div
+                    className="border-t border-border"
+                    style={{
+                      marginTop: '24px',
+                      paddingTop: '16px',
+                    }}
+                  >
                     <div className="text-center" style={{ marginBottom: '12px' }}>
                       <p className="text-sm italic" style={{ color: '#6B7280', margin: 0 }}>
                         {COMPANY.subtitle}
                       </p>
                     </div>
                     <div className="text-center text-xs" style={{ color: '#9CA3AF' }}>
-                      <span>{workspaceName} © {new Date().getFullYear()}</span>
+                      <span>
+                        {workspaceName} © {new Date().getFullYear()}
+                      </span>
                     </div>
                   </div>
                 </td>
@@ -265,13 +276,17 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
                   {isFlightConfirmation ? (
                     <FlightConfirmationContent data={confirmation.data as FlightData} />
                   ) : (
-                    <AccommodationConfirmationContent data={confirmation.data as AccommodationData} />
+                    <AccommodationConfirmationContent
+                      data={confirmation.data as AccommodationData}
+                    />
                   )}
 
                   {/* 備註 */}
                   {confirmation.notes && (
                     <div className="mt-6 avoid-break">
-                      <h3 className="text-sm font-semibold text-foreground mb-2">{LABELS.REMARKS}</h3>
+                      <h3 className="text-sm font-semibold text-foreground mb-2">
+                        {LABELS.REMARKS}
+                      </h3>
                       <div className="text-sm text-morandi-primary whitespace-pre-wrap bg-muted p-4 rounded border border-border">
                         {confirmation.notes}
                       </div>
@@ -287,11 +302,9 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
             <div className="relative pb-4 mb-6" style={{ borderBottom: '1px solid #B8A99A' }}>
               {/* Logo - 左上角 */}
               {logoUrl ? (
-                <div
-                  className="absolute left-0 top-0"
-                  style={{ width: '120px', height: '40px' }}
-                >
-                  <img src={logoUrl}
+                <div className="absolute left-0 top-0" style={{ width: '120px', height: '40px' }}>
+                  <img
+                    src={logoUrl}
                     alt="Company Logo"
                     style={{
                       width: '100%',
@@ -322,9 +335,13 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
 
               {/* 確認單資訊 */}
               <div className="text-sm text-morandi-secondary mt-2 flex justify-between">
-                <span>{LABELS.BOOKING_CODE}: {confirmation.booking_number}</span>
+                <span>
+                  {LABELS.BOOKING_CODE}: {confirmation.booking_number}
+                </span>
                 {confirmation.confirmation_number && (
-                  <span>{LABELS.CONFIRMATION_CODE}: {confirmation.confirmation_number}</span>
+                  <span>
+                    {LABELS.CONFIRMATION_CODE}: {confirmation.confirmation_number}
+                  </span>
                 )}
               </div>
             </div>
@@ -345,17 +362,22 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
             )}
 
             {/* 頁尾 - 公司資訊 */}
-            <div className="border-t border-border" style={{
-              marginTop: '24px',
-              paddingTop: '16px'
-            }}>
+            <div
+              className="border-t border-border"
+              style={{
+                marginTop: '24px',
+                paddingTop: '16px',
+              }}
+            >
               <div className="text-center" style={{ marginBottom: '12px' }}>
                 <p className="text-sm italic" style={{ color: '#6B7280', margin: 0 }}>
                   {COMPANY.subtitle}
                 </p>
               </div>
               <div className="text-center text-xs" style={{ color: '#9CA3AF' }}>
-                <span>{workspaceName} © {new Date().getFullYear()}</span>
+                <span>
+                  {workspaceName} © {new Date().getFullYear()}
+                </span>
               </div>
             </div>
           </div>
@@ -371,7 +393,10 @@ const FlightConfirmationContent: React.FC<{ data: FlightData }> = ({ data }) => 
   return (
     <div className="space-y-5">
       {/* 免責聲明 */}
-      <div className="text-center text-xs italic py-2 bg-status-warning-bg rounded" style={{ color: '#92400E' }}>
+      <div
+        className="text-center text-xs italic py-2 bg-status-warning-bg rounded"
+        style={{ color: '#92400E' }}
+      >
         {LABELS.DISCLAIMER}
       </div>
 
@@ -386,23 +411,38 @@ const FlightConfirmationContent: React.FC<{ data: FlightData }> = ({ data }) => 
 
       {/* 航班資訊表格 */}
       <div className="avoid-break">
-        <table className="w-full text-sm" style={{
-          borderCollapse: 'collapse',
-          fontFamily: "'Noto Sans TC', sans-serif"
-        }}>
+        <table
+          className="w-full text-sm"
+          style={{
+            borderCollapse: 'collapse',
+            fontFamily: "'Noto Sans TC', sans-serif",
+          }}
+        >
           <thead>
-            <tr style={{
-              borderTop: '2px dashed #B8A99A',
-              borderBottom: '2px dashed #B8A99A',
-              backgroundColor: '#FFFBF0'
-            }}>
-              <th className="py-3 text-center font-semibold" style={{ width: '120px', color: 'var(--morandi-primary)' }}>
+            <tr
+              style={{
+                borderTop: '2px dashed #B8A99A',
+                borderBottom: '2px dashed #B8A99A',
+                backgroundColor: '#FFFBF0',
+              }}
+            >
+              <th
+                className="py-3 text-center font-semibold"
+                style={{ width: '120px', color: 'var(--morandi-primary)' }}
+              >
                 {LABELS.DATE}
               </th>
-              <th className="py-3 text-left font-semibold" style={{ color: 'var(--morandi-primary)' }}>
+              <th
+                className="py-3 text-left font-semibold"
+                style={{ color: 'var(--morandi-primary)' }}
+              >
                 {LABELS.TIME_FLIGHT}
               </th>
-              <th className="py-3 text-left font-semibold" colSpan={2} style={{ color: 'var(--morandi-primary)' }}>
+              <th
+                className="py-3 text-left font-semibold"
+                colSpan={2}
+                style={{ color: 'var(--morandi-primary)' }}
+              >
                 {LABELS.OTHER_INFO}
               </th>
             </tr>
@@ -421,37 +461,47 @@ const FlightConfirmationContent: React.FC<{ data: FlightData }> = ({ data }) => 
                   </td>
                   <td className="py-1.5" style={{ width: '110px', color: '#6B7280' }}>
                     {'stops' in segment && typeof segment.stops === 'number'
-                      ? segment.stops === 0 ? `/${LABELS.DIRECT_FLIGHT}` : `/${LABELS.TRANSIT}${segment.stops}次`
+                      ? segment.stops === 0
+                        ? `/${LABELS.DIRECT_FLIGHT}`
+                        : `/${LABELS.TRANSIT}${segment.stops}次`
                       : ''}
                   </td>
                 </tr>
                 {/* 出發行 */}
                 <tr>
-                  <td className="py-1.5" style={{ whiteSpace: 'nowrap', color: '#374151', fontWeight: 500 }}>
+                  <td
+                    className="py-1.5"
+                    style={{ whiteSpace: 'nowrap', color: '#374151', fontWeight: 500 }}
+                  >
                     {segment.departureDate}
                   </td>
                   <td className="py-1.5" style={{ color: '#374151' }}>
                     {segment.departureTime} {LABELS.DEPARTURE}: {segment.departureAirport}
                   </td>
                   <td className="py-1.5" style={{ width: '180px', color: '#6B7280' }}>
-                    {segment.departureTerminal ? `${LABELS.TERMINAL}${segment.departureTerminal} ` : ''}/{'cabin' in segment ? (segment.cabin as string) : LABELS.ECONOMY_CLASS} /OK
+                    {segment.departureTerminal
+                      ? `${LABELS.TERMINAL}${segment.departureTerminal} `
+                      : ''}
+                    /{'cabin' in segment ? (segment.cabin as string) : LABELS.ECONOMY_CLASS} /OK
                   </td>
-                  <td className="py-1.5" style={{ width: '110px', color: '#6B7280' }}>
-                  </td>
+                  <td className="py-1.5" style={{ width: '110px', color: '#6B7280' }}></td>
                 </tr>
                 {/* 抵達行 */}
-                <tr style={{
-                  borderBottom: idx === (data.segments?.length || 0) - 1 ? 'none' : '1px dashed #B8A99A'
-                }}>
+                <tr
+                  style={{
+                    borderBottom:
+                      idx === (data.segments?.length || 0) - 1 ? 'none' : '1px dashed #B8A99A',
+                  }}
+                >
                   <td className="py-1.5 pb-3"></td>
                   <td className="py-1.5 pb-3" style={{ color: '#374151' }}>
                     {segment.arrivalTime} {LABELS.ARRIVAL}: {segment.arrivalAirport}
                   </td>
                   <td className="py-1.5 pb-3" style={{ color: '#6B7280' }}>
-                    {segment.arrivalTerminal ? `${LABELS.TERMINAL}${segment.arrivalTerminal} ` : ''}/${LABELS.MEAL}
+                    {segment.arrivalTerminal ? `${LABELS.TERMINAL}${segment.arrivalTerminal} ` : ''}
+                    /${LABELS.MEAL}
                   </td>
-                  <td className="py-1.5 pb-3" style={{ color: '#6B7280' }}>
-                  </td>
+                  <td className="py-1.5 pb-3" style={{ color: '#6B7280' }}></td>
                 </tr>
               </React.Fragment>
             ))}
@@ -461,30 +511,32 @@ const FlightConfirmationContent: React.FC<{ data: FlightData }> = ({ data }) => 
 
       {/* 機票號碼 */}
       <div className="text-sm space-y-1.5 bg-muted p-4 rounded-lg border border-border">
-        {data.passengers?.map((passenger, idx) => (
-          passenger.ticketNumber && (
-            <div key={idx} style={{ color: '#374151' }}>
-              <span className="font-semibold">{LABELS.TICKET_NUMBER}:</span> {passenger.ticketNumber} - {passenger.nameEn}
-            </div>
-          )
-        ))}
+        {data.passengers?.map(
+          (passenger, idx) =>
+            passenger.ticketNumber && (
+              <div key={idx} style={{ color: '#374151' }}>
+                <span className="font-semibold">{LABELS.TICKET_NUMBER}:</span>{' '}
+                {passenger.ticketNumber} - {passenger.nameEn}
+              </div>
+            )
+        )}
       </div>
 
       {/* 航空公司確認電話 */}
-      {'airlineContacts' in data && Array.isArray(data.airlineContacts) && data.airlineContacts.length > 0 && (
-        <div className="text-sm bg-status-info-bg p-4 rounded-lg border border-status-info/30">
-          <div className="font-semibold mb-2 text-status-info">
-            {LABELS.AIRLINE_CONTACT}:
+      {'airlineContacts' in data &&
+        Array.isArray(data.airlineContacts) &&
+        data.airlineContacts.length > 0 && (
+          <div className="text-sm bg-status-info-bg p-4 rounded-lg border border-status-info/30">
+            <div className="font-semibold mb-2 text-status-info">{LABELS.AIRLINE_CONTACT}:</div>
+            <div className="space-y-1" style={{ color: '#374151' }}>
+              {(data.airlineContacts as string[]).map((contact: string, idx: number) => (
+                <div key={idx} className="pl-4">
+                  {contact}
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="space-y-1" style={{ color: '#374151' }}>
-            {(data.airlineContacts as string[]).map((contact: string, idx: number) => (
-              <div key={idx} className="pl-4">
-                {contact}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+        )}
 
       {/* 重要資訊 */}
       {data.importantNotes && data.importantNotes.length > 0 && (
@@ -517,7 +569,9 @@ const AccommodationConfirmationContent: React.FC<{ data: AccommodationData }> = 
           <div className="font-medium text-foreground text-base">{data.hotelName}</div>
           <div className="text-morandi-primary">{data.hotelAddress}</div>
           {data.hotelPhone && data.hotelPhone.length > 0 && (
-            <div className="text-morandi-primary">{LABELS.PHONE}: {data.hotelPhone.join(' / ')}</div>
+            <div className="text-morandi-primary">
+              {LABELS.PHONE}: {data.hotelPhone.join(' / ')}
+            </div>
           )}
         </div>
       </div>
@@ -540,11 +594,15 @@ const AccommodationConfirmationContent: React.FC<{ data: AccommodationData }> = 
           </div>
           <div className="bg-muted p-4 rounded border border-border">
             <div className="text-morandi-secondary mb-1">{LABELS.ROOM_QUANTITY}</div>
-            <div className="font-medium text-foreground">{data.roomCount} {LABELS.ROOMS}</div>
+            <div className="font-medium text-foreground">
+              {data.roomCount} {LABELS.ROOMS}
+            </div>
           </div>
           <div className="bg-muted p-4 rounded border border-border">
             <div className="text-morandi-secondary mb-1">{LABELS.ACCOMMODATION_DAYS}</div>
-            <div className="font-medium text-foreground">{data.nightCount} {LABELS.NIGHTS}</div>
+            <div className="font-medium text-foreground">
+              {data.nightCount} {LABELS.NIGHTS}
+            </div>
           </div>
         </div>
       </div>
@@ -575,8 +633,12 @@ const AccommodationConfirmationContent: React.FC<{ data: AccommodationData }> = 
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="bg-muted border-y border-border">
-                <th className="py-2 px-3 text-left font-medium text-morandi-primary">{LABELS.DATE}</th>
-                <th className="py-2 px-3 text-left font-medium text-morandi-primary">{LABELS.MEAL_CONTENT}</th>
+                <th className="py-2 px-3 text-left font-medium text-morandi-primary">
+                  {LABELS.DATE}
+                </th>
+                <th className="py-2 px-3 text-left font-medium text-morandi-primary">
+                  {LABELS.MEAL_CONTENT}
+                </th>
               </tr>
             </thead>
             <tbody>

@@ -11,11 +11,11 @@
 
 ### 要完成的三大任務
 
-| 任務 | 當前狀況 | 目標 | 優先級 |
-|------|----------|------|--------|
-| **A. Customers Page 重構** | 2,110 行 | ~150 行 | 🔴 P0 |
-| **B. 修正所有 any 類型** | 185 處 | 0 處 | 🟠 P1 |
-| **C. 拆分 types.ts** | 7,280 行 | 15-20 個文件 | 🟡 P2 |
+| 任務                       | 當前狀況 | 目標         | 優先級 |
+| -------------------------- | -------- | ------------ | ------ |
+| **A. Customers Page 重構** | 2,110 行 | ~150 行      | 🔴 P0  |
+| **B. 修正所有 any 類型**   | 185 處   | 0 處         | 🟠 P1  |
+| **C. 拆分 types.ts**       | 7,280 行 | 15-20 個文件 | 🟡 P2  |
 
 ### 完成後的效果
 
@@ -53,6 +53,7 @@
 ##### Step 1: 完成剩餘 Hooks (2 小時)
 
 **1.1 提取 `usePassportUpload` Hook** (1 小時)
+
 ```typescript
 // src/app/(main)/customers/hooks/usePassportUpload.ts
 
@@ -68,6 +69,7 @@
 ```
 
 **1.2 提取 `useCustomerVerify` Hook** (1 小時)
+
 ```typescript
 // src/app/(main)/customers/hooks/useCustomerVerify.ts
 
@@ -84,6 +86,7 @@
 ##### Step 2: 提取組件 (2-3 小時)
 
 **2.1 創建 `config/tableColumns.tsx`** (30 分鐘)
+
 ```typescript
 // src/app/(main)/customers/config/tableColumns.tsx
 
@@ -94,6 +97,7 @@
 ```
 
 **2.2 創建 `components/CustomerTable.tsx`** (30 分鐘)
+
 ```typescript
 // src/app/(main)/customers/components/CustomerTable.tsx
 
@@ -107,6 +111,7 @@
 ```
 
 **2.3 創建 `components/CustomerAddDialog.tsx`** (30 分鐘)
+
 ```typescript
 // src/app/(main)/customers/components/CustomerAddDialog.tsx
 
@@ -120,6 +125,7 @@
 ```
 
 **2.4 創建 `components/PassportBatchUpload/`** (1 小時)
+
 ```
 src/app/(main)/customers/components/PassportBatchUpload/
 ├── index.tsx                    # 主組件
@@ -131,6 +137,7 @@ src/app/(main)/customers/components/PassportBatchUpload/
 ```
 
 **2.5 創建 `components/CustomerVerifyDialog/`** (1 小時)
+
 ```
 src/app/(main)/customers/components/CustomerVerifyDialog/
 ├── index.tsx                    # 主對話框
@@ -144,6 +151,7 @@ src/app/(main)/customers/components/CustomerVerifyDialog/
 ##### Step 3: 重構主頁面 (1 小時)
 
 **3.1 重寫 `page.tsx`** (45 分鐘)
+
 ```typescript
 // src/app/(main)/customers/page.tsx
 
@@ -158,6 +166,7 @@ src/app/(main)/customers/components/CustomerVerifyDialog/
 ```
 
 **3.2 測試所有功能** (15 分鐘)
+
 - [ ] 搜尋功能正常
 - [ ] 新增顧客正常
 - [ ] 護照上傳正常
@@ -185,6 +194,7 @@ npm test
 ```
 
 **預期結果**:
+
 ```
 ✅ 主文件: 150 行 (通過)
 ✅ 所有組件: < 300 行 (通過)
@@ -197,6 +207,7 @@ npm test
 
 **投入時間**: 4-6 小時
 **產出**:
+
 - 5 個 Hooks (~850 行)
 - 8 個組件 (~1,350 行)
 - 1 個配置文件 (~100 行)
@@ -223,6 +234,7 @@ npm test
 **預估數量**: ~50 處
 
 **範例**:
+
 ```typescript
 // ❌ 之前
 const items: any[] = []
@@ -232,12 +244,14 @@ const items: Customer[] = []
 ```
 
 **高頻文件**:
+
 1. `src/app/(main)/customers/page.tsx` (5 處) - ✅ 已在 Phase 1 處理
 2. `src/constants/quote-status.ts` (2 處)
 3. `src/features/dashboard/components/timer-widget.tsx` (1 處)
 4. `src/lib/constants/morandi-colors.ts` (1 處)
 
 **行動計劃**:
+
 ```bash
 # 1. 批次查找簡單 any 使用
 grep -rn ": any\[\]" src --include="*.ts" --include="*.tsx"
@@ -254,6 +268,7 @@ npm run type-check
 **預估數量**: ~80 處
 
 **範例**:
+
 ```typescript
 // ❌ 之前
 function handleData(data: any) {
@@ -273,12 +288,14 @@ function handleData(data: UserData) {
 ```
 
 **高頻文件**:
+
 1. `src/features/quotes/hooks/useQuoteActions.ts` (7 處)
 2. `src/features/tours/components/ToursPage.tsx` (7 處)
 3. `src/app/(main)/quotes/[id]/page.tsx` (4 處)
 4. `src/features/tours/components/TourExpandedView.tsx` (3 處)
 
 **行動計劃**:
+
 ```bash
 # 1. 識別需要的類型
 # 2. 創建類型定義文件
@@ -293,6 +310,7 @@ function handleData(data: UserData) {
 **預估數量**: ~55 處
 
 **範例**:
+
 ```typescript
 // ❌ 之前
 const result = await supabase.from(tableName as any).select()
@@ -303,12 +321,14 @@ const result = await supabase.from<TableName>(tableName).select()
 ```
 
 **高頻文件**:
+
 1. `src/stores/voucher-entry-store.ts` (1 處)
 2. `src/stores/workspace-module-store.ts` (1 處)
 3. `src/stores/auth-store.ts` (3 處)
 4. `src/components/ui/dropdown-menu.tsx` (1 處)
 
 **行動計劃**:
+
 ```bash
 # 1. 分析泛型需求
 # 2. 設計類型系統
@@ -356,11 +376,13 @@ npm test
 
 **投入時間**: 8-12 小時
 **產出**:
+
 - 修正 185 處 any 類型使用
 - 創建 30-50 個新的類型定義
 - 100% 類型安全
 
 **收益**:
+
 - ✅ 編譯時錯誤檢測
 - ✅ IDE 完整自動完成
 - ✅ 重構工具可安全使用
@@ -454,6 +476,7 @@ touch src/lib/supabase/types/enums/index.ts
 ##### Step 3: 拆分表格類型 (2-3 小時)
 
 **按模組拆分**:
+
 ```typescript
 // 範例: customers.types.ts
 export interface CustomersTable {
@@ -479,6 +502,7 @@ export interface CustomersTable {
 ```
 
 **執行順序**:
+
 1. Customers (最常用)
 2. Tours
 3. Orders
@@ -543,6 +567,7 @@ time npm run build
 #### 向後兼容策略
 
 **選項 A: 保持舊文件 (推薦)**
+
 ```typescript
 // src/lib/supabase/types.ts (保留但標記為 deprecated)
 /**
@@ -552,6 +577,7 @@ export * from './types/index'
 ```
 
 **選項 B: 漸進式遷移**
+
 ```typescript
 // 階段 1: 新舊共存
 // 階段 2: 標記舊的為 deprecated
@@ -562,11 +588,13 @@ export * from './types/index'
 
 **投入時間**: 4-6 小時
 **產出**:
+
 - 1 個主 index 文件
 - 15-20 個模組文件
 - 每個文件 < 500 行
 
 **收益**:
+
 - ✅ 更快的 TypeScript 編譯
 - ✅ 更好的 IDE 性能
 - ✅ 更容易維護和導航
@@ -578,12 +606,12 @@ export * from './types/index'
 
 ### 總時長估算
 
-| Phase | 任務 | 時間估算 | 優先級 |
-|-------|------|----------|--------|
-| **Phase 1** | Customers Page 重構 | 4-6 小時 | 🔴 P0 |
-| **Phase 2** | 修正 185 處 any | 8-12 小時 | 🟠 P1 |
-| **Phase 3** | 拆分 types.ts | 4-6 小時 | 🟡 P2 |
-| **總計** | - | **16-24 小時** | - |
+| Phase       | 任務                | 時間估算       | 優先級 |
+| ----------- | ------------------- | -------------- | ------ |
+| **Phase 1** | Customers Page 重構 | 4-6 小時       | 🔴 P0  |
+| **Phase 2** | 修正 185 處 any     | 8-12 小時      | 🟠 P1  |
+| **Phase 3** | 拆分 types.ts       | 4-6 小時       | 🟡 P2  |
+| **總計**    | -                   | **16-24 小時** | -      |
 
 ### 建議執行時程
 
@@ -634,27 +662,28 @@ Week 4: Phase 3 (2-3 小時/天)
 
 ### 代碼品質指標
 
-| 指標 | 目標值 | 驗證方式 |
-|------|--------|----------|
-| **any 類型使用** | 0 處 | `npm run audit:any-usage` |
-| **超大文件 (>300行)** | 0 個組件 | `npm run audit:file-size` |
+| 指標                  | 目標值       | 驗證方式                  |
+| --------------------- | ------------ | ------------------------- |
+| **any 類型使用**      | 0 處         | `npm run audit:any-usage` |
+| **超大文件 (>300行)** | 0 個組件     | `npm run audit:file-size` |
 | **超大文件 (>500行)** | 0 個類型文件 | `npm run audit:file-size` |
-| **TypeScript 檢查** | 通過 | `npm run type-check` |
-| **ESLint 檢查** | 通過 | `npm run lint` |
-| **所有測試** | 通過 | `npm test` |
-| **Pre-commit Hook** | 啟用 | 嘗試提交測試 |
+| **TypeScript 檢查**   | 通過         | `npm run type-check`      |
+| **ESLint 檢查**       | 通過         | `npm run lint`            |
+| **所有測試**          | 通過         | `npm test`                |
+| **Pre-commit Hook**   | 啟用         | 嘗試提交測試              |
 
 ### 具體檔案指標
 
-| 文件 | 初始 | 目標 | 狀態 |
-|------|------|------|------|
-| `customers/page.tsx` | 2,110 行 | ~150 行 | 🔄 |
-| `lib/supabase/types.ts` | 7,280 行 | 拆分 | 📋 |
-| `any` 使用總數 | 185 處 | 0 處 | 📋 |
+| 文件                    | 初始     | 目標    | 狀態 |
+| ----------------------- | -------- | ------- | ---- |
+| `customers/page.tsx`    | 2,110 行 | ~150 行 | 🔄   |
+| `lib/supabase/types.ts` | 7,280 行 | 拆分    | 📋   |
+| `any` 使用總數          | 185 處   | 0 處    | 📋   |
 
 ### 功能驗證清單
 
 **Customers Page**:
+
 - [ ] 搜尋功能正常
 - [ ] 新增顧客正常
 - [ ] 護照批次上傳正常
@@ -665,6 +694,7 @@ Week 4: Phase 3 (2-3 小時/天)
 - [ ] 所有組件可獨立測試
 
 **類型安全**:
+
 - [ ] 無 any 類型使用
 - [ ] 所有函數有類型註解
 - [ ] 所有變數有明確類型
@@ -672,6 +702,7 @@ Week 4: Phase 3 (2-3 小時/天)
 - [ ] 無類型錯誤警告
 
 **Types.ts**:
+
 - [ ] 所有模組文件 < 500 行
 - [ ] 引用路徑正確
 - [ ] 編譯速度提升
@@ -684,11 +715,13 @@ Week 4: Phase 3 (2-3 小時/天)
 ### 現在就可以開始！
 
 **Step 1: 選擇執行方式**
+
 - A) 密集執行 (2-3 天完成所有)
 - B) 穩健執行 (1-2 週完成所有)
 - C) 漸進執行 (2-4 週完成所有)
 
 **Step 2: 開始 Phase 1**
+
 ```bash
 # 繼續完成 Customers Page 重構
 cd src/app/\(main\)/customers/hooks
@@ -697,6 +730,7 @@ cd src/app/\(main\)/customers/hooks
 ```
 
 **Step 3: 追蹤進度**
+
 ```bash
 # 檢查當前狀況
 npm run audit:code-quality
@@ -755,15 +789,18 @@ A: 每完成一個 Phase，執行完整測試套件
 這是一個雄心勃勃但完全可行的計劃！
 
 **關鍵成功因素**:
+
 1. ✅ 按優先級執行
 2. ✅ 每完成一步就測試
 3. ✅ 保持小步快跑
 4. ✅ 及時提交進度
 
 **記住**:
+
 > "代碼品質不是一次性的工作，而是持續的過程"
 
 但是現在，我們有了：
+
 - 🛡️ 自動化防護機制
 - 📚 完整的文檔和指南
 - 🎯 清晰的執行路線圖
@@ -779,4 +816,4 @@ A: 每完成一個 Phase，執行完整測試套件
 
 ---
 
-*💪 You got this! Let's make the codebase great again!*
+_💪 You got this! Let's make the codebase great again!_

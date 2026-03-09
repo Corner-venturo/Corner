@@ -13,7 +13,11 @@ interface TourFAQSectionProps {
   coverStyle?: CoverStyleType
 }
 
-export function TourFAQSection({ data, viewMode = 'desktop', coverStyle = 'original' }: TourFAQSectionProps) {
+export function TourFAQSection({
+  data,
+  viewMode = 'desktop',
+  coverStyle = 'original',
+}: TourFAQSectionProps) {
   const faqs = data.faqs
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
 
@@ -30,11 +34,7 @@ export function TourFAQSection({ data, viewMode = 'desktop', coverStyle = 'origi
   return (
     <section className={cn('py-12 bg-morandi-container/20', isMobile && 'py-8')}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <SectionTitle
-          title={TOURS_LABELS.LABEL_2640}
-          coverStyle={coverStyle}
-          className="mb-8"
-        />
+        <SectionTitle title={TOURS_LABELS.LABEL_2640} coverStyle={coverStyle} className="mb-8" />
 
         <div className="space-y-3">
           {faqs.map((faq, index) => (
@@ -56,17 +56,21 @@ export function TourFAQSection({ data, viewMode = 'desktop', coverStyle = 'origi
                 )}
               >
                 <div className="flex items-start gap-3 flex-1">
-                  <span className={cn(
-                    'flex-shrink-0 w-6 h-6 rounded-full bg-morandi-gold text-white',
-                    'flex items-center justify-center font-bold',
-                    isMobile ? 'text-xs' : 'text-sm'
-                  )}>
+                  <span
+                    className={cn(
+                      'flex-shrink-0 w-6 h-6 rounded-full bg-morandi-gold text-white',
+                      'flex items-center justify-center font-bold',
+                      isMobile ? 'text-xs' : 'text-sm'
+                    )}
+                  >
                     Q
                   </span>
-                  <span className={cn(
-                    'font-medium text-morandi-primary',
-                    isMobile ? 'text-sm' : 'text-base'
-                  )}>
+                  <span
+                    className={cn(
+                      'font-medium text-morandi-primary',
+                      isMobile ? 'text-sm' : 'text-base'
+                    )}
+                  >
                     {faq.question}
                   </span>
                 </div>
@@ -87,17 +91,21 @@ export function TourFAQSection({ data, viewMode = 'desktop', coverStyle = 'origi
               >
                 <div className="px-4 pb-4 pt-0">
                   <div className="flex items-start gap-3 pl-0">
-                    <span className={cn(
-                      'flex-shrink-0 w-6 h-6 rounded-full bg-morandi-primary/10 text-morandi-primary',
-                      'flex items-center justify-center font-bold',
-                      isMobile ? 'text-xs' : 'text-sm'
-                    )}>
+                    <span
+                      className={cn(
+                        'flex-shrink-0 w-6 h-6 rounded-full bg-morandi-primary/10 text-morandi-primary',
+                        'flex items-center justify-center font-bold',
+                        isMobile ? 'text-xs' : 'text-sm'
+                      )}
+                    >
                       A
                     </span>
-                    <p className={cn(
-                      'text-morandi-secondary leading-relaxed',
-                      isMobile ? 'text-sm' : 'text-base'
-                    )}>
+                    <p
+                      className={cn(
+                        'text-morandi-secondary leading-relaxed',
+                        isMobile ? 'text-sm' : 'text-base'
+                      )}
+                    >
                       {faq.answer}
                     </p>
                   </div>

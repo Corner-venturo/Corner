@@ -30,7 +30,6 @@ import { TourClosingDialog } from './TourClosingDialog'
 import { TourEditDialog } from '@/features/tours/components/tour-edit-dialog'
 import { alert } from '@/lib/ui/alert-dialog'
 
-
 export const ToursPage: React.FC = () => {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -130,11 +129,10 @@ export const ToursPage: React.FC = () => {
     setSelectedTour,
   } = state
 
-  const {
-    handleOpenCreateDialog,
-    resetForm,
-    handleNavigationEffect,
-  } = useToursForm({ state, openDialog })
+  const { handleOpenCreateDialog, resetForm, handleNavigationEffect } = useToursForm({
+    state,
+    openDialog,
+  })
 
   // Handler for opening edit dialog (now uses TourEditDialog instead of TourForm)
   const handleOpenEditDialog = useCallback((tour: Tour) => {
@@ -171,7 +169,7 @@ export const ToursPage: React.FC = () => {
   }, [operations, deleteConfirm.tour, closeDeleteDialog])
 
   const { handleCreateChannel } = useTourChannelOperations({
-    actions: actions as unknown as TourStoreActions
+    actions: actions as unknown as TourStoreActions,
   })
 
   const { renderActions } = useTourActionButtons({
@@ -181,7 +179,7 @@ export const ToursPage: React.FC = () => {
     operations,
     onEditTour: handleOpenEditDialog,
     setSelectedTour,
-    setDeleteConfirm: (state) => state.tour && openDeleteDialog(state.tour),
+    setDeleteConfirm: state => state.tour && openDeleteDialog(state.tour),
     handleCreateChannel,
     onOpenItineraryDialog: openItineraryDialog,
     onOpenQuoteDialog: openQuoteDialog,
@@ -192,10 +190,13 @@ export const ToursPage: React.FC = () => {
   })
 
   // 點擊整列導航到詳情頁面
-  const handleRowClick = useCallback((row: unknown) => {
-    const item = row as Tour
-    router.push(`/tours/${item.code}`)
-  }, [router])
+  const handleRowClick = useCallback(
+    (row: unknown) => {
+      const item = row as Tour
+      router.push(`/tours/${item.code}`)
+    },
+    [router]
+  )
 
   useEffect(() => {
     handleNavigationEffect()
@@ -272,7 +273,7 @@ export const ToursPage: React.FC = () => {
         isOpen={!!archiveDialogTour}
         tour={archiveDialogTour}
         onClose={closeArchiveDialog}
-        onConfirm={(reason) => confirmArchive(reason, operations.handleArchiveTour)}
+        onConfirm={reason => confirmArchive(reason, operations.handleArchiveTour)}
       />
 
       {itineraryDialogTour && (
@@ -309,19 +310,16 @@ export const ToursPage: React.FC = () => {
         />
       )}
 
-
-
       {closingDialogTour && (
         <TourClosingDialog
           tour={closingDialogTour}
           open={!!closingDialogTour}
-          onOpenChange={(open) => !open && closeClosingDialog()}
+          onOpenChange={open => !open && closeClosingDialog()}
           onSuccess={closeClosingDialog}
         />
       )}
 
       {/* 需求總表對話框已移除 — 統一使用詳情頁 */}
-
     </div>
   )
 }

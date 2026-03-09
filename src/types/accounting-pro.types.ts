@@ -69,7 +69,12 @@ export type { VoucherStatus }
 /**
  * 傳票來源類型
  */
-export type VoucherSourceType = 'payment_request' | 'order_payment' | 'card_payment' | 'tour_closing' | 'manual'
+export type VoucherSourceType =
+  | 'payment_request'
+  | 'order_payment'
+  | 'card_payment'
+  | 'tour_closing'
+  | 'manual'
 
 /**
  * 傳票主檔
@@ -168,14 +173,14 @@ export interface AutoVoucherFromPayment {
  * 刷卡收款 meta 資料（V2）
  */
 export interface CardPaymentMeta {
-  gross_amount: number       // 刷卡金額（原始金額）
-  fee_rate_total: number     // 團成本固定費率 (0.02 = 2%)
-  fee_rate_deducted: number  // 實扣費率 (0.0168 = 1.68%)
-  fee_rate_retained: number  // 回饋費率 (0.0032 = 0.32%)
-  fee_total: number          // 團成本總額 (gross * 2%)
-  fee_deducted: number       // 銀行實扣金額 (gross * 1.68%)
-  fee_retained: number       // 公司回饋金額 (gross * 0.32%)
-  bank_net: number           // 銀行實收金額 (gross - fee_deducted)
+  gross_amount: number // 刷卡金額（原始金額）
+  fee_rate_total: number // 團成本固定費率 (0.02 = 2%)
+  fee_rate_deducted: number // 實扣費率 (0.0168 = 1.68%)
+  fee_rate_retained: number // 回饋費率 (0.0032 = 0.32%)
+  fee_total: number // 團成本總額 (gross * 2%)
+  fee_deducted: number // 銀行實扣金額 (gross * 1.68%)
+  fee_retained: number // 公司回饋金額 (gross * 0.32%)
+  bank_net: number // 銀行實收金額 (gross - fee_deducted)
 }
 
 /**
@@ -194,9 +199,9 @@ export interface AutoVoucherFromCardPayment {
   bank_account_code?: string // 銀行科目代碼
   description?: string
   // 刷卡相關
-  gross_amount: number       // 刷卡金額（原始金額）
-  fee_rate_deducted: number  // 實扣費率 (預設 0.0168)
-  fee_rate_total?: number    // 團成本固定費率 (預設 0.02)
+  gross_amount: number // 刷卡金額（原始金額）
+  fee_rate_deducted: number // 實扣費率 (預設 0.0168)
+  fee_rate_total?: number // 團成本固定費率 (預設 0.02)
 }
 
 /**

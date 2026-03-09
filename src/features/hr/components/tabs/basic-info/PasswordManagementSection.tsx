@@ -57,7 +57,9 @@ export function PasswordManagementSection({
       {showPasswordSection && (
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_7220}</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              {COMP_HR_LABELS.LABEL_7220}
+            </label>
             <div className="relative">
               <Input
                 type={showPassword ? 'text' : 'password'}

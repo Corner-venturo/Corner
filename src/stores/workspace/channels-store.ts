@@ -264,7 +264,7 @@ export const useChannelsStore = () => {
     reorderChannels: (channels: Channel[]) => {
       // 批量更新順序 (createStore 會自動處理)
       channels.forEach((channel, index) => {
-        channelStore.update(channel.id, { order: index }).catch((error) => {
+        channelStore.update(channel.id, { order: index }).catch(error => {
           logger.warn('[ChannelsStore] 更新頻道順序失敗:', error)
         })
       })

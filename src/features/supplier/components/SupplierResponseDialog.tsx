@@ -8,7 +8,6 @@
  * 3. 填寫報價和備註
  */
 
-
 import React, { useState, useCallback, useEffect } from 'react'
 import {
   Dialog,
@@ -22,17 +21,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import {
-  X,
-  Save,
-  Loader2,
-  Plus,
-  Trash2,
-  Bus,
-  Users,
-  Calendar,
-  MapPin,
-} from 'lucide-react'
+import { X, Save, Loader2, Plus, Trash2, Bus, Users, Calendar, MapPin } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores'
 import { useToast } from '@/components/ui/use-toast'
@@ -75,7 +64,9 @@ export function SupplierResponseDialog({
 
   // 判斷資源類型
   const isVehicle = request?.category === 'transport'
-  const resourceTypeLabel = isVehicle ? SUPPLIER_LABELS.RESOURCE_VEHICLE : SUPPLIER_LABELS.RESOURCE_LEADER
+  const resourceTypeLabel = isVehicle
+    ? SUPPLIER_LABELS.RESOURCE_VEHICLE
+    : SUPPLIER_LABELS.RESOURCE_LEADER
   const ResourceIcon = isVehicle ? Bus : Users
 
   // 初始化回覆項目
@@ -104,13 +95,12 @@ export function SupplierResponseDialog({
   }, [isOpen, request, isVehicle])
 
   // 更新項目
-  const updateItem = useCallback((id: string, field: keyof ResponseItem, value: string | number) => {
-    setItems(prev =>
-      prev.map(item =>
-        item.id === id ? { ...item, [field]: value } : item
-      )
-    )
-  }, [])
+  const updateItem = useCallback(
+    (id: string, field: keyof ResponseItem, value: string | number) => {
+      setItems(prev => prev.map(item => (item.id === id ? { ...item, [field]: value } : item)))
+    },
+    []
+  )
 
   // 新增項目
   const addItem = useCallback(() => {
@@ -208,12 +198,16 @@ export function SupplierResponseDialog({
   const isReadOnly = request.response_status !== 'pending'
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent level={1} className={cn(DIALOG_SIZES['2xl'], 'max-h-[85vh] overflow-hidden flex flex-col')}>
+    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
+      <DialogContent
+        level={1}
+        className={cn(DIALOG_SIZES['2xl'], 'max-h-[85vh] overflow-hidden flex flex-col')}
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ResourceIcon className="h-5 w-5 text-morandi-gold" />
-            {isReadOnly ? SUPPLIER_LABELS.VIEW_RESPONSE : SUPPLIER_LABELS.RESPOND_REQUEST} - {request.tour_name || request.tour_code}
+            {isReadOnly ? SUPPLIER_LABELS.VIEW_RESPONSE : SUPPLIER_LABELS.RESPOND_REQUEST} -{' '}
+            {request.tour_name || request.tour_code}
           </DialogTitle>
         </DialogHeader>
 
@@ -227,7 +221,8 @@ export function SupplierResponseDialog({
                 <span className="text-morandi-secondary">{SUPPLIER_LABELS.LABEL_9868}</span>
                 <span className="font-medium">
                   {request.service_date}
-                  {request.service_date_end && request.service_date_end !== request.service_date &&
+                  {request.service_date_end &&
+                    request.service_date_end !== request.service_date &&
                     ` ~ ${request.service_date_end}`}
                 </span>
               </div>
@@ -252,12 +247,7 @@ export function SupplierResponseDialog({
                 {SUPPLIER_LABELS.RESOURCE_INFO(resourceTypeLabel, items.length)}
               </h3>
               {!isReadOnly && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={addItem}
-                  className="gap-1"
-                >
+                <Button variant="outline" size="sm" onClick={addItem} className="gap-1">
                   <Plus className="h-4 w-4" />
                   {SUPPLIER_LABELS.ADD_RESOURCE(resourceTypeLabel)}
                 </Button>
@@ -266,10 +256,7 @@ export function SupplierResponseDialog({
 
             <div className="space-y-4">
               {items.map((item, index) => (
-                <div
-                  key={item.id}
-                  className="border border-border rounded-lg p-4 space-y-4"
-                >
+                <div key={item.id} className="border border-border rounded-lg p-4 space-y-4">
                   <div className="flex items-center justify-between">
                     <Badge variant="outline">
                       {resourceTypeLabel} #{index + 1}
@@ -289,11 +276,19 @@ export function SupplierResponseDialog({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* 資源名稱 */}
                     <div className="space-y-2">
-                      <Label required>{isVehicle ? SUPPLIER_LABELS.VEHICLE_NAME_LABEL : SUPPLIER_LABELS.LEADER_NAME_LABEL}</Label>
+                      <Label required>
+                        {isVehicle
+                          ? SUPPLIER_LABELS.VEHICLE_NAME_LABEL
+                          : SUPPLIER_LABELS.LEADER_NAME_LABEL}
+                      </Label>
                       <Input
                         value={item.resourceName}
-                        onChange={(e) => updateItem(item.id, 'resourceName', e.target.value)}
-                        placeholder={isVehicle ? SUPPLIER_LABELS.VEHICLE_NAME_PLACEHOLDER : SUPPLIER_LABELS.LEADER_NAME_PLACEHOLDER}
+                        onChange={e => updateItem(item.id, 'resourceName', e.target.value)}
+                        placeholder={
+                          isVehicle
+                            ? SUPPLIER_LABELS.VEHICLE_NAME_PLACEHOLDER
+                            : SUPPLIER_LABELS.LEADER_NAME_PLACEHOLDER
+                        }
                         disabled={isReadOnly}
                       />
                     </div>
@@ -304,7 +299,7 @@ export function SupplierResponseDialog({
                         <Label>{SUPPLIER_LABELS.LABEL_6418}</Label>
                         <Input
                           value={item.licensePlate}
-                          onChange={(e) => updateItem(item.id, 'licensePlate', e.target.value)}
+                          onChange={e => updateItem(item.id, 'licensePlate', e.target.value)}
                           placeholder={SUPPLIER_LABELS.EXAMPLE_2914}
                           disabled={isReadOnly}
                         />
@@ -317,7 +312,7 @@ export function SupplierResponseDialog({
                         <Label>{SUPPLIER_LABELS.LABEL_6947}</Label>
                         <Input
                           value={item.driverName}
-                          onChange={(e) => updateItem(item.id, 'driverName', e.target.value)}
+                          onChange={e => updateItem(item.id, 'driverName', e.target.value)}
                           placeholder={SUPPLIER_LABELS.LABEL_5402}
                           disabled={isReadOnly}
                         />
@@ -326,10 +321,12 @@ export function SupplierResponseDialog({
 
                     {/* 聯絡電話 */}
                     <div className="space-y-2">
-                      <Label>{isVehicle ? SUPPLIER_LABELS.DRIVER_PHONE : SUPPLIER_LABELS.LEADER_PHONE}</Label>
+                      <Label>
+                        {isVehicle ? SUPPLIER_LABELS.DRIVER_PHONE : SUPPLIER_LABELS.LEADER_PHONE}
+                      </Label>
                       <Input
                         value={item.driverPhone}
-                        onChange={(e) => updateItem(item.id, 'driverPhone', e.target.value)}
+                        onChange={e => updateItem(item.id, 'driverPhone', e.target.value)}
                         placeholder={SUPPLIER_LABELS.LABEL_8624}
                         disabled={isReadOnly}
                       />
@@ -341,7 +338,7 @@ export function SupplierResponseDialog({
                       <Input
                         type="date"
                         value={item.availableStartDate}
-                        onChange={(e) => updateItem(item.id, 'availableStartDate', e.target.value)}
+                        onChange={e => updateItem(item.id, 'availableStartDate', e.target.value)}
                         disabled={isReadOnly}
                       />
                     </div>
@@ -351,7 +348,7 @@ export function SupplierResponseDialog({
                       <Input
                         type="date"
                         value={item.availableEndDate}
-                        onChange={(e) => updateItem(item.id, 'availableEndDate', e.target.value)}
+                        onChange={e => updateItem(item.id, 'availableEndDate', e.target.value)}
                         disabled={isReadOnly}
                       />
                     </div>
@@ -362,7 +359,9 @@ export function SupplierResponseDialog({
                       <Input
                         type="number"
                         value={item.unitPrice || ''}
-                        onChange={(e) => updateItem(item.id, 'unitPrice', parseInt(e.target.value) || 0)}
+                        onChange={e =>
+                          updateItem(item.id, 'unitPrice', parseInt(e.target.value) || 0)
+                        }
                         placeholder={SUPPLIER_LABELS.LABEL_2285}
                         disabled={isReadOnly}
                       />
@@ -373,7 +372,7 @@ export function SupplierResponseDialog({
                       <Label>{SUPPLIER_LABELS.REMARKS}</Label>
                       <Input
                         value={item.notes}
-                        onChange={(e) => updateItem(item.id, 'notes', e.target.value)}
+                        onChange={e => updateItem(item.id, 'notes', e.target.value)}
                         placeholder={SUPPLIER_LABELS.LABEL_8253}
                         disabled={isReadOnly}
                       />
@@ -389,7 +388,7 @@ export function SupplierResponseDialog({
             <Label>{SUPPLIER_LABELS.LABEL_7829}</Label>
             <Textarea
               value={responseNotes}
-              onChange={(e) => setResponseNotes(e.target.value)}
+              onChange={e => setResponseNotes(e.target.value)}
               placeholder={SUPPLIER_LABELS.LABEL_694}
               rows={3}
               disabled={isReadOnly}

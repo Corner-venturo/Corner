@@ -29,13 +29,13 @@ export type VerticalAlign = 'top' | 'center' | 'bottom'
 
 // 漸層定義
 export interface GradientColorStop {
-  offset: number  // 0-1
+  offset: number // 0-1
   color: string
 }
 
 export interface GradientFill {
   type: 'linear' | 'radial'
-  direction?: 'horizontal' | 'vertical'  // 簡化版方向
+  direction?: 'horizontal' | 'vertical' // 簡化版方向
   colorStops: GradientColorStop[]
 }
 
@@ -43,7 +43,7 @@ export interface ShapeElement extends BaseElement {
   type: 'shape'
   variant: ShapeVariant
   fill?: string
-  gradient?: GradientFill  // 漸層填充（優先於 fill）
+  gradient?: GradientFill // 漸層填充（優先於 fill）
   stroke?: string
   strokeWidth?: number
   strokeDashArray?: number[] // 虛線樣式，如 [8, 4] 表示 8px 實線 + 4px 空白
@@ -58,7 +58,18 @@ export interface ShapeElement extends BaseElement {
 export interface TextStyle {
   fontFamily: string
   fontSize: number
-  fontWeight: 'normal' | 'bold' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
+  fontWeight:
+    | 'normal'
+    | 'bold'
+    | '100'
+    | '200'
+    | '300'
+    | '400'
+    | '500'
+    | '600'
+    | '700'
+    | '800'
+    | '900'
   fontStyle: 'normal' | 'italic'
   textAlign: 'left' | 'center' | 'right'
   lineHeight: number
@@ -71,8 +82,8 @@ export interface TextElement extends BaseElementCore {
   type: 'text'
   content: string
   style: TextStyle
-  width?: number   // 舊模板相容，渲染時忽略
-  height?: number  // 舊模板相容，渲染時忽略
+  width?: number // 舊模板相容，渲染時忽略
+  height?: number // 舊模板相容，渲染時忽略
 }
 
 export type ObjectFit = 'cover' | 'contain' | 'fill'
@@ -89,15 +100,15 @@ export interface ImageBorderRadius {
  * 所有數值範圍為 -100 到 100，0 為預設值
  */
 export interface ImageAdjustments {
-  exposure: number      // 曝光度
-  contrast: number      // 對比度
-  highlights: number    // 高光
-  shadows: number       // 陰影
-  clarity: number       // 銳利度/清晰度
-  saturation: number    // 飽和度
-  temperature: number   // 色溫
-  tint: number          // 色調
-  vignette: number      // 暈影 (0 to 100)
+  exposure: number // 曝光度
+  contrast: number // 對比度
+  highlights: number // 高光
+  shadows: number // 陰影
+  clarity: number // 銳利度/清晰度
+  saturation: number // 飽和度
+  temperature: number // 色溫
+  tint: number // 色調
+  vignette: number // 暈影 (0 to 100)
 }
 
 /**
@@ -137,7 +148,7 @@ export interface ImageElement extends BaseElement {
   objectFit: ObjectFit
   borderRadius?: ImageBorderRadius // 自訂圓角（支援圓拱形狀）
   // 新增：圖片編輯設定
-  adjustments?: ImageAdjustments   // 色彩調整
+  adjustments?: ImageAdjustments // 色彩調整
   position?: ImagePositionSettings // 位置/縮放調整
 }
 
@@ -180,8 +191,8 @@ export interface IconElement extends BaseElementCore {
   icon: MaterialIconName
   size: number // 圖標尺寸
   color: string
-  width?: number   // 舊模板相容，渲染時忽略
-  height?: number  // 舊模板相容，渲染時忽略
+  width?: number // 舊模板相容，渲染時忽略
+  height?: number // 舊模板相容，渲染時忽略
 }
 
 // 線條元素
@@ -201,8 +212,8 @@ export interface LineElement extends BaseElementCore {
   lineStyle: LineStyle
   startEndpoint?: LineEndpoint
   endEndpoint?: LineEndpoint
-  width?: number   // 舊模板相容，渲染時忽略
-  height?: number  // 舊模板相容，渲染時忽略
+  width?: number // 舊模板相容，渲染時忽略
+  height?: number // 舊模板相容，渲染時忽略
 }
 
 // 印章/貼紙元素
@@ -211,8 +222,8 @@ export type StickerCategory = 'frame' | 'decoration' | 'stamp' | 'badge' | 'divi
 export interface StickerElement extends BaseElement {
   type: 'sticker'
   category: StickerCategory
-  stickerId: string  // 預設貼紙 ID
-  primaryColor?: string   // 主色（可自訂）
+  stickerId: string // 預設貼紙 ID
+  primaryColor?: string // 主色（可自訂）
   secondaryColor?: string // 副色（可自訂）
 }
 
@@ -221,7 +232,14 @@ export interface GroupElement extends BaseElement {
   children: CanvasElement[]
 }
 
-export type CanvasElement = ShapeElement | TextElement | ImageElement | IconElement | GroupElement | LineElement | StickerElement
+export type CanvasElement =
+  | ShapeElement
+  | TextElement
+  | ImageElement
+  | IconElement
+  | GroupElement
+  | LineElement
+  | StickerElement
 
 export interface CanvasPage {
   id: string

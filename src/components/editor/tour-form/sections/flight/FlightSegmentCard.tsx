@@ -63,11 +63,7 @@ export function FlightSegmentCard({
             disabled={isLoading || !flightData.flightNumber}
             className="h-7 text-xs gap-1"
           >
-            {isLoading ? (
-              <Loader2 size={12} className="animate-spin" />
-            ) : (
-              <Search size={12} />
-            )}
+            {isLoading ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
             查詢航班
           </Button>
           <Button
@@ -87,7 +83,9 @@ export function FlightSegmentCard({
       {segments && segments.length > 0 && onSelectSegment && (
         <div className="bg-card p-3 rounded-lg border border-morandi-gold/30 space-y-2">
           <div className="flex items-center justify-between">
-            <p className="text-xs text-morandi-secondary">{COMP_EDITOR_LABELS.PLEASE_SELECT_4482}</p>
+            <p className="text-xs text-morandi-secondary">
+              {COMP_EDITOR_LABELS.PLEASE_SELECT_4482}
+            </p>
             {onClearSegments && (
               <button
                 type="button"

@@ -52,10 +52,7 @@ export function useImageAdjustments() {
    * 套用圖片調整並回傳處理後的 dataURL
    */
   const applyAdjustments = useCallback(
-    async (
-      imageSrc: string,
-      adjustments: ImageAdjustments
-    ): Promise<string> => {
+    async (imageSrc: string, adjustments: ImageAdjustments): Promise<string> => {
       // 檢查是否有任何調整
       const hasAdjustments = Object.entries(adjustments).some(
         ([key, value]) => value !== DEFAULT_IMAGE_ADJUSTMENTS[key as keyof ImageAdjustments]
@@ -70,12 +67,22 @@ export function useImageAdjustments() {
         logger.log('🖼️ 開始圖片調整:', {
           hasAdjustments,
           adjustments,
-          imageSrcType: imageSrc.startsWith('data:') ? 'data-url' : imageSrc.startsWith('blob:') ? 'blob-url' : 'remote-url',
+          imageSrcType: imageSrc.startsWith('data:')
+            ? 'data-url'
+            : imageSrc.startsWith('blob:')
+              ? 'blob-url'
+              : 'remote-url',
         })
 
         // 動態載入 mini-gl（避免 SSR 問題）
         // 套件使用 named export 'minigl'，但沒有 TypeScript 類型定義
-        const miniglModule = await import('@xdadda/mini-gl') as unknown as { minigl: (canvas: HTMLCanvasElement, img: HTMLImageElement, colorSpace?: string) => MiniGLInstance }
+        const miniglModule = (await import('@xdadda/mini-gl')) as unknown as {
+          minigl: (
+            canvas: HTMLCanvasElement,
+            img: HTMLImageElement,
+            colorSpace?: string
+          ) => MiniGLInstance
+        }
         const minigl = miniglModule.minigl
         logger.log('✅ mini-gl 載入成功')
 
@@ -169,7 +176,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
     }
 
     img.onload = () => resolve(img)
-    img.onerror = (e) => {
+    img.onerror = e => {
       logger.error('圖片載入失敗:', src.slice(0, 100), e)
       reject(new Error(`Failed to load image: ${src.slice(0, 50)}...`))
     }

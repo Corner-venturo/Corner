@@ -9,14 +9,16 @@
 ## 1. 專案現況
 
 ### 基本資訊
-| 項目 | 數值 |
-|------|------|
-| 技術棧 | Next.js 15 + React 19 + TypeScript 5 + Zustand 5 + Supabase |
-| 原始碼檔案 | 881 個 (.ts/.tsx) |
-| TypeScript 錯誤 | ~141 個（目前被 `ignoreBuildErrors: true` 隱藏）|
-| `as any` 使用 | 96 處 |
+
+| 項目            | 數值                                                        |
+| --------------- | ----------------------------------------------------------- |
+| 技術棧          | Next.js 15 + React 19 + TypeScript 5 + Zustand 5 + Supabase |
+| 原始碼檔案      | 881 個 (.ts/.tsx)                                           |
+| TypeScript 錯誤 | ~141 個（目前被 `ignoreBuildErrors: true` 隱藏）            |
+| `as any` 使用   | 96 處                                                       |
 
 ### 已完成的優化（今日）
+
 1. ✅ 建立資料存取層 (DAL) - `src/lib/data/`
 2. ✅ 整合 Hooks 使用 DAL
 3. ✅ 修復團體報價單列印空白問題
@@ -26,6 +28,7 @@
 ## 2. 已發現的問題類型
 
 ### 2.1 CSS/列印問題（剛修復一個）
+
 **問題**: 團體報價單列印顯示空白
 **原因**: 使用 `style={{ display: 'none' }}` 無法被 CSS `!important` 覆蓋
 **修復**: 改用 `className="hidden"`
@@ -34,21 +37,22 @@
 
 ### 2.2 大型檔案（超過 300 行，難以維護）
 
-| 檔案 | 行數 | 說明 |
-|------|------|------|
-| `OrderMembersExpandable.tsx` | 3,095 | 嚴重過大 |
-| `customers/page.tsx` | 2,266 | 嚴重過大 |
-| `itinerary/new/page.tsx` | 1,509 | 過大 |
-| `tour-room-manager.tsx` | 1,216 | 過大 |
-| `VisasPage.tsx` | 1,136 | 過大 |
-| `OrderMemberView.tsx` | 1,100 | 過大 |
-| `TourItinerarySectionArt.tsx` | 1,071 | 過大 |
-| `itinerary/page.tsx` | 1,065 | 過大 |
-| `quotes/[id]/page.tsx` | 953 | 過大 |
-| `QuickQuoteDetail.tsx` | 946 | 過大 |
-| ... 還有更多 | | |
+| 檔案                          | 行數  | 說明     |
+| ----------------------------- | ----- | -------- |
+| `OrderMembersExpandable.tsx`  | 3,095 | 嚴重過大 |
+| `customers/page.tsx`          | 2,266 | 嚴重過大 |
+| `itinerary/new/page.tsx`      | 1,509 | 過大     |
+| `tour-room-manager.tsx`       | 1,216 | 過大     |
+| `VisasPage.tsx`               | 1,136 | 過大     |
+| `OrderMemberView.tsx`         | 1,100 | 過大     |
+| `TourItinerarySectionArt.tsx` | 1,071 | 過大     |
+| `itinerary/page.tsx`          | 1,065 | 過大     |
+| `quotes/[id]/page.tsx`        | 953   | 過大     |
+| `QuickQuoteDetail.tsx`        | 946   | 過大     |
+| ... 還有更多                  |       |          |
 
 ### 2.3 類型安全問題
+
 - 96 處 `as any` 繞過類型檢查
 - 141 個 TypeScript 錯誤被隱藏
 - `ignoreBuildErrors: true` 讓錯誤無法在建置時被發現
@@ -58,19 +62,24 @@
 ## 3. 請求 Gemini 協助的方向
 
 ### 3.1 UI/CSS 一致性審查
+
 請檢查以下目錄的組件：
+
 - `src/features/quotes/components/` - 報價單相關（列印、顯示）
 - `src/features/tours/components/` - 旅遊團相關
 - `src/components/orders/` - 訂單相關
 - `src/components/tours/` - 旅遊團組件
 
 **檢查重點**：
+
 1. 是否有 inline style 與 Tailwind class 混用導致的優先級問題？
 2. 列印組件 (`@media print`) 是否一致？
 3. 響應式設計是否完整？
 
 ### 3.2 功能完整性審查
+
 請針對以下核心功能進行檢查：
+
 1. **報價單系統** (`src/features/quotes/`)
    - 團體報價單 vs 快速報價單
    - 產出、列印、預覽功能
@@ -84,7 +93,9 @@
    - 行程管理
 
 ### 3.3 架構重構建議
+
 針對超大檔案，請建議：
+
 1. 如何拆分這些組件？
 2. 哪些邏輯可以抽取成 Hooks？
 3. 哪些可以拆成子組件？
@@ -139,4 +150,4 @@ src/
 
 ---
 
-*此報告由 Claude Code 協助生成，供 Gemini 進行深度審查使用*
+_此報告由 Claude Code 協助生成，供 Gemini 進行深度審查使用_

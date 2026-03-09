@@ -31,13 +31,20 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 // Morandi 配色
 function getCategoryColor(category?: string): string {
   switch (category) {
-    case '神社寺廟': return '#E8C4C4'
-    case '自然景觀': return '#A8BFA6'
-    case '歷史古蹟': return '#D4C4A8'
-    case '主題樂園': return '#C4B8E0'
-    case '美術館': return '#A5BCCD'
-    case '購物': return '#E8D4C4'
-    default: return '#CFB9A5'
+    case '神社寺廟':
+      return '#E8C4C4'
+    case '自然景觀':
+      return '#A8BFA6'
+    case '歷史古蹟':
+      return '#D4C4A8'
+    case '主題樂園':
+      return '#C4B8E0'
+    case '美術館':
+      return '#A5BCCD'
+    case '購物':
+      return '#E8D4C4'
+    default:
+      return '#CFB9A5'
   }
 }
 
@@ -59,7 +66,7 @@ export function AttractionsMap({
       return
     }
 
-    const nearby = attractions.filter((a) => {
+    const nearby = attractions.filter(a => {
       if (!a.latitude || !a.longitude) return false
       if (a.id === selectedAttraction.id) return false
       const distance = calculateDistance(
@@ -99,7 +106,7 @@ export function AttractionsMap({
       const map = L.map(container, {
         center: [selectedAttraction.latitude!, selectedAttraction.longitude!],
         zoom: 14,
-        zoomControl: false,  // 隱藏縮放控制
+        zoomControl: false, // 隱藏縮放控制
         dragging: true,
         touchZoom: true,
         scrollWheelZoom: true,
@@ -150,13 +157,16 @@ export function AttractionsMap({
               justify-content: center;
               overflow: hidden;
             ">
-              ${img ? `
+              ${
+                img
+                  ? `
                 <img alt=""
                   src="${img}"
                   style="width: ${imgSize}px; height: ${imgSize}px; object-fit: cover; border-radius: 6px;"
                   onerror="this.style.display='none'"
                 />
-              ` : `
+              `
+                  : `
                 <div style="
                   width: ${imgSize}px;
                   height: ${imgSize}px;
@@ -168,7 +178,8 @@ export function AttractionsMap({
                   color: white;
                   font-size: ${isMain ? 16 : 12}px;
                 ">📍</div>
-              `}
+              `
+              }
             </div>
           `,
           iconSize: [size, size],
@@ -177,10 +188,9 @@ export function AttractionsMap({
       }
 
       // 主景點標記
-      const mainMarker = L.marker(
-        [selectedAttraction.latitude!, selectedAttraction.longitude!],
-        { icon: createMarkerIcon(selectedAttraction, true) }
-      ).addTo(map)
+      const mainMarker = L.marker([selectedAttraction.latitude!, selectedAttraction.longitude!], {
+        icon: createMarkerIcon(selectedAttraction, true),
+      }).addTo(map)
 
       mainMarker.bindTooltip(selectedAttraction.name, {
         permanent: true,
@@ -190,7 +200,7 @@ export function AttractionsMap({
       })
 
       // 附近景點標記
-      nearbyAttractions.slice(0, 8).forEach((attraction) => {
+      nearbyAttractions.slice(0, 8).forEach(attraction => {
         if (!attraction.latitude || !attraction.longitude) return
 
         const distance = calculateDistance(
@@ -212,34 +222,51 @@ export function AttractionsMap({
         })
 
         // 點擊顯示詳細資訊
-        marker.bindPopup(`
+        marker.bindPopup(
+          `
           <div style="min-width: 180px; padding: 4px;">
-            ${attraction.thumbnail ? `
+            ${
+              attraction.thumbnail
+                ? `
               <img alt="" src="${attraction.thumbnail}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;" />
-            ` : ''}
+            `
+                : ''
+            }
             <div style="font-weight: 600; font-size: 14px; color: #334155;">${attraction.name}</div>
             <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
               ${attraction.category || ''} · ${distance} km
             </div>
-            ${attraction.description ? `
+            ${
+              attraction.description
+                ? `
               <div style="font-size: 11px; color: #94a3b8; margin-top: 6px; line-height: 1.4;">
                 ${attraction.description.slice(0, 80)}${attraction.description.length > 80 ? '...' : ''}
               </div>
-            ` : ''}
+            `
+                : ''
+            }
           </div>
-        `, {
-          closeButton: true,
-          className: 'attraction-popup',
-        })
+        `,
+          {
+            closeButton: true,
+            className: 'attraction-popup',
+          }
+        )
       })
 
       setIsLoading(false)
     }
 
-    initMap().catch((err) => logger.error('[initMap]', err))
+    initMap().catch(err => logger.error('[initMap]', err))
 
     return () => {}
-  }, [selectedAttraction?.id, selectedAttraction?.latitude, selectedAttraction?.longitude, nearbyAttractions, radiusKm])
+  }, [
+    selectedAttraction?.id,
+    selectedAttraction?.latitude,
+    selectedAttraction?.longitude,
+    nearbyAttractions,
+    radiusKm,
+  ])
 
   // 組件卸載時清理
   useEffect(() => {
@@ -280,7 +307,10 @@ export function AttractionsMap({
       <div ref={containerRef} className="w-full h-full" style={{ minHeight: '400px' }} />
       {nearbyAttractions.length > 0 && (
         <div className="absolute bottom-3 left-3 text-xs bg-card/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm z-[1000] text-morandi-primary">
-          {radiusKm}{ATTRACTIONS_MAP_LABELS.NEARBY_PREFIX}{nearbyAttractions.length}{ATTRACTIONS_MAP_LABELS.NEARBY_SUFFIX}
+          {radiusKm}
+          {ATTRACTIONS_MAP_LABELS.NEARBY_PREFIX}
+          {nearbyAttractions.length}
+          {ATTRACTIONS_MAP_LABELS.NEARBY_SUFFIX}
         </div>
       )}
     </div>

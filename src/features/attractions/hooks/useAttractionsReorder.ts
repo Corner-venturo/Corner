@@ -9,7 +9,6 @@ import { Attraction } from '../types'
 import { logger } from '@/lib/utils/logger'
 
 export function useAttractionsReorder() {
-
   /**
    * 批量更新景點順序
    * @param attractions 重新排序後的景點列表
@@ -19,8 +18,8 @@ export function useAttractionsReorder() {
       // 批量更新每個景點的 display_order
       const updatePromises = attractions.map((attraction, index) =>
         updateAttraction(attraction.id, {
-          display_order: index
-        }).catch((error) => {
+          display_order: index,
+        }).catch(error => {
           logger.error(`更新景點 ${attraction.name} 排序失敗:`, error)
           return null
         })

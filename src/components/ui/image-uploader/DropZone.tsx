@@ -49,7 +49,9 @@ export function DropZone({
       {uploading ? (
         <>
           <Loader2 size={24} className="animate-spin text-morandi-gold" />
-          <span className="text-sm text-morandi-secondary">{IMAGE_UPLOADER_LABELS.UPLOADING_2213}</span>
+          <span className="text-sm text-morandi-secondary">
+            {IMAGE_UPLOADER_LABELS.UPLOADING_2213}
+          </span>
         </>
       ) : (
         <>

@@ -3,7 +3,6 @@
  * Editor Toolbar - formatting controls for rich text editor
  */
 
-
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -201,8 +200,12 @@ export function CanvasToolbar({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem onClick={onUploadImage}>{CANVAS_EDITOR_LABELS.UPLOADING_201}</DropdownMenuItem>
-          <DropdownMenuItem onClick={onAddImage}>{CANVAS_EDITOR_LABELS.LABEL_5883}</DropdownMenuItem>
+          <DropdownMenuItem onClick={onUploadImage}>
+            {CANVAS_EDITOR_LABELS.UPLOADING_201}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onAddImage}>
+            {CANVAS_EDITOR_LABELS.LABEL_5883}
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 

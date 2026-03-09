@@ -6,7 +6,6 @@
  * 此對話框現在只用於管理快速報價單（可建立多份比價）
  */
 
-
 import React, { useState, useMemo, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import {
@@ -29,7 +28,16 @@ import {
   Zap,
   Clock,
 } from 'lucide-react'
-import { useQuotes, useToursSlim, useOrdersSlim, createQuote, updateQuote, deleteQuote, invalidateQuotes, useProposalPackage } from '@/data'
+import {
+  useQuotes,
+  useToursSlim,
+  useOrdersSlim,
+  createQuote,
+  updateQuote,
+  deleteQuote,
+  invalidateQuotes,
+  useProposalPackage,
+} from '@/data'
 import { DEFAULT_CATEGORIES } from '@/features/quotes/constants'
 import type { Tour, Quote } from '@/stores/types'
 import type { ProposalPackage, TimelineItineraryData } from '@/types/proposal.types'
@@ -40,7 +48,10 @@ import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { syncTimelineToQuote } from '@/lib/utils/itinerary-quote-sync'
 import dynamic from 'next/dynamic'
 
-const ItineraryDialog = dynamic(() => import('@/features/proposals/components/ItineraryDialog').then(m => m.ItineraryDialog), { ssr: false })
+const ItineraryDialog = dynamic(
+  () => import('@/features/proposals/components/ItineraryDialog').then(m => m.ItineraryDialog),
+  { ssr: false }
+)
 import { PackageItineraryDialog } from '@/features/proposals/components/package-itinerary'
 import { toast } from 'sonner'
 import type { Proposal } from '@/types/proposal.types'
@@ -104,7 +115,9 @@ export function LinkDocumentsToTourDialog({
   const { items: orders } = useOrdersSlim()
 
   // Proposal Package（只取單筆，避免載入所有 80+ 筆資料）
-  const { item: fetchedPackage, refresh: refreshPackage } = useProposalPackage(tour.proposal_package_id || null)
+  const { item: fetchedPackage, refresh: refreshPackage } = useProposalPackage(
+    tour.proposal_package_id || null
+  )
 
   // 報價單狀態
   const [isCreatingStandardQuote, setIsCreatingStandardQuote] = useState(false)
@@ -138,10 +151,12 @@ export function LinkDocumentsToTourDialog({
 
   // 檢查是否有快速行程表（timeline_data）
   const hasTimelineData = useMemo(() => {
-    return itineraryType === 'timeline' &&
-           tourProposalPackage?.timeline_data &&
-           typeof tourProposalPackage.timeline_data === 'object' &&
-           Object.keys(tourProposalPackage.timeline_data).length > 0
+    return (
+      itineraryType === 'timeline' &&
+      tourProposalPackage?.timeline_data &&
+      typeof tourProposalPackage.timeline_data === 'object' &&
+      Object.keys(tourProposalPackage.timeline_data).length > 0
+    )
   }, [itineraryType, tourProposalPackage])
 
   // 取得該團的第一筆訂單資訊（用於報價單預填客戶資訊）
@@ -152,20 +167,23 @@ export function LinkDocumentsToTourDialog({
   const tourSalesPerson = firstTourOrder?.sales_person || null
 
   // 為 PackageItineraryDialog 建立模擬 Proposal 物件
-  const fakeProposal = useMemo((): Proposal => ({
-    id: tour.id,
-    code: tour.code || '',
-    title: tour.name,
-    status: 'converted' as const,
-    destination: tour.location || null,
-    country_id: tour.country_id || null,
-    main_city_id: tour.main_city_id || null,
-    expected_start_date: tour.departure_date || null,
-    expected_end_date: tour.return_date || null,
-    created_at: tour.created_at || new Date().toISOString(),
-    updated_at: tour.updated_at || new Date().toISOString(),
-    workspace_id: tour.workspace_id || '',
-  }), [tour])
+  const fakeProposal = useMemo(
+    (): Proposal => ({
+      id: tour.id,
+      code: tour.code || '',
+      title: tour.name,
+      status: 'converted' as const,
+      destination: tour.location || null,
+      country_id: tour.country_id || null,
+      main_city_id: tour.main_city_id || null,
+      expected_start_date: tour.departure_date || null,
+      expected_end_date: tour.return_date || null,
+      created_at: tour.created_at || new Date().toISOString(),
+      updated_at: tour.updated_at || new Date().toISOString(),
+      workspace_id: tour.workspace_id || '',
+    }),
+    [tour]
+  )
 
   // ========== 報價單相關 ==========
 
@@ -174,7 +192,8 @@ export function LinkDocumentsToTourDialog({
     return quotes.filter(q => {
       const item = q as Quote & { _deleted?: boolean }
       // quote_type 為 'standard' 或 null/undefined（舊資料）都算團體報價單
-      const isStandardOrLegacy = q.quote_type === 'standard' || q.quote_type === null || q.quote_type === undefined
+      const isStandardOrLegacy =
+        q.quote_type === 'standard' || q.quote_type === null || q.quote_type === undefined
       return q.tour_id === tour.id && !item._deleted && isStandardOrLegacy
     })
   }, [quotes, tour.id])
@@ -287,7 +306,12 @@ export function LinkDocumentsToTourDialog({
 
   const handleDeleteQuote = async (e: React.MouseEvent, quote: Quote) => {
     e.stopPropagation()
-    if (!confirm(`${TOURS_LABELS.CONFIRM_DELETE_PREFIX}${quote.name}${TOURS_LABELS.CONFIRM_DELETE_SUFFIX}`)) return
+    if (
+      !confirm(
+        `${TOURS_LABELS.CONFIRM_DELETE_PREFIX}${quote.name}${TOURS_LABELS.CONFIRM_DELETE_SUFFIX}`
+      )
+    )
+      return
     try {
       setIsDeletingQuote(true)
       await deleteQuote(quote.id)
@@ -345,7 +369,7 @@ export function LinkDocumentsToTourDialog({
       }
 
       // 使用 type assertion 因為這是獨立 package（不屬於任何提案）
-       
+
       const { data: newPackage, error } = await dynamicFrom('proposal_packages')
         .insert(newPackageData)
         .select()
@@ -403,34 +427,37 @@ export function LinkDocumentsToTourDialog({
   // 自動鎖定已移除 - 公司規範：一團一份，不需版本鎖定
 
   // 儲存時間軸資料
-  const handleSaveTimeline = useCallback(async (timelineData: TimelineItineraryData) => {
-    if (!tourProposalPackage) return
+  const handleSaveTimeline = useCallback(
+    async (timelineData: TimelineItineraryData) => {
+      if (!tourProposalPackage) return
 
-    try {
-      const jsonData = JSON.parse(JSON.stringify(timelineData))
+      try {
+        const jsonData = JSON.parse(JSON.stringify(timelineData))
 
-      const { error } = await supabase
-        .from('proposal_packages')
-        .update({
-          itinerary_type: 'timeline',
-          timeline_data: jsonData,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', tourProposalPackage.id)
+        const { error } = await supabase
+          .from('proposal_packages')
+          .update({
+            itinerary_type: 'timeline',
+            timeline_data: jsonData,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', tourProposalPackage.id)
 
-      if (error) throw error
+        if (error) throw error
 
-      // 如果有關聯報價單，同步餐食和住宿資料
-      if (tourProposalPackage.quote_id) {
-        await syncTimelineToQuote(tourProposalPackage.quote_id, timelineData)
+        // 如果有關聯報價單，同步餐食和住宿資料
+        if (tourProposalPackage.quote_id) {
+          await syncTimelineToQuote(tourProposalPackage.quote_id, timelineData)
+        }
+
+        refreshPackage()
+      } catch (error) {
+        logger.error('儲存時間軸資料失敗:', error)
+        throw error
       }
-
-      refreshPackage()
-    } catch (error) {
-      logger.error('儲存時間軸資料失敗:', error)
-      throw error
-    }
-  }, [tourProposalPackage, refreshPackage])
+    },
+    [tourProposalPackage, refreshPackage]
+  )
 
   // 主對話框開啟時，子對話框應關閉
   const mainDialogOpen = isOpen && !timelineDialogOpen && !packageItineraryDialogOpen
@@ -444,7 +471,9 @@ export function LinkDocumentsToTourDialog({
             <DialogHeader className="flex-shrink-0">
               <DialogTitle>{TOURS_LABELS.LABEL_7445}</DialogTitle>
               <DialogDescription>
-                {TOURS_LABELS.QUICK_QUOTE_COMPARE_PREFIX}{tour.name}{TOURS_LABELS.QUICK_QUOTE_COMPARE_SUFFIX}
+                {TOURS_LABELS.QUICK_QUOTE_COMPARE_PREFIX}
+                {tour.name}
+                {TOURS_LABELS.QUICK_QUOTE_COMPARE_SUFFIX}
               </DialogDescription>
             </DialogHeader>
 
@@ -454,7 +483,9 @@ export function LinkDocumentsToTourDialog({
                 <div className="flex items-center justify-between pb-2 border-b border-morandi-container/50 flex-shrink-0">
                   <div className="flex items-center gap-2">
                     <Calculator className="w-4 h-4 text-morandi-primary" />
-                    <span className="font-medium text-sm text-morandi-primary">{TOURS_LABELS.QUICK_QUOTE}</span>
+                    <span className="font-medium text-sm text-morandi-primary">
+                      {TOURS_LABELS.QUICK_QUOTE}
+                    </span>
                   </div>
                   <button
                     onClick={handleCreateQuickQuote}
@@ -498,7 +529,7 @@ export function LinkDocumentsToTourDialog({
                             <ExternalLink className="w-3 h-3" />
                           </button>
                           <button
-                            onClick={(e) => handleDeleteQuote(e, quote)}
+                            onClick={e => handleDeleteQuote(e, quote)}
                             disabled={isDeletingQuote}
                             className="p-1 text-morandi-red/60 hover:text-morandi-red rounded disabled:opacity-50"
                             title={TOURS_LABELS.DELETE}
@@ -542,7 +573,6 @@ export function LinkDocumentsToTourDialog({
           }}
         />
       )}
-
     </>
   )
 }

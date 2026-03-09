@@ -4,14 +4,8 @@
  * 功能：建立新行程表 / 查看已關聯行程表
  */
 
-
 import { FileText, Loader2, Save, AlertCircle, Eye, Wand2, FilePlus, Clock } from 'lucide-react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -24,7 +18,7 @@ import { TimelineEditor } from './TimelineEditor'
 import { ItineraryPreviewContent } from './ItineraryPreview'
 import { AiGenerateDialog } from './AiGenerateDialog'
 import { VersionDropdown } from './VersionDropdown'
-import { PACKAGE_ITINERARY_DIALOG_LABELS } from '../../constants/labels';
+import { PACKAGE_ITINERARY_DIALOG_LABELS } from '../../constants/labels'
 
 export function PackageItineraryDialog({
   isOpen,
@@ -63,7 +57,9 @@ export function PackageItineraryDialog({
               outboundFlight={hook.formData.outboundFlight}
               returnFlight={hook.formData.returnFlight}
               dailyData={hook.getPreviewDailyData()}
-              companyName={hook.currentUser?.workspace_code || PACKAGE_ITINERARY_DIALOG_LABELS.旅行社}
+              companyName={
+                hook.currentUser?.workspace_code || PACKAGE_ITINERARY_DIALOG_LABELS.旅行社
+              }
               isDomestic={hook.isDomestic}
               onEdit={() => hook.setViewMode('edit')}
               onPrint={hook.handlePrintPreview}
@@ -76,7 +72,9 @@ export function PackageItineraryDialog({
                 <DialogHeader className="mb-4">
                   <DialogTitle className="flex items-center gap-2">
                     <FileText className="w-5 h-5 text-morandi-gold" />
-                    {hook.isEditMode ? PACKAGE_ITINERARY_DIALOG_LABELS.編輯行程表 : PACKAGE_ITINERARY_DIALOG_LABELS.建立行程表}
+                    {hook.isEditMode
+                      ? PACKAGE_ITINERARY_DIALOG_LABELS.編輯行程表
+                      : PACKAGE_ITINERARY_DIALOG_LABELS.建立行程表}
                     <span className="text-sm font-normal text-morandi-secondary">
                       {pkg.version_name} - {proposal.title}
                     </span>
@@ -95,7 +93,9 @@ export function PackageItineraryDialog({
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-xs text-morandi-primary">{PACKAGE_ITINERARY_DIALOG_LABELS.LABEL_5957}</Label>
+                    <Label className="text-xs text-morandi-primary">
+                      {PACKAGE_ITINERARY_DIALOG_LABELS.LABEL_5957}
+                    </Label>
                     <Input
                       value={hook.formData.title}
                       onChange={e => hook.setFormData({ ...hook.formData, title: e.target.value })}
@@ -105,41 +105,39 @@ export function PackageItineraryDialog({
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-xs text-morandi-primary">{PACKAGE_ITINERARY_DIALOG_LABELS.LABEL_5475}</Label>
+                      <Label className="text-xs text-morandi-primary">
+                        {PACKAGE_ITINERARY_DIALOG_LABELS.LABEL_5475}
+                      </Label>
                       <Input
-                        value={pkg.country_id && pkg.main_city_id
-                          ? `${pkg.country_id} (${pkg.main_city_id})`
-                          : pkg.country_id || PACKAGE_ITINERARY_DIALOG_LABELS.未設定_2}
+                        value={
+                          pkg.country_id && pkg.main_city_id
+                            ? `${pkg.country_id} (${pkg.main_city_id})`
+                            : pkg.country_id || PACKAGE_ITINERARY_DIALOG_LABELS.未設定_2
+                        }
                         disabled
                         className="bg-muted"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs text-morandi-primary">{PACKAGE_ITINERARY_DIALOG_LABELS.LABEL_6915}</Label>
-                      <Input
-                        value={`${hook.calculateDays()} 天`}
-                        disabled
-                        className="bg-muted"
-                      />
+                      <Label className="text-xs text-morandi-primary">
+                        {PACKAGE_ITINERARY_DIALOG_LABELS.LABEL_6915}
+                      </Label>
+                      <Input value={`${hook.calculateDays()} 天`} disabled className="bg-muted" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-xs text-morandi-primary">{PACKAGE_ITINERARY_DIALOG_LABELS.LABEL_4513}</Label>
-                      <Input
-                        value={pkg.start_date || '(未設定)'}
-                        disabled
-                        className="bg-muted"
-                      />
+                      <Label className="text-xs text-morandi-primary">
+                        {PACKAGE_ITINERARY_DIALOG_LABELS.LABEL_4513}
+                      </Label>
+                      <Input value={pkg.start_date || '(未設定)'} disabled className="bg-muted" />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs text-morandi-primary">{PACKAGE_ITINERARY_DIALOG_LABELS.LABEL_2731}</Label>
-                      <Input
-                        value={pkg.end_date || '(未設定)'}
-                        disabled
-                        className="bg-muted"
-                      />
+                      <Label className="text-xs text-morandi-primary">
+                        {PACKAGE_ITINERARY_DIALOG_LABELS.LABEL_2731}
+                      </Label>
+                      <Input value={pkg.end_date || '(未設定)'} disabled className="bg-muted" />
                     </div>
                   </div>
 
@@ -156,7 +154,9 @@ export function PackageItineraryDialog({
                       onSearchOutbound={hook.flightSearch.handleSearchOutboundFlight}
                       onSelectOutboundSegment={hook.flightSearch.handleSelectOutboundSegment}
                       onClearOutboundSegments={hook.flightSearch.clearOutboundSegments}
-                      onRemoveOutbound={() => hook.setFormData(prev => ({ ...prev, outboundFlight: null }))}
+                      onRemoveOutbound={() =>
+                        hook.setFormData(prev => ({ ...prev, outboundFlight: null }))
+                      }
                       returnFlight={hook.formData.returnFlight}
                       returnFlightNumber={hook.returnFlightNumber}
                       returnFlightDate={hook.returnFlightDate}
@@ -167,7 +167,9 @@ export function PackageItineraryDialog({
                       onSearchReturn={hook.flightSearch.handleSearchReturnFlight}
                       onSelectReturnSegment={hook.flightSearch.handleSelectReturnSegment}
                       onClearReturnSegments={hook.flightSearch.clearReturnSegments}
-                      onRemoveReturn={() => hook.setFormData(prev => ({ ...prev, returnFlight: null }))}
+                      onRemoveReturn={() =>
+                        hook.setFormData(prev => ({ ...prev, returnFlight: null }))
+                      }
                     />
                   )}
 
@@ -230,7 +232,9 @@ export function PackageItineraryDialog({
                         ) : (
                           <Save className="w-3 h-3" />
                         )}
-                        {hook.isEditMode ? PACKAGE_ITINERARY_DIALOG_LABELS.更新行程 : PACKAGE_ITINERARY_DIALOG_LABELS.建立行程}
+                        {hook.isEditMode
+                          ? PACKAGE_ITINERARY_DIALOG_LABELS.更新行程
+                          : PACKAGE_ITINERARY_DIALOG_LABELS.建立行程}
                       </Button>
                     </div>
                   </div>
@@ -241,7 +245,9 @@ export function PackageItineraryDialog({
               <div className="w-1/2 pl-6 overflow-y-auto">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-bold text-morandi-primary">
-                    {hook.isTimelineMode ? PACKAGE_ITINERARY_DIALOG_LABELS.時間軸行程 : PACKAGE_ITINERARY_DIALOG_LABELS.每日行程}
+                    {hook.isTimelineMode
+                      ? PACKAGE_ITINERARY_DIALOG_LABELS.時間軸行程
+                      : PACKAGE_ITINERARY_DIALOG_LABELS.每日行程}
                   </h3>
                   {/* 時間軸模式切換 */}
                   <button
@@ -252,10 +258,18 @@ export function PackageItineraryDialog({
                         ? 'bg-morandi-gold text-white shadow-sm'
                         : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50 border border-morandi-container'
                     }`}
-                    title={hook.isTimelineMode ? PACKAGE_ITINERARY_DIALOG_LABELS.切換簡易模式 : PACKAGE_ITINERARY_DIALOG_LABELS.切換時間軸模式}
+                    title={
+                      hook.isTimelineMode
+                        ? PACKAGE_ITINERARY_DIALOG_LABELS.切換簡易模式
+                        : PACKAGE_ITINERARY_DIALOG_LABELS.切換時間軸模式
+                    }
                   >
                     <Clock size={12} />
-                    <span>{hook.isTimelineMode ? PACKAGE_ITINERARY_DIALOG_LABELS.簡易模式 : PACKAGE_ITINERARY_DIALOG_LABELS.時間軸}</span>
+                    <span>
+                      {hook.isTimelineMode
+                        ? PACKAGE_ITINERARY_DIALOG_LABELS.簡易模式
+                        : PACKAGE_ITINERARY_DIALOG_LABELS.時間軸}
+                    </span>
                   </button>
                 </div>
 

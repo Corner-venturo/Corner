@@ -2,7 +2,14 @@
 
 import { useEffect, useRef, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { useTours, useItineraries, useQuotes, invalidateItineraries, useCountries, useCities } from '@/data'
+import {
+  useTours,
+  useItineraries,
+  useQuotes,
+  invalidateItineraries,
+  useCountries,
+  useCities,
+} from '@/data'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { formatDateTW, formatDateCompactPadded } from '@/lib/utils/format-date'
@@ -38,8 +45,12 @@ export function useItineraryDataLoader({
   const isFromQuote = searchParams.get('from_quote') === 'true'
   const quoteName = searchParams.get('quote_name')
   const daysFromQuote = parseInt(searchParams.get('days') || '0')
-  const mealsFromQuote = searchParams.get('meals') ? JSON.parse(searchParams.get('meals') || '[]') : []
-  const hotelsFromQuote = searchParams.get('hotels') ? JSON.parse(searchParams.get('hotels') || '[]') : []
+  const mealsFromQuote = searchParams.get('meals')
+    ? JSON.parse(searchParams.get('meals') || '[]')
+    : []
+  const hotelsFromQuote = searchParams.get('hotels')
+    ? JSON.parse(searchParams.get('hotels') || '[]')
+    : []
   const activitiesFromQuote = searchParams.get('activities')
     ? JSON.parse(searchParams.get('activities') || '[]')
     : []
@@ -55,130 +66,150 @@ export function useItineraryDataLoader({
   const isFetchingRef = useRef(false)
 
   // 載入行程表資料的輔助函數
-  const loadItineraryData = useCallback((itinerary: Itinerary) => {
-    logger.log('[ItineraryDataLoader] 載入行程表資料:', itinerary.id)
-    logger.log('[ItineraryDataLoader] 行程 daily_itinerary 長度:', (itinerary.daily_itinerary as unknown[] | null)?.length || 0)
-    logger.log('[ItineraryDataLoader] 行程資料 - features:', itinerary.features, 'daily_itinerary:', (itinerary.daily_itinerary as unknown[])?.length || 0)
+  const loadItineraryData = useCallback(
+    (itinerary: Itinerary) => {
+      logger.log('[ItineraryDataLoader] 載入行程表資料:', itinerary.id)
+      logger.log(
+        '[ItineraryDataLoader] 行程 daily_itinerary 長度:',
+        (itinerary.daily_itinerary as unknown[] | null)?.length || 0
+      )
+      logger.log(
+        '[ItineraryDataLoader] 行程資料 - features:',
+        itinerary.features,
+        'daily_itinerary:',
+        (itinerary.daily_itinerary as unknown[])?.length || 0
+      )
 
-    setTourData({
-      tagline: itinerary.tagline || getWorkspaceTagline(),
-      title: itinerary.title || '',
-      subtitle: itinerary.subtitle || '',
-      description: itinerary.description || '',
-      departureDate: itinerary.departure_date || '',
-      tourCode: itinerary.tour_code || '',
-      coverImage: itinerary.cover_image || '',
-      coverStyle: itinerary.cover_style || 'original',
-      flightStyle:
-        ((itinerary as { flight_style?: string }).flight_style || 'original') as LocalTourData['flightStyle'],
-      itineraryStyle:
-        ((itinerary as { itinerary_style?: string }).itinerary_style ||
+      setTourData({
+        tagline: itinerary.tagline || getWorkspaceTagline(),
+        title: itinerary.title || '',
+        subtitle: itinerary.subtitle || '',
+        description: itinerary.description || '',
+        departureDate: itinerary.departure_date || '',
+        tourCode: itinerary.tour_code || '',
+        coverImage: itinerary.cover_image || '',
+        coverStyle: itinerary.cover_style || 'original',
+        flightStyle: ((itinerary as { flight_style?: string }).flight_style ||
+          'original') as LocalTourData['flightStyle'],
+        itineraryStyle: ((itinerary as { itinerary_style?: string }).itinerary_style ||
           'original') as LocalTourData['itineraryStyle'],
-      price: itinerary.price || '',
-      priceNote: itinerary.price_note || '',
-      country: itinerary.country || '',
-      city: itinerary.city || '',
-      status: itinerary.status || ITINERARY_DATA_LOADER_LABELS.STATUS_PROPOSAL,
-      outboundFlight: (Array.isArray(itinerary.outbound_flight) ? itinerary.outbound_flight[0] : itinerary.outbound_flight) || itinerary.flight_info?.outbound || {
-        airline: '',
-        flightNumber: '',
-        departureAirport: 'TPE',
-        departureTime: '',
-        departureDate: '',
-        arrivalAirport: '',
-        arrivalTime: '',
-        duration: '',
-      },
-      returnFlight: (Array.isArray(itinerary.return_flight) ? itinerary.return_flight[0] : itinerary.return_flight) || itinerary.flight_info?.return || {
-        airline: '',
-        flightNumber: '',
-        departureAirport: '',
-        departureTime: '',
-        departureDate: '',
-        arrivalAirport: 'TPE',
-        arrivalTime: '',
-        duration: '',
-      },
-      features: (() => {
-        const f = itinerary.features || []
-        logger.log('[ItineraryDataLoader] 載入 features:', Array.isArray(f) ? f.length : 'not array', f)
-        return f
-      })(),
-      showFeatures: itinerary.show_features !== false,
-      focusCards: itinerary.focus_cards || [],
-      leader: itinerary.leader || {
-        name: '',
-        domesticPhone: '',
-        overseasPhone: '',
-      },
-      showLeaderMeeting: itinerary.show_leader_meeting !== false,
-      meetingInfo: itinerary.meeting_info || {
-        time: '',
-        location: '',
-      },
-      hotels: (itinerary.hotels as HotelInfo[]) || [],
-      showHotels: itinerary.show_hotels || false,
-      itinerarySubtitle: itinerary.itinerary_subtitle || '',
-      dailyItinerary: (itinerary.daily_itinerary || []).map((day) => {
-        const d = day as DailyItinerary
-        return {
-          ...d,
-          activities: Array.isArray(d.activities) ? d.activities : [],
-          recommendations: Array.isArray(d.recommendations) ? d.recommendations : [],
-          images: Array.isArray(d.images) ? d.images : [],
-          meals: d.meals || { breakfast: '', lunch: '', dinner: '' },
+        price: itinerary.price || '',
+        priceNote: itinerary.price_note || '',
+        country: itinerary.country || '',
+        city: itinerary.city || '',
+        status: itinerary.status || ITINERARY_DATA_LOADER_LABELS.STATUS_PROPOSAL,
+        outboundFlight: (Array.isArray(itinerary.outbound_flight)
+          ? itinerary.outbound_flight[0]
+          : itinerary.outbound_flight) ||
+          itinerary.flight_info?.outbound || {
+            airline: '',
+            flightNumber: '',
+            departureAirport: 'TPE',
+            departureTime: '',
+            departureDate: '',
+            arrivalAirport: '',
+            arrivalTime: '',
+            duration: '',
+          },
+        returnFlight: (Array.isArray(itinerary.return_flight)
+          ? itinerary.return_flight[0]
+          : itinerary.return_flight) ||
+          itinerary.flight_info?.return || {
+            airline: '',
+            flightNumber: '',
+            departureAirport: '',
+            departureTime: '',
+            departureDate: '',
+            arrivalAirport: 'TPE',
+            arrivalTime: '',
+            duration: '',
+          },
+        features: (() => {
+          const f = itinerary.features || []
+          logger.log(
+            '[ItineraryDataLoader] 載入 features:',
+            Array.isArray(f) ? f.length : 'not array',
+            f
+          )
+          return f
+        })(),
+        showFeatures: itinerary.show_features !== false,
+        focusCards: itinerary.focus_cards || [],
+        leader: itinerary.leader || {
+          name: '',
+          domesticPhone: '',
+          overseasPhone: '',
+        },
+        showLeaderMeeting: itinerary.show_leader_meeting !== false,
+        meetingInfo: itinerary.meeting_info || {
+          time: '',
+          location: '',
+        },
+        hotels: (itinerary.hotels as HotelInfo[]) || [],
+        showHotels: itinerary.show_hotels || false,
+        itinerarySubtitle: itinerary.itinerary_subtitle || '',
+        dailyItinerary: (itinerary.daily_itinerary || []).map(day => {
+          const d = day as DailyItinerary
+          return {
+            ...d,
+            activities: Array.isArray(d.activities) ? d.activities : [],
+            recommendations: Array.isArray(d.recommendations) ? d.recommendations : [],
+            images: Array.isArray(d.images) ? d.images : [],
+            meals: d.meals || { breakfast: '', lunch: '', dinner: '' },
+          }
+        }),
+        showPricingDetails: itinerary.pricing_details?.show_pricing_details || false,
+        pricingDetails: itinerary.pricing_details || {
+          show_pricing_details: false,
+          insurance_amount: '500',
+          included_items: [
+            { text: ITINERARY_DATA_LOADER_LABELS.TRANSPORT_COST, included: true },
+            { text: ITINERARY_DATA_LOADER_LABELS.ACCOMMODATION_COST, included: true },
+            { text: ITINERARY_DATA_LOADER_LABELS.MEAL_COST, included: true },
+            { text: ITINERARY_DATA_LOADER_LABELS.TICKET_COST, included: true },
+            { text: ITINERARY_DATA_LOADER_LABELS.GUIDE_SERVICE, included: true },
+            { text: ITINERARY_DATA_LOADER_LABELS.INSURANCE, included: true },
+          ],
+          excluded_items: [
+            { text: ITINERARY_DATA_LOADER_LABELS.PASSPORT_VISA, included: false },
+            { text: ITINERARY_DATA_LOADER_LABELS.OPTIONAL_TOUR, included: false },
+            { text: ITINERARY_DATA_LOADER_LABELS.PERSONAL_EXPENSE, included: false },
+            { text: ITINERARY_DATA_LOADER_LABELS.LUGGAGE_OVERWEIGHT, included: false },
+            { text: ITINERARY_DATA_LOADER_LABELS.SINGLE_ROOM, included: false },
+          ],
+          notes: [],
+        },
+        priceTiers: itinerary.price_tiers || [],
+        showPriceTiers: itinerary.show_price_tiers || false,
+        faqs: itinerary.faqs || [],
+        showFaqs: itinerary.show_faqs || false,
+        notices: itinerary.notices || [],
+        showNotices: itinerary.show_notices || false,
+        cancellationPolicy: itinerary.cancellation_policy || [],
+        showCancellationPolicy: itinerary.show_cancellation_policy || false,
+        version_records: itinerary.version_records || [],
+      })
+      setCurrentVersionIndex(-1)
+
+      // 載入關聯報價單的砍次表
+      if (setQuoteTierPricings && itinerary.quote_id) {
+        const quote = quotes.find(q => q.id === itinerary.quote_id)
+        if (quote?.tier_pricings && quote.tier_pricings.length > 0) {
+          setQuoteTierPricings(quote.tier_pricings as TierPricing[])
         }
-      }),
-      showPricingDetails: itinerary.pricing_details?.show_pricing_details || false,
-      pricingDetails: itinerary.pricing_details || {
-        show_pricing_details: false,
-        insurance_amount: '500',
-        included_items: [
-          { text: ITINERARY_DATA_LOADER_LABELS.TRANSPORT_COST, included: true },
-          { text: ITINERARY_DATA_LOADER_LABELS.ACCOMMODATION_COST, included: true },
-          { text: ITINERARY_DATA_LOADER_LABELS.MEAL_COST, included: true },
-          { text: ITINERARY_DATA_LOADER_LABELS.TICKET_COST, included: true },
-          { text: ITINERARY_DATA_LOADER_LABELS.GUIDE_SERVICE, included: true },
-          { text: ITINERARY_DATA_LOADER_LABELS.INSURANCE, included: true },
-        ],
-        excluded_items: [
-          { text: ITINERARY_DATA_LOADER_LABELS.PASSPORT_VISA, included: false },
-          { text: ITINERARY_DATA_LOADER_LABELS.OPTIONAL_TOUR, included: false },
-          { text: ITINERARY_DATA_LOADER_LABELS.PERSONAL_EXPENSE, included: false },
-          { text: ITINERARY_DATA_LOADER_LABELS.LUGGAGE_OVERWEIGHT, included: false },
-          { text: ITINERARY_DATA_LOADER_LABELS.SINGLE_ROOM, included: false },
-        ],
-        notes: [],
-      },
-      priceTiers: itinerary.price_tiers || [],
-      showPriceTiers: itinerary.show_price_tiers || false,
-      faqs: itinerary.faqs || [],
-      showFaqs: itinerary.show_faqs || false,
-      notices: itinerary.notices || [],
-      showNotices: itinerary.show_notices || false,
-      cancellationPolicy: itinerary.cancellation_policy || [],
-      showCancellationPolicy: itinerary.show_cancellation_policy || false,
-      version_records: itinerary.version_records || [],
-    })
-    setCurrentVersionIndex(-1)
-
-    // 載入關聯報價單的砍次表
-    if (setQuoteTierPricings && itinerary.quote_id) {
-      const quote = quotes.find(q => q.id === itinerary.quote_id)
-      if (quote?.tier_pricings && quote.tier_pricings.length > 0) {
-        setQuoteTierPricings(quote.tier_pricings as TierPricing[])
       }
-    }
-    
-    // 設定是否有關聯報價單（用於鎖定住宿編輯）
-    if (setHasLinkedQuote) {
-      setHasLinkedQuote(!!itinerary.quote_id)
-    }
 
-    setLoading(false)
-    hasInitializedRef.current = true
-    lastIdRef.current = itinerary.id
-  }, [setTourData, setCurrentVersionIndex, setQuoteTierPricings, setLoading, quotes])
+      // 設定是否有關聯報價單（用於鎖定住宿編輯）
+      if (setHasLinkedQuote) {
+        setHasLinkedQuote(!!itinerary.quote_id)
+      }
+
+      setLoading(false)
+      hasInitializedRef.current = true
+      lastIdRef.current = itinerary.id
+    },
+    [setTourData, setCurrentVersionIndex, setQuoteTierPricings, setLoading, quotes]
+  )
 
   useEffect(() => {
     const initializeTourData = async () => {
@@ -215,7 +246,10 @@ export function useItineraryDataLoader({
               setLoading(false)
             } else if (data) {
               logger.log('[ItineraryDataLoader] 從資料庫載入成功')
-              logger.log('[ItineraryDataLoader] daily_itinerary 長度:', (data.daily_itinerary as unknown[])?.length || 0)
+              logger.log(
+                '[ItineraryDataLoader] daily_itinerary 長度:',
+                (data.daily_itinerary as unknown[])?.length || 0
+              )
               logger.log('[ItineraryDataLoader] country:', data.country, 'city:', data.city)
               const itinerary = data as unknown as Itinerary
               loadItineraryData(itinerary)
@@ -228,7 +262,7 @@ export function useItineraryDataLoader({
                   .eq('tour_id', itinerary.tour_id)
                   .eq('status', 'completed')
                   .maybeSingle()
-                
+
                 if (confirmSheet) {
                   logger.log('[ItineraryDataLoader] 行程已交接，設為唯讀')
                   setIsHandedOff(true)
@@ -320,20 +354,24 @@ export function useItineraryDataLoader({
       }
 
       // 有 tour_id，從旅遊團載入基本資料
-      const tour = tours.find((t) => t.id === tourId)
+      const tour = tours.find(t => t.id === tourId)
       if (!tour) {
         setLoading(false)
         return
       }
 
-      const country = tour.country_id ? countries.find((c) => c.id === tour.country_id) : null
-      const city = tour.main_city_id ? cities.find((c) => c.id === tour.main_city_id) : null
+      const country = tour.country_id ? countries.find(c => c.id === tour.country_id) : null
+      const city = tour.main_city_id ? cities.find(c => c.id === tour.main_city_id) : null
 
       const departureDate = new Date(tour.departure_date)
       const returnDate = new Date(tour.return_date)
-      const days = Math.ceil((returnDate.getTime() - departureDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
+      const days =
+        Math.ceil((returnDate.getTime() - departureDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
 
-      const tourData = tour as typeof tour & { outbound_flight?: FlightInfo; return_flight?: FlightInfo }
+      const tourData = tour as typeof tour & {
+        outbound_flight?: FlightInfo
+        return_flight?: FlightInfo
+      }
       const tourOutboundFlight = tourData.outbound_flight ?? null
       const tourReturnFlight = tourData.return_flight ?? null
 
@@ -358,8 +396,7 @@ export function useItineraryDataLoader({
           departureAirport: tourOutboundFlight?.departureAirport || 'TPE',
           departureTime: tourOutboundFlight?.departureTime || '',
           departureDate:
-            tourOutboundFlight?.departureDate ||
-            formatDateCompactPadded(departureDate),
+            tourOutboundFlight?.departureDate || formatDateCompactPadded(departureDate),
           arrivalAirport: tourOutboundFlight?.arrivalAirport || city?.airport_code || '',
           arrivalTime: tourOutboundFlight?.arrivalTime || '',
           duration: tourOutboundFlight?.duration || '',
@@ -369,9 +406,7 @@ export function useItineraryDataLoader({
           flightNumber: tourReturnFlight?.flightNumber || '',
           departureAirport: tourReturnFlight?.departureAirport || city?.airport_code || '',
           departureTime: tourReturnFlight?.departureTime || '',
-          departureDate:
-            tourReturnFlight?.departureDate ||
-            formatDateCompactPadded(returnDate),
+          departureDate: tourReturnFlight?.departureDate || formatDateCompactPadded(returnDate),
           arrivalAirport: tourReturnFlight?.arrivalAirport || 'TPE',
           arrivalTime: tourReturnFlight?.arrivalTime || '',
           duration: tourReturnFlight?.duration || '',
@@ -384,7 +419,9 @@ export function useItineraryDataLoader({
           overseasPhone: '',
         },
         meetingInfo: {
-          time: isTaiwan ? formatDateTW(departureDate) + ' 08:00' : formatDateTW(departureDate) + ' 04:50',
+          time: isTaiwan
+            ? formatDateTW(departureDate) + ' 08:00'
+            : formatDateTW(departureDate) + ' 04:50',
           location: isTaiwan ? '' : '桃園機場第二航廈',
         },
         itinerarySubtitle: `${days}天${days - 1}夜精彩旅程規劃`,

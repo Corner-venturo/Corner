@@ -14,7 +14,13 @@ interface AdjustmentSliderProps {
   onChange: (value: number) => void
 }
 
-export function AdjustmentSlider({ label, value, min = -100, max = 100, onChange }: AdjustmentSliderProps) {
+export function AdjustmentSlider({
+  label,
+  value,
+  min = -100,
+  max = 100,
+  onChange,
+}: AdjustmentSliderProps) {
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between">
@@ -28,7 +34,7 @@ export function AdjustmentSlider({ label, value, min = -100, max = 100, onChange
         min={min}
         max={max}
         step={1}
-        onValueChange={(values) => onChange(values[0])}
+        onValueChange={values => onChange(values[0])}
         className="w-full"
       />
     </div>

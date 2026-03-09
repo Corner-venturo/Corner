@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = 'https://pfqvdacxowpgfamuvnsn.supabase.co'
-const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE'
+const supabaseServiceKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE'
 
 async function verifyFinalStatus() {
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
@@ -10,10 +11,7 @@ async function verifyFinalStatus() {
 
   try {
     // 檢查欄位
-    const { data, error } = await supabase
-      .from('todos')
-      .select('*')
-      .limit(1)
+    const { data, error } = await supabase.from('todos').select('*').limit(1)
 
     if (error) {
       console.error('❌ 查詢失敗:', error.message)
@@ -57,13 +55,12 @@ async function verifyFinalStatus() {
   }
 }
 
-verifyFinalStatus()
-  .then(success => {
-    if (success) {
-      console.log('\n🎉 Migration 驗證成功！')
-      console.log('現在可以重啟應用程式測試功能。')
-    } else {
-      console.log('\n⚠️ Migration 驗證失敗')
-    }
-    process.exit(success ? 0 : 1)
-  })
+verifyFinalStatus().then(success => {
+  if (success) {
+    console.log('\n🎉 Migration 驗證成功！')
+    console.log('現在可以重啟應用程式測試功能。')
+  } else {
+    console.log('\n⚠️ Migration 驗證失敗')
+  }
+  process.exit(success ? 0 : 1)
+})

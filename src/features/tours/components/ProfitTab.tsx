@@ -10,7 +10,10 @@ import {
   useMembers,
   useOrdersSlim,
 } from '@/data'
-import { calculateFullProfit, generateProfitTableData } from '../services/profit-calculation.service'
+import {
+  calculateFullProfit,
+  generateProfitTableData,
+} from '../services/profit-calculation.service'
 import {
   BONUS_TYPE_LABELS,
   BONUS_TYPE_BADGE_VARIANTS,
@@ -39,7 +42,9 @@ function ProfitTableColumn({ title, rows }: { title: string; rows: ProfitTableRo
             {rows.map((row, i) => (
               <tr key={i} className={i > 0 ? 'border-t' : ''}>
                 <td className="px-3 py-2">{row.label}</td>
-                <td className={`px-3 py-2 text-right font-mono tabular-nums ${row.amount < 0 ? 'text-red-600' : ''}`}>
+                <td
+                  className={`px-3 py-2 text-right font-mono tabular-nums ${row.amount < 0 ? 'text-red-600' : ''}`}
+                >
                   ${formatAmount(row.amount)}
                 </td>
               </tr>
@@ -147,10 +152,7 @@ export function ProfitTab({ tour }: ProfitTabProps) {
     })
   }, [receipts, normalExpenses, bonusSettings, memberCount, employeeDict])
 
-  const { left, right } = useMemo(
-    () => generateProfitTableData(profitResult),
-    [profitResult]
-  )
+  const { left, right } = useMemo(() => generateProfitTableData(profitResult), [profitResult])
 
   return (
     <div className="space-y-6">
@@ -172,18 +174,26 @@ export function ProfitTab({ tour }: ProfitTabProps) {
                   <tr key={r.id} className="border-t">
                     <td className="px-3 py-2">{r.code}</td>
                     <td className="px-3 py-2">{r.receipt_date}</td>
-                    <td className="px-3 py-2 text-right font-mono">${formatAmount(Number(r.amount))}</td>
+                    <td className="px-3 py-2 text-right font-mono">
+                      ${formatAmount(Number(r.amount))}
+                    </td>
                   </tr>
                 ))}
                 <tr className="border-t bg-muted/30 font-medium">
-                  <td className="px-3 py-2" colSpan={2}>{TOURS_LABELS.LABEL_1423}</td>
-                  <td className="px-3 py-2 text-right font-mono">${formatAmount(profitResult.receipt_total)}</td>
+                  <td className="px-3 py-2" colSpan={2}>
+                    {TOURS_LABELS.LABEL_1423}
+                  </td>
+                  <td className="px-3 py-2 text-right font-mono">
+                    ${formatAmount(profitResult.receipt_total)}
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
         ) : (
-          <div className="text-muted-foreground text-sm py-4 text-center">{TOURS_LABELS.LABEL_7189}</div>
+          <div className="text-muted-foreground text-sm py-4 text-center">
+            {TOURS_LABELS.LABEL_7189}
+          </div>
         )}
       </section>
 
@@ -209,14 +219,20 @@ export function ProfitTab({ tour }: ProfitTabProps) {
                   </tr>
                 ))}
                 <tr className="border-t bg-muted/30 font-medium">
-                  <td className="px-3 py-2" colSpan={2}>{TOURS_LABELS.LABEL_1423}</td>
-                  <td className="px-3 py-2 text-right font-mono">${formatAmount(profitResult.expense_total)}</td>
+                  <td className="px-3 py-2" colSpan={2}>
+                    {TOURS_LABELS.LABEL_1423}
+                  </td>
+                  <td className="px-3 py-2 text-right font-mono">
+                    ${formatAmount(profitResult.expense_total)}
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
         ) : (
-          <div className="text-muted-foreground text-sm py-4 text-center">{TOURS_LABELS.LABEL_4310}</div>
+          <div className="text-muted-foreground text-sm py-4 text-center">
+            {TOURS_LABELS.LABEL_4310}
+          </div>
         )}
       </section>
 
@@ -239,7 +255,9 @@ export function ProfitTab({ tour }: ProfitTabProps) {
         ) : (
           <div className="space-y-2">
             {[...profitResult.team_bonuses, ...profitResult.employee_bonuses].length === 0 ? (
-              <div className="text-muted-foreground text-sm py-4 text-center">{TOURS_LABELS.SETTINGS_6822}</div>
+              <div className="text-muted-foreground text-sm py-4 text-center">
+                {TOURS_LABELS.SETTINGS_6822}
+              </div>
             ) : (
               <div className="border rounded-lg overflow-hidden">
                 <table className="w-full text-sm">
@@ -251,17 +269,25 @@ export function ProfitTab({ tour }: ProfitTabProps) {
                     </tr>
                   </thead>
                   <tbody>
-                    {[...profitResult.team_bonuses, ...profitResult.employee_bonuses].map((b, i) => (
-                      <tr key={i} className="border-t">
-                        <td className="px-3 py-2">
-                          <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${BONUS_TYPE_BADGE_VARIANTS[b.setting.type as BonusSettingType] || ''}`}>
-                            {BONUS_TYPE_LABELS[b.setting.type as BonusSettingType]}
-                          </span>
-                        </td>
-                        <td className="px-3 py-2 text-muted-foreground">{b.employee_name || '-'}</td>
-                        <td className="px-3 py-2 text-right font-mono">${formatAmount(b.amount)}</td>
-                      </tr>
-                    ))}
+                    {[...profitResult.team_bonuses, ...profitResult.employee_bonuses].map(
+                      (b, i) => (
+                        <tr key={i} className="border-t">
+                          <td className="px-3 py-2">
+                            <span
+                              className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${BONUS_TYPE_BADGE_VARIANTS[b.setting.type as BonusSettingType] || ''}`}
+                            >
+                              {BONUS_TYPE_LABELS[b.setting.type as BonusSettingType]}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2 text-muted-foreground">
+                            {b.employee_name || '-'}
+                          </td>
+                          <td className="px-3 py-2 text-right font-mono">
+                            ${formatAmount(b.amount)}
+                          </td>
+                        </tr>
+                      )
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -270,7 +296,9 @@ export function ProfitTab({ tour }: ProfitTabProps) {
             {/* 獎金請款 */}
             {bonusExpenses.length > 0 && (
               <div className="mt-4">
-                <h4 className="text-sm font-medium mb-2 text-muted-foreground">{TOURS_LABELS.LABEL_8378}</h4>
+                <h4 className="text-sm font-medium mb-2 text-muted-foreground">
+                  {TOURS_LABELS.LABEL_8378}
+                </h4>
                 <div className="border rounded-lg overflow-hidden">
                   <table className="w-full text-sm">
                     <tbody>
@@ -278,7 +306,9 @@ export function ProfitTab({ tour }: ProfitTabProps) {
                         <tr key={pr.id} className="border-t first:border-t-0">
                           <td className="px-3 py-2">{pr.code || pr.request_number}</td>
                           <td className="px-3 py-2">{pr.supplier_name || '-'}</td>
-                          <td className="px-3 py-2 text-right font-mono">${formatAmount(pr.amount)}</td>
+                          <td className="px-3 py-2 text-right font-mono">
+                            ${formatAmount(pr.amount)}
+                          </td>
                         </tr>
                       ))}
                     </tbody>

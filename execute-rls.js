@@ -27,18 +27,18 @@ async function executeSQL() {
     path: `/v1/projects/${PROJECT_REF}/database/query`,
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${SUPABASE_ACCESS_TOKEN}`,
-      'Content-Type': 'application/json'
-    }
+      Authorization: `Bearer ${SUPABASE_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
   }
 
   const postData = JSON.stringify({ query: SQL })
 
   return new Promise((resolve, reject) => {
-    const req = https.request(options, (res) => {
+    const req = https.request(options, res => {
       let data = ''
 
-      res.on('data', (chunk) => {
+      res.on('data', chunk => {
         data += chunk
       })
 
@@ -69,7 +69,7 @@ async function executeSQL() {
       })
     })
 
-    req.on('error', (error) => {
+    req.on('error', error => {
       console.error('❌ 請求錯誤:', error.message)
       console.log('\n⚠️ 網路連線失敗，請手動執行:')
       console.log('前往: https://supabase.com/dashboard/project/pfqvdacxowpgfamuvnsn/sql/new')
@@ -89,7 +89,7 @@ executeSQL()
     console.log('請執行 node check-rls-status.js 驗證結果')
     process.exit(0)
   })
-  .catch((error) => {
+  .catch(error => {
     console.error('\n❌ 執行失敗:', error.message)
     process.exit(1)
   })

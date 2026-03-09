@@ -21,16 +21,16 @@ interface MessageListTheme {
 
 const theme: MessageListTheme = {
   colors: {
-    surface: 'bg-card'
+    surface: 'bg-card',
   },
   spacing: {
-    lg: '1rem'
-  }
+    lg: '1rem',
+  },
 }
 
 interface ChannelChatMessagesProps {
-  channel: Channel; // Use the full channel object
-  isAdmin: boolean; // Pass down isAdmin
+  channel: Channel // Use the full channel object
+  isAdmin: boolean // Pass down isAdmin
   messages: Message[]
   advanceLists: AdvanceList[]
   sharedOrderLists: SharedOrderList[]
@@ -163,11 +163,21 @@ export function ChatMessages({
         const trimmedText = text.trim()
         if (trimmedText.startsWith('http://') || trimmedText.startsWith('https://')) {
           // 檢查是否像圖片 URL
-          const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp', '.avif']
+          const imageExtensions = [
+            '.jpg',
+            '.jpeg',
+            '.png',
+            '.gif',
+            '.webp',
+            '.svg',
+            '.bmp',
+            '.avif',
+          ]
           const lowerUrl = trimmedText.toLowerCase()
-          const isImageUrl = imageExtensions.some(ext => lowerUrl.includes(ext)) ||
-                             lowerUrl.includes('image') ||
-                             lowerUrl.includes('photo')
+          const isImageUrl =
+            imageExtensions.some(ext => lowerUrl.includes(ext)) ||
+            lowerUrl.includes('image') ||
+            lowerUrl.includes('photo')
           if (isImageUrl) {
             imageUrl = trimmedText
           }
@@ -219,10 +229,7 @@ export function ChatMessages({
 
   return (
     <div
-      className={cn(
-        'flex flex-col flex-1 min-h-0 relative',
-        isDragging && 'bg-morandi-gold/5'
-      )}
+      className={cn('flex flex-col flex-1 min-h-0 relative', isDragging && 'bg-morandi-gold/5')}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -232,8 +239,12 @@ export function ChatMessages({
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-morandi-gold/10 border-2 border-dashed border-morandi-gold rounded-lg pointer-events-none">
           <div className="text-center bg-card/90 p-6 rounded-xl shadow-lg">
             <Paperclip size={48} className="mx-auto mb-3 text-morandi-gold" />
-            <p className="text-morandi-gold font-semibold text-lg">{COMP_WORKSPACE_LABELS.UPLOADING_2425}</p>
-            <p className="text-morandi-secondary text-sm mt-1">{COMP_WORKSPACE_LABELS.LABEL_7925}</p>
+            <p className="text-morandi-gold font-semibold text-lg">
+              {COMP_WORKSPACE_LABELS.UPLOADING_2425}
+            </p>
+            <p className="text-morandi-secondary text-sm mt-1">
+              {COMP_WORKSPACE_LABELS.LABEL_7925}
+            </p>
           </div>
         </div>
       )}
@@ -252,7 +263,7 @@ export function ChatMessages({
           onReply={onReply}
           getReplyCount={getReplyCount}
           onCreatePayment={onCreatePayment}
-  onDeleteAdvanceList={onDeleteAdvanceList}
+          onDeleteAdvanceList={onDeleteAdvanceList}
           onCreateReceipt={onCreateReceipt}
           messagesEndRef={messagesEndRef}
           theme={theme}

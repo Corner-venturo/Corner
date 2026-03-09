@@ -30,12 +30,13 @@
 
 **決定：全部使用 snake_case，不使用 humps 自動轉換**
 
-| 選項 | 說明 | 決定 |
-|------|------|------|
-| 方案 A：全部 snake_case | DB 和 JS 都用 `created_at` | ✅ 採用 |
-| 方案 B：humps 自動轉換 | DB 用 `created_at`，JS 用 `createdAt` | ❌ 不採用 |
+| 選項                    | 說明                                  | 決定      |
+| ----------------------- | ------------------------------------- | --------- |
+| 方案 A：全部 snake_case | DB 和 JS 都用 `created_at`            | ✅ 採用   |
+| 方案 B：humps 自動轉換  | DB 用 `created_at`，JS 用 `createdAt` | ❌ 不採用 |
 
 **理由**：
+
 - 減少複雜度，不需要額外的轉換層
 - TypeScript 類型直接從資料庫生成，保持一致
 - 避免 humps 轉換可能帶來的邊界問題
@@ -54,11 +55,11 @@
 
 ### 3.1 已執行的 Migration 清單
 
-| 順序 | Migration 檔案 | 內容 |
-|------|---------------|------|
-| 1 | `20260112100000_consolidate_naming_convention.sql` | 43 個欄位重命名為 snake_case |
-| 2 | `20260112200000_workspace_isolation_complete.sql` | proposal_packages 添加 workspace_id |
-| 3 | `20260112210000_naming_convention_complete_fix.sql` | tour_addons、request_response_items 添加 workspace_id + 2 個表格重命名 |
+| 順序 | Migration 檔案                                      | 內容                                                                   |
+| ---- | --------------------------------------------------- | ---------------------------------------------------------------------- |
+| 1    | `20260112100000_consolidate_naming_convention.sql`  | 43 個欄位重命名為 snake_case                                           |
+| 2    | `20260112200000_workspace_isolation_complete.sql`   | proposal_packages 添加 workspace_id                                    |
+| 3    | `20260112210000_naming_convention_complete_fix.sql` | tour_addons、request_response_items 添加 workspace_id + 2 個表格重命名 |
 
 ### 3.2 Migration 詳細內容
 
@@ -159,12 +160,12 @@ COMMIT;
 
 ### 4.1 修改的檔案清單
 
-| 檔案 | 變更內容 |
-|------|---------|
-| `src/lib/supabase/types.ts` | 重新從資料庫生成，所有欄位現在是 snake_case |
+| 檔案                           | 變更內容                                                 |
+| ------------------------------ | -------------------------------------------------------- |
+| `src/lib/supabase/types.ts`    | 重新從資料庫生成，所有欄位現在是 snake_case              |
 | `src/hooks/createCloudHook.ts` | 添加 `request_response_items` 到 WORKSPACE_SCOPED_TABLES |
-| `src/hooks/useTodos.ts` | 修復 `created_by_legacy` 類型錯誤 |
-| `src/types/proposal.types.ts` | 添加 `workspace_id` 到 ProposalPackage interface |
+| `src/hooks/useTodos.ts`        | 修復 `created_by_legacy` 類型錯誤                        |
+| `src/types/proposal.types.ts`  | 添加 `workspace_id` 到 ProposalPackage interface         |
 
 ### 4.2 WORKSPACE_SCOPED_TABLES 最終狀態
 
@@ -223,34 +224,34 @@ const WORKSPACE_SCOPED_TABLES = [
 
 ### 5.1 欄位命名修復（43 個）
 
-| 表格 | 修復的欄位 |
-|------|-----------|
-| `payments` | createdat→created_at, updatedat→updated_at, orderid→order_id, tourid→tour_id, paymentdate→payment_date, paymentnumber→payment_number, paymenttype→payment_type, receivedby→received_by |
-| `price_list_items` | createdat→created_at, updatedat→updated_at, itemcode→item_code, itemname→item_name, minimumorder→minimum_order, supplierid→supplier_id, unitprice→unit_price, validfrom→valid_from, validuntil→valid_until |
-| `quote_categories` | createdat→created_at, updatedat→updated_at, quoteid→quote_id |
-| `quote_versions` | createdat→created_at, quoteid→quote_id, changenote→change_note, createdby→created_by |
-| `receipt_payment_items` | createdat→created_at, itemname→item_name, receiptid→receipt_id |
-| `tour_refunds` | createdat→created_at, updatedat→updated_at, memberid→member_id, orderid→order_id, processedby→processed_by, processingstatus→processing_status, refundamount→refund_amount, refunddate→refund_date, refundreason→refund_reason, tourid→tour_id |
-| `payment_request_items` | unitprice→unit_price |
-| `todos` | creator→created_by_legacy |
-| `messages` | author_id→created_by_legacy_author |
-| `advance_lists` | author_id→created_by_legacy_author |
-| `bulletins` | author_id→created_by |
-| `itineraries` | creator_user_id→created_by_legacy_user_id |
+| 表格                    | 修復的欄位                                                                                                                                                                                                                                     |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `payments`              | createdat→created_at, updatedat→updated_at, orderid→order_id, tourid→tour_id, paymentdate→payment_date, paymentnumber→payment_number, paymenttype→payment_type, receivedby→received_by                                                         |
+| `price_list_items`      | createdat→created_at, updatedat→updated_at, itemcode→item_code, itemname→item_name, minimumorder→minimum_order, supplierid→supplier_id, unitprice→unit_price, validfrom→valid_from, validuntil→valid_until                                     |
+| `quote_categories`      | createdat→created_at, updatedat→updated_at, quoteid→quote_id                                                                                                                                                                                   |
+| `quote_versions`        | createdat→created_at, quoteid→quote_id, changenote→change_note, createdby→created_by                                                                                                                                                           |
+| `receipt_payment_items` | createdat→created_at, itemname→item_name, receiptid→receipt_id                                                                                                                                                                                 |
+| `tour_refunds`          | createdat→created_at, updatedat→updated_at, memberid→member_id, orderid→order_id, processedby→processed_by, processingstatus→processing_status, refundamount→refund_amount, refunddate→refund_date, refundreason→refund_reason, tourid→tour_id |
+| `payment_request_items` | unitprice→unit_price                                                                                                                                                                                                                           |
+| `todos`                 | creator→created_by_legacy                                                                                                                                                                                                                      |
+| `messages`              | author_id→created_by_legacy_author                                                                                                                                                                                                             |
+| `advance_lists`         | author_id→created_by_legacy_author                                                                                                                                                                                                             |
+| `bulletins`             | author_id→created_by                                                                                                                                                                                                                           |
+| `itineraries`           | creator_user_id→created_by_legacy_user_id                                                                                                                                                                                                      |
 
 ### 5.2 表格命名修復（2 個）
 
-| 舊名稱 | 新名稱 |
-|--------|--------|
+| 舊名稱                  | 新名稱                  |
+| ----------------------- | ----------------------- |
 | `Itinerary_Permissions` | `itinerary_permissions` |
-| `Tour_Expenses` | `tour_expenses` |
+| `Tour_Expenses`         | `tour_expenses`         |
 
 ### 5.3 Workspace 隔離修復（3 個）
 
-| 表格 | 回填資料來源 |
-|------|-------------|
-| `proposal_packages` | 從 `proposals.workspace_id` |
-| `tour_addons` | 從 `tours.workspace_id` |
+| 表格                     | 回填資料來源                                              |
+| ------------------------ | --------------------------------------------------------- |
+| `proposal_packages`      | 從 `proposals.workspace_id`                               |
+| `tour_addons`            | 從 `tours.workspace_id`                                   |
 | `request_response_items` | 從 `tour_requests.workspace_id`（透過 request_responses） |
 
 ---
@@ -276,11 +277,11 @@ $ npm run type-check
 
 ## 七、相關文件
 
-| 文件 | 說明 |
-|------|------|
-| `docs/DATABASE_DESIGN_STANDARDS.md` | 資料庫設計規範（已更新） |
-| `docs/DATABASE_AUDIT_REPORT.md` | 資料庫審計報告（已更新） |
-| `docs/DATABASE_RECONSTRUCTION_2026-01-12.md` | 本文件 |
+| 文件                                         | 說明                     |
+| -------------------------------------------- | ------------------------ |
+| `docs/DATABASE_DESIGN_STANDARDS.md`          | 資料庫設計規範（已更新） |
+| `docs/DATABASE_AUDIT_REPORT.md`              | 資料庫審計報告（已更新） |
+| `docs/DATABASE_RECONSTRUCTION_2026-01-12.md` | 本文件                   |
 
 ---
 
@@ -307,12 +308,12 @@ $ npm run type-check
 
 以下欄位被重命名為 `_legacy` 後綴，保留舊資料但標記為過時：
 
-| 表格 | 欄位 | 說明 |
-|------|------|------|
-| `todos` | `created_by_legacy` | 原 `creator`，與 `created_by` 並存 |
-| `messages` | `created_by_legacy_author` | 原 `author_id`，與 `created_by` 並存 |
-| `advance_lists` | `created_by_legacy_author` | 原 `author_id`，與 `created_by` 並存 |
-| `itineraries` | `created_by_legacy_user_id` | 原 `creator_user_id`，與 `created_by` 並存 |
+| 表格            | 欄位                        | 說明                                       |
+| --------------- | --------------------------- | ------------------------------------------ |
+| `todos`         | `created_by_legacy`         | 原 `creator`，與 `created_by` 並存         |
+| `messages`      | `created_by_legacy_author`  | 原 `author_id`，與 `created_by` 並存       |
+| `advance_lists` | `created_by_legacy_author`  | 原 `author_id`，與 `created_by` 並存       |
+| `itineraries`   | `created_by_legacy_user_id` | 原 `creator_user_id`，與 `created_by` 並存 |
 
 這些 legacy 欄位可在未來的資料遷移中統一處理。
 
@@ -332,5 +333,5 @@ $ npm run type-check
 
 ---
 
-*報告生成日期：2026-01-12*
-*報告版本：1.0*
+_報告生成日期：2026-01-12_
+_報告版本：1.0_

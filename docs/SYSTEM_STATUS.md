@@ -45,24 +45,24 @@
 
 ### 主要 Store
 
-| Store | 說明 | 使用方式 |
-|-------|------|----------|
-| `useTourStore` | 旅遊團管理 | `createCloudStore` |
-| `useOrderStore` | 訂單管理 | `createCloudStore` |
-| `useCustomerStore` | 客戶管理 | `createCloudStore` |
-| `usePaymentStore` | 付款管理 | `createCloudStore` |
-| `useQuoteStore` | 報價管理 | `createCloudStore` |
-| `useMemberStore` | 成員管理 | `createCloudStore` |
-| `useEmployeeStore` | 員工管理 | `createCloudStore` |
+| Store              | 說明       | 使用方式           |
+| ------------------ | ---------- | ------------------ |
+| `useTourStore`     | 旅遊團管理 | `createCloudStore` |
+| `useOrderStore`    | 訂單管理   | `createCloudStore` |
+| `useCustomerStore` | 客戶管理   | `createCloudStore` |
+| `usePaymentStore`  | 付款管理   | `createCloudStore` |
+| `useQuoteStore`    | 報價管理   | `createCloudStore` |
+| `useMemberStore`   | 成員管理   | `createCloudStore` |
+| `useEmployeeStore` | 員工管理   | `createCloudStore` |
 
 ### 輔助 Store
 
-| Store | 說明 |
-|-------|------|
-| `auth-store.ts` | 認證狀態 |
+| Store                | 說明     |
+| -------------------- | -------- |
+| `auth-store.ts`      | 認證狀態 |
 | `workspace-store.ts` | 工作空間 |
-| `calendar-store.ts` | 行事曆 |
-| `todo-store.ts` | 待辦事項 |
+| `calendar-store.ts`  | 行事曆   |
+| `todo-store.ts`      | 待辦事項 |
 
 ## 資料結構標準
 
@@ -73,44 +73,44 @@
 
 ### 編號規範
 
-| 項目 | 格式 | 範例 | 說明 |
-|------|------|------|------|
-| **團號** | `{城市代碼}{YYMMDD}{A-Z}` | `CNX250128A` | 清邁 2025/01/28 第1團 |
-| **訂單** | `{團號}-O{2位數}` | `CNX250128A-O01` | 該團第1筆訂單 |
-| **出納單** | `P{YYMMDD}{A-Z}` | `P250128A` | 2025/01/28 第1張出納單 |
-| **客戶** | `C{6位數}` | `C000001` | 全域流水號 |
-| **報價單** | `Q{6位數}` / `X{6位數}` | `Q000001` | 標準報價 Q / 快速報價 X |
-| **員工** | `E{3位數}` | `E001` | 員工編號 |
+| 項目       | 格式                      | 範例             | 說明                    |
+| ---------- | ------------------------- | ---------------- | ----------------------- |
+| **團號**   | `{城市代碼}{YYMMDD}{A-Z}` | `CNX250128A`     | 清邁 2025/01/28 第1團   |
+| **訂單**   | `{團號}-O{2位數}`         | `CNX250128A-O01` | 該團第1筆訂單           |
+| **出納單** | `P{YYMMDD}{A-Z}`          | `P250128A`       | 2025/01/28 第1張出納單  |
+| **客戶**   | `C{6位數}`                | `C000001`        | 全域流水號              |
+| **報價單** | `Q{6位數}` / `X{6位數}`   | `Q000001`        | 標準報價 Q / 快速報價 X |
+| **員工**   | `E{3位數}`                | `E001`           | 員工編號                |
 
 ## 資料表結構
 
 ### 核心業務表
 
-| 表格 | 說明 | RLS |
-|------|------|-----|
-| `tours` | 旅遊團 | ✅ |
-| `orders` | 訂單 | ✅ |
-| `order_members` | 訂單成員 | ✅ |
-| `customers` | 客戶 | ✅ |
-| `payments` | 付款記錄 | ✅ |
-| `receipts` | 收款單 | ✅ |
-| `quotes` | 報價單 | ✅ |
-| `proposals` | 提案 | ✅ |
-| `itineraries` | 行程表 | ✅ |
-| `visas` | 簽證資料 | ✅ |
+| 表格            | 說明     | RLS |
+| --------------- | -------- | --- |
+| `tours`         | 旅遊團   | ✅  |
+| `orders`        | 訂單     | ✅  |
+| `order_members` | 訂單成員 | ✅  |
+| `customers`     | 客戶     | ✅  |
+| `payments`      | 付款記錄 | ✅  |
+| `receipts`      | 收款單   | ✅  |
+| `quotes`        | 報價單   | ✅  |
+| `proposals`     | 提案     | ✅  |
+| `itineraries`   | 行程表   | ✅  |
+| `visas`         | 簽證資料 | ✅  |
 
 ### 基礎資料表（無 RLS）
 
-| 表格 | 說明 |
-|------|------|
-| `workspaces` | 工作空間 |
-| `employees` | 員工 |
-| `countries` | 國家 |
-| `cities` | 城市 |
-| `attractions` | 景點 |
-| `suppliers` | 供應商 |
-| `hotels` | 飯店 |
-| `airlines` | 航空公司 |
+| 表格          | 說明     |
+| ------------- | -------- |
+| `workspaces`  | 工作空間 |
+| `employees`   | 員工     |
+| `countries`   | 國家     |
+| `cities`      | 城市     |
+| `attractions` | 景點     |
+| `suppliers`   | 供應商   |
+| `hotels`      | 飯店     |
+| `airlines`    | 航空公司 |
 
 ## 開發工具
 
@@ -123,17 +123,17 @@
 
 ## 技術棧
 
-| 類別 | 技術 | 版本 |
-|------|------|------|
-| **前端框架** | Next.js | 16 |
-| **UI 框架** | React | 19.2 |
-| **語言** | TypeScript | 5 |
-| **狀態管理** | Zustand | 5 |
-| **資料快取** | SWR | 2.x |
-| **雲端資料庫** | Supabase PostgreSQL | - |
-| **認證** | Supabase Auth | - |
-| **UI 組件** | Tailwind CSS + shadcn/ui | 4 |
-| **開發端口** | - | 3000 |
+| 類別           | 技術                     | 版本 |
+| -------------- | ------------------------ | ---- |
+| **前端框架**   | Next.js                  | 16   |
+| **UI 框架**    | React                    | 19.2 |
+| **語言**       | TypeScript               | 5    |
+| **狀態管理**   | Zustand                  | 5    |
+| **資料快取**   | SWR                      | 2.x  |
+| **雲端資料庫** | Supabase PostgreSQL      | -    |
+| **認證**       | Supabase Auth            | -    |
+| **UI 組件**    | Tailwind CSS + shadcn/ui | 4    |
+| **開發端口**   | -                        | 3000 |
 
 ## 開發進度（2026-01 更新）
 

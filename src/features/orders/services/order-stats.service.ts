@@ -53,11 +53,11 @@ export async function recalculateOrderAmount(order_id: string): Promise<void> {
     const totalMembers = memberCount || 0
 
     // 3. 查詢 tour 的每人售價
-    const { data: tourData, error: tourError } = await supabase
+    const { data: tourData, error: tourError } = (await supabase
       .from('tours')
       .select('selling_price_per_person')
       .eq('id', order.tour_id!)
-      .single() as { data: { selling_price_per_person: number | null } | null; error: unknown }
+      .single()) as { data: { selling_price_per_person: number | null } | null; error: unknown }
 
     if (tourError || !tourData) {
       logger.warn('Failed to fetch tour selling price, defaulting to 0:', tourError)

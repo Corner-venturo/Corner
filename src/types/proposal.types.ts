@@ -34,7 +34,7 @@ export interface ParticipantCounts {
 
 export interface Proposal {
   id: string
-  code: string                            // P000001
+  code: string // P000001
 
   // 客戶資訊（選填）
   customer_id?: string | null
@@ -105,7 +105,7 @@ export interface ConfirmedRequirementsSnapshot {
 
 export interface ConfirmedRequirementItem {
   id: string
-  category: string           // hotel, restaurant, transport, activity, other
+  category: string // hotel, restaurant, transport, activity, other
   supplier_name: string
   service_date: string | null
   title: string
@@ -118,8 +118,8 @@ export interface ProposalPackage {
   proposal_id: string
 
   // 版本識別
-  version_name: string                    // 「方案A - 標準版」
-  version_number: number                  // 1, 2, 3...
+  version_name: string // 「方案A - 標準版」
+  version_number: number // 1, 2, 3...
 
   // 目的地
   country_id?: string | null
@@ -137,13 +137,13 @@ export interface ProposalPackage {
   participant_counts?: ParticipantCounts | null
 
   // 關聯資料（外鍵）
-  quote_id?: string | null                // 關聯報價單
-  itinerary_id?: string | null            // 關聯行程表
-  handbook_id?: string | null             // 關聯手冊（未來）
+  quote_id?: string | null // 關聯報價單
+  itinerary_id?: string | null // 關聯行程表
+  handbook_id?: string | null // 關聯手冊（未來）
 
   // 行程表類型（互斥：選一種就不能用另一種）
-  itinerary_type?: 'simple' | 'timeline' | null  // simple=簡易行程表, timeline=時間軸
-  timeline_data?: TimelineItineraryData | null   // 時間軸資料
+  itinerary_type?: 'simple' | 'timeline' | null // simple=簡易行程表, timeline=時間軸
+  timeline_data?: TimelineItineraryData | null // 時間軸資料
 
   // 需求確認追蹤
   confirmed_requirements?: ConfirmedRequirementsSnapshot | null
@@ -162,7 +162,7 @@ export interface ProposalPackage {
   updated_at: string
 
   // Workspace 隔離
-  workspace_id?: string | null  // ✅ 2026-01-12: 添加 workspace 隔離
+  workspace_id?: string | null // ✅ 2026-01-12: 添加 workspace 隔離
 
   // 關聯資料（查詢時 JOIN）
   quote?: {
@@ -187,13 +187,13 @@ export interface CreateProposalData {
   customer_name?: string
   customer_email?: string
   customer_phone?: string
-  title?: string                            // 選填，轉開團時補填
+  title?: string // 選填，轉開團時補填
   description?: string
   notes?: string
   country_id?: string
   main_city_id?: string
   destination?: string
-  expected_start_date?: string              // 預計出發日期
+  expected_start_date?: string // 預計出發日期
   expected_end_date?: string
   flexible_dates?: boolean
   group_size?: number
@@ -236,11 +236,11 @@ export interface UpdatePackageData extends Partial<Omit<CreatePackageData, 'prop
 export interface ConvertToTourData {
   proposal_id: string
   package_id: string
-  city_code: string                       // 用於生成團號
-  departure_date: string                  // 確定的出發日期
-  tour_name?: string                      // 團名（選填，預設用提案標題）
-  contact_person?: string                 // 聯絡人
-  contact_phone?: string                  // 聯絡電話
+  city_code: string // 用於生成團號
+  departure_date: string // 確定的出發日期
+  tour_name?: string // 團名（選填，預設用提案標題）
+  contact_person?: string // 聯絡人
+  contact_phone?: string // 聯絡電話
 }
 
 export interface ConvertToTourResult {

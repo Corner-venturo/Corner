@@ -23,7 +23,9 @@ export function CreateGroupDialog({
   return (
     <div className="absolute inset-0 bg-black/20 flex items-center justify-center z-50">
       <div className="card-morandi-elevated w-80">
-        <h3 className="font-semibold mb-3 text-morandi-primary">{COMP_WORKSPACE_LABELS.ADD_2009}</h3>
+        <h3 className="font-semibold mb-3 text-morandi-primary">
+          {COMP_WORKSPACE_LABELS.ADD_2009}
+        </h3>
         <input
           type="text"
           placeholder={COMP_WORKSPACE_LABELS.群組名稱}

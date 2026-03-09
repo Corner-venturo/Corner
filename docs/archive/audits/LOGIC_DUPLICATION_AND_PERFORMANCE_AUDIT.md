@@ -11,12 +11,13 @@
 
 **問題**：相同邏輯在 2 個檔案中重複實作
 
-| 檔案 | 行號 | 說明 |
-|------|------|------|
-| `src/stores/core/create-store.ts` | 54-76 | 完整實作 |
-| `src/hooks/createCloudHook.ts` | 28-47 | 完全相同的實作 |
+| 檔案                              | 行號  | 說明           |
+| --------------------------------- | ----- | -------------- |
+| `src/stores/core/create-store.ts` | 54-76 | 完整實作       |
+| `src/hooks/createCloudHook.ts`    | 28-47 | 完全相同的實作 |
 
 **程式碼對比**：
+
 ```typescript
 // 兩處完全相同的程式碼（約 20 行）
 function getCurrentUserContext(): { workspaceId: string | null; userRole: UserRole | null } {
@@ -32,10 +33,12 @@ function getCurrentUserContext(): { workspaceId: string | null; userRole: UserRo
 ```
 
 **影響**：
+
 - 維護負擔：修改時需同步兩處
 - 不一致風險：容易漏改一處
 
 **解決方案**：
+
 ```typescript
 // src/lib/workspace-helpers.ts（已存在但未使用）
 export function getCurrentUserContext() { ... }
@@ -50,12 +53,13 @@ import { getCurrentUserContext } from '@/lib/workspace-helpers'
 
 **問題**：UUID 生成邏輯在 2 個檔案中重複
 
-| 檔案 | 行號 |
-|------|------|
+| 檔案                              | 行號  |
+| --------------------------------- | ----- |
 | `src/stores/core/create-store.ts` | 31-48 |
-| `src/hooks/useTodos.ts` | 24-38 |
+| `src/hooks/useTodos.ts`           | 24-38 |
 
 **解決方案**：
+
 ```typescript
 // 已有 src/lib/utils/uuid.ts，應統一使用
 import { generateUUID } from '@/lib/utils/uuid'
@@ -67,13 +71,14 @@ import { generateUUID } from '@/lib/utils/uuid'
 
 **問題**：3 個會計 API 有幾乎相同的處理結構
 
-| 檔案 |
-|------|
+| 檔案                                             |
+| ------------------------------------------------ |
 | `/api/accounting/post/customer-receipt/route.ts` |
 | `/api/accounting/post/supplier-payment/route.ts` |
 | `/api/accounting/post/group-settlement/route.ts` |
 
 **重複的模式**（約 40 行）：
+
 ```typescript
 export async function POST(request: NextRequest) {
   try {
@@ -94,6 +99,7 @@ export async function POST(request: NextRequest) {
 ```
 
 **解決方案**：建立共用 middleware
+
 ```typescript
 // src/lib/api/accounting-handler.ts
 export function createAccountingHandler<T>(
@@ -111,11 +117,13 @@ export function createAccountingHandler<T>(
 **問題**：相同的錯誤處理模式出現 20+ 次
 
 **重複的程式碼**：
+
 ```typescript
 error instanceof Error ? error.message : 'Unknown error'
 ```
 
 **出現位置**（部分）：
+
 - `src/app/api/cron/ticket-status/route.ts:57`
 - `src/app/api/gemini/generate-image/route.ts:105, 173`
 - `src/app/api/ocr/passport/route.ts:109, 136`
@@ -123,6 +131,7 @@ error instanceof Error ? error.message : 'Unknown error'
 - 等 20+ 處
 
 **解決方案**：
+
 ```typescript
 // src/lib/utils/error.ts
 export function errorToMessage(error: unknown): string {
@@ -142,13 +151,14 @@ export function errorToMessage(error: unknown): string {
 
 **嚴重案例**：
 
-| 頁面 | 問題 | 影響 |
-|------|------|------|
-| `unclosed-tours/page.tsx` | `fetchAll()` 載入所有 tours，前端 `filter()` | 若有 1000 團，全部下載後只顯示 10 個 |
-| `monthly-disbursement/page.tsx` | 載入所有 payment_requests + disbursement_orders | 兩個大表全部下載 |
-| `monthly-income/page.tsx` | 載入所有 receipt_orders | 全表下載 |
+| 頁面                            | 問題                                            | 影響                                 |
+| ------------------------------- | ----------------------------------------------- | ------------------------------------ |
+| `unclosed-tours/page.tsx`       | `fetchAll()` 載入所有 tours，前端 `filter()`    | 若有 1000 團，全部下載後只顯示 10 個 |
+| `monthly-disbursement/page.tsx` | 載入所有 payment_requests + disbursement_orders | 兩個大表全部下載                     |
+| `monthly-income/page.tsx`       | 載入所有 receipt_orders                         | 全表下載                             |
 
 **具體程式碼**：
+
 ```typescript
 // unclosed-tours/page.tsx:70-72
 useEffect(() => {
@@ -162,6 +172,7 @@ const unclosedTours = useMemo(() => {
 ```
 
 **影響**：
+
 - 初次載入慢（需下載整個表）
 - 頻寬浪費（傳輸大量不需要的資料）
 - 記憶體佔用高（前端存放完整資料）
@@ -208,23 +219,21 @@ export async function GET() {
 
 **高風險案例**：
 
-| 檔案 | 程式碼 | 問題 |
-|------|--------|------|
-| `orders/page.tsx:169` | `orders.filter(o => o.tour_id === ...)` | 載入所有訂單找一個團的 |
-| `region-store.ts:231` | `regionStore.items.filter(r => r.country_id === ...)` | 可用 Supabase 查詢 |
-| `region-store.ts:245` | `cityStore.items.filter(c => c.region_id === ...)` | 可用 Supabase 查詢 |
-| `quick-add/hooks/useQuickAdd.ts:133` | `memberStore.items.filter(m => m.order_id === ...)` | 載入所有成員找一個訂單的 |
+| 檔案                                 | 程式碼                                                | 問題                     |
+| ------------------------------------ | ----------------------------------------------------- | ------------------------ |
+| `orders/page.tsx:169`                | `orders.filter(o => o.tour_id === ...)`               | 載入所有訂單找一個團的   |
+| `region-store.ts:231`                | `regionStore.items.filter(r => r.country_id === ...)` | 可用 Supabase 查詢       |
+| `region-store.ts:245`                | `cityStore.items.filter(c => c.region_id === ...)`    | 可用 Supabase 查詢       |
+| `quick-add/hooks/useQuickAdd.ts:133` | `memberStore.items.filter(m => m.order_id === ...)`   | 載入所有成員找一個訂單的 |
 
 **正確做法**：
+
 ```typescript
 // ❌ 錯誤：前端過濾
 const tourOrders = orderStore.items.filter(o => o.tour_id === tourId)
 
 // ✅ 正確：Supabase 查詢
-const { data: tourOrders } = await supabase
-  .from('orders')
-  .select('*')
-  .eq('tour_id', tourId)
+const { data: tourOrders } = await supabase.from('orders').select('*').eq('tour_id', tourId)
 ```
 
 ---
@@ -234,12 +243,14 @@ const { data: tourOrders } = await supabase
 **問題**：報表頁面沒有分頁，當資料量增加會越來越慢
 
 **受影響頁面**：
+
 - `monthly-disbursement/page.tsx`
 - `monthly-income/page.tsx`
 - `unclosed-tours/page.tsx`
 - `pnrs/page.tsx`
 
 **解決方案**：
+
 ```typescript
 // 1. Store 支援分頁
 fetchPaginated: async (page: number, pageSize: number, filters: Filters) => {
@@ -267,26 +278,27 @@ const { data, total } = usePaginatedData(page, 20, filters)
 **問題**：載入父表格來取得子表格資料
 
 **案例**：
+
 ```typescript
 // 為了取得某個訂單的成員，載入所有成員
 const existingMembers = memberStore.items.filter(m => m.order_id === orderId)
 ```
 
 **正確做法**：使用 Supabase join 或直接查詢
+
 ```typescript
 // 方案 1: 直接查詢
-const { data } = await supabase
-  .from('order_members')
-  .select('*')
-  .eq('order_id', orderId)
+const { data } = await supabase.from('order_members').select('*').eq('order_id', orderId)
 
 // 方案 2: 使用 join（如果需要關聯資料）
 const { data } = await supabase
   .from('orders')
-  .select(`
+  .select(
+    `
     *,
     members:order_members(*)
-  `)
+  `
+  )
   .eq('id', orderId)
   .single()
 ```
@@ -297,11 +309,11 @@ const { data } = await supabase
 
 ### 3.1 建立共用工具函數
 
-| 工具 | 位置 | 用途 |
-|------|------|------|
+| 工具                      | 位置                           | 用途                 |
+| ------------------------- | ------------------------------ | -------------------- |
 | `getCurrentUserContext()` | `src/lib/workspace-helpers.ts` | 統一取得使用者上下文 |
-| `generateUUID()` | `src/lib/utils/uuid.ts` | 統一 UUID 生成 |
-| `errorToMessage()` | `src/lib/utils/error.ts` | 統一錯誤訊息提取 |
+| `generateUUID()`          | `src/lib/utils/uuid.ts`        | 統一 UUID 生成       |
+| `errorToMessage()`        | `src/lib/utils/error.ts`       | 統一錯誤訊息提取     |
 
 ### 3.2 建立 API 中間件
 
@@ -343,40 +355,40 @@ export function createFilteredQuery<T>(
 
 ### Phase 1：立即修復（效能影響最大）
 
-| # | 任務 | 影響 |
-|---|------|------|
-| 1 | `unclosed-tours` 改用 Supabase 查詢 | 減少 90%+ 資料傳輸 |
-| 2 | `monthly-disbursement` 加入日期過濾 | 減少 90%+ 資料傳輸 |
-| 3 | `monthly-income` 加入日期過濾 | 減少 90%+ 資料傳輸 |
+| #   | 任務                                | 影響               |
+| --- | ----------------------------------- | ------------------ |
+| 1   | `unclosed-tours` 改用 Supabase 查詢 | 減少 90%+ 資料傳輸 |
+| 2   | `monthly-disbursement` 加入日期過濾 | 減少 90%+ 資料傳輸 |
+| 3   | `monthly-income` 加入日期過濾       | 減少 90%+ 資料傳輸 |
 
 ### Phase 2：統一工具函數
 
-| # | 任務 |
-|---|------|
-| 1 | 統一 `getCurrentUserContext` 到 workspace-helpers.ts |
-| 2 | 統一 `generateUUID` 到 uuid.ts |
-| 3 | 建立 `errorToMessage` 工具函數 |
+| #   | 任務                                                 |
+| --- | ---------------------------------------------------- |
+| 1   | 統一 `getCurrentUserContext` 到 workspace-helpers.ts |
+| 2   | 統一 `generateUUID` 到 uuid.ts                       |
+| 3   | 建立 `errorToMessage` 工具函數                       |
 
 ### Phase 3：架構優化
 
-| # | 任務 |
-|---|------|
-| 1 | 建立 API 中間件系統 |
-| 2 | 建立分頁查詢 helper |
-| 3 | 審查所有 `.items.filter()` 使用 |
+| #   | 任務                            |
+| --- | ------------------------------- |
+| 1   | 建立 API 中間件系統             |
+| 2   | 建立分頁查詢 helper             |
+| 3   | 審查所有 `.items.filter()` 使用 |
 
 ---
 
 ## 五、效能問題統計
 
-| 問題類型 | 數量 | 嚴重程度 |
-|---------|------|---------|
-| 全表讀取後前端過濾 | 3+ 頁面 | 🔴🔴🔴 極嚴重 |
-| `.items.filter()` 模式 | 30+ 處 | 🔴🔴 嚴重 |
-| 缺乏分頁 | 5+ 頁面 | 🔴 嚴重 |
-| 重複載入父表 | 10+ 處 | 🟡 中等 |
+| 問題類型               | 數量    | 嚴重程度      |
+| ---------------------- | ------- | ------------- |
+| 全表讀取後前端過濾     | 3+ 頁面 | 🔴🔴🔴 極嚴重 |
+| `.items.filter()` 模式 | 30+ 處  | 🔴🔴 嚴重     |
+| 缺乏分頁               | 5+ 頁面 | 🔴 嚴重       |
+| 重複載入父表           | 10+ 處  | 🟡 中等       |
 
 ---
 
-*報告生成日期：2026-01-12*
-*建議：優先處理效能問題，對使用者體驗影響最大*
+_報告生成日期：2026-01-12_
+_建議：優先處理效能問題，對使用者體驗影響最大_

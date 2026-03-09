@@ -6,7 +6,12 @@ import React from 'react'
 import type { Itinerary } from '@/stores/types'
 import type { Database } from '@/lib/supabase/types'
 import type { TourRoom, QuoteRoomItem } from '../../hooks/useTourSheetData'
-import { CONFIRMATION_HEADER_LABELS, DAILY_ITINERARY_SECTION_LABELS, HOTEL_CONFIRMATION_SECTION_LABELS, TOUR_CONFIRMATION_SHEET_PAGE_LABELS } from '../../constants/labels';
+import {
+  CONFIRMATION_HEADER_LABELS,
+  DAILY_ITINERARY_SECTION_LABELS,
+  HOTEL_CONFIRMATION_SECTION_LABELS,
+  TOUR_CONFIRMATION_SHEET_PAGE_LABELS,
+} from '../../constants/labels'
 
 type TourRequestRow = Database['public']['Tables']['tour_requests']['Row']
 
@@ -41,9 +46,11 @@ export function HotelConfirmationSection({
   itinerary.daily_itinerary.forEach((day, idx) => {
     // 最後一天通常不住宿
     if (idx === itinerary.daily_itinerary.length - 1) return
-    if (!day.accommodation || day.accommodation === TOUR_CONFIRMATION_SHEET_PAGE_LABELS.溫暖的家) return
+    if (!day.accommodation || day.accommodation === TOUR_CONFIRMATION_SHEET_PAGE_LABELS.溫暖的家)
+      return
 
-    const isSame = day.isSameAccommodation || day.accommodation.includes(DAILY_ITINERARY_SECTION_LABELS.同上)
+    const isSame =
+      day.isSameAccommodation || day.accommodation.includes(DAILY_ITINERARY_SECTION_LABELS.同上)
     // 提取實際飯店名稱（去掉「同上」前綴）
     let hotelName = day.accommodation
     if (isSame && day.accommodation.includes('(')) {
@@ -73,15 +80,13 @@ export function HotelConfirmationSection({
     // 優先從報價單取得房型
     const quoteRooms = quoteRoomItems.filter(r => r.day === nightNumber)
     if (quoteRooms.length > 0) {
-      return quoteRooms
-        .map(r => `${r.room_type} x${r.quantity}`)
-        .join('、')
+      return quoteRooms.map(r => `${r.room_type} x${r.quantity}`).join('、')
     }
 
     // 其次從 tour_rooms 表取得
     const rooms = tourRooms.filter(r => r.night_number === nightNumber)
     if (rooms.length === 0) return '-'
-    
+
     // 統計各房型數量
     const roomCounts: Record<string, number> = {}
     rooms.forEach(r => {
@@ -95,13 +100,32 @@ export function HotelConfirmationSection({
 
   // 取得飯店的確認狀態
   const getHotelStatus = (hotelName: string) => {
-    const req = accommodationRequests.find(r =>
-      r.supplier_name?.includes(hotelName) || r.title?.includes(hotelName)
+    const req = accommodationRequests.find(
+      r => r.supplier_name?.includes(hotelName) || r.title?.includes(hotelName)
     )
-    if (!req) return { status: 'pending', label: HOTEL_CONFIRMATION_SECTION_LABELS.待確認, color: 'bg-morandi-gold/20 text-morandi-gold' }
-    if (req.status === 'confirmed') return { status: 'confirmed', label: CONFIRMATION_HEADER_LABELS.已確認, color: 'bg-morandi-green/20 text-morandi-green' }
-    if (req.status === 'replied') return { status: 'replied', label: HOTEL_CONFIRMATION_SECTION_LABELS.已回覆, color: 'bg-morandi-container text-morandi-primary' }
-    return { status: 'pending', label: HOTEL_CONFIRMATION_SECTION_LABELS.待確認, color: 'bg-morandi-gold/20 text-morandi-gold' }
+    if (!req)
+      return {
+        status: 'pending',
+        label: HOTEL_CONFIRMATION_SECTION_LABELS.待確認,
+        color: 'bg-morandi-gold/20 text-morandi-gold',
+      }
+    if (req.status === 'confirmed')
+      return {
+        status: 'confirmed',
+        label: CONFIRMATION_HEADER_LABELS.已確認,
+        color: 'bg-morandi-green/20 text-morandi-green',
+      }
+    if (req.status === 'replied')
+      return {
+        status: 'replied',
+        label: HOTEL_CONFIRMATION_SECTION_LABELS.已回覆,
+        color: 'bg-morandi-container text-morandi-primary',
+      }
+    return {
+      status: 'pending',
+      label: HOTEL_CONFIRMATION_SECTION_LABELS.待確認,
+      color: 'bg-morandi-gold/20 text-morandi-gold',
+    }
   }
 
   return (
@@ -109,16 +133,28 @@ export function HotelConfirmationSection({
       <div className="flex items-center justify-between px-4 py-2 bg-morandi-primary text-white">
         <div className="flex items-center gap-2">
           <span className="font-medium">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.CONFIRM_2803}</span>
-          <span className="text-white/80 text-sm">{HOTEL_CONFIRMATION_SECTION_LABELS.NIGHTS_PREFIX}{nightlyAccommodations.length}{HOTEL_CONFIRMATION_SECTION_LABELS.NIGHTS_SUFFIX}</span>
+          <span className="text-white/80 text-sm">
+            {HOTEL_CONFIRMATION_SECTION_LABELS.NIGHTS_PREFIX}
+            {nightlyAccommodations.length}
+            {HOTEL_CONFIRMATION_SECTION_LABELS.NIGHTS_SUFFIX}
+          </span>
         </div>
       </div>
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-morandi-container/50 border-b border-border">
-            <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[80px]">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.日期}</th>
-            <th className="px-3 py-2 text-left font-medium text-morandi-primary">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.LABEL_5863}</th>
-            <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[200px]">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.LABEL_4541}</th>
-            <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[80px]">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.STATUS}</th>
+            <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[80px]">
+              {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.日期}
+            </th>
+            <th className="px-3 py-2 text-left font-medium text-morandi-primary">
+              {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.LABEL_5863}
+            </th>
+            <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[200px]">
+              {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.LABEL_4541}
+            </th>
+            <th className="px-3 py-2 text-left font-medium text-morandi-primary w-[80px]">
+              {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.STATUS}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -126,12 +162,17 @@ export function HotelConfirmationSection({
             const status = getHotelStatus(night.hotelName)
             const roomTypes = getRoomTypesForNight(night.nightNumber)
             return (
-              <tr key={idx} className={`border-t border-border/50 hover:bg-morandi-container/10 ${idx % 2 === 1 ? 'bg-morandi-container/5' : ''}`}>
+              <tr
+                key={idx}
+                className={`border-t border-border/50 hover:bg-morandi-container/10 ${idx % 2 === 1 ? 'bg-morandi-container/5' : ''}`}
+              >
                 <td className="px-3 py-2 text-morandi-secondary">{night.date}</td>
                 <td className="px-3 py-2">
                   <span className="font-medium">{night.hotelName}</span>
                   {night.isSameAsPrevious && (
-                    <span className="ml-2 text-xs text-morandi-secondary">{HOTEL_CONFIRMATION_SECTION_LABELS.CONTINUED_STAY}</span>
+                    <span className="ml-2 text-xs text-morandi-secondary">
+                      {HOTEL_CONFIRMATION_SECTION_LABELS.CONTINUED_STAY}
+                    </span>
                   )}
                 </td>
                 <td className="px-3 py-2 text-morandi-secondary">{roomTypes}</td>

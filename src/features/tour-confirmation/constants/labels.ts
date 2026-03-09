@@ -9,7 +9,7 @@ export const CONFIRMATION_HEADER_LABELS = {
   業務姓名: '業務姓名',
   助理姓名: '助理姓名',
   航班資訊: '航班資訊',
-};
+}
 
 export const CONFIRMATION_SECTION_LABELS = {
   開啟_Google_Maps_導航: '開啟 Google Maps 導航',
@@ -23,7 +23,7 @@ export const CONFIRMATION_SECTION_LABELS = {
   LABEL_1075: '小計：',
   LABEL_6009: '預計',
   LABEL_3550: '實際',
-};
+}
 
 export const COST_SUMMARY_LABELS = {
   交通: '交通',
@@ -38,7 +38,7 @@ export const COST_SUMMARY_LABELS = {
   LABEL_686: '實際支出',
   LABEL_8980: '差額',
   TOTAL: '總計',
-};
+}
 
 export const ITEM_EDIT_DIALOG_LABELS = {
   待處理: '待處理',
@@ -54,7 +54,7 @@ export const ITEM_EDIT_DIALOG_LABELS = {
   領隊支付金額: '領隊支付金額',
   領隊備註: '領隊備註',
   內部備註: '內部備註...',
-};
+}
 
 export const TOUR_CONFIRMATION_SHEET_PAGE_LABELS = {
   更新失敗: '更新失敗',
@@ -78,7 +78,8 @@ export const TOUR_CONFIRMATION_SHEET_PAGE_LABELS = {
   如果此團需要領隊_請先在上方填寫領隊姓名_n: '如果此團需要領隊，請先在上方填寫領隊姓名。\n',
   如果此團不需要領隊_如包車_可以繼續交接_n_n: '如果此團不需要領隊（如包車），可以繼續交接。\n\n',
   確定要繼續交接嗎: '確定要繼續交接嗎？',
-  交接完成_n_n確認單狀態已更新_n行程已同步到_Onlin: '交接完成！\n\n確認單狀態已更新。\n行程已同步到 Online App。',
+  交接完成_n_n確認單狀態已更新_n行程已同步到_Onlin:
+    '交接完成！\n\n確認單狀態已更新。\n行程已同步到 Online App。',
   交接失敗_請稍後再試: '交接失敗，請稍後再試',
   備註: '備註...',
   確認帶入: '確認帶入',
@@ -136,7 +137,7 @@ export const TOUR_CONFIRMATION_SHEET_PAGE_LABELS = {
   LABEL_5863: '飯店名稱',
   LABEL_4541: '房型配置',
   STATUS: '狀態',
-};
+}
 
 export const ITEM_EDIT_DIALOG_ADDITIONAL_LABELS = {
   編輯: '編輯',
@@ -169,14 +170,14 @@ export const ITEM_EDIT_DIALOG_ADDITIONAL_LABELS = {
   小計: '小計',
   預計支出: '預計支出',
   實際支出: '實際支出',
-};
+}
 
 export const DAILY_ITINERARY_SECTION_LABELS = {
   新增說明: '新增說明',
   飯店早餐: '飯店早餐',
   同上: '同上',
   輸入說明文字_例如_提醒客戶帶護照: '輸入說明文字，例如：提醒客戶帶護照...',
-};
+}
 
 export const EXCHANGE_RATE_DIALOG_LABELS = {
   例如_0_22_日圓_或_0_9_泰銖: '例如：0.22（日圓）或 0.9（泰銖）',
@@ -186,7 +187,7 @@ export const EXCHANGE_RATE_DIALOG_LABELS = {
   RATE_DESCRIPTION_PREFIX: '設定 ',
   RATE_DESCRIPTION_SUFFIX: ' 對台幣的匯率，用於換算預計支出',
   外幣: '外幣',
-};
+}
 
 export const HOTEL_CONFIRMATION_SECTION_LABELS = {
   未指定: '未指定',
@@ -195,9 +196,7 @@ export const HOTEL_CONFIRMATION_SECTION_LABELS = {
   NIGHTS_SUFFIX: ' 晚)',
   NIGHTS_PREFIX: '(',
   CONTINUED_STAY: '(續住)',
-};
-
-
+}
 
 export const TOUR_INFO_LABELS = {
   TOUR_NAME: '團名',

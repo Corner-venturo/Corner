@@ -3,19 +3,13 @@
  * AiGenerateDialog - AI 排行程設定對話框
  */
 
-
 import { Sparkles, Loader2, X } from 'lucide-react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { AI_THEMES, type AccommodationStatus } from './types'
-import { AI_GENERATE_DIALOG_LABELS } from '../../constants/labels';
+import { AI_GENERATE_DIALOG_LABELS } from '../../constants/labels'
 
 interface AiGenerateDialogProps {
   isOpen: boolean
@@ -61,15 +55,23 @@ export function AiGenerateDialog({
           {/* 基本資訊（唯讀） */}
           <div className="flex items-center gap-4 p-3 bg-morandi-container/30 rounded-lg">
             <div className="flex-1">
-              <div className="text-[10px] text-morandi-secondary">{AI_GENERATE_DIALOG_LABELS.LABEL_5475}</div>
-              <div className="text-sm font-medium">{destination || AI_GENERATE_DIALOG_LABELS.未設定}</div>
+              <div className="text-[10px] text-morandi-secondary">
+                {AI_GENERATE_DIALOG_LABELS.LABEL_5475}
+              </div>
+              <div className="text-sm font-medium">
+                {destination || AI_GENERATE_DIALOG_LABELS.未設定}
+              </div>
             </div>
             <div className="flex-1">
-              <div className="text-[10px] text-morandi-secondary">{AI_GENERATE_DIALOG_LABELS.LABEL_1983}</div>
+              <div className="text-[10px] text-morandi-secondary">
+                {AI_GENERATE_DIALOG_LABELS.LABEL_1983}
+              </div>
               <div className="text-sm font-medium">{numDays} 天</div>
             </div>
             <div className="flex-1">
-              <div className="text-[10px] text-morandi-secondary">{AI_GENERATE_DIALOG_LABELS.LABEL_4587}</div>
+              <div className="text-[10px] text-morandi-secondary">
+                {AI_GENERATE_DIALOG_LABELS.LABEL_4587}
+              </div>
               <div className="text-sm font-medium text-morandi-green">
                 ✓ 已填寫 {accommodationStatus.filledCount}/{accommodationStatus.requiredDays} 天
               </div>
@@ -79,20 +81,24 @@ export function AiGenerateDialog({
           {/* 時間設定 */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <Label className="text-xs text-morandi-primary">{AI_GENERATE_DIALOG_LABELS.LABEL_1928}</Label>
+              <Label className="text-xs text-morandi-primary">
+                {AI_GENERATE_DIALOG_LABELS.LABEL_1928}
+              </Label>
               <Input
                 type="time"
                 value={arrivalTime}
-                onChange={(e) => onArrivalTimeChange(e.target.value)}
+                onChange={e => onArrivalTimeChange(e.target.value)}
                 className="h-9"
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-morandi-primary">{AI_GENERATE_DIALOG_LABELS.LABEL_4695}</Label>
+              <Label className="text-xs text-morandi-primary">
+                {AI_GENERATE_DIALOG_LABELS.LABEL_4695}
+              </Label>
               <Input
                 type="time"
                 value={departureTime}
-                onChange={(e) => onDepartureTimeChange(e.target.value)}
+                onChange={e => onDepartureTimeChange(e.target.value)}
                 className="h-9"
               />
             </div>
@@ -100,9 +106,11 @@ export function AiGenerateDialog({
 
           {/* 行程風格選擇 */}
           <div className="space-y-2">
-            <Label className="text-xs text-morandi-primary">{AI_GENERATE_DIALOG_LABELS.LABEL_121}</Label>
+            <Label className="text-xs text-morandi-primary">
+              {AI_GENERATE_DIALOG_LABELS.LABEL_121}
+            </Label>
             <div className="grid grid-cols-3 gap-2">
-              {AI_THEMES.map((t) => (
+              {AI_THEMES.map(t => (
                 <button
                   key={t.value}
                   type="button"
@@ -113,12 +121,12 @@ export function AiGenerateDialog({
                       : 'border-border hover:border-morandi-gold/50'
                   }`}
                 >
-                  <div className={`text-xs font-medium ${theme === t.value ? 'text-morandi-gold' : ''}`}>
+                  <div
+                    className={`text-xs font-medium ${theme === t.value ? 'text-morandi-gold' : ''}`}
+                  >
                     {t.label}
                   </div>
-                  <div className="text-[10px] text-morandi-secondary mt-0.5">
-                    {t.description}
-                  </div>
+                  <div className="text-[10px] text-morandi-secondary mt-0.5">{t.description}</div>
                 </button>
               ))}
             </div>
@@ -130,11 +138,7 @@ export function AiGenerateDialog({
           </p>
         </div>
         <div className="flex justify-end gap-2">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="gap-1"
-          >
+          <Button variant="outline" onClick={onClose} className="gap-1">
             <X size={14} />
             {AI_GENERATE_DIALOG_LABELS.CANCEL}
           </Button>

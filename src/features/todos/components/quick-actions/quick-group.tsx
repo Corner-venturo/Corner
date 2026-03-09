@@ -11,10 +11,18 @@ import { Input } from '@/components/ui/input'
 import { SimpleDateInput } from '@/components/ui/simple-date-input'
 import { Combobox } from '@/components/ui/combobox'
 import { DestinationSelector } from '@/components/shared/destination-selector'
-import { createTour, createOrder, useCountries, useCities, updateCountry, updateCity, useEmployeesSlim } from '@/data'
+import {
+  createTour,
+  createOrder,
+  useCountries,
+  useCities,
+  updateCountry,
+  updateCity,
+  useEmployeesSlim,
+} from '@/data'
 import { useWorkspaceId } from '@/lib/workspace-context'
 import { alert } from '@/lib/ui/alert-dialog'
-import { QUICK_ACTIONS_LABELS } from "./constants/labels"
+import { QUICK_ACTIONS_LABELS } from './constants/labels'
 
 interface QuickGroupProps {
   onSubmit?: () => void
@@ -169,7 +177,10 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
         assistant: '',
       })
 
-      await alert(newOrder.contact_person ? '成功建立旅遊團和訂單！' : '成功建立旅遊團！', 'success')
+      await alert(
+        newOrder.contact_person ? '成功建立旅遊團和訂單！' : '成功建立旅遊團！',
+        'success'
+      )
       onSubmit?.()
     } catch (error) {
       void alert('建立失敗，請稍後再試', 'error')
@@ -198,7 +209,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
           countryCode={newTour.countryCode}
           cityCode={newTour.cityCode}
           customLocation={newTour.customLocation}
-          onCountryChange={(countryCode) => {
+          onCountryChange={countryCode => {
             setNewTour(prev => ({
               ...prev,
               countryCode,
@@ -266,11 +277,15 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
 
       {/* 訂單資訊（選填） */}
       <div className="border-t border-morandi-container/30 pt-4 space-y-4">
-        <h4 className="text-sm font-semibold text-morandi-primary">{QUICK_ACTIONS_LABELS.ADD_8364}</h4>
+        <h4 className="text-sm font-semibold text-morandi-primary">
+          {QUICK_ACTIONS_LABELS.ADD_8364}
+        </h4>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">{QUICK_ACTIONS_LABELS.LABEL_7009}</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">
+              {QUICK_ACTIONS_LABELS.LABEL_7009}
+            </label>
             <Input
               value={newOrder.contact_person}
               onChange={e => setNewOrder(prev => ({ ...prev, contact_person: e.target.value }))}
@@ -279,7 +294,9 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">{QUICK_ACTIONS_LABELS.LABEL_6280}</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">
+              {QUICK_ACTIONS_LABELS.LABEL_6280}
+            </label>
             <Input
               value={newOrder.contact_phone}
               onChange={e => setNewOrder(prev => ({ ...prev, contact_phone: e.target.value }))}
@@ -311,7 +328,9 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-morandi-primary mb-2 block">{QUICK_ACTIONS_LABELS.LABEL_7412}</label>
+              <label className="text-sm font-medium text-morandi-primary mb-2 block">
+                {QUICK_ACTIONS_LABELS.LABEL_7412}
+              </label>
               <Combobox
                 value={newOrder.assistant}
                 onChange={assistant => setNewOrder(prev => ({ ...prev, assistant }))}
@@ -326,14 +345,11 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
                 className="border-morandi-container/30"
               />
             </div>
-
           </>
         )}
 
         <div className="bg-morandi-container/10 p-3 rounded-lg">
-          <p className="text-xs text-morandi-secondary">
-            {QUICK_ACTIONS_LABELS.LABEL_8280}
-          </p>
+          <p className="text-xs text-morandi-secondary">{QUICK_ACTIONS_LABELS.LABEL_8280}</p>
         </div>
       </div>
 

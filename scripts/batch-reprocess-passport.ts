@@ -26,7 +26,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 const args = process.argv.slice(2)
 const doOcr = args.includes('--ocr')
 const tableArg = args.find(a => a.startsWith('--table'))
-const targetTable = tableArg ? (args[args.indexOf('--table') + 1] || 'customers') : 'customers'
+const targetTable = tableArg ? args[args.indexOf('--table') + 1] || 'customers' : 'customers'
 const limitArg = args.find(a => a.startsWith('--limit'))
 const limit = limitArg ? parseInt(args[args.indexOf('--limit') + 1] || '10') : 10
 
@@ -66,7 +66,9 @@ async function main() {
   console.log('')
   console.log('API 狀態：')
   console.log(`- OCR.space: ${OCR_SPACE_API_KEY ? '✓ 已設定' : '✗ 未設定'}`)
-  console.log(`- Google Vision: ${GOOGLE_VISION_API_KEYS.length > 0 ? `✓ 已設定 (${GOOGLE_VISION_API_KEYS.length} 個 key)` : '✗ 未設定'}`)
+  console.log(
+    `- Google Vision: ${GOOGLE_VISION_API_KEYS.length > 0 ? `✓ 已設定 (${GOOGLE_VISION_API_KEYS.length} 個 key)` : '✗ 未設定'}`
+  )
   console.log('')
 
   if (!doOcr) {
@@ -163,7 +165,9 @@ async function reprocessPassportImage(imageData: string): Promise<string | null>
     // 同時呼叫兩個 API
     const [ocrSpaceResult, googleVisionResult] = await Promise.all([
       OCR_SPACE_API_KEY ? callOcrSpace(base64Image) : Promise.resolve(''),
-      GOOGLE_VISION_API_KEYS.length > 0 ? callGoogleVision(base64Image, GOOGLE_VISION_API_KEYS[0]) : Promise.resolve(''),
+      GOOGLE_VISION_API_KEYS.length > 0
+        ? callGoogleVision(base64Image, GOOGLE_VISION_API_KEYS[0])
+        : Promise.resolve(''),
     ])
 
     // 優先使用 Google Vision 結果（更準確）
@@ -197,7 +201,7 @@ async function callOcrSpace(base64Image: string): Promise<string> {
     const response = await fetch('https://api.ocr.space/parse/image', {
       method: 'POST',
       headers: {
-        'apikey': OCR_SPACE_API_KEY,
+        apikey: OCR_SPACE_API_KEY,
       },
       body: formData,
     })
@@ -222,23 +226,20 @@ async function callGoogleVision(base64Image: string, apiKey: string): Promise<st
     // 移除 data:image/xxx;base64, 前綴
     const base64Data = base64Image.replace(/^data:image\/[a-z]+;base64,/, '')
 
-    const response = await fetch(
-      `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          requests: [
-            {
-              image: { content: base64Data },
-              features: [{ type: 'TEXT_DETECTION', maxResults: 1 }],
-            },
-          ],
-        }),
-      }
-    )
+    const response = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        requests: [
+          {
+            image: { content: base64Data },
+            features: [{ type: 'TEXT_DETECTION', maxResults: 1 }],
+          },
+        ],
+      }),
+    })
 
     const data = await response.json()
 

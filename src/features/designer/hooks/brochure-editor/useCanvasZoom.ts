@@ -4,11 +4,11 @@ import { useState, useCallback } from 'react'
 
 /**
  * useCanvasZoom - 縮放操作 Hook
- * 
+ *
  * 功能：
  * - setZoom, zoomIn, zoomOut, resetZoom
  * - fitToContainer
- * 
+ *
  * 注意：縮放只使用 CSS transform 顯示，不影響 canvas 內部座標
  * 這樣可以避免雙重縮放問題，且匯出時保持原始尺寸
  */
@@ -65,16 +65,19 @@ export function useCanvasZoom(options: UseCanvasZoomOptions): UseCanvasZoomRetur
   // ============================================
   // Fit to Container
   // ============================================
-  const fitToContainer = useCallback((containerWidth: number, containerHeight: number, padding = 64) => {
-    const availableWidth = containerWidth - padding * 2
-    const availableHeight = containerHeight - padding * 2
+  const fitToContainer = useCallback(
+    (containerWidth: number, containerHeight: number, padding = 64) => {
+      const availableWidth = containerWidth - padding * 2
+      const availableHeight = containerHeight - padding * 2
 
-    const scaleX = availableWidth / width
-    const scaleY = availableHeight / height
-    const fitZoom = Math.min(scaleX, scaleY)
+      const scaleX = availableWidth / width
+      const scaleY = availableHeight / height
+      const fitZoom = Math.min(scaleX, scaleY)
 
-    setZoom(fitZoom)
-  }, [width, height, setZoom])
+      setZoom(fitZoom)
+    },
+    [width, height, setZoom]
+  )
 
   return {
     zoom,

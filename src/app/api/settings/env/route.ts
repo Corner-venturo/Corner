@@ -13,7 +13,7 @@ interface ApiConfig {
   name: string
   description: string
   envKey: string
-  isConfigured: boolean  // 改為只顯示是否已設定
+  isConfigured: boolean // 改為只顯示是否已設定
   docsUrl?: string
   consoleUrl?: string
   usageInfo?: string

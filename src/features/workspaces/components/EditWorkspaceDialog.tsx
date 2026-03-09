@@ -3,7 +3,6 @@
  * EditWorkspaceDialog - 編輯公司設定對話框
  */
 
-
 import { useState, useCallback, useEffect } from 'react'
 import {
   Dialog,
@@ -29,7 +28,12 @@ interface EditWorkspaceDialogProps {
   onSuccess: () => void
 }
 
-export function EditWorkspaceDialog({ open, onOpenChange, workspace, onSuccess }: EditWorkspaceDialogProps) {
+export function EditWorkspaceDialog({
+  open,
+  onOpenChange,
+  workspace,
+  onSuccess,
+}: EditWorkspaceDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
@@ -49,7 +53,7 @@ export function EditWorkspaceDialog({ open, onOpenChange, workspace, onSuccess }
   }, [open, workspace])
 
   const handleFieldChange = useCallback((field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    setFormData(prev => ({ ...prev, [field]: value }))
   }, [])
 
   const handleSubmit = useCallback(async () => {
@@ -116,7 +120,7 @@ export function EditWorkspaceDialog({ open, onOpenChange, workspace, onSuccess }
             <Label required>{WORKSPACES_LABELS.LABEL_20}</Label>
             <Input
               value={formData.name}
-              onChange={(e) => handleFieldChange('name', e.target.value)}
+              onChange={e => handleFieldChange('name', e.target.value)}
               placeholder={WORKSPACES_LABELS.例_角落旅遊}
             />
           </div>
@@ -125,13 +129,14 @@ export function EditWorkspaceDialog({ open, onOpenChange, workspace, onSuccess }
             <Label required>{WORKSPACES_LABELS.LABEL_5013}</Label>
             <Input
               value={formData.employee_number_prefix}
-              onChange={(e) => handleFieldChange('employee_number_prefix', e.target.value)}
+              onChange={e => handleFieldChange('employee_number_prefix', e.target.value)}
               placeholder={WORKSPACES_LABELS.例_E_TP_JY}
               className="uppercase"
               maxLength={5}
             />
             <p className="text-xs text-morandi-secondary">
-              新增員工時的編號格式：{formData.employee_number_prefix || 'E'}001, {formData.employee_number_prefix || 'E'}002...
+              新增員工時的編號格式：{formData.employee_number_prefix || 'E'}001,{' '}
+              {formData.employee_number_prefix || 'E'}002...
             </p>
           </div>
 
@@ -139,12 +144,10 @@ export function EditWorkspaceDialog({ open, onOpenChange, workspace, onSuccess }
             <Label required>{WORKSPACES_LABELS.LABEL_9036}</Label>
             <Input
               value={formData.default_password}
-              onChange={(e) => handleFieldChange('default_password', e.target.value)}
+              onChange={e => handleFieldChange('default_password', e.target.value)}
               placeholder={WORKSPACES_LABELS.新員工的預設密碼}
             />
-            <p className="text-xs text-morandi-secondary">
-              {WORKSPACES_LABELS.ADD_6539}
-            </p>
+            <p className="text-xs text-morandi-secondary">{WORKSPACES_LABELS.ADD_6539}</p>
           </div>
         </div>
 
@@ -159,11 +162,7 @@ export function EditWorkspaceDialog({ open, onOpenChange, workspace, onSuccess }
             disabled={isSubmitting}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
-            {isSubmitting ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <Save size={16} />
-            )}
+            {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
             儲存設定
           </Button>
         </div>

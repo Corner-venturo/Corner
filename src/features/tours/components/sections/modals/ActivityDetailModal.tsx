@@ -15,19 +15,13 @@ interface ActivityDetailModalProps {
   onClose: () => void
 }
 
-export function ActivityDetailModal({
-  activity,
-  onClose,
-}: ActivityDetailModalProps) {
+export function ActivityDetailModal({ activity, onClose }: ActivityDetailModalProps) {
   return (
-    <Dialog open={!!activity} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={!!activity} onOpenChange={open => !open && onClose()}>
       <DialogContent level={1} className="max-w-lg p-0 overflow-hidden rounded-2xl">
         {activity?.image && (
           <div className="relative h-48">
-            <img src={activity.image}
-              alt={activity.title}
-              className="w-full h-full object-cover"
-            />
+            <img src={activity.image} alt={activity.title} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             <div className="absolute bottom-4 left-4 text-white">
               <DialogHeader className="p-0">
@@ -53,7 +47,7 @@ export function ActivityDetailModal({
                 className="text-xl font-bold pr-8"
                 style={{
                   color: LUXURY.text,
-                  fontFamily: "'Noto Serif TC', serif"
+                  fontFamily: "'Noto Serif TC', serif",
                 }}
               >
                 {activity.title}
@@ -61,10 +55,7 @@ export function ActivityDetailModal({
             </DialogHeader>
           )}
           {activity?.description && (
-            <p
-              className="leading-relaxed"
-              style={{ color: LUXURY.muted }}
-            >
+            <p className="leading-relaxed" style={{ color: LUXURY.muted }}>
               {activity.description}
             </p>
           )}

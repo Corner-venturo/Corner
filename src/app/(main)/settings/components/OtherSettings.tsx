@@ -12,7 +12,9 @@ export function OtherSettings() {
         </div>
         <div className="p-6 border border-border rounded-lg bg-card">
           <h3 className="font-medium mb-2">{OTHER_SETTINGS_LABELS.NOTIFICATION_SETTING}</h3>
-          <p className="text-sm text-morandi-secondary">{OTHER_SETTINGS_LABELS.NOTIFICATION_VALUE}</p>
+          <p className="text-sm text-morandi-secondary">
+            {OTHER_SETTINGS_LABELS.NOTIFICATION_VALUE}
+          </p>
         </div>
         <div className="p-6 border border-border rounded-lg bg-card">
           <h3 className="font-medium mb-2">{OTHER_SETTINGS_LABELS.BACKUP_SETTING}</h3>

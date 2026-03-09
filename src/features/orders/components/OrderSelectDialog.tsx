@@ -4,7 +4,6 @@
  * 團體模式新增成員時選擇訂單
  */
 
-
 import React, { useState } from 'react'
 import {
   Dialog,
@@ -30,16 +29,11 @@ interface OrderSelectDialogProps {
   onSelect: (orderId: string) => void
 }
 
-export function OrderSelectDialog({
-  isOpen,
-  orders,
-  onClose,
-  onSelect,
-}: OrderSelectDialogProps) {
+export function OrderSelectDialog({ isOpen, orders, onClose, onSelect }: OrderSelectDialogProps) {
   const [selectedOrderId, setSelectedOrderId] = useState<string>('')
 
   // 將 orders 轉換為 Combobox 選項格式
-  const orderOptions = orders.map((order) => ({
+  const orderOptions = orders.map(order => ({
     value: order.id,
     label: order.order_number || COMP_ORDERS_LABELS.未命名訂單,
     data: order,
@@ -64,7 +58,7 @@ export function OrderSelectDialog({
         nested
         level={2}
         className="max-w-md"
-        onInteractOutside={(e) => {
+        onInteractOutside={e => {
           const target = e.target as HTMLElement
           if (
             target.closest('[role="listbox"]') ||

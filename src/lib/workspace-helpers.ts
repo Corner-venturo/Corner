@@ -8,7 +8,11 @@ import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStoreData } from '@/stores/workspace/workspace-store'
 import type { Workspace } from '@/stores/workspace/types'
 import { logger } from '@/lib/utils/logger'
-import { canCrossWorkspace, canManageWorkspace as canManageWorkspaceByRole, type UserRole } from './rbac-config'
+import {
+  canCrossWorkspace,
+  canManageWorkspace as canManageWorkspaceByRole,
+  type UserRole,
+} from './rbac-config'
 
 // 定義 Workspace 擴展型別（包含 code 欄位）
 interface WorkspaceWithCode extends Workspace {
@@ -73,7 +77,11 @@ export function getCurrentWorkspaceCode(): string | null {
     let workspaces = (workspaceStore.items || []) as WorkspaceWithCode[]
 
     // 如果 store 沒有資料，嘗試用快取
-    if (workspaces.length === 0 && workspacesCache && Date.now() - workspacesCacheTime < CACHE_TTL) {
+    if (
+      workspaces.length === 0 &&
+      workspacesCache &&
+      Date.now() - workspacesCacheTime < CACHE_TTL
+    ) {
       workspaces = workspacesCache
     }
 
@@ -81,7 +89,9 @@ export function getCurrentWorkspaceCode(): string | null {
     // 注意：這是同步函數，無法等待 fetchAll 完成
     // 呼叫端應該在 useEffect 中先呼叫 workspaceStore.fetchAll()
     if (workspaces.length === 0) {
-      logger.warn('[getCurrentWorkspaceCode] Super Admin: workspaces not loaded yet, please ensure fetchAll() is called first')
+      logger.warn(
+        '[getCurrentWorkspaceCode] Super Admin: workspaces not loaded yet, please ensure fetchAll() is called first'
+      )
       return null
     }
 
@@ -129,7 +139,9 @@ export function getCurrentWorkspace() {
 
   // 檢查 workspaces 是否已載入
   if (workspaces.length === 0) {
-    logger.warn('[getCurrentWorkspace] Workspaces not loaded yet, please ensure fetchAll() is called first')
+    logger.warn(
+      '[getCurrentWorkspace] Workspaces not loaded yet, please ensure fetchAll() is called first'
+    )
     return null
   }
 

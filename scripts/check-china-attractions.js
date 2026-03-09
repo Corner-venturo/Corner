@@ -6,9 +6,7 @@ const supabase = createClient(
 )
 
 async function checkAttractions() {
-  const { data, error } = await supabase
-    .from('attractions')
-    .select('city_id, name')
+  const { data, error } = await supabase.from('attractions').select('city_id, name')
 
   if (error) {
     console.error('Error:', error.message)
@@ -24,7 +22,17 @@ async function checkAttractions() {
   })
 
   // 只顯示中國城市
-  const chinaCities = ['chengdu', 'chongqing', 'xian', 'dunhuang', 'changsha', 'shenzhen', 'guangzhou', 'shanghai', 'xiamen']
+  const chinaCities = [
+    'chengdu',
+    'chongqing',
+    'xian',
+    'dunhuang',
+    'changsha',
+    'shenzhen',
+    'guangzhou',
+    'shanghai',
+    'xiamen',
+  ]
 
   const cityNames = {
     chengdu: '成都',
@@ -35,7 +43,7 @@ async function checkAttractions() {
     shenzhen: '深圳',
     guangzhou: '廣州',
     shanghai: '上海',
-    xiamen: '廈門'
+    xiamen: '廈門',
   }
 
   console.log('==========================================')

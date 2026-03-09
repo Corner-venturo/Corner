@@ -51,7 +51,8 @@ export function ChannelListSection({
 }: ChannelListSectionProps) {
   if (channels.length === 0) return null
 
-  const Icon = icon === 'star' ? Star : icon === 'userPlus' ? UserPlus : icon === 'user' ? User : Hash
+  const Icon =
+    icon === 'star' ? Star : icon === 'userPlus' ? UserPlus : icon === 'user' ? User : Hash
 
   return (
     <div className="px-2 py-2">
@@ -67,7 +68,8 @@ export function ChannelListSection({
         {showAddButton && onAddClick && (
           <Button
             variant="ghost"
-            size="icon" aria-label="Add"
+            size="icon"
+            aria-label="Add"
             className="h-5 w-5 opacity-0 group-hover/section:opacity-100 transition-opacity"
             onClick={onAddClick}
           >

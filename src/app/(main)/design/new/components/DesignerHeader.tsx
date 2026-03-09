@@ -4,7 +4,6 @@
  * 包含返回按鈕、標題、面板切換、縮放控制、{DESIGNER_LABELS.SAVE}按鈕
  */
 
-
 import { useRouter } from 'next/navigation'
 import {
   Save,
@@ -88,12 +87,7 @@ export function DesignerHeader({
   return (
     <header className="h-[72px] bg-card border-b border-border px-4 flex items-center gap-3 shrink-0">
       {/* {DESIGNER_LABELS.BACK}按鈕 - 回到設計列表 */}
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => router.push('/design')}
-        className="gap-2"
-      >
+      <Button variant="ghost" size="sm" onClick={() => router.push('/design')} className="gap-2">
         <ArrowLeft size={16} />
         {DESIGNER_LABELS.BACK}
       </Button>
@@ -135,9 +129,19 @@ export function DesignerHeader({
           }
         }}
         className={cn(!showLeftPanel && 'text-morandi-muted')}
-        title={showLeftPanel && leftPanelMode === 'components' ? '切換至元素庫' : showLeftPanel ? '關閉面板' : '開啟元件庫'}
+        title={
+          showLeftPanel && leftPanelMode === 'components'
+            ? '切換至元素庫'
+            : showLeftPanel
+              ? '關閉面板'
+              : '開啟元件庫'
+        }
       >
-        {showLeftPanel && leftPanelMode === 'components' ? <LayoutGrid size={16} /> : <PanelLeftClose size={16} />}
+        {showLeftPanel && leftPanelMode === 'components' ? (
+          <LayoutGrid size={16} />
+        ) : (
+          <PanelLeftClose size={16} />
+        )}
       </Button>
       <Button
         variant="ghost"

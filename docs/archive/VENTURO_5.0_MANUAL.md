@@ -186,10 +186,7 @@ export const useTourStore = createStore<Tour>('tours', 'T')
 // ✅ 正確：使用 Supabase Client 進行 CRUD 操作
 import { supabase } from '@/lib/supabase/client'
 
-const { data, error } = await supabase
-  .from('tours')
-  .select('*')
-  .eq('workspace_id', workspaceId)
+const { data, error } = await supabase.from('tours').select('*').eq('workspace_id', workspaceId)
 ```
 
 ---
@@ -201,19 +198,19 @@ const { data, error } = await supabase
 
 ### 編號格式一覽表
 
-| 項目 | 格式 | 範例 | 說明 |
-|------|------|------|------|
-| **團號** | `{城市代碼}{YYMMDD}{A-Z}` | `CNX250128A` | 清邁 2025/01/28 第1團 |
-| **訂單** | `{團號}-O{2位數}` | `CNX250128A-O01` | 該團第1筆訂單 |
-| **需求單** | `{團號}-RQ{2位數}` | `CNX250128A-RQ01` | 該團第1張需求單 (RQ=Request) |
-| **請款單** | `{團號}-I{2位數}` | `CNX250128A-I01` | 該團第1張請款單 (I=Invoice) |
-| **收款單** | `{團號}-R{2位數}` | `CNX250128A-R01` | 該團第1張收款單 (R=Receipt) |
-| **出納單** | `P{YYMMDD}{A-Z}` | `P250128A` | 2025/01/28 第1張出納單 |
-| **客戶** | `C{6位數}` | `C000001` | 流水號 |
-| **報價單(標準)** | `Q{6位數}` | `Q000001` | 流水號 |
-| **報價單(快速)** | `X{6位數}` | `X000001` | 流水號 |
-| **員工** | `E{3位數}` | `E001` | 無辦公室前綴，入口選公司 |
-| **提案** | `PR{6位數}` | `PR000001` | 提案編號 |
+| 項目             | 格式                      | 範例              | 說明                         |
+| ---------------- | ------------------------- | ----------------- | ---------------------------- |
+| **團號**         | `{城市代碼}{YYMMDD}{A-Z}` | `CNX250128A`      | 清邁 2025/01/28 第1團        |
+| **訂單**         | `{團號}-O{2位數}`         | `CNX250128A-O01`  | 該團第1筆訂單                |
+| **需求單**       | `{團號}-RQ{2位數}`        | `CNX250128A-RQ01` | 該團第1張需求單 (RQ=Request) |
+| **請款單**       | `{團號}-I{2位數}`         | `CNX250128A-I01`  | 該團第1張請款單 (I=Invoice)  |
+| **收款單**       | `{團號}-R{2位數}`         | `CNX250128A-R01`  | 該團第1張收款單 (R=Receipt)  |
+| **出納單**       | `P{YYMMDD}{A-Z}`          | `P250128A`        | 2025/01/28 第1張出納單       |
+| **客戶**         | `C{6位數}`                | `C000001`         | 流水號                       |
+| **報價單(標準)** | `Q{6位數}`                | `Q000001`         | 流水號                       |
+| **報價單(快速)** | `X{6位數}`                | `X000001`         | 流水號                       |
+| **員工**         | `E{3位數}`                | `E001`            | 無辦公室前綴，入口選公司     |
+| **提案**         | `PR{6位數}`               | `PR000001`        | 提案編號                     |
 
 ### 編號規則說明
 
@@ -450,11 +447,11 @@ interface BadTour {
 
 ### 認證相關檔案
 
-| 檔案 | 用途 |
-|------|------|
-| `src/stores/auth-store.ts` | 認證狀態管理 |
-| `src/lib/auth.ts` | 認證工具函數 |
-| `src/lib/auth/auth-sync.ts` | Session 同步 |
+| 檔案                          | 用途          |
+| ----------------------------- | ------------- |
+| `src/stores/auth-store.ts`    | 認證狀態管理  |
+| `src/lib/auth.ts`             | 認證工具函數  |
+| `src/lib/auth/auth-sync.ts`   | Session 同步  |
 | `src/hooks/useRequireAuth.ts` | 認證守衛 Hook |
 
 ### 權限檢查
@@ -810,13 +807,13 @@ Member (團員)
 
 > **注意**：完整的編號規範請參考上方「編號規範」章節。以下為快速參考表。
 
-| 實體     | 格式                        | 範例              | 說明                       |
-| -------- | --------------------------- | ----------------- | -------------------------- |
-| Tour     | `{城市代碼}{YYMMDD}{A-Z}`   | `CNX250128A`      | 清邁 2025/01/28 第1團      |
-| Order    | `{團號}-O{2位數}`           | `CNX250128A-O01`  | 該團第1筆訂單              |
-| Customer | `C{6位數}`                  | `C000001`         | 全域流水號                 |
-| Payment  | `P{YYMMDD}{A-Z}`            | `P250128A`        | 2025/01/28 第1張出納單     |
-| Quote    | `Q{6位數}` / `X{6位數}`     | `Q000001`         | 標準報價 Q / 快速報價 X    |
+| 實體     | 格式                      | 範例             | 說明                    |
+| -------- | ------------------------- | ---------------- | ----------------------- |
+| Tour     | `{城市代碼}{YYMMDD}{A-Z}` | `CNX250128A`     | 清邁 2025/01/28 第1團   |
+| Order    | `{團號}-O{2位數}`         | `CNX250128A-O01` | 該團第1筆訂單           |
+| Customer | `C{6位數}`                | `C000001`        | 全域流水號              |
+| Payment  | `P{YYMMDD}{A-Z}`          | `P250128A`       | 2025/01/28 第1張出納單  |
+| Quote    | `Q{6位數}` / `X{6位數}`   | `Q000001`        | 標準報價 Q / 快速報價 X |
 
 **訂單編號說明：**
 
@@ -1256,17 +1253,17 @@ function createTour(data: CreateTourData): Promise<Tour> {
 
 > **注意**：編號格式詳見本文件「編號規範」章節
 
-| Store | 說明 | 編號格式範例 |
-|-------|------|-------------|
-| useTourStore | 旅遊團 | `CNX250128A` |
-| useOrderStore | 訂單 | `CNX250128A-O01` |
-| useCustomerStore | 客戶 | `C000001` |
-| useQuoteStore | 報價單 | `Q000001` |
-| usePaymentRequestStore | 請款單 | `CNX250128A-I01` |
-| useReceiptOrderStore | 收款單 | `CNX250128A-R01` |
-| useDisbursementOrderStore | 出納單 | `P250128A` |
-| useMemberStore | 團員 | 無獨立編號 |
-| useEmployeeStore | 員工 | `E001` |
+| Store                     | 說明   | 編號格式範例     |
+| ------------------------- | ------ | ---------------- |
+| useTourStore              | 旅遊團 | `CNX250128A`     |
+| useOrderStore             | 訂單   | `CNX250128A-O01` |
+| useCustomerStore          | 客戶   | `C000001`        |
+| useQuoteStore             | 報價單 | `Q000001`        |
+| usePaymentRequestStore    | 請款單 | `CNX250128A-I01` |
+| useReceiptOrderStore      | 收款單 | `CNX250128A-R01` |
+| useDisbursementOrderStore | 出納單 | `P250128A`       |
+| useMemberStore            | 團員   | 無獨立編號       |
+| useEmployeeStore          | 員工   | `E001`           |
 
 ### 設計特點
 
@@ -2805,6 +2802,7 @@ class TourEventSourcing {
 > ⚠️ **架構更新 (2026-01)**：系統已升級為純雲端架構，以下「三層快取」中的 L2 (IndexedDB) 已棄用。
 >
 > **現行架構**：
+>
 > - SWR 快取（React Query 層級快取）
 > - Supabase 即時查詢（唯一資料來源）
 
@@ -6089,7 +6087,7 @@ async function createTour(tourData: CreateTourInput) {
 ```typescript
 // ❌ 錯誤：使用已棄用的 localDB（2026-01 已棄用）
 import { localDB } from '@/lib/db'
-const tours = await localDB.getAll('tours')  // 不再支援
+const tours = await localDB.getAll('tours') // 不再支援
 
 // ❌ 錯誤：使用 localStorage 儲存業務資料
 function saveTour(tour: Tour) {

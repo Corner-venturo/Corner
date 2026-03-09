@@ -185,25 +185,25 @@ export const useChatStore = () => {
 
       try {
         // 取得頻道的 workspace_id
-        const channel = useChannelStore.getState().items.find((c: { id: string }) => c.id === newMessage.channel_id)
+        const channel = useChannelStore
+          .getState()
+          .items.find((c: { id: string }) => c.id === newMessage.channel_id)
         const workspaceId = channel?.workspace_id
 
         // 直接寫入 Supabase（不透過 messageStore 避免重複更新）
         // 注意：messages 表沒有 author_id 欄位，使用 created_by 和 author (JSON)
-        const { error } = await supabase
-          .from('messages')
-          .insert({
-            id: newMessage.id,
-            channel_id: newMessage.channel_id,
-            created_by: newMessage.author_id, // 使用 created_by 而非 author_id
-            content: newMessage.content,
-            author: newMessage.author as unknown as Json,
-            attachments: newMessage.attachments as unknown as Json,
-            reactions: newMessage.reactions as unknown as Json,
-            parent_message_id: newMessage.parent_message_id,
-            created_at: newMessage.created_at,
-            workspace_id: workspaceId,
-          })
+        const { error } = await supabase.from('messages').insert({
+          id: newMessage.id,
+          channel_id: newMessage.channel_id,
+          created_by: newMessage.author_id, // 使用 created_by 而非 author_id
+          content: newMessage.content,
+          author: newMessage.author as unknown as Json,
+          attachments: newMessage.attachments as unknown as Json,
+          reactions: newMessage.reactions as unknown as Json,
+          parent_message_id: newMessage.parent_message_id,
+          created_at: newMessage.created_at,
+          workspace_id: workspaceId,
+        })
 
         if (error) {
           // 回滾樂觀更新
@@ -236,24 +236,24 @@ export const useChatStore = () => {
       }
 
       // 取得頻道的 workspace_id
-      const channel = useChannelStore.getState().items.find((c: { id: string }) => c.id === newMessage.channel_id)
+      const channel = useChannelStore
+        .getState()
+        .items.find((c: { id: string }) => c.id === newMessage.channel_id)
       const workspaceId = channel?.workspace_id
 
       // 直接寫入 Supabase（注意：messages 表沒有 author_id 欄位，使用 created_by）
-      const { error } = await supabase
-        .from('messages')
-        .insert({
-          id: newMessage.id,
-          channel_id: newMessage.channel_id,
-          created_by: newMessage.author_id, // 使用 created_by 而非 author_id
-          content: newMessage.content,
-          author: newMessage.author as unknown as Json,
-          attachments: newMessage.attachments as unknown as Json,
-          reactions: newMessage.reactions as unknown as Json,
-          parent_message_id: newMessage.parent_message_id,
-          created_at: newMessage.created_at,
-          workspace_id: workspaceId,
-        })
+      const { error } = await supabase.from('messages').insert({
+        id: newMessage.id,
+        channel_id: newMessage.channel_id,
+        created_by: newMessage.author_id, // 使用 created_by 而非 author_id
+        content: newMessage.content,
+        author: newMessage.author as unknown as Json,
+        attachments: newMessage.attachments as unknown as Json,
+        reactions: newMessage.reactions as unknown as Json,
+        parent_message_id: newMessage.parent_message_id,
+        created_at: newMessage.created_at,
+        workspace_id: workspaceId,
+      })
 
       if (error) {
         logger.error('addMessage 失敗:', error)
@@ -298,7 +298,7 @@ export const useChatStore = () => {
         channelId = uiStore.currentChannelId
       }
 
-      const currentMessages = channelId ? (uiStore.channelMessages[channelId] || []) : []
+      const currentMessages = channelId ? uiStore.channelMessages[channelId] || [] : []
 
       logger.log('🗑️ 準備刪除訊息:', { messageId, channelId, found: !!message })
 
@@ -317,9 +317,7 @@ export const useChatStore = () => {
             .filter((path): path is string => !!path)
 
           if (paths.length > 0) {
-            const { error } = await supabase.storage
-              .from('workspace-files')
-              .remove(paths)
+            const { error } = await supabase.storage.from('workspace-files').remove(paths)
 
             if (error) {
               logger.warn('刪除附件檔案失敗:', error)
@@ -330,10 +328,7 @@ export const useChatStore = () => {
         }
 
         // 直接從 Supabase 刪除
-        const { error } = await supabase
-          .from('messages')
-          .delete()
-          .eq('id', messageId)
+        const { error } = await supabase.from('messages').delete().eq('id', messageId)
 
         if (error) {
           // 回滾樂觀更新
@@ -431,7 +426,7 @@ export const useChatStore = () => {
             table: 'messages',
             filter: `channel_id=eq.${channelId}`,
           },
-          (payload) => {
+          payload => {
             logger.log('[ChatStore] Realtime 收到新訊息:', payload.new)
             const raw = payload.new as Record<string, unknown>
             const newMessage = { ...raw, author_id: raw.created_by as string } as unknown as Message
@@ -453,10 +448,13 @@ export const useChatStore = () => {
             table: 'messages',
             filter: `channel_id=eq.${channelId}`,
           },
-          (payload) => {
+          payload => {
             logger.log('[ChatStore] Realtime 訊息更新:', payload.new)
             const rawUpdated = payload.new as Record<string, unknown>
-            const updatedMessage = { ...rawUpdated, author_id: rawUpdated.created_by as string } as unknown as Message
+            const updatedMessage = {
+              ...rawUpdated,
+              author_id: rawUpdated.created_by as string,
+            } as unknown as Message
             const currentMessages = uiStore.channelMessages[channelId] || []
             const updatedMessages = currentMessages.map(m =>
               m.id === updatedMessage.id ? updatedMessage : m
@@ -472,7 +470,7 @@ export const useChatStore = () => {
             table: 'messages',
             filter: `channel_id=eq.${channelId}`,
           },
-          (payload) => {
+          payload => {
             logger.log('[ChatStore] Realtime 訊息刪除:', payload.old)
             const deletedMessage = payload.old as { id: string }
             const currentMessages = uiStore.channelMessages[channelId] || []
@@ -480,7 +478,7 @@ export const useChatStore = () => {
             uiStore.setCurrentChannelMessages(channelId, updatedMessages)
           }
         )
-        .subscribe((status) => {
+        .subscribe(status => {
           logger.log('[ChatStore] Realtime 訂閱狀態:', status)
         })
     },

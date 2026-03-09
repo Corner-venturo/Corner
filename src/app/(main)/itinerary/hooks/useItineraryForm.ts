@@ -4,7 +4,12 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { alertError } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
-import { formatDateCompact, formatWeekday, formatDateTW, formatDateCompactPadded } from '@/lib/utils/format-date'
+import {
+  formatDateCompact,
+  formatWeekday,
+  formatDateTW,
+  formatDateCompactPadded,
+} from '@/lib/utils/format-date'
 import type { Itinerary } from '@/stores/types'
 import type { FlightInfo } from '@/types/flight.types'
 import { ITINERARY_ACTIONS_LABELS } from '../constants/labels'
@@ -40,7 +45,9 @@ export function useItineraryForm({ createItinerary, userId }: UseItineraryFormPr
   const [newItineraryDays, setNewItineraryDays] = useState('')
 
   // Flight info
-  const [newItineraryOutboundFlight, setNewItineraryOutboundFlight] = useState<FlightInfo | null>(null)
+  const [newItineraryOutboundFlight, setNewItineraryOutboundFlight] = useState<FlightInfo | null>(
+    null
+  )
   const [newItineraryReturnFlight, setNewItineraryReturnFlight] = useState<FlightInfo | null>(null)
 
   // Daily data
@@ -186,44 +193,48 @@ export function useItineraryForm({ createItinerary, userId }: UseItineraryFormPr
         country: newItineraryCountry,
         city: '', // 城市欄位已移除，不再從表單取值
         status: '開團' as const,
-        outbound_flight: newItineraryOutboundFlight ? {
-          airline: newItineraryOutboundFlight.airline,
-          flightNumber: newItineraryOutboundFlight.flightNumber,
-          departureAirport: newItineraryOutboundFlight.departureAirport,
-          departureTime: newItineraryOutboundFlight.departureTime,
-          departureDate: newItineraryOutboundFlight.departureDate,
-          arrivalAirport: newItineraryOutboundFlight.arrivalAirport,
-          arrivalTime: newItineraryOutboundFlight.arrivalTime,
-          duration: '',
-        } : {
-          airline: '',
-          flightNumber: '',
-          departureAirport: 'TPE',
-          departureTime: '',
-          departureDate: formatDateCompactPadded(newItineraryDepartureDate),
-          arrivalAirport: '',
-          arrivalTime: '',
-          duration: '',
-        },
-        return_flight: newItineraryReturnFlight ? {
-          airline: newItineraryReturnFlight.airline,
-          flightNumber: newItineraryReturnFlight.flightNumber,
-          departureAirport: newItineraryReturnFlight.departureAirport,
-          departureTime: newItineraryReturnFlight.departureTime,
-          departureDate: newItineraryReturnFlight.departureDate,
-          arrivalAirport: newItineraryReturnFlight.arrivalAirport,
-          arrivalTime: newItineraryReturnFlight.arrivalTime,
-          duration: '',
-        } : {
-          airline: '',
-          flightNumber: '',
-          departureAirport: '',
-          departureTime: '',
-          departureDate: formatDateCompactPadded(returnDate),
-          arrivalAirport: 'TPE',
-          arrivalTime: '',
-          duration: '',
-        },
+        outbound_flight: newItineraryOutboundFlight
+          ? {
+              airline: newItineraryOutboundFlight.airline,
+              flightNumber: newItineraryOutboundFlight.flightNumber,
+              departureAirport: newItineraryOutboundFlight.departureAirport,
+              departureTime: newItineraryOutboundFlight.departureTime,
+              departureDate: newItineraryOutboundFlight.departureDate,
+              arrivalAirport: newItineraryOutboundFlight.arrivalAirport,
+              arrivalTime: newItineraryOutboundFlight.arrivalTime,
+              duration: '',
+            }
+          : {
+              airline: '',
+              flightNumber: '',
+              departureAirport: 'TPE',
+              departureTime: '',
+              departureDate: formatDateCompactPadded(newItineraryDepartureDate),
+              arrivalAirport: '',
+              arrivalTime: '',
+              duration: '',
+            },
+        return_flight: newItineraryReturnFlight
+          ? {
+              airline: newItineraryReturnFlight.airline,
+              flightNumber: newItineraryReturnFlight.flightNumber,
+              departureAirport: newItineraryReturnFlight.departureAirport,
+              departureTime: newItineraryReturnFlight.departureTime,
+              departureDate: newItineraryReturnFlight.departureDate,
+              arrivalAirport: newItineraryReturnFlight.arrivalAirport,
+              arrivalTime: newItineraryReturnFlight.arrivalTime,
+              duration: '',
+            }
+          : {
+              airline: '',
+              flightNumber: '',
+              departureAirport: '',
+              departureTime: '',
+              departureDate: formatDateCompactPadded(returnDate),
+              arrivalAirport: 'TPE',
+              arrivalTime: '',
+              duration: '',
+            },
         features: [],
         focus_cards: [],
         leader: { name: '', domesticPhone: '', overseasPhone: '' },
@@ -233,7 +244,9 @@ export function useItineraryForm({ createItinerary, userId }: UseItineraryFormPr
         created_by: userId,
       }
 
-      const createdItinerary = await createItinerary(newItinerary as Omit<Itinerary, 'id' | 'created_at' | 'updated_at'>)
+      const createdItinerary = await createItinerary(
+        newItinerary as Omit<Itinerary, 'id' | 'created_at' | 'updated_at'>
+      )
 
       if (createdItinerary?.id) {
         resetForm()

@@ -12,12 +12,24 @@ import { TOUR_ARCHIVE } from '../constants'
 
 // 封存原因選項
 export const ARCHIVE_REASONS = [
-  { value: 'no_deal', label: TOUR_ARCHIVE.reason_no_deal, description: TOUR_ARCHIVE.reason_no_deal_desc },
-  { value: 'cancelled', label: TOUR_ARCHIVE.reason_cancelled, description: TOUR_ARCHIVE.reason_cancelled_desc },
-  { value: 'test_error', label: TOUR_ARCHIVE.reason_test_error, description: TOUR_ARCHIVE.reason_test_error_desc },
+  {
+    value: 'no_deal',
+    label: TOUR_ARCHIVE.reason_no_deal,
+    description: TOUR_ARCHIVE.reason_no_deal_desc,
+  },
+  {
+    value: 'cancelled',
+    label: TOUR_ARCHIVE.reason_cancelled,
+    description: TOUR_ARCHIVE.reason_cancelled_desc,
+  },
+  {
+    value: 'test_error',
+    label: TOUR_ARCHIVE.reason_test_error,
+    description: TOUR_ARCHIVE.reason_test_error_desc,
+  },
 ] as const
 
-export type ArchiveReason = typeof ARCHIVE_REASONS[number]['value']
+export type ArchiveReason = (typeof ARCHIVE_REASONS)[number]['value']
 
 interface ArchiveReasonDialogProps {
   isOpen: boolean
@@ -56,14 +68,12 @@ export function ArchiveReasonDialog({
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <p className="text-sm text-morandi-primary">
-            {TOUR_ARCHIVE.confirm_text(tour?.name)}
-          </p>
+          <p className="text-sm text-morandi-primary">{TOUR_ARCHIVE.confirm_text(tour?.name)}</p>
 
           <div className="space-y-2">
             <p className="text-sm font-medium text-morandi-primary">{TOUR_ARCHIVE.select_reason}</p>
             <div className="space-y-2">
-              {ARCHIVE_REASONS.map((reason) => (
+              {ARCHIVE_REASONS.map(reason => (
                 <button
                   key={reason.value}
                   onClick={() => setSelectedReason(reason.value)}
@@ -82,9 +92,7 @@ export function ArchiveReasonDialog({
           </div>
 
           <div className="bg-morandi-gold/5 border border-morandi-gold/20 rounded-lg p-3 space-y-2">
-            <p className="text-sm text-morandi-secondary">
-              {TOUR_ARCHIVE.after_archive_title}
-            </p>
+            <p className="text-sm text-morandi-secondary">{TOUR_ARCHIVE.after_archive_title}</p>
             <ul className="text-sm text-morandi-secondary space-y-1 ml-4">
               <li>{TOUR_ARCHIVE.after_archive_hidden}</li>
               <li>{TOUR_ARCHIVE.after_archive_unlink}</li>

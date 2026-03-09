@@ -46,36 +46,101 @@ const WORKBENCH_CATEGORIES = [
     title: MOBILE_NAV_LABELS.COMMON_FEATURES,
     items: [
       { icon: MapPin, label: MOBILE_NAV_LABELS.TOURS, href: '/m/tours', color: 'text-blue-600' },
-      { icon: ShoppingCart, label: MOBILE_NAV_LABELS.ORDERS, href: '/m/orders', color: 'text-green-600' },
-      { icon: Users, label: MOBILE_NAV_LABELS.MEMBERS, href: '/m/members', color: 'text-purple-600' },
-      { icon: CheckCircle, label: MOBILE_NAV_LABELS.CHECK_IN, href: '/m/checkin', color: 'text-orange-600' },
+      {
+        icon: ShoppingCart,
+        label: MOBILE_NAV_LABELS.ORDERS,
+        href: '/m/orders',
+        color: 'text-green-600',
+      },
+      {
+        icon: Users,
+        label: MOBILE_NAV_LABELS.MEMBERS,
+        href: '/m/members',
+        color: 'text-purple-600',
+      },
+      {
+        icon: CheckCircle,
+        label: MOBILE_NAV_LABELS.CHECK_IN,
+        href: '/m/checkin',
+        color: 'text-orange-600',
+      },
     ],
   },
   {
     title: MOBILE_NAV_LABELS.FINANCE,
     items: [
-      { icon: CreditCard, label: MOBILE_NAV_LABELS.PAYMENT_REQUEST, href: '/m/payments', color: 'text-emerald-600' },
-      { icon: FileText, label: MOBILE_NAV_LABELS.TREASURY, href: '/m/treasury', color: 'text-cyan-600' },
-      { icon: FileCheck, label: MOBILE_NAV_LABELS.RECEIPT, href: '/m/receipts', color: 'text-teal-600' },
+      {
+        icon: CreditCard,
+        label: MOBILE_NAV_LABELS.PAYMENT_REQUEST,
+        href: '/m/payments',
+        color: 'text-emerald-600',
+      },
+      {
+        icon: FileText,
+        label: MOBILE_NAV_LABELS.TREASURY,
+        href: '/m/treasury',
+        color: 'text-cyan-600',
+      },
+      {
+        icon: FileCheck,
+        label: MOBILE_NAV_LABELS.RECEIPT,
+        href: '/m/receipts',
+        color: 'text-teal-600',
+      },
     ],
   },
   {
     title: MOBILE_NAV_LABELS.ADMIN,
     items: [
-      { icon: Calendar, label: MOBILE_NAV_LABELS.CALENDAR, href: '/calendar', color: 'text-red-600' },
+      {
+        icon: Calendar,
+        label: MOBILE_NAV_LABELS.CALENDAR,
+        href: '/calendar',
+        color: 'text-red-600',
+      },
       { icon: Stamp, label: MOBILE_NAV_LABELS.VISA, href: '/m/visas', color: 'text-amber-600' },
       { icon: Palette, label: MOBILE_NAV_LABELS.DESIGN, href: '/design', color: 'text-indigo-600' },
-      { icon: FileSpreadsheet, label: MOBILE_NAV_LABELS.DOCUMENTS, href: '/office', color: 'text-pink-600' },
-      { icon: Calendar, label: MOBILE_NAV_LABELS.SCHEDULING, href: '/scheduling', color: 'text-sky-600' },
+      {
+        icon: FileSpreadsheet,
+        label: MOBILE_NAV_LABELS.DOCUMENTS,
+        href: '/office',
+        color: 'text-pink-600',
+      },
+      {
+        icon: Calendar,
+        label: MOBILE_NAV_LABELS.SCHEDULING,
+        href: '/scheduling',
+        color: 'text-sky-600',
+      },
     ],
   },
   {
     title: MOBILE_NAV_LABELS.DATABASE,
     items: [
-      { icon: Hotel, label: MOBILE_NAV_LABELS.HOTELS, href: '/database/hotels', color: 'text-violet-600' },
-      { icon: Truck, label: MOBILE_NAV_LABELS.SUPPLIERS, href: '/database/suppliers', color: 'text-slate-600' },
-      { icon: MapPinned, label: MOBILE_NAV_LABELS.ATTRACTIONS, href: '/database/attractions', color: 'text-lime-600' },
-      { icon: UserCheck, label: MOBILE_NAV_LABELS.LEADERS, href: '/database/tour-leaders', color: 'text-rose-600' },
+      {
+        icon: Hotel,
+        label: MOBILE_NAV_LABELS.HOTELS,
+        href: '/database/hotels',
+        color: 'text-violet-600',
+      },
+      {
+        icon: Truck,
+        label: MOBILE_NAV_LABELS.SUPPLIERS,
+        href: '/database/suppliers',
+        color: 'text-slate-600',
+      },
+      {
+        icon: MapPinned,
+        label: MOBILE_NAV_LABELS.ATTRACTIONS,
+        href: '/database/attractions',
+        color: 'text-lime-600',
+      },
+      {
+        icon: UserCheck,
+        label: MOBILE_NAV_LABELS.LEADERS,
+        href: '/database/tour-leaders',
+        color: 'text-rose-600',
+      },
     ],
   },
 ]
@@ -94,7 +159,7 @@ export function MobileNav() {
       {/* 底部導航欄 */}
       <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 safe-area-pb">
         <div className="flex items-center justify-around h-16 px-1">
-          {NAV_ITEMS.map((item) => {
+          {NAV_ITEMS.map(item => {
             const Icon = item.icon
             const active = isActive(item.href)
 
@@ -120,9 +185,7 @@ export function MobileNav() {
                 href={item.href}
                 className={cn(
                   'flex flex-col items-center justify-center flex-1 py-2 transition-colors',
-                  active
-                    ? 'text-morandi-gold'
-                    : 'text-morandi-secondary hover:text-morandi-primary'
+                  active ? 'text-morandi-gold' : 'text-morandi-secondary hover:text-morandi-primary'
                 )}
               >
                 <Icon size={22} className={active ? 'stroke-[2]' : 'stroke-[1.5]'} />
@@ -135,7 +198,10 @@ export function MobileNav() {
 
       {/* 工作台彈出面板 - 使用 Dialog 作為底部抽屜 */}
       <Dialog open={showWorkbench} onOpenChange={setShowWorkbench}>
-        <DialogContent level={1} className="fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 max-w-none w-full rounded-t-2xl rounded-b-none max-h-[80vh] overflow-auto p-0 data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom">
+        <DialogContent
+          level={1}
+          className="fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 max-w-none w-full rounded-t-2xl rounded-b-none max-h-[80vh] overflow-auto p-0 data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom"
+        >
           {/* 標題列 */}
           <div className="sticky top-0 bg-card border-b border-border px-4 py-3 flex items-center justify-between">
             <h2 className="text-lg font-bold text-morandi-primary">{MOBILE_LABELS.LABEL_6263}</h2>
@@ -149,13 +215,13 @@ export function MobileNav() {
 
           {/* 功能分類 */}
           <div className="p-4 space-y-6">
-            {WORKBENCH_CATEGORIES.map((category) => (
+            {WORKBENCH_CATEGORIES.map(category => (
               <div key={category.title}>
                 <h3 className="text-sm font-medium text-morandi-secondary mb-3">
                   {category.title}
                 </h3>
                 <div className="grid grid-cols-4 gap-3">
-                  {category.items.map((item) => {
+                  {category.items.map(item => {
                     const Icon = item.icon
                     return (
                       <Link

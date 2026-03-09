@@ -70,7 +70,7 @@ export function TourPriceTiersSectionLuxury({ data, viewMode }: TourPriceTiersSe
             style={{
               color: LUXURY.secondary,
               fontFamily: "'Noto Serif TC', serif",
-              fontSize: isMobile ? '1rem' : '1.125rem'
+              fontSize: isMobile ? '1rem' : '1.125rem',
             }}
           >
             Investment
@@ -79,7 +79,7 @@ export function TourPriceTiersSectionLuxury({ data, viewMode }: TourPriceTiersSe
             className={`font-bold ${isMobile ? 'text-2xl' : 'text-3xl'}`}
             style={{
               color: LUXURY.text,
-              fontFamily: "'Noto Serif TC', serif"
+              fontFamily: "'Noto Serif TC', serif",
             }}
           >
             {TOURS_LABELS.LABEL_1385}
@@ -87,13 +87,15 @@ export function TourPriceTiersSectionLuxury({ data, viewMode }: TourPriceTiersSe
         </motion.div>
 
         {/* 價格卡片 */}
-        <div className={`grid gap-8 ${
-          isMobile
-            ? 'grid-cols-1'
-            : priceTiers.length === 1
-              ? 'grid-cols-1 max-w-md mx-auto'
-              : 'md:grid-cols-2'
-        }`}>
+        <div
+          className={`grid gap-8 ${
+            isMobile
+              ? 'grid-cols-1'
+              : priceTiers.length === 1
+                ? 'grid-cols-1 max-w-md mx-auto'
+                : 'md:grid-cols-2'
+          }`}
+        >
           {priceTiers.map((tier, index) => {
             const cardStyle = getCardStyle(index)
 
@@ -111,7 +113,7 @@ export function TourPriceTiersSectionLuxury({ data, viewMode }: TourPriceTiersSe
                   className="p-6 text-center"
                   style={{
                     backgroundColor: cardStyle.headerBg,
-                    borderBottom: `1px solid ${cardStyle.headerBorder}`
+                    borderBottom: `1px solid ${cardStyle.headerBorder}`,
                   }}
                 >
                   <h3
@@ -137,7 +139,7 @@ export function TourPriceTiersSectionLuxury({ data, viewMode }: TourPriceTiersSe
                       className={`font-bold ${isMobile ? 'text-4xl' : 'text-5xl'}`}
                       style={{
                         color: LUXURY.primary,
-                        fontFamily: "'Noto Serif TC', serif"
+                        fontFamily: "'Noto Serif TC', serif",
                       }}
                     >
                       {formatPrice(tier.price) || '---'}
@@ -168,11 +170,11 @@ export function TourPriceTiersSectionLuxury({ data, viewMode }: TourPriceTiersSe
                       borderColor: LUXURY.primary,
                       color: LUXURY.primary,
                     }}
-                    onMouseEnter={(e) => {
+                    onMouseEnter={e => {
                       e.currentTarget.style.backgroundColor = LUXURY.primary
                       e.currentTarget.style.color = '#FFFFFF'
                     }}
-                    onMouseLeave={(e) => {
+                    onMouseLeave={e => {
                       e.currentTarget.style.backgroundColor = 'transparent'
                       e.currentTarget.style.color = LUXURY.primary
                     }}

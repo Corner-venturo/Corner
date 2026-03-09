@@ -3,15 +3,7 @@
 import React from 'react'
 import { format, differenceInDays } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
-import {
-  ChevronRight,
-  MessageCircle,
-  Bell,
-  Users,
-  Calendar,
-  Lock,
-  Unlock,
-} from 'lucide-react'
+import { ChevronRight, MessageCircle, Bell, Users, Calendar, Lock, Unlock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import type { TourGroup, TourConversation } from '../types'
@@ -106,15 +98,11 @@ export function TourList({
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-morandi-secondary truncate">
-                    {group.tourName}
-                  </div>
+                  <div className="text-xs text-morandi-secondary truncate">{group.tourName}</div>
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-xs text-morandi-secondary">
-                    {daysText}
-                  </span>
+                  <span className="text-xs text-morandi-secondary">{daysText}</span>
 
                   {/* 開啟/關閉按鈕 */}
                   <Button
@@ -126,7 +114,7 @@ export function TourList({
                         ? 'text-morandi-green hover:text-morandi-green'
                         : 'text-morandi-secondary hover:text-morandi-primary'
                     )}
-                    onClick={(e) => handleToggle(e, group.tourId, !group.isOpen)}
+                    onClick={e => handleToggle(e, group.tourId, !group.isOpen)}
                     disabled={isTogglingThis}
                     title={group.isOpen ? LABELS.closeTravelerChat : LABELS.openTravelerChat}
                   >

@@ -19,7 +19,11 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { ATTRACTIONS_LIST_LABELS, MICHELIN_RESTAURANTS_TAB_LABELS, PREMIUM_EXPERIENCES_TAB_LABELS } from '../../constants/labels';
+import {
+  ATTRACTIONS_LIST_LABELS,
+  MICHELIN_RESTAURANTS_TAB_LABELS,
+  PREMIUM_EXPERIENCES_TAB_LABELS,
+} from '../../constants/labels'
 
 interface PremiumExperience {
   id: string
@@ -51,7 +55,9 @@ interface PremiumExperiencesTabProps {
 export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperiencesTabProps) {
   const [experiences, setExperiences] = useState<PremiumExperience[]>([])
   const [loading, setLoading] = useState(true)
-  const [countries, setCountries] = useState<Array<{ id: string; name: string; emoji?: string }>>([])
+  const [countries, setCountries] = useState<Array<{ id: string; name: string; emoji?: string }>>(
+    []
+  )
   const [cities, setCities] = useState<Array<{ id: string; name: string }>>([])
 
   const [editingExperience, setEditingExperience] = useState<PremiumExperience | null>(null)
@@ -86,7 +92,10 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
             .in('id', countryIds)
             .limit(500)
             .then(({ data }) => {
-              if (data) setCountries(data.map(c => ({ id: c.id, name: c.name, emoji: c.emoji ?? undefined })))
+              if (data)
+                setCountries(
+                  data.map(c => ({ id: c.id, name: c.name, emoji: c.emoji ?? undefined }))
+                )
             })
         }
 
@@ -144,7 +153,6 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
     if (!editingExperience) return
 
     try {
-       
       const { error } = await dynamicFrom('premium_experiences')
         .update(updatedData)
         .eq('id', editingExperience.id)
@@ -246,7 +254,9 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
           <div className="min-w-[180px]">
             <div className="font-medium text-morandi-primary line-clamp-1">{experience.name}</div>
             {experience.english_name && (
-              <div className="text-xs text-morandi-muted line-clamp-1">{experience.english_name}</div>
+              <div className="text-xs text-morandi-muted line-clamp-1">
+                {experience.english_name}
+              </div>
             )}
           </div>
         ),
@@ -283,9 +293,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
           const country = countries.find(c => c.id === experience.country_id)
           const city = cities.find(c => c.id === experience.city_id)
           return (
-            <div className="text-sm text-morandi-secondary line-clamp-1">
-              {city?.name || '-'}
-            </div>
+            <div className="text-sm text-morandi-secondary line-clamp-1">{city?.name || '-'}</div>
           )
         },
       },
@@ -399,48 +407,51 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
             actions={(row: unknown) => {
               const experience = row as PremiumExperience
               return (
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={e => {
-                    e.stopPropagation()
-                    handleEdit(experience)
-                  }}
-                  className="h-8 px-2 text-morandi-blue hover:bg-morandi-blue/10"
-                  title={ATTRACTIONS_LIST_LABELS.編輯}
-                >
-                  <Edit2 size={14} />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={e => {
-                    e.stopPropagation()
-                    handleToggleStatus(experience)
-                  }}
-                  className="h-8 px-2"
-                  title={experience.is_active ? '停用' : ATTRACTIONS_LIST_LABELS.啟用}
-                >
-                  <Power
-                    size={14}
-                    className={experience.is_active ? 'text-morandi-green' : 'text-morandi-secondary'}
-                  />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={e => {
-                    e.stopPropagation()
-                    handleDelete(experience.id)
-                  }}
-                  className="h-8 px-2 hover:text-morandi-red hover:bg-morandi-red/10"
-                  title={ATTRACTIONS_LIST_LABELS.刪除}
-                >
-                  <Trash2 size={14} />
-                </Button>
-              </div>
-            )}}
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={e => {
+                      e.stopPropagation()
+                      handleEdit(experience)
+                    }}
+                    className="h-8 px-2 text-morandi-blue hover:bg-morandi-blue/10"
+                    title={ATTRACTIONS_LIST_LABELS.編輯}
+                  >
+                    <Edit2 size={14} />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={e => {
+                      e.stopPropagation()
+                      handleToggleStatus(experience)
+                    }}
+                    className="h-8 px-2"
+                    title={experience.is_active ? '停用' : ATTRACTIONS_LIST_LABELS.啟用}
+                  >
+                    <Power
+                      size={14}
+                      className={
+                        experience.is_active ? 'text-morandi-green' : 'text-morandi-secondary'
+                      }
+                    />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={e => {
+                      e.stopPropagation()
+                      handleDelete(experience.id)
+                    }}
+                    className="h-8 px-2 hover:text-morandi-red hover:bg-morandi-red/10"
+                    title={ATTRACTIONS_LIST_LABELS.刪除}
+                  >
+                    <Trash2 size={14} />
+                  </Button>
+                </div>
+              )
+            }}
           />
         </div>
       </div>
@@ -455,7 +466,9 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium">{PREMIUM_EXPERIENCES_TAB_LABELS.NAME}</label>
+                  <label className="text-sm font-medium">
+                    {PREMIUM_EXPERIENCES_TAB_LABELS.NAME}
+                  </label>
                   <Input
                     value={editingExperience.name}
                     onChange={e =>
@@ -464,7 +477,9 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">{PREMIUM_EXPERIENCES_TAB_LABELS.LABEL_3778}</label>
+                  <label className="text-sm font-medium">
+                    {PREMIUM_EXPERIENCES_TAB_LABELS.LABEL_3778}
+                  </label>
                   <Input
                     value={editingExperience.english_name || ''}
                     onChange={e =>
@@ -474,7 +489,9 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium">{PREMIUM_EXPERIENCES_TAB_LABELS.LABEL_3951}</label>
+                <label className="text-sm font-medium">
+                  {PREMIUM_EXPERIENCES_TAB_LABELS.LABEL_3951}
+                </label>
                 <textarea
                   value={editingExperience.description || ''}
                   onChange={e =>
@@ -485,7 +502,9 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium">{PREMIUM_EXPERIENCES_TAB_LABELS.LABEL_1913}</label>
+                  <label className="text-sm font-medium">
+                    {PREMIUM_EXPERIENCES_TAB_LABELS.LABEL_1913}
+                  </label>
                   <Input
                     value={editingExperience.expert_name || ''}
                     onChange={e =>
@@ -494,7 +513,9 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">{PREMIUM_EXPERIENCES_TAB_LABELS.LABEL_4473}</label>
+                  <label className="text-sm font-medium">
+                    {PREMIUM_EXPERIENCES_TAB_LABELS.LABEL_4473}
+                  </label>
                   <Input
                     value={editingExperience.expert_credentials || ''}
                     onChange={e =>
@@ -513,7 +534,10 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
               <X size={16} />
               {PREMIUM_EXPERIENCES_TAB_LABELS.CANCEL}
             </Button>
-            <Button onClick={() => editingExperience && handleUpdate(editingExperience)} className="gap-2">
+            <Button
+              onClick={() => editingExperience && handleUpdate(editingExperience)}
+              className="gap-2"
+            >
               <Save size={16} />
               {PREMIUM_EXPERIENCES_TAB_LABELS.SAVE}
             </Button>

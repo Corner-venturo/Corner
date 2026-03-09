@@ -4,7 +4,6 @@
  * 在應用啟動時自動初始化並確保 Auth 同步
  */
 
-
 import { logger } from '@/lib/utils/logger'
 import { useEffect } from 'react'
 import { useAuthStore } from '@/stores/auth-store'

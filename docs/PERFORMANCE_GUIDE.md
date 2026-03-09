@@ -17,7 +17,7 @@
 
 > **2026-02-27 建立** — 所有 Supabase 查詢必須遵守以下三條規則。
 
-### 鐵律一：禁止列表查詢用 select('*')
+### 鐵律一：禁止列表查詢用 select('\*')
 
 ```typescript
 // ❌ 列表頁拿全部欄位（tours 有 63 欄，但列表只顯示 10 欄）
@@ -28,18 +28,21 @@ const TOUR_LIST_SELECT = 'id, code, name, status, departure_date, return_date, c
 const { data } = await supabase.from('tours').select(TOUR_LIST_SELECT)
 ```
 
-**允許用 select('*') 的情況：**
+**允許用 select('\*') 的情況：**
+
 - `.single()` / `.maybeSingle()` — 單筆查詢，影響小
 - 表單編輯 — 需要全部欄位回寫
 - 建立後回傳 — `.insert().select('*').single()`
 
 **必須精簡 select 的情況：**
+
 - 列表頁（最常見的效能瓶頸）
 - 下拉選單（通常只需要 id + name）
 - 統計/分析（只需要計算用的欄位）
 - 任何可能回傳 >50 筆的查詢
 
 **做法：**
+
 1. 定義 `XXX_LIST_SELECT` 常數（放在 hook 或 service 頂部）
 2. 只列出 UI 實際渲染 + 過濾 + 排序需要的欄位
 3. 一定要包含 `id` 和 `workspace_id`
@@ -56,16 +59,17 @@ const { data } = await supabase.from('orders').select('*').eq('tour_id', tourId)
 
 **Limit 建議值：**
 
-| 場景 | 建議 limit | 說明 |
-|------|-----------|------|
-| 列表頁 | 500 | 超過用分頁 |
-| 下拉選單 | 200 | 不可能選 200 個以上 |
-| 參考表（航空公司、機場）| 2000 | 全球也就這麼多 |
-| Dialog 內的子項目 | 500 | 一個團不會有 500 個需求 |
-| 統計查詢 | 1000 | 超過的用 DB aggregate |
-| 歷史紀錄 | 100 | 顯示最近的就好 |
+| 場景                     | 建議 limit | 說明                    |
+| ------------------------ | ---------- | ----------------------- |
+| 列表頁                   | 500        | 超過用分頁              |
+| 下拉選單                 | 200        | 不可能選 200 個以上     |
+| 參考表（航空公司、機場） | 2000       | 全球也就這麼多          |
+| Dialog 內的子項目        | 500        | 一個團不會有 500 個需求 |
+| 統計查詢                 | 1000       | 超過的用 DB aggregate   |
+| 歷史紀錄                 | 100        | 顯示最近的就好          |
 
 **唯一可以不加 limit 的情況：**
+
 - `.single()` / `.maybeSingle()` — 本身就是 limit 1
 - `.count()` / `.head()` — 不回傳資料
 
@@ -76,7 +80,7 @@ const { data } = await supabase.from('orders').select('*').eq('tour_id', tourId)
 ```typescript
 export const useXxxStore = createStore<XxxEntity>({
   tableName: 'xxx',
-  fetchLimit: 2000,  // 明確設定
+  fetchLimit: 2000, // 明確設定
   workspaceScoped: true,
 })
 ```
@@ -106,7 +110,7 @@ const supabase = createClient(url, key)
 
 // ✅ 使用單例模式
 import { getSupabase } from '@/lib/supabase-server'
-const supabase = getSupabase()  // 重用連線
+const supabase = getSupabase() // 重用連線
 ```
 
 ### 2. N+1 查詢 (map + await)
@@ -114,17 +118,14 @@ const supabase = getSupabase()  // 重用連線
 ```typescript
 // ❌ 10 筆 = 10 次查詢
 const results = await Promise.all(
-  items.map(async (item) => {
+  items.map(async item => {
     return await supabase.from('table').select().eq('id', item.id)
   })
 )
 
 // ✅ 批量查詢，1 次取得所有
 const itemIds = items.map(i => i.id)
-const { data } = await supabase
-  .from('table')
-  .select()
-  .in('id', itemIds)
+const { data } = await supabase.from('table').select().in('id', itemIds)
 ```
 
 ### 3. Waterfall 查詢
@@ -147,15 +148,10 @@ const [users, orders, items] = await Promise.all([
 
 ```typescript
 // ❌ 登入時即時 JOIN 計算
-const tours = await supabase
-  .from('tours')
-  .select('*, orders(*), order_members(*), itineraries(*)')
+const tours = await supabase.from('tours').select('*, orders(*), order_members(*), itineraries(*)')
 
 // ✅ 使用快取表，直接讀取
-const { data } = await supabase
-  .from('traveler_tour_cache')
-  .select('*')
-  .eq('user_id', userId)
+const { data } = await supabase.from('traveler_tour_cache').select('*').eq('user_id', userId)
 ```
 
 ---
@@ -211,18 +207,18 @@ SELECT * FROM xxx_cache WHERE user_id = auth.uid();
 
 ### 已實作的快取表
 
-| 快取表 | 來源 | 觸發時機 |
-|--------|------|---------|
+| 快取表                | 來源                                         | 觸發時機                            |
+| --------------------- | -------------------------------------------- | ----------------------------------- |
 | `traveler_tour_cache` | tours + orders + order_members + itineraries | order_members 新增/修改、tours 修改 |
 
 ### 應該使用快取的功能
 
-| 功能 | 建議快取表 | 觸發時機 |
-|------|-----------|---------|
-| 未讀訊息數 | `user_unread_counts` | 訊息新增時 |
-| 用戶統計 | `user_stats_cache` | 相關資料變更時 |
-| 權限快取 | `user_permissions_cache` | 角色變更時 |
-| 通知數量 | `notification_counts` | 通知新增時 |
+| 功能       | 建議快取表               | 觸發時機       |
+| ---------- | ------------------------ | -------------- |
+| 未讀訊息數 | `user_unread_counts`     | 訊息新增時     |
+| 用戶統計   | `user_stats_cache`       | 相關資料變更時 |
+| 權限快取   | `user_permissions_cache` | 角色變更時     |
+| 通知數量   | `notification_counts`    | 通知新增時     |
 
 ### 快取檢查清單
 
@@ -244,8 +240,8 @@ SELECT * FROM xxx_cache WHERE user_id = auth.uid();
 
 ```typescript
 // ❌ 1. 載入所有資料但只用一個欄位
-const { items: tours } = useTourStore()  // 載入 50 個欄位
-const tourNames = tours.map(t => t.name)  // 只用 name
+const { items: tours } = useTourStore() // 載入 50 個欄位
+const tourNames = tours.map(t => t.name) // 只用 name
 
 // ❌ 2. 載入關聯資料做轉換（實體已有 denormalized 欄位）
 const { countries } = useRegionsStore()
@@ -256,15 +252,14 @@ const destination = countries.find(c => c.id === tour.country_id)?.name
 useEffect(() => {
   fetchTours()
   fetchOrders()
-  fetchMembers()      // 這頁面不用！
-  fetchCustomers()    // 這頁面也不用！
+  fetchMembers() // 這頁面不用！
+  fetchCustomers() // 這頁面也不用！
 }, [])
 
 // ❌ 4. 計算可以在資料庫完成的統計
 const memberCount = orders
   .filter(o => o.tour_id === tour.id)
-  .flatMap(o => members.filter(m => m.order_id === o.id))
-  .length
+  .flatMap(o => members.filter(m => m.order_id === o.id)).length
 // 但 Tour 已經有 tour.current_participants 欄位！
 ```
 
@@ -272,12 +267,12 @@ const memberCount = orders
 
 ```typescript
 // ✅ 1. 使用 denormalized 欄位
-const destination = tour.location  // 直接用
-const memberCount = tour.current_participants  // 直接用
+const destination = tour.location // 直接用
+const memberCount = tour.current_participants // 直接用
 
 // ✅ 2. 延遲載入：Dialog 開啟時才載入
 const handleOpenDialog = () => {
-  regionsStore.fetchAll()  // 需要時才載入
+  regionsStore.fetchAll() // 需要時才載入
   setDialogOpen(true)
 }
 
@@ -305,13 +300,13 @@ const { data: member } = await supabase
 
 ### 常見的 Denormalized 欄位
 
-| 實體 | 欄位 | 說明 |
-|------|------|------|
-| `Tour` | `location` | 目的地名稱（不需查 regions） |
-| `Tour` | `current_participants` | 團員人數（不需計算） |
-| `Order` | `tour_name` | 團名（不需查 tours） |
-| `Proposal` | `destination` | 目的地名稱 |
-| `Receipt` | `tour_name`, `order_number` | 不需查關聯表 |
+| 實體       | 欄位                        | 說明                         |
+| ---------- | --------------------------- | ---------------------------- |
+| `Tour`     | `location`                  | 目的地名稱（不需查 regions） |
+| `Tour`     | `current_participants`      | 團員人數（不需計算）         |
+| `Order`    | `tour_name`                 | 團名（不需查 tours）         |
+| `Proposal` | `destination`               | 目的地名稱                   |
+| `Receipt`  | `tour_name`, `order_number` | 不需查關聯表                 |
 
 ---
 
@@ -339,6 +334,7 @@ const AddReceiptDialog = dynamic(
 ```
 
 **使用時機**：
+
 - Dialog/Modal 組件（用戶不一定會打開）
 - 複雜的表單組件
 - 圖表/視覺化組件
@@ -380,6 +376,7 @@ import { VirtualizedTable } from '@/components/ui/enhanced-table'
 ```
 
 **使用時機**：
+
 - 資料量 >100 筆
 - 需要無分頁顯示全部資料
 
@@ -387,14 +384,14 @@ import { VirtualizedTable } from '@/components/ui/enhanced-table'
 
 ## 📁 效能工具檔案位置
 
-| 工具 | 檔案位置 | 用途 |
-|------|---------|------|
-| Supabase 單例 | `src/lib/supabase/admin.ts` | API 用 Supabase 連線 |
-| 請求去重 | `src/lib/request-dedup.ts` | SWR 快取 |
-| API 快取標頭 | `src/lib/api-utils.ts` | 回應快取設定 |
-| VirtualizedTable | `src/components/ui/enhanced-table/VirtualizedTable.tsx` | 虛擬化表格 |
-| useVirtualList | `src/hooks/useVirtualList.ts` | 虛擬列表 Hook |
-| 圖片優化 | `src/lib/image-utils.ts` | blur placeholder |
+| 工具             | 檔案位置                                                | 用途                 |
+| ---------------- | ------------------------------------------------------- | -------------------- |
+| Supabase 單例    | `src/lib/supabase/admin.ts`                             | API 用 Supabase 連線 |
+| 請求去重         | `src/lib/request-dedup.ts`                              | SWR 快取             |
+| API 快取標頭     | `src/lib/api-utils.ts`                                  | 回應快取設定         |
+| VirtualizedTable | `src/components/ui/enhanced-table/VirtualizedTable.tsx` | 虛擬化表格           |
+| useVirtualList   | `src/hooks/useVirtualList.ts`                           | 虛擬列表 Hook        |
+| 圖片優化         | `src/lib/image-utils.ts`                                | blur placeholder     |
 
 ---
 

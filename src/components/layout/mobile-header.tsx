@@ -62,9 +62,7 @@ export function MobileHeader({ onMenuClick }: MobileHeaderProps) {
       </button>
 
       {/* 頁面標題 */}
-      <h1 className="ml-2 text-lg font-semibold text-foreground truncate">
-        {getPageTitle()}
-      </h1>
+      <h1 className="ml-2 text-lg font-semibold text-foreground truncate">{getPageTitle()}</h1>
     </header>
   )
 }

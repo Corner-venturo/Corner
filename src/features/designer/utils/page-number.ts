@@ -24,8 +24,8 @@ export function shouldCountPageNumber(
   if (page.templateKey === 'cover') return false
 
   // 找到目錄的位置
-  const tocIndex = pages.findIndex((p) => p.templateKey === 'toc')
-  const pageIndex = pages.findIndex((p) => p.id === page.id)
+  const tocIndex = pages.findIndex(p => p.templateKey === 'toc')
+  const pageIndex = pages.findIndex(p => p.id === page.id)
 
   // 如果有目錄，且此頁在目錄前面
   if (tocIndex !== -1 && pageIndex < tocIndex) {
@@ -73,11 +73,8 @@ export function formatPageNumber(num: number): string {
  * 計算頁面的頁碼（用於批量計算）
  * @returns 頁碼數字，或 0 表示不顯示頁碼
  */
-export function calculatePageNumberForToc(
-  pageId: string,
-  pages: PageWithTemplateKey[]
-): number {
-  const pageIndex = pages.findIndex((p) => p.id === pageId)
+export function calculatePageNumberForToc(pageId: string, pages: PageWithTemplateKey[]): number {
+  const pageIndex = pages.findIndex(p => p.id === pageId)
   if (pageIndex === -1) return 0
 
   const pageNumber = calculatePageNumber(pageIndex, pages)

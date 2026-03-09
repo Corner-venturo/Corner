@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { X, Check, ListChecks } from 'lucide-react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -13,7 +19,7 @@ import { useTravelInvoiceStore } from '@/stores/travel-invoice-store'
 import { useAuthStore } from '@/stores'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import { BATCH_INVOICE_DIALOG_LABELS, BATCH_INVOICE_TOAST_LABELS } from '../../constants/labels';
+import { BATCH_INVOICE_DIALOG_LABELS, BATCH_INVOICE_TOAST_LABELS } from '../../constants/labels'
 
 interface BatchInvoiceDialogProps {
   open: boolean
@@ -23,9 +29,16 @@ interface BatchInvoiceDialogProps {
   onSuccess?: () => void
 }
 
-export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId, onSuccess }: BatchInvoiceDialogProps) {
+export function BatchInvoiceDialog({
+  open,
+  onOpenChange,
+  tours = [],
+  workspaceId,
+  onSuccess,
+}: BatchInvoiceDialogProps) {
   const user = useAuthStore(state => state.user)
-  const { invoiceableOrders, fetchInvoiceableOrders, batchIssueInvoice, isLoading } = useTravelInvoiceStore()
+  const { invoiceableOrders, fetchInvoiceableOrders, batchIssueInvoice, isLoading } =
+    useTravelInvoiceStore()
 
   const [selectedTourId, setSelectedTourId] = useState<string>('')
   const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([])
@@ -107,7 +120,9 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
           {/* 團別選擇 - 表格式 */}
           <div className="border rounded-lg overflow-hidden">
             <div className="grid grid-cols-12 gap-2 px-3 py-2 items-center">
-              <div className="col-span-2 text-sm text-muted-foreground">{BATCH_INVOICE_DIALOG_LABELS.LABEL_9860}</div>
+              <div className="col-span-2 text-sm text-muted-foreground">
+                {BATCH_INVOICE_DIALOG_LABELS.LABEL_9860}
+              </div>
               <div className="col-span-10">
                 <Combobox
                   options={tours}
@@ -126,10 +141,18 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
               <div className="grid grid-cols-12 gap-2 px-3 py-2 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
                 <div className="col-span-1 flex items-center justify-center">
                   <Checkbox
-                    checked={invoiceableOrders.length > 0 && selectedOrderIds.length === invoiceableOrders.filter(o => o.invoiceable_amount > 0).length}
+                    checked={
+                      invoiceableOrders.length > 0 &&
+                      selectedOrderIds.length ===
+                        invoiceableOrders.filter(o => o.invoiceable_amount > 0).length
+                    }
                     onCheckedChange={checked => {
                       if (checked) {
-                        setSelectedOrderIds(invoiceableOrders.filter(o => o.invoiceable_amount > 0).map(o => o.order_id))
+                        setSelectedOrderIds(
+                          invoiceableOrders
+                            .filter(o => o.invoiceable_amount > 0)
+                            .map(o => o.order_id)
+                        )
                       } else {
                         setSelectedOrderIds([])
                       }
@@ -165,17 +188,23 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
                       <div className="col-span-1 flex items-center justify-center">
                         <Checkbox
                           checked={selectedOrderIds.includes(order.order_id)}
-                          onCheckedChange={checked => toggleOrder(order.order_id, checked as boolean)}
+                          onCheckedChange={checked =>
+                            toggleOrder(order.order_id, checked as boolean)
+                          }
                           disabled={order.invoiceable_amount <= 0}
                           onClick={e => e.stopPropagation()}
                         />
                       </div>
                       <div className="col-span-4 font-medium text-sm">{order.order_number}</div>
-                      <div className="col-span-4 text-sm text-morandi-secondary">{order.contact_person}</div>
-                      <div className={cn(
-                        'col-span-3 text-right font-medium',
-                        order.invoiceable_amount > 0 ? 'text-morandi-gold' : 'text-morandi-muted'
-                      )}>
+                      <div className="col-span-4 text-sm text-morandi-secondary">
+                        {order.contact_person}
+                      </div>
+                      <div
+                        className={cn(
+                          'col-span-3 text-right font-medium',
+                          order.invoiceable_amount > 0 ? 'text-morandi-gold' : 'text-morandi-muted'
+                        )}
+                      >
                         <CurrencyCell amount={order.invoiceable_amount} />
                       </div>
                     </div>
@@ -189,10 +218,13 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
           {selectedOrderIds.length > 0 && (
             <div className="flex justify-between items-center p-4 bg-morandi-container/40 rounded-lg">
               <div>
-                已選 <span className="font-bold">{selectedOrderIds.length}</span> {BATCH_INVOICE_DIALOG_LABELS.LABEL_3592}
+                已選 <span className="font-bold">{selectedOrderIds.length}</span>{' '}
+                {BATCH_INVOICE_DIALOG_LABELS.LABEL_3592}
               </div>
               <div className="text-right">
-                <div className="text-sm text-morandi-secondary">{BATCH_INVOICE_DIALOG_LABELS.LABEL_3678}</div>
+                <div className="text-sm text-morandi-secondary">
+                  {BATCH_INVOICE_DIALOG_LABELS.LABEL_3678}
+                </div>
                 <div className="text-xl font-bold text-morandi-gold">
                   <CurrencyCell amount={totalAmount} />
                 </div>
@@ -208,7 +240,9 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
               </div>
               <div className="divide-y">
                 <div className="grid grid-cols-12 gap-2 px-3 py-2 items-center">
-                  <div className="col-span-2 text-sm text-muted-foreground">{BATCH_INVOICE_DIALOG_LABELS.LABEL_7408}</div>
+                  <div className="col-span-2 text-sm text-muted-foreground">
+                    {BATCH_INVOICE_DIALOG_LABELS.LABEL_7408}
+                  </div>
                   <div className="col-span-4">
                     <Input
                       value={buyerName}
@@ -217,7 +251,9 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
                       className="h-8"
                     />
                   </div>
-                  <div className="col-span-2 text-sm text-muted-foreground text-right">{BATCH_INVOICE_DIALOG_LABELS.LABEL_3729}</div>
+                  <div className="col-span-2 text-sm text-muted-foreground text-right">
+                    {BATCH_INVOICE_DIALOG_LABELS.LABEL_3729}
+                  </div>
                   <div className="col-span-4">
                     <Input
                       value={buyerUBN}
@@ -239,7 +275,9 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
                       className="h-8"
                     />
                   </div>
-                  <div className="col-span-2 text-sm text-muted-foreground text-right">{BATCH_INVOICE_DIALOG_LABELS.LABEL_3494}</div>
+                  <div className="col-span-2 text-sm text-muted-foreground text-right">
+                    {BATCH_INVOICE_DIALOG_LABELS.LABEL_3494}
+                  </div>
                   <div className="col-span-4">
                     <DatePicker value={invoiceDate} onChange={setInvoiceDate} />
                   </div>
@@ -260,7 +298,9 @@ export function BatchInvoiceDialog({ open, onOpenChange, tours = [], workspaceId
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
             <Check size={16} />
-            {isLoading ? BATCH_INVOICE_TOAST_LABELS.ISSUING : BATCH_INVOICE_TOAST_LABELS.ISSUE_N(selectedOrderIds.length)}
+            {isLoading
+              ? BATCH_INVOICE_TOAST_LABELS.ISSUING
+              : BATCH_INVOICE_TOAST_LABELS.ISSUE_N(selectedOrderIds.length)}
           </Button>
         </DialogFooter>
       </DialogContent>

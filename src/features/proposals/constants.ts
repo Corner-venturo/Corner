@@ -192,7 +192,8 @@ export const PROPOSAL_LABELS = {
     dinnerCol: '晚餐',
     hotelCol: '住宿',
     footer: (company: string) => `本行程表由 ${company} 提供`,
-    printFooter: (company: string, date: string) => `本行程表由 ${company} 提供 | 列印日期：${date}`,
+    printFooter: (company: string, date: string) =>
+      `本行程表由 ${company} 提供 | 列印日期：${date}`,
   },
 
   // === RequirementSyncDialog ===

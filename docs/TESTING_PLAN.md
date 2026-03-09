@@ -12,27 +12,32 @@
 These require a real or test Supabase database:
 
 ### 1. Receipt Creation → Stats Update
+
 - Create a receipt via API
 - Verify tour statistics (total_received) updates correctly
 - Verify receipt_number auto-generation
 
 ### 2. Receipt Deletion → Stats Rollback
+
 - Delete a confirmed receipt
 - Verify tour statistics deducts the amount
 - Verify linkpay_logs cleanup
 
 ### 3. Batch Confirmation → Multi-Order Update
+
 - Create multiple receipts in pending state
 - Run batch confirmation
 - Verify all orders update to confirmed status
 - Verify financial summaries recalculate
 
 ### 4. LinkPay Flow
+
 - Create LinkPay request → verify linkpay_logs created
 - Simulate webhook callback → verify receipt auto-fill
 - Verify receipt stays in "pending confirmation" for accountant review
 
 ### 5. Employee Auth Flow
+
 - Create employee auth account
 - Validate login with correct/incorrect credentials
 - Change password → verify old password invalid

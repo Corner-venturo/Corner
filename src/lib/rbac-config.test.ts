@@ -11,7 +11,16 @@ import {
 
 describe('ROLES', () => {
   it('has all expected roles', () => {
-    const roles: UserRole[] = ['super_admin', 'admin', 'tour_leader', 'sales', 'accountant', 'assistant', 'controller', 'staff']
+    const roles: UserRole[] = [
+      'super_admin',
+      'admin',
+      'tour_leader',
+      'sales',
+      'accountant',
+      'assistant',
+      'controller',
+      'staff',
+    ]
     for (const r of roles) {
       expect(ROLES[r]).toBeDefined()
     }

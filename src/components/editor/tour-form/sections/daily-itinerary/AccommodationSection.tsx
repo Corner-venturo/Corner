@@ -4,7 +4,13 @@ import React from 'react'
 import { Building2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DailyItinerary, TourFormData } from '../../types'
 import { COMP_EDITOR_LABELS } from '../../../constants/labels'
@@ -13,9 +19,13 @@ interface AccommodationSectionProps {
   day: DailyItinerary
   dayIndex: number
   data: TourFormData
-  updateDailyItinerary: (index: number, field: string | Record<string, unknown>, value?: unknown) => void
+  updateDailyItinerary: (
+    index: number,
+    field: string | Record<string, unknown>,
+    value?: unknown
+  ) => void
   onOpenHotelSelector: (dayIndex: number) => void
-  isLockedByQuote?: boolean  // 有關聯報價單時鎖定飯店名稱
+  isLockedByQuote?: boolean // 有關聯報價單時鎖定飯店名稱
 }
 
 export function AccommodationSection({
@@ -30,7 +40,7 @@ export function AccommodationSection({
   const isNameLocked = isLockedByQuote || day.isSameAccommodation
   // 續住時星級和連結也不需要編輯（跟前一天一樣）
   const isDetailLocked = day.isSameAccommodation
-  
+
   return (
     <div className="space-y-2">
       {/* 續住勾選（第二天以後才顯示） — 永遠可操作 */}
@@ -62,9 +72,7 @@ export function AccommodationSection({
             }
           }}
         >
-          <Checkbox
-            checked={day.isSameAccommodation || false}
-          />
+          <Checkbox checked={day.isSameAccommodation || false} />
           <span className="text-sm text-morandi-primary">
             {COMP_EDITOR_LABELS.LABEL_3005}
             {data.dailyItinerary[dayIndex - 1]?.accommodation && (
@@ -104,7 +112,9 @@ export function AccommodationSection({
                     updateDailyItinerary(dayIndex, 'accommodationUrl', '')
                     updateDailyItinerary(dayIndex, 'accommodationRating', 5)
                     setTimeout(() => {
-                      const input = document.querySelector(`#accommodation-input-${dayIndex}`) as HTMLInputElement
+                      const input = document.querySelector(
+                        `#accommodation-input-${dayIndex}`
+                      ) as HTMLInputElement
                       input?.focus()
                     }, 0)
                   }}
@@ -121,7 +131,9 @@ export function AccommodationSection({
           <div className="flex flex-wrap gap-3">
             {/* 飯店名稱：有報價單時鎖定 */}
             <div className={`flex-1 min-w-[200px] ${isNameLocked ? 'opacity-60' : ''}`}>
-              <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5732}</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">
+                {COMP_EDITOR_LABELS.LABEL_5732}
+              </label>
               <Input
                 id={`accommodation-input-${dayIndex}`}
                 type="text"
@@ -134,11 +146,17 @@ export function AccommodationSection({
             </div>
             {/* 星級：永遠可編輯（行程表階段填入） */}
             <div className="w-24">
-              <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5000}</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">
+                {COMP_EDITOR_LABELS.LABEL_5000}
+              </label>
               <Select
                 value={String(day.accommodationRating ?? 5)}
                 onValueChange={val => {
-                  updateDailyItinerary(dayIndex, 'accommodationRating', val === '0' ? 0 : Number(val))
+                  updateDailyItinerary(
+                    dayIndex,
+                    'accommodationRating',
+                    val === '0' ? 0 : Number(val)
+                  )
                 }}
                 disabled={isDetailLocked}
               >
@@ -157,7 +175,9 @@ export function AccommodationSection({
             </div>
             {/* 飯店連結：永遠可編輯（行程表階段填入） */}
             <div className="flex-1 min-w-[180px]">
-              <label className="block text-xs font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5538}</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">
+                {COMP_EDITOR_LABELS.LABEL_5538}
+              </label>
               <Input
                 type="url"
                 value={day.accommodationUrl || ''}

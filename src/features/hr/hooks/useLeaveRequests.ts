@@ -77,94 +77,102 @@ export function useLeaveRequests() {
   /**
    * 取得請假申請列表
    */
-  const fetchRequests = useCallback(async (filters?: {
-    status?: LeaveRequestStatus
-    employee_id?: string
-    start_date?: string
-    end_date?: string
-  }) => {
-    if (!user) return
+  const fetchRequests = useCallback(
+    async (filters?: {
+      status?: LeaveRequestStatus
+      employee_id?: string
+      start_date?: string
+      end_date?: string
+    }) => {
+      if (!user) return
 
-    setLoading(true)
-    setError(null)
+      setLoading(true)
+      setError(null)
 
-    try {
-      let query = supabase
-        .from('leave_requests')
-        .select(`
+      try {
+        let query = supabase
+          .from('leave_requests')
+          .select(
+            `
           *,
           employee:employees!leave_requests_employee_id_fkey(id, chinese_name, display_name),
           leave_type:leave_types!leave_requests_leave_type_id_fkey(id, name)
-        `)
-        
-        .order('created_at', { ascending: false })
+        `
+          )
 
-      if (filters?.status) {
-        query = query.eq('status', filters.status)
-      }
-      if (filters?.employee_id) {
-        query = query.eq('employee_id', filters.employee_id)
-      }
-      if (filters?.start_date) {
-        query = query.gte('start_date', filters.start_date)
-      }
-      if (filters?.end_date) {
-        query = query.lte('end_date', filters.end_date)
-      }
+          .order('created_at', { ascending: false })
 
-      const { data, error: queryError } = await query
-
-      if (queryError) throw queryError
-
-      const mappedData: LeaveRequest[] = (data || []).map(item => {
-        const employee = item.employee as { id: string; chinese_name: string | null; display_name: string | null } | null
-        const leaveType = item.leave_type as { id: string; name: string } | null
-        return {
-          id: item.id,
-          workspace_id: item.workspace_id,
-          employee_id: item.employee_id,
-          leave_type_id: item.leave_type_id,
-          start_date: item.start_date,
-          end_date: item.end_date,
-          start_time: item.start_time,
-          end_time: item.end_time,
-          days: item.days,
-          reason: item.reason,
-          proof_url: item.proof_url,
-          status: item.status as LeaveRequestStatus,
-          approved_by: item.approved_by,
-          approved_at: item.approved_at,
-          reject_reason: item.reject_reason,
-          created_at: item.created_at || '',
-          updated_at: item.updated_at || '',
-          employee_name: employee?.display_name || employee?.chinese_name || '未知',
-          leave_type_name: leaveType?.name || '未知',
+        if (filters?.status) {
+          query = query.eq('status', filters.status)
         }
-      })
+        if (filters?.employee_id) {
+          query = query.eq('employee_id', filters.employee_id)
+        }
+        if (filters?.start_date) {
+          query = query.gte('start_date', filters.start_date)
+        }
+        if (filters?.end_date) {
+          query = query.lte('end_date', filters.end_date)
+        }
 
-      setRequests(mappedData)
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '載入請假申請失敗'
-      setError(message)
-      logger.error('載入請假申請失敗:', err)
-    } finally {
-      setLoading(false)
-    }
-  }, [user])
+        const { data, error: queryError } = await query
+
+        if (queryError) throw queryError
+
+        const mappedData: LeaveRequest[] = (data || []).map(item => {
+          const employee = item.employee as {
+            id: string
+            chinese_name: string | null
+            display_name: string | null
+          } | null
+          const leaveType = item.leave_type as { id: string; name: string } | null
+          return {
+            id: item.id,
+            workspace_id: item.workspace_id,
+            employee_id: item.employee_id,
+            leave_type_id: item.leave_type_id,
+            start_date: item.start_date,
+            end_date: item.end_date,
+            start_time: item.start_time,
+            end_time: item.end_time,
+            days: item.days,
+            reason: item.reason,
+            proof_url: item.proof_url,
+            status: item.status as LeaveRequestStatus,
+            approved_by: item.approved_by,
+            approved_at: item.approved_at,
+            reject_reason: item.reject_reason,
+            created_at: item.created_at || '',
+            updated_at: item.updated_at || '',
+            employee_name: employee?.display_name || employee?.chinese_name || '未知',
+            leave_type_name: leaveType?.name || '未知',
+          }
+        })
+
+        setRequests(mappedData)
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '載入請假申請失敗'
+        setError(message)
+        logger.error('載入請假申請失敗:', err)
+      } finally {
+        setLoading(false)
+      }
+    },
+    [user]
+  )
 
   /**
    * 新增請假申請
    */
-  const createRequest = useCallback(async (input: LeaveRequestInput): Promise<boolean> => {
-    if (!user) return false
+  const createRequest = useCallback(
+    async (input: LeaveRequestInput): Promise<boolean> => {
+      if (!user) return false
 
-    setLoading(true)
-    setError(null)
+      setLoading(true)
+      setError(null)
 
-    try {
-      const { error: insertError } = await supabase
-        .from('leave_requests')
-        .insert({
+      try {
+        const { error: insertError } = await supabase.from('leave_requests').insert({
           workspace_id: getRequiredWorkspaceId(),
           employee_id: input.employee_id,
           leave_type_id: input.leave_type_id,
@@ -178,255 +186,270 @@ export function useLeaveRequests() {
           status: 'pending',
         })
 
-      if (insertError) throw insertError
+        if (insertError) throw insertError
 
-      await fetchRequests()
-      return true
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '新增請假申請失敗'
-      setError(message)
-      logger.error('新增請假申請失敗:', err)
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }, [user, fetchRequests])
+        await fetchRequests()
+        return true
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '新增請假申請失敗'
+        setError(message)
+        logger.error('新增請假申請失敗:', err)
+        return false
+      } finally {
+        setLoading(false)
+      }
+    },
+    [user, fetchRequests]
+  )
 
   /**
    * 審核請假申請
    */
-  const approveRequest = useCallback(async (id: string): Promise<boolean> => {
-    if (!user?.id) return false
+  const approveRequest = useCallback(
+    async (id: string): Promise<boolean> => {
+      if (!user?.id) return false
 
-    setLoading(true)
-    setError(null)
+      setLoading(true)
+      setError(null)
 
-    try {
-      // 取得請假申請資訊
-      const { data: request, error: fetchError } = await supabase
-        .from('leave_requests')
-        .select('*')
-        .eq('id', id)
-        .limit(500)
-        
-        .single()
+      try {
+        // 取得請假申請資訊
+        const { data: request, error: fetchError } = await supabase
+          .from('leave_requests')
+          .select('*')
+          .eq('id', id)
+          .limit(500)
 
-      if (fetchError) throw fetchError
-      if (!request) throw new Error('找不到請假申請')
+          .single()
 
-      // 更新為已核准
-      const { error: updateError } = await supabase
-        .from('leave_requests')
-        .update({
-          status: 'approved',
-          approved_by: user.id,
-          approved_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', id)
+        if (fetchError) throw fetchError
+        if (!request) throw new Error('找不到請假申請')
 
-      if (updateError) throw updateError
-
-      // 更新假別餘額
-      const year = new Date(request.start_date).getFullYear()
-      const { data: balance, error: balanceError } = await supabase
-        .from('leave_balances')
-        .select('*')
-        .eq('employee_id', request.employee_id)
-        .eq('leave_type_id', request.leave_type_id)
-        .eq('year', year)
-        .single()
-
-      if (!balanceError && balance) {
-        const newUsedDays = (balance.used_days || 0) + request.days
-        const newRemainingDays = (balance.entitled_days || 0) - newUsedDays
-
-        await supabase
-          .from('leave_balances')
+        // 更新為已核准
+        const { error: updateError } = await supabase
+          .from('leave_requests')
           .update({
-            used_days: newUsedDays,
-            remaining_days: newRemainingDays,
+            status: 'approved',
+            approved_by: user.id,
+            approved_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           })
-          .eq('id', balance.id)
-      }
+          .eq('id', id)
 
-      await fetchRequests()
-      return true
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '審核請假申請失敗'
-      setError(message)
-      logger.error('審核請假申請失敗:', err)
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }, [user?.id, fetchRequests])
+        if (updateError) throw updateError
+
+        // 更新假別餘額
+        const year = new Date(request.start_date).getFullYear()
+        const { data: balance, error: balanceError } = await supabase
+          .from('leave_balances')
+          .select('*')
+          .eq('employee_id', request.employee_id)
+          .eq('leave_type_id', request.leave_type_id)
+          .eq('year', year)
+          .single()
+
+        if (!balanceError && balance) {
+          const newUsedDays = (balance.used_days || 0) + request.days
+          const newRemainingDays = (balance.entitled_days || 0) - newUsedDays
+
+          await supabase
+            .from('leave_balances')
+            .update({
+              used_days: newUsedDays,
+              remaining_days: newRemainingDays,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', balance.id)
+        }
+
+        await fetchRequests()
+        return true
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '審核請假申請失敗'
+        setError(message)
+        logger.error('審核請假申請失敗:', err)
+        return false
+      } finally {
+        setLoading(false)
+      }
+    },
+    [user?.id, fetchRequests]
+  )
 
   /**
    * 駁回請假申請
    */
-  const rejectRequest = useCallback(async (id: string, reason: string): Promise<boolean> => {
-    if (!user?.id) return false
+  const rejectRequest = useCallback(
+    async (id: string, reason: string): Promise<boolean> => {
+      if (!user?.id) return false
 
-    setLoading(true)
-    setError(null)
+      setLoading(true)
+      setError(null)
 
-    try {
-      const { error: updateError } = await supabase
-        .from('leave_requests')
-        .update({
-          status: 'rejected',
-          approved_by: user.id,
-          approved_at: new Date().toISOString(),
-          reject_reason: reason,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', id)
-        
+      try {
+        const { error: updateError } = await supabase
+          .from('leave_requests')
+          .update({
+            status: 'rejected',
+            approved_by: user.id,
+            approved_at: new Date().toISOString(),
+            reject_reason: reason,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', id)
 
-      if (updateError) throw updateError
+        if (updateError) throw updateError
 
-      await fetchRequests()
-      return true
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '駁回請假申請失敗'
-      setError(message)
-      logger.error('駁回請假申請失敗:', err)
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }, [user?.id, fetchRequests])
+        await fetchRequests()
+        return true
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '駁回請假申請失敗'
+        setError(message)
+        logger.error('駁回請假申請失敗:', err)
+        return false
+      } finally {
+        setLoading(false)
+      }
+    },
+    [user?.id, fetchRequests]
+  )
 
   /**
    * 取消請假申請
    */
-  const cancelRequest = useCallback(async (id: string): Promise<boolean> => {
-    if (!user) return false
+  const cancelRequest = useCallback(
+    async (id: string): Promise<boolean> => {
+      if (!user) return false
 
-    setLoading(true)
-    setError(null)
+      setLoading(true)
+      setError(null)
 
-    try {
-      const { error: updateError } = await supabase
-        .from('leave_requests')
-        .update({
-          status: 'cancelled',
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', id)
-        
+      try {
+        const { error: updateError } = await supabase
+          .from('leave_requests')
+          .update({
+            status: 'cancelled',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', id)
 
-      if (updateError) throw updateError
+        if (updateError) throw updateError
 
-      await fetchRequests()
-      return true
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '取消請假申請失敗'
-      setError(message)
-      logger.error('取消請假申請失敗:', err)
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }, [user, fetchRequests])
+        await fetchRequests()
+        return true
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '取消請假申請失敗'
+        setError(message)
+        logger.error('取消請假申請失敗:', err)
+        return false
+      } finally {
+        setLoading(false)
+      }
+    },
+    [user, fetchRequests]
+  )
 
   /**
    * 取得員工假別餘額
    */
-  const fetchBalances = useCallback(async (employeeId: string, year?: number) => {
-    if (!user) return
+  const fetchBalances = useCallback(
+    async (employeeId: string, year?: number) => {
+      if (!user) return
 
-    setLoading(true)
-    setError(null)
+      setLoading(true)
+      setError(null)
 
-    try {
-      const targetYear = year || new Date().getFullYear()
+      try {
+        const targetYear = year || new Date().getFullYear()
 
-      const { data, error: queryError } = await supabase
-        .from('leave_balances')
-        .select(`
+        const { data, error: queryError } = await supabase
+          .from('leave_balances')
+          .select(
+            `
           *,
           leave_type:leave_types!leave_balances_leave_type_id_fkey(id, name, code)
-        `)
-        .eq('employee_id', employeeId)
-        .eq('year', targetYear)
+        `
+          )
+          .eq('employee_id', employeeId)
+          .eq('year', targetYear)
 
-      if (queryError) throw queryError
+        if (queryError) throw queryError
 
-      const mappedData: LeaveBalance[] = (data || []).map(item => {
-        const leaveType = item.leave_type as { id: string; name: string; code: string } | null
-        return {
-          id: item.id,
-          employee_id: item.employee_id,
-          leave_type_id: item.leave_type_id,
-          year: item.year,
-          entitled_days: item.entitled_days || 0,
-          used_days: item.used_days || 0,
-          remaining_days: item.remaining_days || 0,
-          leave_type_name: leaveType?.name || '未知',
-          leave_type_code: leaveType?.code || '',
-        }
-      })
+        const mappedData: LeaveBalance[] = (data || []).map(item => {
+          const leaveType = item.leave_type as { id: string; name: string; code: string } | null
+          return {
+            id: item.id,
+            employee_id: item.employee_id,
+            leave_type_id: item.leave_type_id,
+            year: item.year,
+            entitled_days: item.entitled_days || 0,
+            used_days: item.used_days || 0,
+            remaining_days: item.remaining_days || 0,
+            leave_type_name: leaveType?.name || '未知',
+            leave_type_code: leaveType?.code || '',
+          }
+        })
 
-      setBalances(mappedData)
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '載入假別餘額失敗'
-      setError(message)
-      logger.error('載入假別餘額失敗:', err)
-    } finally {
-      setLoading(false)
-    }
-  }, [user])
+        setBalances(mappedData)
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '載入假別餘額失敗'
+        setError(message)
+        logger.error('載入假別餘額失敗:', err)
+      } finally {
+        setLoading(false)
+      }
+    },
+    [user]
+  )
 
   /**
    * 初始化員工假別餘額
    */
-  const initializeBalances = useCallback(async (
-    employeeId: string,
-    year: number,
-    leaveTypes: { id: string; days_per_year: number | null }[]
-  ): Promise<boolean> => {
-    if (!user) return false
+  const initializeBalances = useCallback(
+    async (
+      employeeId: string,
+      year: number,
+      leaveTypes: { id: string; days_per_year: number | null }[]
+    ): Promise<boolean> => {
+      if (!user) return false
 
-    setLoading(true)
-    setError(null)
+      setLoading(true)
+      setError(null)
 
-    try {
-      const insertData = leaveTypes
-        .filter(type => type.days_per_year !== null)
-        .map(type => ({
-          employee_id: employeeId,
-          leave_type_id: type.id,
-          year,
-          workspace_id: getRequiredWorkspaceId(),
-          entitled_days: type.days_per_year!,
-          used_days: 0,
-          remaining_days: type.days_per_year!,
-        }))
+      try {
+        const insertData = leaveTypes
+          .filter(type => type.days_per_year !== null)
+          .map(type => ({
+            employee_id: employeeId,
+            leave_type_id: type.id,
+            year,
+            workspace_id: getRequiredWorkspaceId(),
+            entitled_days: type.days_per_year!,
+            used_days: 0,
+            remaining_days: type.days_per_year!,
+          }))
 
-      if (insertData.length > 0) {
-        const { error: insertError } = await supabase
-          .from('leave_balances')
-          .upsert(insertData, {
+        if (insertData.length > 0) {
+          const { error: insertError } = await supabase.from('leave_balances').upsert(insertData, {
             onConflict: 'employee_id,leave_type_id,year',
           })
 
-        if (insertError) throw insertError
-      }
+          if (insertError) throw insertError
+        }
 
-      await fetchBalances(employeeId, year)
-      return true
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '初始化假別餘額失敗'
-      setError(message)
-      logger.error('初始化假別餘額失敗:', err)
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }, [user, fetchBalances])
+        await fetchBalances(employeeId, year)
+        return true
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '初始化假別餘額失敗'
+        setError(message)
+        logger.error('初始化假別餘額失敗:', err)
+        return false
+      } finally {
+        setLoading(false)
+      }
+    },
+    [user, fetchBalances]
+  )
 
   return {
     loading,

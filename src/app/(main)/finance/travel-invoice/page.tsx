@@ -77,7 +77,9 @@ export default function TravelInvoicePage() {
       label: TRAVEL_INVOICE_LABELS.COL_BUYER,
       width: '150px',
       render: (value: unknown) => (
-        <span className="text-morandi-primary">{(value as { buyerName?: string })?.buyerName || '-'}</span>
+        <span className="text-morandi-primary">
+          {(value as { buyerName?: string })?.buyerName || '-'}
+        </span>
       ),
     },
     {
@@ -91,12 +93,7 @@ export default function TravelInvoicePage() {
       key: 'status',
       label: TRAVEL_INVOICE_LABELS.COL_STATUS,
       width: '100px',
-      render: (value: unknown) => (
-        <StatusCell
-          type="invoice"
-          status={String(value)}
-        />
-      ),
+      render: (value: unknown) => <StatusCell type="invoice" status={String(value)} />,
     },
   ]
 
@@ -131,10 +128,7 @@ export default function TravelInvoicePage() {
 
   if (error) {
     return (
-      <ContentPageLayout
-        title={TRAVEL_INVOICE_LABELS.MANAGE_1246}
-        icon={FileText}
-      >
+      <ContentPageLayout title={TRAVEL_INVOICE_LABELS.MANAGE_1246} icon={FileText}>
         <ContentContainer>
           <div className="text-center py-12">
             <p className="text-status-danger">{error}</p>
@@ -161,11 +155,7 @@ export default function TravelInvoicePage() {
         onRowClick={handleRowClick}
         renderActions={renderActions}
         headerActions={
-          <Button
-            variant="outline"
-            onClick={() => setIsBatchDialogOpen(true)}
-            className="gap-2"
-          >
+          <Button variant="outline" onClick={() => setIsBatchDialogOpen(true)} className="gap-2">
             <ListChecks size={16} />
             {TRAVEL_INVOICE_LABELS.LABEL_1677}
           </Button>
@@ -173,10 +163,7 @@ export default function TravelInvoicePage() {
       />
 
       {/* 開立發票懸浮視窗 */}
-      <InvoiceDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-      />
+      <InvoiceDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
 
       {/* 發票詳情 Dialog */}
       <TravelInvoiceDetailDialog

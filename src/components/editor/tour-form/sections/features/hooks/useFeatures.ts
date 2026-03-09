@@ -52,9 +52,7 @@ export function useFeatures() {
         return
       }
 
-      const { data: urlData } = supabase.storage
-        .from('workspace-files')
-        .getPublicUrl(filePath)
+      const { data: urlData } = supabase.storage.from('workspace-files').getPublicUrl(filePath)
 
       const newImages = [...currentImages]
       if (imageIndex >= newImages.length) {
@@ -115,9 +113,7 @@ export function useFeatures() {
             return
           }
 
-          const { data: urlData } = supabase.storage
-            .from('workspace-files')
-            .getPublicUrl(filePath)
+          const { data: urlData } = supabase.storage.from('workspace-files').getPublicUrl(filePath)
 
           uploadedUrls[idx] = urlData.publicUrl
         })
@@ -129,7 +125,10 @@ export function useFeatures() {
       }
 
       if (successfulUrls.length < imageFiles.length) {
-        void alert(`${successfulUrls.length} 張圖片上傳成功，${imageFiles.length - successfulUrls.length} 張失敗`, 'warning')
+        void alert(
+          `${successfulUrls.length} 張圖片上傳成功，${imageFiles.length - successfulUrls.length} 張失敗`,
+          'warning'
+        )
       }
     } catch (error) {
       logger.error(COMP_EDITOR_LABELS.批量上傳錯誤, error)
@@ -208,7 +207,10 @@ export function useFeatures() {
     }
   }
 
-  const handleFeatureDrop = (targetIndex: number, reorderFeature: (from: number, to: number) => void) => {
+  const handleFeatureDrop = (
+    targetIndex: number,
+    reorderFeature: (from: number, to: number) => void
+  ) => {
     if (draggedFeature !== null && draggedFeature !== targetIndex) {
       reorderFeature(draggedFeature, targetIndex)
     }

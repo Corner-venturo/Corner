@@ -7,37 +7,20 @@ vi.mock('swr', () => ({
 describe('order-stats.service', () => {
   describe('recalculateOrderTotal logic', () => {
     it('should sum total_payable from all members', () => {
-      const members = [
-        { total_payable: 15000 },
-        { total_payable: 12000 },
-        { total_payable: 18000 },
-      ]
-      const totalAmount = members.reduce(
-        (sum, m) => sum + (m.total_payable || 0),
-        0
-      )
+      const members = [{ total_payable: 15000 }, { total_payable: 12000 }, { total_payable: 18000 }]
+      const totalAmount = members.reduce((sum, m) => sum + (m.total_payable || 0), 0)
       expect(totalAmount).toBe(45000)
     })
 
     it('should return 0 when no members exist', () => {
       const members: { total_payable: number }[] = []
-      const totalAmount = members.reduce(
-        (sum, m) => sum + (m.total_payable || 0),
-        0
-      )
+      const totalAmount = members.reduce((sum, m) => sum + (m.total_payable || 0), 0)
       expect(totalAmount).toBe(0)
     })
 
     it('should handle null total_payable', () => {
-      const members = [
-        { total_payable: 15000 },
-        { total_payable: null },
-        { total_payable: 10000 },
-      ]
-      const totalAmount = members.reduce(
-        (sum, m) => sum + (m.total_payable || 0),
-        0
-      )
+      const members = [{ total_payable: 15000 }, { total_payable: null }, { total_payable: 10000 }]
+      const totalAmount = members.reduce((sum, m) => sum + (m.total_payable || 0), 0)
       expect(totalAmount).toBe(25000)
     })
 
@@ -76,23 +59,13 @@ describe('order-stats.service', () => {
 
     it('訂單沒有成員時 total_amount=0', () => {
       const members: { total_payable: number }[] = []
-      const totalAmount = members.reduce(
-        (sum, m) => sum + (m.total_payable || 0),
-        0
-      )
+      const totalAmount = members.reduce((sum, m) => sum + (m.total_payable || 0), 0)
       expect(totalAmount).toBe(0)
     })
 
     it('成員金額為 0', () => {
-      const members = [
-        { total_payable: 0 },
-        { total_payable: 0 },
-        { total_payable: 0 },
-      ]
-      const totalAmount = members.reduce(
-        (sum, m) => sum + (m.total_payable || 0),
-        0
-      )
+      const members = [{ total_payable: 0 }, { total_payable: 0 }, { total_payable: 0 }]
+      const totalAmount = members.reduce((sum, m) => sum + (m.total_payable || 0), 0)
       expect(totalAmount).toBe(0)
     })
 
@@ -100,10 +73,7 @@ describe('order-stats.service', () => {
       const members = Array.from({ length: 50 }, () => ({
         total_payable: 15000,
       }))
-      const totalAmount = members.reduce(
-        (sum, m) => sum + (m.total_payable || 0),
-        0
-      )
+      const totalAmount = members.reduce((sum, m) => sum + (m.total_payable || 0), 0)
       expect(totalAmount).toBe(750000)
       expect(members.length).toBe(50)
     })
@@ -116,10 +86,7 @@ describe('order-stats.service', () => {
         { total_payable: null },
         { total_payable: 15000 },
       ]
-      const totalAmount = members.reduce(
-        (sum, m) => sum + (m.total_payable || 0),
-        0
-      )
+      const totalAmount = members.reduce((sum, m) => sum + (m.total_payable || 0), 0)
       expect(totalAmount).toBe(45000)
     })
 
@@ -151,7 +118,7 @@ describe('order-stats.service', () => {
     })
 
     it('remaining_amount 精確到小數', () => {
-      const totalAmount = 100.50
+      const totalAmount = 100.5
       const paidAmount = 33.33
       const remaining = Math.max(0, totalAmount - paidAmount)
       expect(remaining).toBeCloseTo(67.17)

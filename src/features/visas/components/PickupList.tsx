@@ -1,7 +1,13 @@
 'use client'
 
 import React from 'react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Check, AlertTriangle, FileImage } from 'lucide-react'
 import type { Visa } from '@/stores/types'
 import type { MatchedItem } from '../hooks/useBatchPickup'
@@ -37,7 +43,8 @@ export function PickupList({
             {/* 左側：護照圖片預覽 */}
             <div className="flex-shrink-0 w-32">
               {item.ocrResult.imageBase64 ? (
-                <img src={item.ocrResult.imageBase64}
+                <img
+                  src={item.ocrResult.imageBase64}
                   alt={L.alt_passport}
                   className="w-full h-24 object-cover rounded border"
                 />
@@ -63,7 +70,9 @@ export function PickupList({
                     <div className="text-xs text-morandi-secondary">
                       {item.ocrResult.customer.passport_name}
                       {item.ocrResult.customer.passport_number && (
-                        <span className="ml-2">{L.passport_label} {item.ocrResult.customer.passport_number}</span>
+                        <span className="ml-2">
+                          {L.passport_label} {item.ocrResult.customer.passport_number}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -93,13 +102,10 @@ export function PickupList({
                     </SelectTrigger>
                     <SelectContent>
                       {pendingVisas.map(visa => {
-                        const isSelected = selectedVisaIds.includes(visa.id) && visa.id !== item.manualVisaId
+                        const isSelected =
+                          selectedVisaIds.includes(visa.id) && visa.id !== item.manualVisaId
                         return (
-                          <SelectItem
-                            key={visa.id}
-                            value={visa.id}
-                            disabled={isSelected}
-                          >
+                          <SelectItem key={visa.id} value={visa.id} disabled={isSelected}>
                             {visa.applicant_name} - {visa.country}
                             {visa.order_number && ` (${visa.order_number})`}
                             {isSelected && ` ${L.already_selected}`}
@@ -118,16 +124,15 @@ export function PickupList({
                         onChange={() => onToggleUpdateCustomer(index)}
                         className="rounded border-border"
                       />
-                      <span className="text-xs text-morandi-secondary">
-                        {L.update_customer}
-                      </span>
+                      <span className="text-xs text-morandi-secondary">{L.update_customer}</span>
                     </label>
                   )}
                 </>
               ) : (
                 <div className="text-sm text-status-danger">
                   <AlertTriangle size={16} className="inline mr-1" />
-                  {L.ocr_failed_prefix}{item.ocrResult.error || L.ocr_failed_default}
+                  {L.ocr_failed_prefix}
+                  {item.ocrResult.error || L.ocr_failed_default}
                 </div>
               )}
             </div>

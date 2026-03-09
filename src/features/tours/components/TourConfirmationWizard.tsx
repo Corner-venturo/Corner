@@ -209,9 +209,7 @@ export function TourConfirmationWizard({
             <Lock className="h-5 w-5 text-morandi-gold" />
             {TOUR_WIZARD.title(tour.name)}
           </DialogTitle>
-          <DialogDescription>
-            {TOUR_WIZARD.subtitle}
-          </DialogDescription>
+          <DialogDescription>{TOUR_WIZARD.subtitle}</DialogDescription>
         </DialogHeader>
 
         {/* 步驟指示器 */}
@@ -230,11 +228,7 @@ export function TourConfirmationWizard({
                     !isActive && !isCompleted && 'text-muted-foreground'
                   )}
                 >
-                  {isCompleted ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <Icon className="h-4 w-4" />
-                  )}
+                  {isCompleted ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
                   <span className="hidden sm:inline">{step.label}</span>
                 </div>
                 {index < STEPS.length - 1 && (
@@ -298,7 +292,9 @@ export function TourConfirmationWizard({
                                 </div>
                               )}
                               <div className="text-xs text-muted-foreground">
-                                {QUOTE_STATUS_LABELS[quote.status as keyof typeof QUOTE_STATUS_LABELS] || quote.status}
+                                {QUOTE_STATUS_LABELS[
+                                  quote.status as keyof typeof QUOTE_STATUS_LABELS
+                                ] || quote.status}
                               </div>
                             </div>
                           </div>
@@ -344,12 +340,11 @@ export function TourConfirmationWizard({
                                 </span>
                               </div>
                               <div className="text-sm text-muted-foreground flex items-center gap-1">
-                                {TOUR_WIZARD.last_updated} <DateCell date={itinerary.updated_at} showIcon={false} />
+                                {TOUR_WIZARD.last_updated}{' '}
+                                <DateCell date={itinerary.updated_at} showIcon={false} />
                               </div>
                             </div>
-                            <div className="text-xs text-muted-foreground">
-                              {itinerary.status}
-                            </div>
+                            <div className="text-xs text-muted-foreground">{itinerary.status}</div>
                           </div>
                         </button>
                       ))}
@@ -365,7 +360,9 @@ export function TourConfirmationWizard({
                     <div className="flex gap-3">
                       <AlertTriangle className="h-5 w-5 text-status-warning flex-shrink-0 mt-0.5" />
                       <div>
-                        <h4 className="font-medium text-morandi-primary">{TOUR_WIZARD.confirm_lock_title}</h4>
+                        <h4 className="font-medium text-morandi-primary">
+                          {TOUR_WIZARD.confirm_lock_title}
+                        </h4>
                         <p className="text-sm text-morandi-secondary mt-1">
                           {TOUR_WIZARD.confirm_lock_desc}
                         </p>
@@ -375,11 +372,14 @@ export function TourConfirmationWizard({
 
                   <div className="space-y-4">
                     <div className="p-4 rounded-lg border bg-muted/30">
-                      <div className="text-sm text-muted-foreground mb-1">{TOUR_WIZARD.selected_quote}</div>
+                      <div className="text-sm text-muted-foreground mb-1">
+                        {TOUR_WIZARD.selected_quote}
+                      </div>
                       <div className="font-medium">
                         {selectedQuote ? (
                           <>
-                            {selectedQuote.name || selectedQuote.code || TOUR_WIZARD.unnamed} (v{selectedQuote.version})
+                            {selectedQuote.name || selectedQuote.code || TOUR_WIZARD.unnamed} (v
+                            {selectedQuote.version})
                           </>
                         ) : (
                           <span className="text-muted-foreground">{TOUR_WIZARD.not_selected}</span>
@@ -388,11 +388,14 @@ export function TourConfirmationWizard({
                     </div>
 
                     <div className="p-4 rounded-lg border bg-muted/30">
-                      <div className="text-sm text-muted-foreground mb-1">{TOUR_WIZARD.selected_itinerary}</div>
+                      <div className="text-sm text-muted-foreground mb-1">
+                        {TOUR_WIZARD.selected_itinerary}
+                      </div>
                       <div className="font-medium">
                         {selectedItinerary ? (
                           <>
-                            {selectedItinerary.title || TOUR_WIZARD.unnamed} (v{selectedItinerary.version})
+                            {selectedItinerary.title || TOUR_WIZARD.unnamed} (v
+                            {selectedItinerary.version})
                           </>
                         ) : (
                           <span className="text-muted-foreground">{TOUR_WIZARD.not_selected}</span>
@@ -410,14 +413,24 @@ export function TourConfirmationWizard({
         <DialogFooter className="flex justify-between sm:justify-between">
           <div>
             {currentStep !== 'quote' && (
-              <Button variant="outline" onClick={handleBack} disabled={submitting} className="gap-2">
+              <Button
+                variant="outline"
+                onClick={handleBack}
+                disabled={submitting}
+                className="gap-2"
+              >
                 <ArrowLeft size={16} />
                 {TOUR_WIZARD.prev_step}
               </Button>
             )}
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting} className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={submitting}
+              className="gap-2"
+            >
               <X size={16} />
               {TOUR_WIZARD.cancel}
             </Button>

@@ -40,7 +40,8 @@ export const MEMBERS_LABELS = {
 
   // MemberPayments
   找到N位相似顧客: (count: number, name: string) => `找到 ${count} 位相似顧客「${name}」`,
-  找到N位相同身分證: (count: number, idNumber: string) => `找到 ${count} 位相同身分證「${idNumber}」`,
+  找到N位相同身分證: (count: number, idNumber: string) =>
+    `找到 ${count} 位相同身分證「${idNumber}」`,
 
   // passport-utils
   壓縮失敗: '壓縮失敗',

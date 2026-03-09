@@ -16,7 +16,13 @@ import {
 import { cn } from '@/lib/utils'
 import { getWeatherAction } from '../actions/weather-actions'
 import { DatePicker } from '@/components/ui/date-picker'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { DASHBOARD_LABELS } from './constants/labels'
 
 interface WeatherData {
@@ -114,7 +120,9 @@ export function WeatherWidget() {
     }
   }
 
-  const weatherInfo = weather ? WEATHER_DESCRIPTIONS[weather.weatherCode] || WEATHER_DESCRIPTIONS[0] : null
+  const weatherInfo = weather
+    ? WEATHER_DESCRIPTIONS[weather.weatherCode] || WEATHER_DESCRIPTIONS[0]
+    : null
   const today = getTodayString()
   const minDate = new Date()
   minDate.setFullYear(minDate.getFullYear() - 5)
@@ -131,19 +139,32 @@ export function WeatherWidget() {
       >
         <div className="p-5 space-y-4 h-full flex flex-col">
           <div className="flex items-start gap-3">
-            <div className={cn('rounded-full p-2.5 text-white shadow-lg shadow-black/10', 'bg-gradient-to-br from-morandi-gold/10 to-status-info-bg', 'ring-2 ring-border/50 ring-offset-1 ring-offset-background/20')}>
+            <div
+              className={cn(
+                'rounded-full p-2.5 text-white shadow-lg shadow-black/10',
+                'bg-gradient-to-br from-morandi-gold/10 to-status-info-bg',
+                'ring-2 ring-border/50 ring-offset-1 ring-offset-background/20'
+              )}
+            >
               <Cloud className="w-5 h-5 drop-shadow-sm" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">{DASHBOARD_LABELS.QUERYING_3837}</p>
-              <p className="text-xs text-morandi-secondary/90 mt-1.5 leading-relaxed">{DASHBOARD_LABELS.QUERYING_1415}</p>
+              <p className="text-sm font-semibold text-morandi-primary leading-tight tracking-wide">
+                {DASHBOARD_LABELS.QUERYING_3837}
+              </p>
+              <p className="text-xs text-morandi-secondary/90 mt-1.5 leading-relaxed">
+                {DASHBOARD_LABELS.QUERYING_1415}
+              </p>
             </div>
           </div>
 
           <div className="rounded-xl bg-card/70 p-3.5 shadow-md border border-border/40">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />{DASHBOARD_LABELS.SELECT_240}</label>
+                <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5" />
+                  {DASHBOARD_LABELS.SELECT_240}
+                </label>
                 <Select value={selectedCity.name} onValueChange={handleCityChange}>
                   <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm">
                     <SelectValue placeholder={DASHBOARD_LABELS.SELECT_240} />
@@ -158,10 +179,13 @@ export function WeatherWidget() {
                 </Select>
               </div>
               <div>
-                <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" />{DASHBOARD_LABELS.SELECT_5234}</label>
+                <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5" />
+                  {DASHBOARD_LABELS.SELECT_5234}
+                </label>
                 <DatePicker
                   value={selectedDate}
-                  onChange={(date) => handleDateChange(date)}
+                  onChange={date => handleDateChange(date)}
                   minDate={minDate}
                   maxDate={maxDate}
                   placeholder={DASHBOARD_LABELS.SELECT_5234}
@@ -190,11 +214,21 @@ export function WeatherWidget() {
               <div className="flex items-center gap-2 md:gap-4">
                 <div className="text-5xl md:text-6xl flex-shrink-0">{weatherInfo.icon}</div>
                 <div className="min-w-0">
-                  <p className="text-lg md:text-xl font-bold text-morandi-primary truncate">{weatherInfo.label}</p>
-                  <p className="text-3xl md:text-4xl font-bold text-morandi-primary mt-1">{weather.temperature}°C</p>
+                  <p className="text-lg md:text-xl font-bold text-morandi-primary truncate">
+                    {weatherInfo.label}
+                  </p>
+                  <p className="text-3xl md:text-4xl font-bold text-morandi-primary mt-1">
+                    {weather.temperature}°C
+                  </p>
                   <div className="flex items-center gap-3 mt-2 text-xs text-morandi-secondary">
-                    <span><Droplets className="inline w-3 h-3 mr-1" />{weather.humidity}%</span>
-                    <span><Wind className="inline w-3 h-3 mr-1" />{weather.windSpeed} km/h</span>
+                    <span>
+                      <Droplets className="inline w-3 h-3 mr-1" />
+                      {weather.humidity}%
+                    </span>
+                    <span>
+                      <Wind className="inline w-3 h-3 mr-1" />
+                      {weather.windSpeed} km/h
+                    </span>
                   </div>
                 </div>
               </div>

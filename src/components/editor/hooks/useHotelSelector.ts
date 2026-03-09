@@ -42,7 +42,12 @@ function getSavedFilters() {
   }
 }
 
-function saveFilters(filters: { countryId: string; regionId: string; cityId: string; brand: string }) {
+function saveFilters(filters: {
+  countryId: string
+  regionId: string
+  cityId: string
+  brand: string
+}) {
   if (typeof window === 'undefined') return
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(filters))
@@ -54,10 +59,14 @@ function saveFilters(filters: { countryId: string; regionId: string; cityId: str
 interface UseHotelSelectorProps {
   isOpen: boolean
   tourCountryName?: string
-  tourCountryId?: string  // 可直接用 country_id，優先於 tourCountryName
+  tourCountryId?: string // 可直接用 country_id，優先於 tourCountryName
 }
 
-export function useHotelSelector({ isOpen, tourCountryName, tourCountryId }: UseHotelSelectorProps) {
+export function useHotelSelector({
+  isOpen,
+  tourCountryName,
+  tourCountryId,
+}: UseHotelSelectorProps) {
   // 使用 ref 來追蹤是否已初始化
   const savedFilters = useRef(getSavedFilters())
 
@@ -89,7 +98,7 @@ export function useHotelSelector({ isOpen, tourCountryName, tourCountryId }: Use
         .order('name')
       setCountries(data || [])
     }
-    loadCountries().catch((err) => logger.error('[loadCountries]', err))
+    loadCountries().catch(err => logger.error('[loadCountries]', err))
   }, [isOpen])
 
   // 打開對話框時自動選擇行程的國家
@@ -153,14 +162,24 @@ export function useHotelSelector({ isOpen, tourCountryName, tourCountryId }: Use
   const handleCityChange = (cityId: string) => {
     const value = cityId === '__all__' ? '' : cityId
     setSelectedCityId(value)
-    saveFilters({ countryId: selectedCountryId, regionId: selectedRegionId, cityId: value, brand: selectedBrand })
+    saveFilters({
+      countryId: selectedCountryId,
+      regionId: selectedRegionId,
+      cityId: value,
+      brand: selectedBrand,
+    })
   }
 
   // 品牌變更
   const handleBrandChange = (brand: string) => {
     const value = brand === '__all__' ? '' : brand
     setSelectedBrand(value)
-    saveFilters({ countryId: selectedCountryId, regionId: selectedRegionId, cityId: selectedCityId, brand: value })
+    saveFilters({
+      countryId: selectedCountryId,
+      regionId: selectedRegionId,
+      cityId: selectedCityId,
+      brand: value,
+    })
   }
 
   // 載入區域列表
@@ -179,7 +198,7 @@ export function useHotelSelector({ isOpen, tourCountryName, tourCountryId }: Use
         .order('name')
       setRegions(data || [])
     }
-    loadRegions().catch((err) => logger.error('[loadRegions]', err))
+    loadRegions().catch(err => logger.error('[loadRegions]', err))
   }, [isOpen, selectedCountryId])
 
   // 載入城市列表（根據區域或國家）
@@ -205,7 +224,7 @@ export function useHotelSelector({ isOpen, tourCountryName, tourCountryId }: Use
       const { data } = await query
       setCities(data || [])
     }
-    loadCities().catch((err) => logger.error('[loadCities]', err))
+    loadCities().catch(err => logger.error('[loadCities]', err))
   }, [isOpen, selectedCountryId, selectedRegionId])
 
   // 載入飯店資料
@@ -222,14 +241,16 @@ export function useHotelSelector({ isOpen, tourCountryName, tourCountryId }: Use
       try {
         let query = supabase
           .from('hotels')
-          .select(`
+          .select(
+            `
             id, name, name_en, brand, country_id, region_id, city_id,
             star_rating, hotel_class, category, description,
             highlights, price_range, avg_price_per_night,
             thumbnail, images, is_active, is_featured,
             regions(name),
             cities!inner(name)
-          `)
+          `
+          )
           .eq('is_active', true)
           .eq('country_id', selectedCountryId)
           .order('is_featured', { ascending: false })
@@ -255,28 +276,30 @@ export function useHotelSelector({ isOpen, tourCountryName, tourCountryId }: Use
         if (error) throw error
 
         // 透過 unknown 中轉處理 Supabase 的複雜型別
-        const formatted = ((data || []) as unknown as HotelQueryResult[]).map((item): LuxuryHotel => ({
-          id: item.id,
-          name: item.name,
-          name_en: item.name_en,
-          brand: item.brand,
-          country_id: item.country_id,
-          region_id: item.region_id || null,
-          city_id: item.city_id,
-          star_rating: item.star_rating,
-          hotel_class: item.hotel_class,
-          category: item.category,
-          description: item.description,
-          highlights: item.highlights,
-          price_range: item.price_range,
-          avg_price_per_night: item.avg_price_per_night,
-          thumbnail: item.thumbnail,
-          images: item.images,
-          is_active: item.is_active ?? true,
-          is_featured: item.is_featured ?? false,
-          region_name: item.regions?.name || '',
-          city_name: item.cities?.name || '',
-        }))
+        const formatted = ((data || []) as unknown as HotelQueryResult[]).map(
+          (item): LuxuryHotel => ({
+            id: item.id,
+            name: item.name,
+            name_en: item.name_en,
+            brand: item.brand,
+            country_id: item.country_id,
+            region_id: item.region_id || null,
+            city_id: item.city_id,
+            star_rating: item.star_rating,
+            hotel_class: item.hotel_class,
+            category: item.category,
+            description: item.description,
+            highlights: item.highlights,
+            price_range: item.price_range,
+            avg_price_per_night: item.avg_price_per_night,
+            thumbnail: item.thumbnail,
+            images: item.images,
+            is_active: item.is_active ?? true,
+            is_featured: item.is_featured ?? false,
+            region_name: item.regions?.name || '',
+            city_name: item.cities?.name || '',
+          })
+        )
 
         setHotels(formatted)
       } catch (error) {

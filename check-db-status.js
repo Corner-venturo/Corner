@@ -1,12 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = 'https://pfqvdacxowpgfamuvnsn.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjY5MjQwOTksImV4cCI6MjA0MjUwMDA5OX0.yNSfe-bVFsj1_j_vN9p8j5I3pqLMXU5SZnNWgZUYkQI'
+const supabaseKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjY5MjQwOTksImV4cCI6MjA0MjUwMDA5OX0.yNSfe-bVFsj1_j_vN9p8j5I3pqLMXU5SZnNWgZUYkQI'
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 async function checkDatabase() {
-  console.log('=' .repeat(60))
+  console.log('='.repeat(60))
   console.log('🔍 資料庫狀態檢查報告')
   console.log('='.repeat(60))
   console.log()
@@ -30,8 +31,16 @@ async function checkDatabase() {
       console.log('\n欄位驗證:')
       console.log('  - id:', emp.id ? '✅' : '❌')
       console.log('  - roles:', emp.roles ? '✅ (type: ' + typeof emp.roles + ')' : '❌')
-      console.log('  - permissions:', emp.permissions ? '✅ (type: ' + typeof emp.permissions + ')' : '❌')
-      console.log('  - preferred_features:', emp.preferred_features !== undefined ? '✅ (type: ' + typeof emp.preferred_features + ')' : '❌')
+      console.log(
+        '  - permissions:',
+        emp.permissions ? '✅ (type: ' + typeof emp.permissions + ')' : '❌'
+      )
+      console.log(
+        '  - preferred_features:',
+        emp.preferred_features !== undefined
+          ? '✅ (type: ' + typeof emp.preferred_features + ')'
+          : '❌'
+      )
       console.log('  - workspace_id:', emp.workspace_id ? '✅' : '❌')
 
       console.log('\n範例資料:')

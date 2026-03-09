@@ -23,7 +23,11 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { getStickersByCategory, STICKER_CATEGORIES, type StickerDefinition } from './core/sticker-paths'
+import {
+  getStickersByCategory,
+  STICKER_CATEGORIES,
+  type StickerDefinition,
+} from './core/sticker-paths'
 import { IconPicker } from './IconPicker'
 import { ImageLibraryPicker } from './ImageLibraryPicker'
 import { ColorfulIconPicker } from './ColorfulIconPicker'
@@ -41,17 +45,38 @@ interface ElementLibraryProps {
   onAddColorfulIcon?: (iconName: string) => void
   onAddQRCode?: (dataUrl: string) => void
   // 時間軸
-  onAddTimeline?: (options?: { orientation?: 'vertical' | 'horizontal'; pointCount?: number }) => void
+  onAddTimeline?: (options?: {
+    orientation?: 'vertical' | 'horizontal'
+    pointCount?: number
+  }) => void
   onAddTimelinePoint?: () => void
-  isTimelineSelected?: boolean  // 是否選中時間軸（用於顯示新增時間點按鈕）
+  isTimelineSelected?: boolean // 是否選中時間軸（用於顯示新增時間點按鈕）
 }
 
 // 線條樣式選項
 const LINE_OPTIONS = [
   { id: 'solid', name: DESIGNER_LABELS.實線, icon: Minus, style: 'solid' as const, arrow: false },
-  { id: 'dashed', name: DESIGNER_LABELS.虛線, icon: MoreHorizontal, style: 'dashed' as const, arrow: false },
-  { id: 'dotted', name: DESIGNER_LABELS.點線, icon: MoreHorizontal, style: 'dotted' as const, arrow: false },
-  { id: 'arrow', name: DESIGNER_LABELS.箭頭, icon: ArrowRight, style: 'solid' as const, arrow: true },
+  {
+    id: 'dashed',
+    name: DESIGNER_LABELS.虛線,
+    icon: MoreHorizontal,
+    style: 'dashed' as const,
+    arrow: false,
+  },
+  {
+    id: 'dotted',
+    name: DESIGNER_LABELS.點線,
+    icon: MoreHorizontal,
+    style: 'dotted' as const,
+    arrow: false,
+  },
+  {
+    id: 'arrow',
+    name: DESIGNER_LABELS.箭頭,
+    icon: ArrowRight,
+    style: 'solid' as const,
+    arrow: true,
+  },
 ]
 
 // 基本形狀
@@ -86,11 +111,21 @@ export function ElementLibrary({
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
         <TabsList className="grid grid-cols-5 mx-2 mt-2">
-          <TabsTrigger value="elements" className="text-xs px-1">{DESIGNER_LABELS.基本}</TabsTrigger>
-          <TabsTrigger value="colorful" className="text-xs px-1">{DESIGNER_LABELS.彩色}</TabsTrigger>
-          <TabsTrigger value="icons" className="text-xs px-1">{DESIGNER_LABELS.圖示}</TabsTrigger>
-          <TabsTrigger value="images" className="text-xs px-1">{DESIGNER_LABELS.圖片}</TabsTrigger>
-          <TabsTrigger value="qrcode" className="text-xs px-1">QR</TabsTrigger>
+          <TabsTrigger value="elements" className="text-xs px-1">
+            {DESIGNER_LABELS.基本}
+          </TabsTrigger>
+          <TabsTrigger value="colorful" className="text-xs px-1">
+            {DESIGNER_LABELS.彩色}
+          </TabsTrigger>
+          <TabsTrigger value="icons" className="text-xs px-1">
+            {DESIGNER_LABELS.圖示}
+          </TabsTrigger>
+          <TabsTrigger value="images" className="text-xs px-1">
+            {DESIGNER_LABELS.圖片}
+          </TabsTrigger>
+          <TabsTrigger value="qrcode" className="text-xs px-1">
+            QR
+          </TabsTrigger>
         </TabsList>
 
         <div className="flex-1 relative overflow-hidden">
@@ -99,7 +134,9 @@ export function ElementLibrary({
             <div className="p-3 space-y-4">
               {/* 文字 */}
               <div>
-                <h4 className="text-xs font-medium text-morandi-secondary mb-2">{DESIGNER_LABELS.文字}</h4>
+                <h4 className="text-xs font-medium text-morandi-secondary mb-2">
+                  {DESIGNER_LABELS.文字}
+                </h4>
                 <Button
                   variant="outline"
                   size="sm"
@@ -113,9 +150,11 @@ export function ElementLibrary({
 
               {/* 形狀 */}
               <div>
-                <h4 className="text-xs font-medium text-morandi-secondary mb-2">{DESIGNER_LABELS.形狀}</h4>
+                <h4 className="text-xs font-medium text-morandi-secondary mb-2">
+                  {DESIGNER_LABELS.形狀}
+                </h4>
                 <div className="grid grid-cols-2 gap-2">
-                  {BASIC_SHAPES.map((shape) => (
+                  {BASIC_SHAPES.map(shape => (
                     <Button
                       key={shape.id}
                       variant="outline"
@@ -133,7 +172,9 @@ export function ElementLibrary({
               {/* 時間軸 */}
               {onAddTimeline && (
                 <div>
-                  <h4 className="text-xs font-medium text-morandi-secondary mb-2">{DESIGNER_LABELS.時間軸}</h4>
+                  <h4 className="text-xs font-medium text-morandi-secondary mb-2">
+                    {DESIGNER_LABELS.時間軸}
+                  </h4>
                   <div className="grid grid-cols-2 gap-2">
                     <Button
                       variant="outline"
@@ -172,33 +213,24 @@ export function ElementLibrary({
             </div>
           </TabsContent>
 
-
           {/* 彩色圖標（使用 Iconify API） */}
           <TabsContent value="colorful" className="absolute inset-0 m-0 p-0 overflow-auto">
-            {onAddColorfulIcon && (
-              <ColorfulIconPicker onSelectIcon={onAddColorfulIcon} />
-            )}
+            {onAddColorfulIcon && <ColorfulIconPicker onSelectIcon={onAddColorfulIcon} />}
           </TabsContent>
 
           {/* 圖示庫 */}
           <TabsContent value="icons" className="absolute inset-0 m-0 p-0 overflow-auto">
-            {onAddIcon && (
-              <IconPicker onSelectIcon={onAddIcon} />
-            )}
+            {onAddIcon && <IconPicker onSelectIcon={onAddIcon} />}
           </TabsContent>
 
           {/* 圖片庫 (Unsplash + Pexels) */}
           <TabsContent value="images" className="absolute inset-0 m-0 p-0 overflow-auto">
-            {onAddImage && (
-              <ImageLibraryPicker onSelectImage={onAddImage} />
-            )}
+            {onAddImage && <ImageLibraryPicker onSelectImage={onAddImage} />}
           </TabsContent>
 
           {/* QR Code 生成器 */}
           <TabsContent value="qrcode" className="absolute inset-0 m-0 p-0 overflow-auto">
-            {onAddQRCode && (
-              <QRCodeGenerator onGenerate={onAddQRCode} />
-            )}
+            {onAddQRCode && <QRCodeGenerator onGenerate={onAddQRCode} />}
           </TabsContent>
         </div>
       </Tabs>
@@ -207,13 +239,7 @@ export function ElementLibrary({
 }
 
 // 貼紙按鈕組件
-function StickerButton({
-  sticker,
-  onClick,
-}: {
-  sticker: StickerDefinition
-  onClick: () => void
-}) {
+function StickerButton({ sticker, onClick }: { sticker: StickerDefinition; onClick: () => void }) {
   return (
     <Button
       variant="outline"

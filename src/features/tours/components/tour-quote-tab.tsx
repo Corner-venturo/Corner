@@ -108,10 +108,10 @@ export function TourQuoteTab({ tour }: TourQuoteTabProps) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <Calculator className="w-12 h-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium text-morandi-primary mb-2">{COMP_TOURS_LABELS.LABEL_1448}</h3>
-        <p className="text-sm text-muted-foreground mb-6">
-          {COMP_TOURS_LABELS.CALCULATING_1295}
-        </p>
+        <h3 className="text-lg font-medium text-morandi-primary mb-2">
+          {COMP_TOURS_LABELS.LABEL_1448}
+        </h3>
+        <p className="text-sm text-muted-foreground mb-6">{COMP_TOURS_LABELS.CALCULATING_1295}</p>
         <Button onClick={handleCreateQuote} disabled={creating}>
           {creating ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />

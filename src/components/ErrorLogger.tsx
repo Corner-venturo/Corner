@@ -112,7 +112,6 @@ export function ErrorLogger() {
       window.removeEventListener('unhandledrejection', handleRejection)
       console.error = originalConsoleError
     }
-     
   }, [])
 
   return null

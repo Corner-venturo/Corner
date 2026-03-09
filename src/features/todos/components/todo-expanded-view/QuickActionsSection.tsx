@@ -17,7 +17,11 @@ import { useAuthStore } from '@/stores/auth-store'
 import { Receipt, FileText, Plane, UserPlus } from 'lucide-react'
 import { QuickActionsSectionProps, QuickActionContentProps, QuickActionTabConfig } from './types'
 import { alert } from '@/lib/ui/alert-dialog'
-import { QUICK_ACTION_LABELS, LOADING_LABELS, SHARE_LABELS } from '@/features/todos/constants/labels'
+import {
+  QUICK_ACTION_LABELS,
+  LOADING_LABELS,
+  SHARE_LABELS,
+} from '@/features/todos/constants/labels'
 // 使用懶加載避免打包問題
 const QuickReceipt = lazy(() =>
   import('../quick-actions/quick-receipt').then(m => ({ default: m.QuickReceipt }))
@@ -63,7 +67,12 @@ export function QuickActionsSection({ activeTab, onTabChange }: QuickActionsSect
   )
 }
 
-export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: QuickActionContentProps) {
+export function QuickActionContent({
+  activeTab,
+  todo,
+  onUpdate,
+  onClose,
+}: QuickActionContentProps) {
   const { items: employees } = useEmployeesSlim()
   const { user: currentUser } = useAuthStore()
   const [shareData, setShareData] = React.useState({
@@ -109,7 +118,6 @@ export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: Quick
     }
   }, [shareData, todo, onUpdate])
 
-
   // 只在收款分頁時載入團體和訂單資料
   useEffect(() => {
     const loadReceiptData = async () => {
@@ -119,10 +127,7 @@ export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: Quick
           const { invalidateTours, invalidateOrders } = await import('@/data')
 
           // SWR 快取失效，確保資料已載入
-          await Promise.all([
-            invalidateTours(),
-            invalidateOrders(),
-          ])
+          await Promise.all([invalidateTours(), invalidateOrders()])
         } catch (error) {
           logger.error('載入收款資料失敗:', error)
         } finally {
@@ -149,7 +154,9 @@ export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: Quick
       if (isLoadingReceipt) {
         return (
           <div className="flex items-center justify-center h-full">
-            <div className="text-sm text-morandi-secondary">{LOADING_LABELS.loadingReceiptData}</div>
+            <div className="text-sm text-morandi-secondary">
+              {LOADING_LABELS.loadingReceiptData}
+            </div>
           </div>
         )
       }
@@ -181,13 +188,17 @@ export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: Quick
               <UserPlus size={16} className="text-morandi-gold" />
             </div>
             <div>
-              <h5 className="text-sm font-semibold text-morandi-primary">{SHARE_LABELS.shareTask}</h5>
+              <h5 className="text-sm font-semibold text-morandi-primary">
+                {SHARE_LABELS.shareTask}
+              </h5>
               <p className="text-xs text-morandi-secondary">{SHARE_LABELS.shareDescription}</p>
             </div>
           </div>
           <div className="space-y-3">
             <div>
-              <label className="block text-xs font-medium text-morandi-primary mb-1">{SHARE_LABELS.shareTo}</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">
+                {SHARE_LABELS.shareTo}
+              </label>
               <Select
                 value={shareData.targetUserId}
                 onValueChange={value => setShareData(prev => ({ ...prev, targetUserId: value }))}
@@ -211,7 +222,9 @@ export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: Quick
               </Select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-morandi-primary mb-1">{SHARE_LABELS.permission}</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">
+                {SHARE_LABELS.permission}
+              </label>
               <Select
                 value={shareData.permission}
                 onValueChange={(value: 'view' | 'edit') =>

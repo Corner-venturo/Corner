@@ -25,18 +25,21 @@ export interface MichelinRestaurant {
   created_by: string | null
 }
 
-export const michelinRestaurantEntity = createEntityHook<MichelinRestaurant>('michelin_restaurants', {
-  list: {
-    select: '*',
-    orderBy: { column: 'display_order', ascending: true },
-  },
-  slim: {
-    select: 'id,name,city_id,country_id,stars,is_active',
-  },
-  detail: { select: '*' },
-  cache: CACHE_PRESETS.medium,
-  workspaceScoped: false,
-})
+export const michelinRestaurantEntity = createEntityHook<MichelinRestaurant>(
+  'michelin_restaurants',
+  {
+    list: {
+      select: '*',
+      orderBy: { column: 'display_order', ascending: true },
+    },
+    slim: {
+      select: 'id,name,city_id,country_id,stars,is_active',
+    },
+    detail: { select: '*' },
+    cache: CACHE_PRESETS.medium,
+    workspaceScoped: false,
+  }
+)
 
 export const useMichelinRestaurants = michelinRestaurantEntity.useList
 export const useMichelinRestaurantsSlim = michelinRestaurantEntity.useListSlim

@@ -8,7 +8,12 @@
  * - 交替背景色增加可讀性
  */
 import type { PageTemplate, TemplateData, VehicleData } from './types'
-import type { CanvasElement, ShapeElement, TextElement, TextStyle } from '@/features/designer/components/types'
+import type {
+  CanvasElement,
+  ShapeElement,
+  TextElement,
+  TextStyle,
+} from '@/features/designer/components/types'
 
 // A5 尺寸（像素，96 DPI）
 const A5_WIDTH = 559
@@ -91,7 +96,8 @@ export const japaneseStyleV1Table: PageTemplate = {
     const tables = vehicles.filter(v => v.groupType === 'table')
 
     // 如果沒有桌次，使用預設資料
-    const displayTables = tables.length > 0 ? tables : [getDefaultTable(), getDefaultTable(), getDefaultTable()]
+    const displayTables =
+      tables.length > 0 ? tables : [getDefaultTable(), getDefaultTable(), getDefaultTable()]
 
     // 計算每頁顯示幾桌（最多 3 桌）
     const pageIndex = data.currentVehiclePageIndex ?? 0
@@ -306,7 +312,10 @@ export const japaneseStyleV1Table: PageTemplate = {
           : member.chineseName || ''
 
         const memberNameElement: TextElement = {
-          ...createBaseElement(`table-${tableIdx}-member-${memberIdx}`, `成員-${member.chineseName}`),
+          ...createBaseElement(
+            `table-${tableIdx}-member-${memberIdx}`,
+            `成員-${member.chineseName}`
+          ),
           type: 'text',
           x: columnX + 6,
           y: tableY + 5,

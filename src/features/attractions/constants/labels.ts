@@ -12,7 +12,7 @@ export const ATTRACTIONS_DIALOG_LABELS = {
   AI_補充: 'AI 補充',
   已補充_PREFIX: '已補充 ',
   已補充_SUFFIX: ' 個欄位的資料',
-};
+}
 
 export const ATTRACTIONS_LIST_LABELS = {
   圖片: '圖片',
@@ -31,7 +31,7 @@ export const ATTRACTIONS_LIST_LABELS = {
   刪除: '刪除',
 
   LABEL_7396: '缺少：',
-};
+}
 
 export const DATABASE_MANAGEMENT_PAGE_LABELS = {
   景點: '景點',
@@ -51,13 +51,13 @@ export const DATABASE_MANAGEMENT_PAGE_LABELS = {
   LABEL_937: '所有國家',
   LABEL_3573: '全部分類',
   LOADING_6912: '載入中...',
-};
+}
 
 export const SORTABLE_ATTRACTIONS_LIST_LABELS = {
   拖拽排序: '拖拽排序',
 
   EMPTY_2193: '尚無景點資料',
-};
+}
 
 export const ATTRACTION_FORM_LABELS = {
   例如_太宰府天滿宮: '例如: 太宰府天滿宮',
@@ -84,7 +84,7 @@ export const ATTRACTION_FORM_LABELS = {
   ADDRESS: '地址',
   INTERNAL_NOTES: '內部備註',
   ENABLE_ATTRACTION: '啟用此景點',
-};
+}
 
 export const ATTRACTION_IMAGE_UPLOAD_LABELS = {
   景點圖片: '景點圖片',
@@ -94,7 +94,7 @@ export const ATTRACTION_IMAGE_UPLOAD_LABELS = {
   UPLOADING_115: '放開以上傳圖片',
   UPLOADING_2247: '拖曳圖片到此處，或點擊上方按鈕上傳',
   EDIT_4224: '雙擊圖片開啟編輯器，可調整位置、色彩、AI 美化。建議尺寸 1920x1080',
-};
+}
 
 export const ATTRACTION_PREVIEW_LABELS = {
   未命名景點: '未命名景點',
@@ -108,14 +108,14 @@ export const ATTRACTION_PREVIEW_LABELS = {
   LABEL_9704: '電話：',
   LABEL_2203: '官網：',
   LABEL_9893: '連結',
-};
+}
 
 export const ATTRACTIONS_TAB_LABELS = {
   按名稱排序: '按名稱排序',
 
   LABEL_6756: '列表檢視',
   LABEL_3804: '拖拽排序',
-};
+}
 
 export const MICHELIN_RESTAURANTS_TAB_LABELS = {
   載入失敗: '載入失敗：',
@@ -141,7 +141,7 @@ export const MICHELIN_RESTAURANTS_TAB_LABELS = {
   LABEL_3529: '貨幣',
   CANCEL: '取消',
   SAVE: '儲存',
-};
+}
 
 export const PREMIUM_EXPERIENCES_TAB_LABELS = {
   更新失敗: '更新失敗',
@@ -171,7 +171,7 @@ export const PREMIUM_EXPERIENCES_TAB_LABELS = {
   LABEL_4473: '專家資格',
   CANCEL: '取消',
   SAVE: '儲存',
-};
+}
 
 export const ATTRACTIONS_TYPES_LABELS = {
   座標: '座標',
@@ -207,5 +207,4 @@ export const REGIONS_TAB_LABELS = {
 
   EMPTY_4173: '此國家尚無城市資料',
   CLOSE: '關閉',
-};
-
+}

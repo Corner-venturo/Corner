@@ -16,7 +16,16 @@ import { Button } from '@/components/ui/button'
 import { logger } from '@/lib/utils/logger'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores'
-import { useTours, useItineraries, useQuotes, createItinerary, updateItinerary, useCountries, useCities, createTourLeader } from '@/data'
+import {
+  useTours,
+  useItineraries,
+  useQuotes,
+  createItinerary,
+  updateItinerary,
+  useCountries,
+  useCities,
+  createTourLeader,
+} from '@/data'
 import { syncHotelsFromItineraryToQuote } from '@/features/quotes/services/quoteItinerarySync'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { formatDateTW, formatDateCompactPadded } from '@/lib/utils/format-date'
@@ -27,17 +36,34 @@ import type { TierPricing } from '@/stores/types/quote.types'
 import dynamic from 'next/dynamic'
 
 const ItineraryEditor = dynamic(
-  () => import('@/app/(main)/itinerary/new/components/ItineraryEditor').then(m => m.ItineraryEditor),
-  { loading: () => <div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin" /></div> }
+  () =>
+    import('@/app/(main)/itinerary/new/components/ItineraryEditor').then(m => m.ItineraryEditor),
+  {
+    loading: () => (
+      <div className="flex-1 flex items-center justify-center">
+        <Loader2 className="animate-spin" />
+      </div>
+    ),
+  }
 )
 
 const ItineraryPreview = dynamic(
-  () => import('@/app/(main)/itinerary/new/components/ItineraryPreview').then(m => m.ItineraryPreview),
-  { loading: () => <div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin" /></div> }
+  () =>
+    import('@/app/(main)/itinerary/new/components/ItineraryPreview').then(m => m.ItineraryPreview),
+  {
+    loading: () => (
+      <div className="flex-1 flex items-center justify-center">
+        <Loader2 className="animate-spin" />
+      </div>
+    ),
+  }
 )
 
 // 從 useItineraryEditor 複製的類型和初始值
-import type { LocalTourData, AutoSaveStatus } from '@/app/(main)/itinerary/new/hooks/useItineraryEditor'
+import type {
+  LocalTourData,
+  AutoSaveStatus,
+} from '@/app/(main)/itinerary/new/hooks/useItineraryEditor'
 import { COMP_TOURS_LABELS } from '../constants/labels'
 import { TOUR_WEBPAGE_TAB_LABELS, TOUR_SERVICE_LABELS } from '../constants/labels'
 import { getWorkspaceTagline } from '@/lib/workspace-helpers'
@@ -174,63 +200,79 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
     if (itineraries.length > 0 || !loading) {
       loadItinerary()
     }
-     
   }, [tour.id, tour.country_id, tour.main_city_id, itineraries, countries, cities])
 
   // 載入行程表資料的函數
-  const loadItineraryData = useCallback((itinerary: Itinerary) => {
-    // 找到關聯的旅遊團
-    const relatedTour = tours.find(t => t.id === tour.id)
+  const loadItineraryData = useCallback(
+    (itinerary: Itinerary) => {
+      // 找到關聯的旅遊團
+      const relatedTour = tours.find(t => t.id === tour.id)
 
-    // 找到關聯的報價單
-    const relatedQuote = quotes.find(q => q.tour_id === tour.id)
+      // 找到關聯的報價單
+      const relatedQuote = quotes.find(q => q.tour_id === tour.id)
 
-    setTourData({
-      tagline: itinerary.tagline || getWorkspaceTagline(),
-      title: itinerary.title || relatedTour?.name || '',
-      subtitle: itinerary.subtitle || '',
-      description: itinerary.description || '',
-      departureDate: itinerary.departure_date || relatedTour?.departure_date || '',
-      tourCode: itinerary.tour_code || relatedTour?.code || '',
-      coverImage: itinerary.cover_image || '',
-      coverStyle: itinerary.cover_style || 'original',
-      flightStyle: (itinerary as { flight_style?: string }).flight_style as LocalTourData['flightStyle'] || 'original',
-      itineraryStyle: (itinerary as { itinerary_style?: string }).itinerary_style as LocalTourData['itineraryStyle'] || 'original',
-      price: itinerary.price || '',
-      priceNote: itinerary.price_note || '',
-      country: itinerary.country || '',
-      city: itinerary.city || '',
-      status: itinerary.status || TOUR_WEBPAGE_TAB_LABELS.STATUS_PROPOSAL,
-      outboundFlight: (Array.isArray(itinerary.outbound_flight) ? itinerary.outbound_flight[0] : itinerary.outbound_flight) || itinerary.flight_info?.outbound || getEmptyTourData().outboundFlight,
-      returnFlight: (Array.isArray(itinerary.return_flight) ? itinerary.return_flight[0] : itinerary.return_flight) || itinerary.flight_info?.return || getEmptyTourData().returnFlight,
-      features: itinerary.features || [],
-      focusCards: itinerary.focus_cards || [],
-      leader: itinerary.leader || { name: '', domesticPhone: '', overseasPhone: '' },
-      meetingInfo: itinerary.meeting_info || { time: '', location: '' },
-      hotels: itinerary.hotels || [],
-      showFeatures: itinerary.show_features !== false,
-      showLeaderMeeting: itinerary.show_leader_meeting !== false,
-      showHotels: itinerary.show_hotels || false,
-      showPricingDetails: itinerary.show_pricing_details || false,
-      pricingDetails: itinerary.pricing_details || getEmptyTourData().pricingDetails,
-      priceTiers: itinerary.price_tiers || [],
-      showPriceTiers: itinerary.show_price_tiers || false,
-      faqs: itinerary.faqs || [],
-      showFaqs: itinerary.show_faqs || false,
-      notices: itinerary.notices || [],
-      showNotices: itinerary.show_notices || false,
-      cancellationPolicy: itinerary.cancellation_policy || [],
-      showCancellationPolicy: itinerary.show_cancellation_policy || false,
-      itinerarySubtitle: itinerary.itinerary_subtitle || '',
-      dailyItinerary: itinerary.daily_itinerary || [],
-      version_records: itinerary.version_records || [],
-    })
+      setTourData({
+        tagline: itinerary.tagline || getWorkspaceTagline(),
+        title: itinerary.title || relatedTour?.name || '',
+        subtitle: itinerary.subtitle || '',
+        description: itinerary.description || '',
+        departureDate: itinerary.departure_date || relatedTour?.departure_date || '',
+        tourCode: itinerary.tour_code || relatedTour?.code || '',
+        coverImage: itinerary.cover_image || '',
+        coverStyle: itinerary.cover_style || 'original',
+        flightStyle:
+          ((itinerary as { flight_style?: string }).flight_style as LocalTourData['flightStyle']) ||
+          'original',
+        itineraryStyle:
+          ((itinerary as { itinerary_style?: string })
+            .itinerary_style as LocalTourData['itineraryStyle']) || 'original',
+        price: itinerary.price || '',
+        priceNote: itinerary.price_note || '',
+        country: itinerary.country || '',
+        city: itinerary.city || '',
+        status: itinerary.status || TOUR_WEBPAGE_TAB_LABELS.STATUS_PROPOSAL,
+        outboundFlight:
+          (Array.isArray(itinerary.outbound_flight)
+            ? itinerary.outbound_flight[0]
+            : itinerary.outbound_flight) ||
+          itinerary.flight_info?.outbound ||
+          getEmptyTourData().outboundFlight,
+        returnFlight:
+          (Array.isArray(itinerary.return_flight)
+            ? itinerary.return_flight[0]
+            : itinerary.return_flight) ||
+          itinerary.flight_info?.return ||
+          getEmptyTourData().returnFlight,
+        features: itinerary.features || [],
+        focusCards: itinerary.focus_cards || [],
+        leader: itinerary.leader || { name: '', domesticPhone: '', overseasPhone: '' },
+        meetingInfo: itinerary.meeting_info || { time: '', location: '' },
+        hotels: itinerary.hotels || [],
+        showFeatures: itinerary.show_features !== false,
+        showLeaderMeeting: itinerary.show_leader_meeting !== false,
+        showHotels: itinerary.show_hotels || false,
+        showPricingDetails: itinerary.show_pricing_details || false,
+        pricingDetails: itinerary.pricing_details || getEmptyTourData().pricingDetails,
+        priceTiers: itinerary.price_tiers || [],
+        showPriceTiers: itinerary.show_price_tiers || false,
+        faqs: itinerary.faqs || [],
+        showFaqs: itinerary.show_faqs || false,
+        notices: itinerary.notices || [],
+        showNotices: itinerary.show_notices || false,
+        cancellationPolicy: itinerary.cancellation_policy || [],
+        showCancellationPolicy: itinerary.show_cancellation_policy || false,
+        itinerarySubtitle: itinerary.itinerary_subtitle || '',
+        dailyItinerary: itinerary.daily_itinerary || [],
+        version_records: itinerary.version_records || [],
+      })
 
-    // 載入報價單檻次表
-    if (relatedQuote?.tier_pricings) {
-      setQuoteTierPricings(relatedQuote.tier_pricings as TierPricing[])
-    }
-  }, [tours, quotes, tour.id])
+      // 載入報價單檻次表
+      if (relatedQuote?.tier_pricings) {
+        setQuoteTierPricings(relatedQuote.tier_pricings as TierPricing[])
+      }
+    },
+    [tours, quotes, tour.id]
+  )
 
   // 轉換資料格式（camelCase → snake_case）
   const convertDataForSave = useCallback(() => {
@@ -291,8 +333,10 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
 
         // 同步飯店到報價單
         if (convertedData.daily_itinerary && convertedData.daily_itinerary.length > 0) {
-          syncHotelsFromItineraryToQuote(currentItineraryId, convertedData.daily_itinerary as { accommodation?: string }[])
-            .catch(err => logger.error('飯店同步錯誤:', err))
+          syncHotelsFromItineraryToQuote(
+            currentItineraryId,
+            convertedData.daily_itinerary as { accommodation?: string }[]
+          ).catch(err => logger.error('飯店同步錯誤:', err))
         }
 
         // 同步領隊到 tour_leaders 表
@@ -444,10 +488,10 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
     return (
       <div className="flex flex-col items-center justify-center h-[600px] text-center">
         <FileText className="w-12 h-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium text-morandi-primary mb-2">{COMP_TOURS_LABELS.LABEL_4270}</h3>
-        <p className="text-sm text-muted-foreground mb-6">
-          {COMP_TOURS_LABELS.LABEL_4124}
-        </p>
+        <h3 className="text-lg font-medium text-morandi-primary mb-2">
+          {COMP_TOURS_LABELS.LABEL_4270}
+        </h3>
+        <p className="text-sm text-muted-foreground mb-6">{COMP_TOURS_LABELS.LABEL_4124}</p>
         <Button onClick={handleCreateItinerary} disabled={creating}>
           {creating ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />

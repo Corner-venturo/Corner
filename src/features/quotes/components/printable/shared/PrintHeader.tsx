@@ -3,7 +3,6 @@
  * PrintHeader - 列印頁首組件（共用）
  */
 
-
 import React from 'react'
 import { MORANDI_COLORS } from './print-styles'
 import { PRINTABLE_QUICK_QUOTE_LABELS } from '../../../constants/labels'
@@ -29,11 +28,9 @@ export const PrintHeader: React.FC<PrintHeaderProps> = ({
     >
       {/* Logo - 左上角 */}
       {logoUrl ? (
-        <div
-          className="absolute left-0 top-0"
-          style={{ width: '120px', height: '40px' }}
-        >
-          <img src={logoUrl}
+        <div className="absolute left-0 top-0" style={{ width: '120px', height: '40px' }}>
+          <img
+            src={logoUrl}
             alt={PRINTABLE_QUICK_QUOTE_LABELS.公司_Logo_Alt}
             style={{
               width: '100%',

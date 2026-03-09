@@ -29,7 +29,7 @@ const SYNC_LABELS = {
  */
 export async function syncQuotePricingToCore(
   categories: CostCategory[],
-  tour_id: string | null,
+  tour_id: string | null
 ): Promise<{ success: boolean; synced_count: number; message?: string }> {
   if (!tour_id) {
     return { success: true, synced_count: 0, message: SYNC_LABELS.NO_TOUR_ID }
@@ -127,8 +127,13 @@ const REVERSE_CATEGORY_MAP: Record<string, string> = Object.fromEntries(
  */
 export async function importItineraryItemsToQuote(
   tour_id: string,
-  existing_categories: CostCategory[],
-): Promise<{ success: boolean; categories: CostCategory[]; imported_count: number; message?: string }> {
+  existing_categories: CostCategory[]
+): Promise<{
+  success: boolean
+  categories: CostCategory[]
+  imported_count: number
+  message?: string
+}> {
   logger.log(SYNC_LABELS.IMPORT_START, { tour_id })
 
   try {
@@ -143,7 +148,12 @@ export async function importItineraryItemsToQuote(
 
     if (error) throw error
     if (!core_items || core_items.length === 0) {
-      return { success: true, categories: existing_categories, imported_count: 0, message: 'No items found' }
+      return {
+        success: true,
+        categories: existing_categories,
+        imported_count: 0,
+        message: 'No items found',
+      }
     }
 
     // 收集已有的 itinerary_item_id，避免重複
@@ -164,14 +174,12 @@ export async function importItineraryItemsToQuote(
 
     let imported_count = 0
 
-    for (const core_item of (core_items as TourItineraryItem[])) {
+    for (const core_item of core_items as TourItineraryItem[]) {
       // 跳過已存在的
       if (existing_item_ids.has(core_item.id)) continue
 
       // 找到對應的 category
-      const quote_category_id = core_item.category
-        ? REVERSE_CATEGORY_MAP[core_item.category]
-        : null
+      const quote_category_id = core_item.category ? REVERSE_CATEGORY_MAP[core_item.category] : null
       if (!quote_category_id) continue
 
       const target_category = new_categories.find(c => c.id === quote_category_id)
@@ -214,6 +222,11 @@ export async function importItineraryItemsToQuote(
     return { success: true, categories: new_categories, imported_count }
   } catch (error) {
     logger.error(SYNC_LABELS.IMPORT_ERROR, error)
-    return { success: false, categories: existing_categories, imported_count: 0, message: String(error) }
+    return {
+      success: false,
+      categories: existing_categories,
+      imported_count: 0,
+      message: String(error),
+    }
   }
 }

@@ -9,18 +9,19 @@
 
 ### 1. Git 追蹤了大量不該追蹤的檔案（~72MB+）
 
-| 檔案/目錄 | 大小 | 說明 |
-|---|---|---|
-| `public/city-backgrounds-all/` | 34 MB | 程式碼沒有引用這個目錄（code 引用的是 Supabase bucket `city-backgrounds`） |
-| `public/city-backgrounds-2/` | 32 MB | 同上，沒有被引用 |
-| `public/city-backgrounds/` | 5 MB | 同上，圖片是透過 Supabase storage 拉的 |
-| `public/assets/fonts/NotoSansTC-*.ttf` | 32 MB | 有用到（PDF），但建議用 Git LFS |
-| `public/assets/fonts/ChironHeiHK-*.ttf` | 29 MB | 有用到（PDF），但建議用 Git LFS |
-| `Claude.pdf` | 1.3 MB | 不該在 repo 裡 |
-| `lint-report.json` | 504 KB | 產出物，不該追蹤 |
-| `playwright-report/index.html` | 522 KB | 產出物，不該追蹤 |
+| 檔案/目錄                               | 大小   | 說明                                                                       |
+| --------------------------------------- | ------ | -------------------------------------------------------------------------- |
+| `public/city-backgrounds-all/`          | 34 MB  | 程式碼沒有引用這個目錄（code 引用的是 Supabase bucket `city-backgrounds`） |
+| `public/city-backgrounds-2/`            | 32 MB  | 同上，沒有被引用                                                           |
+| `public/city-backgrounds/`              | 5 MB   | 同上，圖片是透過 Supabase storage 拉的                                     |
+| `public/assets/fonts/NotoSansTC-*.ttf`  | 32 MB  | 有用到（PDF），但建議用 Git LFS                                            |
+| `public/assets/fonts/ChironHeiHK-*.ttf` | 29 MB  | 有用到（PDF），但建議用 Git LFS                                            |
+| `Claude.pdf`                            | 1.3 MB | 不該在 repo 裡                                                             |
+| `lint-report.json`                      | 504 KB | 產出物，不該追蹤                                                           |
+| `playwright-report/index.html`          | 522 KB | 產出物，不該追蹤                                                           |
 
 **建議：**
+
 - 把三個 `city-backgrounds*` 目錄從 git 移除（加到 `.gitignore`）
 - `Claude.pdf`、`lint-report.json`、`playwright-report/` 加到 `.gitignore`
 - 字體檔考慮用 Git LFS 或移到 CDN
@@ -30,6 +31,7 @@
 整個專案沒有任何測試檔（`.test.*`、`.spec.*`、`__tests__`）。
 
 **建議：** 至少為核心邏輯加單元測試：
+
 - `src/lib/utils/format-currency.ts`
 - `src/lib/utils/format-date.ts`
 - `src/lib/utils/receipt-number-generator.ts`
@@ -73,6 +75,7 @@ run-migration.html, schema-checker.html, test-realtime.html
 ### 7. Dynamic import 使用數：0
 
 整個專案沒有用 `next/dynamic` 做 lazy loading。以下大型依賴建議 dynamic import：
+
 - `@univerjs/*`（整個 spreadsheet engine）
 - `fabric`（Canvas 編輯器）
 - `leaflet` / `react-leaflet`（地圖）
@@ -85,6 +88,7 @@ run-migration.html, schema-checker.html, test-realtime.html
 ### 8. 環境變數不一致
 
 **在 code 裡引用但 `.env.local` 沒定義的：**
+
 - `BOT_API_SECRET`, `CRON_SECRET`, `GOOGLE_VISION_API_KEY`
 - `NEXT_PUBLIC_FASTMOVE_API_KEY`, `NEXT_PUBLIC_FASTMOVE_API_URL`
 - `NEXT_PUBLIC_LOG_LEVEL`, `NEXT_PUBLIC_ONLINE_URL`
@@ -94,6 +98,7 @@ run-migration.html, schema-checker.html, test-realtime.html
 - `GEMINI_API_KEY_`（注意結尾多了底線，可能是 typo）
 
 **在 `.env.local` 定義但 code 沒用到的：**
+
 - `NEXT_PUBLIC_DEV_MODE`
 - `NEXT_PUBLIC_ENABLE_DEVTOOLS`
 - `NEXT_PUBLIC_SKIP_AUTH`
@@ -115,6 +120,7 @@ run-migration.html, schema-checker.html, test-realtime.html
 ### 11. CSS 檔案檢查
 
 3 個 CSS 檔案，都有在用：
+
 - `src/app/globals.css` ✅
 - `src/features/itinerary/components/PrintItineraryPreview.module.css` ✅
 - `src/components/documents/itinerary-document.css` ✅
@@ -138,4 +144,4 @@ run-migration.html, schema-checker.html, test-realtime.html
 
 ---
 
-*報告結束*
+_報告結束_

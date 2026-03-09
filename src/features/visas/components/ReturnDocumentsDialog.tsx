@@ -78,12 +78,10 @@ export function ReturnDocumentsDialog({
     >
       <div className="space-y-4">
         <div>
-          <label className="text-sm font-medium text-morandi-primary">
-            {L.return_date}
-          </label>
+          <label className="text-sm font-medium text-morandi-primary">{L.return_date}</label>
           <DatePicker
             value={returnDate}
-            onChange={(date) => setReturnDate(date)}
+            onChange={date => setReturnDate(date)}
             className="mt-1"
             placeholder={L.placeholder_date}
           />
@@ -91,7 +89,8 @@ export function ReturnDocumentsDialog({
 
         <div>
           <label className="text-sm font-medium text-morandi-primary">
-            {L.notes_label} <span className="text-xs text-morandi-secondary">{L.notes_optional}</span>
+            {L.notes_label}{' '}
+            <span className="text-xs text-morandi-secondary">{L.notes_optional}</span>
           </label>
           <Input
             value={returnNote}

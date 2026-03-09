@@ -2,7 +2,17 @@
 
 import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { TourPreview } from '@/components/editor/TourPreview'
-import { Sparkles, Building2, UtensilsCrossed, Calendar, Plane, MapPin, Cloud, CloudOff, Save } from 'lucide-react'
+import {
+  Sparkles,
+  Building2,
+  UtensilsCrossed,
+  Calendar,
+  Plane,
+  MapPin,
+  Cloud,
+  CloudOff,
+  Save,
+} from 'lucide-react'
 import type { LocalTourData, AutoSaveStatus } from '../hooks/useItineraryEditor'
 import { NEW_LABELS } from './constants/labels'
 
@@ -23,7 +33,12 @@ const iconMap: Record<string, React.ComponentType<{ className?: string; size?: n
   IconMapPin: MapPin,
 }
 
-export function ItineraryPreview({ tourData, isDirty, autoSaveStatus, onSave }: ItineraryPreviewProps) {
+export function ItineraryPreview({
+  tourData,
+  isDirty,
+  autoSaveStatus,
+  onSave,
+}: ItineraryPreviewProps) {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop')
   const mobileContentRef = useRef<HTMLDivElement>(null)
 
@@ -33,7 +48,7 @@ export function ItineraryPreview({ tourData, isDirty, autoSaveStatus, onSave }: 
   const processedData = useMemo(
     () => ({
       ...tourData,
-      features: (tourData.features || []).map((f) => ({
+      features: (tourData.features || []).map(f => ({
         ...f,
         iconComponent: iconMap[f.icon] || Sparkles,
       })),

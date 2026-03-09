@@ -107,9 +107,6 @@ export interface Attachment {
   type: string
 }
 
-
-
-
 // ==================== 同步相關 ====================
 
 /**

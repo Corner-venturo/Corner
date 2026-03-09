@@ -165,9 +165,8 @@ export function useTourOperations(params: UseTourOperationsParams) {
         const createdTour = await actions.create(tourData)
 
         // 更新國家和城市的使用次數（讓常用的排在前面）
-        const countryName = newTour.countryCode === '__custom__'
-          ? newTour.customCountry!
-          : newTour.countryCode
+        const countryName =
+          newTour.countryCode === '__custom__' ? newTour.customCountry! : newTour.countryCode
         if (countryName) {
           incrementCountryUsage(countryName)
         }
@@ -207,9 +206,14 @@ export function useTourOperations(params: UseTourOperationsParams) {
         if (fromQuoteId) {
           // 🔧 優化：直接用 supabase update
           try {
-            await updateQuote(fromQuoteId, { tour_id: createdTour.id } as Parameters<typeof updateQuote>[1])
+            await updateQuote(fromQuoteId, { tour_id: createdTour.id } as Parameters<
+              typeof updateQuote
+            >[1])
           } catch (quoteError) {
-            logger.warn('更新報價單失敗:', quoteError instanceof Error ? quoteError.message : quoteError)
+            logger.warn(
+              '更新報價單失敗:',
+              quoteError instanceof Error ? quoteError.message : quoteError
+            )
           }
           onQuoteLinked?.(fromQuoteId, createdTour.id)
         }
@@ -220,7 +224,8 @@ export function useTourOperations(params: UseTourOperationsParams) {
         // 開團成功後跳轉到詳情頁
         router.push(`/tours/${code}`)
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : TOUR_OPERATIONS_LABELS.CREATE_TOUR_FAILED
+        const errorMessage =
+          err instanceof Error ? err.message : TOUR_OPERATIONS_LABELS.CREATE_TOUR_FAILED
         setFormError(errorMessage)
         logger.error('Failed to create tour:', err)
       } finally {
@@ -258,7 +263,10 @@ export function useTourOperations(params: UseTourOperationsParams) {
         // 檢查是否有已付款訂單
         const { hasPaidOrders, count: paidCount } = await checkTourPaidOrders(tour.id)
         if (hasPaidOrders) {
-          return { success: false, error: TOUR_OPERATIONS_LABELS.CANNOT_DELETE_PAID_ORDERS(paidCount) }
+          return {
+            success: false,
+            error: TOUR_OPERATIONS_LABELS.CANNOT_DELETE_PAID_ORDERS(paidCount),
+          }
         }
 
         // 刪除關聯的訂單（沒有團員的空訂單可以刪）
@@ -271,17 +279,19 @@ export function useTourOperations(params: UseTourOperationsParams) {
         // 刪除旅遊團
         await actions.delete(tour.id)
 
-        logger.info(`已刪除旅遊團 ${tour.code}，斷開 ${linkedQuotesCount} 個報價單和 ${linkedItinerariesCount} 個行程表的連結`)
+        logger.info(
+          `已刪除旅遊團 ${tour.code}，斷開 ${linkedQuotesCount} 個報價單和 ${linkedItinerariesCount} 個行程表的連結`
+        )
         return { success: true }
       } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : TOUR_OPERATIONS_LABELS.DELETE_TOUR_FAILED
+        const errorMsg =
+          err instanceof Error ? err.message : TOUR_OPERATIONS_LABELS.DELETE_TOUR_FAILED
         logger.error('刪除旅遊團失敗:', JSON.stringify(err, null, 2))
         return { success: false, error: errorMsg }
       }
     },
     [actions]
   )
-
 
   const handleArchiveTour = useCallback(
     async (tour: Tour, reason?: string) => {
@@ -290,7 +300,9 @@ export function useTourOperations(params: UseTourOperationsParams) {
         if (!tour.archived) {
           const linkedQuotesCount = await unlinkTourQuotes(tour.id)
           const linkedItinerariesCount = await unlinkTourItineraries(tour.id)
-          logger.info(`封存旅遊團 ${tour.code}，斷開 ${linkedQuotesCount} 個報價單和 ${linkedItinerariesCount} 個行程表的連結`)
+          logger.info(
+            `封存旅遊團 ${tour.code}，斷開 ${linkedQuotesCount} 個報價單和 ${linkedItinerariesCount} 個行程表的連結`
+          )
         }
 
         // 封存時記錄原因，解除封存時清除原因

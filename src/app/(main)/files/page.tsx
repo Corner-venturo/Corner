@@ -17,13 +17,8 @@ export default function FilesPage() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
 
-  const {
-    fetchFolders,
-    fetchFiles,
-    selectedFileIds,
-    uploadDialogOpen,
-    setUploadDialogOpen,
-  } = useFileSystemStore()
+  const { fetchFolders, fetchFiles, selectedFileIds, uploadDialogOpen, setUploadDialogOpen } =
+    useFileSystemStore()
 
   // 初始化
   useEffect(() => {
@@ -43,10 +38,7 @@ export default function FilesPage() {
     <>
       {/* 手機版頂部標題列 */}
       <MobileHeader onMenuClick={() => setMobileSidebarOpen(true)} />
-      <MobileSidebar
-        isOpen={mobileSidebarOpen}
-        onClose={() => setMobileSidebarOpen(false)}
-      />
+      <MobileSidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
 
       {/* 主內容區域 */}
       <main
@@ -76,12 +68,7 @@ export default function FilesPage() {
 
           {/* 右側：檔案預覽（選中時顯示） */}
           {selectedFileIds.size > 0 && (
-            <div
-              className={cn(
-                'lg:w-80 min-w-0 shrink-0',
-                !showPreview && 'hidden lg:block'
-              )}
-            >
+            <div className={cn('lg:w-80 min-w-0 shrink-0', !showPreview && 'hidden lg:block')}>
               <FilePreview onBack={() => setShowPreview(false)} />
             </div>
           )}
@@ -89,10 +76,7 @@ export default function FilesPage() {
       </main>
 
       {/* 上傳對話框 */}
-      <UploadDialog
-        open={uploadDialogOpen}
-        onClose={() => setUploadDialogOpen(false)}
-      />
+      <UploadDialog open={uploadDialogOpen} onClose={() => setUploadDialogOpen(false)} />
     </>
   )
 }

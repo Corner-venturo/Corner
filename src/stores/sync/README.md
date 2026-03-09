@@ -13,9 +13,7 @@ import { StoreSyncProvider } from '@/stores/sync'
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <OtherProviders>
-      <StoreSyncProvider>
-        {children}
-      </StoreSyncProvider>
+      <StoreSyncProvider>{children}</StoreSyncProvider>
     </OtherProviders>
   )
 }
@@ -44,25 +42,25 @@ function TourEditor() {
 
 ## 事件類型
 
-| 事件 | 說明 | 觸發同步 |
-|------|------|---------|
-| `TOUR_CREATED` | 旅遊團建立 | - |
-| `TOUR_UPDATED` | 旅遊團更新 | Orders 重新載入 |
-| `TOUR_DELETED` | 旅遊團刪除 | Orders, Members 清理 |
-| `ORDER_CREATED` | 訂單建立 | - |
-| `ORDER_UPDATED` | 訂單更新 | Members 重新載入 |
-| `ORDER_DELETED` | 訂單刪除 | Members 清理 |
-| `MEMBER_CREATED` | 團員建立 | - |
-| `MEMBER_UPDATED` | 團員更新 | - |
-| `MEMBER_DELETED` | 團員刪除 | - |
+| 事件             | 說明       | 觸發同步             |
+| ---------------- | ---------- | -------------------- |
+| `TOUR_CREATED`   | 旅遊團建立 | -                    |
+| `TOUR_UPDATED`   | 旅遊團更新 | Orders 重新載入      |
+| `TOUR_DELETED`   | 旅遊團刪除 | Orders, Members 清理 |
+| `ORDER_CREATED`  | 訂單建立   | -                    |
+| `ORDER_UPDATED`  | 訂單更新   | Members 重新載入     |
+| `ORDER_DELETED`  | 訂單刪除   | Members 清理         |
+| `MEMBER_CREATED` | 團員建立   | -                    |
+| `MEMBER_UPDATED` | 團員更新   | -                    |
+| `MEMBER_DELETED` | 團員刪除   | -                    |
 
 ## 預設同步配置
 
 ```typescript
 import {
-  TOUR_SYNC_CONFIG,      // Tour 同步設定
-  ORDER_SYNC_CONFIG,     // Order 同步設定
-  MEMBER_SYNC_CONFIG,    // Member 同步設定
+  TOUR_SYNC_CONFIG, // Tour 同步設定
+  ORDER_SYNC_CONFIG, // Order 同步設定
+  MEMBER_SYNC_CONFIG, // Member 同步設定
   ITINERARY_SYNC_CONFIG, // Itinerary 同步設定
 } from '@/stores'
 ```
@@ -89,7 +87,7 @@ subscription.unsubscribe()
 ```typescript
 // 避免 Order Store 自己觸發的事件再次觸發自己
 storeEvents.on('ORDER_UPDATED', handler, {
-  ignoreSources: ['order']
+  ignoreSources: ['order'],
 })
 ```
 

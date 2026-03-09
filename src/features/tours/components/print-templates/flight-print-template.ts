@@ -20,13 +20,16 @@ interface FlightPrintOptions {
 
 // ─── Helpers ───
 
-function calculateDuration(depTime: string | undefined, arrTime: string | undefined): string | null {
+function calculateDuration(
+  depTime: string | undefined,
+  arrTime: string | undefined
+): string | null {
   if (!depTime || !arrTime || depTime.length < 4 || arrTime.length < 4) return null
   const depHour = parseInt(depTime.substring(0, 2))
   const depMin = parseInt(depTime.substring(2, 4))
   const arrHour = parseInt(arrTime.substring(0, 2))
   const arrMin = parseInt(arrTime.substring(2, 4))
-  let totalMin = (arrHour * 60 + arrMin) - (depHour * 60 + depMin)
+  let totalMin = arrHour * 60 + arrMin - (depHour * 60 + depMin)
   if (totalMin < 0) totalMin += 24 * 60
   const hours = Math.floor(totalMin / 60)
   const mins = totalMin % 60
@@ -35,8 +38,18 @@ function calculateDuration(depTime: string | undefined, arrTime: string | undefi
 
 function formatPnrDate(dateStr: string): string {
   const months: Record<string, number> = {
-    JAN: 0, FEB: 1, MAR: 2, APR: 3, MAY: 4, JUN: 5,
-    JUL: 6, AUG: 7, SEP: 8, OCT: 9, NOV: 10, DEC: 11,
+    JAN: 0,
+    FEB: 1,
+    MAR: 2,
+    APR: 3,
+    MAY: 4,
+    JUN: 5,
+    JUL: 6,
+    AUG: 7,
+    SEP: 8,
+    OCT: 9,
+    NOV: 10,
+    DEC: 11,
   }
   const day = parseInt(dateStr.substring(0, 2))
   const monthStr = dateStr.substring(2, 5).toUpperCase()
@@ -61,7 +74,11 @@ function formatTime(time: string | undefined): string {
 }
 
 function escapeHtml(str: string): string {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
 }
 
 function getClassName(code: string): string {
@@ -69,10 +86,7 @@ function getClassName(code: string): string {
 }
 
 /** Extract baggage info for a specific segment from SSR/OSI */
-function getBaggageForSegment(
-  pnr: PNR | undefined,
-  segmentIndex: number
-): string | null {
+function getBaggageForSegment(pnr: PNR | undefined, segmentIndex: number): string | null {
   if (!pnr) return null
 
   // Try SSR baggage first
@@ -81,8 +95,8 @@ function getBaggageForSegment(
   )
   if (ssrBaggage && ssrBaggage.length > 0) {
     // Find segment-specific baggage
-    const segSpecific = ssrBaggage.find(
-      (ssr: EnhancedSSR) => ssr.segments?.includes(segmentIndex + 1)
+    const segSpecific = ssrBaggage.find((ssr: EnhancedSSR) =>
+      ssr.segments?.includes(segmentIndex + 1)
     )
     if (segSpecific) {
       return segSpecific.description || segSpecific.raw
@@ -94,7 +108,8 @@ function getBaggageForSegment(
 
   // Try OSI baggage (Trip.com style)
   const osiBaggage = pnr.other_info?.filter(
-    (osi: EnhancedOSI) => osi.message.includes(FLIGHT_PRINT_LABELS.CHECKED_BAGGAGE_KEYWORD) ||
+    (osi: EnhancedOSI) =>
+      osi.message.includes(FLIGHT_PRINT_LABELS.CHECKED_BAGGAGE_KEYWORD) ||
       osi.message.includes(FLIGHT_PRINT_LABELS.CARRY_ON_KEYWORD)
   )
   if (osiBaggage && osiBaggage.length > 0) {
@@ -108,18 +123,14 @@ function getBaggageForSegment(
 function getDisplaySSRTags(pnr: PNR | undefined): EnhancedSSR[] {
   if (!pnr?.special_requests) return []
   return pnr.special_requests.filter(
-    (ssr: EnhancedSSR) =>
-      ssr.category !== SSRCategory.BAGGAGE &&
-      ssr.category !== SSRCategory.MEAL
+    (ssr: EnhancedSSR) => ssr.category !== SSRCategory.BAGGAGE && ssr.category !== SSRCategory.MEAL
   )
 }
 
 /** Get meal SSR tags */
 function getMealSSRTags(pnr: PNR | undefined): EnhancedSSR[] {
   if (!pnr?.special_requests) return []
-  return pnr.special_requests.filter(
-    (ssr: EnhancedSSR) => ssr.category === SSRCategory.MEAL
-  )
+  return pnr.special_requests.filter((ssr: EnhancedSSR) => ssr.category === SSRCategory.MEAL)
 }
 
 // ─── Card Builders ───
@@ -161,11 +172,13 @@ function buildFlightCard(
   // Via / stopover
   let flightTypeHtml = ''
   if (seg.via && seg.via.length > 0) {
-    const stops = seg.via.map(v => {
-      const parts = [v.city || v.airport || '']
-      if (v.duration) parts.push(v.duration)
-      return parts.join(' ')
-    }).join(', ')
+    const stops = seg.via
+      .map(v => {
+        const parts = [v.city || v.airport || '']
+        if (v.duration) parts.push(v.duration)
+        return parts.join(' ')
+      })
+      .join(', ')
     flightTypeHtml = `<div class="flight-type">${FLIGHT_PRINT_LABELS.STOPOVER_LABEL} ${escapeHtml(stops)}</div>`
   } else if (seg.isDirect !== false) {
     flightTypeHtml = `<div class="flight-type">${FLIGHT_PRINT_LABELS.DIRECT_FLIGHT}</div>`
@@ -260,74 +273,92 @@ export function generateFlightPrintContent({
   getAirportName,
   getAirlineName,
 }: FlightPrintOptions): string {
-  const pages = members.map((member, pageIndex) => {
-    const formatPassportName = (name: string) => name.toUpperCase().replace('/', ' / ')
-    const companyInfo = getCompanyInfo()
-    const companyFooter = getCompanyFooterLine()
+  const pages = members
+    .map((member, pageIndex) => {
+      const formatPassportName = (name: string) => name.toUpperCase().replace('/', ' / ')
+      const companyInfo = getCompanyInfo()
+      const companyFooter = getCompanyFooterLine()
 
-    const passengerName = member.passport_name
-      ? formatPassportName(member.passport_name)
-      : member.chinese_name || ''
+      const passengerName = member.passport_name
+        ? formatPassportName(member.passport_name)
+        : member.chinese_name || ''
 
-    const memberPnr = pnrData.find(p => p.record_locator === member.pnr)
-    const segments: PNRSegment[] = memberPnr?.segments || []
+      const memberPnr = pnrData.find(p => p.record_locator === member.pnr)
+      const segments: PNRSegment[] = memberPnr?.segments || []
 
-    // Ticket number: prefer member field, fallback to PNR ticketNumbers
-    const ticketNumber = member.ticket_number || ''
+      // Ticket number: prefer member field, fallback to PNR ticketNumbers
+      const ticketNumber = member.ticket_number || ''
 
-    // Build flight cards
-    const flightCards: string[] = []
-    if (segments.length > 0) {
-      segments.forEach((seg, idx) => {
-        flightCards.push(buildFlightCard(seg, idx, segments.length, memberPnr, getAirportName, getAirlineName))
-      })
-    } else if (tour.outbound_flight || tour.return_flight) {
-      let idx = 0
-      const outbound = Array.isArray(tour.outbound_flight) ? tour.outbound_flight[0] : tour.outbound_flight
-      const returnFlt = Array.isArray(tour.return_flight) ? tour.return_flight[0] : tour.return_flight
-      if (outbound) {
-        flightCards.push(buildTourFlightCard(outbound, tour.departure_date || '', idx, getAirportName))
-        idx++
+      // Build flight cards
+      const flightCards: string[] = []
+      if (segments.length > 0) {
+        segments.forEach((seg, idx) => {
+          flightCards.push(
+            buildFlightCard(seg, idx, segments.length, memberPnr, getAirportName, getAirlineName)
+          )
+        })
+      } else if (tour.outbound_flight || tour.return_flight) {
+        let idx = 0
+        const outbound = Array.isArray(tour.outbound_flight)
+          ? tour.outbound_flight[0]
+          : tour.outbound_flight
+        const returnFlt = Array.isArray(tour.return_flight)
+          ? tour.return_flight[0]
+          : tour.return_flight
+        if (outbound) {
+          flightCards.push(
+            buildTourFlightCard(outbound, tour.departure_date || '', idx, getAirportName)
+          )
+          idx++
+        }
+        if (returnFlt) {
+          flightCards.push(
+            buildTourFlightCard(returnFlt, tour.return_date || '', idx, getAirportName)
+          )
+        }
       }
-      if (returnFlt) {
-        flightCards.push(buildTourFlightCard(returnFlt, tour.return_date || '', idx, getAirportName))
-      }
-    }
 
-    // SSR tags (non-baggage, non-meal)
-    const ssrTags = getDisplaySSRTags(memberPnr)
-    const mealTags = getMealSSRTags(memberPnr)
-    const allDisplayTags = [...mealTags, ...ssrTags]
+      // SSR tags (non-baggage, non-meal)
+      const ssrTags = getDisplaySSRTags(memberPnr)
+      const mealTags = getMealSSRTags(memberPnr)
+      const allDisplayTags = [...mealTags, ...ssrTags]
 
-    const ssrHtml = allDisplayTags.length > 0 ? `
+      const ssrHtml =
+        allDisplayTags.length > 0
+          ? `
       <div class="ssr-section">
         <div class="section-title" style="margin-bottom: 10px;">
           <h2 style="font-size: 10px;">${FLIGHT_PRINT_LABELS.SPECIAL_REQUESTS_TITLE}</h2>
         </div>
-        ${allDisplayTags.map((ssr: EnhancedSSR) => {
-          const label = ssr.description
-            ? `${escapeHtml(ssr.code)} ${escapeHtml(ssr.description)}`
-            : escapeHtml(ssr.raw)
-          return `<span class="ssr-tag">${label}</span>`
-        }).join('')}
+        ${allDisplayTags
+          .map((ssr: EnhancedSSR) => {
+            const label = ssr.description
+              ? `${escapeHtml(ssr.code)} ${escapeHtml(ssr.description)}`
+              : escapeHtml(ssr.raw)
+            return `<span class="ssr-tag">${label}</span>`
+          })
+          .join('')}
       </div>
-    ` : ''
+    `
+          : ''
 
-    // Order code
-    const orderCode = member.order_code || ''
-    const orderInfoHtml = orderCode ? `
+      // Order code
+      const orderCode = member.order_code || ''
+      const orderInfoHtml = orderCode
+        ? `
       <div class="info-grid" style="grid-template-columns: 1fr;">
         <div class="info-box">
           <div class="label">${FLIGHT_PRINT_LABELS.ORDER_NUMBER_LABEL}</div>
           <div class="value" style="font-size: 12px; letter-spacing: 0.5px;">${escapeHtml(orderCode)}</div>
         </div>
       </div>
-    ` : ''
+    `
+        : ''
 
-    // Passenger info cells
-    const pnrCode = member.pnr || ''
+      // Passenger info cells
+      const pnrCode = member.pnr || ''
 
-    return `
+      return `
       <div class="page"${pageIndex > 0 ? ' style="page-break-before: always;"' : ''}>
         <div class="watermark">
           <img src="/corner-logo.png" alt="" />
@@ -335,15 +366,23 @@ export function generateFlightPrintContent({
 
         <div class="header">
           <div class="header-left">
-            ${companyInfo.name ? `<div class="logo-box">
+            ${
+              companyInfo.name
+                ? `<div class="logo-box">
               <span class="logo-letter">${companyInfo.name.charAt(0)}</span>
-            </div>` : ''}
+            </div>`
+                : ''
+            }
             <div class="company-info">
               <h1>${escapeHtml(companyInfo.name)}</h1>
-              ${companyInfo.address || companyInfo.tel || companyInfo.email ? `<p>
+              ${
+                companyInfo.address || companyInfo.tel || companyInfo.email
+                  ? `<p>
                 ${companyInfo.address ? `${escapeHtml(companyInfo.address)}<br/>` : ''}
                 ${companyInfo.tel ? `TEL ${escapeHtml(companyInfo.tel)}` : ''}${companyInfo.tel && companyInfo.email ? ' | ' : ''}${companyInfo.email ? escapeHtml(companyInfo.email) : ''}
-              </p>` : ''}
+              </p>`
+                  : ''
+              }
             </div>
           </div>
         </div>
@@ -353,18 +392,26 @@ export function generateFlightPrintContent({
             <div class="label">${FLIGHT_PRINT_LABELS.PASSENGER_NAME_LABEL}</div>
             <div class="value">${escapeHtml(passengerName)}</div>
           </div>
-          ${pnrCode ? `
+          ${
+            pnrCode
+              ? `
           <div class="info-cell">
             <div class="label">${FLIGHT_PRINT_LABELS.PNR_LABEL}</div>
             <div class="value pnr-value">${escapeHtml(pnrCode)}</div>
           </div>
-          ` : ''}
-          ${ticketNumber ? `
+          `
+              : ''
+          }
+          ${
+            ticketNumber
+              ? `
           <div class="info-cell">
             <div class="label">${FLIGHT_PRINT_LABELS.ETICKET_LABEL}</div>
             <div class="value ticket-value">${escapeHtml(ticketNumber)}</div>
           </div>
-          ` : ''}
+          `
+              : ''
+          }
         </div>
 
         <div class="section-title">
@@ -386,16 +433,21 @@ export function generateFlightPrintContent({
 
         <div class="footer">
           ${companyFooter ? `<div class="footer-notice">${escapeHtml(companyFooter)}</div>` : ''}
-          ${companyInfo.address || companyInfo.tel || companyInfo.fax || companyInfo.email ? `<div class="footer-contact">
+          ${
+            companyInfo.address || companyInfo.tel || companyInfo.fax || companyInfo.email
+              ? `<div class="footer-contact">
             ${companyInfo.address ? `<span>${escapeHtml(companyInfo.address)}</span>` : ''}
             ${companyInfo.tel ? `<span>TEL ${escapeHtml(companyInfo.tel)}</span>` : ''}
             ${companyInfo.fax ? `<span>FAX ${escapeHtml(companyInfo.fax)}</span>` : ''}
             ${companyInfo.email ? `<span>${escapeHtml(companyInfo.email)}</span>` : ''}
-          </div>` : ''}
+          </div>`
+              : ''
+          }
         </div>
       </div>
     `
-  }).join('')
+    })
+    .join('')
 
   return `
     <!DOCTYPE html>

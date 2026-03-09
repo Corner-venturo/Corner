@@ -27,8 +27,7 @@ export default function WorkspacePage() {
       await loadWorkspaces()
     }
 
-    init().catch((err) => logger.error('[init]', err))
-
+    init().catch(err => logger.error('[init]', err))
   }, [])
 
   // 🔥 Step 2: 當 workspace 載入後，載入 channels 和 groups（只執行一次）
@@ -42,8 +41,7 @@ export default function WorkspacePage() {
       logger.log('✅ [WorkspacePage] 初始化完成')
     }
 
-    loadData().catch((err) => logger.error('[loadData]', err))
-
+    loadData().catch(err => logger.error('[loadData]', err))
   }, [currentWorkspace?.id])
 
   // 載入中顯示 loading
@@ -63,10 +61,7 @@ export default function WorkspacePage() {
     <>
       {/* 手機版頂部標題列 */}
       <MobileHeader onMenuClick={() => setMobileSidebarOpen(true)} />
-      <MobileSidebar
-        isOpen={mobileSidebarOpen}
-        onClose={() => setMobileSidebarOpen(false)}
-      />
+      <MobileSidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
 
       {/* 主內容區域 - 頂部對齊，分割線對齊 logo 下方 */}
       <main

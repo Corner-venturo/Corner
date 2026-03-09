@@ -14,7 +14,10 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { EXCHANGE_RATE_DIALOG_LABELS, TOUR_CONFIRMATION_SHEET_PAGE_LABELS } from '../../constants/labels';
+import {
+  EXCHANGE_RATE_DIALOG_LABELS,
+  TOUR_CONFIRMATION_SHEET_PAGE_LABELS,
+} from '../../constants/labels'
 
 interface ExchangeRateDialogProps {
   open: boolean
@@ -41,17 +44,21 @@ export function ExchangeRateDialog({
         </DialogHeader>
         <div className="space-y-4 py-4">
           <p className="text-sm text-morandi-secondary">
-            {EXCHANGE_RATE_DIALOG_LABELS.RATE_DESCRIPTION_PREFIX}{destinationCurrency || TOUR_CONFIRMATION_SHEET_PAGE_LABELS.外幣}{EXCHANGE_RATE_DIALOG_LABELS.RATE_DESCRIPTION_SUFFIX}
+            {EXCHANGE_RATE_DIALOG_LABELS.RATE_DESCRIPTION_PREFIX}
+            {destinationCurrency || TOUR_CONFIRMATION_SHEET_PAGE_LABELS.外幣}
+            {EXCHANGE_RATE_DIALOG_LABELS.RATE_DESCRIPTION_SUFFIX}
           </p>
           <div className="space-y-2">
-            <Label htmlFor="exchange-rate">1 {destinationCurrency || EXCHANGE_RATE_DIALOG_LABELS.外幣} = ? TWD</Label>
+            <Label htmlFor="exchange-rate">
+              1 {destinationCurrency || EXCHANGE_RATE_DIALOG_LABELS.外幣} = ? TWD
+            </Label>
             <Input
               id="exchange-rate"
               type="number"
               step="0.001"
               placeholder={EXCHANGE_RATE_DIALOG_LABELS.例如_0_22_日圓_或_0_9_泰銖}
               value={exchangeRateInput}
-              onChange={(e) => onExchangeRateInputChange(e.target.value)}
+              onChange={e => onExchangeRateInputChange(e.target.value)}
             />
             <p className="text-xs text-morandi-secondary">
               {EXCHANGE_RATE_DIALOG_LABELS.EXAMPLE_HINT}

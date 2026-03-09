@@ -1,6 +1,6 @@
 /**
  * 團確單相關資料載入 Hook
- * 
+ *
  * 整合載入行程表、需求單、報價單項目、訂單團員、房型配置等資料
  */
 
@@ -186,12 +186,12 @@ export function useTourSheetData({ tourId, quoteId, departureDate }: UseTourShee
 
         const items: QuoteItem[] = []
         const CATEGORY_MAP: Record<string, string> = {
-          'transport': 'transport',
+          transport: 'transport',
           'group-transport': 'transport',
-          'accommodation': 'accommodation',
-          'meals': 'meal',
-          'activities': 'activity',
-          'others': 'other',
+          accommodation: 'accommodation',
+          meals: 'meal',
+          activities: 'activity',
+          others: 'other',
         }
 
         for (const cat of categories) {
@@ -214,7 +214,9 @@ export function useTourSheetData({ tourId, quoteId, departureDate }: UseTourShee
               title = item.name
               if (item.day) serviceDate = calculateDate(item.day)
             } else if (mappedCategory === 'meal') {
-              const match = item.name.match(/Day\s*(\d+)\s*(早餐|午餐|晚餐)\s*(?:[：:]|\s*-\s*)\s*(.+)/)
+              const match = item.name.match(
+                /Day\s*(\d+)\s*(早餐|午餐|晚餐)\s*(?:[：:]|\s*-\s*)\s*(.+)/
+              )
               if (match) {
                 const dayNum = parseInt(match[1])
                 supplierName = match[3].trim()
@@ -281,7 +283,11 @@ export function useTourSheetData({ tourId, quoteId, departureDate }: UseTourShee
           const membersByOrder = new Map<string, OrderMember[]>()
           for (const member of allMembers || []) {
             const existing = membersByOrder.get(member.order_id) || []
-            existing.push({ id: member.id, chinese_name: member.chinese_name, birth_date: member.birth_date })
+            existing.push({
+              id: member.id,
+              chinese_name: member.chinese_name,
+              birth_date: member.birth_date,
+            })
             membersByOrder.set(member.order_id, existing)
           }
 
@@ -387,7 +393,9 @@ export function useTourSheetData({ tourId, quoteId, departureDate }: UseTourShee
         return
       }
       const birthDate = new Date(member.birth_date)
-      const age = Math.floor((refDate.getTime() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000))
+      const age = Math.floor(
+        (refDate.getTime() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000)
+      )
       if (age < 6) {
         under6++
       } else if (age >= 65) {

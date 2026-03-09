@@ -3,6 +3,7 @@
 ## 目標
 
 優化旅客管理系統，支援：
+
 1. 團體旅客總覽（匯總所有訂單的旅客）
 2. 分房管理（拖拽式界面）
 3. 企業客戶管理（統編、付款流程）
@@ -193,12 +194,14 @@ CREATE INDEX idx_customers_company ON customers(company_id);
 ### 2.1 Tour-Members 頁面功能
 
 #### 位置
+
 - 路徑：`/tours/[id]/members`
 - 組件：`src/app/tours/[id]/components/TourMembers.tsx`
 
 #### 核心功能
 
 **1. 旅客總覽**
+
 ```typescript
 // 匯總所有訂單的旅客
 const allMembers = useMemo(() => {
@@ -244,19 +247,19 @@ const columns = [
 // 匯出 Excel
 const handleExportExcel = () => {
   const data = allMembers.map(m => ({
-    '訂單編號': getOrderNumber(m),
-    '姓名': m.name,
-    '英文姓名': m.name_en,
-    '性別': m.gender === 'M' ? '男' : '女',
-    '生日': formatDate(m.birthday),
-    '年齡': calculateAge(m.birthday, tour.departure_date),
-    '身分證號': m.id_number,
-    '護照號碼': m.passport_number,
-    '護照效期': formatDate(m.passport_expiry),
-    '房號': m.room_number || '-',
-    '房型': m.room_type || '-',
-    '餐食偏好': m.meal_preference || '-',
-    '備註': m.note || '-',
+    訂單編號: getOrderNumber(m),
+    姓名: m.name,
+    英文姓名: m.name_en,
+    性別: m.gender === 'M' ? '男' : '女',
+    生日: formatDate(m.birthday),
+    年齡: calculateAge(m.birthday, tour.departure_date),
+    身分證號: m.id_number,
+    護照號碼: m.passport_number,
+    護照效期: formatDate(m.passport_expiry),
+    房號: m.room_number || '-',
+    房型: m.room_type || '-',
+    餐食偏好: m.meal_preference || '-',
+    備註: m.note || '-',
   }))
 
   const worksheet = XLSX.utils.json_to_sheet(data)
@@ -274,9 +277,7 @@ const handleImportExcel = async (file: File) => {
 
   // 根據姓名+身分證號匹配現有旅客並更新
   for (const row of jsonData) {
-    const member = allMembers.find(
-      m => m.name === row['姓名'] && m.id_number === row['身分證號']
-    )
+    const member = allMembers.find(m => m.name === row['姓名'] && m.id_number === row['身分證號'])
     if (member) {
       await updateMember(member.id, {
         room_number: row['房號'],
@@ -296,6 +297,7 @@ const handleImportExcel = async (file: File) => {
 ### 3.1 分房界面設計
 
 #### 位置
+
 - 路徑：`/tours/[id]/rooms`
 - 組件：`src/app/tours/[id]/components/RoomAllocation.tsx`
 
@@ -361,12 +363,12 @@ const parseRoomTypesFromRequests = (paymentRequests: PaymentRequest[]) => {
 // 根據房型推算容量
 const getRoomCapacity = (roomType: string): number => {
   const capacityMap: Record<string, number> = {
-    '單人房': 1,
-    '雙人房': 2,
-    '雙床房': 2,
-    '三人房': 3,
-    '四人房': 4,
-    '家庭房': 4,
+    單人房: 1,
+    雙人房: 2,
+    雙床房: 2,
+    三人房: 3,
+    四人房: 4,
+    家庭房: 4,
   }
 
   return capacityMap[roomType] || 2 // 預設 2 人
@@ -452,16 +454,19 @@ const suggestRoomAllocation = () => {
 ### Phase 1: 企業客戶系統（2-3 天）
 
 **Day 1: 資料庫與型別**
+
 - [ ] 創建 companies 和 company_contacts 表格
 - [ ] 擴充 customers 表格
 - [ ] 創建型別定義和 Store
 
 **Day 2: UI 組件**
+
 - [ ] 企業客戶列表頁面
 - [ ] 企業客戶表單（新增/編輯）
 - [ ] 企業聯絡人管理
 
 **Day 3: 整合**
+
 - [ ] 訂單建立時選擇企業客戶
 - [ ] 顯示企業客戶的統編和付款條件
 - [ ] 收款單關聯企業客戶
@@ -469,11 +474,13 @@ const suggestRoomAllocation = () => {
 ### Phase 2: 旅客總覽優化（1-2 天）
 
 **Day 1: 旅客總覽**
+
 - [ ] 創建 TourMembers 頁面
 - [ ] 實作旅客統計
 - [ ] 旅客列表表格
 
 **Day 2: 匯入匯出**
+
 - [ ] Excel 匯出功能
 - [ ] Excel 匯入更新功能
 - [ ] 批量操作
@@ -481,16 +488,19 @@ const suggestRoomAllocation = () => {
 ### Phase 3: 分房管理（2-3 天）
 
 **Day 1: 房間管理**
+
 - [ ] 創建 RoomAllocation 頁面
 - [ ] 房型自動解析
 - [ ] 房間列表顯示
 
 **Day 2: 拖拽分房**
+
 - [ ] 實作拖拽功能
 - [ ] 容量檢查
 - [ ] 視覺化反饋
 
 **Day 3: 智慧功能**
+
 - [ ] 智慧分房建議
 - [ ] 分房規則設定
 - [ ] 分房報表匯出

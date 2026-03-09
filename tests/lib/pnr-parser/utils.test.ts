@@ -13,16 +13,34 @@ vi.mock('@/lib/pnr-parser/constants', () => ({
     { keywords: ['VIP'], category: 'vip' },
   ],
   MONTH_MAP: {
-    JAN: 0, FEB: 1, MAR: 2, APR: 3, MAY: 4, JUN: 5,
-    JUL: 6, AUG: 7, SEP: 8, OCT: 9, NOV: 10, DEC: 11,
+    JAN: 0,
+    FEB: 1,
+    MAR: 2,
+    APR: 3,
+    MAY: 4,
+    JUN: 5,
+    JUL: 6,
+    AUG: 7,
+    SEP: 8,
+    OCT: 9,
+    NOV: 10,
+    DEC: 11,
   } as Record<string, number>,
   AIRPORT_MAP_EN: { BANGKOK: 'BKK', TOKYO: 'NRT' } as Record<string, string>,
-  AIRPORT_MAP_ZH: { '曼谷': 'BKK', '東京': 'NRT' } as Record<string, string>,
+  AIRPORT_MAP_ZH: { 曼谷: 'BKK', 東京: 'NRT' } as Record<string, string>,
 }))
 
 // Mock types
 vi.mock('@/lib/pnr-parser/types', () => ({
-  SSRCategory: { MEAL: 'meal', MEDICAL: 'medical', OTHER: 'other', SEAT: 'seat', BAGGAGE: 'baggage', FREQUENT: 'frequent', PASSENGER: 'passenger' },
+  SSRCategory: {
+    MEAL: 'meal',
+    MEDICAL: 'medical',
+    OTHER: 'other',
+    SEAT: 'seat',
+    BAGGAGE: 'baggage',
+    FREQUENT: 'frequent',
+    PASSENGER: 'passenger',
+  },
   OSICategory: { GENERAL: 'general', CONTACT: 'contact', VIP: 'vip', MEDICAL: 'medical' },
 }))
 

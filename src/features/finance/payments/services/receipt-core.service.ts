@@ -60,10 +60,7 @@ async function recalculateOrderPayment(orderId: string): Promise<void> {
     throw receiptsError
   }
 
-  const totalPaid = (confirmedReceipts || []).reduce(
-    (sum, r) => sum + (r.actual_amount || 0),
-    0
-  )
+  const totalPaid = (confirmedReceipts || []).reduce((sum, r) => sum + (r.actual_amount || 0), 0)
 
   // 計算付款狀態
   let paymentStatus: 'unpaid' | 'partial' | 'paid' = 'unpaid'
@@ -121,9 +118,7 @@ async function recalculateTourFinancials(tourId: string): Promise<void> {
     .is('deleted_at', null)
 
   if (orderIds.length > 0) {
-    receiptsQuery = receiptsQuery.or(
-      `order_id.in.(${orderIds.join(',')}),tour_id.eq.${tourId}`
-    )
+    receiptsQuery = receiptsQuery.or(`order_id.in.(${orderIds.join(',')}),tour_id.eq.${tourId}`)
   } else {
     receiptsQuery = receiptsQuery.eq('tour_id', tourId)
   }
@@ -135,10 +130,7 @@ async function recalculateTourFinancials(tourId: string): Promise<void> {
     throw receiptsQueryError
   }
 
-  const totalRevenue = (receiptsData || []).reduce(
-    (sum, r) => sum + (r.actual_amount || 0),
-    0
-  )
+  const totalRevenue = (receiptsData || []).reduce((sum, r) => sum + (r.actual_amount || 0), 0)
 
   // 取得當前成本
   const { data: currentTour, error: tourCostError } = await supabase
@@ -179,16 +171,10 @@ async function recalculateTourFinancials(tourId: string): Promise<void> {
 /**
  * 刷新 SWR 快取
  */
-async function invalidateFinanceCache(
-  tourId?: string | null
-): Promise<void> {
+async function invalidateFinanceCache(tourId?: string | null): Promise<void> {
   const { mutate } = await import('swr')
 
-  const promises: Promise<unknown>[] = [
-    mutate('tours'),
-    mutate('orders'),
-    mutate('receipts'),
-  ]
+  const promises: Promise<unknown>[] = [mutate('tours'), mutate('orders'), mutate('receipts')]
 
   if (tourId) {
     promises.push(mutate(`tour-${tourId}`))

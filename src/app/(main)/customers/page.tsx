@@ -10,7 +10,6 @@
  * - ResetPasswordDialog: 重置密碼
  */
 
-
 import { useState, useMemo, useCallback } from 'react'
 import { Search, X, Plus, AlertTriangle, Edit, Trash2, Users, FileSpreadsheet } from 'lucide-react'
 import { formatPassportExpiryWithStatus } from '@/lib/utils/passport-expiry'
@@ -47,13 +46,8 @@ export default function CustomersPage() {
   const addCustomer = createCustomer
 
   // 搜尋 Hook
-  const {
-    searchParams,
-    setSearchParams,
-    filteredCustomers,
-    hasActiveFilters,
-    clearFilters,
-  } = useCustomerSearch(customers)
+  const { searchParams, setSearchParams, filteredCustomers, hasActiveFilters, clearFilters } =
+    useCustomerSearch(customers)
 
   // 驗證 Hook
   const customerVerify = useCustomerVerify({
@@ -125,44 +119,46 @@ export default function CustomersPage() {
   }, [])
 
   // 處理刪除
-  const handleDelete = useCallback(async (customer: Customer) => {
-    // 先檢查是否有訂單成員關聯
-    const { data: linkedMembers } = await supabase
-      .from('order_members')
-      .select('id, order_id, orders!inner(code, tour_name)')
-      .eq('customer_id', customer.id)
-      .limit(5)
+  const handleDelete = useCallback(
+    async (customer: Customer) => {
+      // 先檢查是否有訂單成員關聯
+      const { data: linkedMembers } = await supabase
+        .from('order_members')
+        .select('id, order_id, orders!inner(code, tour_name)')
+        .eq('customer_id', customer.id)
+        .limit(5)
 
-    if (linkedMembers && linkedMembers.length > 0) {
-      const orderInfo = linkedMembers.map(m => {
-        const order = m.orders as { code?: string; tour_name?: string } | null
-        return order?.code || order?.tour_name || L.unknown_order
-      }).join('、')
+      if (linkedMembers && linkedMembers.length > 0) {
+        const orderInfo = linkedMembers
+          .map(m => {
+            const order = m.orders as { code?: string; tour_name?: string } | null
+            return order?.code || order?.tour_name || L.unknown_order
+          })
+          .join('、')
 
-      const goToOrder = await confirm(
-        L.cannot_delete_msg(orderInfo),
-        {
+        const goToOrder = await confirm(L.cannot_delete_msg(orderInfo), {
           title: L.cannot_delete_title,
           type: 'warning',
           confirmText: L.btn_go_to_order,
           cancelText: L.btn_cancel,
+        })
+
+        if (goToOrder) {
+          router.push('/orders')
         }
-      )
-
-      if (goToOrder) {
-        router.push('/orders')
+        return
       }
-      return
-    }
 
-    const confirmed = await confirm(L.confirm_delete(customer.name), {
-      title: L.confirm_delete_title,
-      type: 'warning',
-    })
-    if (confirmed) {
-      deleteCustomer(customer.id)
-    }
-  }, [deleteCustomer, router])
+      const confirmed = await confirm(L.confirm_delete(customer.name), {
+        title: L.confirm_delete_title,
+        type: 'warning',
+      })
+      if (confirmed) {
+        deleteCustomer(customer.id)
+      }
+    },
+    [deleteCustomer, router]
+  )
 
   // 表格欄位定義
   const tableColumns: TableColumn<Customer>[] = useMemo(
@@ -241,7 +237,9 @@ export default function CustomersPage() {
         label: L.col_national_id,
         sortable: false,
         render: (_value, customer: Customer) => (
-          <div className="text-xs text-morandi-primary font-mono">{customer.national_id || '-'}</div>
+          <div className="text-xs text-morandi-primary font-mono">
+            {customer.national_id || '-'}
+          </div>
         ),
       },
       {
@@ -261,7 +259,9 @@ export default function CustomersPage() {
         label: L.col_dietary,
         sortable: false,
         render: (_value, customer: Customer) => (
-          <div className={`text-xs ${customer.dietary_restrictions ? 'text-morandi-gold bg-status-warning-bg px-1.5 py-0.5 rounded' : 'text-morandi-secondary'}`}>
+          <div
+            className={`text-xs ${customer.dietary_restrictions ? 'text-morandi-gold bg-status-warning-bg px-1.5 py-0.5 rounded' : 'text-morandi-secondary'}`}
+          >
             {customer.dietary_restrictions || '-'}
           </div>
         ),
@@ -285,32 +285,34 @@ export default function CustomersPage() {
   )
 
   // 處理新增顧客
-  const handleAddCustomer = useCallback(async (data: {
-    name: string
-    email: string
-    phone: string
-    address: string
-    passport_number: string
-    passport_name: string
-    passport_expiry: string
-    national_id: string
-    birth_date: string
-  }) => {
-    // 將空字串日期欄位轉換為 null，避免 PostgreSQL 日期格式錯誤
-    const cleanedData = {
-      ...data,
-      passport_expiry: data.passport_expiry || null,
-      birth_date: data.birth_date || null,
-    }
-    await (addCustomer as (data: CreateCustomerData) => Promise<Customer>)({
-      ...cleanedData,
-      is_vip: false,
-      is_active: true,
-      total_spent: 0,
-      verification_status: 'unverified',
-    } as CreateCustomerData)
-  }, [addCustomer])
-
+  const handleAddCustomer = useCallback(
+    async (data: {
+      name: string
+      email: string
+      phone: string
+      address: string
+      passport_number: string
+      passport_name: string
+      passport_expiry: string
+      national_id: string
+      birth_date: string
+    }) => {
+      // 將空字串日期欄位轉換為 null，避免 PostgreSQL 日期格式錯誤
+      const cleanedData = {
+        ...data,
+        passport_expiry: data.passport_expiry || null,
+        birth_date: data.birth_date || null,
+      }
+      await (addCustomer as (data: CreateCustomerData) => Promise<Customer>)({
+        ...cleanedData,
+        is_vip: false,
+        is_active: true,
+        total_spent: 0,
+        verification_status: 'unverified',
+      } as CreateCustomerData)
+    },
+    [addCustomer]
+  )
 
   return (
     <ContentPageLayout
@@ -374,7 +376,11 @@ export default function CustomersPage() {
       {hasActiveFilters && (
         <div className="px-4 py-2 bg-morandi-container/20 border-b border-border">
           <div className="text-xs text-morandi-secondary">
-            {L.filter_applied(Object.keys(searchParams).length, filteredCustomers.length, customers.length)}
+            {L.filter_applied(
+              Object.keys(searchParams).length,
+              filteredCustomers.length,
+              customers.length
+            )}
           </div>
         </div>
       )}
@@ -391,7 +397,7 @@ export default function CustomersPage() {
                   <button
                     className="p-1 text-status-warning hover:text-status-warning hover:bg-status-warning-bg rounded transition-colors"
                     title={L.title_verify}
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation()
                       customerVerify.openDialog(customer)
                     }}
@@ -402,7 +408,7 @@ export default function CustomersPage() {
                 <button
                   className="p-1 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
                   title={L.title_edit}
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation()
                     customerVerify.openDialog(customer)
                   }}
@@ -412,7 +418,7 @@ export default function CustomersPage() {
                 <button
                   className="p-1 text-morandi-secondary hover:text-status-danger hover:bg-status-danger-bg rounded transition-colors"
                   title={L.title_delete}
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation()
                     handleDelete(customer)
                   }}
@@ -439,18 +445,22 @@ export default function CustomersPage() {
         onOpenChange={setIsAddDialogOpen}
         customers={customers}
         onAddCustomer={handleAddCustomer}
-        updateCustomer={updateCustomer as unknown as (id: string, data: Partial<Customer>) => Promise<void>}
+        updateCustomer={
+          updateCustomer as unknown as (id: string, data: Partial<Customer>) => Promise<void>
+        }
         addCustomer={addCustomer as (data: Partial<Customer>) => Promise<Customer>}
       />
 
       {/* 驗證/編輯對話框 */}
       <CustomerVerifyDialog
         open={customerVerify.isOpen}
-        onOpenChange={(open) => {
+        onOpenChange={open => {
           if (!open) customerVerify.closeDialog()
         }}
         customer={customerVerify.customer}
-        onUpdate={updateCustomer as unknown as (id: string, data: Partial<Customer>) => Promise<void>}
+        onUpdate={
+          updateCustomer as unknown as (id: string, data: Partial<Customer>) => Promise<void>
+        }
       />
 
       {/* 顧客詳情對話框 */}
@@ -458,7 +468,7 @@ export default function CustomersPage() {
         open={isDetailDialogOpen}
         onOpenChange={setIsDetailDialogOpen}
         customer={selectedCustomer}
-        onEdit={(customer) => {
+        onEdit={customer => {
           setIsDetailDialogOpen(false)
           customerVerify.openDialog(customer)
         }}
@@ -472,10 +482,7 @@ export default function CustomersPage() {
       />
 
       {/* 批次匯入對話框 */}
-      <ImportCustomersDialog
-        open={isImportDialogOpen}
-        onOpenChange={setIsImportDialogOpen}
-      />
+      <ImportCustomersDialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen} />
     </ContentPageLayout>
   )
 }

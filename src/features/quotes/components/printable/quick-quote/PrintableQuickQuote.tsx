@@ -3,7 +3,6 @@
  * PrintableQuickQuote - 快速報價單列印版
  */
 
-
 import React from 'react'
 import { Quote, QuickQuoteItem } from '@/types/quote.types'
 import { PrintableWrapper } from '../shared/PrintableWrapper'
@@ -12,7 +11,7 @@ import { QuickQuoteItemsTable } from './QuickQuoteItemsTable'
 import { QuickQuoteSummary } from './QuickQuoteSummary'
 import { QuickQuotePaymentInfo } from './QuickQuotePaymentInfo'
 import { QuickQuoteReceiptInfo } from './QuickQuoteReceiptInfo'
-import { PRINTABLE_QUICK_QUOTE_LABELS } from '../../../constants/labels';
+import { PRINTABLE_QUICK_QUOTE_LABELS } from '../../../constants/labels'
 
 interface PrintableQuickQuoteProps {
   quote: Quote
@@ -41,10 +40,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
     >
       <QuickQuoteCustomerInfo quote={quote} />
       <QuickQuoteItemsTable items={items} />
-      <QuickQuoteSummary
-        totalAmount={totalAmount}
-        receivedAmount={quote.received_amount}
-      />
+      <QuickQuoteSummary totalAmount={totalAmount} receivedAmount={quote.received_amount} />
       <QuickQuotePaymentInfo />
       <QuickQuoteReceiptInfo />
     </PrintableWrapper>

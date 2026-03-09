@@ -8,7 +8,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { isFeatureAvailable } from '@/lib/feature-restrictions'
 import { ImageEditor, type ImageEditorSettings } from '@/components/ui/image-editor'
 import { logger } from '@/lib/utils/logger'
-import { ATTRACTION_IMAGE_UPLOAD_LABELS } from '../../constants/labels';
+import { ATTRACTION_IMAGE_UPLOAD_LABELS } from '../../constants/labels'
 
 interface ImagePositionAdjusterProps {
   url: string
@@ -39,7 +39,7 @@ function ImagePositionAdjuster({
     // 將 x/y 轉換為 ImagePosition
     const { x, y } = settings
     let newPosition: ImagePosition = 'center'
-    
+
     if (y <= 33) {
       newPosition = 'top'
     } else if (y >= 67) {
@@ -47,7 +47,7 @@ function ImagePositionAdjuster({
     } else {
       newPosition = 'center'
     }
-    
+
     onPositionChange(newPosition)
   }
 
@@ -57,7 +57,7 @@ function ImagePositionAdjuster({
 
     try {
       const { supabase } = await import('@/lib/supabase/client')
-      
+
       const fileName = `attractions/${Date.now()}_${Math.random().toString(36).substring(2, 8)}.jpg`
       const { error: uploadError } = await supabase.storage
         .from('workspace-files')
@@ -101,11 +101,13 @@ function ImagePositionAdjuster({
         className="w-full h-24 rounded-md border border-border overflow-hidden cursor-pointer"
         onDoubleClick={handleDoubleClick}
       >
-        <img src={url}
+        <img
+          src={url}
           alt={ATTRACTION_IMAGE_UPLOAD_LABELS.景點圖片}
           className="w-full h-full object-cover"
           style={{
-            objectPosition: position === 'top' ? 'top' : position === 'bottom' ? 'bottom' : 'center',
+            objectPosition:
+              position === 'top' ? 'top' : position === 'bottom' ? 'bottom' : 'center',
           }}
           draggable={false}
         />
@@ -222,12 +224,7 @@ export function AttractionImageUpload({
             </>
           )}
         </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={onAddUrlImage}
-        >
+        <Button type="button" variant="ghost" size="sm" onClick={onAddUrlImage}>
           貼上網址
         </Button>
       </div>
@@ -244,7 +241,9 @@ export function AttractionImageUpload({
       >
         {isDragOver && (
           <div className="flex items-center justify-center h-[120px]">
-            <div className="text-morandi-gold font-medium">{ATTRACTION_IMAGE_UPLOAD_LABELS.UPLOADING_115}</div>
+            <div className="text-morandi-gold font-medium">
+              {ATTRACTION_IMAGE_UPLOAD_LABELS.UPLOADING_115}
+            </div>
           </div>
         )}
         {!isDragOver && uploadedImages.length > 0 ? (
@@ -254,9 +253,9 @@ export function AttractionImageUpload({
                 key={`${url}-${index}`}
                 url={url}
                 position={imagePositions[url] || 'center'}
-                onPositionChange={(pos) => onPositionChange(url, pos)}
+                onPositionChange={pos => onPositionChange(url, pos)}
                 onRemove={() => onRemoveImage(index)}
-                onReplace={onReplaceImage ? (newUrl) => onReplaceImage(index, newUrl) : undefined}
+                onReplace={onReplaceImage ? newUrl => onReplaceImage(index, newUrl) : undefined}
                 showAiEdit={showAiEdit}
               />
             ))}
@@ -268,9 +267,7 @@ export function AttractionImageUpload({
           </div>
         ) : null}
       </div>
-      <p className="text-xs text-morandi-muted mt-2">
-        {ATTRACTION_IMAGE_UPLOAD_LABELS.EDIT_4224}
-      </p>
+      <p className="text-xs text-morandi-muted mt-2">{ATTRACTION_IMAGE_UPLOAD_LABELS.EDIT_4224}</p>
     </div>
   )
 }

@@ -211,7 +211,7 @@
 // ✅ 標準方式：使用 shadcn Dialog 組件（推薦）
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
-<Dialog open={open} onOpenChange={setOpen}>
+;<Dialog open={open} onOpenChange={setOpen}>
   <DialogContent>
     <DialogHeader>
       <DialogTitle>標題</DialogTitle>
@@ -242,21 +242,21 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 
 ### 遮罩層級規範
 
-| z-index | 用途 |
-|---------|------|
-| `z-50` | 一般 Dialog、Modal |
-| `z-[9998]` | Dialog 遮罩層 (DialogOverlay) |
-| `z-[9999]` | Dialog 內容層 (DialogContent) |
-| `z-[10000]` | Dialog 關閉按鈕 |
+| z-index     | 用途                          |
+| ----------- | ----------------------------- |
+| `z-50`      | 一般 Dialog、Modal            |
+| `z-[9998]`  | Dialog 遮罩層 (DialogOverlay) |
+| `z-[9999]`  | Dialog 內容層 (DialogContent) |
+| `z-[10000]` | Dialog 關閉按鈕               |
 
 ### 關鍵樣式說明
 
-| 樣式 | 說明 |
-|------|------|
-| `fixed inset-0` | **必須** - 確保遮罩覆蓋整個視窗 |
-| `bg-black/60` | 標準透明度 60%（比 50% 更明顯） |
-| `backdrop-blur-sm` | 模糊背景，增加層次感 |
-| `flex items-center justify-center` | 彈窗內容置中 |
+| 樣式                               | 說明                            |
+| ---------------------------------- | ------------------------------- |
+| `fixed inset-0`                    | **必須** - 確保遮罩覆蓋整個視窗 |
+| `bg-black/60`                      | 標準透明度 60%（比 50% 更明顯） |
+| `backdrop-blur-sm`                 | 模糊背景，增加層次感            |
+| `flex items-center justify-center` | 彈窗內容置中                    |
 
 ### 參考範例
 
@@ -308,18 +308,18 @@ import { Plus, Save, Check, X, Trash2 } from 'lucide-react'
 
 ### 按鈕圖標對應表
 
-| 操作 | 圖標 | 說明 |
-|------|------|------|
-| 新增 | `Plus` | 新增項目、建立資料 |
-| 儲存 | `Save` | 儲存變更 |
-| 確認 | `Check` | 確認操作 |
-| 取消 | `X` | 取消、關閉 |
-| 刪除 | `Trash2` | 刪除項目（危險操作） |
-| 編輯 | `Edit2` | 編輯模式 |
-| 同步 | `RefreshCw` | 同步資料 |
-| 上傳 | `Upload` | 上傳檔案 |
-| 下載 | `Download` | 下載檔案 |
-| 列印 | `Printer` | 列印功能 |
+| 操作 | 圖標        | 說明                 |
+| ---- | ----------- | -------------------- |
+| 新增 | `Plus`      | 新增項目、建立資料   |
+| 儲存 | `Save`      | 儲存變更             |
+| 確認 | `Check`     | 確認操作             |
+| 取消 | `X`         | 取消、關閉           |
+| 刪除 | `Trash2`    | 刪除項目（危險操作） |
+| 編輯 | `Edit2`     | 編輯模式             |
+| 同步 | `RefreshCw` | 同步資料             |
+| 上傳 | `Upload`    | 上傳檔案             |
+| 下載 | `Download`  | 下載檔案             |
+| 列印 | `Printer`   | 列印功能             |
 
 ---
 
@@ -347,11 +347,7 @@ import { Plus, Save, Check, X, Trash2 } from 'lucide-react'
 import { DatePicker } from '@/components/ui/date-picker'
 
 // ✅ 正確
-<DatePicker
-  value={date}
-  onChange={setDate}
-  placeholder="選擇日期"
-/>
+;<DatePicker value={date} onChange={setDate} placeholder="選擇日期" />
 
 // ❌ 錯誤：使用其他日期組件
 // SimpleDateInput, DateInput 等都應改為 DatePicker
@@ -365,21 +361,22 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { Combobox } from '@/components/ui/combobox'
 
 // ✅ 客戶選擇、團號選擇、城市選擇（選項 > 10）
-<Combobox
-  options={options}
-  value={value}
-  onChange={setValue}
-  placeholder="搜尋..."
-/>
+;<Combobox options={options} value={value} onChange={setValue} placeholder="搜尋..." />
 ```
 
 **固定選項（選項少）用 Select**：
 
 ```tsx
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 // ✅ 狀態選擇、排序方式（選項 < 5）
-<Select value={value} onValueChange={setValue}>
+;<Select value={value} onValueChange={setValue}>
   <SelectTrigger>
     <SelectValue placeholder="選擇..." />
   </SelectTrigger>
@@ -409,14 +406,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 以下規則由 ESLint 自動檢查：
 
-| 規則 | 說明 | 嚴重程度 |
-|------|------|---------|
-| `venturo/no-forbidden-classes` | 禁止使用非設計系統的 CSS 類別 | warn |
-| `venturo/no-custom-modal` | 禁止自訂 Modal 遮罩層 | warn |
-| `venturo/button-requires-icon` | Dialog 按鈕需要圖標 | warn |
-| `venturo/consistent-form-label` | 表單標籤一致性 | warn |
+| 規則                            | 說明                          | 嚴重程度 |
+| ------------------------------- | ----------------------------- | -------- |
+| `venturo/no-forbidden-classes`  | 禁止使用非設計系統的 CSS 類別 | warn     |
+| `venturo/no-custom-modal`       | 禁止自訂 Modal 遮罩層         | warn     |
+| `venturo/button-requires-icon`  | Dialog 按鈕需要圖標           | warn     |
+| `venturo/consistent-form-label` | 表單標籤一致性                | warn     |
 
 執行掃描：
+
 ```bash
 node scripts/scan-design-violations.js
 ```

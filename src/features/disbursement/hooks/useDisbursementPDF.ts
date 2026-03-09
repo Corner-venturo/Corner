@@ -20,9 +20,7 @@ export function useDisbursementPDF() {
       try {
         // 找出該出納單關聯的所有請款單
         const requestIds = order.payment_request_ids || []
-        const relatedRequests = paymentRequests.filter(req =>
-          requestIds.includes(req.id)
-        )
+        const relatedRequests = paymentRequests.filter(req => requestIds.includes(req.id))
 
         // 找出這些請款單的所有項目
         const relatedItems = paymentRequestItems.filter(item =>

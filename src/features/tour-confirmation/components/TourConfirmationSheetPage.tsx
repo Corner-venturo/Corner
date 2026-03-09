@@ -8,14 +8,7 @@
  */
 
 import React, { useState, useCallback } from 'react'
-import {
-  Plus,
-  Loader2,
-  RefreshCw,
-  Send,
-  AlertCircle,
-  Printer,
-} from 'lucide-react'
+import { Plus, Loader2, RefreshCw, Send, AlertCircle, Printer } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
 import { useAuthStore } from '@/stores/auth-store'
@@ -37,11 +30,7 @@ import {
   SettlementSection,
   ExchangeRateDialog,
 } from './sections'
-import {
-  getDestinationCurrency,
-  getCurrencySymbol,
-  formatCurrency,
-} from '../constants/currency'
+import { getDestinationCurrency, getCurrencySymbol, formatCurrency } from '../constants/currency'
 import type { Tour } from '@/stores/types'
 import type {
   TourConfirmationItem,
@@ -123,7 +112,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
 
   // forceUpdate for currency conversion
   const [, setForceUpdateKey] = useState(0)
-  const forceUpdate = useCallback(() => setForceUpdateKey((n) => n + 1), [])
+  const forceUpdate = useCallback(() => setForceUpdateKey(n => n + 1), [])
 
   // 匯率 hook
   const {
@@ -333,11 +322,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
               disabled={handingOver}
               className="gap-2 bg-morandi-green hover:bg-morandi-green/90"
             >
-              {handingOver ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                <Send size={16} />
-              )}
+              {handingOver ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
               {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.確認交接}
             </Button>
           )}
@@ -377,20 +362,40 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
           <table className="w-full text-sm table-fixed">
             <thead>
               <tr className="bg-morandi-container/50 border-b border-border">
-                <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[4%] border-r border-border/30">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.分類}</th>
-                <th className="px-1 py-2 text-left font-medium text-morandi-primary w-[5%] border-r border-border/30">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.日期}</th>
-                <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[12%] border-r border-border/30">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.供應商}</th>
-                <th className="px-2 py-2 text-left font-medium text-morandi-primary border-r border-border/30">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.項目說明}</th>
-                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[6%] border-r border-border/30">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.單價}</th>
-                <th className="px-1 py-2 text-center font-medium text-morandi-primary w-[4%] border-r border-border/30">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.數量}</th>
-                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[6%] border-r border-border/30">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.小計}</th>
-                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[7%] border-r border-border/30">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.預計支出}</th>
-                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[7%] border-r border-border/30">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.實際支出}</th>
-                <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[28%]">{TOUR_CONFIRMATION_SHEET_PAGE_LABELS.備註}</th>
+                <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[4%] border-r border-border/30">
+                  {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.分類}
+                </th>
+                <th className="px-1 py-2 text-left font-medium text-morandi-primary w-[5%] border-r border-border/30">
+                  {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.日期}
+                </th>
+                <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[12%] border-r border-border/30">
+                  {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.供應商}
+                </th>
+                <th className="px-2 py-2 text-left font-medium text-morandi-primary border-r border-border/30">
+                  {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.項目說明}
+                </th>
+                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[6%] border-r border-border/30">
+                  {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.單價}
+                </th>
+                <th className="px-1 py-2 text-center font-medium text-morandi-primary w-[4%] border-r border-border/30">
+                  {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.數量}
+                </th>
+                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[6%] border-r border-border/30">
+                  {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.小計}
+                </th>
+                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[7%] border-r border-border/30">
+                  {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.預計支出}
+                </th>
+                <th className="px-1 py-2 text-right font-medium text-morandi-primary w-[7%] border-r border-border/30">
+                  {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.實際支出}
+                </th>
+                <th className="px-2 py-2 text-left font-medium text-morandi-primary w-[28%]">
+                  {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.備註}
+                </th>
               </tr>
             </thead>
             <tbody>
-              {CATEGORIES.map((cat) => {
+              {CATEGORIES.map(cat => {
                 const categoryItems = groupedItems[cat.key]
 
                 return (
@@ -399,7 +404,9 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                     <tr className="bg-morandi-container/30 border-t border-border print:hidden">
                       <td colSpan={9} className="px-3 py-1.5">
                         <span className="font-medium text-morandi-primary">{cat.label}</span>
-                        <span className="ml-2 text-xs text-morandi-secondary">({categoryItems.length})</span>
+                        <span className="ml-2 text-xs text-morandi-secondary">
+                          ({categoryItems.length})
+                        </span>
                       </td>
                       <td className="px-2 py-1.5 text-right">
                         <Button
@@ -422,7 +429,10 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                     {/* 項目列表 */}
                     {categoryItems.length === 0 && addingCategory !== cat.key ? (
                       <tr className="border-t border-border/50">
-                        <td colSpan={10} className="px-3 py-3 text-center text-morandi-secondary text-xs">
+                        <td
+                          colSpan={10}
+                          className="px-3 py-3 text-center text-morandi-secondary text-xs"
+                        >
                           {TOUR_CONFIRMATION_SHEET_PAGE_LABELS.尚無項目.replace('{0}', cat.label)}
                         </td>
                       </tr>
@@ -500,7 +510,8 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                     <td className="px-2 py-2 text-right font-mono text-morandi-primary">
                       {expectedForeign > 0 && (
                         <div className="text-morandi-gold">
-                          {getCurrencySymbol(destinationCurrency)} {expectedForeign.toLocaleString()}
+                          {getCurrencySymbol(destinationCurrency)}{' '}
+                          {expectedForeign.toLocaleString()}
                         </div>
                       )}
                     </td>
@@ -538,7 +549,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
       {/* 匯率設定對話框 */}
       <ExchangeRateDialog
         open={exchangeRateDialog.open}
-        onOpenChange={(open) => !open && setExchangeRateDialog({ open: false, itemId: null })}
+        onOpenChange={open => !open && setExchangeRateDialog({ open: false, itemId: null })}
         destinationCurrency={destinationCurrency}
         exchangeRateInput={exchangeRateInput}
         onExchangeRateInputChange={setExchangeRateInput}

@@ -18,6 +18,7 @@
 ### 1. [部署指引](trip-sync-deployment-guide.md) ← **從這裡開始**
 
 完整的部署步驟，包括：
+
 - Google API 設定
 - Google Sheet 建立
 - n8n 安裝與設定
@@ -26,6 +27,7 @@
 ### 2. [Google API 設定](google-api-setup.md)
 
 如何設定 Gmail API 和 Google Sheets API，包括：
+
 - OAuth 2.0 認證
 - 服務帳號建立
 - 初次認證流程
@@ -33,6 +35,7 @@
 ### 3. [n8n Workflow 設計](n8n-trip-flight-workflow.md)
 
 Workflow 的詳細架構，包括：
+
 - 節點設定說明
 - 資料流範例
 - 錯誤處理機制
@@ -41,6 +44,7 @@ Workflow 的詳細架構，包括：
 ### 4. [Parser 研究報告](trip-flight-final-report.md)
 
 PDF 解析的技術細節，包括：
+
 - 解析流程
 - 資料結構
 - 性能優化
@@ -53,12 +57,14 @@ PDF 解析的技術細節，包括：
 ### `scripts/trip-flight-parser-n8n.py`
 
 n8n 專用解析器，支援：
+
 - `--pdf-base64 <data>` - 接收 base64 PDF（n8n 模式）
 - `--message-id <id>` - 解析單一郵件（測試模式）
 
 ### `scripts/create-trip-sheet.py`
 
 建立 Google Sheet「Trip.com 機票訂單」，並自動：
+
 - 設定欄位標題和說明
 - 格式化標題行
 - 授權給服務帳號
@@ -66,6 +72,7 @@ n8n 專用解析器，支援：
 ### `scripts/test-trip-sync.py`
 
 測試整個系統，驗證：
+
 - Google Sheet 已建立
 - Gmail API 可用
 - Parser 可正確解析最新郵件
@@ -112,13 +119,13 @@ docker run -d --name n8n -p 5678:5678 n8nio/n8n
        ▼
 ┌──────────────┐
 │ n8n          │  下載 PDF 附件
-│ Workflow     │  
+│ Workflow     │
 └──────┬───────┘
        │
        ▼
 ┌──────────────┐
 │ Python       │  解析 PDF（訂單、航班、旅客）
-│ Parser       │  
+│ Parser       │
 └──────┬───────┘
        │
        ├──── 成功 ────▶ ┌──────────────┐
@@ -134,19 +141,19 @@ docker run -d --name n8n -p 5678:5678 n8nio/n8n
 
 ## Google Sheet 欄位
 
-| 欄位名稱 | 說明 | 範例 |
-|---------|------|------|
-| order_no | 訂單編號 | 1658108575539696 |
-| route | 航線 | 台北 - 東京 |
-| flight_no | 航班號 | GK014 |
-| pnr | 訂位代號 | TRYPQA |
-| departure_date | 出發日期 | 2026-01-25 |
-| departure_time | 出發時間 | 12:50 |
-| airline | 航空公司 | 捷星日本航空 |
-| passengers | 旅客姓名 | LIN/CHUNGTSO |
-| ticket_no | 機票號碼 | 189-6506931183 |
-| status | 狀態 | 已確認 |
-| sync_time | 同步時間 | 2026-03-07T02:30:00Z |
+| 欄位名稱       | 說明     | 範例                 |
+| -------------- | -------- | -------------------- |
+| order_no       | 訂單編號 | 1658108575539696     |
+| route          | 航線     | 台北 - 東京          |
+| flight_no      | 航班號   | GK014                |
+| pnr            | 訂位代號 | TRYPQA               |
+| departure_date | 出發日期 | 2026-01-25           |
+| departure_time | 出發時間 | 12:50                |
+| airline        | 航空公司 | 捷星日本航空         |
+| passengers     | 旅客姓名 | LIN/CHUNGTSO         |
+| ticket_no      | 機票號碼 | 189-6506931183       |
+| status         | 狀態     | 已確認               |
+| sync_time      | 同步時間 | 2026-03-07T02:30:00Z |
 
 ---
 
@@ -155,6 +162,7 @@ docker run -d --name n8n -p 5678:5678 n8nio/n8n
 **Cron 排程**: `0 */6 * * *`
 
 每天執行 4 次：
+
 - 00:00
 - 06:00
 - 12:00
@@ -199,17 +207,20 @@ docker run -d --name n8n -p 5678:5678 n8nio/n8n
 ## 未來優化
 
 ### P0 (本週)
+
 - [ ] 完成 Google API 認證設定
 - [ ] 建立 Google Sheet
 - [ ] 部署 n8n workflow
 - [ ] 測試自動同步（至少 5 筆郵件）
 
 ### P1 (本月)
+
 - [ ] 多航段優化（每個航段寫一行）
 - [ ] 重複訂單檢查
 - [ ] 訂單狀態更新（取消通知）
 
 ### P2 (未來)
+
 - [ ] 整合 Venturo ERP（透過 Supabase）
 - [ ] 整合飯店訂單
 - [ ] 統一的 Trip.com 訂單管理介面

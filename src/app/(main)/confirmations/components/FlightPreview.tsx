@@ -11,18 +11,28 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
   const extendedData = data as Partial<FlightData> & { airlineContacts?: string[] }
 
   return (
-    <div className="p-8 space-y-4" style={{ fontFamily: "'Noto Sans TC', sans-serif", fontSize: '14px' }}>
+    <div
+      className="p-8 space-y-4"
+      style={{ fontFamily: "'Noto Sans TC', sans-serif", fontSize: '14px' }}
+    >
       {/* 頂部資訊 */}
-      <div className="flex justify-between items-start pb-3 border-b" style={{ borderColor: '#e5e7eb' }}>
+      <div
+        className="flex justify-between items-start pb-3 border-b"
+        style={{ borderColor: '#e5e7eb' }}
+      >
         <div>
           <div className="font-medium" style={{ color: '#374151' }}>
-            {FLIGHT_PREVIEW_LABELS.COMPUTER_CODE}: {formData.booking_number || FLIGHT_PREVIEW_LABELS.NOT_FILLED}
+            {FLIGHT_PREVIEW_LABELS.COMPUTER_CODE}:{' '}
+            {formData.booking_number || FLIGHT_PREVIEW_LABELS.NOT_FILLED}
           </div>
         </div>
       </div>
 
       {/* 免責聲明 */}
-      <div className="text-center text-xs italic py-2 bg-status-warning-bg rounded" style={{ color: '#92400E' }}>
+      <div
+        className="text-center text-xs italic py-2 bg-status-warning-bg rounded"
+        style={{ color: '#92400E' }}
+      >
         {FLIGHT_PREVIEW_LABELS.DISCLAIMER}
       </div>
 
@@ -31,7 +41,8 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
         <div>
           {data.passengers.map((passenger, idx) => (
             <div key={idx} className="mb-1" style={{ color: '#374151' }}>
-              {FLIGHT_PREVIEW_LABELS.PASSENGER_NAME}:{String(idx + 1).padStart(2, '0')}. {passenger.nameEn}
+              {FLIGHT_PREVIEW_LABELS.PASSENGER_NAME}:{String(idx + 1).padStart(2, '0')}.{' '}
+              {passenger.nameEn}
             </div>
           ))}
         </div>
@@ -40,8 +51,14 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
       {/* 航班資訊 - 使用虛線分隔 */}
       {data.segments && data.segments.length > 0 && (
         <div>
-          <div className="border-t border-b py-2" style={{ borderColor: '#d4af37', borderStyle: 'dashed' }}>
-            <div className="grid grid-cols-12 gap-2 font-medium" style={{ color: 'var(--morandi-primary)' }}>
+          <div
+            className="border-t border-b py-2"
+            style={{ borderColor: '#d4af37', borderStyle: 'dashed' }}
+          >
+            <div
+              className="grid grid-cols-12 gap-2 font-medium"
+              style={{ color: 'var(--morandi-primary)' }}
+            >
               <div className="col-span-2 text-center">{FLIGHT_PREVIEW_LABELS.DATE_HEADER}</div>
               <div className="col-span-6">{FLIGHT_PREVIEW_LABELS.TIME_FLIGHT_HEADER}</div>
               <div className="col-span-4">{FLIGHT_PREVIEW_LABELS.OTHER_INFO_HEADER}</div>
@@ -67,10 +84,14 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
                   {segment.departureDate}
                 </div>
                 <div className="col-span-6" style={{ color: '#374151' }}>
-                  {segment.departureTime} {FLIGHT_PREVIEW_LABELS.DEPARTURE_PREFIX}: {segment.departureAirport}
+                  {segment.departureTime} {FLIGHT_PREVIEW_LABELS.DEPARTURE_PREFIX}:{' '}
+                  {segment.departureAirport}
                 </div>
                 <div className="col-span-4" style={{ color: '#6B7280' }}>
-                  {segment.departureTerminal ? `${FLIGHT_PREVIEW_LABELS.TERMINAL}${segment.departureTerminal} ` : ''}/{data.passengers?.[0]?.cabin || FLIGHT_PREVIEW_LABELS.DEFAULT_CABIN} /OK
+                  {segment.departureTerminal
+                    ? `${FLIGHT_PREVIEW_LABELS.TERMINAL}${segment.departureTerminal} `
+                    : ''}
+                  /{data.passengers?.[0]?.cabin || FLIGHT_PREVIEW_LABELS.DEFAULT_CABIN} /OK
                 </div>
               </div>
 
@@ -78,36 +99,48 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
               <div
                 className="grid grid-cols-12 gap-2 py-1 pb-3"
                 style={{
-                  borderBottom: idx < (data.segments?.length || 0) - 1 ? '1px dashed #d4af37' : 'none'
+                  borderBottom:
+                    idx < (data.segments?.length || 0) - 1 ? '1px dashed #d4af37' : 'none',
                 }}
               >
                 <div className="col-span-2"></div>
                 <div className="col-span-6" style={{ color: '#374151' }}>
-                  {segment.arrivalTime} {FLIGHT_PREVIEW_LABELS.ARRIVAL_PREFIX}: {segment.arrivalAirport}
+                  {segment.arrivalTime} {FLIGHT_PREVIEW_LABELS.ARRIVAL_PREFIX}:{' '}
+                  {segment.arrivalAirport}
                 </div>
                 <div className="col-span-4" style={{ color: '#6B7280' }}>
-                  {segment.arrivalTerminal ? `${FLIGHT_PREVIEW_LABELS.TERMINAL}${segment.arrivalTerminal} ` : ''}/{FLIGHT_PREVIEW_LABELS.MEAL}
+                  {segment.arrivalTerminal
+                    ? `${FLIGHT_PREVIEW_LABELS.TERMINAL}${segment.arrivalTerminal} `
+                    : ''}
+                  /{FLIGHT_PREVIEW_LABELS.MEAL}
                 </div>
               </div>
             </div>
           ))}
 
-          <div className="border-b py-1" style={{ borderColor: '#d4af37', borderStyle: 'dashed' }}></div>
+          <div
+            className="border-b py-1"
+            style={{ borderColor: '#d4af37', borderStyle: 'dashed' }}
+          ></div>
         </div>
       )}
 
       {/* 機票號碼 */}
-      {data.passengers && data.passengers.length > 0 && data.passengers.some(p => p.ticketNumber) && (
-        <div className="space-y-1">
-          {data.passengers.map((passenger, idx) => (
-            passenger.ticketNumber && (
-              <div key={idx} style={{ color: '#374151' }}>
-                {FLIGHT_PREVIEW_LABELS.TICKET_NUMBER}: {passenger.ticketNumber} - {passenger.nameEn}
-              </div>
-            )
-          ))}
-        </div>
-      )}
+      {data.passengers &&
+        data.passengers.length > 0 &&
+        data.passengers.some(p => p.ticketNumber) && (
+          <div className="space-y-1">
+            {data.passengers.map(
+              (passenger, idx) =>
+                passenger.ticketNumber && (
+                  <div key={idx} style={{ color: '#374151' }}>
+                    {FLIGHT_PREVIEW_LABELS.TICKET_NUMBER}: {passenger.ticketNumber} -{' '}
+                    {passenger.nameEn}
+                  </div>
+                )
+            )}
+          </div>
+        )}
 
       {/* 航空公司確認電話 */}
       {extendedData.airlineContacts && extendedData.airlineContacts.length > 0 && (

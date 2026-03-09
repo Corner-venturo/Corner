@@ -105,7 +105,7 @@ export const PluginRegistry: Record<string, () => Plugin> = {
       description: '第三方服務整合（Google Calendar, LINE 等）',
       author: 'Venturo',
     },
-    init: async (context) => {
+    init: async context => {
       context.logger.info('Initializing integrations...')
       // [Planned] 初始化第三方服務連接 (OAuth tokens, API keys)
       logger.debug('[Plugin] venturo-integrations: initialized')

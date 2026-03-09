@@ -37,4 +37,4 @@ export const OFFICE_LABELS = {
   SELECT_3424: '選擇類型',
   CANCEL: '取消',
   CREATE: '建立',
-};
+}

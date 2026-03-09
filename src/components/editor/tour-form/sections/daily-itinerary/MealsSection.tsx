@@ -31,7 +31,9 @@ export function MealsSection({
         {/* 早餐 */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="block text-xs font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_1347}</label>
+            <label className="block text-xs font-medium text-morandi-primary">
+              {COMP_EDITOR_LABELS.LABEL_1347}
+            </label>
             <Button
               type="button"
               onClick={() => onOpenRestaurantSelector(dayIndex, 'breakfast')}
@@ -59,7 +61,9 @@ export function MealsSection({
         {/* 午餐 */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="block text-xs font-medium text-morandi-primary">{COMP_EDITOR_LABELS.午餐}</label>
+            <label className="block text-xs font-medium text-morandi-primary">
+              {COMP_EDITOR_LABELS.午餐}
+            </label>
             <Button
               type="button"
               onClick={() => onOpenRestaurantSelector(dayIndex, 'lunch')}
@@ -84,7 +88,9 @@ export function MealsSection({
         {/* 晚餐 */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="block text-xs font-medium text-morandi-primary">{COMP_EDITOR_LABELS.晚餐}</label>
+            <label className="block text-xs font-medium text-morandi-primary">
+              {COMP_EDITOR_LABELS.晚餐}
+            </label>
             <Button
               type="button"
               onClick={() => onOpenRestaurantSelector(dayIndex, 'dinner')}

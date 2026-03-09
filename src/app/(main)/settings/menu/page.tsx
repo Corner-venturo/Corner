@@ -106,9 +106,7 @@ export default function MenuSettingsPage() {
     <div className="container max-w-4xl py-8 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">{LABELS.MENU_SETTINGS}</h1>
-        <p className="text-muted-foreground mt-2">
-          {LABELS.MENU_SETTINGS_DESC}
-        </p>
+        <p className="text-muted-foreground mt-2">{LABELS.MENU_SETTINGS_DESC}</p>
       </div>
 
       <div className="space-y-4">
@@ -116,9 +114,7 @@ export default function MenuSettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">{LABELS.CORE_FEATURES}</CardTitle>
-            <CardDescription>
-              {LABELS.CORE_FEATURES_DESC}
-            </CardDescription>
+            <CardDescription>{LABELS.CORE_FEATURES_DESC}</CardDescription>
           </CardHeader>
         </Card>
 
@@ -137,7 +133,11 @@ export default function MenuSettingsPage() {
 
       {/* 操作按鈕 */}
       <div className="flex gap-3 pt-4 border-t">
-        <Button onClick={handleSave} disabled={isSaving} className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+        <Button
+          onClick={handleSave}
+          disabled={isSaving}
+          className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
+        >
           <Save size={16} />
           {isSaving ? LABELS.SAVING : LABELS.SAVE_SETTINGS}
         </Button>

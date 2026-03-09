@@ -76,7 +76,7 @@ function PainPointsSection() {
           {LANDING_LABELS.PAIN_SECTION_TITLE}
         </h2>
         <div className="mt-14 grid gap-8 sm:grid-cols-3">
-          {PAIN_POINTS.map((point) => (
+          {PAIN_POINTS.map(point => (
             <div
               key={point.before}
               className="rounded-xl border border-slate-100 bg-slate-50/50 p-6 transition-shadow hover:shadow-md"
@@ -124,8 +124,11 @@ function FeaturesSection() {
           {LANDING_LABELS.FEATURES_TITLE}
         </h2>
         <div className="mt-14 grid gap-8 sm:grid-cols-3">
-          {FEATURES.map((feature) => (
-            <div key={feature.title} className="rounded-xl bg-white border border-slate-100 p-6 shadow-sm">
+          {FEATURES.map(feature => (
+            <div
+              key={feature.title}
+              className="rounded-xl bg-white border border-slate-100 p-6 shadow-sm"
+            >
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-slate-700">
                 <feature.icon size={24} />
               </div>
@@ -177,7 +180,7 @@ function PlanCard({ name, price, period, features, popular, badge }: PlanCardPro
         <span className="text-sm text-slate-500">{period}</span>
       </div>
       <ul className="mt-6 space-y-3">
-        {features.map((feat) => (
+        {features.map(feat => (
           <li key={feat} className="flex items-start gap-2 text-sm text-slate-600">
             <Check size={16} className="mt-0.5 shrink-0 text-amber-600" />
             {feat}
@@ -241,14 +244,18 @@ function Footer() {
           <div>
             <div className="flex items-center gap-2">
               <Sparkles size={20} className="text-amber-600" />
-              <span className="text-lg font-bold text-slate-900">{LANDING_LABELS.FOOTER_BRAND}</span>
+              <span className="text-lg font-bold text-slate-900">
+                {LANDING_LABELS.FOOTER_BRAND}
+              </span>
             </div>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-600">
               {LANDING_LABELS.FOOTER_DESCRIPTION}
             </p>
           </div>
           <div className="sm:text-right">
-            <h4 className="text-sm font-semibold text-slate-900">{LANDING_LABELS.FOOTER_CONTACT_TITLE}</h4>
+            <h4 className="text-sm font-semibold text-slate-900">
+              {LANDING_LABELS.FOOTER_CONTACT_TITLE}
+            </h4>
             <a
               href={`mailto:${LANDING_LABELS.FOOTER_EMAIL}`}
               className="mt-2 inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-amber-700 transition-colors"

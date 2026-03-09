@@ -8,7 +8,14 @@
  * - 底部頁碼與裝飾
  */
 import type { PageTemplate, TemplateData, HotelData } from './types'
-import type { CanvasElement, ShapeElement, TextElement, ImageElement, IconElement, TextStyle } from '@/features/designer/components/types'
+import type {
+  CanvasElement,
+  ShapeElement,
+  TextElement,
+  ImageElement,
+  IconElement,
+  TextStyle,
+} from '@/features/designer/components/types'
 
 // A5 尺寸（像素，96 DPI）
 const A5_WIDTH = 559
@@ -65,7 +72,8 @@ function getDefaultHotel(index: number): HotelData {
       nameZh: '主要飯店名稱',
       nameEn: 'Main Hotel Name',
       location: '請從右側面板帶入飯店',
-      description: '此處將顯示主要飯店的介紹文字。請在右側面板中「從行程帶入飯店」或「手動新增飯店」。',
+      description:
+        '此處將顯示主要飯店的介紹文字。請在右側面板中「從行程帶入飯店」或「手動新增飯店」。',
       tags: ['設施標籤'],
       enabled: true,
     },

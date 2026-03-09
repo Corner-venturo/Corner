@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { X, Check, FileText } from 'lucide-react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -14,7 +20,11 @@ import { useAuthStore } from '@/stores'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
-import { BATCH_INVOICE_DIALOG_LABELS, ISSUE_INVOICE_DIALOG_LABELS, ISSUE_INVOICE_EXTRA_LABELS } from '../../constants/labels';
+import {
+  BATCH_INVOICE_DIALOG_LABELS,
+  ISSUE_INVOICE_DIALOG_LABELS,
+  ISSUE_INVOICE_EXTRA_LABELS,
+} from '../../constants/labels'
 
 interface IssueInvoiceDialogProps {
   open: boolean
@@ -168,33 +178,45 @@ export function IssueInvoiceDialog({
             <CardContent>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-morandi-secondary">{ISSUE_INVOICE_DIALOG_LABELS.ORDER_NUMBER_LABEL}</span>
+                  <span className="text-morandi-secondary">
+                    {ISSUE_INVOICE_DIALOG_LABELS.ORDER_NUMBER_LABEL}
+                  </span>
                   <span className="font-medium">{orderNumber}</span>
                 </div>
                 <div>
-                  <span className="text-morandi-secondary">{ISSUE_INVOICE_DIALOG_LABELS.CONTACT_LABEL}</span>
+                  <span className="text-morandi-secondary">
+                    {ISSUE_INVOICE_DIALOG_LABELS.CONTACT_LABEL}
+                  </span>
                   <span className="font-medium">{contactPerson}</span>
                 </div>
               </div>
 
               {loadingSummary ? (
-                <p className="text-sm text-morandi-secondary mt-3">{ISSUE_INVOICE_DIALOG_LABELS.LOADING}</p>
+                <p className="text-sm text-morandi-secondary mt-3">
+                  {ISSUE_INVOICE_DIALOG_LABELS.LOADING}
+                </p>
               ) : summary ? (
                 <div className="grid grid-cols-3 gap-4 mt-3 pt-3 border-t">
                   <div>
-                    <p className="text-xs text-morandi-secondary">{ISSUE_INVOICE_DIALOG_LABELS.RECEIVED}</p>
+                    <p className="text-xs text-morandi-secondary">
+                      {ISSUE_INVOICE_DIALOG_LABELS.RECEIVED}
+                    </p>
                     <p className="font-medium">
                       <CurrencyCell amount={summary.paid_amount} />
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-morandi-secondary">{ISSUE_INVOICE_DIALOG_LABELS.INVOICED}</p>
+                    <p className="text-xs text-morandi-secondary">
+                      {ISSUE_INVOICE_DIALOG_LABELS.INVOICED}
+                    </p>
                     <p className="font-medium">
                       <CurrencyCell amount={summary.invoiced_amount} />
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-morandi-secondary">{ISSUE_INVOICE_DIALOG_LABELS.AVAILABLE}</p>
+                    <p className="text-xs text-morandi-secondary">
+                      {ISSUE_INVOICE_DIALOG_LABELS.AVAILABLE}
+                    </p>
                     <p className="font-medium text-morandi-gold">
                       <CurrencyCell amount={summary.invoiceable_amount} />
                     </p>
@@ -216,7 +238,9 @@ export function IssueInvoiceDialog({
                 max={summary?.invoiceable_amount}
               />
               {summary && amount > summary.invoiceable_amount && (
-                <p className="text-xs text-morandi-red mt-1">{ISSUE_INVOICE_DIALOG_LABELS.EXCEEDS_AVAILABLE}</p>
+                <p className="text-xs text-morandi-red mt-1">
+                  {ISSUE_INVOICE_DIALOG_LABELS.EXCEEDS_AVAILABLE}
+                </p>
               )}
             </div>
 
@@ -273,7 +297,12 @@ export function IssueInvoiceDialog({
           </Button>
           <Button
             onClick={handleIssue}
-            disabled={!buyerName || amount <= 0 || isLoading || Boolean(summary && amount > summary.invoiceable_amount)}
+            disabled={
+              !buyerName ||
+              amount <= 0 ||
+              isLoading ||
+              Boolean(summary && amount > summary.invoiceable_amount)
+            }
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
             <Check size={16} />

@@ -41,12 +41,12 @@ export async function GET() {
   // 1. Row counts (parallel)
   const tableCounts: Record<string, number | null> = {}
   const countResults = await Promise.allSettled(
-    coreTables.map(async (t) => {
+    coreTables.map(async t => {
       const { count, error } = await supabase
         .from(t as 'employees')
         .select('*', { count: 'exact', head: true })
       return { table: t, count: error ? null : count }
-    }),
+    })
   )
   for (const r of countResults) {
     if (r.status === 'fulfilled') {
@@ -95,6 +95,6 @@ export async function GET() {
         latestMigration,
       },
     },
-    { status: 200 },
+    { status: 200 }
   )
 }

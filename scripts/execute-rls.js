@@ -7,25 +7,43 @@ const fs = require('fs')
 const path = require('path')
 
 const supabaseUrl = 'https://pfqvdacxowpgfamuvnsn.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE'
+const supabaseKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE'
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // 所有核心表格
 const TABLES = [
   // 系統表
-  'employees', 'workspaces', 'user_roles',
+  'employees',
+  'workspaces',
+  'user_roles',
   // Workspace
-  'channels', 'channel_members', 'messages',
+  'channels',
+  'channel_members',
+  'messages',
   // 核心業務
-  'tours', 'orders', 'order_members', 'quotes', 'itineraries',
-  'customers', 'suppliers',
+  'tours',
+  'orders',
+  'order_members',
+  'quotes',
+  'itineraries',
+  'customers',
+  'suppliers',
   // 財務
-  'payments', 'receipts', 'finance_requests',
+  'payments',
+  'receipts',
+  'finance_requests',
   // 其他
-  'todos', 'calendar_events', 'esims', 'visas', 'contracts',
+  'todos',
+  'calendar_events',
+  'esims',
+  'visas',
+  'contracts',
   // 輔助
-  'cost_templates', 'price_lists', 'bank_codes'
+  'cost_templates',
+  'price_lists',
+  'bank_codes',
 ]
 
 async function disableAllRLS() {

@@ -80,15 +80,18 @@ export function PassportConflictDialog({
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto space-y-3 py-2">
-          {conflicts.map((conflict) => (
-            <div
-              key={conflict.memberId}
-              className="border rounded-lg p-3 space-y-2 text-sm"
-            >
+          {conflicts.map(conflict => (
+            <div key={conflict.memberId} className="border rounded-lg p-3 space-y-2 text-sm">
               <div className="flex gap-4 text-muted-foreground">
-                <span>{L.order}: {conflict.orderCode}</span>
-                <span>{L.tour}: {conflict.tourName}</span>
-                <span>{L.member}: {conflict.memberName}</span>
+                <span>
+                  {L.order}: {conflict.orderCode}
+                </span>
+                <span>
+                  {L.tour}: {conflict.tourName}
+                </span>
+                <span>
+                  {L.member}: {conflict.memberName}
+                </span>
               </div>
               <table className="w-full text-xs">
                 <thead>
@@ -101,15 +104,9 @@ export function PassportConflictDialog({
                 <tbody>
                   {Object.entries(conflict.diffs).map(([field, { oldValue, newValue }]) => (
                     <tr key={field} className="border-b last:border-0">
-                      <td className="py-1 font-medium">
-                        {PASSPORT_FIELD_LABELS[field] || field}
-                      </td>
-                      <td className="py-1 text-red-500 line-through">
-                        {oldValue || '-'}
-                      </td>
-                      <td className="py-1 text-green-600 font-medium">
-                        {newValue || '-'}
-                      </td>
+                      <td className="py-1 font-medium">{PASSPORT_FIELD_LABELS[field] || field}</td>
+                      <td className="py-1 text-red-500 line-through">{oldValue || '-'}</td>
+                      <td className="py-1 text-green-600 font-medium">{newValue || '-'}</td>
                     </tr>
                   ))}
                 </tbody>

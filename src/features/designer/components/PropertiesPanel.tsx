@@ -35,7 +35,7 @@ interface PropertiesPanelProps {
   canvas: fabric.Canvas | null
   selectedObject: fabric.FabricObject | null
   onUpdate: () => void
-  onImageFill?: (object: fabric.FabricObject) => void  // 圖片填充回調
+  onImageFill?: (object: fabric.FabricObject) => void // 圖片填充回調
 }
 
 export function PropertiesPanel({
@@ -47,8 +47,7 @@ export function PropertiesPanel({
   const [properties, setProperties] = useState<Record<string, unknown>>({})
 
   // 檢查是否為文字類型
-  const isTextType = (type: string) =>
-    type === 'i-text' || type === 'text' || type === 'textbox'
+  const isTextType = (type: string) => type === 'i-text' || type === 'text' || type === 'textbox'
 
   // 檢查多選時是否全部都是文字（使用 useMemo 避免重複計算）
   const { selectedObjects, allAreText, isMultiSelect } = useMemo(() => {
@@ -78,7 +77,7 @@ export function PropertiesPanel({
 
     const updateProperties = () => {
       // 多選且全是文字時，取第一個文字的屬性作為參考
-      const firstTextObj = allAreText ? selectedObjects[0] as fabric.IText : null
+      const firstTextObj = allAreText ? (selectedObjects[0] as fabric.IText) : null
 
       setProperties({
         type: selectedObject.type,
@@ -92,13 +91,15 @@ export function PropertiesPanel({
         strokeWidth: selectedObject.strokeWidth,
         opacity: Math.round((selectedObject.opacity || 1) * 100),
         // Text properties (單選文字或多選全是文字)
-        ...((isTextType(selectedObject.type || '') || allAreText)
+        ...(isTextType(selectedObject.type || '') || allAreText
           ? {
               fontFamily: firstTextObj?.fontFamily || (selectedObject as fabric.IText).fontFamily,
               fontSize: firstTextObj?.fontSize || (selectedObject as fabric.IText).fontSize,
               fontWeight: firstTextObj?.fontWeight || (selectedObject as fabric.IText).fontWeight,
               textAlign: firstTextObj?.textAlign || (selectedObject as fabric.IText).textAlign,
-              text: isMultiSelect ? `${selectedObjects.length} ${DESIGNER_LABELS.個文字}` : (selectedObject as fabric.IText).text,
+              text: isMultiSelect
+                ? `${selectedObjects.length} ${DESIGNER_LABELS.個文字}`
+                : (selectedObject as fabric.IText).text,
             }
           : {}),
         // 標記多選狀態
@@ -121,7 +122,6 @@ export function PropertiesPanel({
       selectedObject.off('moving', updateProperties)
       selectedObject.off('rotating', updateProperties)
     }
-   
   }, [selectedObject])
 
   // 更新物件屬性（支援多選）
@@ -148,7 +148,7 @@ export function PropertiesPanel({
     canvas.renderAll()
     onUpdate()
 
-    setProperties((prev) => ({ ...prev, [key]: value }))
+    setProperties(prev => ({ ...prev, [key]: value }))
   }
 
   if (!selectedObject) {
@@ -166,7 +166,7 @@ export function PropertiesPanel({
     )
   }
 
-  const isText = isTextType(properties.type as string || '') || allAreText
+  const isText = isTextType((properties.type as string) || '') || allAreText
 
   return (
     <div className="w-64 h-full bg-white border-l border-border flex flex-col overflow-hidden">
@@ -184,14 +184,14 @@ export function PropertiesPanel({
             {/* 多選時顯示選中數量，單選時可編輯文字 */}
             {isMultiSelect ? (
               <div className="p-2 bg-morandi-container/30 rounded text-sm text-morandi-secondary">
-{DESIGNER_LABELS.已選擇} {selectedObjects.length} {DESIGNER_LABELS.個文字元素}
+                {DESIGNER_LABELS.已選擇} {selectedObjects.length} {DESIGNER_LABELS.個文字元素}
               </div>
             ) : (
               <div>
                 <Label className="text-xs text-morandi-primary">{DESIGNER_LABELS.文字內容}</Label>
                 <Input
                   value={(properties.text as string) || ''}
-                  onChange={(e) => {
+                  onChange={e => {
                     updateProperty('text', e.target.value)
                   }}
                   className="mt-1 text-sm"
@@ -209,7 +209,7 @@ export function PropertiesPanel({
                 <Input
                   type="number"
                   value={String((properties.fontSize as number) || 24)}
-                  onChange={(e) => updateProperty('fontSize', parseInt(e.target.value) || 24)}
+                  onChange={e => updateProperty('fontSize', parseInt(e.target.value) || 24)}
                   className="w-20 text-sm h-8"
                   min={8}
                   max={200}
@@ -217,7 +217,7 @@ export function PropertiesPanel({
                 <span className="text-xs text-morandi-secondary">px</span>
                 {/* 快速選擇 */}
                 <div className="flex gap-1">
-                  {[16, 24, 32, 48].map((size) => (
+                  {[16, 24, 32, 48].map(size => (
                     <button
                       key={size}
                       type="button"
@@ -241,8 +241,8 @@ export function PropertiesPanel({
               <FontPicker
                 fontFamily={(properties.fontFamily as string) || 'Noto Sans TC'}
                 fontSize={(properties.fontSize as number) || 24}
-                onFontFamilyChange={(font) => updateProperty('fontFamily', font)}
-                onFontSizeChange={(size) => updateProperty('fontSize', size)}
+                onFontFamilyChange={font => updateProperty('fontFamily', font)}
+                onFontSizeChange={size => updateProperty('fontSize', size)}
               />
             </div>
 
@@ -251,7 +251,7 @@ export function PropertiesPanel({
                 <Label className="text-xs text-morandi-primary">{DESIGNER_LABELS.粗細}</Label>
                 <FontWeightPicker
                   fontWeight={String(properties.fontWeight || 'normal')}
-                  onChange={(weight) => updateProperty('fontWeight', weight)}
+                  onChange={weight => updateProperty('fontWeight', weight)}
                 />
               </div>
             </div>
@@ -260,7 +260,7 @@ export function PropertiesPanel({
               <Label className="text-xs text-morandi-primary">{DESIGNER_LABELS.對齊}</Label>
               <TextAlignPicker
                 textAlign={(properties.textAlign as string) || 'left'}
-                onChange={(align) => updateProperty('textAlign', align)}
+                onChange={align => updateProperty('textAlign', align)}
               />
             </div>
           </div>
@@ -278,7 +278,7 @@ export function PropertiesPanel({
               <Input
                 type="number"
                 value={String(properties.left || 0)}
-                onChange={(e) => updateProperty('left', parseInt(e.target.value))}
+                onChange={e => updateProperty('left', parseInt(e.target.value))}
                 className="mt-0.5 text-sm h-8"
               />
             </div>
@@ -287,7 +287,7 @@ export function PropertiesPanel({
               <Input
                 type="number"
                 value={String(properties.top || 0)}
-                onChange={(e) => updateProperty('top', parseInt(e.target.value))}
+                onChange={e => updateProperty('top', parseInt(e.target.value))}
                 className="mt-0.5 text-sm h-8"
               />
             </div>
@@ -307,7 +307,7 @@ export function PropertiesPanel({
                 <Input
                   type="number"
                   value={String(properties.width || 0)}
-                  onChange={(e) => {
+                  onChange={e => {
                     const newWidth = parseInt(e.target.value)
                     const scale = newWidth / (selectedObject?.width || 1)
                     updateProperty('scaleX', scale)
@@ -320,7 +320,7 @@ export function PropertiesPanel({
                 <Input
                   type="number"
                   value={String(properties.height || 0)}
-                  onChange={(e) => {
+                  onChange={e => {
                     const newHeight = parseInt(e.target.value)
                     const scale = newHeight / (selectedObject?.height || 1)
                     updateProperty('scaleY', scale)
@@ -342,7 +342,7 @@ export function PropertiesPanel({
             <Input
               type="number"
               value={String(properties.angle || 0)}
-              onChange={(e) => updateProperty('angle', parseInt(e.target.value))}
+              onChange={e => updateProperty('angle', parseInt(e.target.value))}
               className="w-20 text-sm h-8"
             />
             <span className="text-xs text-morandi-secondary">{DESIGNER_LABELS.度}</span>
@@ -358,7 +358,9 @@ export function PropertiesPanel({
           <div className="space-y-3">
             {/* 漸層/純色填充 */}
             <div>
-              <Label className="text-[10px] text-morandi-muted mb-1 block">{DESIGNER_LABELS.顏色漸層}</Label>
+              <Label className="text-[10px] text-morandi-muted mb-1 block">
+                {DESIGNER_LABELS.顏色漸層}
+              </Label>
               <GradientPicker
                 value={getFillValue(properties.fill)}
                 onChange={(value, isSolid) => {
@@ -399,7 +401,9 @@ export function PropertiesPanel({
             {/* 圖片填充（僅形狀支援） */}
             {isShapeType(properties.type as string) && onImageFill && (
               <div>
-                <Label className="text-[10px] text-morandi-muted mb-1 block">{DESIGNER_LABELS.圖片遮罩}</Label>
+                <Label className="text-[10px] text-morandi-muted mb-1 block">
+                  {DESIGNER_LABELS.圖片遮罩}
+                </Label>
                 <Button
                   variant="outline"
                   size="sm"
@@ -407,7 +411,7 @@ export function PropertiesPanel({
                   onClick={() => selectedObject && onImageFill(selectedObject)}
                 >
                   <Upload size={14} />
-{DESIGNER_LABELS.上傳圖片填充}
+                  {DESIGNER_LABELS.上傳圖片填充}
                 </Button>
                 <p className="text-[10px] text-morandi-muted mt-1">
                   {DESIGNER_LABELS.上傳圖片後會裁切成此形狀}
@@ -422,12 +426,12 @@ export function PropertiesPanel({
                 <input
                   type="color"
                   value={String(properties.stroke || 'var(--morandi-primary)')}
-                  onChange={(e) => updateProperty('stroke', e.target.value)}
+                  onChange={e => updateProperty('stroke', e.target.value)}
                   className="w-8 h-8 rounded cursor-pointer"
                 />
                 <Input
                   value={String(properties.stroke || 'var(--morandi-primary)')}
-                  onChange={(e) => updateProperty('stroke', e.target.value)}
+                  onChange={e => updateProperty('stroke', e.target.value)}
                   className="flex-1 text-sm h-8"
                 />
               </div>

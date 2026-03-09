@@ -2,7 +2,11 @@ import React from 'react'
 import { CostItem } from '../types'
 import { ResourceSelectButton } from './ResourceSelectButton'
 import { CalcInput } from '@/components/ui/calc-input'
-import { ACCOMMODATION_ITEM_ROW_LABELS, CATEGORY_SECTION_LABELS, COST_ITEM_ROW_LABELS } from '../constants/labels';
+import {
+  ACCOMMODATION_ITEM_ROW_LABELS,
+  CATEGORY_SECTION_LABELS,
+  COST_ITEM_ROW_LABELS,
+} from '../constants/labels'
 import { QUOTE_COMPONENT_LABELS } from '../constants/labels'
 
 interface CostItemRowProps {
@@ -24,7 +28,8 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
   handleRemoveItem,
 }) => {
   // 判斷是否為兒童或嬰兒（顯示為灰色）
-  const isChildOrInfantTicket = item.name === COST_ITEM_ROW_LABELS.兒童 || item.name === COST_ITEM_ROW_LABELS.嬰兒
+  const isChildOrInfantTicket =
+    item.name === COST_ITEM_ROW_LABELS.兒童 || item.name === COST_ITEM_ROW_LABELS.嬰兒
   // 判斷是否為餐飲類別（顯示自理選項）
   const isMealItem = categoryId === 'meals'
   // 判斷是否為自理餐（顯示為淡色）
@@ -120,13 +125,19 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
             {/* 餐飲類別：自理按鈕 */}
             {isMealItem && (
               <button
-                onClick={() => handleUpdateItem(categoryId, item.id, 'is_self_arranged', !item.is_self_arranged)}
+                onClick={() =>
+                  handleUpdateItem(categoryId, item.id, 'is_self_arranged', !item.is_self_arranged)
+                }
                 className={`px-2 py-0.5 text-xs rounded transition-all ${
                   item.is_self_arranged
                     ? 'bg-morandi-gold text-white'
                     : 'bg-morandi-container/50 text-morandi-secondary hover:bg-morandi-container'
                 }`}
-                title={item.is_self_arranged ? COST_ITEM_ROW_LABELS.取消自理 : COST_ITEM_ROW_LABELS.設為自理}
+                title={
+                  item.is_self_arranged
+                    ? COST_ITEM_ROW_LABELS.取消自理
+                    : COST_ITEM_ROW_LABELS.設為自理
+                }
               >
                 {COST_ITEM_ROW_LABELS.LABEL_2796}
               </button>

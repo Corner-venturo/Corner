@@ -50,7 +50,10 @@ export function IllustrationPicker({ onSelectIllustration }: IllustrationPickerP
   // 按分類分組顯示
   const groupedIllustrations = useMemo(() => {
     if (searchQuery.trim() || selectedCategory !== 'all') {
-      return { [selectedCategory === 'all' ? '搜尋結果' : ILLUSTRATION_CATEGORIES[selectedCategory]]: filteredIllustrations }
+      return {
+        [selectedCategory === 'all' ? '搜尋結果' : ILLUSTRATION_CATEGORIES[selectedCategory]]:
+          filteredIllustrations,
+      }
     }
 
     const groups: Record<string, Illustration[]> = {}
@@ -70,12 +73,15 @@ export function IllustrationPicker({ onSelectIllustration }: IllustrationPickerP
       {/* 搜尋列 */}
       <div className="p-2 border-b border-border">
         <div className="relative">
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-morandi-secondary" size={14} />
+          <Search
+            className="absolute left-2 top-1/2 -translate-y-1/2 text-morandi-secondary"
+            size={14}
+          />
           <Input
             type="text"
             placeholder={DESIGNER_LABELS.SEARCH_3666}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={e => setSearchQuery(e.target.value)}
             className="pl-7 pr-7 h-8 text-xs"
           />
           {searchQuery && (
@@ -119,7 +125,7 @@ export function IllustrationPicker({ onSelectIllustration }: IllustrationPickerP
                 {groupName} ({illustrations.length})
               </h4>
               <div className="grid grid-cols-3 gap-2">
-                {illustrations.map((illustration) => (
+                {illustrations.map(illustration => (
                   <IllustrationButton
                     key={illustration.id}
                     illustration={illustration}

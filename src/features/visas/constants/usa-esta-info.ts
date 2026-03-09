@@ -44,11 +44,7 @@ export const ESTA_REQUIREMENTS: EstaRequirementSection[] = [
   },
   {
     title: '父母資訊',
-    items: [
-      '父親中英文姓名',
-      '母親中英文姓名',
-      '（包含親生父母、養父母、繼父母或監護人）',
-    ],
+    items: ['父親中英文姓名', '母親中英文姓名', '（包含親生父母、養父母、繼父母或監護人）'],
   },
   {
     title: '就業資訊',
@@ -128,17 +124,7 @@ export const ESTA_ELIGIBILITY_QUESTIONS = [
     id: 'q9',
     question:
       '是否於 2011 年 3 月 1 日或之後曾前往或身處伊朗、伊拉克、利比亞、北韓、索馬利亞、蘇丹、敘利亞、葉門或古巴的旅客？',
-    countries: [
-      '伊朗',
-      '伊拉克',
-      '利比亞',
-      '北韓',
-      '索馬利亞',
-      '蘇丹',
-      '敘利亞',
-      '葉門',
-      '古巴',
-    ],
+    countries: ['伊朗', '伊拉克', '利比亞', '北韓', '索馬利亞', '蘇丹', '敘利亞', '葉門', '古巴'],
     purposeOptions: [
       '以觀光客身分前往（渡假）',
       '個人旅遊或探親（包括緊急事件）',
@@ -167,20 +153,10 @@ export const ESTA_NOTES: string[] = [
 ]
 
 // 取得其他國籍的方式
-export const CITIZENSHIP_ACQUISITION_METHODS = [
-  '經出生',
-  '經父母',
-  '歸化',
-  '其他',
-]
+export const CITIZENSHIP_ACQUISITION_METHODS = ['經出生', '經父母', '歸化', '其他']
 
 // 就業狀態選項
-export const EMPLOYMENT_STATUS_OPTIONS = [
-  '待業',
-  '學齡前兒童',
-  '家庭主婦',
-  '退休',
-]
+export const EMPLOYMENT_STATUS_OPTIONS = ['待業', '學齡前兒童', '家庭主婦', '退休']
 
 // 社群媒體平台列表
 export const SOCIAL_MEDIA_PLATFORMS = [

@@ -168,7 +168,7 @@ export default function MobileHomePage() {
           </div>
           {todayDepartures.length > 0 ? (
             <div className="space-y-3">
-              {todayDepartures.map((tour) => (
+              {todayDepartures.map(tour => (
                 <TourCard key={tour.id} tour={formatTourForCard(tour)} />
               ))}
             </div>
@@ -200,7 +200,7 @@ export default function MobileHomePage() {
           </div>
           {todayReturns.length > 0 ? (
             <div className="space-y-3">
-              {todayReturns.map((tour) => (
+              {todayReturns.map(tour => (
                 <TourCard key={tour.id} tour={formatTourForCard(tour)} />
               ))}
             </div>
@@ -223,16 +223,13 @@ export default function MobileHomePage() {
                 </span>
               )}
             </div>
-            <Link
-              href="/m/todos"
-              className="text-sm text-morandi-gold flex items-center gap-1"
-            >
+            <Link href="/m/todos" className="text-sm text-morandi-gold flex items-center gap-1">
               查看全部 <ChevronRight size={16} />
             </Link>
           </div>
           {urgentTodos.length > 0 ? (
             <div className="space-y-3">
-              {urgentTodos.map((todo) => (
+              {urgentTodos.map(todo => (
                 <TodoCard key={todo.id} todo={formatTodoForCard(todo)} />
               ))}
             </div>
@@ -258,9 +255,13 @@ function calculateNights(start: string, end: string): number {
 // 轉換 priority 數字為字串
 function priorityNumberToString(priority: number): 'low' | 'medium' | 'high' | 'urgent' {
   switch (priority) {
-    case 4: return 'urgent'
-    case 3: return 'high'
-    case 2: return 'medium'
-    default: return 'low'
+    case 4:
+      return 'urgent'
+    case 3:
+      return 'high'
+    case 2:
+      return 'medium'
+    default:
+      return 'low'
   }
 }

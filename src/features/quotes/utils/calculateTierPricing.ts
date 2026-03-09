@@ -1,10 +1,5 @@
 import { QUOTE_HOOKS_LABELS } from '../constants/labels'
-import {
-  CostCategory,
-  ParticipantCounts,
-  IdentityCosts,
-  CostItem,
-} from '../types'
+import { CostCategory, ParticipantCounts, IdentityCosts, CostItem } from '../types'
 
 /**
  * 計算檻次表的各身份成本

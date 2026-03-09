@@ -39,12 +39,7 @@ interface TourClosingDialogProps {
   onSuccess?: () => void
 }
 
-export function TourClosingDialog({
-  open,
-  onOpenChange,
-  tour,
-  onSuccess,
-}: TourClosingDialogProps) {
+export function TourClosingDialog({ open, onOpenChange, tour, onSuccess }: TourClosingDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isPrinting, setIsPrinting] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
@@ -71,7 +66,8 @@ export function TourClosingDialog({
   // 取得團的成本請款單（排除獎金類型）
   const tourCosts = useMemo(() => {
     return paymentRequests.filter(
-      pr => pr.tour_id === tour.id &&
+      pr =>
+        pr.tour_id === tour.id &&
         pr.request_type !== TOUR_CLOSING_LABELS.SALES_BONUS &&
         pr.request_type !== TOUR_CLOSING_LABELS.OP_BONUS
     )
@@ -90,8 +86,10 @@ export function TourClosingDialog({
   // 取得團的獎金請款單
   const tourBonuses = useMemo(() => {
     return paymentRequests.filter(
-      pr => pr.tour_id === tour.id &&
-        (pr.request_type === TOUR_CLOSING_LABELS.SALES_BONUS || pr.request_type === TOUR_CLOSING_LABELS.OP_BONUS)
+      pr =>
+        pr.tour_id === tour.id &&
+        (pr.request_type === TOUR_CLOSING_LABELS.SALES_BONUS ||
+          pr.request_type === TOUR_CLOSING_LABELS.OP_BONUS)
     )
   }, [paymentRequests, tour.id])
 
@@ -228,7 +226,8 @@ export function TourClosingDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calculator size={20} className="text-morandi-gold" />
-            {TOURS_LABELS.CLOSING_TITLE_PREFIX}{tour.code}
+            {TOURS_LABELS.CLOSING_TITLE_PREFIX}
+            {tour.code}
           </DialogTitle>
         </DialogHeader>
 
@@ -241,7 +240,10 @@ export function TourClosingDialog({
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-morandi-secondary">{TOURS_LABELS.LABEL_6293}</span>
-              <span className="font-medium">{tourOrders.length}{TOURS_LABELS.UNIT_COUNT}</span>
+              <span className="font-medium">
+                {tourOrders.length}
+                {TOURS_LABELS.UNIT_COUNT}
+              </span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-morandi-secondary">{TOURS_LABELS.TOTAL_7262}</span>
@@ -253,7 +255,9 @@ export function TourClosingDialog({
             </div>
             <div className="flex justify-between text-sm pt-2 border-t border-border/50">
               <span className="text-morandi-secondary">{TOURS_LABELS.LABEL_6713}</span>
-              <span className={`font-bold ${totalRevenue - totalCost >= 0 ? 'text-morandi-gold' : 'text-morandi-red'}`}>
+              <span
+                className={`font-bold ${totalRevenue - totalCost >= 0 ? 'text-morandi-gold' : 'text-morandi-red'}`}
+              >
                 {formatCurrency(totalRevenue - totalCost)}
               </span>
             </div>
@@ -272,7 +276,7 @@ export function TourClosingDialog({
                   min={0}
                   max={100}
                   value={salesBonusPercent}
-                  onChange={(e) => setSalesBonusPercent(Number(e.target.value))}
+                  onChange={e => setSalesBonusPercent(Number(e.target.value))}
                   className="w-20 text-center"
                 />
                 <span className="text-morandi-secondary">%</span>
@@ -290,7 +294,7 @@ export function TourClosingDialog({
                   min={0}
                   max={100}
                   value={opBonusPercent}
-                  onChange={(e) => setOpBonusPercent(Number(e.target.value))}
+                  onChange={e => setOpBonusPercent(Number(e.target.value))}
                   className="w-20 text-center"
                 />
                 <span className="text-morandi-secondary">%</span>
@@ -302,15 +306,15 @@ export function TourClosingDialog({
             {/* 總計 */}
             <div className="flex items-center gap-4 pt-2 border-t border-border">
               <Label className="w-24 text-sm font-medium">{TOURS_LABELS.TOTAL_6305}</Label>
-              <span className="text-lg font-bold text-morandi-gold">{formatCurrency(totalBonus)}</span>
+              <span className="text-lg font-bold text-morandi-gold">
+                {formatCurrency(totalBonus)}
+              </span>
             </div>
           </div>
 
           {/* 說明 */}
           <div className="p-3 bg-status-warning-bg border border-status-warning rounded-lg">
-            <p className="text-sm text-status-warning">
-              {TOURS_LABELS.LABEL_1342}
-            </p>
+            <p className="text-sm text-status-warning">{TOURS_LABELS.LABEL_1342}</p>
           </div>
         </div>
 
@@ -324,11 +328,7 @@ export function TourClosingDialog({
             {isPrinting ? <Loader2 size={16} className="animate-spin" /> : <Printer size={16} />}
             {isPrinting ? TOURS_LABELS.PRINTING : TOURS_LABELS.PRINT_REPORT}
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            className="gap-2"
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-2">
             <X size={16} />
             {TOURS_LABELS.CANCEL}
           </Button>
@@ -348,16 +348,17 @@ export function TourClosingDialog({
         <DialogContent level={3} className="max-w-sm">
           <DialogHeader>
             <DialogTitle>{TOURS_LABELS.CONFIRM_CLOSE}</DialogTitle>
-            <DialogDescription>
-              {TOURS_LABELS.CONFIRM_CLOSE_WARNING}
-            </DialogDescription>
+            <DialogDescription>{TOURS_LABELS.CONFIRM_CLOSE_WARNING}</DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setShowConfirmation(false)}>
               {TOURS_LABELS.CANCEL}
             </Button>
             <Button
-              onClick={() => { setShowConfirmation(false); handleClose() }}
+              onClick={() => {
+                setShowConfirmation(false)
+                handleClose()
+              }}
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
               {TOURS_LABELS.CONFIRM_CLOSE}

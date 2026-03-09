@@ -4,7 +4,6 @@
  * 團體模式使用，管理自訂費用項目
  */
 
-
 import React, { useState } from 'react'
 import { Coins, Plus, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -55,14 +54,12 @@ export function CustomCostFieldsSection({
 
       {fields.length > 0 && (
         <div className="space-y-2">
-          {fields.map((field) => (
+          {fields.map(field => (
             <div
               key={field.id}
               className="flex items-center gap-2 px-3 py-2 bg-emerald-50 rounded border border-emerald-200"
             >
-              <span className="flex-1 text-sm text-morandi-primary">
-                {field.name}
-              </span>
+              <span className="flex-1 text-sm text-morandi-primary">{field.name}</span>
               <Button
                 variant="ghost"
                 size="sm"
@@ -87,8 +84,8 @@ export function CustomCostFieldsSection({
             <Input
               placeholder={COMP_ORDERS_LABELS.輸入欄位名稱_例如_簽證費_小費}
               value={newFieldName}
-              onChange={(e) => setNewFieldName(e.target.value)}
-              onKeyDown={(e) => {
+              onChange={e => setNewFieldName(e.target.value)}
+              onKeyDown={e => {
                 if (e.key === 'Enter') handleAdd()
               }}
               autoFocus

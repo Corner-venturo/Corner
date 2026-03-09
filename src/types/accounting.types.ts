@@ -9,12 +9,12 @@
 export type AccountType = 'asset' | 'liability' | 'equity' | 'revenue' | 'expense' | 'cost'
 
 export type AccountingEventType =
-  | 'customer_receipt_posted'    // 客戶收款過帳
-  | 'supplier_payment_posted'    // 供應商付款過帳
-  | 'group_settlement_posted'    // 結團過帳
-  | 'bonus_paid'                 // 獎金付款
-  | 'tax_paid'                   // 代收稅金繳納
-  | 'manual_voucher'             // 手動傳票
+  | 'customer_receipt_posted' // 客戶收款過帳
+  | 'supplier_payment_posted' // 供應商付款過帳
+  | 'group_settlement_posted' // 結團過帳
+  | 'bonus_paid' // 獎金付款
+  | 'tax_paid' // 代收稅金繳納
+  | 'manual_voucher' // 手動傳票
 
 export type AccountingEventStatus = 'posted' | 'reversed'
 
@@ -31,8 +31,8 @@ export interface Account {
   workspace_id: string
   code: string
   name: string
-  account_type: AccountType  // 資料庫欄位名稱
-  type?: AccountType  // 向下相容別名
+  account_type: AccountType // 資料庫欄位名稱
+  type?: AccountType // 向下相容別名
   parent_id: string | null
   is_system_locked: boolean
   is_active: boolean
@@ -209,7 +209,7 @@ export interface PostCustomerReceiptRequest {
   receipt_id: string
   payment_method: 'cash' | 'transfer' | 'credit_card'
   amount: number
-  fee_rate?: number  // 刷卡手續費率
+  fee_rate?: number // 刷卡手續費率
   bank_account_id?: string
   tour_id?: string
   memo?: string
@@ -227,15 +227,15 @@ export interface PostSupplierPaymentRequest {
 // 結團過帳
 export interface PostGroupSettlementRequest {
   tour_id: string
-  group_revenue: number      // 團收入（預收團款總額）
-  original_cost: number      // 原始團務成本（預付團務成本總額）
-  participants: number       // 參加人數
-  admin_fee_per_person?: number  // 行政費單價，預設 10
-  tax_rate?: number          // 稅率，預設 0.12
-  sales_bonus?: number       // 業務獎金
-  op_bonus?: number          // OP 獎金
-  team_bonus?: number        // 團績獎金
-  bank_account_id: string    // 付款銀行帳戶
+  group_revenue: number // 團收入（預收團款總額）
+  original_cost: number // 原始團務成本（預付團務成本總額）
+  participants: number // 參加人數
+  admin_fee_per_person?: number // 行政費單價，預設 10
+  tax_rate?: number // 稅率，預設 0.12
+  sales_bonus?: number // 業務獎金
+  op_bonus?: number // OP 獎金
+  team_bonus?: number // 團績獎金
+  bank_account_id: string // 付款銀行帳戶
   memo?: string
 }
 
@@ -251,7 +251,7 @@ export interface PostBonusPaidRequest {
 
 // 代收稅金繳納
 export interface PostTaxPaidRequest {
-  period: string  // 如 2025-01
+  period: string // 如 2025-01
   amount: number
   bank_account_id: string
   memo?: string
@@ -289,32 +289,224 @@ export interface TrialBalance {
 // 預設科目表
 // ============================================
 
-export const DEFAULT_ACCOUNTS: Omit<Account, 'id' | 'workspace_id' | 'created_at' | 'updated_at'>[] = [
+export const DEFAULT_ACCOUNTS: Omit<
+  Account,
+  'id' | 'workspace_id' | 'created_at' | 'updated_at'
+>[] = [
   // 資產
-  { code: '1100', name: '銀行存款', account_type: 'asset', type: 'asset', parent_id: null, is_system_locked: true, is_active: true, description: null },
-  { code: '1110', name: '現金', account_type: 'asset', type: 'asset', parent_id: null, is_system_locked: true, is_active: true, description: null },
-  { code: '1200', name: '預付團務成本', account_type: 'asset', type: 'asset', parent_id: null, is_system_locked: true, is_active: true, description: '未結團的預付成本' },
+  {
+    code: '1100',
+    name: '銀行存款',
+    account_type: 'asset',
+    type: 'asset',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: null,
+  },
+  {
+    code: '1110',
+    name: '現金',
+    account_type: 'asset',
+    type: 'asset',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: null,
+  },
+  {
+    code: '1200',
+    name: '預付團務成本',
+    account_type: 'asset',
+    type: 'asset',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: '未結團的預付成本',
+  },
   // 負債
-  { code: '2100', name: '預收團款', account_type: 'liability', type: 'liability', parent_id: null, is_system_locked: true, is_active: true, description: '未結團的預收款項' },
-  { code: '2200', name: '代收稅金（應付）', account_type: 'liability', type: 'liability', parent_id: null, is_system_locked: true, is_active: true, description: '12% 代收稅金' },
-  { code: '2300', name: '獎金應付帳款', account_type: 'liability', type: 'liability', parent_id: null, is_system_locked: true, is_active: true, description: null },
-  { code: '2400', name: '代收款－員工自付', account_type: 'liability', type: 'liability', parent_id: null, is_system_locked: true, is_active: true, description: '勞健保等' },
+  {
+    code: '2100',
+    name: '預收團款',
+    account_type: 'liability',
+    type: 'liability',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: '未結團的預收款項',
+  },
+  {
+    code: '2200',
+    name: '代收稅金（應付）',
+    account_type: 'liability',
+    type: 'liability',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: '12% 代收稅金',
+  },
+  {
+    code: '2300',
+    name: '獎金應付帳款',
+    account_type: 'liability',
+    type: 'liability',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: null,
+  },
+  {
+    code: '2400',
+    name: '代收款－員工自付',
+    account_type: 'liability',
+    type: 'liability',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: '勞健保等',
+  },
   // 權益
-  { code: '3100', name: '股本', account_type: 'equity', type: 'equity', parent_id: null, is_system_locked: true, is_active: true, description: '實收資本' },
-  { code: '3200', name: '本期損益', account_type: 'equity', type: 'equity', parent_id: null, is_system_locked: true, is_active: true, description: '期末結轉用，匯集損益科目餘額' },
-  { code: '3300', name: '保留盈餘', account_type: 'equity', type: 'equity', parent_id: null, is_system_locked: true, is_active: true, description: '累積盈虧，本期損益結轉至此' },
+  {
+    code: '3100',
+    name: '股本',
+    account_type: 'equity',
+    type: 'equity',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: '實收資本',
+  },
+  {
+    code: '3200',
+    name: '本期損益',
+    account_type: 'equity',
+    type: 'equity',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: '期末結轉用，匯集損益科目餘額',
+  },
+  {
+    code: '3300',
+    name: '保留盈餘',
+    account_type: 'equity',
+    type: 'equity',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: '累積盈虧，本期損益結轉至此',
+  },
   // 收入
-  { code: '4100', name: '團費收入', account_type: 'revenue', type: 'revenue', parent_id: null, is_system_locked: true, is_active: true, description: '結團才認列' },
-  { code: '4200', name: '其他收入－行政費收入', account_type: 'revenue', type: 'revenue', parent_id: null, is_system_locked: true, is_active: true, description: null },
+  {
+    code: '4100',
+    name: '團費收入',
+    account_type: 'revenue',
+    type: 'revenue',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: '結團才認列',
+  },
+  {
+    code: '4200',
+    name: '其他收入－行政費收入',
+    account_type: 'revenue',
+    type: 'revenue',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: null,
+  },
   // 成本
-  { code: '5100', name: '團務成本', account_type: 'cost', type: 'cost', parent_id: null, is_system_locked: true, is_active: true, description: '結團才成立' },
-  { code: '5110', name: '團務成本－行政費', account_type: 'cost', type: 'cost', parent_id: null, is_system_locked: true, is_active: true, description: null },
-  { code: '5120', name: '團務成本－代收稅金', account_type: 'cost', type: 'cost', parent_id: null, is_system_locked: true, is_active: true, description: '12%' },
-  { code: '5130', name: '團務成本－業務獎金', account_type: 'cost', type: 'cost', parent_id: null, is_system_locked: true, is_active: true, description: null },
-  { code: '5140', name: '團務成本－OP獎金', account_type: 'cost', type: 'cost', parent_id: null, is_system_locked: true, is_active: true, description: null },
-  { code: '5150', name: '團務成本－團績獎金', account_type: 'cost', type: 'cost', parent_id: null, is_system_locked: true, is_active: true, description: null },
+  {
+    code: '5100',
+    name: '團務成本',
+    account_type: 'cost',
+    type: 'cost',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: '結團才成立',
+  },
+  {
+    code: '5110',
+    name: '團務成本－行政費',
+    account_type: 'cost',
+    type: 'cost',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: null,
+  },
+  {
+    code: '5120',
+    name: '團務成本－代收稅金',
+    account_type: 'cost',
+    type: 'cost',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: '12%',
+  },
+  {
+    code: '5130',
+    name: '團務成本－業務獎金',
+    account_type: 'cost',
+    type: 'cost',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: null,
+  },
+  {
+    code: '5140',
+    name: '團務成本－OP獎金',
+    account_type: 'cost',
+    type: 'cost',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: null,
+  },
+  {
+    code: '5150',
+    name: '團務成本－團績獎金',
+    account_type: 'cost',
+    type: 'cost',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: null,
+  },
   // 費用
-  { code: '6100', name: '刷卡手續費費用', account_type: 'expense', type: 'expense', parent_id: null, is_system_locked: true, is_active: true, description: '實扣 1.68%' },
-  { code: '6200', name: '勞健保費用', account_type: 'expense', type: 'expense', parent_id: null, is_system_locked: true, is_active: true, description: '公司負擔' },
-  { code: '6300', name: '利息費用', account_type: 'expense', type: 'expense', parent_id: null, is_system_locked: true, is_active: true, description: null },
+  {
+    code: '6100',
+    name: '刷卡手續費費用',
+    account_type: 'expense',
+    type: 'expense',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: '實扣 1.68%',
+  },
+  {
+    code: '6200',
+    name: '勞健保費用',
+    account_type: 'expense',
+    type: 'expense',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: '公司負擔',
+  },
+  {
+    code: '6300',
+    name: '利息費用',
+    account_type: 'expense',
+    type: 'expense',
+    parent_id: null,
+    is_system_locked: true,
+    is_active: true,
+    description: null,
+  },
 ]

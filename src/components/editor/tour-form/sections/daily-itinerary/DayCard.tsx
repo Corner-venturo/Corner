@@ -41,8 +41,14 @@ export function DayCard({
   onOpenPositionEditor,
 }: DayCardProps) {
   // 圖片上傳狀態
-  const [uploadingActivityImage, setUploadingActivityImage] = useState<{ dayIndex: number; actIndex: number } | null>(null)
-  const [activityDragOver, setActivityDragOver] = useState<{ dayIndex: number; actIndex: number } | null>(null)
+  const [uploadingActivityImage, setUploadingActivityImage] = useState<{
+    dayIndex: number
+    actIndex: number
+  } | null>(null)
+  const [activityDragOver, setActivityDragOver] = useState<{
+    dayIndex: number
+    actIndex: number
+  } | null>(null)
 
   // 包裝上傳函數，加入 loading 狀態管理
   const handleImageUploadWithLoading = async (dIdx: number, aIdx: number, file: File) => {
@@ -75,10 +81,7 @@ export function DayCard({
             >
               <ChevronRight
                 size={18}
-                className={cn(
-                  'transition-transform duration-200',
-                  !isCollapsed && 'rotate-90'
-                )}
+                className={cn('transition-transform duration-200', !isCollapsed && 'rotate-90')}
               />
             </button>
           )}
@@ -113,9 +116,11 @@ export function DayCard({
               </button>
             </div>
           )}
-          <span className={`px-3 py-1 text-white text-sm font-bold rounded-full ${
-            day.isAlternative ? 'bg-morandi-secondary' : 'bg-morandi-gold'
-          }`}>
+          <span
+            className={`px-3 py-1 text-white text-sm font-bold rounded-full ${
+              day.isAlternative ? 'bg-morandi-secondary' : 'bg-morandi-gold'
+            }`}
+          >
             {dayLabel}
           </span>
           {day.isAlternative && (
@@ -140,8 +145,8 @@ export function DayCard({
               dayIndex={dayIndex}
               dayData={day}
               currentStyle={day.displayStyle || 'single-image'}
-              onStyleChange={(style) => updateDailyItinerary(dayIndex, 'displayStyle', style)}
-              onDayUpdate={(updatedDay) => {
+              onStyleChange={style => updateDailyItinerary(dayIndex, 'displayStyle', style)}
+              onDayUpdate={updatedDay => {
                 const newItinerary = [...data.dailyItinerary]
                 newItinerary[dayIndex] = updatedDay
                 updateField('dailyItinerary', newItinerary)
@@ -154,7 +159,7 @@ export function DayCard({
             <DreamscapeLayoutPicker
               dayIndex={dayIndex}
               currentLayout={day.dreamscapeLayout}
-              onLayoutChange={(layout) => updateDailyItinerary(dayIndex, 'dreamscapeLayout', layout)}
+              onLayoutChange={layout => updateDailyItinerary(dayIndex, 'dreamscapeLayout', layout)}
             />
           )}
           {/* 建議方案 checkbox - 不顯示在第一天 */}
@@ -194,7 +199,9 @@ export function DayCard({
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-1">
               {COMP_EDITOR_LABELS.LABEL_1304}
-              <span className="text-xs text-morandi-secondary ml-2">{COMP_EDITOR_LABELS.SHIFT_ENTER_HINT}</span>
+              <span className="text-xs text-morandi-secondary ml-2">
+                {COMP_EDITOR_LABELS.SHIFT_ENTER_HINT}
+              </span>
             </label>
             <textarea
               value={day.highlight || ''}
@@ -246,25 +253,27 @@ export function DayCard({
 
           {/* 活動 */}
           <ActivitiesSection
-        day={day}
-        dayIndex={dayIndex}
-        addActivity={addActivity}
-        updateActivity={updateActivity}
-        removeActivity={removeActivity}
-        reorderActivities={reorderActivities}
-        updateDailyItinerary={updateDailyItinerary}
-        onOpenAttractionSelector={onOpenAttractionSelector}
-        handleActivityImageUpload={handleImageUploadWithLoading}
-        handleExternalImageUpload={handleExternalImageUpload}
-        uploadingActivityImage={uploadingActivityImage}
-        activityDragOver={activityDragOver}
-        setActivityDragOver={setActivityDragOver}
-        onOpenPositionEditor={onOpenPositionEditor}
-      />
+            day={day}
+            dayIndex={dayIndex}
+            addActivity={addActivity}
+            updateActivity={updateActivity}
+            removeActivity={removeActivity}
+            reorderActivities={reorderActivities}
+            updateDailyItinerary={updateDailyItinerary}
+            onOpenAttractionSelector={onOpenAttractionSelector}
+            handleActivityImageUpload={handleImageUploadWithLoading}
+            handleExternalImageUpload={handleExternalImageUpload}
+            uploadingActivityImage={uploadingActivityImage}
+            activityDragOver={activityDragOver}
+            setActivityDragOver={setActivityDragOver}
+            onOpenPositionEditor={onOpenPositionEditor}
+          />
 
           {/* 描述 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_3951}</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              {COMP_EDITOR_LABELS.LABEL_3951}
+            </label>
             <textarea
               value={day.description || ''}
               onChange={e => updateDailyItinerary(dayIndex, 'description', e.target.value)}
@@ -274,70 +283,68 @@ export function DayCard({
             />
           </div>
 
-      {/* 推薦行程 */}
-      <RecommendationsSection
-        day={day}
-        dayIndex={dayIndex}
-        addRecommendation={addRecommendation}
-        updateRecommendation={updateRecommendation}
-        removeRecommendation={removeRecommendation}
-      />
+          {/* 推薦行程 */}
+          <RecommendationsSection
+            day={day}
+            dayIndex={dayIndex}
+            addRecommendation={addRecommendation}
+            updateRecommendation={updateRecommendation}
+            removeRecommendation={removeRecommendation}
+          />
 
-      {/* 餐食 */}
-      <MealsSection
-        day={day}
-        dayIndex={dayIndex}
-        updateDailyItinerary={updateDailyItinerary}
-        onOpenRestaurantSelector={onOpenRestaurantSelector}
-      />
+          {/* 餐食 */}
+          <MealsSection
+            day={day}
+            dayIndex={dayIndex}
+            updateDailyItinerary={updateDailyItinerary}
+            onOpenRestaurantSelector={onOpenRestaurantSelector}
+          />
 
-      {/* 住宿 */}
-      <AccommodationSection
-        day={day}
-        dayIndex={dayIndex}
-        data={data}
-        updateDailyItinerary={updateDailyItinerary}
-        onOpenHotelSelector={onOpenHotelSelector}
-        isLockedByQuote={isAccommodationLockedByQuote}
-      />
+          {/* 住宿 */}
+          <AccommodationSection
+            day={day}
+            dayIndex={dayIndex}
+            data={data}
+            updateDailyItinerary={updateDailyItinerary}
+            onOpenHotelSelector={onOpenHotelSelector}
+            isLockedByQuote={isAccommodationLockedByQuote}
+          />
 
-      {/* 每日圖片 */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={day.showDailyImages === true}
-              onChange={e => {
-                updateDailyItinerary(dayIndex, 'showDailyImages', e.target.checked)
-              }}
-              className="h-4 w-4 text-morandi-gold focus:ring-morandi-gold border-morandi-container rounded"
-            />
-            <span className="text-sm font-medium text-morandi-primary">{COMP_EDITOR_LABELS.LABEL_6290}</span>
-          </label>
-          {day.showDailyImages === true && (day.images?.length || 0) > 0 && (
-            <span className="text-xs text-morandi-secondary">
-              {day.images?.length} 張
-            </span>
-          )}
-        </div>
-        {day.showDailyImages === true && (
-            <DailyImagesUploader
-              dayIndex={dayIndex}
-              images={day.images || []}
-              onImagesChange={(newImages) => {
-                updateDailyItinerary(dayIndex, 'images', newImages)
-              }}
-              allTourImages={
-                data.dailyItinerary?.flatMap(d =>
-                  (d.images || []).map(img =>
-                    typeof img === 'string' ? img : img.url
-                  )
-                ) || []
-              }
-            />
-          )}
-        </div>
+          {/* 每日圖片 */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={day.showDailyImages === true}
+                  onChange={e => {
+                    updateDailyItinerary(dayIndex, 'showDailyImages', e.target.checked)
+                  }}
+                  className="h-4 w-4 text-morandi-gold focus:ring-morandi-gold border-morandi-container rounded"
+                />
+                <span className="text-sm font-medium text-morandi-primary">
+                  {COMP_EDITOR_LABELS.LABEL_6290}
+                </span>
+              </label>
+              {day.showDailyImages === true && (day.images?.length || 0) > 0 && (
+                <span className="text-xs text-morandi-secondary">{day.images?.length} 張</span>
+              )}
+            </div>
+            {day.showDailyImages === true && (
+              <DailyImagesUploader
+                dayIndex={dayIndex}
+                images={day.images || []}
+                onImagesChange={newImages => {
+                  updateDailyItinerary(dayIndex, 'images', newImages)
+                }}
+                allTourImages={
+                  data.dailyItinerary?.flatMap(d =>
+                    (d.images || []).map(img => (typeof img === 'string' ? img : img.url))
+                  ) || []
+                }
+              />
+            )}
+          </div>
         </>
       )}
     </div>

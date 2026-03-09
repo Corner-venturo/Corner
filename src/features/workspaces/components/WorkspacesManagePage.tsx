@@ -4,7 +4,6 @@
  * 僅限 super_admin 存取
  */
 
-
 import { useState, useEffect, useCallback } from 'react'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { StatusCell, ActionCell, DateCell } from '@/components/table-cells'
@@ -34,7 +33,9 @@ export function WorkspacesManagePage() {
       // 取得所有 workspaces
       const { data: workspacesData, error: wsError } = await supabase
         .from('workspaces')
-        .select('id, name, code, type, is_active, description, created_at, updated_at, employee_number_prefix, default_password')
+        .select(
+          'id, name, code, type, is_active, description, created_at, updated_at, employee_number_prefix, default_password'
+        )
         .order('created_at', { ascending: true })
 
       if (wsError) throw wsError
@@ -53,39 +54,39 @@ export function WorkspacesManagePage() {
   }, [fetchWorkspaces])
 
   // 刪除公司
-  const handleDelete = useCallback(async (workspace: WorkspaceWithDetails) => {
-    // 檢查是否有員工
-    const { count } = await supabase
-      .from('employees')
-      .select('id', { count: 'exact', head: true })
-      .eq('workspace_id', workspace.id)
+  const handleDelete = useCallback(
+    async (workspace: WorkspaceWithDetails) => {
+      // 檢查是否有員工
+      const { count } = await supabase
+        .from('employees')
+        .select('id', { count: 'exact', head: true })
+        .eq('workspace_id', workspace.id)
 
-    if (count && count > 0) {
-      await alert(`無法刪除「${workspace.name}」，此公司還有 ${count} 位員工`, 'error')
-      return
-    }
+      if (count && count > 0) {
+        await alert(`無法刪除「${workspace.name}」，此公司還有 ${count} 位員工`, 'error')
+        return
+      }
 
-    const confirmed = await confirm(`確定要刪除公司「${workspace.name}」嗎？`, {
-      title: WORKSPACES_LABELS.刪除公司,
-      type: 'warning',
-    })
-    if (!confirmed) return
+      const confirmed = await confirm(`確定要刪除公司「${workspace.name}」嗎？`, {
+        title: WORKSPACES_LABELS.刪除公司,
+        type: 'warning',
+      })
+      if (!confirmed) return
 
-    try {
-      const { error } = await supabase
-        .from('workspaces')
-        .delete()
-        .eq('id', workspace.id)
+      try {
+        const { error } = await supabase.from('workspaces').delete().eq('id', workspace.id)
 
-      if (error) throw error
+        if (error) throw error
 
-      await alert(WORKSPACES_LABELS.公司已刪除, 'success')
-      fetchWorkspaces()
-    } catch (error) {
-      logger.error(WORKSPACES_LABELS.刪除公司失敗, error)
-      await alert(WORKSPACES_LABELS.刪除失敗, 'error')
-    }
-  }, [fetchWorkspaces])
+        await alert(WORKSPACES_LABELS.公司已刪除, 'success')
+        fetchWorkspaces()
+      } catch (error) {
+        logger.error(WORKSPACES_LABELS.刪除公司失敗, error)
+        await alert(WORKSPACES_LABELS.刪除失敗, 'error')
+      }
+    },
+    [fetchWorkspaces]
+  )
 
   // 新增管理員
   const handleAddAdmin = useCallback((workspace: WorkspaceWithDetails) => {
@@ -118,7 +119,9 @@ export function WorkspacesManagePage() {
       width: '100',
       render: (_: unknown, row: WorkspaceWithDetails) => (
         <span className="text-sm text-morandi-secondary">
-          {row.type ? WORKSPACE_TYPE_LABELS[row.type as keyof typeof WORKSPACE_TYPE_LABELS] || row.type : '-'}
+          {row.type
+            ? WORKSPACE_TYPE_LABELS[row.type as keyof typeof WORKSPACE_TYPE_LABELS] || row.type
+            : '-'}
         </span>
       ),
     },
@@ -128,8 +131,14 @@ export function WorkspacesManagePage() {
       width: '150',
       render: (_: unknown, row: WorkspaceWithDetails) => (
         <div className="text-xs text-morandi-secondary">
-          <div>{WORKSPACES_LABELS.LABEL_535}{row.employee_number_prefix || 'E'}</div>
-          <div>{WORKSPACES_LABELS.LABEL_243}{row.default_password || '1234'}</div>
+          <div>
+            {WORKSPACES_LABELS.LABEL_535}
+            {row.employee_number_prefix || 'E'}
+          </div>
+          <div>
+            {WORKSPACES_LABELS.LABEL_243}
+            {row.default_password || '1234'}
+          </div>
         </div>
       ),
     },
@@ -138,11 +147,13 @@ export function WorkspacesManagePage() {
       label: WORKSPACES_LABELS.狀態,
       width: '100',
       render: (_: unknown, row: WorkspaceWithDetails) => (
-        <span className={`px-2 py-1 rounded-full text-xs ${
-          row.is_active
-            ? 'bg-status-success-bg text-morandi-green'
-            : 'bg-status-error-bg text-morandi-red'
-        }`}>
+        <span
+          className={`px-2 py-1 rounded-full text-xs ${
+            row.is_active
+              ? 'bg-status-success-bg text-morandi-green'
+              : 'bg-status-error-bg text-morandi-red'
+          }`}
+        >
           {row.is_active ? WORKSPACES_LABELS.啟用 : WORKSPACES_LABELS.停用}
         </span>
       ),

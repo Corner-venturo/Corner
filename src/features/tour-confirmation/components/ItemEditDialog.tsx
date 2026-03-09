@@ -11,12 +11,7 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import { X, Save, Plus, Upload, Image as ImageIcon, Trash2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -34,7 +29,12 @@ import type {
   CreateConfirmationItem,
   BookingStatus,
 } from '@/types/tour-confirmation-sheet.types'
-import { CONFIRMATION_HEADER_LABELS, COST_SUMMARY_LABELS, ITEM_EDIT_DIALOG_LABELS, ITEM_EDIT_DIALOG_ADDITIONAL_LABELS } from '../constants/labels';
+import {
+  CONFIRMATION_HEADER_LABELS,
+  COST_SUMMARY_LABELS,
+  ITEM_EDIT_DIALOG_LABELS,
+  ITEM_EDIT_DIALOG_ADDITIONAL_LABELS,
+} from '../constants/labels'
 
 interface ItemEditDialogProps {
   open: boolean
@@ -138,7 +138,7 @@ export function ItemEditDialog({
     key: K,
     value: CreateConfirmationItem[K]
   ) => {
-    setFormData((prev) => ({ ...prev, [key]: value }))
+    setFormData(prev => ({ ...prev, [key]: value }))
   }
 
   // 上傳收據照片
@@ -164,9 +164,7 @@ export function ItemEditDialog({
         return
       }
 
-      const { data: urlData } = supabase.storage
-        .from('tour-documents')
-        .getPublicUrl(filePath)
+      const { data: urlData } = supabase.storage.from('tour-documents').getPublicUrl(filePath)
 
       if (urlData?.publicUrl) {
         setReceiptImages(prev => [...prev, urlData.publicUrl])
@@ -208,11 +206,12 @@ export function ItemEditDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+    <Dialog open={open} onOpenChange={o => !o && onClose()}>
       <DialogContent level={1} className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {isEdit ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.編輯 : ITEM_EDIT_DIALOG_LABELS.新增}{categoryLabels[category]}項目
+            {isEdit ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.編輯 : ITEM_EDIT_DIALOG_LABELS.新增}
+            {categoryLabels[category]}項目
           </DialogTitle>
         </DialogHeader>
 
@@ -224,7 +223,7 @@ export function ItemEditDialog({
               <Input
                 type="date"
                 value={formData.service_date || ''}
-                onChange={(e) => updateField('service_date', e.target.value)}
+                onChange={e => updateField('service_date', e.target.value)}
                 className="mt-1"
               />
             </div>
@@ -234,7 +233,7 @@ export function ItemEditDialog({
                 <Input
                   type="date"
                   value={formData.service_date_end || ''}
-                  onChange={(e) => updateField('service_date_end', e.target.value)}
+                  onChange={e => updateField('service_date_end', e.target.value)}
                   className="mt-1"
                 />
               </div>
@@ -244,7 +243,7 @@ export function ItemEditDialog({
               <Input
                 placeholder="Day 1"
                 value={formData.day_label || ''}
-                onChange={(e) => updateField('day_label', e.target.value)}
+                onChange={e => updateField('day_label', e.target.value)}
                 className="mt-1"
               />
             </div>
@@ -254,25 +253,35 @@ export function ItemEditDialog({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label>
-                {category === 'transport' ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.接駁公司 :
-                 category === 'meal' ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.餐廳名稱 :
-                 category === 'accommodation' ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.飯店名稱 :
-                 category === 'activity' ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.場地名稱 : ITEM_EDIT_DIALOG_LABELS.供應商} *
+                {category === 'transport'
+                  ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.接駁公司
+                  : category === 'meal'
+                    ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.餐廳名稱
+                    : category === 'accommodation'
+                      ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.飯店名稱
+                      : category === 'activity'
+                        ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.場地名稱
+                        : ITEM_EDIT_DIALOG_LABELS.供應商}{' '}
+                *
               </Label>
               <Input
                 value={formData.supplier_name || ''}
-                onChange={(e) => updateField('supplier_name', e.target.value)}
+                onChange={e => updateField('supplier_name', e.target.value)}
                 className="mt-1"
               />
             </div>
             <div>
               <Label>
-                {category === 'transport' ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.接駁地點 :
-                 category === 'accommodation' ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.房型 : ITEM_EDIT_DIALOG_LABELS.項目名稱} *
+                {category === 'transport'
+                  ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.接駁地點
+                  : category === 'accommodation'
+                    ? ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.房型
+                    : ITEM_EDIT_DIALOG_LABELS.項目名稱}{' '}
+                *
               </Label>
               <Input
                 value={formData.title || ''}
-                onChange={(e) => updateField('title', e.target.value)}
+                onChange={e => updateField('title', e.target.value)}
                 className="mt-1"
               />
             </div>
@@ -283,7 +292,7 @@ export function ItemEditDialog({
             <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.描述備註}</Label>
             <Textarea
               value={formData.description || ''}
-              onChange={(e) => updateField('description', e.target.value)}
+              onChange={e => updateField('description', e.target.value)}
               placeholder={ITEM_EDIT_DIALOG_LABELS.詳細說明}
               className="mt-1"
               rows={2}
@@ -297,7 +306,7 @@ export function ItemEditDialog({
               <Input
                 type="number"
                 value={formData.unit_price ?? ''}
-                onChange={(e) => updateField('unit_price', parseFloat(e.target.value) || null)}
+                onChange={e => updateField('unit_price', parseFloat(e.target.value) || null)}
                 className="mt-1"
               />
             </div>
@@ -306,7 +315,7 @@ export function ItemEditDialog({
               <Input
                 type="number"
                 value={formData.quantity ?? 1}
-                onChange={(e) => updateField('quantity', parseInt(e.target.value) || 1)}
+                onChange={e => updateField('quantity', parseInt(e.target.value) || 1)}
                 className="mt-1"
                 min={1}
               />
@@ -324,7 +333,7 @@ export function ItemEditDialog({
               <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.幣別}</Label>
               <Select
                 value={formData.currency || 'TWD'}
-                onValueChange={(v) => updateField('currency', v)}
+                onValueChange={v => updateField('currency', v)}
               >
                 <SelectTrigger className="mt-1">
                   <SelectValue />
@@ -346,7 +355,7 @@ export function ItemEditDialog({
               <Input
                 type="number"
                 value={formData.expected_cost ?? subtotal}
-                onChange={(e) => updateField('expected_cost', parseFloat(e.target.value) || null)}
+                onChange={e => updateField('expected_cost', parseFloat(e.target.value) || null)}
                 className="mt-1"
               />
             </div>
@@ -355,7 +364,7 @@ export function ItemEditDialog({
               <Input
                 type="number"
                 value={formData.actual_cost ?? ''}
-                onChange={(e) => updateField('actual_cost', parseFloat(e.target.value) || null)}
+                onChange={e => updateField('actual_cost', parseFloat(e.target.value) || null)}
                 className="mt-1"
                 placeholder={ITEM_EDIT_DIALOG_LABELS.完成後填寫}
               />
@@ -368,7 +377,7 @@ export function ItemEditDialog({
               <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.預訂編號}</Label>
               <Input
                 value={formData.booking_reference || ''}
-                onChange={(e) => updateField('booking_reference', e.target.value)}
+                onChange={e => updateField('booking_reference', e.target.value)}
                 className="mt-1"
                 placeholder={ITEM_EDIT_DIALOG_LABELS.預約確認碼}
               />
@@ -377,13 +386,13 @@ export function ItemEditDialog({
               <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.預訂狀態}</Label>
               <Select
                 value={formData.booking_status || 'pending'}
-                onValueChange={(v) => updateField('booking_status', v as BookingStatus)}
+                onValueChange={v => updateField('booking_status', v as BookingStatus)}
               >
                 <SelectTrigger className="mt-1">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {bookingStatusOptions.map((opt) => (
+                  {bookingStatusOptions.map(opt => (
                     <SelectItem key={opt.value} value={opt.value}>
                       {opt.label}
                     </SelectItem>
@@ -405,7 +414,9 @@ export function ItemEditDialog({
                   <Input
                     type="number"
                     value={formData.leader_expense ?? ''}
-                    onChange={(e) => updateField('leader_expense', parseFloat(e.target.value) || null)}
+                    onChange={e =>
+                      updateField('leader_expense', parseFloat(e.target.value) || null)
+                    }
                     className="mt-1"
                     placeholder={ITEM_EDIT_DIALOG_LABELS.領隊支付金額}
                   />
@@ -414,7 +425,7 @@ export function ItemEditDialog({
                   <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.支出備註}</Label>
                   <Input
                     value={formData.leader_expense_note || ''}
-                    onChange={(e) => updateField('leader_expense_note', e.target.value)}
+                    onChange={e => updateField('leader_expense_note', e.target.value)}
                     className="mt-1"
                     placeholder={ITEM_EDIT_DIALOG_LABELS.領隊備註}
                   />
@@ -433,7 +444,8 @@ export function ItemEditDialog({
                 <div className="mt-2 flex flex-wrap gap-2">
                   {receiptImages.map((url, index) => (
                     <div key={index} className="relative group">
-                      <img src={url}
+                      <img
+                        src={url}
                         alt={`${ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.收據} ${index + 1}`}
                         className="w-20 h-20 object-cover rounded-lg border border-border"
                       />
@@ -458,7 +470,9 @@ export function ItemEditDialog({
                     ) : (
                       <>
                         <Upload size={20} />
-                        <span className="text-xs mt-1">{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.上傳}</span>
+                        <span className="text-xs mt-1">
+                          {ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.上傳}
+                        </span>
                       </>
                     )}
                   </button>
@@ -479,7 +493,7 @@ export function ItemEditDialog({
             <Label>{ITEM_EDIT_DIALOG_ADDITIONAL_LABELS.備註}</Label>
             <Textarea
               value={formData.notes || ''}
-              onChange={(e) => updateField('notes', e.target.value)}
+              onChange={e => updateField('notes', e.target.value)}
               placeholder={ITEM_EDIT_DIALOG_LABELS.內部備註}
               className="mt-1"
               rows={2}
@@ -495,7 +509,9 @@ export function ItemEditDialog({
           </Button>
           <Button
             onClick={handleSave}
-            disabled={saving || !formData.service_date || !formData.supplier_name || !formData.title}
+            disabled={
+              saving || !formData.service_date || !formData.supplier_name || !formData.title
+            }
             className="bg-morandi-gold hover:bg-morandi-gold-hover gap-1"
           >
             {isEdit ? <Save size={14} /> : <Plus size={14} />}

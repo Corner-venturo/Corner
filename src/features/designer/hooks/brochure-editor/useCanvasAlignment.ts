@@ -6,7 +6,7 @@ import type { BoundingBox } from './types'
 
 /**
  * useCanvasAlignment - 對齊和分佈操作 Hook
- * 
+ *
  * 功能：
  * - 對齊：alignLeft, alignCenterH, alignRight, alignTop, alignCenterV, alignBottom
  * - 分佈：distributeH, distributeV
@@ -53,49 +53,60 @@ export function useCanvasAlignment(options: UseCanvasAlignmentOptions): UseCanva
   // ============================================
   // Helper: Move Object To
   // ============================================
-  const moveObjectTo = useCallback((obj: fabric.FabricObject, targetLeft: number, targetTop: number) => {
-    const currentBound = obj.getBoundingRect()
-    const deltaX = targetLeft - currentBound.left
-    const deltaY = targetTop - currentBound.top
-    obj.set({
-      left: (obj.left || 0) + deltaX,
-      top: (obj.top || 0) + deltaY,
-    })
-    obj.setCoords()
-  }, [])
+  const moveObjectTo = useCallback(
+    (obj: fabric.FabricObject, targetLeft: number, targetTop: number) => {
+      const currentBound = obj.getBoundingRect()
+      const deltaX = targetLeft - currentBound.left
+      const deltaY = targetTop - currentBound.top
+      obj.set({
+        left: (obj.left || 0) + deltaX,
+        top: (obj.top || 0) + deltaY,
+      })
+      obj.setCoords()
+    },
+    []
+  )
 
   // ============================================
   // Helper: Prepare Objects for Alignment
   // ============================================
-  const prepareObjectsForAlignment = useCallback((canvas: fabric.Canvas): {
-    objects: fabric.FabricObject[]
-    wasMultiSelect: boolean
-  } => {
-    const activeObject = canvas.getActiveObject()
-    if (!activeObject) return { objects: [], wasMultiSelect: false }
+  const prepareObjectsForAlignment = useCallback(
+    (
+      canvas: fabric.Canvas
+    ): {
+      objects: fabric.FabricObject[]
+      wasMultiSelect: boolean
+    } => {
+      const activeObject = canvas.getActiveObject()
+      if (!activeObject) return { objects: [], wasMultiSelect: false }
 
-    if (activeObject.type === 'activeSelection') {
-      const activeSelection = activeObject as fabric.ActiveSelection
-      const objects = activeSelection.getObjects()
-      canvas.discardActiveObject()
-      objects.forEach(obj => obj.setCoords())
-      return { objects, wasMultiSelect: true }
-    }
+      if (activeObject.type === 'activeSelection') {
+        const activeSelection = activeObject as fabric.ActiveSelection
+        const objects = activeSelection.getObjects()
+        canvas.discardActiveObject()
+        objects.forEach(obj => obj.setCoords())
+        return { objects, wasMultiSelect: true }
+      }
 
-    return { objects: [activeObject], wasMultiSelect: false }
-  }, [])
+      return { objects: [activeObject], wasMultiSelect: false }
+    },
+    []
+  )
 
   // ============================================
   // Helper: Restore Multi Selection
   // ============================================
-  const restoreMultiSelection = useCallback((canvas: fabric.Canvas, objects: fabric.FabricObject[]) => {
-    if (objects.length > 1) {
-      const selection = new fabric.ActiveSelection(objects, { canvas })
-      canvas.setActiveObject(selection)
-    } else if (objects.length === 1) {
-      canvas.setActiveObject(objects[0])
-    }
-  }, [])
+  const restoreMultiSelection = useCallback(
+    (canvas: fabric.Canvas, objects: fabric.FabricObject[]) => {
+      if (objects.length > 1) {
+        const selection = new fabric.ActiveSelection(objects, { canvas })
+        canvas.setActiveObject(selection)
+      } else if (objects.length === 1) {
+        canvas.setActiveObject(objects[0])
+      }
+    },
+    []
+  )
 
   // ============================================
   // Align Left
@@ -122,7 +133,14 @@ export function useCanvasAlignment(options: UseCanvasAlignmentOptions): UseCanva
     if (wasMultiSelect) restoreMultiSelection(canvas, objects)
     canvas.renderAll()
     markDirty()
-  }, [getCanvas, prepareObjectsForAlignment, getObjectBoundingBox, moveObjectTo, restoreMultiSelection, markDirty])
+  }, [
+    getCanvas,
+    prepareObjectsForAlignment,
+    getObjectBoundingBox,
+    moveObjectTo,
+    restoreMultiSelection,
+    markDirty,
+  ])
 
   // ============================================
   // Align Center Horizontal
@@ -152,7 +170,15 @@ export function useCanvasAlignment(options: UseCanvasAlignmentOptions): UseCanva
     if (wasMultiSelect) restoreMultiSelection(canvas, objects)
     canvas.renderAll()
     markDirty()
-  }, [width, getCanvas, prepareObjectsForAlignment, getObjectBoundingBox, moveObjectTo, restoreMultiSelection, markDirty])
+  }, [
+    width,
+    getCanvas,
+    prepareObjectsForAlignment,
+    getObjectBoundingBox,
+    moveObjectTo,
+    restoreMultiSelection,
+    markDirty,
+  ])
 
   // ============================================
   // Align Right
@@ -179,7 +205,15 @@ export function useCanvasAlignment(options: UseCanvasAlignmentOptions): UseCanva
     if (wasMultiSelect) restoreMultiSelection(canvas, objects)
     canvas.renderAll()
     markDirty()
-  }, [width, getCanvas, prepareObjectsForAlignment, getObjectBoundingBox, moveObjectTo, restoreMultiSelection, markDirty])
+  }, [
+    width,
+    getCanvas,
+    prepareObjectsForAlignment,
+    getObjectBoundingBox,
+    moveObjectTo,
+    restoreMultiSelection,
+    markDirty,
+  ])
 
   // ============================================
   // Align Top
@@ -206,7 +240,14 @@ export function useCanvasAlignment(options: UseCanvasAlignmentOptions): UseCanva
     if (wasMultiSelect) restoreMultiSelection(canvas, objects)
     canvas.renderAll()
     markDirty()
-  }, [getCanvas, prepareObjectsForAlignment, getObjectBoundingBox, moveObjectTo, restoreMultiSelection, markDirty])
+  }, [
+    getCanvas,
+    prepareObjectsForAlignment,
+    getObjectBoundingBox,
+    moveObjectTo,
+    restoreMultiSelection,
+    markDirty,
+  ])
 
   // ============================================
   // Align Center Vertical
@@ -236,7 +277,15 @@ export function useCanvasAlignment(options: UseCanvasAlignmentOptions): UseCanva
     if (wasMultiSelect) restoreMultiSelection(canvas, objects)
     canvas.renderAll()
     markDirty()
-  }, [height, getCanvas, prepareObjectsForAlignment, getObjectBoundingBox, moveObjectTo, restoreMultiSelection, markDirty])
+  }, [
+    height,
+    getCanvas,
+    prepareObjectsForAlignment,
+    getObjectBoundingBox,
+    moveObjectTo,
+    restoreMultiSelection,
+    markDirty,
+  ])
 
   // ============================================
   // Align Bottom
@@ -263,7 +312,15 @@ export function useCanvasAlignment(options: UseCanvasAlignmentOptions): UseCanva
     if (wasMultiSelect) restoreMultiSelection(canvas, objects)
     canvas.renderAll()
     markDirty()
-  }, [height, getCanvas, prepareObjectsForAlignment, getObjectBoundingBox, moveObjectTo, restoreMultiSelection, markDirty])
+  }, [
+    height,
+    getCanvas,
+    prepareObjectsForAlignment,
+    getObjectBoundingBox,
+    moveObjectTo,
+    restoreMultiSelection,
+    markDirty,
+  ])
 
   // ============================================
   // Distribute Horizontal
@@ -295,7 +352,14 @@ export function useCanvasAlignment(options: UseCanvasAlignmentOptions): UseCanva
     if (wasMultiSelect) restoreMultiSelection(canvas, objects)
     canvas.renderAll()
     markDirty()
-  }, [getCanvas, prepareObjectsForAlignment, getObjectBoundingBox, moveObjectTo, restoreMultiSelection, markDirty])
+  }, [
+    getCanvas,
+    prepareObjectsForAlignment,
+    getObjectBoundingBox,
+    moveObjectTo,
+    restoreMultiSelection,
+    markDirty,
+  ])
 
   // ============================================
   // Distribute Vertical
@@ -327,7 +391,14 @@ export function useCanvasAlignment(options: UseCanvasAlignmentOptions): UseCanva
     if (wasMultiSelect) restoreMultiSelection(canvas, objects)
     canvas.renderAll()
     markDirty()
-  }, [getCanvas, prepareObjectsForAlignment, getObjectBoundingBox, moveObjectTo, restoreMultiSelection, markDirty])
+  }, [
+    getCanvas,
+    prepareObjectsForAlignment,
+    getObjectBoundingBox,
+    moveObjectTo,
+    restoreMultiSelection,
+    markDirty,
+  ])
 
   return {
     alignLeft,

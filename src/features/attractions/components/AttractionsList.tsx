@@ -5,7 +5,7 @@ import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { Attraction, hasMissingData } from '../types'
 import type { Country, City } from '@/stores/region-store'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { ATTRACTIONS_LIST_LABELS } from '../constants/labels';
+import { ATTRACTIONS_LIST_LABELS } from '../constants/labels'
 
 // ============================================
 // 景點列表組件（使用 EnhancedTable）
@@ -76,7 +76,10 @@ export function AttractionsList({
                     <AlertTriangle size={14} className="text-status-warning mt-1 flex-shrink-0" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{ATTRACTIONS_LIST_LABELS.LABEL_7396}{missing.join('、')}</p>
+                    <p>
+                      {ATTRACTIONS_LIST_LABELS.LABEL_7396}
+                      {missing.join('、')}
+                    </p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -84,7 +87,9 @@ export function AttractionsList({
             <div>
               <div className="font-medium text-morandi-primary line-clamp-1">{attraction.name}</div>
               {attraction.english_name && (
-                <div className="text-xs text-morandi-muted line-clamp-1">{attraction.english_name}</div>
+                <div className="text-xs text-morandi-muted line-clamp-1">
+                  {attraction.english_name}
+                </div>
               )}
             </div>
           </div>
@@ -107,7 +112,9 @@ export function AttractionsList({
       sortable: false,
       render: (_: unknown, attraction: Attraction) => (
         <div className="min-w-[200px] text-sm text-morandi-secondary">
-          <p className="line-clamp-2 leading-relaxed">{attraction.description || ATTRACTIONS_LIST_LABELS.暫無簡介}</p>
+          <p className="line-clamp-2 leading-relaxed">
+            {attraction.description || ATTRACTIONS_LIST_LABELS.暫無簡介}
+          </p>
         </div>
       ),
     },
@@ -174,80 +181,83 @@ export function AttractionsList({
         const isFirst = index === 0
         const isLast = index === sortedAttractions.length - 1
         return (
-        <div className="flex items-center gap-0.5">
-          {/* 上移/下移按鈕 */}
-          {onMoveUp && onMoveDown && (
-            <>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={e => {
-                  e.stopPropagation()
-                  onMoveUp(attraction)
-                }}
-                disabled={isFirst}
-                className="h-7 w-7 p-0 text-morandi-secondary hover:bg-morandi-container disabled:opacity-30"
-                title={ATTRACTIONS_LIST_LABELS.上移}
-              >
-                <ChevronUp size={14} />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={e => {
-                  e.stopPropagation()
-                  onMoveDown(attraction)
-                }}
-                disabled={isLast}
-                className="h-7 w-7 p-0 text-morandi-secondary hover:bg-morandi-container disabled:opacity-30"
-                title={ATTRACTIONS_LIST_LABELS.下移}
-              >
-                <ChevronDown size={14} />
-              </Button>
-              <div className="w-px h-4 bg-border mx-1" />
-            </>
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={e => {
-              e.stopPropagation()
-              onEdit(attraction)
-            }}
-            className="h-8 px-2 text-morandi-blue hover:bg-morandi-blue/10"
-            title={ATTRACTIONS_LIST_LABELS.編輯}
-          >
-            <Edit2 size={14} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={e => {
-              e.stopPropagation()
-              onToggleStatus(attraction)
-            }}
-            className="h-8 px-2"
-            title={attraction.is_active ? ATTRACTIONS_LIST_LABELS.停用 : ATTRACTIONS_LIST_LABELS.啟用}
-          >
-            <Power
-              size={14}
-              className={attraction.is_active ? 'text-morandi-green' : 'text-morandi-secondary'}
-            />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={e => {
-              e.stopPropagation()
-              onDelete(attraction.id)
-            }}
-            className="h-8 px-2 hover:text-morandi-red hover:bg-morandi-red/10"
-            title={ATTRACTIONS_LIST_LABELS.刪除}
-          >
-            <Trash2 size={14} />
-          </Button>
-        </div>
-      )}}
+          <div className="flex items-center gap-0.5">
+            {/* 上移/下移按鈕 */}
+            {onMoveUp && onMoveDown && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={e => {
+                    e.stopPropagation()
+                    onMoveUp(attraction)
+                  }}
+                  disabled={isFirst}
+                  className="h-7 w-7 p-0 text-morandi-secondary hover:bg-morandi-container disabled:opacity-30"
+                  title={ATTRACTIONS_LIST_LABELS.上移}
+                >
+                  <ChevronUp size={14} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={e => {
+                    e.stopPropagation()
+                    onMoveDown(attraction)
+                  }}
+                  disabled={isLast}
+                  className="h-7 w-7 p-0 text-morandi-secondary hover:bg-morandi-container disabled:opacity-30"
+                  title={ATTRACTIONS_LIST_LABELS.下移}
+                >
+                  <ChevronDown size={14} />
+                </Button>
+                <div className="w-px h-4 bg-border mx-1" />
+              </>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={e => {
+                e.stopPropagation()
+                onEdit(attraction)
+              }}
+              className="h-8 px-2 text-morandi-blue hover:bg-morandi-blue/10"
+              title={ATTRACTIONS_LIST_LABELS.編輯}
+            >
+              <Edit2 size={14} />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={e => {
+                e.stopPropagation()
+                onToggleStatus(attraction)
+              }}
+              className="h-8 px-2"
+              title={
+                attraction.is_active ? ATTRACTIONS_LIST_LABELS.停用 : ATTRACTIONS_LIST_LABELS.啟用
+              }
+            >
+              <Power
+                size={14}
+                className={attraction.is_active ? 'text-morandi-green' : 'text-morandi-secondary'}
+              />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={e => {
+                e.stopPropagation()
+                onDelete(attraction.id)
+              }}
+              className="h-8 px-2 hover:text-morandi-red hover:bg-morandi-red/10"
+              title={ATTRACTIONS_LIST_LABELS.刪除}
+            >
+              <Trash2 size={14} />
+            </Button>
+          </div>
+        )
+      }}
     />
   )
 }

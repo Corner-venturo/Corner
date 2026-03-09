@@ -1,7 +1,13 @@
 import React from 'react'
 import { Search, PenLine, Plus } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { COMP_EDITOR_LABELS } from '../constants/labels'
 
@@ -145,7 +151,7 @@ export function HotelSearchBar({
           className={`rounded-xl h-11 gap-1.5 ${showManualInput ? 'bg-morandi-gold/10 border-morandi-gold' : ''}`}
         >
           <PenLine size={16} />
-{COMP_EDITOR_LABELS.手動輸入}
+          {COMP_EDITOR_LABELS.手動輸入}
         </Button>
       </div>
 
@@ -172,7 +178,7 @@ export function HotelSearchBar({
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-lg h-10 px-4 gap-1.5"
           >
             <Plus size={16} />
-{COMP_EDITOR_LABELS.新增}
+            {COMP_EDITOR_LABELS.新增}
           </Button>
         </div>
       )}

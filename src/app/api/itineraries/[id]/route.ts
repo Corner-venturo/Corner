@@ -5,10 +5,7 @@ import { logger } from '@/lib/utils/logger'
 import { successResponse, ApiError } from '@/lib/api/response'
 import { getServerAuth } from '@/lib/auth/server-auth'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const supabaseAdmin = getSupabaseAdminClient()
@@ -34,11 +31,7 @@ export async function GET(
 
     if (isUUID) {
       // 用完整 UUID 查詢
-      const result = await supabaseAdmin
-        .from('itineraries')
-        .select('*')
-        .eq('id', id)
-        .single()
+      const result = await supabaseAdmin.from('itineraries').select('*').eq('id', id).single()
       itinerary = result.data
       error = result.error
     } else if (isShortId) {
@@ -66,7 +59,7 @@ export async function GET(
 
     if (error) {
       logger.error('查詢行程失敗:', error)
-    captureException(error, { module: 'itineraries.[id]' })
+      captureException(error, { module: 'itineraries.[id]' })
       if (error.code === 'PGRST116') {
         return ApiError.notFound('行程')
       }

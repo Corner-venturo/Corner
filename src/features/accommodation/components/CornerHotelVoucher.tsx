@@ -4,14 +4,13 @@
  * 用於生成住宿憑證 PDF
  */
 
-
 import React from 'react'
 
 // Corner 品牌色系
 const CORNER_COLORS = {
   orange: '#F89A1E', // Corner 橘色
-  gold: '#B8A99A',   // 金色（次要）
-  brown: '#3a3633',  // 深棕色
+  gold: '#B8A99A', // 金色（次要）
+  brown: '#3a3633', // 深棕色
   lightBrown: '#FAF7F2', // 淺棕背景
   gray: '#4B5563',
   lightGray: '#9CA3AF',
@@ -55,9 +54,11 @@ interface CornerHotelVoucherProps {
   companyName?: string
 }
 
-
-
-export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, language = 'zh', companyName }) => {
+export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({
+  data,
+  language = 'zh',
+  companyName,
+}) => {
   const displayCompany = companyName || ''
 
   const labels = {
@@ -120,9 +121,7 @@ export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, la
       <div className="bg-[#FAF7F2] p-3 px-4 rounded-lg mb-5 border-l-4 border-[#F89A1E]">
         <div className="mb-1.5">
           <span className="text-[var(--morandi-primary)] font-semibold">{t.confirmation}</span>
-          <span className="text-[#F89A1E] font-bold text-[12pt]">
-            {data.confirmation_number}
-          </span>
+          <span className="text-[#F89A1E] font-bold text-[12pt]">{data.confirmation_number}</span>
         </div>
         <div className="mb-1.5">
           <span className="text-[var(--morandi-primary)] font-semibold">{t.pin}</span>
@@ -139,14 +138,17 @@ export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, la
       <div className="flex gap-4 mb-6 p-4 border border-[#E5E7EB] rounded-lg">
         {data.hotel_image && (
           <div className="flex-shrink-0">
-            <img src={data.hotel_image}
+            <img
+              src={data.hotel_image}
               alt={data.hotel_name}
               className="w-[120px] h-[90px] object-cover rounded-md"
             />
           </div>
         )}
         <div className="flex-1">
-          <h2 className="m-0 mb-2 text-[14pt] font-bold text-[var(--morandi-primary)]">{data.hotel_name}</h2>
+          <h2 className="m-0 mb-2 text-[14pt] font-bold text-[var(--morandi-primary)]">
+            {data.hotel_name}
+          </h2>
           <div className="text-[10pt] text-[#4B5563] mb-1">📍 {data.hotel_address}</div>
           <div className="text-[10pt] text-[#4B5563]">📞 {data.hotel_phone}</div>
         </div>
@@ -157,7 +159,9 @@ export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, la
         {/* 入住時間 */}
         <div className="p-4 bg-[#FAF7F2] rounded-lg text-center">
           <div className="text-[9pt] text-[#9CA3AF] mb-2 font-semibold">{t.checkIn}</div>
-          <div className="text-[15pt] font-bold text-[var(--morandi-primary)] mb-1">{data.check_in_date}</div>
+          <div className="text-[15pt] font-bold text-[var(--morandi-primary)] mb-1">
+            {data.check_in_date}
+          </div>
           <div className="text-[9pt] text-[#4B5563] mb-1">{data.check_in_day}</div>
           <div className="text-[10pt] text-[#F89A1E] font-semibold">{data.check_in_time}</div>
           <div className="text-[8pt] text-[#9CA3AF] mt-0.5">{t.hotelTime}</div>
@@ -166,7 +170,9 @@ export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, la
         {/* 退房時間 */}
         <div className="p-4 bg-[#FAF7F2] rounded-lg text-center">
           <div className="text-[9pt] text-[#9CA3AF] mb-2 font-semibold">{t.checkOut}</div>
-          <div className="text-[15pt] font-bold text-[var(--morandi-primary)] mb-1">{data.check_out_date}</div>
+          <div className="text-[15pt] font-bold text-[var(--morandi-primary)] mb-1">
+            {data.check_out_date}
+          </div>
           <div className="text-[9pt] text-[#4B5563] mb-1">{data.check_out_day}</div>
           <div className="text-[10pt] text-[#F89A1E] font-semibold">{data.check_out_time}</div>
           <div className="text-[8pt] text-[#9CA3AF] mt-0.5">{t.hotelTime}</div>

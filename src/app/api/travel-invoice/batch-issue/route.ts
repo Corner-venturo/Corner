@@ -23,7 +23,8 @@ export async function POST(request: NextRequest) {
   try {
     const validation = await validateBody(request, batchIssueInvoiceSchema)
     if (!validation.success) return validation.error
-    const { tour_id, order_ids, invoice_date, buyerInfo, created_by, workspace_id } = validation.data
+    const { tour_id, order_ids, invoice_date, buyerInfo, created_by, workspace_id } =
+      validation.data
 
     const supabase = getSupabaseAdminClient()
 
@@ -59,13 +60,15 @@ export async function POST(request: NextRequest) {
     }))
 
     // 準備發票項目（合併所有訂單）
-    const items = [{
-      item_name: `旅遊服務費 (${ordersData.length}筆訂單)`,
-      item_count: 1,
-      item_unit: '式',
-      item_price: totalAmount,
-      itemAmt: totalAmount,
-    }]
+    const items = [
+      {
+        item_name: `旅遊服務費 (${ordersData.length}筆訂單)`,
+        item_count: 1,
+        item_unit: '式',
+        item_price: totalAmount,
+        itemAmt: totalAmount,
+      },
+    ]
 
     // 呼叫藍新 API（依 workspace_id 取得該租戶的藍新金鑰）
     const finalWorkspaceId = workspace_id || ordersData[0]?.workspace_id
@@ -118,7 +121,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       logger.error('儲存發票失敗:', error)
-    captureException(error, { module: 'travel-invoice.batch-issue' })
+      captureException(error, { module: 'travel-invoice.batch-issue' })
       return successResponse({
         ...result.data,
         warning: '發票已開立，但儲存時發生錯誤，請手動記錄此發票資訊',
@@ -137,9 +140,7 @@ export async function POST(request: NextRequest) {
       created_by: created_by || auth.data.employeeId,
     }))
 
-    const { error: ioError } = await supabase
-      .from('invoice_orders')
-      .insert(invoiceOrdersData)
+    const { error: ioError } = await supabase.from('invoice_orders').insert(invoiceOrdersData)
 
     if (ioError) {
       logger.error('建立發票-訂單關聯失敗:', ioError)

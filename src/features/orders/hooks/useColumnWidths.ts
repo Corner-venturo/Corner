@@ -65,9 +65,12 @@ export function useColumnWidths() {
   }, [])
 
   // 取得欄位寬度
-  const getColumnWidth = useCallback((columnId: string) => {
-    return columnWidths[columnId] || DEFAULT_WIDTHS[columnId] || 80
-  }, [columnWidths])
+  const getColumnWidth = useCallback(
+    (columnId: string) => {
+      return columnWidths[columnId] || DEFAULT_WIDTHS[columnId] || 80
+    },
+    [columnWidths]
+  )
 
   // 重置所有欄位寬度
   const resetColumnWidths = useCallback(() => {

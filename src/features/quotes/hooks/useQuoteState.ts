@@ -4,7 +4,14 @@ import { useParams, useRouter } from 'next/navigation'
 import { useQuotes } from './useQuotes'
 import { useToursSlim, useItineraries, useOrdersSlim, createTour } from '@/data'
 import { useWorkspaceChannels } from '@/stores/workspace'
-import { CostCategory, ParticipantCounts, SellingPrices, costCategories, TierPricing, CostItem } from '../types'
+import {
+  CostCategory,
+  ParticipantCounts,
+  SellingPrices,
+  costCategories,
+  TierPricing,
+  CostItem,
+} from '../types'
 import { QuickQuoteItem } from '@/types/quote.types'
 import type { FlightInfo } from '@/stores/types/tour.types'
 import { QUOTE_HOOKS_LABELS } from '../constants/labels'
@@ -26,7 +33,6 @@ export const useQuoteState = () => {
     if (workspaces.length === 0) {
       loadWorkspaces()
     }
-
   }, [])
 
   // 自動載入 quotes（如果還沒載入）
@@ -34,14 +40,12 @@ export const useQuoteState = () => {
     if (quotes.length === 0) {
       loadQuotes()
     }
-
   }, [])
 
   // 檢查是否為特殊團報價單
   const relatedTour = quote?.tour_id ? tours.find(t => t.id === quote.tour_id) : null
   const isSpecialTour = relatedTour?.status === '特殊團' // 使用中文狀態值
   const isReadOnly = isSpecialTour // 特殊團報價單設為唯讀
-
 
   // SWR 自動載入行程表
 
@@ -61,18 +65,21 @@ export const useQuoteState = () => {
   }, [quote?.itinerary_id, quote?.proposal_package_id, itineraries])
 
   // 格式化航班資訊
-  const formatFlightInfo = useCallback((flight: FlightInfo | null, type: '去程' | '回程'): string => {
-    if (!flight) return ''
-    const parts: string[] = []
-    if (flight.flightNumber) parts.push(flight.flightNumber)
-    if (flight.departureAirport && flight.arrivalAirport) {
-      parts.push(`${flight.departureAirport}→${flight.arrivalAirport}`)
-    }
-    if (flight.departureTime && flight.arrivalTime) {
-      parts.push(`${flight.departureTime}-${flight.arrivalTime}`)
-    }
-    return parts.length > 0 ? `【${type}】${parts.join(' ')}` : ''
-  }, [])
+  const formatFlightInfo = useCallback(
+    (flight: FlightInfo | null, type: '去程' | '回程'): string => {
+      if (!flight) return ''
+      const parts: string[] = []
+      if (flight.flightNumber) parts.push(flight.flightNumber)
+      if (flight.departureAirport && flight.arrivalAirport) {
+        parts.push(`${flight.departureAirport}→${flight.arrivalAirport}`)
+      }
+      if (flight.departureTime && flight.arrivalTime) {
+        parts.push(`${flight.departureTime}-${flight.arrivalTime}`)
+      }
+      return parts.length > 0 ? `【${type}】${parts.join(' ')}` : ''
+    },
+    []
+  )
 
   // 追蹤是否已添加過航班資訊，避免重複添加
   const hasAddedFlightInfo = useRef(false)
@@ -88,9 +95,8 @@ export const useQuoteState = () => {
 
   const [categories, setCategories] = useState<CostCategory[]>(() => {
     // 注意：空陣列 [] 是 truthy，所以要用 length 檢查
-    const initialCategories = (quote?.categories && quote.categories.length > 0)
-      ? quote.categories
-      : costCategories
+    const initialCategories =
+      quote?.categories && quote.categories.length > 0 ? quote.categories : costCategories
     // 確保每個分類的總計都正確計算
     let processedCategories = initialCategories.map(cat => ({
       ...cat,
@@ -245,7 +251,8 @@ export const useQuoteState = () => {
         handler_name: quote.handler_name || 'William',
         issue_date: quote.issue_date || getTodayString(),
         received_amount: quote.received_amount || 0,
-        expense_description: (quote as typeof quote & { expense_description?: string })?.expense_description || '',
+        expense_description:
+          (quote as typeof quote & { expense_description?: string })?.expense_description || '',
       })
       // 載入砍次表資料（只在第一次載入時執行）
       if (!hasLoadedTierPricings.current) {
@@ -276,9 +283,7 @@ export const useQuoteState = () => {
 
     // 檢查交通類別是否已有「機票成人」
     const transportCategory = categories.find(cat => cat.id === 'transport')
-    const hasExistingFlightItem = transportCategory?.items.some(
-      item => item.name === '機票成人'
-    )
+    const hasExistingFlightItem = transportCategory?.items.some(item => item.name === '機票成人')
 
     // 如果已有航班項目，不重複添加
     if (hasExistingFlightItem) {
@@ -324,17 +329,17 @@ export const useQuoteState = () => {
   // 總人數：直接用報價單設定的人數
   const groupSize =
     participantCounts.adult +
-    participantCounts.child_with_bed +
-    participantCounts.child_no_bed +
-    participantCounts.single_room +
-    participantCounts.infant || 1
+      participantCounts.child_with_bed +
+      participantCounts.child_no_bed +
+      participantCounts.single_room +
+      participantCounts.infant || 1
 
   // 團體分攤人數（不含嬰兒）：直接用報價單設定的人數
   const groupSizeForGuide =
     participantCounts.adult +
-    participantCounts.child_with_bed +
-    participantCounts.child_no_bed +
-    participantCounts.single_room || 1
+      participantCounts.child_with_bed +
+      participantCounts.child_no_bed +
+      participantCounts.single_room || 1
 
   const [quoteName, setQuoteName] = useState<string>(quote?.name || '')
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false)
@@ -363,7 +368,8 @@ export const useQuoteState = () => {
     handler_name: quote?.handler_name || 'William',
     issue_date: quote?.issue_date || getTodayString(),
     received_amount: quote?.received_amount || 0,
-    expense_description: (quote as typeof quote & { expense_description?: string })?.expense_description || '',
+    expense_description:
+      (quote as typeof quote & { expense_description?: string })?.expense_description || '',
   })
 
   // 砍次表狀態 - 從 quote 載入或初始化為空陣列

@@ -36,12 +36,21 @@ test.describe('旅遊團管理 - 創建流程測試', () => {
 
         // 常見的開團欄位
         const possibleFields = [
-          '團名', '目的地', '出發日期', '回程日期',
-          '開團', '團號', '人數', '價格'
+          '團名',
+          '目的地',
+          '出發日期',
+          '回程日期',
+          '開團',
+          '團號',
+          '人數',
+          '價格',
         ]
 
         for (const field of possibleFields) {
-          const hasField = await dialog.locator(`text=${field}`).isVisible().catch(() => false)
+          const hasField = await dialog
+            .locator(`text=${field}`)
+            .isVisible()
+            .catch(() => false)
           if (hasField) {
             console.log(`找到欄位：${field}`)
           }
@@ -83,7 +92,10 @@ test.describe('旅遊團管理 - 創建流程測試', () => {
         }
 
         // 檢查是否有提交按鈕
-        const submitButton = dialog.locator('button[type="submit"], button').filter({ hasText: /建立|新增|開團|儲存/ }).first()
+        const submitButton = dialog
+          .locator('button[type="submit"], button')
+          .filter({ hasText: /建立|新增|開團|儲存/ })
+          .first()
         const hasSubmit = await submitButton.isVisible().catch(() => false)
         console.log('有提交按鈕：', hasSubmit)
 
@@ -104,7 +116,10 @@ test.describe('旅遊團管理 - 創建流程測試', () => {
 
       if (await dialog.isVisible()) {
         // 不填寫任何欄位，直接嘗試提交
-        const submitButton = dialog.locator('button[type="submit"], button').filter({ hasText: /建立|新增|開團|儲存/ }).first()
+        const submitButton = dialog
+          .locator('button[type="submit"], button')
+          .filter({ hasText: /建立|新增|開團|儲存/ })
+          .first()
 
         if (await submitButton.isVisible()) {
           const isEnabled = await submitButton.isEnabled()
@@ -116,7 +131,10 @@ test.describe('旅遊團管理 - 創建流程測試', () => {
             await page.waitForTimeout(500)
 
             // 檢查是否有錯誤訊息
-            const hasError = await page.locator('text=/必填|請填寫|請選擇/i').isVisible().catch(() => false)
+            const hasError = await page
+              .locator('text=/必填|請填寫|請選擇/i')
+              .isVisible()
+              .catch(() => false)
             console.log('顯示錯誤訊息：', hasError)
           }
         }
@@ -144,7 +162,10 @@ test.describe('旅遊團管理 - 創建流程測試', () => {
         await page.waitForTimeout(500)
 
         // 檢查是否有展開內容或對話框
-        const hasExpanded = await page.locator('[data-state="open"], [aria-expanded="true"]').isVisible().catch(() => false)
+        const hasExpanded = await page
+          .locator('[data-state="open"], [aria-expanded="true"]')
+          .isVisible()
+          .catch(() => false)
         const hasDialog = await page.locator('[role="dialog"]').isVisible()
 
         console.log('點擊旅遊團後：', {
@@ -154,7 +175,11 @@ test.describe('旅遊團管理 - 創建流程測試', () => {
 
         // 如果有對話框，關閉它
         if (hasDialog) {
-          const closeButton = page.locator('[role="dialog"]').locator('button').filter({ hasText: /關閉|取消|×/ }).first()
+          const closeButton = page
+            .locator('[role="dialog"]')
+            .locator('button')
+            .filter({ hasText: /關閉|取消|×/ })
+            .first()
           if (await closeButton.isVisible()) {
             await closeButton.click()
           }
@@ -179,7 +204,10 @@ test.describe('旅遊團管理 - 創建流程測試', () => {
         await page.waitForTimeout(500)
 
         // 檢查是否有下拉選單或對話框
-        const hasDropdown = await page.locator('[role="menu"], [data-state="open"]').isVisible().catch(() => false)
+        const hasDropdown = await page
+          .locator('[role="menu"], [data-state="open"]')
+          .isVisible()
+          .catch(() => false)
         const hasDialog = await page.locator('[role="dialog"]').isVisible()
 
         console.log('點擊操作按鈕後：', {

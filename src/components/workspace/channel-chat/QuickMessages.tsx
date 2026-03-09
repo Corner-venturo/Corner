@@ -2,11 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Dialog,
   DialogContent,
@@ -41,8 +37,18 @@ const QUICK_MESSAGES: QuickMessage[] = [
     label: COMP_WORKSPACE_LABELS.集合通知,
     template: '📍 集合通知\n\n時間：{{time}}\n地點：{{location}}\n\n請準時集合！',
     variables: [
-      { key: 'time', label: COMP_WORKSPACE_LABELS.集合時間, placeholder: COMP_WORKSPACE_LABELS.例如_08_30, required: true },
-      { key: 'location', label: COMP_WORKSPACE_LABELS.集合地點, placeholder: COMP_WORKSPACE_LABELS.例如_飯店大廳, required: true },
+      {
+        key: 'time',
+        label: COMP_WORKSPACE_LABELS.集合時間,
+        placeholder: COMP_WORKSPACE_LABELS.例如_08_30,
+        required: true,
+      },
+      {
+        key: 'location',
+        label: COMP_WORKSPACE_LABELS.集合地點,
+        placeholder: COMP_WORKSPACE_LABELS.例如_飯店大廳,
+        required: true,
+      },
     ],
   },
   {
@@ -51,7 +57,12 @@ const QUICK_MESSAGES: QuickMessage[] = [
     label: COMP_WORKSPACE_LABELS.用餐通知,
     template: '🍽️ 用餐通知\n\n{{message}}\n\n請移動至餐廳用餐',
     variables: [
-      { key: 'message', label: COMP_WORKSPACE_LABELS.餐廳_說明, placeholder: COMP_WORKSPACE_LABELS.例如_一樓中餐廳, required: false },
+      {
+        key: 'message',
+        label: COMP_WORKSPACE_LABELS.餐廳_說明,
+        placeholder: COMP_WORKSPACE_LABELS.例如_一樓中餐廳,
+        required: false,
+      },
     ],
   },
   {
@@ -60,7 +71,12 @@ const QUICK_MESSAGES: QuickMessage[] = [
     label: COMP_WORKSPACE_LABELS.上車通知,
     template: '🚌 上車通知\n\n{{message}}\n\n請回到車上，即將出發！',
     variables: [
-      { key: 'message', label: COMP_WORKSPACE_LABELS.說明, placeholder: COMP_WORKSPACE_LABELS.例如_請在_5_分鐘內上車, required: false },
+      {
+        key: 'message',
+        label: COMP_WORKSPACE_LABELS.說明,
+        placeholder: COMP_WORKSPACE_LABELS.例如_請在_5_分鐘內上車,
+        required: false,
+      },
     ],
   },
   {
@@ -69,7 +85,12 @@ const QUICK_MESSAGES: QuickMessage[] = [
     label: COMP_WORKSPACE_LABELS.緊急通知,
     template: '⚠️ 緊急通知\n\n{{message}}\n\n請注意查看！',
     variables: [
-      { key: 'message', label: COMP_WORKSPACE_LABELS.緊急訊息, placeholder: COMP_WORKSPACE_LABELS.請輸入緊急通知內容, required: true },
+      {
+        key: 'message',
+        label: COMP_WORKSPACE_LABELS.緊急訊息,
+        placeholder: COMP_WORKSPACE_LABELS.請輸入緊急通知內容,
+        required: true,
+      },
     ],
   },
 ]
@@ -182,7 +203,7 @@ export function QuickMessages({ onSend, disabled }: QuickMessagesProps) {
       </Popover>
 
       {/* 編輯對話框 */}
-      <Dialog open={!!selectedMessage} onOpenChange={(open) => !open && handleCloseDialog()}>
+      <Dialog open={!!selectedMessage} onOpenChange={open => !open && handleCloseDialog()}>
         <DialogContent level={1} className="sm:max-w-md bg-[#1e1b2e] border-violet-500/30">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-violet-200">
@@ -203,7 +224,7 @@ export function QuickMessages({ onSend, disabled }: QuickMessagesProps) {
                     </Label>
                     <Input
                       value={variableValues[variable.key] || ''}
-                      onChange={(e) => handleVariableChange(variable.key, e.target.value)}
+                      onChange={e => handleVariableChange(variable.key, e.target.value)}
                       placeholder={variable.placeholder}
                       className="mt-1 border-violet-500/30 focus:border-violet-400 focus:ring-violet-400 bg-[#2d2640] text-violet-100 placeholder:text-violet-400/60"
                     />
@@ -214,10 +235,12 @@ export function QuickMessages({ onSend, disabled }: QuickMessagesProps) {
 
             {/* 預覽 */}
             <div>
-              <Label className="text-sm text-violet-300">{COMP_WORKSPACE_LABELS.PREVIEW_4634}</Label>
+              <Label className="text-sm text-violet-300">
+                {COMP_WORKSPACE_LABELS.PREVIEW_4634}
+              </Label>
               <Textarea
                 value={previewContent}
-                onChange={(e) => setPreviewContent(e.target.value)}
+                onChange={e => setPreviewContent(e.target.value)}
                 className="mt-1 min-h-[120px] border-violet-500/30 focus:border-violet-400 focus:ring-violet-400 bg-[#2d2640] text-violet-100 placeholder:text-violet-400/60"
                 placeholder={COMP_WORKSPACE_LABELS.編輯訊息內容}
               />

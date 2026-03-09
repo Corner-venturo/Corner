@@ -2,7 +2,7 @@
 
 /**
  * TourTabs - 團詳情頁籤（共用元件）
- * 
+ *
  * 提供：
  * 1. TOUR_TABS - 頁籤定義（給 ResponsiveHeader 等使用）
  * 2. TourTabContent - 只渲染內容（不含頁籤列）
@@ -35,7 +35,10 @@ const TourOrders = dynamic(
 )
 
 const OrderMembersExpandable = dynamic(
-  () => import('@/features/orders/components/OrderMembersExpandable').then(m => m.OrderMembersExpandable),
+  () =>
+    import('@/features/orders/components/OrderMembersExpandable').then(
+      m => m.OrderMembersExpandable
+    ),
   { loading: () => <TabLoading /> }
 )
 
@@ -45,7 +48,8 @@ const TourCheckin = dynamic(
 )
 
 const TourRequirementsTab = dynamic(
-  () => import('@/features/tours/components/tour-requirements-tab').then(m => m.TourRequirementsTab),
+  () =>
+    import('@/features/tours/components/tour-requirements-tab').then(m => m.TourRequirementsTab),
   { loading: () => <TabLoading /> }
 )
 
@@ -84,7 +88,6 @@ const TourTrackingPanel = dynamic(
   { loading: () => <TabLoading /> }
 )
 
-
 // ============================================================================
 // 頁籤定義（共用）
 // ============================================================================
@@ -102,7 +105,7 @@ export const TOUR_TABS = [
   { value: 'closing', label: COMP_TOURS_LABELS.結案 },
 ] as const
 
-export type TourTabValue = typeof TOUR_TABS[number]['value']
+export type TourTabValue = (typeof TOUR_TABS)[number]['value']
 
 // ============================================================================
 // TourTabContent - 只渲染內容（不含頁籤列）
@@ -173,7 +176,14 @@ export function TourTabContent({
     case 'itinerary':
       return <TourItineraryTab tour={tour} />
     case 'files':
-      return <TourFilesTree tourId={tour.id} tourCode={tour.code || ''} quoteId={tour.quote_id} itineraryId={tour.itinerary_id} />
+      return (
+        <TourFilesTree
+          tourId={tour.id}
+          tourCode={tour.code || ''}
+          quoteId={tour.quote_id}
+          itineraryId={tour.itinerary_id}
+        />
+      )
     case 'overview':
       return (
         <div className="space-y-6">
@@ -210,10 +220,13 @@ export function TourTabs({
 }: TourTabsProps) {
   const [activeTab, setActiveTab] = useState<TourTabValue>(defaultTab)
 
-  const handleTabChange = useCallback((tab: TourTabValue) => {
-    setActiveTab(tab)
-    onTabChange?.(tab)
-  }, [onTabChange])
+  const handleTabChange = useCallback(
+    (tab: TourTabValue) => {
+      setActiveTab(tab)
+      onTabChange?.(tab)
+    },
+    [onTabChange]
+  )
 
   const visibleTabs = TOUR_TABS.filter(tab => !hiddenTabs.includes(tab.value))
 
@@ -226,11 +239,11 @@ export function TourTabs({
             key={tab.value}
             onClick={() => handleTabChange(tab.value)}
             className={cn(
-              "px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors",
-              "border-b-2 -mb-px",
+              'px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors',
+              'border-b-2 -mb-px',
               activeTab === tab.value
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
             )}
           >
             {tab.label}
@@ -240,11 +253,7 @@ export function TourTabs({
 
       {/* 內容區 */}
       <div className="flex-1 overflow-auto p-4">
-        <TourTabContent
-          tour={tour}
-          activeTab={activeTab}
-          onAddRequest={onAddRequest}
-        />
+        <TourTabContent tour={tour} activeTab={activeTab} onAddRequest={onAddRequest} />
       </div>
     </div>
   )

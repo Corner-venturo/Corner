@@ -95,7 +95,9 @@ export function ContractFormFields({
       {/* 旅客資訊 */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-morandi-primary">{COMP_CONTRACTS_LABELS.旅客資訊_甲方}</h3>
+          <h3 className="text-sm font-semibold text-morandi-primary">
+            {COMP_CONTRACTS_LABELS.旅客資訊_甲方}
+          </h3>
           {members.length > 0 && (
             <div className="relative">
               <button
@@ -112,13 +114,17 @@ export function ContractFormFields({
                 <div className="absolute right-0 top-full mt-1 w-64 bg-card border border-border rounded-lg shadow-lg z-50 max-h-72 overflow-hidden flex flex-col">
                   {/* 標題列 */}
                   <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-morandi-container/30">
-                    <span className="text-xs text-morandi-secondary">{CONTRACT_FORM_LABELS.SELECT_SIGNER}</span>
+                    <span className="text-xs text-morandi-secondary">
+                      {CONTRACT_FORM_LABELS.SELECT_SIGNER}
+                    </span>
                     <button
                       type="button"
                       onClick={toggleAll}
                       className="text-xs text-morandi-gold hover:underline"
                     >
-                      {selectedMemberIds.length === members.length ? COMP_CONTRACTS_LABELS.取消全選 : COMP_CONTRACTS_LABELS.全選}
+                      {selectedMemberIds.length === members.length
+                        ? COMP_CONTRACTS_LABELS.取消全選
+                        : COMP_CONTRACTS_LABELS.全選}
                     </button>
                   </div>
 
@@ -132,14 +138,20 @@ export function ContractFormFields({
                         selectedMemberIds.length === 0 ? 'bg-morandi-gold/10' : ''
                       }`}
                     >
-                      <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
-                        selectedMemberIds.length === 0
-                          ? 'bg-morandi-gold border-morandi-gold'
-                          : 'border-border'
-                      }`}>
-                        {selectedMemberIds.length === 0 && <Check size={12} className="text-white" />}
+                      <div
+                        className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
+                          selectedMemberIds.length === 0
+                            ? 'bg-morandi-gold border-morandi-gold'
+                            : 'border-border'
+                        }`}
+                      >
+                        {selectedMemberIds.length === 0 && (
+                          <Check size={12} className="text-white" />
+                        )}
                       </div>
-                      <span className="text-morandi-primary">{CONTRACT_FORM_LABELS.COMPANY_SIGN}</span>
+                      <span className="text-morandi-primary">
+                        {CONTRACT_FORM_LABELS.COMPANY_SIGN}
+                      </span>
                     </button>
 
                     {/* 成員列表 */}
@@ -154,17 +166,19 @@ export function ContractFormFields({
                             isSelected ? 'bg-morandi-gold/10' : ''
                           }`}
                         >
-                          <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
-                            isSelected
-                              ? 'bg-morandi-gold border-morandi-gold'
-                              : 'border-border'
-                          }`}>
+                          <div
+                            className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
+                              isSelected ? 'bg-morandi-gold border-morandi-gold' : 'border-border'
+                            }`}
+                          >
                             {isSelected && <Check size={12} className="text-white" />}
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="truncate text-morandi-primary">{member.name}</div>
                             {member.idNumber && (
-                              <div className="text-xs text-morandi-secondary truncate">{member.idNumber}</div>
+                              <div className="text-xs text-morandi-secondary truncate">
+                                {member.idNumber}
+                              </div>
                             )}
                           </div>
                         </button>
@@ -189,7 +203,9 @@ export function ContractFormFields({
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs text-morandi-primary block mb-1">{CONTRACT_FORM_LABELS.NAME}</label>
+            <label className="text-xs text-morandi-primary block mb-1">
+              {CONTRACT_FORM_LABELS.NAME}
+            </label>
             <Input
               type="text"
               value={contractData.travelerName || ''}
@@ -197,7 +213,9 @@ export function ContractFormFields({
             />
           </div>
           <div>
-            <label className="text-xs text-morandi-primary block mb-1">{CONTRACT_FORM_LABELS.ID_NUMBER}</label>
+            <label className="text-xs text-morandi-primary block mb-1">
+              {CONTRACT_FORM_LABELS.ID_NUMBER}
+            </label>
             <Input
               type="text"
               value={contractData.travelerIdNumber || ''}
@@ -205,7 +223,9 @@ export function ContractFormFields({
             />
           </div>
           <div className="col-span-2">
-            <label className="text-xs text-morandi-primary block mb-1">{CONTRACT_FORM_LABELS.ADDRESS}</label>
+            <label className="text-xs text-morandi-primary block mb-1">
+              {CONTRACT_FORM_LABELS.ADDRESS}
+            </label>
             <Input
               type="text"
               value={contractData.travelerAddress || ''}
@@ -213,7 +233,9 @@ export function ContractFormFields({
             />
           </div>
           <div>
-            <label className="text-xs text-morandi-primary block mb-1">{CONTRACT_FORM_LABELS.PHONE}</label>
+            <label className="text-xs text-morandi-primary block mb-1">
+              {CONTRACT_FORM_LABELS.PHONE}
+            </label>
             <Input
               type="text"
               value={contractData.travelerPhone || ''}
@@ -225,10 +247,14 @@ export function ContractFormFields({
 
       {/* 集合時地 */}
       <div>
-        <h3 className="text-sm font-semibold text-morandi-primary mb-3">{CONTRACT_FORM_LABELS.MEETING_PLACE}</h3>
+        <h3 className="text-sm font-semibold text-morandi-primary mb-3">
+          {CONTRACT_FORM_LABELS.MEETING_PLACE}
+        </h3>
         <div className="space-y-2">
           <div>
-            <label className="text-xs text-morandi-primary block mb-1">{CONTRACT_FORM_LABELS.MEETING_TIME}</label>
+            <label className="text-xs text-morandi-primary block mb-1">
+              {CONTRACT_FORM_LABELS.MEETING_TIME}
+            </label>
             <Input
               type="datetime-local"
               value={(() => {
@@ -270,7 +296,9 @@ export function ContractFormFields({
             />
           </div>
           <div>
-            <label className="text-xs text-morandi-primary block mb-1">{CONTRACT_FORM_LABELS.LABEL_863}</label>
+            <label className="text-xs text-morandi-primary block mb-1">
+              {CONTRACT_FORM_LABELS.LABEL_863}
+            </label>
             <Input
               type="text"
               value={contractData.gatherLocation || ''}
@@ -283,10 +311,14 @@ export function ContractFormFields({
 
       {/* 費用 */}
       <div>
-        <h3 className="text-sm font-semibold text-morandi-primary mb-3">{CONTRACT_FORM_LABELS.LABEL_3906}</h3>
+        <h3 className="text-sm font-semibold text-morandi-primary mb-3">
+          {CONTRACT_FORM_LABELS.LABEL_3906}
+        </h3>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs text-morandi-primary block mb-1">{CONTRACT_FORM_LABELS.TOTAL_6648}</label>
+            <label className="text-xs text-morandi-primary block mb-1">
+              {CONTRACT_FORM_LABELS.TOTAL_6648}
+            </label>
             <Input
               type="text"
               value={contractData.totalAmount || ''}
@@ -294,7 +326,9 @@ export function ContractFormFields({
             />
           </div>
           <div>
-            <label className="text-xs text-morandi-primary block mb-1">{CONTRACT_FORM_LABELS.LABEL_3770}</label>
+            <label className="text-xs text-morandi-primary block mb-1">
+              {CONTRACT_FORM_LABELS.LABEL_3770}
+            </label>
             <Input
               type="text"
               value={contractData.depositAmount || ''}
@@ -306,10 +340,13 @@ export function ContractFormFields({
 
       {/* 乙方資訊 */}
       <div>
-        <h3 className="text-sm font-semibold text-morandi-primary mb-3">{CONTRACT_FORM_LABELS.LABEL_2868}</h3>
+        <h3 className="text-sm font-semibold text-morandi-primary mb-3">
+          {CONTRACT_FORM_LABELS.LABEL_2868}
+        </h3>
         <div>
           <label className="text-xs text-morandi-primary block mb-1">
-            {CONTRACT_FORM_LABELS.PHONE_EXTENSION}{ws.phone ? `（${ws.phone}${CONTRACT_FORM_LABELS.PHONE_EXTENSION_SUFFIX}` : ''}
+            {CONTRACT_FORM_LABELS.PHONE_EXTENSION}
+            {ws.phone ? `（${ws.phone}${CONTRACT_FORM_LABELS.PHONE_EXTENSION_SUFFIX}` : ''}
           </label>
           <Input
             type="text"

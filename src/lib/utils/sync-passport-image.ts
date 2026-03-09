@@ -17,7 +17,7 @@ interface PassportData {
   passport_image_url?: string | null
   birth_date?: string | null
   gender?: string | null
-  national_id?: string | null  // 對應 order_members 的 id_number
+  national_id?: string | null // 對應 order_members 的 id_number
 }
 
 /**
@@ -59,7 +59,8 @@ export async function checkMemberConflicts(
     // 查詢關聯的 order_members
     const { data: members, error } = await supabase
       .from('order_members')
-      .select(`
+      .select(
+        `
         id,
         order_id,
         chinese_name,
@@ -70,7 +71,8 @@ export async function checkMemberConflicts(
         gender,
         id_number,
         orders!inner(code, tour_name)
-      `)
+      `
+      )
       .eq('customer_id', customerId)
 
     if (error || !members) {
@@ -83,20 +85,32 @@ export async function checkMemberConflicts(
       const conflictFields: string[] = []
 
       // 檢查每個欄位是否有衝突（成員有值且與新值不同）
-      if (passportData.passport_number && member.passport_number &&
-          member.passport_number !== passportData.passport_number) {
+      if (
+        passportData.passport_number &&
+        member.passport_number &&
+        member.passport_number !== passportData.passport_number
+      ) {
         conflictFields.push('護照號碼')
       }
-      if (passportData.passport_expiry && member.passport_expiry &&
-          member.passport_expiry !== passportData.passport_expiry) {
+      if (
+        passportData.passport_expiry &&
+        member.passport_expiry &&
+        member.passport_expiry !== passportData.passport_expiry
+      ) {
         conflictFields.push('護照效期')
       }
-      if (passportData.passport_name && member.passport_name &&
-          member.passport_name !== passportData.passport_name) {
+      if (
+        passportData.passport_name &&
+        member.passport_name &&
+        member.passport_name !== passportData.passport_name
+      ) {
         conflictFields.push('護照拼音')
       }
-      if (passportData.birth_date && member.birth_date &&
-          member.birth_date !== passportData.birth_date) {
+      if (
+        passportData.birth_date &&
+        member.birth_date &&
+        member.birth_date !== passportData.birth_date
+      ) {
         conflictFields.push('生日')
       }
 
@@ -198,20 +212,21 @@ export async function syncPassportToCustomer(
 ): Promise<boolean> {
   try {
     const updatePayload: Record<string, string | null | undefined> = {}
-    if (passportData.passport_number !== undefined) updatePayload.passport_number = passportData.passport_number
-    if (passportData.passport_name !== undefined) updatePayload.passport_name = passportData.passport_name
-    if (passportData.passport_expiry !== undefined) updatePayload.passport_expiry = passportData.passport_expiry
-    if (passportData.passport_image_url !== undefined) updatePayload.passport_image_url = passportData.passport_image_url
+    if (passportData.passport_number !== undefined)
+      updatePayload.passport_number = passportData.passport_number
+    if (passportData.passport_name !== undefined)
+      updatePayload.passport_name = passportData.passport_name
+    if (passportData.passport_expiry !== undefined)
+      updatePayload.passport_expiry = passportData.passport_expiry
+    if (passportData.passport_image_url !== undefined)
+      updatePayload.passport_image_url = passportData.passport_image_url
     if (passportData.birth_date !== undefined) updatePayload.birth_date = passportData.birth_date
     if (passportData.gender !== undefined) updatePayload.gender = passportData.gender
     if (passportData.national_id !== undefined) updatePayload.national_id = passportData.national_id
 
     if (Object.keys(updatePayload).length === 0) return true
 
-    const { error } = await supabase
-      .from('customers')
-      .update(updatePayload)
-      .eq('id', customerId)
+    const { error } = await supabase.from('customers').update(updatePayload).eq('id', customerId)
 
     if (error) {
       logger.error('回寫護照資料到客戶失敗:', error)
@@ -250,9 +265,7 @@ export async function findActiveOrderConflicts(params: {
     const excludedStatuses = ['completed', 'cancelled']
 
     // 查詢一般訂單的成員
-    let query = supabase
-      .from('order_members')
-      .select(`
+    let query = supabase.from('order_members').select(`
         id,
         order_id,
         chinese_name,
@@ -356,10 +369,14 @@ export async function batchUpdateConflictMembers(
 
   try {
     const updatePayload: Record<string, string | null | undefined> = {}
-    if (passportData.passport_number !== undefined) updatePayload.passport_number = passportData.passport_number
-    if (passportData.passport_name !== undefined) updatePayload.passport_name = passportData.passport_name
-    if (passportData.passport_expiry !== undefined) updatePayload.passport_expiry = passportData.passport_expiry
-    if (passportData.passport_image_url !== undefined) updatePayload.passport_image_url = passportData.passport_image_url
+    if (passportData.passport_number !== undefined)
+      updatePayload.passport_number = passportData.passport_number
+    if (passportData.passport_name !== undefined)
+      updatePayload.passport_name = passportData.passport_name
+    if (passportData.passport_expiry !== undefined)
+      updatePayload.passport_expiry = passportData.passport_expiry
+    if (passportData.passport_image_url !== undefined)
+      updatePayload.passport_image_url = passportData.passport_image_url
     if (passportData.birth_date !== undefined) updatePayload.birth_date = passportData.birth_date
     if (passportData.gender !== undefined) updatePayload.gender = passportData.gender
     if (passportData.national_id !== undefined) updatePayload.id_number = passportData.national_id

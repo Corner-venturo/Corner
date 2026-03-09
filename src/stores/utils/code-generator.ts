@@ -140,7 +140,11 @@ export function generateCode(
           }
         }
         // 向後相容：匹配舊格式 A001, AA001, TP-A001, Q001 等
-        if (/^[AQ]\d{3,}$/.test(code) || /^[AQ][A-Z]\d{3}$/.test(code) || /^[A-Z]{2}-[AQ]\d{3,}$/.test(code)) {
+        if (
+          /^[AQ]\d{3,}$/.test(code) ||
+          /^[AQ][A-Z]\d{3}$/.test(code) ||
+          /^[A-Z]{2}-[AQ]\d{3,}$/.test(code)
+        ) {
           let number = 0
           if (/^[AQ]\d{3,}$/.test(code)) {
             number = parseInt(code.substring(1), 10)
@@ -167,11 +171,12 @@ export function generateCode(
   // 快速報價單使用 X 前綴，團體報價單使用 Q 前綴
   const prefix = config.quoteType === 'quick' ? 'X' : 'Q'
   const finalCode = `${prefix}${nextNumber}`
-  logger.log('✅ [code-generator] 報價單編號生成:', finalCode, { maxNumber, quoteType: config.quoteType })
+  logger.log('✅ [code-generator] 報價單編號生成:', finalCode, {
+    maxNumber,
+    quoteType: config.quoteType,
+  })
   return finalCode
 }
-
-
 
 /**
  * 生成訂單編號
@@ -184,10 +189,7 @@ export function generateCode(
  * generateOrderCode('CNX250128A', existingOrders)
  * // => 'CNX250128A-O01', 'CNX250128A-O02'...
  */
-export function generateOrderCode(
-  tourCode: string,
-  existingOrders: { code?: string }[]
-): string {
+export function generateOrderCode(tourCode: string, existingOrders: { code?: string }[]): string {
   const prefix = `${tourCode}-O`
   let maxNumber = 0
 
@@ -206,8 +208,6 @@ export function generateOrderCode(
   return `${prefix}${nextNumber}`
 }
 
-
-
 /**
  * 生成提案編號
  *
@@ -218,9 +218,7 @@ export function generateOrderCode(
  * generateProposalCode(existingProposals)
  * // => 'P000001', 'P000002'...
  */
-export function generateProposalCode(
-  existingProposals: { code?: string }[]
-): string {
+export function generateProposalCode(existingProposals: { code?: string }[]): string {
   let maxNumber = 0
 
   existingProposals.forEach(proposal => {

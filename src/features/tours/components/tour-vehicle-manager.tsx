@@ -11,7 +11,13 @@ import { createTourVehicle, deleteTourVehicle } from '@/data/entities/tour-vehic
 import { useAuthStore } from '@/stores'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Bus, Plus, Trash2, X, User, Phone } from 'lucide-react'
@@ -34,7 +40,12 @@ interface TourVehicleManagerProps {
   onOpenChange: (open: boolean) => void
 }
 
-export function TourVehicleManager({ tourId, members, open, onOpenChange }: TourVehicleManagerProps) {
+export function TourVehicleManager({
+  tourId,
+  members,
+  open,
+  onOpenChange,
+}: TourVehicleManagerProps) {
   const user = useAuthStore(state => state.user)
   const [vehicles, setVehicles] = useState<TourVehicleStatus[]>([])
   const [loading, setLoading] = useState(true)
@@ -168,31 +179,39 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
                   {COMP_TOURS_LABELS.VEHICLE_SUMMARY(vehicles.length, totalCapacity, totalAssigned)}
                 </div>
                 {vehicles.map(vehicle => {
-                  const vehicleTypeLabel = VEHICLE_TYPES.find(t => t.value === vehicle.vehicle_type)?.label || vehicle.vehicle_type
+                  const vehicleTypeLabel =
+                    VEHICLE_TYPES.find(t => t.value === vehicle.vehicle_type)?.label ||
+                    vehicle.vehicle_type
                   const progress = (vehicle.assigned_count / vehicle.capacity) * 100
 
                   return (
                     <div
                       key={vehicle.id}
                       className={cn(
-                        "flex items-center justify-between p-3 rounded-lg border",
+                        'flex items-center justify-between p-3 rounded-lg border',
                         vehicle.is_full
-                          ? "border-morandi-green bg-morandi-green/5"
-                          : "border-border bg-card"
+                          ? 'border-morandi-green bg-morandi-green/5'
+                          : 'border-border bg-card'
                       )}
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <Bus className={cn(
-                            "h-4 w-4",
-                            vehicle.is_full ? "text-morandi-green" : "text-morandi-gold"
-                          )} />
-                          <span className="font-medium text-morandi-primary">{vehicle.vehicle_name}</span>
+                          <Bus
+                            className={cn(
+                              'h-4 w-4',
+                              vehicle.is_full ? 'text-morandi-green' : 'text-morandi-gold'
+                            )}
+                          />
+                          <span className="font-medium text-morandi-primary">
+                            {vehicle.vehicle_name}
+                          </span>
                           <span className="text-xs px-2 py-0.5 rounded bg-morandi-container text-morandi-secondary">
                             {vehicleTypeLabel}
                           </span>
                           {vehicle.license_plate && (
-                            <span className="text-xs text-morandi-muted font-mono">{vehicle.license_plate}</span>
+                            <span className="text-xs text-morandi-muted font-mono">
+                              {vehicle.license_plate}
+                            </span>
                           )}
                         </div>
 
@@ -219,17 +238,22 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
                           <div className="w-24 h-1.5 bg-morandi-container rounded-full overflow-hidden">
                             <div
                               className={cn(
-                                "h-full rounded-full transition-all",
-                                vehicle.is_full ? "bg-morandi-green" : "bg-morandi-gold"
+                                'h-full rounded-full transition-all',
+                                vehicle.is_full ? 'bg-morandi-green' : 'bg-morandi-gold'
                               )}
                               style={{ width: `${progress}%` }}
                             />
                           </div>
-                          <span className={cn(
-                            "text-xs",
-                            vehicle.is_full ? "text-morandi-green" : "text-morandi-secondary"
-                          )}>
-                            {COMP_TOURS_LABELS.CAPACITY_DISPLAY(vehicle.assigned_count, vehicle.capacity)}
+                          <span
+                            className={cn(
+                              'text-xs',
+                              vehicle.is_full ? 'text-morandi-green' : 'text-morandi-secondary'
+                            )}
+                          >
+                            {COMP_TOURS_LABELS.CAPACITY_DISPLAY(
+                              vehicle.assigned_count,
+                              vehicle.capacity
+                            )}
                           </span>
                         </div>
                       </div>
@@ -283,7 +307,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
                     setNewVehicle({
                       ...newVehicle,
                       vehicle_type: value,
-                      capacity: type?.capacity || 45
+                      capacity: type?.capacity || 45,
                     })
                   }}
                 >
@@ -292,7 +316,9 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
                   </SelectTrigger>
                   <SelectContent>
                     {VEHICLE_TYPES.map(type => (
-                      <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -303,7 +329,9 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
                   type="number"
                   min={1}
                   value={newVehicle.capacity}
-                  onChange={e => setNewVehicle({ ...newVehicle, capacity: parseInt(e.target.value) || 45 })}
+                  onChange={e =>
+                    setNewVehicle({ ...newVehicle, capacity: parseInt(e.target.value) || 45 })
+                  }
                 />
               </div>
             </div>

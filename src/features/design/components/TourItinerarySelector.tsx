@@ -54,7 +54,7 @@ export function TourItinerarySelector({
       setLoadingTours(false)
     }
 
-    fetchTours().catch((err) => logger.error('[fetchTours]', err))
+    fetchTours().catch(err => logger.error('[fetchTours]', err))
   }, [workspaceId])
 
   // 根據選擇的團載入行程列表
@@ -76,47 +76,41 @@ export function TourItinerarySelector({
       setLoadingItineraries(false)
     }
 
-    fetchItineraries().catch((err) => logger.error('[fetchItineraries]', err))
+    fetchItineraries().catch(err => logger.error('[fetchItineraries]', err))
   }, [selectedTourId])
 
   const handleTourChange = (tourId: string) => {
-    const tour = tours.find((t) => t.id === tourId)
+    const tour = tours.find(t => t.id === tourId)
     onTourChange(tourId, tour?.code || '', tour?.name || '')
     onItineraryChange('', '') // 清除行程選擇
   }
 
   const handleItineraryChange = (itineraryId: string) => {
-    const itinerary = itineraries.find((i) => i.id === itineraryId)
+    const itinerary = itineraries.find(i => i.id === itineraryId)
     onItineraryChange(itineraryId, itinerary?.title || '')
   }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label className="text-sm font-medium text-morandi-primary">
-          {LABELS.selectTour}
-        </label>
-        <Select
-          value={selectedTourId}
-          onValueChange={handleTourChange}
-          disabled={loadingTours}
-        >
+        <label className="text-sm font-medium text-morandi-primary">{LABELS.selectTour}</label>
+        <Select value={selectedTourId} onValueChange={handleTourChange} disabled={loadingTours}>
           <SelectTrigger className="mt-1">
             <SelectValue placeholder={loadingTours ? LABELS.loading : LABELS.selectTour} />
           </SelectTrigger>
           <SelectContent>
-            {tours.map((tour) => (
+            {tours.map(tour => (
               <SelectItem key={tour.id} value={tour.id}>
-                {tour.code ? `${tour.code} - ${tour.name || ''}` : tour.name || `(${LABELS.noName})`}
+                {tour.code
+                  ? `${tour.code} - ${tour.name || ''}`
+                  : tour.name || `(${LABELS.noName})`}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
       <div>
-        <label className="text-sm font-medium text-morandi-primary">
-          {LABELS.selectItinerary}
-        </label>
+        <label className="text-sm font-medium text-morandi-primary">{LABELS.selectItinerary}</label>
         <Select
           value={selectedItineraryId}
           onValueChange={handleItineraryChange}
@@ -136,7 +130,7 @@ export function TourItinerarySelector({
             />
           </SelectTrigger>
           <SelectContent>
-            {itineraries.map((itinerary) => (
+            {itineraries.map(itinerary => (
               <SelectItem key={itinerary.id} value={itinerary.id}>
                 {itinerary.title || `(${LABELS.noName})`}
               </SelectItem>

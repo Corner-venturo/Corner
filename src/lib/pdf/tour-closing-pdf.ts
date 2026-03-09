@@ -123,12 +123,9 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
   if (preparedBy) {
     doc.text(`${L.PREPARED_BY}：${preparedBy}`, margin, yPos)
   }
-  doc.text(
-    `${L.PRINT_DATE}：${formatDate(new Date().toISOString())}`,
-    pageWidth - margin,
-    yPos,
-    { align: 'right' }
-  )
+  doc.text(`${L.PRINT_DATE}：${formatDate(new Date().toISOString())}`, pageWidth - margin, yPos, {
+    align: 'right',
+  })
   yPos += 8
 
   // ---- 收入明細 ----
@@ -137,15 +134,16 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
   doc.text(L.SECTION_INCOME, margin, yPos)
   yPos += 2
 
-  const incomeRows: string[][] = receipts.length > 0
-    ? receipts.map((r, idx) => [
-        String(idx + 1),
-        r.receipt_number || '-',
-        r.receipt_date ? formatDate(r.receipt_date) : '-',
-        formatCurrency(r.receipt_amount ?? r.amount ?? 0),
-        getPaymentMethodLabel(r.payment_method),
-      ])
-    : [['', L.NO_INCOME_RECORDS, '', '', '']]
+  const incomeRows: string[][] =
+    receipts.length > 0
+      ? receipts.map((r, idx) => [
+          String(idx + 1),
+          r.receipt_number || '-',
+          r.receipt_date ? formatDate(r.receipt_date) : '-',
+          formatCurrency(r.receipt_amount ?? r.amount ?? 0),
+          getPaymentMethodLabel(r.payment_method),
+        ])
+      : [['', L.NO_INCOME_RECORDS, '', '', '']]
 
   // 加入小計行
   incomeRows.push(['', '', '', formatCurrency(profitResult.receipt_total), L.INCOME_SUBTOTAL])
@@ -173,7 +171,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
       4: { cellWidth: 30, halign: 'center' },
     },
     margin: { left: margin, right: margin },
-    didParseCell: (hookData) => {
+    didParseCell: hookData => {
       // 小計行加粗
       if (hookData.section === 'body' && hookData.row.index === incomeRows.length - 1) {
         hookData.cell.styles.fontStyle = 'bold'
@@ -189,15 +187,16 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
   doc.text(L.SECTION_EXPENSE, margin, yPos)
   yPos += 2
 
-  const expenseRows: string[][] = costs.length > 0
-    ? costs.map((c, idx) => [
-        String(idx + 1),
-        c.code || '-',
-        c.supplier_name || '-',
-        formatCurrency(c.amount || 0),
-        c.request_type || '-',
-      ])
-    : [['', L.NO_EXPENSE_RECORDS, '', '', '']]
+  const expenseRows: string[][] =
+    costs.length > 0
+      ? costs.map((c, idx) => [
+          String(idx + 1),
+          c.code || '-',
+          c.supplier_name || '-',
+          formatCurrency(c.amount || 0),
+          c.request_type || '-',
+        ])
+      : [['', L.NO_EXPENSE_RECORDS, '', '', '']]
 
   expenseRows.push(['', '', '', formatCurrency(profitResult.expense_total), L.EXPENSE_SUBTOTAL])
 
@@ -224,7 +223,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
       4: { cellWidth: 30 },
     },
     margin: { left: margin, right: margin },
-    didParseCell: (hookData) => {
+    didParseCell: hookData => {
       if (hookData.section === 'body' && hookData.row.index === expenseRows.length - 1) {
         hookData.cell.styles.fontStyle = 'bold'
       }
@@ -256,10 +255,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
       `- ${formatCurrency(profitResult.administrative_cost)}`,
     ],
     [L.PROFIT_BEFORE_TAX, formatCurrency(profitResult.profit_before_tax)],
-    [
-      L.PROFIT_TAX(profitResult.tax_rate),
-      `- ${formatCurrency(profitResult.profit_tax)}`,
-    ],
+    [L.PROFIT_TAX(profitResult.tax_rate), `- ${formatCurrency(profitResult.profit_tax)}`],
     [L.NET_PROFIT, formatCurrency(profitResult.net_profit)],
   ]
 
@@ -272,14 +268,12 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
     for (const b of profitResult.employee_bonuses) {
       if (b.setting.type === BonusSettingType.OP_BONUS) {
         const bonusVal = Number(b.setting.bonus)
-        const pctLabel = b.setting.bonus_type === BonusCalculationType.PERCENT
-          ? L.PERCENT_LABEL(bonusVal)
-          : L.FIXED_LABEL(bonusVal)
+        const pctLabel =
+          b.setting.bonus_type === BonusCalculationType.PERCENT
+            ? L.PERCENT_LABEL(bonusVal)
+            : L.FIXED_LABEL(bonusVal)
         const suffix = b.employee_name ? L.EMPLOYEE_SUFFIX(b.employee_name) : ''
-        profitRows.push([
-          `${L.OP_BONUS}${pctLabel}${suffix}`,
-          `- ${formatCurrency(b.amount)}`,
-        ])
+        profitRows.push([`${L.OP_BONUS}${pctLabel}${suffix}`, `- ${formatCurrency(b.amount)}`])
       }
     }
 
@@ -287,27 +281,23 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
     for (const b of profitResult.employee_bonuses) {
       if (b.setting.type === BonusSettingType.SALE_BONUS) {
         const bonusVal = Number(b.setting.bonus)
-        const pctLabel = b.setting.bonus_type === BonusCalculationType.PERCENT
-          ? L.PERCENT_LABEL(bonusVal)
-          : L.FIXED_LABEL(bonusVal)
+        const pctLabel =
+          b.setting.bonus_type === BonusCalculationType.PERCENT
+            ? L.PERCENT_LABEL(bonusVal)
+            : L.FIXED_LABEL(bonusVal)
         const suffix = b.employee_name ? L.EMPLOYEE_SUFFIX(b.employee_name) : ''
-        profitRows.push([
-          `${L.SALE_BONUS}${pctLabel}${suffix}`,
-          `- ${formatCurrency(b.amount)}`,
-        ])
+        profitRows.push([`${L.SALE_BONUS}${pctLabel}${suffix}`, `- ${formatCurrency(b.amount)}`])
       }
     }
 
     // 團隊獎金
     for (const b of profitResult.team_bonuses) {
       const bonusVal = Number(b.setting.bonus)
-      const pctLabel = b.setting.bonus_type === BonusCalculationType.PERCENT
-        ? L.PERCENT_LABEL(bonusVal)
-        : L.FIXED_LABEL(bonusVal)
-      profitRows.push([
-        `${L.TEAM_BONUS}${pctLabel}`,
-        `- ${formatCurrency(b.amount)}`,
-      ])
+      const pctLabel =
+        b.setting.bonus_type === BonusCalculationType.PERCENT
+          ? L.PERCENT_LABEL(bonusVal)
+          : L.FIXED_LABEL(bonusVal)
+      profitRows.push([`${L.TEAM_BONUS}${pctLabel}`, `- ${formatCurrency(b.amount)}`])
     }
   } else {
     profitRows.push([L.NO_BONUS, ''])
@@ -331,7 +321,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
       1: { cellWidth: 50, halign: 'right' },
     },
     margin: { left: margin, right: margin },
-    didDrawCell: (hookData) => {
+    didDrawCell: hookData => {
       // 淨利行底線
       if (hookData.section === 'body' && hookData.row.index === 5) {
         const cell = hookData.cell
@@ -347,7 +337,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
         doc.line(cell.x, cell.y, cell.x + cell.width, cell.y)
       }
     },
-    didParseCell: (hookData) => {
+    didParseCell: hookData => {
       // 公司盈餘行加粗加大
       if (hookData.section === 'body' && hookData.row.index === profitRows.length - 1) {
         hookData.cell.styles.fontSize = 12
@@ -370,17 +360,8 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
 
     const pageHeight = doc.internal.pageSize.getHeight()
 
-    doc.text(
-      L.GENERATED_AT(formatDate(new Date().toISOString())),
-      margin,
-      pageHeight - 10,
-    )
-    doc.text(
-      L.PAGE_NUMBER(i, pageCount),
-      pageWidth - margin,
-      pageHeight - 10,
-      { align: 'right' }
-    )
+    doc.text(L.GENERATED_AT(formatDate(new Date().toISOString())), margin, pageHeight - 10)
+    doc.text(L.PAGE_NUMBER(i, pageCount), pageWidth - margin, pageHeight - 10, { align: 'right' })
   }
 
   // ========== 儲存 PDF ==========

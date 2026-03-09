@@ -43,7 +43,7 @@ export const ADD_RECEIPT_DIALOG_LABELS = {
   COPY: '複製',
   LABEL_1670: '開啟',
   TOTAL_6550: '總金額',
-};
+}
 
 export const BATCH_RECEIPT_DIALOG_LABELS = {
   現金: '現金',
@@ -56,7 +56,7 @@ export const BATCH_RECEIPT_DIALOG_LABELS = {
   建立失敗_請稍後再試: '建立失敗，請稍後再試',
   搜尋訂單: '搜尋訂單...',
   分配金額超過總金額: '分配金額超過總金額',
-};
+}
 
 export const PAYMENT_ITEM_ROW_LABELS = {
   請填寫必要欄位: '請填寫必要欄位',
@@ -80,7 +80,7 @@ export const PAYMENT_ITEM_ROW_LABELS = {
   LABEL_2899: '產生連結',
   LABEL_1487: '付款連結',
   LABEL_1670: '開啟',
-};
+}
 
 export const RECEIPT_CONFIRM_DIALOG_LABELS = {
   已確認: '已確認',
@@ -94,9 +94,10 @@ export const RECEIPT_CONFIRM_DIALOG_LABELS = {
   待確認: '待確認',
   金額正確: '金額正確',
   金額異常: '金額異常',
-  確認後將通知建立者: (receiptNumber: string) => `確認後將通知收款單建立者：${receiptNumber} 金額異常`,
+  確認後將通知建立者: (receiptNumber: string) =>
+    `確認後將通知收款單建立者：${receiptNumber} 金額異常`,
   輸入實際金額: '輸入實際金額',
-};
+}
 
 export const ADD_REQUEST_DIALOG_LABELS = {
   其他: '其他',
@@ -116,13 +117,13 @@ export const ADD_REQUEST_DIALOG_LABELS = {
   搜尋旅遊團: '搜尋旅遊團...',
   請款備註_選填: '請款備註（選填）',
   新增請款單: '新增請款單',
-};
+}
 
 export const EXPENSE_TYPE_SELECTOR_LABELS = {
   選擇費用類型: '選擇費用類型...',
 
   LABEL_6005: '費用類型 *',
-};
+}
 
 export const QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS = {
   請輸入有效的金額: '請輸入有效的金額',
@@ -137,12 +138,12 @@ export const QUICK_REQUEST_FROM_ITEM_DIALOG_LABELS = {
   LABEL_3827: '請款金額 *',
   REMARKS: '備註',
   CANCEL: '取消',
-};
+}
 
 export const REQUEST_DATE_INPUT_LABELS = {
   請款日期: '請款日期',
   一般請款_週四出帳: '一般請款：週四出帳',
-};
+}
 
 export const REQUEST_DETAIL_DIALOG_LABELS = {
   未命名: '未命名',
@@ -165,7 +166,7 @@ export const REQUEST_DETAIL_DIALOG_LABELS = {
   請款人: '請款人',
   選擇付款對象: '選擇付款對象...',
   說明: '說明',
-};
+}
 
 export const REQUEST_ITEM_LIST_LABELS = {
   選擇供應商: '選擇供應商...',
@@ -179,12 +180,12 @@ export const REQUEST_ITEM_LIST_LABELS = {
   QUANTITY: '數量',
   LABEL_832: '小計',
   TOTAL_6550: '總金額',
-};
+}
 
 export const USE_REQUEST_TABLE_LABELS = {
   金額: '金額',
   狀態: '狀態',
-};
+}
 
 export const BATCH_INVOICE_DIALOG_LABELS = {
   請輸入買受人名稱: '請輸入買受人名稱',
@@ -209,7 +210,7 @@ export const BATCH_INVOICE_DIALOG_LABELS = {
   LABEL_3729: '統編',
   LABEL_3494: '日期 *',
   CANCEL: '取消',
-};
+}
 
 export const ISSUE_INVOICE_DIALOG_LABELS = {
   旅遊服務費: '旅遊服務費',
@@ -234,7 +235,7 @@ export const ISSUE_INVOICE_DIALOG_LABELS = {
   LABEL_8296: '統一編號',
   LABEL_3957: '開立日期 *',
   CANCEL: '取消',
-};
+}
 
 // 請款單 (AddRequestDialog / RequestDetailDialog)
 export const REQUEST_LABELS = {
@@ -245,22 +246,25 @@ export const REQUEST_LABELS = {
   餐食: '餐食',
   其他: '其他',
   // 訊息
-  建立完成: (success: number, error: number) => `建立完成：成功 ${success} 筆，失敗 ${error} 筆。請檢查失敗的請款單品項。`,
-  成功建立: (count: number, batchId: string) => `成功建立 ${count} 筆請款單（批次 ID: ${batchId.slice(0, 8)}...）`,
+  建立完成: (success: number, error: number) =>
+    `建立完成：成功 ${success} 筆，失敗 ${error} 筆。請檢查失敗的請款單品項。`,
+  成功建立: (count: number, batchId: string) =>
+    `成功建立 ${count} 筆請款單（批次 ID: ${batchId.slice(0, 8)}...）`,
   請款單號: '請款單號',
   確認成本: (amount: string) => `確認成本：NT$ ${amount}`,
   預估成本: (amount: string) => `預估成本：NT$ ${amount}`,
   共N筆總金額: (count: number) => `共 ${count} 筆，總金額`,
   共N項總金額: (count: number) => `共 ${count} 項，總金額`,
-  確定要刪除此請款單: (code: string) => `確定要刪除此請款單（${code}）嗎？此操作無法復原。\n\n注意：只會刪除當前選中的請款單，同批次的其他請款單不受影響。`,
+  確定要刪除此請款單: (code: string) =>
+    `確定要刪除此請款單（${code}）嗎？此操作無法復原。\n\n注意：只會刪除當前選中的請款單，同批次的其他請款單不受影響。`,
   訂單: (orderNumber: string) => ` | 訂單：${orderNumber}`,
   同批次請款單: '同批次請款單',
-};
+}
 
 // 批次收款 (BatchReceiptDialog)
 export const BATCH_RECEIPT_LABELS = {
   成功建立收款單: (count: number) => `成功建立 ${count} 筆收款單`,
-};
+}
 
 // AddRequestDialog 額外標籤
 export const ADD_REQUEST_FORM_LABELS = {
@@ -301,7 +305,7 @@ export const ADD_REQUEST_FORM_LABELS = {
   ADD_3774: '點擊「新增旅遊團」開始分配',
   CANCEL: '取消',
   處理中: '處理中...',
-};
+}
 
 // RequestDetailDialog 額外標籤
 export const REQUEST_DETAIL_FORM_LABELS = {
@@ -321,12 +325,13 @@ export const REQUEST_DETAIL_FORM_LABELS = {
   ADD_2089: '新增項目',
   EMPTY_9932: '尚無請款項目',
   DELETE: '刪除',
-};
+}
 
 // BatchReceiptDialog 額外標籤
 export const BATCH_RECEIPT_FORM_LABELS = {
   過濾有選擇訂單且金額大於0的分配: '// 過濾有選擇訂單且金額 > 0 的分配',
-  還有NT金額未分配: (amount: number, status: string) => `還有 NT$ ${amount.toLocaleString('zh-TW')} ${status}，請確認分配金額`,
+  還有NT金額未分配: (amount: number, status: string) =>
+    `還有 NT$ ${amount.toLocaleString('zh-TW')} ${status}，請確認分配金額`,
   未分配: '未分配',
   收款日期: '收款日期',
   收款方式: '收款方式',
@@ -345,10 +350,7 @@ export const BATCH_RECEIPT_FORM_LABELS = {
   ADD_8367: '點擊「新增訂單」開始分配',
   CANCEL: '取消',
   LABEL_7330: '建立批量收款單',
-};
-
-
-
+}
 
 export const RECEIPT_CONFIRM_LABELS = {
   TITLE: '收款單詳情',
@@ -384,12 +386,16 @@ export const FINANCE_LABELS = {
 
 // AddReceiptDialog
 export const ADD_RECEIPT_TOAST_LABELS = {
-  UPDATED: (receiptNumber: string, itemCount: number) => `已更新收款單 ${receiptNumber}（${itemCount} 個項目）`,
-  CREATED_WITH_LINKPAY: (itemCount: number, linkPayCount: number) => `已新增 ${itemCount} 項收款，其中 ${linkPayCount} 項 LinkPay 已產生連結`,
+  UPDATED: (receiptNumber: string, itemCount: number) =>
+    `已更新收款單 ${receiptNumber}（${itemCount} 個項目）`,
+  CREATED_WITH_LINKPAY: (itemCount: number, linkPayCount: number) =>
+    `已新增 ${itemCount} 項收款，其中 ${linkPayCount} 項 LinkPay 已產生連結`,
   CREATE_SUCCESS: '收款單建立成功',
-  CREATED: (itemCount: number, totalAmount: string) => `已新增 ${itemCount} 項收款，總金額 NT$ ${totalAmount}`,
+  CREATED: (itemCount: number, totalAmount: string) =>
+    `已新增 ${itemCount} 項收款，總金額 NT$ ${totalAmount}`,
   ERROR_CODE: (code: string) => `錯誤代碼: ${code}`,
-  DELETE_CONFIRM: (receiptNumber: string) => `確定要刪除收款單 ${receiptNumber} 嗎？此操作無法復原。`,
+  DELETE_CONFIRM: (receiptNumber: string) =>
+    `確定要刪除收款單 ${receiptNumber} 嗎？此操作無法復原。`,
   DELETED: (receiptNumber: string) => `收款單 ${receiptNumber} 已刪除`,
   CONFIRMED_READONLY: (receiptNumber: string) => `${receiptNumber} - 已確認的收款單無法編輯或刪除`,
   EDIT_TITLE: (receiptNumber: string) => `編輯 ${receiptNumber}`,
@@ -406,7 +412,8 @@ export const RECEIPT_CONFIRM_TOAST_LABELS = {
   CONFIRM_SUCCESS: '確認成功',
   CONFIRM_FAILED: '確認失敗',
   PLEASE_TRY_LATER: '請稍後再試',
-  DELETE_CONFIRM: (receiptNumber: string) => `確定要刪除收款單 ${receiptNumber} 嗎？此操作無法復原。`,
+  DELETE_CONFIRM: (receiptNumber: string) =>
+    `確定要刪除收款單 ${receiptNumber} 嗎？此操作無法復原。`,
   DELETED: (receiptNumber: string) => `收款單 ${receiptNumber} 已刪除`,
 }
 

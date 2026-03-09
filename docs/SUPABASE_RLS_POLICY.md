@@ -205,6 +205,7 @@ WHERE schemaname = 'public'
 **原因**: 表格啟用了 RLS，但 INSERT 策略不允許
 
 **解決方案**:
+
 1. 確認已登入 Supabase Auth
 2. 確認 `ensureAuthSync()` 已執行
 3. 確認 `workspace_id` 正確
@@ -214,6 +215,7 @@ WHERE schemaname = 'public'
 **原因**: RLS 過濾掉了資料
 
 **解決方案**:
+
 1. 確認當前用戶的 `workspace_id` 正確
 2. 使用 API Route（Service Role）繞過 RLS 進行偵錯
 
@@ -222,6 +224,7 @@ WHERE schemaname = 'public'
 **原因**: `is_super_admin()` 函數未正確設定
 
 **解決方案**:
+
 ```sql
 -- 檢查 super_admin 角色
 SELECT * FROM employees
@@ -232,11 +235,11 @@ WHERE supabase_user_id = auth.uid();
 
 ## 🔐 權限層級
 
-| 角色 | 權限範圍 |
-|------|---------|
-| **一般員工** | 只能存取自己 Workspace 的資料 |
-| **Super Admin** | 可存取所有 Workspace 的資料 |
-| **Service Role** | 繞過 RLS（僅限後端 API） |
+| 角色             | 權限範圍                      |
+| ---------------- | ----------------------------- |
+| **一般員工**     | 只能存取自己 Workspace 的資料 |
+| **Super Admin**  | 可存取所有 Workspace 的資料   |
+| **Service Role** | 繞過 RLS（僅限後端 API）      |
 
 ### 前端存取
 

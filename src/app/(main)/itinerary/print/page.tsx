@@ -4,7 +4,6 @@
  * 適用於非 TP/TC 的公司，提供簡潔的 A4 列印格式
  */
 
-
 import { PRINT_LABELS } from '../constants/labels'
 
 import { useSearchParams, useRouter } from 'next/navigation'
@@ -88,7 +87,10 @@ function ItineraryPrintContent() {
           <ArrowLeft size={16} />
           {PRINT_LABELS.BACK}
         </Button>
-        <Button onClick={handlePrint} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+        <Button
+          onClick={handlePrint}
+          className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
+        >
           <Printer size={16} />
           {PRINT_LABELS.PRINT}
         </Button>
@@ -99,17 +101,21 @@ function ItineraryPrintContent() {
         <div className="p-8 print:p-6">
           {/* 封面圖（如果有） */}
           {itinerary.cover_image && (
-            <div className="mb-6 -mx-8 -mt-8 print:-mx-6 print:-mt-6 relative overflow-hidden" style={{ height: '280px' }}>
-              <img src={itinerary.cover_image}
+            <div
+              className="mb-6 -mx-8 -mt-8 print:-mx-6 print:-mt-6 relative overflow-hidden"
+              style={{ height: '280px' }}
+            >
+              <img
+                src={itinerary.cover_image}
                 alt={itinerary.title || ''}
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <div className="absolute bottom-6 left-8 right-8 text-white">
-                <h1 className="text-3xl font-bold mb-1">{itinerary.title || PRINT_LABELS.DEFAULT_TITLE}</h1>
-                {itinerary.subtitle && (
-                  <p className="text-sm opacity-90">{itinerary.subtitle}</p>
-                )}
+                <h1 className="text-3xl font-bold mb-1">
+                  {itinerary.title || PRINT_LABELS.DEFAULT_TITLE}
+                </h1>
+                {itinerary.subtitle && <p className="text-sm opacity-90">{itinerary.subtitle}</p>}
               </div>
             </div>
           )}
@@ -136,9 +142,7 @@ function ItineraryPrintContent() {
               </div>
               <div className="text-right text-sm text-morandi-secondary">
                 <p className="font-semibold text-morandi-gold">{companyName}</p>
-                {itinerary.tour_code && (
-                  <p className="font-mono">{itinerary.tour_code}</p>
-                )}
+                {itinerary.tour_code && <p className="font-mono">{itinerary.tour_code}</p>}
               </div>
             </div>
 
@@ -154,7 +158,9 @@ function ItineraryPrintContent() {
               </div>
               <div className="flex gap-2">
                 <span className="text-morandi-secondary">{PRINT_LABELS.TRIP_DAYS}</span>
-                <span className="font-medium">{dailyItinerary.length} {PRINT_LABELS.DAY_UNIT}</span>
+                <span className="font-medium">
+                  {dailyItinerary.length} {PRINT_LABELS.DAY_UNIT}
+                </span>
               </div>
               {tour && (
                 <div className="flex gap-2">
@@ -168,34 +174,40 @@ function ItineraryPrintContent() {
           {/* 航班資訊（如果有） */}
           {(itinerary.outbound_flight || itinerary.return_flight) && (
             <div className="mb-6 p-4 bg-morandi-container/30 rounded-lg">
-              <h3 className="text-sm font-semibold text-morandi-primary mb-2">{PRINT_LABELS.FLIGHT_INFO}</h3>
+              <h3 className="text-sm font-semibold text-morandi-primary mb-2">
+                {PRINT_LABELS.FLIGHT_INFO}
+              </h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
-                {itinerary.outbound_flight && (() => {
-                  const flight = Array.isArray(itinerary.outbound_flight) ? itinerary.outbound_flight[0] : itinerary.outbound_flight
-                  return flight ? (
-                    <div>
-                      <span className="text-morandi-secondary">{PRINT_LABELS.OUTBOUND}</span>
-                      <span className="ml-2">
-                        {flight.airline} {flight.flightNumber}
-                        {' '}
-                        {flight.departureTime} - {flight.arrivalTime}
-                      </span>
-                    </div>
-                  ) : null
-                })()}
-                {itinerary.return_flight && (() => {
-                  const flight = Array.isArray(itinerary.return_flight) ? itinerary.return_flight[0] : itinerary.return_flight
-                  return flight ? (
-                    <div>
-                      <span className="text-morandi-secondary">{PRINT_LABELS.RETURN}</span>
-                      <span className="ml-2">
-                        {flight.airline} {flight.flightNumber}
-                        {' '}
-                        {flight.departureTime} - {flight.arrivalTime}
-                      </span>
-                    </div>
-                  ) : null
-                })()}
+                {itinerary.outbound_flight &&
+                  (() => {
+                    const flight = Array.isArray(itinerary.outbound_flight)
+                      ? itinerary.outbound_flight[0]
+                      : itinerary.outbound_flight
+                    return flight ? (
+                      <div>
+                        <span className="text-morandi-secondary">{PRINT_LABELS.OUTBOUND}</span>
+                        <span className="ml-2">
+                          {flight.airline} {flight.flightNumber} {flight.departureTime} -{' '}
+                          {flight.arrivalTime}
+                        </span>
+                      </div>
+                    ) : null
+                  })()}
+                {itinerary.return_flight &&
+                  (() => {
+                    const flight = Array.isArray(itinerary.return_flight)
+                      ? itinerary.return_flight[0]
+                      : itinerary.return_flight
+                    return flight ? (
+                      <div>
+                        <span className="text-morandi-secondary">{PRINT_LABELS.RETURN}</span>
+                        <span className="ml-2">
+                          {flight.airline} {flight.flightNumber} {flight.departureTime} -{' '}
+                          {flight.arrivalTime}
+                        </span>
+                      </div>
+                    ) : null
+                  })()}
               </div>
             </div>
           )}
@@ -204,12 +216,24 @@ function ItineraryPrintContent() {
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="bg-morandi-gold text-white">
-                <th className="border border-morandi-gold/50 px-3 py-2 text-left w-24">{PRINT_LABELS.DATE}</th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-left">{PRINT_LABELS.ITINERARY_CONTENT}</th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-20">{PRINT_LABELS.BREAKFAST}</th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-20">{PRINT_LABELS.LUNCH}</th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-20">{PRINT_LABELS.DINNER}</th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-left w-36">{PRINT_LABELS.ACCOMMODATION}</th>
+                <th className="border border-morandi-gold/50 px-3 py-2 text-left w-24">
+                  {PRINT_LABELS.DATE}
+                </th>
+                <th className="border border-morandi-gold/50 px-3 py-2 text-left">
+                  {PRINT_LABELS.ITINERARY_CONTENT}
+                </th>
+                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-20">
+                  {PRINT_LABELS.BREAKFAST}
+                </th>
+                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-20">
+                  {PRINT_LABELS.LUNCH}
+                </th>
+                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-20">
+                  {PRINT_LABELS.DINNER}
+                </th>
+                <th className="border border-morandi-gold/50 px-3 py-2 text-left w-36">
+                  {PRINT_LABELS.ACCOMMODATION}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -244,7 +268,10 @@ function ItineraryPrintContent() {
 
           {/* 頁尾 */}
           <div className="mt-8 pt-4 border-t border-morandi-container text-xs text-morandi-secondary text-center">
-            <p>{PRINT_LABELS.FOOTER_PROVIDED_BY} {companyName} {PRINT_LABELS.FOOTER_PRINT_DATE}{formatDateTW(new Date())}</p>
+            <p>
+              {PRINT_LABELS.FOOTER_PROVIDED_BY} {companyName} {PRINT_LABELS.FOOTER_PRINT_DATE}
+              {formatDateTW(new Date())}
+            </p>
           </div>
         </div>
       </div>
@@ -260,11 +287,24 @@ function ItineraryPrintContent() {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }
-          table { page-break-inside: auto; }
-          tr { page-break-inside: avoid; page-break-after: auto; }
-          thead { display: table-header-group; }
-          h1, h2, h3 { page-break-after: avoid; }
-          img { page-break-inside: avoid; }
+          table {
+            page-break-inside: auto;
+          }
+          tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+          }
+          thead {
+            display: table-header-group;
+          }
+          h1,
+          h2,
+          h3 {
+            page-break-after: avoid;
+          }
+          img {
+            page-break-inside: avoid;
+          }
         }
       `}</style>
     </div>
@@ -273,11 +313,13 @@ function ItineraryPrintContent() {
 
 export default function ItineraryPrintPage() {
   return (
-    <Suspense fallback={
-      <div className="h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-morandi-gold" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="h-screen flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-morandi-gold" />
+        </div>
+      }
+    >
       <ItineraryPrintContent />
     </Suspense>
   )

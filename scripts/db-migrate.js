@@ -28,17 +28,17 @@ async function executeSQL(sql, description = 'SQL') {
       path: `/v1/projects/${PROJECT_REF}/database/query`,
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${SUPABASE_ACCESS_TOKEN}`,
-        'Content-Type': 'application/json'
-      }
+        Authorization: `Bearer ${SUPABASE_ACCESS_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
     }
 
     const postData = JSON.stringify({ query: sql })
 
-    const req = https.request(options, (res) => {
+    const req = https.request(options, res => {
       let data = ''
 
-      res.on('data', (chunk) => {
+      res.on('data', chunk => {
         data += chunk
       })
 
@@ -54,7 +54,7 @@ async function executeSQL(sql, description = 'SQL') {
       })
     })
 
-    req.on('error', (error) => {
+    req.on('error', error => {
       console.error(`❌ 網路錯誤:`, error.message)
       reject(error)
     })
@@ -118,7 +118,8 @@ function getMigrationFiles() {
     return []
   }
 
-  return fs.readdirSync(MIGRATIONS_DIR)
+  return fs
+    .readdirSync(MIGRATIONS_DIR)
     .filter(file => file.endsWith('.sql'))
     .sort()
 }
@@ -150,9 +151,7 @@ async function main() {
   console.log(`\n📋 Migration 檔案總數: ${allMigrations.length} 個`)
 
   // 4. 找出未執行的 migrations
-  const pendingMigrations = allMigrations.filter(
-    file => !executedMigrations.includes(file)
-  )
+  const pendingMigrations = allMigrations.filter(file => !executedMigrations.includes(file))
 
   if (pendingMigrations.length === 0) {
     console.log('\n✅ 所有 migrations 都已執行，資料庫是最新狀態！')

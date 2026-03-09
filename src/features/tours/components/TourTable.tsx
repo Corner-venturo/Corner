@@ -64,7 +64,6 @@ export const TourTable: React.FC<TourTableProps> = ({
               tour={tour}
               onClick={() => onRowClick(tour)}
               getStatusColor={getStatusColor || (() => '')}
-
             />
           ))
         )}

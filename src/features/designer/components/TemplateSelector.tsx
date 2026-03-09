@@ -7,13 +7,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react'
-import {
-  BookOpen,
-  ChevronRight,
-  Check,
-  Loader2,
-  ArrowLeft,
-} from 'lucide-react'
+import { BookOpen, ChevronRight, Check, Loader2, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   styleSeries,
@@ -44,7 +38,11 @@ interface TemplateSelectorProps {
   itineraryId?: string | null
   tourId?: string | null
   onBack: () => void
-  onComplete: (pages: CanvasPage[], templateData: TemplateData | null, selectedStyle: StyleSeries) => void
+  onComplete: (
+    pages: CanvasPage[],
+    templateData: TemplateData | null,
+    selectedStyle: StyleSeries
+  ) => void
   sidebarWidth: string
 }
 
@@ -56,9 +54,7 @@ export function TemplateSelector({
   sidebarWidth,
 }: TemplateSelectorProps) {
   // 選擇的風格系列
-  const [selectedStyle, setSelectedStyle] = useState<StyleSeries | null>(
-    styleSeries[0] || null
-  )
+  const [selectedStyle, setSelectedStyle] = useState<StyleSeries | null>(styleSeries[0] || null)
   // 行程資料
   const [itineraryData, setItineraryData] = useState<TemplateData | null>(null)
   // 載入狀態
@@ -70,11 +66,7 @@ export function TemplateSelector({
   useEffect(() => {
     // 載入行程表資料
     const loadItinerary = async (id: string) => {
-      const { data, error } = await supabase
-        .from('itineraries')
-        .select('*')
-        .eq('id', id)
-        .single()
+      const { data, error } = await supabase.from('itineraries').select('*').eq('id', id).single()
 
       if (error) throw error
 
@@ -101,11 +93,7 @@ export function TemplateSelector({
 
     // 載入旅遊團資料
     const loadTour = async (id: string) => {
-      const { data, error } = await supabase
-        .from('tours')
-        .select('*')
-        .eq('id', id)
-        .single()
+      const { data, error } = await supabase.from('tours').select('*').eq('id', id).single()
 
       if (error) throw error
 
@@ -237,7 +225,9 @@ export function TemplateSelector({
         </Button>
         <div className="flex items-center gap-3">
           <BookOpen size={24} className="text-morandi-gold" />
-          <h1 className="text-xl font-semibold text-morandi-primary">{DESIGNER_LABELS.SELECT_9662}</h1>
+          <h1 className="text-xl font-semibold text-morandi-primary">
+            {DESIGNER_LABELS.SELECT_9662}
+          </h1>
         </div>
       </div>
 
@@ -260,9 +250,7 @@ export function TemplateSelector({
                   已載入行程：{itineraryData.mainTitle || '未命名行程'}
                 </div>
                 {itineraryData.coverImage && (
-                  <p className="text-sm text-morandi-secondary mt-1">
-                    ✓ 包含封面圖片
-                  </p>
+                  <p className="text-sm text-morandi-secondary mt-1">✓ 包含封面圖片</p>
                 )}
                 {itineraryData.travelDates && (
                   <p className="text-sm text-morandi-secondary">
@@ -279,13 +267,14 @@ export function TemplateSelector({
           <h2 className="text-lg font-semibold text-morandi-primary mb-4">
             {DESIGNER_LABELS.SELECT_2078}
           </h2>
-          <p className="text-sm text-morandi-secondary mb-4">
-            {DESIGNER_LABELS.ADD_795}
-          </p>
+          <p className="text-sm text-morandi-secondary mb-4">{DESIGNER_LABELS.ADD_795}</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {styleSeries.map((style) => {
-              const styleInfo = STYLE_DESCRIPTIONS[style.id] || { description: '', colors: ['#e8dcc8', '#c9aa7c', '#6b5b4a'] }
+            {styleSeries.map(style => {
+              const styleInfo = STYLE_DESCRIPTIONS[style.id] || {
+                description: '',
+                colors: ['#e8dcc8', '#c9aa7c', '#6b5b4a'],
+              }
               return (
                 <button
                   key={style.id}
@@ -306,7 +295,11 @@ export function TemplateSelector({
                       {/* 模擬封面 header */}
                       <div
                         className="w-full h-2 mt-1 mx-auto rounded-md"
-                        style={{ backgroundColor: styleInfo.colors[1] || '#c9aa7c', width: '80%', marginLeft: '10%' }}
+                        style={{
+                          backgroundColor: styleInfo.colors[1] || '#c9aa7c',
+                          width: '80%',
+                          marginLeft: '10%',
+                        }}
                       />
                       {/* 模擬圖片區域 */}
                       <div
@@ -315,8 +308,17 @@ export function TemplateSelector({
                       />
                       {/* 模擬標題文字 */}
                       <div className="flex flex-col items-center gap-0.5 mt-1 px-1">
-                        <div className="w-full h-1 rounded-md" style={{ backgroundColor: styleInfo.colors[1] || '#c9aa7c' }} />
-                        <div className="w-3/4 h-0.5 rounded-md" style={{ backgroundColor: styleInfo.colors[2] || '#6b5b4a', opacity: 0.5 }} />
+                        <div
+                          className="w-full h-1 rounded-md"
+                          style={{ backgroundColor: styleInfo.colors[1] || '#c9aa7c' }}
+                        />
+                        <div
+                          className="w-3/4 h-0.5 rounded-md"
+                          style={{
+                            backgroundColor: styleInfo.colors[2] || '#6b5b4a',
+                            opacity: 0.5,
+                          }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -328,9 +330,7 @@ export function TemplateSelector({
                         <Check size={16} className="text-morandi-gold" />
                       )}
                     </div>
-                    <p className="text-sm text-morandi-secondary mt-1">
-                      {styleInfo.description}
-                    </p>
+                    <p className="text-sm text-morandi-secondary mt-1">{styleInfo.description}</p>
                     {/* 色系預覽 */}
                     <div className="flex gap-1 mt-2">
                       {styleInfo.colors.map((color, i) => (

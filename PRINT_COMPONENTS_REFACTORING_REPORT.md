@@ -13,14 +13,14 @@
 
 ### 重構前後對比
 
-| 指標 | 重構前 | 重構後 | 改善 |
-|------|--------|--------|------|
-| **PrintableQuotation 主組件** | 973 行 | 192 行 | -80.3% |
-| **PrintableQuickQuote 主組件** | 922 行 | 137 行 | -85.1% |
-| **總組件數** | 2 個 | 18 個 | +900% |
-| **可重用組件** | 0 個 | 5 個 | ∞ |
-| **平均組件大小** | 947.5 行 | 67.7 行 | -92.9% |
-| **Build 時間** | N/A | 8.9 秒 | ✅ 通過 |
+| 指標                           | 重構前   | 重構後  | 改善    |
+| ------------------------------ | -------- | ------- | ------- |
+| **PrintableQuotation 主組件**  | 973 行   | 192 行  | -80.3%  |
+| **PrintableQuickQuote 主組件** | 922 行   | 137 行  | -85.1%  |
+| **總組件數**                   | 2 個     | 18 個   | +900%   |
+| **可重用組件**                 | 0 個     | 5 個    | ∞       |
+| **平均組件大小**               | 947.5 行 | 67.7 行 | -92.9%  |
+| **Build 時間**                 | N/A      | 8.9 秒  | ✅ 通過 |
 
 ### 關鍵成果
 
@@ -60,6 +60,7 @@ src/features/quotes/components/printable/
 ```
 
 **總計**:
+
 - **18 個新檔案** (包含 2 個主組件 + 16 個子組件)
 - **1,229 行新程式碼** (比原始 1,895 行更結構化)
 - **2 個向後相容匯出檔案** (各 8 行)
@@ -73,18 +74,16 @@ src/features/quotes/components/printable/
 **⭐ 標註的組件被兩個列印組件共用**
 
 #### PrintHeader.tsx (63 行)
+
 ```tsx
 // 原本在兩個組件中重複了 ~120 行
-<PrintHeader
-  logoUrl={logoUrl}
-  title="旅遊報價單"
-  subtitle="QUOTATION"
-/>
+<PrintHeader logoUrl={logoUrl} title="旅遊報價單" subtitle="QUOTATION" />
 ```
 
 **減少重複**: ~120 行 → 63 行（-47.5%）
 
 #### PrintFooter.tsx (31 行)
+
 ```tsx
 // 原本在兩個組件中重複了 ~80 行
 <PrintFooter />
@@ -93,6 +92,7 @@ src/features/quotes/components/printable/
 **減少重複**: ~80 行 → 31 行（-61.3%）
 
 #### PrintControls.tsx (29 行)
+
 ```tsx
 // 原本在兩個組件中重複了 ~40 行
 <PrintControls onClose={onClose} onPrint={onPrint} />
@@ -101,6 +101,7 @@ src/features/quotes/components/printable/
 **減少重複**: ~40 行 → 29 行（-27.5%）
 
 #### usePrintLogo.ts (46 行)
+
 ```tsx
 // 原本在兩個組件中重複了 ~80 行
 const logoUrl = usePrintLogo(isOpen)
@@ -109,6 +110,7 @@ const logoUrl = usePrintLogo(isOpen)
 **減少重複**: ~80 行 → 46 行（-42.5%）
 
 #### print-styles.ts (75 行)
+
 ```tsx
 // 原本在兩個組件中重複了 ~320 行 CSS
 import { PRINT_STYLES, MORANDI_COLORS, TABLE_STYLES } from '../shared/print-styles'
@@ -122,17 +124,18 @@ import { PRINT_STYLES, MORANDI_COLORS, TABLE_STYLES } from '../shared/print-styl
 
 #### 拆分策略
 
-| 原始區塊 | 新組件 | 行數 | 職責 |
-|----------|--------|------|------|
-| 旅程資訊 | QuotationInfo | 63 | 行程名稱、編號、人數、有效期限 |
-| 團費報價表 | QuotationPricingTable | 133 | 價格表格、多檻次比較 |
-| 費用包含/不包含 | QuotationInclusions | 40 | 包含項目、不包含項目 |
-| 注意事項 | QuotationTerms | 40 | 取消政策、有效期限說明 |
-| **主組件** | **PrintableQuotation** | **192** | **組合所有子組件** |
+| 原始區塊        | 新組件                 | 行數    | 職責                           |
+| --------------- | ---------------------- | ------- | ------------------------------ |
+| 旅程資訊        | QuotationInfo          | 63      | 行程名稱、編號、人數、有效期限 |
+| 團費報價表      | QuotationPricingTable  | 133     | 價格表格、多檻次比較           |
+| 費用包含/不包含 | QuotationInclusions    | 40      | 包含項目、不包含項目           |
+| 注意事項        | QuotationTerms         | 40      | 取消政策、有效期限說明         |
+| **主組件**      | **PrintableQuotation** | **192** | **組合所有子組件**             |
 
 #### 程式碼對比
 
 **重構前** (973 行):
+
 ```tsx
 export const PrintableQuotation = ({ ... }) => {
   // 70 行 state 和 effect
@@ -146,6 +149,7 @@ export const PrintableQuotation = ({ ... }) => {
 ```
 
 **重構後** (192 行):
+
 ```tsx
 export const PrintableQuotation = ({ ... }) => {
   const logoUrl = usePrintLogo(isOpen)  // 共用 Hook
@@ -169,18 +173,19 @@ export const PrintableQuotation = ({ ... }) => {
 
 #### 拆分策略
 
-| 原始區塊 | 新組件 | 行數 | 職責 |
-|----------|--------|------|------|
-| 客戶資訊 | QuickQuoteCustomerInfo | 47 | 團體名稱、編號、聯絡資訊 |
-| 收費明細表 | QuickQuoteItemsTable | 160 | 項目列表、單價、金額 |
-| 金額統計 | QuickQuoteSummary | 94 | 應收、已收、餘額計算 |
-| 付款資訊 | QuickQuotePaymentInfo | 43 | 匯款、支票資訊 |
-| 收據資訊 | QuickQuoteReceiptInfo | 36 | 代收轉付資訊 |
-| **主組件** | **PrintableQuickQuote** | **137** | **組合所有子組件** |
+| 原始區塊   | 新組件                  | 行數    | 職責                     |
+| ---------- | ----------------------- | ------- | ------------------------ |
+| 客戶資訊   | QuickQuoteCustomerInfo  | 47      | 團體名稱、編號、聯絡資訊 |
+| 收費明細表 | QuickQuoteItemsTable    | 160     | 項目列表、單價、金額     |
+| 金額統計   | QuickQuoteSummary       | 94      | 應收、已收、餘額計算     |
+| 付款資訊   | QuickQuotePaymentInfo   | 43      | 匯款、支票資訊           |
+| 收據資訊   | QuickQuoteReceiptInfo   | 36      | 代收轉付資訊             |
+| **主組件** | **PrintableQuickQuote** | **137** | **組合所有子組件**       |
 
 #### 程式碼對比
 
 **重構前** (922 行):
+
 ```tsx
 export const PrintableQuickQuote = ({ ... }) => {
   // 60 行 state 和 effect
@@ -194,6 +199,7 @@ export const PrintableQuickQuote = ({ ... }) => {
 ```
 
 **重構後** (137 行):
+
 ```tsx
 export const PrintableQuickQuote = ({ ... }) => {
   const logoUrl = usePrintLogo(isOpen)  // 共用 Hook
@@ -219,11 +225,13 @@ export const PrintableQuickQuote = ({ ... }) => {
 ### 1. 可維護性提升 ⭐⭐⭐⭐⭐
 
 **改善前**:
+
 - 單一檔案 900+ 行，難以定位問題
 - 修改某區塊需滾動數百行
 - 樣式散落各處，難以統一
 
 **改善後**:
+
 - 最大組件不超過 192 行
 - 每個組件職責單一，易於定位
 - 樣式集中管理，修改一次全部更新
@@ -232,14 +240,14 @@ export const PrintableQuickQuote = ({ ... }) => {
 
 **共用組件使用情況**:
 
-| 共用組件 | 使用次數 | 節省行數 |
-|----------|----------|----------|
-| PrintHeader | 2 次 | ~120 行 |
-| PrintFooter | 2 次 | ~80 行 |
-| PrintControls | 2 次 | ~40 行 |
-| usePrintLogo | 2 次 | ~80 行 |
-| print-styles | 2 次 | ~320 行 |
-| **總計** | **10 次** | **~640 行** |
+| 共用組件      | 使用次數  | 節省行數    |
+| ------------- | --------- | ----------- |
+| PrintHeader   | 2 次      | ~120 行     |
+| PrintFooter   | 2 次      | ~80 行      |
+| PrintControls | 2 次      | ~40 行      |
+| usePrintLogo  | 2 次      | ~80 行      |
+| print-styles  | 2 次      | ~320 行     |
+| **總計**      | **10 次** | **~640 行** |
 
 **未來擴展性**:
 如果需要新增第三個列印組件（例如：合約列印），可直接重用 5 個共用組件，節省 ~400 行程式碼。
@@ -247,6 +255,7 @@ export const PrintableQuickQuote = ({ ... }) => {
 ### 3. 可測試性提升 ⭐⭐⭐⭐⭐
 
 **改善前**:
+
 ```tsx
 // 難以測試：需要模擬整個組件的所有 props
 test('PrintableQuotation renders correctly', () => {
@@ -256,6 +265,7 @@ test('PrintableQuotation renders correctly', () => {
 ```
 
 **改善後**:
+
 ```tsx
 // 易於測試：可單獨測試每個小組件
 test('QuotationInfo displays correct data', () => {
@@ -273,16 +283,19 @@ test('QuotationPricingTable calculates prices', () => {
 ### 4. 程式碼品質提升 ⭐⭐⭐⭐
 
 **型別安全**:
+
 - ✅ 所有子組件都有明確的 Props 介面
 - ✅ 使用 TypeScript 嚴格模式
 - ✅ 無 `as any` 或 `as unknown` 型別斷言
 
 **命名一致性**:
+
 - ✅ 組件命名遵循 PascalCase
 - ✅ Hook 命名遵循 `use` 前綴
 - ✅ 樣式檔案使用 kebab-case
 
 **註釋完整**:
+
 - ✅ 每個檔案都有檔頭註釋說明用途
 - ✅ 複雜邏輯有行內註釋
 
@@ -320,10 +333,7 @@ function PricingPreview() {
   return (
     <div>
       <h2>價格預覽</h2>
-      <QuotationPricingTable
-        sellingPrices={prices}
-        tierPricings={tiers}
-      />
+      <QuotationPricingTable sellingPrices={prices} tierPricings={tiers} />
     </div>
   )
 }
@@ -404,6 +414,7 @@ describe('Print Layout Snapshot', () => {
 ### 對現有程式碼無影響
 
 **原有引用路徑完全保留**:
+
 ```tsx
 // ✅ 這些 import 仍然有效，無需修改
 import { PrintableQuotation } from '@/features/quotes/components/PrintableQuotation'
@@ -411,6 +422,7 @@ import { PrintableQuickQuote } from '@/features/quotes/components/PrintableQuick
 ```
 
 **內部實作已改為轉發**:
+
 ```tsx
 // src/features/quotes/components/PrintableQuotation.tsx
 export { PrintableQuotation } from './printable/quotation/PrintableQuotation'
@@ -436,6 +448,7 @@ import { QuotationPricingTable } from '@/features/quotes/components/printable/qu
 **問題**: 重構後的 PDF 必須與原始版本像素級一致
 
 **解決方案**:
+
 - 提取所有樣式到 `print-styles.ts`
 - 使用相同的 CSS 值（顏色、邊距、字體大小）
 - 保留原始的 table 結構用於列印版本
@@ -446,6 +459,7 @@ import { QuotationPricingTable } from '@/features/quotes/components/printable/qu
 **問題**: 專案中可能有多處引用原始組件
 
 **解決方案**:
+
 - 保留原始檔案作為轉發（re-export）點
 - 新組件放在 `printable/` 子目錄
 - 所有現有 import 路徑仍然有效
@@ -455,6 +469,7 @@ import { QuotationPricingTable } from '@/features/quotes/components/printable/qu
 **問題**: 如何決定哪些部分應該共用
 
 **解決方案**:
+
 - **完全相同** → 提取為共用組件（Header, Footer）
 - **相似但不同** → 各自實作（CustomerInfo vs QuotationInfo）
 - **可參數化** → 使用 props 控制行為（PrintHeader 的 title）
@@ -491,23 +506,23 @@ QuickQuote 組件 (6 個):
 
 ### 行數統計總覽
 
-| 類別 | 檔案數 | 總行數 | 平均行數 | 最大 | 最小 |
-|------|--------|--------|----------|------|------|
-| 共用組件 | 5 | 244 | 48.8 | 75 | 29 |
-| Quotation 組件 | 5 | 468 | 93.6 | 192 | 40 |
-| QuickQuote 組件 | 6 | 517 | 86.2 | 160 | 36 |
-| **總計** | **16** | **1,229** | **76.8** | **192** | **29** |
+| 類別            | 檔案數 | 總行數    | 平均行數 | 最大    | 最小   |
+| --------------- | ------ | --------- | -------- | ------- | ------ |
+| 共用組件        | 5      | 244       | 48.8     | 75      | 29     |
+| Quotation 組件  | 5      | 468       | 93.6     | 192     | 40     |
+| QuickQuote 組件 | 6      | 517       | 86.2     | 160     | 36     |
+| **總計**        | **16** | **1,229** | **76.8** | **192** | **29** |
 
 ### 重複程式碼減少
 
-| 項目 | 原始 | 重構後 | 節省 |
-|------|------|--------|------|
-| Header 程式碼 | ~200 行 × 2 | 63 行 × 1 | -337 行 |
-| Footer 程式碼 | ~100 行 × 2 | 31 行 × 1 | -169 行 |
-| Logo 載入邏輯 | ~80 行 × 2 | 46 行 × 1 | -114 行 |
-| 列印樣式 | ~300 行 × 2 | 75 行 × 1 | -525 行 |
-| 控制按鈕 | ~40 行 × 2 | 29 行 × 1 | -51 行 |
-| **總節省** | - | - | **-1,196 行** |
+| 項目          | 原始        | 重構後    | 節省          |
+| ------------- | ----------- | --------- | ------------- |
+| Header 程式碼 | ~200 行 × 2 | 63 行 × 1 | -337 行       |
+| Footer 程式碼 | ~100 行 × 2 | 31 行 × 1 | -169 行       |
+| Logo 載入邏輯 | ~80 行 × 2  | 46 行 × 1 | -114 行       |
+| 列印樣式      | ~300 行 × 2 | 75 行 × 1 | -525 行       |
+| 控制按鈕      | ~40 行 × 2  | 29 行 × 1 | -51 行        |
+| **總節省**    | -           | -         | **-1,196 行** |
 
 ---
 

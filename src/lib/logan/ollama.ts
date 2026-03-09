@@ -162,10 +162,7 @@ export async function* chatStream(
 /**
  * 簡單的單輪對話
  */
-export async function ask(
-  question: string,
-  systemPrompt?: string
-): Promise<string> {
+export async function ask(question: string, systemPrompt?: string): Promise<string> {
   const messages: OllamaMessage[] = []
 
   if (systemPrompt) {

@@ -12,16 +12,12 @@ interface TourOrderSectionProps {
 export function TourOrderSection({ newOrder, setNewOrder }: TourOrderSectionProps) {
   return (
     <div>
-      <h3 className="text-lg font-medium text-morandi-primary mb-4">
-        {TOUR_ORDER_SECTION.title}
-      </h3>
+      <h3 className="text-lg font-medium text-morandi-primary mb-4">{TOUR_ORDER_SECTION.title}</h3>
 
       <AddOrderForm tourId="embedded" value={newOrder} onChange={setNewOrder} />
 
       <div className="bg-morandi-container/20 p-3 rounded-lg mt-4">
-        <p className="text-xs text-morandi-secondary">
-          {TOUR_ORDER_SECTION.hint}
-        </p>
+        <p className="text-xs text-morandi-secondary">{TOUR_ORDER_SECTION.hint}</p>
       </div>
     </div>
   )

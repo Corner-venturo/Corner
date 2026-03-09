@@ -75,14 +75,18 @@ export function useTourDestinations(options: UseTourDestinationsOptions = {}) {
   const user = useAuthStore(state => state.user)
 
   // 使用 SWR 載入國家資料（只在 enabled 時才載入）
-  const { data: countriesData = [], isLoading: countriesLoading, error: countriesError } = useSWR<Country[]>(
-    enabled ? COUNTRIES_CACHE_KEY : null,
-    fetchCountries,
-    SWR_CONFIG
-  )
+  const {
+    data: countriesData = [],
+    isLoading: countriesLoading,
+    error: countriesError,
+  } = useSWR<Country[]>(enabled ? COUNTRIES_CACHE_KEY : null, fetchCountries, SWR_CONFIG)
 
   // 使用 SWR 載入目的地資料（只在 enabled 時才載入）
-  const { data: destinations = [], isLoading: destinationsLoading, error: destinationsError } = useSWR<TourDestination[]>(
+  const {
+    data: destinations = [],
+    isLoading: destinationsLoading,
+    error: destinationsError,
+  } = useSWR<TourDestination[]>(
     enabled ? DESTINATIONS_CACHE_KEY : null,
     fetchDestinations,
     SWR_CONFIG
@@ -94,10 +98,7 @@ export function useTourDestinations(options: UseTourDestinationsOptions = {}) {
 
   // 重新載入資料
   const refreshDestinations = useCallback(async () => {
-    await Promise.all([
-      mutate(COUNTRIES_CACHE_KEY),
-      mutate(DESTINATIONS_CACHE_KEY),
-    ])
+    await Promise.all([mutate(COUNTRIES_CACHE_KEY), mutate(DESTINATIONS_CACHE_KEY)])
   }, [])
 
   // 取得國家列表（從 countries 表，按使用次數排序）
@@ -121,9 +122,7 @@ export function useTourDestinations(options: UseTourDestinationsOptions = {}) {
   // 檢查城市是否有機場代碼
   const getAirportCode = useCallback(
     (countryName: string, cityName: string): string | null => {
-      const dest = destinations.find(
-        d => d.country === countryName && d.city === cityName
-      )
+      const dest = destinations.find(d => d.country === countryName && d.city === cityName)
       return dest?.airport_code || null
     },
     [destinations]
@@ -168,17 +167,18 @@ export function useTourDestinations(options: UseTourDestinationsOptions = {}) {
 
   // 更新目的地
   const updateDestination = useCallback(
-    async (id: string, updates: Partial<Pick<TourDestination, 'country' | 'city' | 'airport_code'>>) => {
+    async (
+      id: string,
+      updates: Partial<Pick<TourDestination, 'country' | 'city' | 'airport_code'>>
+    ) => {
       try {
         const updateData: Record<string, string> = {}
         if (updates.country) updateData.country = updates.country.trim()
         if (updates.city) updateData.city = updates.city.trim()
-        if (updates.airport_code) updateData.airport_code = updates.airport_code.trim().toUpperCase()
+        if (updates.airport_code)
+          updateData.airport_code = updates.airport_code.trim().toUpperCase()
 
-        const { error } = await supabase
-          .from('tour_destinations')
-          .update(updateData)
-          .eq('id', id)
+        const { error } = await supabase.from('tour_destinations').update(updateData).eq('id', id)
 
         if (error) throw error
 
@@ -195,31 +195,25 @@ export function useTourDestinations(options: UseTourDestinationsOptions = {}) {
   )
 
   // 刪除目的地
-  const deleteDestination = useCallback(
-    async (id: string) => {
-      try {
-        const { error } = await supabase
-          .from('tour_destinations')
-          .delete()
-          .eq('id', id)
+  const deleteDestination = useCallback(async (id: string) => {
+    try {
+      const { error } = await supabase.from('tour_destinations').delete().eq('id', id)
 
-        if (error) throw error
+      if (error) throw error
 
-        // 使用 SWR mutate 更新快取
-        mutate(
-          DESTINATIONS_CACHE_KEY,
-          (current: TourDestination[] | undefined) => (current || []).filter(d => d.id !== id),
-          false
-        )
-        return { success: true }
-      } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : '未知錯誤'
-        logger.error('刪除目的地失敗:', error)
-        return { success: false, error: errorMessage }
-      }
-    },
-    []
-  )
+      // 使用 SWR mutate 更新快取
+      mutate(
+        DESTINATIONS_CACHE_KEY,
+        (current: TourDestination[] | undefined) => (current || []).filter(d => d.id !== id),
+        false
+      )
+      return { success: true }
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : '未知錯誤'
+      logger.error('刪除目的地失敗:', error)
+      return { success: false, error: errorMessage }
+    }
+  }, [])
 
   return {
     destinations,

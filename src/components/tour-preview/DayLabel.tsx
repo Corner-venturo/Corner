@@ -13,16 +13,40 @@ export interface DayLabelProps {
 
 // 數字轉中文（用於 nature 風格）
 const numberToChinese: Record<number, string> = {
-  1: '一', 2: '二', 3: '三', 4: '四', 5: '五',
-  6: '六', 7: '七', 8: '八', 9: '九', 10: '十',
-  11: '十一', 12: '十二', 13: '十三', 14: '十四', 15: '十五'
+  1: '一',
+  2: '二',
+  3: '三',
+  4: '四',
+  5: '五',
+  6: '六',
+  7: '七',
+  8: '八',
+  9: '九',
+  10: '十',
+  11: '十一',
+  12: '十二',
+  13: '十三',
+  14: '十四',
+  15: '十五',
 }
 
 // 數字轉英文序數（用於 nature 風格）
 const numberToOrdinal: Record<number, string> = {
-  1: 'ONE', 2: 'TWO', 3: 'THREE', 4: 'FOUR', 5: 'FIVE',
-  6: 'SIX', 7: 'SEVEN', 8: 'EIGHT', 9: 'NINE', 10: 'TEN',
-  11: 'ELEVEN', 12: 'TWELVE', 13: 'THIRTEEN', 14: 'FOURTEEN', 15: 'FIFTEEN'
+  1: 'ONE',
+  2: 'TWO',
+  3: 'THREE',
+  4: 'FOUR',
+  5: 'FIVE',
+  6: 'SIX',
+  7: 'SEVEN',
+  8: 'EIGHT',
+  9: 'NINE',
+  10: 'TEN',
+  11: 'ELEVEN',
+  12: 'TWELVE',
+  13: 'THIRTEEN',
+  14: 'FOURTEEN',
+  15: 'FIFTEEN',
 }
 
 /**
@@ -37,12 +61,12 @@ export function DayLabel({
   variant = 'default',
   coverStyle = 'original',
   title,
-  className = ''
+  className = '',
 }: DayLabelProps) {
   // 從 dayLabel 中提取數字（如 "Day 3" -> 3, "Day 3-B" -> 3）
   const extractedNumber = dayLabel
     ? parseInt(dayLabel.replace(/Day\s*/i, '').split('-')[0], 10)
-    : (dayNumber || 1)
+    : dayNumber || 1
 
   // 優先使用 dayLabel，否則用 dayNumber 生成
   const displayLabel = dayLabel || `Day ${String(dayNumber || 1).padStart(2, '0')}`
@@ -71,11 +95,7 @@ export function DayLabel({
           <span className="block text-[#30abe8] text-xs font-bold tracking-[0.2em] mb-1">
             DAY {ordinalText}
           </span>
-          {title && (
-            <h3 className="text-2xl font-bold text-[#2c3e50] tracking-widest">
-              {title}
-            </h3>
-          )}
+          {title && <h3 className="text-2xl font-bold text-[#2c3e50] tracking-widest">{title}</h3>}
         </div>
       </div>
     )

@@ -43,14 +43,18 @@ export function FamilyQuickAddDialog({
   const availableMembers = useMemo(() => {
     if (!family) return []
     return family.members.filter(
-      (m: { customer: Customer | null }) => m.customer && !existingCustomerIds.includes(m.customer.id)
+      (m: { customer: Customer | null }) =>
+        m.customer && !existingCustomerIds.includes(m.customer.id)
     )
   }, [family, existingCustomerIds])
 
   // 已在名單的成員
   const existingMembers = useMemo(() => {
     if (!family) return []
-    return family.members.filter((m: { customer: Customer | null }) => m.customer && existingCustomerIds.includes(m.customer.id))
+    return family.members.filter(
+      (m: { customer: Customer | null }) =>
+        m.customer && existingCustomerIds.includes(m.customer.id)
+    )
   }, [family, existingCustomerIds])
 
   // 切換選擇
@@ -73,7 +77,9 @@ export function FamilyQuickAddDialog({
   // 確認加入
   const handleConfirm = () => {
     const customersToAdd = availableMembers
-      .filter((m: { customer: Customer | null }) => m.customer && selectedIds.includes(m.customer.id))
+      .filter(
+        (m: { customer: Customer | null }) => m.customer && selectedIds.includes(m.customer.id)
+      )
       .map((m: { customer: Customer }) => m.customer)
 
     onAddMembers(customersToAdd)
@@ -91,7 +97,9 @@ export function FamilyQuickAddDialog({
               {CUSTOMERS_LABELS.LOADING_3991}
             </DialogTitle>
           </DialogHeader>
-          <div className="py-8 text-center text-muted-foreground">{CUSTOMERS_LABELS.LOADING_6991}</div>
+          <div className="py-8 text-center text-muted-foreground">
+            {CUSTOMERS_LABELS.LOADING_6991}
+          </div>
         </DialogContent>
       </Dialog>
     )
@@ -134,14 +142,22 @@ export function FamilyQuickAddDialog({
         <div className="space-y-4">
           {/* 操作按鈕 */}
           <div className="flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
-              可加入 {availableMembers.length} 人
-            </div>
+            <div className="text-sm text-muted-foreground">可加入 {availableMembers.length} 人</div>
             <div className="flex gap-2">
-              <Button variant="ghost" size="sm" onClick={selectAll} disabled={selectedIds.length === availableMembers.length}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={selectAll}
+                disabled={selectedIds.length === availableMembers.length}
+              >
                 {CUSTOMERS_LABELS.LABEL_7782}
               </Button>
-              <Button variant="ghost" size="sm" onClick={clearSelection} disabled={selectedIds.length === 0}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearSelection}
+                disabled={selectedIds.length === 0}
+              >
                 {CUSTOMERS_LABELS.CLEAR}
               </Button>
             </div>
@@ -151,56 +167,63 @@ export function FamilyQuickAddDialog({
           <ScrollArea className="max-h-96">
             <div className="space-y-2">
               {/* 可加入的成員 */}
-              {availableMembers.map((member: { id: string; customer: Customer; role: string | null }) => {
-                const customer = member.customer
-                const isSelected = selectedIds.includes(customer.id)
-                const missingInfo = !customer.passport_number || !customer.birth_date
+              {availableMembers.map(
+                (member: { id: string; customer: Customer; role: string | null }) => {
+                  const customer = member.customer
+                  const isSelected = selectedIds.includes(customer.id)
+                  const missingInfo = !customer.passport_number || !customer.birth_date
 
-                return (
-                  <div
-                    key={member.id}
-                    onClick={() => toggleMember(customer.id)}
-                    className="flex items-start gap-3 rounded-lg border p-3 cursor-pointer hover:bg-accent transition-colors"
-                  >
-                    <Checkbox checked={isSelected} onCheckedChange={() => toggleMember(customer.id)} />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{customer.name}</span>
-                        {member.role === 'leader' && (
-                          <Badge variant="secondary" className="text-xs">
-                            {CUSTOMERS_LABELS.LABEL_6239}
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="mt-1 text-sm text-muted-foreground space-y-0.5">
-                        {customer.passport_number && (
-                          <div className="flex items-center gap-1">
-                            <span className="text-xs">{CUSTOMERS_LABELS.LABEL_9194}</span>
-                            <span>{customer.passport_number}</span>
-                          </div>
-                        )}
-                        {customer.birth_date && (
-                          <div className="flex items-center gap-1">
-                            <span className="text-xs">{CUSTOMERS_LABELS.LABEL_3937}</span>
-                            <span>{customer.birth_date}</span>
-                          </div>
-                        )}
-                        {missingInfo && (
-                          <div className="flex items-center gap-1 text-amber-600">
-                            <AlertCircle className="h-3 w-3" />
-                            <span className="text-xs">{CUSTOMERS_LABELS.LABEL_2476}</span>
-                          </div>
-                        )}
+                  return (
+                    <div
+                      key={member.id}
+                      onClick={() => toggleMember(customer.id)}
+                      className="flex items-start gap-3 rounded-lg border p-3 cursor-pointer hover:bg-accent transition-colors"
+                    >
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={() => toggleMember(customer.id)}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{customer.name}</span>
+                          {member.role === 'leader' && (
+                            <Badge variant="secondary" className="text-xs">
+                              {CUSTOMERS_LABELS.LABEL_6239}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="mt-1 text-sm text-muted-foreground space-y-0.5">
+                          {customer.passport_number && (
+                            <div className="flex items-center gap-1">
+                              <span className="text-xs">{CUSTOMERS_LABELS.LABEL_9194}</span>
+                              <span>{customer.passport_number}</span>
+                            </div>
+                          )}
+                          {customer.birth_date && (
+                            <div className="flex items-center gap-1">
+                              <span className="text-xs">{CUSTOMERS_LABELS.LABEL_3937}</span>
+                              <span>{customer.birth_date}</span>
+                            </div>
+                          )}
+                          {missingInfo && (
+                            <div className="flex items-center gap-1 text-amber-600">
+                              <AlertCircle className="h-3 w-3" />
+                              <span className="text-xs">{CUSTOMERS_LABELS.LABEL_2476}</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )
-              })}
+                  )
+                }
+              )}
 
               {/* 已在名單的成員 */}
               {existingMembers.length > 0 && (
                 <>
-                  <div className="pt-4 pb-2 text-sm font-medium text-muted-foreground">{CUSTOMERS_LABELS.LABEL_4017}</div>
+                  <div className="pt-4 pb-2 text-sm font-medium text-muted-foreground">
+                    {CUSTOMERS_LABELS.LABEL_4017}
+                  </div>
                   {existingMembers.map((member: { id: string; customer: Customer }) => {
                     const customer = member.customer
                     return (
@@ -212,7 +235,12 @@ export function FamilyQuickAddDialog({
                         <div className="flex-1 min-w-0">
                           <div className="font-medium">{customer.name}</div>
                           <div className="text-sm text-muted-foreground">
-                            {customer.passport_number && <div>{CUSTOMERS_LABELS.LABEL_9194}{customer.passport_number}</div>}
+                            {customer.passport_number && (
+                              <div>
+                                {CUSTOMERS_LABELS.LABEL_9194}
+                                {customer.passport_number}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>

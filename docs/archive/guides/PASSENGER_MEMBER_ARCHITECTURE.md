@@ -26,29 +26,29 @@
 
 ```typescript
 export interface Member extends BaseEntity {
-  order_id: string              // 所屬訂單 ID
-  tour_id: string               // 所屬旅遊團 ID（重要！）
-  name: string                  // 姓名（中文）
-  name_en: string               // 英文姓名/拼音
-  birthday: string              // 生日 YYYY-MM-DD
-  passport_number: string       // 護照號碼
-  passport_expiry: string       // 護照到期日 YYYY-MM-DD
-  id_number: string             // 身分證字號
-  gender: 'M' | 'F' | ''        // 性別
-  age?: number                  // 年齡（計算欄位）
-  phone?: string                // 電話
-  email?: string                // Email
-  emergency_contact?: string    // 緊急聯絡人
-  emergency_phone?: string      // 緊急聯絡電話
+  order_id: string // 所屬訂單 ID
+  tour_id: string // 所屬旅遊團 ID（重要！）
+  name: string // 姓名（中文）
+  name_en: string // 英文姓名/拼音
+  birthday: string // 生日 YYYY-MM-DD
+  passport_number: string // 護照號碼
+  passport_expiry: string // 護照到期日 YYYY-MM-DD
+  id_number: string // 身分證字號
+  gender: 'M' | 'F' | '' // 性別
+  age?: number // 年齡（計算欄位）
+  phone?: string // 電話
+  email?: string // Email
+  emergency_contact?: string // 緊急聯絡人
+  emergency_phone?: string // 緊急聯絡電話
   dietary_restrictions?: string // 飲食限制
-  medical_conditions?: string   // 醫療狀況
-  room_preference?: string      // 房間偏好
-  assigned_room?: string        // 分配的房間（分房功能）
-  is_child_no_bed?: boolean     // 小孩不佔床
-  reservation_code?: string     // 訂位代號
-  add_ons?: string[]            // 加購項目IDs
-  refunds?: string[]            // 退費項目IDs
-  notes?: string                // 備註
+  medical_conditions?: string // 醫療狀況
+  room_preference?: string // 房間偏好
+  assigned_room?: string // 分配的房間（分房功能）
+  is_child_no_bed?: boolean // 小孩不佔床
+  reservation_code?: string // 訂位代號
+  add_ons?: string[] // 加購項目IDs
+  refunds?: string[] // 退費項目IDs
+  notes?: string // 備註
 }
 ```
 
@@ -177,39 +177,39 @@ Member (旅客)
 
 ```typescript
 export interface Order extends BaseEntity {
-  order_number: string          // 訂單編號
-  code: string                  // 團號代碼
-  tour_id: string               // 旅遊團 ID
-  tour_name: string             // 旅遊團名稱
-  customer_id?: string          // 客戶 ID（可選）
-  contact_person: string        // 聯絡人
-  contact_phone?: string        // 聯絡電話
-  sales_person: string          // 業務人員
-  assistant: string             // 助理
-  member_count: number          // 團員人數
+  order_number: string // 訂單編號
+  code: string // 團號代碼
+  tour_id: string // 旅遊團 ID
+  tour_name: string // 旅遊團名稱
+  customer_id?: string // 客戶 ID（可選）
+  contact_person: string // 聯絡人
+  contact_phone?: string // 聯絡電話
+  sales_person: string // 業務人員
+  assistant: string // 助理
+  member_count: number // 團員人數
   payment_status: PaymentStatus // 付款狀態
-  status?: OrderStatus          // 訂單狀態
-  total_amount: number          // 總金額
-  paid_amount: number           // 已付金額
-  remaining_amount: number      // 待付金額
-  notes?: string                // 備註
+  status?: OrderStatus // 訂單狀態
+  total_amount: number // 總金額
+  paid_amount: number // 已付金額
+  remaining_amount: number // 待付金額
+  notes?: string // 備註
 }
 ```
 
 ### 3. 狀態枚舉
 
 ```typescript
-export type OrderStatus = 
-  | 'pending'        // 待確認
-  | 'confirmed'      // 已確認
-  | 'completed'      // 已完成
-  | 'cancelled'      // 已取消
+export type OrderStatus =
+  | 'pending' // 待確認
+  | 'confirmed' // 已確認
+  | 'completed' // 已完成
+  | 'cancelled' // 已取消
 
-export type PaymentStatus = 
-  | 'unpaid'         // 未付款
-  | 'partial'        // 部分付款
-  | 'paid'           // 已付清
-  | 'refunded'       // 已退款
+export type PaymentStatus =
+  | 'unpaid' // 未付款
+  | 'partial' // 部分付款
+  | 'paid' // 已付清
+  | 'refunded' // 已退款
 ```
 
 ### 4. 訂單-旅客查詢邏輯
@@ -221,9 +221,7 @@ export type PaymentStatus =
 const tourOrders = orders.filter(order => order.tour_id === tour.id)
 
 // 獲取屬於這些訂單的所有旅客
-const tourMembers = members.filter(member =>
-  tourOrders.some(order => order.id === member.order_id)
-)
+const tourMembers = members.filter(member => tourOrders.some(order => order.id === member.order_id))
 
 // 取得旅客對應的訂單資訊
 const relatedOrder = tourOrders.find(order => order.id === member.order_id)
@@ -267,21 +265,21 @@ Member (旅客) - 該訂單的所有旅客
 
 ```typescript
 export interface Tour extends BaseEntity {
-  code: string                      // 團號
-  name: string                      // 團體名稱
-  departure_date: string            // 出發日期
-  return_date: string               // 返回日期
-  status: TourStatus                // 團體狀態
-  location: string                  // 目的地
-  price: number                     // 成人價格
-  max_participants: number          // 最多參加人數
-  current_participants?: number     // 當前參加人數
-  contract_status: ContractStatus   // 合約狀態
-  total_revenue: number             // 總收入
-  total_cost: number                // 總成本
-  profit: number                    // 利潤
-  description?: string              // 說明
-  is_active: boolean                // 是否啟用
+  code: string // 團號
+  name: string // 團體名稱
+  departure_date: string // 出發日期
+  return_date: string // 返回日期
+  status: TourStatus // 團體狀態
+  location: string // 目的地
+  price: number // 成人價格
+  max_participants: number // 最多參加人數
+  current_participants?: number // 當前參加人數
+  contract_status: ContractStatus // 合約狀態
+  total_revenue: number // 總收入
+  total_cost: number // 總成本
+  profit: number // 利潤
+  description?: string // 說明
+  is_active: boolean // 是否啟用
 }
 ```
 
@@ -294,20 +292,16 @@ export interface Tour extends BaseEntity {
 const totalMembers = tableMembers.length
 
 // 計算已完成資料的成員數
-const completedMembers = tableMembers.filter(
-  member => member.name && member.idNumber
-).length
+const completedMembers = tableMembers.filter(member => member.name && member.idNumber).length
 
 // 計算完成率
-const completionRate = totalMembers > 0 
-  ? Math.round((completedMembers / totalMembers) * 100) 
-  : 0
+const completionRate = totalMembers > 0 ? Math.round((completedMembers / totalMembers) * 100) : 0
 
 // 按訂單分組統計
 const membersByOrder = tourOrders.map(order => ({
   order_id: order.id,
   order_number: order.order_number,
-  member_count: tableMembers.filter(m => m.order_id === order.id).length
+  member_count: tableMembers.filter(m => m.order_id === order.id).length,
 }))
 ```
 
@@ -320,6 +314,7 @@ const membersByOrder = tourOrders.map(order => ({
 **檔案位置：** `/src/components/tours/room-allocation.tsx`
 
 #### 核心功能：
+
 1. **房間配額解析** - 從請款單提取房型和數量
 2. **分房分配** - 將旅客分配到具體房間
 3. **容量管理** - 確保房間不超載
@@ -329,11 +324,11 @@ const membersByOrder = tourOrders.map(order => ({
 
 ```typescript
 interface RoomOption {
-  value: string         // 房間唯一識別 (如: "雙人房-1")
-  label: string         // 顯示標籤
-  room_type: string     // 房型 (如: "雙人房")
-  capacity: number      // 容量 (1, 2, 3, 或 4)
-  currentCount: number  // 當前已分配人數
+  value: string // 房間唯一識別 (如: "雙人房-1")
+  label: string // 顯示標籤
+  room_type: string // 房型 (如: "雙人房")
+  capacity: number // 容量 (1, 2, 3, 或 4)
+  currentCount: number // 當前已分配人數
 }
 
 interface MemberWithRoom extends Member {
@@ -397,9 +392,7 @@ const assignMemberToRoom = (member_id: string, roomValue: string) => {
   // 前端狀態更新
   setMembersWithRooms(prev =>
     prev.map(member =>
-      member.id === member_id 
-        ? { ...member, assignedRoom: roomValue || undefined } 
-        : member
+      member.id === member_id ? { ...member, assignedRoom: roomValue || undefined } : member
     )
   )
   // 自動保存到 Store/Database
@@ -416,6 +409,7 @@ const assignMemberToRoom = (member_id: string, roomValue: string) => {
 **檔案位置：** `/src/components/members/excel-member-table.tsx`
 
 #### 功能特性：
+
 - **Excel式操作** - 支援 Tab 鍵導航、複製貼上
 - **自動儲存** - 編輯即保存，無需額外按鈕
 - **自動計算** - 年齡、性別自動推導
@@ -423,13 +417,14 @@ const assignMemberToRoom = (member_id: string, roomValue: string) => {
 - **新增行** - 自動補充至指定人數
 
 #### 支援欄位：
+
 ```typescript
 const dataSheetColumns = [
   { key: 'index', label: '序號', readOnly: true },
   { key: 'name', label: '姓名' },
   { key: 'nameEn', label: '英文姓名' },
   { key: 'birthday', label: '生日' },
-  { key: 'age', label: '年齡', readOnly: true },  // 自動計算
+  { key: 'age', label: '年齡', readOnly: true }, // 自動計算
   { key: 'gender', label: '性別', readOnly: true }, // 自動推導
   { key: 'idNumber', label: '身分證字號' },
   { key: 'passportNumber', label: '護照號碼' },
@@ -457,6 +452,7 @@ const age = calculateAge(birthday || idNumber, departureDate, returnDate)
 **檔案位置：** `/src/components/tours/tour-members.tsx`
 
 #### 功能特性：
+
 - **整團查看** - 一次性顯示團體的所有成員（跨多個訂單）
 - **訂單色調區分** - 不同訂單用不同背景色區分
 - **拖拽排序** - 調整成員順序
@@ -464,8 +460,9 @@ const age = calculateAge(birthday || idNumber, departureDate, returnDate)
 - **實時統計** - 總人數、完成率
 
 #### 支援欄位：
+
 ```
-序號 | 姓名 | 英文姓名 | 生日 | 年齡 | 性別 | 身分證字號 | 
+序號 | 姓名 | 英文姓名 | 生日 | 年齡 | 性別 | 身分證字號 |
 護照號碼 | 護照效期 | 所屬訂單 | 聯絡人 | 分房 | 操作
 ```
 
@@ -474,6 +471,7 @@ const age = calculateAge(birthday || idNumber, departureDate, returnDate)
 **檔案位置：** `/src/lib/excel/`
 
 已有通用Excel匯出模組：
+
 - `payment-request-excel.ts` - 請款單Excel
 - `receipt-excel.ts` - 收據Excel
 
@@ -504,79 +502,81 @@ export async function exportMembersToExcel(
 
 ```typescript
 export interface Customer extends BaseEntity {
-  code: string                         // 客戶編號 (C20240001)
-  name: string                         // 客戶姓名
-  english_name?: string                // 英文姓名
-  phone: string                        // 主要電話
-  alternative_phone?: string           // 備用電話
-  email?: string                       // Email
-  address?: string                     // 地址
-  city?: string                        // 城市
-  country?: string                     // 國家
-  national_id?: string                 // 身分證字號 (個人客戶)
-  passport_number?: string             // 護照號碼
-  passport_romanization?: string       // 護照拼音 (WANG/XIAOMING)
-  passport_expiry_date?: string        // 護照效期
-  date_of_birth?: string               // 出生日期
-  gender?: string                      // 性別
-  company?: string                     // 公司名稱 (企業客戶)
-  tax_id?: string                      // 統編 (企業客戶)
-  is_vip: boolean                      // VIP 標記
-  vip_level?: VipLevel                 // VIP 等級
-  source?: CustomerSource              // 客戶來源
-  referred_by?: string                 // 推薦人
-  notes?: string                       // 備註
-  is_active: boolean                   // 是否啟用
-  total_orders?: number                // 統計：總訂單數
-  total_spent?: number                 // 統計：總消費金額
-  last_order_date?: string             // 統計：最後訂單日期
+  code: string // 客戶編號 (C20240001)
+  name: string // 客戶姓名
+  english_name?: string // 英文姓名
+  phone: string // 主要電話
+  alternative_phone?: string // 備用電話
+  email?: string // Email
+  address?: string // 地址
+  city?: string // 城市
+  country?: string // 國家
+  national_id?: string // 身分證字號 (個人客戶)
+  passport_number?: string // 護照號碼
+  passport_romanization?: string // 護照拼音 (WANG/XIAOMING)
+  passport_expiry_date?: string // 護照效期
+  date_of_birth?: string // 出生日期
+  gender?: string // 性別
+  company?: string // 公司名稱 (企業客戶)
+  tax_id?: string // 統編 (企業客戶)
+  is_vip: boolean // VIP 標記
+  vip_level?: VipLevel // VIP 等級
+  source?: CustomerSource // 客戶來源
+  referred_by?: string // 推薦人
+  notes?: string // 備註
+  is_active: boolean // 是否啟用
+  total_orders?: number // 統計：總訂單數
+  total_spent?: number // 統計：總消費金額
+  last_order_date?: string // 統計：最後訂單日期
 }
 ```
 
 ### 2. 客戶分類
 
 #### VIP 等級
+
 ```typescript
 export type VipLevel =
-  | 'bronze'    // 銅卡
-  | 'silver'    // 銀卡
-  | 'gold'      // 金卡
-  | 'platinum'  // 白金卡
-  | 'diamond'   // 鑽石卡
+  | 'bronze' // 銅卡
+  | 'silver' // 銀卡
+  | 'gold' // 金卡
+  | 'platinum' // 白金卡
+  | 'diamond' // 鑽石卡
 ```
 
 #### 客戶來源
+
 ```typescript
 export type CustomerSource =
-  | 'website'   // 官網
-  | 'facebook'  // Facebook
+  | 'website' // 官網
+  | 'facebook' // Facebook
   | 'instagram' // Instagram
-  | 'line'      // LINE
-  | 'referral'  // 推薦
-  | 'phone'     // 電話
-  | 'walk_in'   // 現場
-  | 'other'     // 其他
+  | 'line' // LINE
+  | 'referral' // 推薦
+  | 'phone' // 電話
+  | 'walk_in' // 現場
+  | 'other' // 其他
 ```
 
 ### 3. 企業客戶 vs 個人客戶
 
-| 欄位 | 個人客戶 | 企業客戶 |
-|-----|--------|--------|
-| name | 個人姓名 | 公司名稱 |
-| english_name | 英文姓名 | 英文公司名 |
-| national_id | 身分證號 | - |
-| tax_id | - | 統一編號 |
-| company | - | 公司名稱(同name) |
-| contact_person | (name) | 聯絡人 |
+| 欄位           | 個人客戶 | 企業客戶         |
+| -------------- | -------- | ---------------- |
+| name           | 個人姓名 | 公司名稱         |
+| english_name   | 英文姓名 | 英文公司名       |
+| national_id    | 身分證號 | -                |
+| tax_id         | -        | 統一編號         |
+| company        | -        | 公司名稱(同name) |
+| contact_person | (name)   | 聯絡人           |
 
 ### 4. 訂單與客戶的關聯
 
 ```typescript
 // Order 中的客戶參考
 export interface Order extends BaseEntity {
-  customer_id?: string        // 可選的客戶ID
-  contact_person: string      // 團體聯絡人（必填）
-  contact_phone?: string      // 聯絡電話
+  customer_id?: string // 可選的客戶ID
+  contact_person: string // 團體聯絡人（必填）
+  contact_phone?: string // 聯絡電話
   // ...其他訂單欄位
 }
 
@@ -642,7 +642,7 @@ SyncCoordinator
     ├─▶ IndexedDB (立即寫入)
     │
     └─▶ Supabase (背景同步)
-    
+
 FETCH Member
     │
     ▼
@@ -655,27 +655,27 @@ useMemberStore.fetchAll()
 
 ### 3. 關鍵設計決策
 
-| 決策項目 | 選擇 | 原因 |
-|--------|------|-----|
-| 離線編輯 | 否 | 內部系統，網路通常可用 |
-| 快取策略 | IndexedDB | 加速載入，無需複雜離線邏輯 |
-| RLS | 禁用 | 內部認證系統已足夠 |
-| 編號格式 | 自動生成 (M前綴) | 系統管理，無人工輸入 |
-| 外鍵關聯 | tour_id + order_id | 確保資料完整性 |
+| 決策項目 | 選擇               | 原因                       |
+| -------- | ------------------ | -------------------------- |
+| 離線編輯 | 否                 | 內部系統，網路通常可用     |
+| 快取策略 | IndexedDB          | 加速載入，無需複雜離線邏輯 |
+| RLS      | 禁用               | 內部認證系統已足夠         |
+| 編號格式 | 自動生成 (M前綴)   | 系統管理，無人工輸入       |
+| 外鍵關聯 | tour_id + order_id | 確保資料完整性             |
 
 ### 4. 核心檔案清單
 
-| 檔案 | 功能 | 類型 |
-|-----|------|------|
-| `/src/types/order.types.ts` | 旅客/訂單型別定義 | 型別 |
-| `/src/types/customer.types.ts` | 客戶型別定義 | 型別 |
-| `/src/components/tours/tour-members.tsx` | 整團旅客管理 | UI組件 |
-| `/src/components/tours/room-allocation.tsx` | 分房管理 | UI組件 |
-| `/src/components/members/excel-member-table.tsx` | Excel編輯表格 | UI組件 |
-| `/src/stores/index.ts` | Zustand Store初始化 | Store |
-| `/src/stores/core/create-store.ts` | Store工廠函數 | Store |
-| `/src/features/orders/services/order.service.ts` | 訂單業務邏輯 | Service |
-| `/supabase-migration.sql` | 資料庫結構 | SQL |
+| 檔案                                             | 功能                | 類型    |
+| ------------------------------------------------ | ------------------- | ------- |
+| `/src/types/order.types.ts`                      | 旅客/訂單型別定義   | 型別    |
+| `/src/types/customer.types.ts`                   | 客戶型別定義        | 型別    |
+| `/src/components/tours/tour-members.tsx`         | 整團旅客管理        | UI組件  |
+| `/src/components/tours/room-allocation.tsx`      | 分房管理            | UI組件  |
+| `/src/components/members/excel-member-table.tsx` | Excel編輯表格       | UI組件  |
+| `/src/stores/index.ts`                           | Zustand Store初始化 | Store   |
+| `/src/stores/core/create-store.ts`               | Store工廠函數       | Store   |
+| `/src/features/orders/services/order.service.ts` | 訂單業務邏輯        | Service |
+| `/supabase-migration.sql`                        | 資料庫結構          | SQL     |
 
 ### 5. 狀態管理模式
 
@@ -709,6 +709,7 @@ const { items: members, create, update, delete, fetchAll } = useMemberStore()
 ### 7. 擴展建議
 
 #### 1. 實時協作編輯
+
 ```typescript
 // 使用 Realtime Manager 訂閱 members 表
 useRealtimeForMembers(tourId)
@@ -716,6 +717,7 @@ useRealtimeForMembers(tourId)
 ```
 
 #### 2. 批量匯入
+
 ```typescript
 // 支援 Excel/CSV 匯入
 importMembersFromFile(file: File, orderId: string)
@@ -723,12 +725,14 @@ importMembersFromFile(file: File, orderId: string)
 ```
 
 #### 3. 高級統計
+
 ```typescript
 // 按年齡分布、性別比例、護照效期等統計
 getMembersStatistics(tourId: string)
 ```
 
 #### 4. 簽證管理
+
 ```typescript
 // 與簽證系統集成
 Member.visa_status: 'pending' | 'submitted' | 'issued' | 'collected'
@@ -748,4 +752,3 @@ Venturo ERP 的旅客管理系統採用：
 6. **高度複用的 Store** - 統一的 Store 工廠函數，易於擴展
 
 該架構適合 10-50 人的中型旅行社團隊，可支援數十個並行旅遊團的管理。
-

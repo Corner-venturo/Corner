@@ -6,7 +6,12 @@ import { Plus, Send, Smile } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { FilePreview } from './FilePreview'
 import { UploadProgress } from './UploadProgress'
-import { QuickActionMenu, createQuickActions, createBotQuickActions, type QuickAction } from './QuickActionMenu'
+import {
+  QuickActionMenu,
+  createQuickActions,
+  createBotQuickActions,
+  type QuickAction,
+} from './QuickActionMenu'
 import { validateFile } from './utils'
 import { alert } from '@/lib/ui/alert-dialog'
 import type { Channel } from '@/stores/workspace'
@@ -191,7 +196,10 @@ export function MessageInput({
               return
             }
           } catch {
-            void alert(COMP_WORKSPACE_LABELS.此網站不允許下載圖片_請改用右鍵另存圖片後上傳, 'warning')
+            void alert(
+              COMP_WORKSPACE_LABELS.此網站不允許下載圖片_請改用右鍵另存圖片後上傳,
+              'warning'
+            )
             return
           }
         }
@@ -203,9 +211,10 @@ export function MessageInput({
     if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
       const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp', '.avif']
       const lowerUrl = url.toLowerCase()
-      const isImageUrl = imageExtensions.some(ext => lowerUrl.includes(ext)) ||
-                         lowerUrl.includes('image') ||
-                         lowerUrl.includes('photo')
+      const isImageUrl =
+        imageExtensions.some(ext => lowerUrl.includes(ext)) ||
+        lowerUrl.includes('image') ||
+        lowerUrl.includes('photo')
 
       if (isImageUrl) {
         try {
@@ -341,7 +350,17 @@ export function MessageInput({
         setShowQuickMenu(false)
       },
     })
-  }, [isBotDM, onCheckTicketStatus, onTourReview, onShowShareOrders, onShowShareQuote, onShowNewPayment, onShowNewReceipt, onShowShareAdvance, onShowNewTask])
+  }, [
+    isBotDM,
+    onCheckTicketStatus,
+    onTourReview,
+    onShowShareOrders,
+    onShowShareQuote,
+    onShowNewPayment,
+    onShowNewReceipt,
+    onShowShareAdvance,
+    onShowNewTask,
+  ])
 
   // 🔥 阻止整個頁面的拖曳預設行為（防止圖片在新分頁打開）
   useEffect(() => {
@@ -401,7 +420,8 @@ export function MessageInput({
           <Button
             type="button"
             variant="ghost"
-            size="icon" aria-label="Toggle menu"
+            size="icon"
+            aria-label="Toggle menu"
             className="w-9 h-9 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10"
             onClick={() => setShowQuickMenu(!showQuickMenu)}
             disabled={isDisabled}
@@ -442,7 +462,11 @@ export function MessageInput({
                 }
               }
             }}
-            placeholder={isDisabled ? COMP_WORKSPACE_LABELS.只有管理員才能在此頻道發言 : `傳送訊息給 ${displayChannelName}...`}
+            placeholder={
+              isDisabled
+                ? COMP_WORKSPACE_LABELS.只有管理員才能在此頻道發言
+                : `傳送訊息給 ${displayChannelName}...`
+            }
             className="w-full min-h-[40px] max-h-[120px] px-3 py-2 pr-10 bg-card border border-morandi-container rounded-md resize-none text-sm focus:outline-none focus:border-morandi-gold transition-colors disabled:bg-muted disabled:cursor-not-allowed"
             rows={1}
             style={{

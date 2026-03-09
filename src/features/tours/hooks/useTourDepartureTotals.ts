@@ -44,7 +44,8 @@ export function useTourDepartureTotals(
       serviceFee,
       pettyCash,
       expectedTotal: mealsTotal + accomTotal + activityTotal + othersTotal + serviceFee + pettyCash,
-      actualTotal: mealsActual + accomActual + activityActual + othersActual + serviceFee + pettyCash,
+      actualTotal:
+        mealsActual + accomActual + activityActual + othersActual + serviceFee + pettyCash,
     }
   }, [meals, accommodations, activities, others, data, tour.current_participants])
 }

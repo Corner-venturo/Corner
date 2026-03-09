@@ -64,27 +64,30 @@ export function BonusSettingTab({ tour }: BonusSettingTabProps) {
     }
   }, [])
 
-  const handleSave = useCallback(async (data: {
-    type: BonusSettingType
-    bonus: number
-    bonus_type: BonusCalculationType
-    employee_id: string | null
-  }) => {
-    try {
-      if (editing) {
-        await updateTourBonusSetting(editing.id, data)
-      } else {
-        await createTourBonusSetting({
-          ...data,
-          workspace_id,
-          tour_id: tour.id,
-        })
+  const handleSave = useCallback(
+    async (data: {
+      type: BonusSettingType
+      bonus: number
+      bonus_type: BonusCalculationType
+      employee_id: string | null
+    }) => {
+      try {
+        if (editing) {
+          await updateTourBonusSetting(editing.id, data)
+        } else {
+          await createTourBonusSetting({
+            ...data,
+            workspace_id,
+            tour_id: tour.id,
+          })
+        }
+        await invalidateTourBonusSettings()
+      } catch (err) {
+        logger.error('Failed to save bonus setting:', err)
       }
-      await invalidateTourBonusSettings()
-    } catch (err) {
-      logger.error('Failed to save bonus setting:', err)
-    }
-  }, [editing, workspace_id, tour.id])
+    },
+    [editing, workspace_id, tour.id]
+  )
 
   const handleCopyDefaults = useCallback(async () => {
     if (!defaults || defaults.length === 0) return
@@ -114,7 +117,10 @@ export function BonusSettingTab({ tour }: BonusSettingTabProps) {
   const formatBonusValue = (setting: TourBonusSetting): string => {
     const val = Number(setting.bonus)
     const calcLabel = BONUS_CALCULATION_LABELS[setting.bonus_type as BonusCalculationType]
-    if (setting.bonus_type === BonusCalculationType.PERCENT || setting.bonus_type === BonusCalculationType.MINUS_PERCENT) {
+    if (
+      setting.bonus_type === BonusCalculationType.PERCENT ||
+      setting.bonus_type === BonusCalculationType.MINUS_PERCENT
+    ) {
       return `${val}% (${calcLabel})`
     }
     return `$${val} (${calcLabel})`
@@ -138,9 +144,13 @@ export function BonusSettingTab({ tour }: BonusSettingTabProps) {
       </div>
 
       {loading ? (
-        <div className="text-muted-foreground py-8 text-center text-sm">{TOURS_LABELS.LOADING_9771}</div>
+        <div className="text-muted-foreground py-8 text-center text-sm">
+          {TOURS_LABELS.LOADING_9771}
+        </div>
       ) : !settings || settings.length === 0 ? (
-        <div className="text-muted-foreground py-8 text-center text-sm">{BONUS_TAB_LABELS.no_settings}</div>
+        <div className="text-muted-foreground py-8 text-center text-sm">
+          {BONUS_TAB_LABELS.no_settings}
+        </div>
       ) : (
         <div className="border rounded-lg overflow-hidden">
           <table className="w-full text-sm">
@@ -156,17 +166,31 @@ export function BonusSettingTab({ tour }: BonusSettingTabProps) {
               {settings.map(s => (
                 <tr key={s.id} className="border-t hover:bg-muted/30">
                   <td className="px-4 py-2">
-                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${BONUS_TYPE_BADGE_VARIANTS[s.type as BonusSettingType] || ''}`}>
+                    <span
+                      className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${BONUS_TYPE_BADGE_VARIANTS[s.type as BonusSettingType] || ''}`}
+                    >
                       {BONUS_TYPE_LABELS[s.type as BonusSettingType] || s.type}
                     </span>
                   </td>
                   <td className="px-4 py-2">{formatBonusValue(s)}</td>
-                  <td className="px-4 py-2 text-muted-foreground">{getEmployeeName(s.employee_id)}</td>
+                  <td className="px-4 py-2 text-muted-foreground">
+                    {getEmployeeName(s.employee_id)}
+                  </td>
                   <td className="px-4 py-2 text-right">
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEdit(s)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => handleEdit(s)}
+                    >
                       <Pencil className="h-3.5 w-3.5" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(s.id)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-destructive"
+                      onClick={() => handleDelete(s.id)}
+                    >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </td>

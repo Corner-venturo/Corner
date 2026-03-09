@@ -19,23 +19,36 @@ function getMichelinDisplay(restaurant: CombinedRestaurant) {
   if (michelin.michelin_stars && michelin.michelin_stars > 0) {
     return (
       <span className="flex items-center gap-0.5 text-status-danger">
-        {Array(michelin.michelin_stars).fill(0).map((_, i) => (
-          <Star key={i} size={10} fill="currentColor" />
-        ))}
+        {Array(michelin.michelin_stars)
+          .fill(0)
+          .map((_, i) => (
+            <Star key={i} size={10} fill="currentColor" />
+          ))}
       </span>
     )
   }
   if (michelin.bib_gourmand) {
-    return <span className="text-xs text-status-warning font-medium">{RESTAURANT_LABELS.LABEL_7082}</span>
+    return (
+      <span className="text-xs text-status-warning font-medium">
+        {RESTAURANT_LABELS.LABEL_7082}
+      </span>
+    )
   }
   if (michelin.green_star) {
-    return <span className="text-xs text-status-success font-medium">{RESTAURANT_LABELS.LABEL_5569}</span>
+    return (
+      <span className="text-xs text-status-success font-medium">
+        {RESTAURANT_LABELS.LABEL_5569}
+      </span>
+    )
   }
   return <span className="text-xs text-morandi-red">{RESTAURANT_LABELS.LABEL_4852}</span>
 }
 
 function getRestaurantImage(restaurant: CombinedRestaurant) {
-  return restaurant.thumbnail || (restaurant.images && restaurant.images.length > 0 ? restaurant.images[0] : null)
+  return (
+    restaurant.thumbnail ||
+    (restaurant.images && restaurant.images.length > 0 ? restaurant.images[0] : null)
+  )
 }
 
 export function RestaurantCard({ restaurant, isSelected, onToggle }: RestaurantCardProps) {
@@ -47,11 +60,12 @@ export function RestaurantCard({ restaurant, isSelected, onToggle }: RestaurantC
       className={`
         relative flex gap-3 p-3 rounded-xl cursor-pointer transition-all
         border-2 hover:shadow-md
-        ${isSelected
-          ? 'border-rose-500 bg-status-danger-bg shadow-sm'
-          : isMichelin
-            ? 'border-morandi-red/30 bg-status-danger-bg hover:bg-status-danger-bg'
-            : 'border-transparent bg-morandi-container/20 hover:bg-morandi-container/30'
+        ${
+          isSelected
+            ? 'border-rose-500 bg-status-danger-bg shadow-sm'
+            : isMichelin
+              ? 'border-morandi-red/30 bg-status-danger-bg hover:bg-status-danger-bg'
+              : 'border-transparent bg-morandi-container/20 hover:bg-morandi-container/30'
         }
       `}
     >
@@ -65,10 +79,7 @@ export function RestaurantCard({ restaurant, isSelected, onToggle }: RestaurantC
       {/* 縮圖 */}
       <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-morandi-container/30">
         {image ? (
-          <img src={image}
-            alt={restaurant.name}
-            className="w-full h-full object-cover"
-          />
+          <img src={image} alt={restaurant.name} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-morandi-secondary/50">
             <ImageIcon size={24} />
@@ -83,9 +94,7 @@ export function RestaurantCard({ restaurant, isSelected, onToggle }: RestaurantC
           {restaurant.name}
         </div>
         {restaurant.name_en && (
-          <div className="text-xs text-morandi-muted truncate mt-0.5">
-            {restaurant.name_en}
-          </div>
+          <div className="text-xs text-morandi-muted truncate mt-0.5">{restaurant.name_en}</div>
         )}
         <div className="text-xs text-morandi-secondary mt-1 flex items-center gap-1.5 flex-wrap">
           {/* 顯示區域與城市 */}
@@ -98,9 +107,7 @@ export function RestaurantCard({ restaurant, isSelected, onToggle }: RestaurantC
             {restaurant.city_name}
           </span>
           {restaurant.cuisine_type && restaurant.cuisine_type.length > 0 && (
-            <span className="text-morandi-red">
-              {restaurant.cuisine_type[0]}
-            </span>
+            <span className="text-morandi-red">{restaurant.cuisine_type[0]}</span>
           )}
         </div>
         <div className="text-xs mt-1 flex items-center gap-2">
@@ -111,9 +118,7 @@ export function RestaurantCard({ restaurant, isSelected, onToggle }: RestaurantC
             </span>
           )}
           {'private_room' in restaurant && restaurant.private_room && (
-            <span className="text-purple-600">
-              {RESTAURANT_LABELS.LABEL_8522}
-            </span>
+            <span className="text-purple-600">{RESTAURANT_LABELS.LABEL_8522}</span>
           )}
           {restaurant.price_range && (
             <span className="text-status-success font-medium">

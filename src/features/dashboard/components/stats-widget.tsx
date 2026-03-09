@@ -30,7 +30,9 @@ export function StatsWidget() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4 text-morandi-gold" />
-            <h3 className="font-semibold text-sm text-morandi-primary">{DASHBOARD_LABELS.LABEL_5967}</h3>
+            <h3 className="font-semibold text-sm text-morandi-primary">
+              {DASHBOARD_LABELS.LABEL_5967}
+            </h3>
           </div>
           <button
             onClick={() => setIsConfigOpen(!isConfigOpen)}
@@ -44,7 +46,9 @@ export function StatsWidget() {
         {/* 設定面板 */}
         {isConfigOpen && (
           <div className="mt-3 pt-3 border-t border-morandi-gold/20">
-            <div className="text-xs text-morandi-secondary mb-2">{DASHBOARD_LABELS.SELECT_4619}</div>
+            <div className="text-xs text-morandi-secondary mb-2">
+              {DASHBOARD_LABELS.SELECT_4619}
+            </div>
             <div className="grid grid-cols-2 gap-2">
               {allStats.map(stat => (
                 <label

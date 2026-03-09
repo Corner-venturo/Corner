@@ -27,10 +27,7 @@ export async function seedRegions(): Promise<void> {
 
   try {
     // 檢查是否已有資料
-    const { data: existingCountries } = await supabase
-      .from('countries')
-      .select('id')
-      .limit(1)
+    const { data: existingCountries } = await supabase.from('countries').select('id').limit(1)
 
     if (existingCountries && existingCountries.length > 0) {
       logger.log('✓ [Seed] 地區資料已存在，跳過初始化')
@@ -47,7 +44,10 @@ export async function seedRegions(): Promise<void> {
     // 遍歷所有國家
     for (const [countryId, countryData] of Object.entries(COUNTRIES)) {
       // 1. 建立國家
-      const country: Omit<Country, 'created_at' | 'updated_at'> & { created_at: string; updated_at: string } = {
+      const country: Omit<Country, 'created_at' | 'updated_at'> & {
+        created_at: string
+        updated_at: string
+      } = {
         id: crypto.randomUUID(),
         name: countryData.name,
         name_en: countryData.nameEn,
@@ -70,7 +70,10 @@ export async function seedRegions(): Promise<void> {
       // 2. 建立地區（如果有）
       if (countryData.regions) {
         for (const regionData of countryData.regions) {
-          const region: Omit<Region, 'created_at' | 'updated_at'> & { created_at: string; updated_at: string } = {
+          const region: Omit<Region, 'created_at' | 'updated_at'> & {
+            created_at: string
+            updated_at: string
+          } = {
             id: crypto.randomUUID(),
             country_id: country.id,
             name: regionData.name,
@@ -89,7 +92,9 @@ export async function seedRegions(): Promise<void> {
           logger.log(`  ✓ [Seed] 建立地區: ${region.name}`)
 
           // 3. 建立城市
-          const cities: Array<Omit<City, 'created_at' | 'updated_at'> & { created_at: string; updated_at: string }> = []
+          const cities: Array<
+            Omit<City, 'created_at' | 'updated_at'> & { created_at: string; updated_at: string }
+          > = []
           for (const cityData of regionData.cities) {
             cities.push({
               id: crypto.randomUUID(),
@@ -116,7 +121,9 @@ export async function seedRegions(): Promise<void> {
 
       // 4. 建立城市（無地區分類的國家）
       if (countryData.cities) {
-        const cities: Array<Omit<City, 'created_at' | 'updated_at'> & { created_at: string; updated_at: string }> = []
+        const cities: Array<
+          Omit<City, 'created_at' | 'updated_at'> & { created_at: string; updated_at: string }
+        > = []
         for (const cityData of countryData.cities) {
           cities.push({
             id: crypto.randomUUID(),
@@ -141,9 +148,15 @@ export async function seedRegions(): Promise<void> {
     }
 
     // 統計
-    const { count: countryCount } = await supabase.from('countries').select('*', { count: 'exact', head: true })
-    const { count: regionCount } = await supabase.from('regions').select('*', { count: 'exact', head: true })
-    const { count: cityCount } = await supabase.from('cities').select('*', { count: 'exact', head: true })
+    const { count: countryCount } = await supabase
+      .from('countries')
+      .select('*', { count: 'exact', head: true })
+    const { count: regionCount } = await supabase
+      .from('regions')
+      .select('*', { count: 'exact', head: true })
+    const { count: cityCount } = await supabase
+      .from('cities')
+      .select('*', { count: 'exact', head: true })
 
     logger.log('✅ [Seed] 地區資料初始化完成')
     logger.log(`   📊 國家: ${countryCount} 筆`)

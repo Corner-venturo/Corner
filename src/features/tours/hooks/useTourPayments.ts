@@ -98,8 +98,9 @@ export function useTourPayments({
           return receipt.order_id === orderFilter
         }
         // 包含: 訂單屬於此團 OR 收款單直接關聯此團
-        return (receipt.order_id && tourOrderIds.has(receipt.order_id)) ||
-               receipt.tour_id === tour.id
+        return (
+          (receipt.order_id && tourOrderIds.has(receipt.order_id)) || receipt.tour_id === tour.id
+        )
       })
       .map(receipt => ({
         id: receipt.id,
@@ -117,13 +118,31 @@ export function useTourPayments({
   }, [receipts, tourOrders, tour.id, orderFilter])
 
   // 統計數據計算
-  const confirmedPayments = useMemo(() => tourPayments.filter(p => p.status === 'confirmed'), [tourPayments])
-  const pendingPayments = useMemo(() => tourPayments.filter(p => p.status === 'pending'), [tourPayments])
-  const totalConfirmed = useMemo(() => confirmedPayments.reduce((sum, p) => sum + p.amount, 0), [confirmedPayments])
-  const totalPending = useMemo(() => pendingPayments.reduce((sum, p) => sum + p.amount, 0), [pendingPayments])
+  const confirmedPayments = useMemo(
+    () => tourPayments.filter(p => p.status === 'confirmed'),
+    [tourPayments]
+  )
+  const pendingPayments = useMemo(
+    () => tourPayments.filter(p => p.status === 'pending'),
+    [tourPayments]
+  )
+  const totalConfirmed = useMemo(
+    () => confirmedPayments.reduce((sum, p) => sum + p.amount, 0),
+    [confirmedPayments]
+  )
+  const totalPending = useMemo(
+    () => pendingPayments.reduce((sum, p) => sum + p.amount, 0),
+    [pendingPayments]
+  )
   const totalPayments = useMemo(() => totalConfirmed + totalPending, [totalConfirmed, totalPending])
-  const totalOrderAmount = useMemo(() => tourOrders.reduce((sum, order) => sum + (order.total_amount ?? 0), 0), [tourOrders])
-  const remaining_amount = useMemo(() => Math.max(0, totalOrderAmount - totalConfirmed), [totalOrderAmount, totalConfirmed])
+  const totalOrderAmount = useMemo(
+    () => tourOrders.reduce((sum, order) => sum + (order.total_amount ?? 0), 0),
+    [tourOrders]
+  )
+  const remaining_amount = useMemo(
+    () => Math.max(0, totalOrderAmount - totalConfirmed),
+    [totalOrderAmount, totalConfirmed]
+  )
 
   // 更新 tour 的財務欄位
   const updateTourFinancials = useCallback(async () => {
@@ -212,7 +231,7 @@ export function useTourPayments({
 
       const receiptData: Partial<Receipt> = {
         order_id: data.order_id || null,
-        tour_id: tour.id,  // 設定 tour_id 以便計算總收入
+        tour_id: tour.id, // 設定 tour_id 以便計算總收入
         order_number: order?.order_number || null,
         tour_name: tour.name || null,
         receipt_date: new Date().toISOString(),
@@ -235,7 +254,10 @@ export function useTourPayments({
         description: TOUR_PAYMENTS_LABELS.RECEIPT_CREATED,
       })
     } catch (error) {
-      logger.error(TOUR_PAYMENTS_LABELS.CREATE_RECEIPT_FAILED, error instanceof Error ? error.message : String(error))
+      logger.error(
+        TOUR_PAYMENTS_LABELS.CREATE_RECEIPT_FAILED,
+        error instanceof Error ? error.message : String(error)
+      )
       toast({
         title: TOUR_PAYMENTS_LABELS.ERROR,
         description: TOUR_PAYMENTS_LABELS.CREATE_RECEIPT_FAILED,
@@ -290,7 +312,10 @@ export function useTourPayments({
     setInvoiceItems(newItems)
   }
 
-  const invoiceTotal = useMemo(() => invoiceItems.reduce((sum, item) => sum + item.itemAmt, 0), [invoiceItems])
+  const invoiceTotal = useMemo(
+    () => invoiceItems.reduce((sum, item) => sum + item.itemAmt, 0),
+    [invoiceItems]
+  )
 
   const openInvoiceDialog = (orderId?: string) => {
     if (orderId) {
@@ -312,11 +337,19 @@ export function useTourPayments({
 
   const handleIssueInvoice = async () => {
     if (!invoiceBuyer.buyerName) {
-      toast({ title: TOUR_PAYMENTS_LABELS.ERROR, description: TOUR_PAYMENTS_LABELS.ENTER_BUYER_NAME, variant: 'destructive' })
+      toast({
+        title: TOUR_PAYMENTS_LABELS.ERROR,
+        description: TOUR_PAYMENTS_LABELS.ENTER_BUYER_NAME,
+        variant: 'destructive',
+      })
       return
     }
     if (invoiceItems.some(item => !item.item_name || item.item_price <= 0)) {
-      toast({ title: TOUR_PAYMENTS_LABELS.ERROR, description: TOUR_PAYMENTS_LABELS.FILL_PRODUCT_INFO, variant: 'destructive' })
+      toast({
+        title: TOUR_PAYMENTS_LABELS.ERROR,
+        description: TOUR_PAYMENTS_LABELS.FILL_PRODUCT_INFO,
+        variant: 'destructive',
+      })
       return
     }
 
@@ -324,7 +357,10 @@ export function useTourPayments({
       const order = tourOrders.find(o => o.id === invoiceOrderId)
       if (order && invoiceTotal > (order.paid_amount ?? 0)) {
         const confirmed = await confirm(
-          TOUR_PAYMENTS_LABELS.AMOUNT_EXCEED_CONFIRM(invoiceTotal.toLocaleString(), (order.paid_amount ?? 0).toLocaleString()),
+          TOUR_PAYMENTS_LABELS.AMOUNT_EXCEED_CONFIRM(
+            invoiceTotal.toLocaleString(),
+            (order.paid_amount ?? 0).toLocaleString()
+          ),
           { title: TOUR_PAYMENTS_LABELS.AMOUNT_EXCEED_TITLE, type: 'warning' }
         )
         if (!confirmed) return
@@ -342,10 +378,15 @@ export function useTourPayments({
         tour_id: tour.id,
         created_by: 'current_user',
       })
-      toast({ title: TOUR_PAYMENTS_LABELS.SUCCESS, description: TOUR_PAYMENTS_LABELS.INVOICE_SUCCESS })
+      toast({
+        title: TOUR_PAYMENTS_LABELS.SUCCESS,
+        description: TOUR_PAYMENTS_LABELS.INVOICE_SUCCESS,
+      })
       setIsInvoiceDialogOpen(false)
       setInvoiceBuyer({ buyerName: '', buyerUBN: '', buyerEmail: '', buyerMobile: '' })
-      setInvoiceItems([{ item_name: '', item_count: 1, item_unit: '式', item_price: 0, itemAmt: 0 }])
+      setInvoiceItems([
+        { item_name: '', item_count: 1, item_unit: '式', item_price: 0, itemAmt: 0 },
+      ])
       setInvoiceRemark('')
     } catch (error) {
       toast({

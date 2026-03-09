@@ -1,4 +1,16 @@
-import { Home, Plane, MapPin, Phone, Users, HelpCircle, DollarSign, Hotel, Sparkles, AlertCircle, type LucideIcon } from 'lucide-react'
+import {
+  Home,
+  Plane,
+  MapPin,
+  Phone,
+  Users,
+  HelpCircle,
+  DollarSign,
+  Hotel,
+  Sparkles,
+  AlertCircle,
+  type LucideIcon,
+} from 'lucide-react'
 import { FloatingDock } from '@/components/ui/floating-dock'
 import { useMemo } from 'react'
 import type { TourPageData } from '@/features/tours/types/tour-display.types'
@@ -35,7 +47,11 @@ export function TourNavigation({ data, scrollOpacity, isPreview, viewMode }: Tou
     }
 
     // 領隊與集合資訊
-    const hasLeaderInfo = data.leader?.name || data.meetingInfo?.time || data.meetingInfo?.location || (data.meetingPoints && data.meetingPoints.length > 0)
+    const hasLeaderInfo =
+      data.leader?.name ||
+      data.meetingInfo?.time ||
+      data.meetingInfo?.location ||
+      (data.meetingPoints && data.meetingPoints.length > 0)
     if (hasLeaderInfo) {
       links.push({ title: '領隊', icon: Phone, href: '#leader' })
     }
@@ -61,8 +77,9 @@ export function TourNavigation({ data, scrollOpacity, isPreview, viewMode }: Tou
     }
 
     // 提醒事項/取消政策
-    const hasNotices = (data.showNotices && data.notices && data.notices.length > 0) ||
-                       (data.showCancellationPolicy && data.cancellationPolicy && data.cancellationPolicy.length > 0)
+    const hasNotices =
+      (data.showNotices && data.notices && data.notices.length > 0) ||
+      (data.showCancellationPolicy && data.cancellationPolicy && data.cancellationPolicy.length > 0)
     if (hasNotices) {
       links.push({ title: '須知', icon: AlertCircle, href: '#notices' })
     }
@@ -78,20 +95,19 @@ export function TourNavigation({ data, scrollOpacity, isPreview, viewMode }: Tou
           className="fixed left-0 right-0 z-40 transition-all duration-300 hidden md:block"
           style={{
             // 滾動後使用深色背景，確保清晰可見
-            backgroundColor: scrollOpacity > 0.1
-              ? `rgba(30, 41, 59, ${Math.min(scrollOpacity * 1.5, 0.95)})` // slate-800
-              : 'transparent',
+            backgroundColor:
+              scrollOpacity > 0.1
+                ? `rgba(30, 41, 59, ${Math.min(scrollOpacity * 1.5, 0.95)})` // slate-800
+                : 'transparent',
             backdropFilter: scrollOpacity > 0.1 ? 'blur(12px)' : 'none',
             boxShadow: scrollOpacity > 0.3 ? '0 4px 12px -2px rgba(0, 0, 0, 0.3)' : 'none',
           }}
         >
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center justify-between h-16">
-              <div className="text-xl font-bold text-white">
-                Venturo
-              </div>
+              <div className="text-xl font-bold text-white">Venturo</div>
               <div className="flex items-center gap-6">
-                {navLinks.map((link) => {
+                {navLinks.map(link => {
                   const IconComponent = link.icon || Home
                   return (
                     <a
@@ -113,7 +129,7 @@ export function TourNavigation({ data, scrollOpacity, isPreview, viewMode }: Tou
       {/* 手機版底部導航 */}
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 md:hidden">
         <FloatingDock
-          items={navLinks.map((link) => ({
+          items={navLinks.map(link => ({
             title: link.title,
             icon: <link.icon className="w-5 h-5" />,
             href: link.href,

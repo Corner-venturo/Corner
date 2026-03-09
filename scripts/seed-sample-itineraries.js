@@ -11,7 +11,8 @@ const crypto = require('crypto')
 
 // Supabase 連線
 const supabaseUrl = 'https://pfqvdacxowpgfamuvnsn.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE'
+const supabaseKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE'
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
@@ -31,14 +32,18 @@ const SAMPLE_ITINERARIES = [
     price: '51,900',
     price_note: '起',
     features: [
-      { icon: 'IconShip', title: '破冰船體驗', description: '搭乘破冰船穿越流冰，近距離觀賞海冰奇景' },
+      {
+        icon: 'IconShip',
+        title: '破冰船體驗',
+        description: '搭乘破冰船穿越流冰，近距離觀賞海冰奇景',
+      },
       { icon: 'IconSnowflake', title: '雪祭盛會', description: '札幌雪祭，欣賞壯觀的冰雕藝術作品' },
-      { icon: 'IconFish', title: '三大螃蟹', description: '品嚐北海道著名的帝王蟹、毛蟹、松葉蟹' }
+      { icon: 'IconFish', title: '三大螃蟹', description: '品嚐北海道著名的帝王蟹、毛蟹、松葉蟹' },
     ],
     focus_cards: [
       { title: '破冰船', src: '/images/hokkaido/icebreaker.jpg' },
       { title: '札幌雪祭', src: '/images/hokkaido/snow-festival.jpg' },
-      { title: '小樽運河', src: '/images/hokkaido/otaru.jpg' }
+      { title: '小樽運河', src: '/images/hokkaido/otaru.jpg' },
     ],
     daily_itinerary: [
       {
@@ -48,11 +53,11 @@ const SAMPLE_ITINERARIES = [
         description: '搭乘豪華客機飛往北海道札幌，抵達後專車接往飯店休息',
         activities: [
           { icon: '✈️', title: '桃園機場出發', description: '搭乘直飛班機前往札幌' },
-          { icon: '🏨', title: '入住飯店', description: '札幌市區溫泉飯店' }
+          { icon: '🏨', title: '入住飯店', description: '札幌市區溫泉飯店' },
         ],
         recommendations: ['新千歲機場購物', '拉麵共和國'],
         meals: { breakfast: '機上輕食', lunch: '機上輕食', dinner: '飯店內享用' },
-        accommodation: '札幌溫泉飯店'
+        accommodation: '札幌溫泉飯店',
       },
       {
         dayLabel: 'Day 2',
@@ -62,11 +67,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🏛️', title: '北海道舊道廳', description: '紅磚建築的歷史象徵' },
           { icon: '🕰️', title: '時計台', description: '札幌地標性建築' },
-          { icon: '🛒', title: '狸小路商店街', description: '購物天堂，藥妝美食應有盡有' }
+          { icon: '🛒', title: '狸小路商店街', description: '購物天堂，藥妝美食應有盡有' },
         ],
         recommendations: ['白色戀人公園', '二條市場'],
         meals: { breakfast: '飯店內', lunch: '味噌拉麵', dinner: '成吉思汗烤羊肉' },
-        accommodation: '札幌溫泉飯店'
+        accommodation: '札幌溫泉飯店',
       },
       {
         dayLabel: 'Day 3',
@@ -76,11 +81,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🚢', title: '極光號破冰船', description: '搭乘破冰船穿越鄂霍次克海流冰' },
           { icon: '🦅', title: '網走監獄博物館', description: '了解北海道開拓歷史' },
-          { icon: '♨️', title: '溫泉體驗', description: '享受溫泉放鬆身心' }
+          { icon: '♨️', title: '溫泉體驗', description: '享受溫泉放鬆身心' },
         ],
         recommendations: ['流冰館', '天都山展望台'],
         meals: { breakfast: '飯店內', lunch: '海鮮丼飯', dinner: '溫泉會席料理' },
-        accommodation: '網走溫泉飯店'
+        accommodation: '網走溫泉飯店',
       },
       {
         dayLabel: 'Day 4',
@@ -90,11 +95,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🏞️', title: '小樽運河', description: '北海道最浪漫的運河景致' },
           { icon: '🎵', title: '音樂盒堂', description: '精緻音樂盒藝術收藏' },
-          { icon: '🍫', title: 'LeTAO甜點', description: '品嚐北海道著名雙層起司蛋糕' }
+          { icon: '🍫', title: 'LeTAO甜點', description: '品嚐北海道著名雙層起司蛋糕' },
         ],
         recommendations: ['北一硝子館', '銀之鐘咖啡'],
         meals: { breakfast: '飯店內', lunch: '海鮮壽司', dinner: '三大螃蟹吃到飽' },
-        accommodation: '札幌溫泉飯店'
+        accommodation: '札幌溫泉飯店',
       },
       {
         dayLabel: 'Day 5',
@@ -103,13 +108,13 @@ const SAMPLE_ITINERARIES = [
         description: '享用早餐後，前往機場搭機返回溫暖的家',
         activities: [
           { icon: '🛒', title: '新千歲機場購物', description: '最後採購伴手禮的機會' },
-          { icon: '✈️', title: '返回台北', description: '帶著美好回憶返家' }
+          { icon: '✈️', title: '返回台北', description: '帶著美好回憶返家' },
         ],
         recommendations: ['Royce巧克力', '白色戀人', '薯條三兄弟'],
         meals: { breakfast: '飯店內', lunch: '機場自理', dinner: '機上輕食' },
-        accommodation: '溫暖的家'
-      }
-    ]
+        accommodation: '溫暖的家',
+      },
+    ],
   },
 
   {
@@ -127,12 +132,12 @@ const SAMPLE_ITINERARIES = [
     features: [
       { icon: 'IconBuilding', title: '星野度假村', description: '入住頂級星野TOMAMU度假村' },
       { icon: 'IconChurch', title: '水之教堂', description: '安藤忠雄設計的夢幻教堂' },
-      { icon: 'IconPool', title: '微笑海灘', description: '日本最大室內人工海灘' }
+      { icon: 'IconPool', title: '微笑海灘', description: '日本最大室內人工海灘' },
     ],
     focus_cards: [
       { title: '水之教堂', src: '/images/hokkaido/church.jpg' },
       { title: '雲海テラス', src: '/images/hokkaido/unkai.jpg' },
-      { title: '微笑海灘', src: '/images/hokkaido/beach.jpg' }
+      { title: '微笑海灘', src: '/images/hokkaido/beach.jpg' },
     ],
     daily_itinerary: [
       {
@@ -142,11 +147,11 @@ const SAMPLE_ITINERARIES = [
         description: '抵達後直接前往星野TOMAMU度假村',
         activities: [
           { icon: '✈️', title: '直飛札幌', description: '搭乘豪華客機' },
-          { icon: '🏨', title: '星野度假村', description: '辦理入住，享受設施' }
+          { icon: '🏨', title: '星野度假村', description: '辦理入住，享受設施' },
         ],
         recommendations: ['微笑海灘', '木林之湯'],
         meals: { breakfast: '機上輕食', lunch: '機上輕食', dinner: '度假村自助餐' },
-        accommodation: '星野TOMAMU度假村'
+        accommodation: '星野TOMAMU度假村',
       },
       {
         dayLabel: 'Day 2',
@@ -156,11 +161,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '⛷️', title: '滑雪體驗', description: '初學者雪道或雪盆戲雪' },
           { icon: '🌊', title: '微笑海灘', description: '日本最大室內人工海灘' },
-          { icon: '⛪', title: '水之教堂', description: '參觀安藤忠雄設計的夢幻教堂' }
+          { icon: '⛪', title: '水之教堂', description: '參觀安藤忠雄設計的夢幻教堂' },
         ],
         recommendations: ['愛絲冰城', '霧冰テラス'],
         meals: { breakfast: '度假村內', lunch: '度假村內', dinner: '度假村內' },
-        accommodation: '星野TOMAMU度假村'
+        accommodation: '星野TOMAMU度假村',
       },
       {
         dayLabel: 'Day 3',
@@ -170,11 +175,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🏔️', title: '富良野滑雪場', description: '北海道知名滑雪勝地' },
           { icon: '🧀', title: '富良野起司工房', description: '品嚐手工起司' },
-          { icon: '🌃', title: '札幌夜景', description: '藻岩山夜景' }
+          { icon: '🌃', title: '札幌夜景', description: '藻岩山夜景' },
         ],
         recommendations: ['精靈露台', '森之時計咖啡'],
         meals: { breakfast: '度假村內', lunch: '富良野午餐', dinner: '札幌湯咖哩' },
-        accommodation: '札幌市區飯店'
+        accommodation: '札幌市區飯店',
       },
       {
         dayLabel: 'Day 4',
@@ -184,11 +189,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🏞️', title: '小樽運河', description: '北海道最浪漫景點' },
           { icon: '🎵', title: '音樂盒堂', description: '精緻音樂盒收藏' },
-          { icon: '🛒', title: '狸小路', description: '札幌購物天堂' }
+          { icon: '🛒', title: '狸小路', description: '札幌購物天堂' },
         ],
         recommendations: ['六花亭', '北菓樓'],
         meals: { breakfast: '飯店內', lunch: '小樽壽司', dinner: '三大螃蟹' },
-        accommodation: '札幌市區飯店'
+        accommodation: '札幌市區飯店',
       },
       {
         dayLabel: 'Day 5',
@@ -197,13 +202,13 @@ const SAMPLE_ITINERARIES = [
         description: '帶著美好回憶返回台灣',
         activities: [
           { icon: '🛒', title: '機場購物', description: '最後採購時間' },
-          { icon: '✈️', title: '返回台北', description: '結束愉快旅程' }
+          { icon: '✈️', title: '返回台北', description: '結束愉快旅程' },
         ],
         recommendations: ['Royce巧克力', '六花亭'],
         meals: { breakfast: '飯店內', lunch: '機場自理', dinner: '機上輕食' },
-        accommodation: '溫暖的家'
-      }
-    ]
+        accommodation: '溫暖的家',
+      },
+    ],
   },
 
   // ========== 日本 - 九州 ==========
@@ -222,12 +227,12 @@ const SAMPLE_ITINERARIES = [
     features: [
       { icon: 'IconTrain', title: '由布院之森', description: '九州最人氣的觀光列車' },
       { icon: 'IconShip', title: '柳川遊船', description: '搭乘小舟遊覽水鄉柳川' },
-      { icon: 'IconFlame', title: '別府溫泉', description: '日本溫泉之都，體驗地獄溫泉' }
+      { icon: 'IconFlame', title: '別府溫泉', description: '日本溫泉之都，體驗地獄溫泉' },
     ],
     focus_cards: [
       { title: '由布院之森', src: '/images/kyushu/yufuin-train.jpg' },
       { title: '金鱗湖', src: '/images/kyushu/kinrinko.jpg' },
-      { title: '別府地獄', src: '/images/kyushu/beppu.jpg' }
+      { title: '別府地獄', src: '/images/kyushu/beppu.jpg' },
     ],
     daily_itinerary: [
       {
@@ -237,11 +242,11 @@ const SAMPLE_ITINERARIES = [
         description: '抵達福岡後，享用博多美食',
         activities: [
           { icon: '✈️', title: '飛抵福岡', description: '搭乘直飛班機' },
-          { icon: '🍜', title: '博多拉麵', description: '品嚐正宗豚骨拉麵' }
+          { icon: '🍜', title: '博多拉麵', description: '品嚐正宗豚骨拉麵' },
         ],
         recommendations: ['運河城', '天神地下街'],
         meals: { breakfast: '機上輕食', lunch: '機上輕食', dinner: '博多拉麵' },
-        accommodation: '福岡市區飯店'
+        accommodation: '福岡市區飯店',
       },
       {
         dayLabel: 'Day 2',
@@ -251,11 +256,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🚃', title: '由布院之森', description: '搭乘人氣觀光列車' },
           { icon: '🏞️', title: '金鱗湖', description: '夢幻湖畔散步' },
-          { icon: '🛍️', title: '湯之坪街道', description: '特色商店街購物' }
+          { icon: '🛍️', title: '湯之坪街道', description: '特色商店街購物' },
         ],
         recommendations: ['B-speak蛋糕卷', '由布院花卉村'],
         meals: { breakfast: '飯店內', lunch: '列車便當', dinner: '溫泉會席' },
-        accommodation: '由布院溫泉旅館'
+        accommodation: '由布院溫泉旅館',
       },
       {
         dayLabel: 'Day 3',
@@ -265,11 +270,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🔥', title: '別府地獄巡遊', description: '海地獄、血池地獄等' },
           { icon: '🐻', title: '熊本熊廣場', description: '與熊本熊見面' },
-          { icon: '🏯', title: '熊本城', description: '日本三大名城之一' }
+          { icon: '🏯', title: '熊本城', description: '日本三大名城之一' },
         ],
         recommendations: ['地獄蒸工房', '馬肉料理'],
         meals: { breakfast: '旅館內', lunch: '地獄蒸料理', dinner: '熊本馬肉' },
-        accommodation: '熊本市區飯店'
+        accommodation: '熊本市區飯店',
       },
       {
         dayLabel: 'Day 4',
@@ -279,11 +284,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🛶', title: '柳川遊船', description: '船夫搖櫓穿梭水鄉' },
           { icon: '⛩️', title: '太宰府天滿宮', description: '學問之神，祈求考運' },
-          { icon: '🛒', title: '天神購物', description: '福岡最大購物區' }
+          { icon: '🛒', title: '天神購物', description: '福岡最大購物區' },
         ],
         recommendations: ['梅枝餅', '表參道商店街'],
         meals: { breakfast: '飯店內', lunch: '鰻魚飯', dinner: '內臟鍋' },
-        accommodation: '福岡市區飯店'
+        accommodation: '福岡市區飯店',
       },
       {
         dayLabel: 'Day 5',
@@ -292,13 +297,13 @@ const SAMPLE_ITINERARIES = [
         description: '結束美好的九州之旅',
         activities: [
           { icon: '🛒', title: '福岡機場購物', description: '最後採購時間' },
-          { icon: '✈️', title: '返回台北', description: '帶著滿滿回憶回家' }
+          { icon: '✈️', title: '返回台北', description: '帶著滿滿回憶回家' },
         ],
         recommendations: ['通りもん', '博多の女'],
         meals: { breakfast: '飯店內', lunch: '機場自理', dinner: '機上輕食' },
-        accommodation: '溫暖的家'
-      }
-    ]
+        accommodation: '溫暖的家',
+      },
+    ],
   },
 
   {
@@ -316,12 +321,12 @@ const SAMPLE_ITINERARIES = [
     features: [
       { icon: 'IconCastle', title: '豪斯登堡', description: '日本最大歐洲主題樂園' },
       { icon: 'IconPenguin', title: '企鵝水族館', description: '長崎企鵝互動體驗' },
-      { icon: 'IconStrawberry', title: '採草莓', description: '冬季限定甜蜜體驗' }
+      { icon: 'IconStrawberry', title: '採草莓', description: '冬季限定甜蜜體驗' },
     ],
     focus_cards: [
       { title: '豪斯登堡', src: '/images/kyushu/huis.jpg' },
       { title: '企鵝水族館', src: '/images/kyushu/penguin.jpg' },
-      { title: '稻佐山夜景', src: '/images/kyushu/inasayama.jpg' }
+      { title: '稻佐山夜景', src: '/images/kyushu/inasayama.jpg' },
     ],
     daily_itinerary: [
       {
@@ -332,11 +337,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '✈️', title: '飛抵福岡', description: '搭乘直飛班機' },
           { icon: '🚌', title: '前往長崎', description: '車程約2小時' },
-          { icon: '🌃', title: '稻佐山夜景', description: '世界新三大夜景' }
+          { icon: '🌃', title: '稻佐山夜景', description: '世界新三大夜景' },
         ],
         recommendations: ['眼鏡橋', '長崎新地中華街'],
         meals: { breakfast: '機上輕食', lunch: '機上輕食', dinner: '長崎強棒麵' },
-        accommodation: '長崎市區飯店'
+        accommodation: '長崎市區飯店',
       },
       {
         dayLabel: 'Day 2',
@@ -346,11 +351,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🏰', title: '豪斯登堡', description: '荷蘭風情主題樂園' },
           { icon: '🎡', title: '遊樂設施', description: 'VR過山車、鬼屋等' },
-          { icon: '🌷', title: '花卉節', description: '季節限定花海' }
+          { icon: '🌷', title: '花卉節', description: '季節限定花海' },
         ],
         recommendations: ['光之王國', '起司蛋糕'],
         meals: { breakfast: '飯店內', lunch: '園區內自理', dinner: '園區內自理' },
-        accommodation: '豪斯登堡園區飯店'
+        accommodation: '豪斯登堡園區飯店',
       },
       {
         dayLabel: 'Day 3',
@@ -360,11 +365,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🐧', title: '企鵝水族館', description: '與企鵝近距離互動' },
           { icon: '🍓', title: '採草莓', description: '冬季限定體驗' },
-          { icon: '🏯', title: '熊本城', description: '日本三大名城' }
+          { icon: '🏯', title: '熊本城', description: '日本三大名城' },
         ],
         recommendations: ['熊本熊廣場', '馬肉刺身'],
         meals: { breakfast: '飯店內', lunch: '佐世保漢堡', dinner: '熊本料理' },
-        accommodation: '熊本溫泉飯店'
+        accommodation: '熊本溫泉飯店',
       },
       {
         dayLabel: 'Day 4',
@@ -374,11 +379,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '⛩️', title: '太宰府天滿宮', description: '學問之神' },
           { icon: '🍡', title: '梅枝餅', description: '太宰府名物' },
-          { icon: '🛒', title: '天神購物', description: '福岡購物天堂' }
+          { icon: '🛒', title: '天神購物', description: '福岡購物天堂' },
         ],
         recommendations: ['星巴克太宰府', '博多運河城'],
         meals: { breakfast: '飯店內', lunch: '太宰府午餐', dinner: '內臟鍋' },
-        accommodation: '福岡市區飯店'
+        accommodation: '福岡市區飯店',
       },
       {
         dayLabel: 'Day 5',
@@ -387,13 +392,13 @@ const SAMPLE_ITINERARIES = [
         description: '帶著美好回憶返回台灣',
         activities: [
           { icon: '🛒', title: '機場購物', description: '最後採購' },
-          { icon: '✈️', title: '返回台北', description: '結束旅程' }
+          { icon: '✈️', title: '返回台北', description: '結束旅程' },
         ],
         recommendations: ['明太子', '通りもん'],
         meals: { breakfast: '飯店內', lunch: '機場自理', dinner: '機上輕食' },
-        accommodation: '溫暖的家'
-      }
-    ]
+        accommodation: '溫暖的家',
+      },
+    ],
   },
 
   // ========== 日本 - 沖繩 ==========
@@ -412,12 +417,12 @@ const SAMPLE_ITINERARIES = [
     features: [
       { icon: 'IconFish', title: '美麗海水族館', description: '超大鯨鯊水族箱，親子必訪' },
       { icon: 'IconBridge', title: '古宇利大橋', description: '沖繩最美跨海大橋' },
-      { icon: 'IconShoppingCart', title: '國際通', description: '沖繩最熱鬧購物街' }
+      { icon: 'IconShoppingCart', title: '國際通', description: '沖繩最熱鬧購物街' },
     ],
     focus_cards: [
       { title: '鯨鯊水族箱', src: '/images/okinawa/aquarium.jpg' },
       { title: '古宇利大橋', src: '/images/okinawa/kouri.jpg' },
-      { title: '美麗海灘', src: '/images/okinawa/beach.jpg' }
+      { title: '美麗海灘', src: '/images/okinawa/beach.jpg' },
     ],
     daily_itinerary: [
       {
@@ -428,11 +433,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '✈️', title: '飛抵那霸', description: '約1.5小時航程' },
           { icon: '🛍️', title: '國際通', description: '沖繩最熱鬧商店街' },
-          { icon: '🍖', title: '阿古豬', description: '沖繩名產黑毛豬' }
+          { icon: '🍖', title: '阿古豬', description: '沖繩名產黑毛豬' },
         ],
         recommendations: ['第一牧志公設市場', '御菓子御殿'],
         meals: { breakfast: '機上輕食', lunch: '機上輕食', dinner: '阿古豬燒肉' },
-        accommodation: '那霸市區飯店'
+        accommodation: '那霸市區飯店',
       },
       {
         dayLabel: 'Day 2',
@@ -442,11 +447,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🐋', title: '美麗海水族館', description: '世界最大鯨鯊水族箱' },
           { icon: '🐬', title: '海豚表演', description: '精彩海豚秀' },
-          { icon: '🏖️', title: '翡翠海灘', description: '白沙碧海' }
+          { icon: '🏖️', title: '翡翠海灘', description: '白沙碧海' },
         ],
         recommendations: ['海洋博公園', '備瀨福木林道'],
         meals: { breakfast: '飯店內', lunch: '水族館餐廳', dinner: '沖繩料理' },
-        accommodation: '恩納海濱度假村'
+        accommodation: '恩納海濱度假村',
       },
       {
         dayLabel: 'Day 3',
@@ -456,11 +461,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🌉', title: '古宇利大橋', description: '沖繩最美跨海大橋' },
           { icon: '🏝️', title: '古宇利海灘', description: '心形岩打卡' },
-          { icon: '🎡', title: '美國村', description: '美式風情購物區' }
+          { icon: '🎡', title: '美國村', description: '美式風情購物區' },
         ],
         recommendations: ['蝦蝦飯', 'Blue Seal冰淇淋'],
         meals: { breakfast: '飯店內', lunch: '蝦蝦飯', dinner: '美國村BBQ' },
-        accommodation: '那霸市區飯店'
+        accommodation: '那霸市區飯店',
       },
       {
         dayLabel: 'Day 4',
@@ -469,13 +474,13 @@ const SAMPLE_ITINERARIES = [
         description: '自由活動後返回台灣',
         activities: [
           { icon: '🛒', title: 'Outlet購物', description: 'Ashibinaa Outlet' },
-          { icon: '✈️', title: '返回台北', description: '結束沖繩之旅' }
+          { icon: '✈️', title: '返回台北', description: '結束沖繩之旅' },
         ],
         recommendations: ['沖繩Outlet', '國際通伴手禮'],
         meals: { breakfast: '飯店內', lunch: '自理', dinner: '機上輕食' },
-        accommodation: '溫暖的家'
-      }
-    ]
+        accommodation: '溫暖的家',
+      },
+    ],
   },
 
   // ========== 日本 - 東京 ==========
@@ -494,12 +499,12 @@ const SAMPLE_ITINERARIES = [
     features: [
       { icon: 'IconCastle', title: '東京迪士尼', description: '魔法王國一日暢遊' },
       { icon: 'IconMountain', title: '富士山', description: '日本第一聖山' },
-      { icon: 'IconFlame', title: '河口湖溫泉', description: '眺望富士山泡溫泉' }
+      { icon: 'IconFlame', title: '河口湖溫泉', description: '眺望富士山泡溫泉' },
     ],
     focus_cards: [
       { title: '東京迪士尼', src: '/images/tokyo/disney.jpg' },
       { title: '富士山', src: '/images/tokyo/fuji.jpg' },
-      { title: '淺草寺', src: '/images/tokyo/asakusa.jpg' }
+      { title: '淺草寺', src: '/images/tokyo/asakusa.jpg' },
     ],
     daily_itinerary: [
       {
@@ -510,11 +515,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '✈️', title: '飛抵成田/羽田', description: '約3小時航程' },
           { icon: '⛩️', title: '淺草寺', description: '東京最古老寺廟' },
-          { icon: '🗼', title: '晴空塔', description: '東京新地標' }
+          { icon: '🗼', title: '晴空塔', description: '東京新地標' },
         ],
         recommendations: ['仲見世通', '雷門'],
         meals: { breakfast: '機上輕食', lunch: '機上輕食', dinner: '淺草天婦羅' },
-        accommodation: '東京市區飯店'
+        accommodation: '東京市區飯店',
       },
       {
         dayLabel: 'Day 2',
@@ -524,11 +529,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🏰', title: '迪士尼樂園', description: '魔法王國夢幻體驗' },
           { icon: '🎢', title: '人氣設施', description: '太空山、巨雷山等' },
-          { icon: '🎆', title: '夜間遊行', description: '燈光花車遊行' }
+          { icon: '🎆', title: '夜間遊行', description: '燈光花車遊行' },
         ],
         recommendations: ['米奇冰棒', '爆米花桶'],
         meals: { breakfast: '飯店內', lunch: '園區內', dinner: '園區內' },
-        accommodation: '東京灣飯店'
+        accommodation: '東京灣飯店',
       },
       {
         dayLabel: 'Day 3',
@@ -538,11 +543,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🏔️', title: '富士山五合目', description: '天氣許可時前往' },
           { icon: '🚡', title: '河口湖纜車', description: '俯瞰富士山全景' },
-          { icon: '♨️', title: '溫泉旅館', description: '眺望富士山泡湯' }
+          { icon: '♨️', title: '溫泉旅館', description: '眺望富士山泡湯' },
         ],
         recommendations: ['忍野八海', '富士急樂園'],
         meals: { breakfast: '飯店內', lunch: '富士山餺飥', dinner: '溫泉會席' },
-        accommodation: '河口湖溫泉旅館'
+        accommodation: '河口湖溫泉旅館',
       },
       {
         dayLabel: 'Day 4',
@@ -552,11 +557,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🛍️', title: '銀座購物', description: '高級購物區' },
           { icon: '📸', title: '澀谷', description: '著名十字路口' },
-          { icon: '🌳', title: '明治神宮', description: '東京最大神社' }
+          { icon: '🌳', title: '明治神宮', description: '東京最大神社' },
         ],
         recommendations: ['表參道', '原宿竹下通'],
         meals: { breakfast: '旅館內', lunch: '銀座午餐', dinner: '燒肉吃到飽' },
-        accommodation: '東京市區飯店'
+        accommodation: '東京市區飯店',
       },
       {
         dayLabel: 'Day 5',
@@ -565,13 +570,13 @@ const SAMPLE_ITINERARIES = [
         description: '自由活動後返回台灣',
         activities: [
           { icon: '🛒', title: '上野阿美橫丁', description: '藥妝採購' },
-          { icon: '✈️', title: '返回台北', description: '結束旅程' }
+          { icon: '✈️', title: '返回台北', description: '結束旅程' },
         ],
         recommendations: ['成田機場購物'],
         meals: { breakfast: '飯店內', lunch: '自理', dinner: '機上輕食' },
-        accommodation: '溫暖的家'
-      }
-    ]
+        accommodation: '溫暖的家',
+      },
+    ],
   },
 
   // ========== 越南 - 峴港 ==========
@@ -590,12 +595,12 @@ const SAMPLE_ITINERARIES = [
     features: [
       { icon: 'IconBridge', title: '黃金橋', description: '巴拿山巨手天空步道' },
       { icon: 'IconBuilding', title: '會安古鎮', description: '世界文化遺產' },
-      { icon: 'IconBeach', title: '美溪海灘', description: '東方夏威夷' }
+      { icon: 'IconBeach', title: '美溪海灘', description: '東方夏威夷' },
     ],
     focus_cards: [
       { title: '黃金橋', src: '/images/vietnam/golden-bridge.jpg' },
       { title: '會安古鎮', src: '/images/vietnam/hoian.jpg' },
-      { title: '美溪海灘', src: '/images/vietnam/beach.jpg' }
+      { title: '美溪海灘', src: '/images/vietnam/beach.jpg' },
     ],
     daily_itinerary: [
       {
@@ -606,11 +611,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '✈️', title: '飛抵峴港', description: '約3小時航程' },
           { icon: '🏖️', title: '美溪海灘', description: '東方夏威夷' },
-          { icon: '🌉', title: '龍橋夜景', description: '週末噴火表演' }
+          { icon: '🌉', title: '龍橋夜景', description: '週末噴火表演' },
         ],
         recommendations: ['粉紅教堂', '山茶半島'],
         meals: { breakfast: '機上輕食', lunch: '機上輕食', dinner: '海鮮餐' },
-        accommodation: '峴港海景飯店'
+        accommodation: '峴港海景飯店',
       },
       {
         dayLabel: 'Day 2',
@@ -620,11 +625,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🚡', title: '世界最長纜車', description: '5公里纜車體驗' },
           { icon: '✋', title: '黃金橋', description: '巨手托起的天空步道' },
-          { icon: '🎢', title: '巴拿山樂園', description: '法式山城主題樂園' }
+          { icon: '🎢', title: '巴拿山樂園', description: '法式山城主題樂園' },
         ],
         recommendations: ['法國村', '空中花園'],
         meals: { breakfast: '飯店內', lunch: '山上自助餐', dinner: '越式料理' },
-        accommodation: '峴港海景飯店'
+        accommodation: '峴港海景飯店',
       },
       {
         dayLabel: 'Day 3',
@@ -634,11 +639,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🏘️', title: '會安古鎮', description: '世界文化遺產' },
           { icon: '🏮', title: '日本橋', description: '會安地標' },
-          { icon: '🛶', title: '迦南島竹籃船', description: '傳統竹籃船體驗' }
+          { icon: '🛶', title: '迦南島竹籃船', description: '傳統竹籃船體驗' },
         ],
         recommendations: ['燈籠製作', '越式咖啡'],
         meals: { breakfast: '飯店內', lunch: '會安料理', dinner: '河畔餐廳' },
-        accommodation: '會安度假村'
+        accommodation: '會安度假村',
       },
       {
         dayLabel: 'Day 4',
@@ -648,11 +653,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '⛩️', title: '靈應寺', description: '觀世音菩薩像' },
           { icon: '🛒', title: 'VINCOM購物中心', description: '現代購物商場' },
-          { icon: '💆', title: 'SPA體驗', description: '越式按摩放鬆' }
+          { icon: '💆', title: 'SPA體驗', description: '越式按摩放鬆' },
         ],
         recommendations: ['韓市場', '峴港大教堂'],
         meals: { breakfast: '飯店內', lunch: '越式河粉', dinner: '龍蝦海鮮' },
-        accommodation: '峴港市區飯店'
+        accommodation: '峴港市區飯店',
       },
       {
         dayLabel: 'Day 5',
@@ -661,13 +666,13 @@ const SAMPLE_ITINERARIES = [
         description: '帶著美好回憶返回台灣',
         activities: [
           { icon: '🛒', title: '機場購物', description: '最後採購' },
-          { icon: '✈️', title: '返回台北', description: '結束旅程' }
+          { icon: '✈️', title: '返回台北', description: '結束旅程' },
         ],
         recommendations: ['越南咖啡', '腰果'],
         meals: { breakfast: '飯店內', lunch: '機場自理', dinner: '機上輕食' },
-        accommodation: '溫暖的家'
-      }
-    ]
+        accommodation: '溫暖的家',
+      },
+    ],
   },
 
   // ========== 泰國 - 曼谷 ==========
@@ -686,12 +691,12 @@ const SAMPLE_ITINERARIES = [
     features: [
       { icon: 'IconCastle', title: '大皇宮', description: '泰國最神聖的皇家建築' },
       { icon: 'IconShip', title: '水上市場', description: '體驗傳統水上交易' },
-      { icon: 'IconSpa', title: 'SPA按摩', description: '正宗泰式按摩體驗' }
+      { icon: 'IconSpa', title: 'SPA按摩', description: '正宗泰式按摩體驗' },
     ],
     focus_cards: [
       { title: '大皇宮', src: '/images/thailand/grand-palace.jpg' },
       { title: '水上市場', src: '/images/thailand/floating-market.jpg' },
-      { title: '考山路', src: '/images/thailand/khaosan.jpg' }
+      { title: '考山路', src: '/images/thailand/khaosan.jpg' },
     ],
     daily_itinerary: [
       {
@@ -702,11 +707,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '✈️', title: '飛抵曼谷', description: '約4小時航程' },
           { icon: '🍜', title: '考山路', description: '背包客天堂' },
-          { icon: '💆', title: '泰式按摩', description: '放鬆疲憊身心' }
+          { icon: '💆', title: '泰式按摩', description: '放鬆疲憊身心' },
         ],
         recommendations: ['芒果糯米', '泰式奶茶'],
         meals: { breakfast: '機上輕食', lunch: '機上輕食', dinner: '泰式料理' },
-        accommodation: '曼谷市區飯店'
+        accommodation: '曼谷市區飯店',
       },
       {
         dayLabel: 'Day 2',
@@ -716,11 +721,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🏛️', title: '大皇宮', description: '泰國最神聖建築' },
           { icon: '🙏', title: '玉佛寺', description: '供奉玉佛' },
-          { icon: '🛥️', title: '昭披耶河遊船', description: '河畔風光' }
+          { icon: '🛥️', title: '昭披耶河遊船', description: '河畔風光' },
         ],
         recommendations: ['臥佛寺', '鄭王廟'],
         meals: { breakfast: '飯店內', lunch: '河畔餐廳', dinner: '海鮮晚餐' },
-        accommodation: '曼谷市區飯店'
+        accommodation: '曼谷市區飯店',
       },
       {
         dayLabel: 'Day 3',
@@ -730,11 +735,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🛶', title: '水上市場', description: '傳統木舟購物' },
           { icon: '🍜', title: '船上美食', description: '現煮船麵' },
-          { icon: '🛒', title: 'Terminal 21', description: '機場主題商場' }
+          { icon: '🛒', title: 'Terminal 21', description: '機場主題商場' },
         ],
         recommendations: ['美功鐵道市場', 'Jodd Fairs夜市'],
         meals: { breakfast: '飯店內', lunch: '水上市場', dinner: '夜市小吃' },
-        accommodation: '曼谷市區飯店'
+        accommodation: '曼谷市區飯店',
       },
       {
         dayLabel: 'Day 4',
@@ -744,11 +749,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🛍️', title: 'Siam商圈', description: '曼谷購物中心' },
           { icon: '📸', title: '四面佛', description: '有求必應' },
-          { icon: '🎡', title: 'ICON SIAM', description: '奢華購物體驗' }
+          { icon: '🎡', title: 'ICON SIAM', description: '奢華購物體驗' },
         ],
         recommendations: ['BigC採購', 'MBK Center'],
         meals: { breakfast: '飯店內', lunch: '自理', dinner: '河畔晚餐' },
-        accommodation: '曼谷市區飯店'
+        accommodation: '曼谷市區飯店',
       },
       {
         dayLabel: 'Day 5',
@@ -757,13 +762,13 @@ const SAMPLE_ITINERARIES = [
         description: '返回台灣',
         activities: [
           { icon: '🛒', title: '機場購物', description: 'King Power免稅店' },
-          { icon: '✈️', title: '返回台北', description: '結束泰國之旅' }
+          { icon: '✈️', title: '返回台北', description: '結束泰國之旅' },
         ],
         recommendations: ['泰國手標茶', '小老闆海苔'],
         meals: { breakfast: '飯店內', lunch: '機場自理', dinner: '機上輕食' },
-        accommodation: '溫暖的家'
-      }
-    ]
+        accommodation: '溫暖的家',
+      },
+    ],
   },
 
   // ========== 韓國 - 首爾 ==========
@@ -782,12 +787,12 @@ const SAMPLE_ITINERARIES = [
     features: [
       { icon: 'IconShoppingBag', title: '明洞購物', description: '韓國最大購物區' },
       { icon: 'IconCastle', title: '景福宮', description: '朝鮮王朝正宮' },
-      { icon: 'IconCamera', title: '韓服體驗', description: '穿韓服遊古宮' }
+      { icon: 'IconCamera', title: '韓服體驗', description: '穿韓服遊古宮' },
     ],
     focus_cards: [
       { title: '景福宮', src: '/images/korea/gyeongbokgung.jpg' },
       { title: '北村韓屋村', src: '/images/korea/bukchon.jpg' },
-      { title: '明洞', src: '/images/korea/myeongdong.jpg' }
+      { title: '明洞', src: '/images/korea/myeongdong.jpg' },
     ],
     daily_itinerary: [
       {
@@ -798,11 +803,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '✈️', title: '飛抵仁川', description: '約2.5小時' },
           { icon: '🛍️', title: '明洞商圈', description: '韓國最大購物區' },
-          { icon: '🍗', title: '韓式炸雞', description: '配啤酒必嚐' }
+          { icon: '🍗', title: '韓式炸雞', description: '配啤酒必嚐' },
         ],
         recommendations: ['樂天免稅店', 'LINE Friends Store'],
         meals: { breakfast: '機上輕食', lunch: '機上輕食', dinner: '韓式炸雞' },
-        accommodation: '首爾市區飯店'
+        accommodation: '首爾市區飯店',
       },
       {
         dayLabel: 'Day 2',
@@ -812,11 +817,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🏯', title: '景福宮', description: '穿韓服免費入場' },
           { icon: '👘', title: '韓服體驗', description: '4小時租借' },
-          { icon: '🏘️', title: '北村韓屋村', description: '傳統韓屋巷弄' }
+          { icon: '🏘️', title: '北村韓屋村', description: '傳統韓屋巷弄' },
         ],
         recommendations: ['三清洞', '仁寺洞'],
         meals: { breakfast: '飯店內', lunch: '土俗村蔘雞湯', dinner: '烤肉吃到飽' },
-        accommodation: '首爾市區飯店'
+        accommodation: '首爾市區飯店',
       },
       {
         dayLabel: 'Day 3',
@@ -826,11 +831,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🏝️', title: '南怡島', description: '冬季戀歌拍攝地' },
           { icon: '🏰', title: '小法國村', description: '小王子主題村' },
-          { icon: '🚡', title: 'Skyline Luge', description: '斜坡滑車' }
+          { icon: '🚡', title: 'Skyline Luge', description: '斜坡滑車' },
         ],
         recommendations: ['晨靜樹木園', '江村鐵道自行車'],
         meals: { breakfast: '飯店內', lunch: '春川辣炒雞排', dinner: '部隊鍋' },
-        accommodation: '首爾市區飯店'
+        accommodation: '首爾市區飯店',
       },
       {
         dayLabel: 'Day 4',
@@ -840,11 +845,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🎤', title: '弘大商圈', description: '年輕人聚集地' },
           { icon: '🌸', title: '汝矣島', description: '漢江賞景' },
-          { icon: '🛒', title: '樂天世界塔', description: '首爾地標' }
+          { icon: '🛒', title: '樂天世界塔', description: '首爾地標' },
         ],
         recommendations: ['益善洞', 'KAKAO Friends'],
         meals: { breakfast: '飯店內', lunch: '弘大美食', dinner: '醬蟹' },
-        accommodation: '首爾市區飯店'
+        accommodation: '首爾市區飯店',
       },
       {
         dayLabel: 'Day 5',
@@ -853,13 +858,13 @@ const SAMPLE_ITINERARIES = [
         description: '返回台灣',
         activities: [
           { icon: '🛒', title: '仁川機場購物', description: '最後採購' },
-          { icon: '✈️', title: '返回台北', description: '結束韓國之旅' }
+          { icon: '✈️', title: '返回台北', description: '結束韓國之旅' },
         ],
         recommendations: ['韓國面膜', '零食'],
         meals: { breakfast: '飯店內', lunch: '機場自理', dinner: '機上輕食' },
-        accommodation: '溫暖的家'
-      }
-    ]
+        accommodation: '溫暖的家',
+      },
+    ],
   },
 
   // ========== 法國 - 巴黎 ==========
@@ -878,12 +883,12 @@ const SAMPLE_ITINERARIES = [
     features: [
       { icon: 'IconTower', title: '艾菲爾鐵塔', description: '巴黎最著名地標' },
       { icon: 'IconPhoto', title: '羅浮宮', description: '世界三大博物館' },
-      { icon: 'IconCrown', title: '凡爾賽宮', description: '法國皇室宮殿' }
+      { icon: 'IconCrown', title: '凡爾賽宮', description: '法國皇室宮殿' },
     ],
     focus_cards: [
       { title: '艾菲爾鐵塔', src: '/images/france/eiffel.jpg' },
       { title: '羅浮宮', src: '/images/france/louvre.jpg' },
-      { title: '凡爾賽宮', src: '/images/france/versailles.jpg' }
+      { title: '凡爾賽宮', src: '/images/france/versailles.jpg' },
     ],
     daily_itinerary: [
       {
@@ -891,12 +896,10 @@ const SAMPLE_ITINERARIES = [
         date: '第一天',
         title: '台北 → 巴黎',
         description: '飛往浪漫之都巴黎',
-        activities: [
-          { icon: '✈️', title: '飛往巴黎', description: '約14小時航程' }
-        ],
+        activities: [{ icon: '✈️', title: '飛往巴黎', description: '約14小時航程' }],
         recommendations: [],
         meals: { breakfast: '機上', lunch: '機上', dinner: '機上' },
-        accommodation: '機上'
+        accommodation: '機上',
       },
       {
         dayLabel: 'Day 2',
@@ -906,11 +909,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🗼', title: '艾菲爾鐵塔', description: '巴黎地標打卡' },
           { icon: '🛥️', title: '塞納河遊船', description: '欣賞河畔風光' },
-          { icon: '🌉', title: '亞歷山大三世橋', description: '巴黎最美橋樑' }
+          { icon: '🌉', title: '亞歷山大三世橋', description: '巴黎最美橋樑' },
         ],
         recommendations: ['戰神廣場', '夏佑宮'],
         meals: { breakfast: '機上', lunch: '法式午餐', dinner: '遊船晚宴' },
-        accommodation: '巴黎市區五星飯店'
+        accommodation: '巴黎市區五星飯店',
       },
       {
         dayLabel: 'Day 3',
@@ -920,13 +923,13 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🖼️', title: '羅浮宮', description: '蒙娜麗莎、勝利女神' },
           { icon: '🏛️', title: '杜樂麗花園', description: '皇家花園漫步' },
-          { icon: '🛍️', title: '香榭麗舍大道', description: '世界最美大道' }
+          { icon: '🛍️', title: '香榭麗舍大道', description: '世界最美大道' },
         ],
         recommendations: ['凱旋門', '老佛爺百貨'],
         meals: { breakfast: '飯店內', lunch: '羅浮宮附近', dinner: '法式餐廳' },
-        accommodation: '巴黎市區五星飯店'
-      }
-    ]
+        accommodation: '巴黎市區五星飯店',
+      },
+    ],
   },
 
   // ========== 埃及 ==========
@@ -945,12 +948,12 @@ const SAMPLE_ITINERARIES = [
     features: [
       { icon: 'IconPyramid', title: '吉薩金字塔', description: '世界七大奇蹟唯一倖存' },
       { icon: 'IconShip', title: '尼羅河遊輪', description: '豪華遊輪五星體驗' },
-      { icon: 'IconTemple', title: '盧克索神殿', description: '古埃及神廟群' }
+      { icon: 'IconTemple', title: '盧克索神殿', description: '古埃及神廟群' },
     ],
     focus_cards: [
       { title: '金字塔', src: '/images/egypt/pyramid.jpg' },
       { title: '人面獅身', src: '/images/egypt/sphinx.jpg' },
-      { title: '尼羅河', src: '/images/egypt/nile.jpg' }
+      { title: '尼羅河', src: '/images/egypt/nile.jpg' },
     ],
     daily_itinerary: [
       {
@@ -958,12 +961,10 @@ const SAMPLE_ITINERARIES = [
         date: '第一天',
         title: '台北 → 開羅',
         description: '飛往神秘古國埃及',
-        activities: [
-          { icon: '✈️', title: '飛往開羅', description: '經轉機約15小時' }
-        ],
+        activities: [{ icon: '✈️', title: '飛往開羅', description: '經轉機約15小時' }],
         recommendations: [],
         meals: { breakfast: '機上', lunch: '機上', dinner: '機上' },
-        accommodation: '機上'
+        accommodation: '機上',
       },
       {
         dayLabel: 'Day 2',
@@ -973,11 +974,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🔺', title: '吉薩金字塔群', description: '古夫、卡夫拉、孟卡拉' },
           { icon: '🦁', title: '人面獅身像', description: '守護金字塔的神獸' },
-          { icon: '🐪', title: '沙漠騎駱駝', description: '體驗沙漠風情' }
+          { icon: '🐪', title: '沙漠騎駱駝', description: '體驗沙漠風情' },
         ],
         recommendations: ['金字塔聲光秀', '埃及博物館'],
         meals: { breakfast: '飯店內', lunch: '埃及料理', dinner: '飯店晚餐' },
-        accommodation: '開羅五星飯店'
+        accommodation: '開羅五星飯店',
       },
       {
         dayLabel: 'Day 3',
@@ -987,13 +988,13 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '✈️', title: '國內航班', description: '飛往亞斯旺' },
           { icon: '🛳️', title: '登上遊輪', description: '尼羅河豪華遊輪' },
-          { icon: '🌅', title: '河畔夕陽', description: '尼羅河落日' }
+          { icon: '🌅', title: '河畔夕陽', description: '尼羅河落日' },
         ],
         recommendations: ['亞斯旺大壩', '未完成方尖碑'],
         meals: { breakfast: '飯店內', lunch: '遊輪午餐', dinner: '遊輪晚宴' },
-        accommodation: '尼羅河豪華遊輪'
-      }
-    ]
+        accommodation: '尼羅河豪華遊輪',
+      },
+    ],
   },
 
   // ========== 沙烏地阿拉伯 ==========
@@ -1012,12 +1013,12 @@ const SAMPLE_ITINERARIES = [
     features: [
       { icon: 'IconTemple', title: '黑格拉遺址', description: '沙國第一個世界遺產' },
       { icon: 'IconMountain', title: '埃爾奧拉', description: '奇岩地形沙漠觀星' },
-      { icon: 'IconBuilding', title: '吉達老城', description: 'UNESCO世界遺產' }
+      { icon: 'IconBuilding', title: '吉達老城', description: 'UNESCO世界遺產' },
     ],
     focus_cards: [
       { title: '黑格拉', src: '/images/saudi/hegra.jpg' },
       { title: '大象岩', src: '/images/saudi/elephant.jpg' },
-      { title: '世界之崖', src: '/images/saudi/edge.jpg' }
+      { title: '世界之崖', src: '/images/saudi/edge.jpg' },
     ],
     daily_itinerary: [
       {
@@ -1025,12 +1026,10 @@ const SAMPLE_ITINERARIES = [
         date: '第一天',
         title: '台北 → 利雅德',
         description: '飛往沙烏地阿拉伯首都',
-        activities: [
-          { icon: '✈️', title: '飛往利雅德', description: '經轉機約14小時' }
-        ],
+        activities: [{ icon: '✈️', title: '飛往利雅德', description: '經轉機約14小時' }],
         recommendations: [],
         meals: { breakfast: '機上', lunch: '機上', dinner: '機上' },
-        accommodation: '利雅德五星飯店'
+        accommodation: '利雅德五星飯店',
       },
       {
         dayLabel: 'Day 2',
@@ -1040,11 +1039,11 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🏙️', title: '王國中心塔', description: '99樓天空橋觀景' },
           { icon: '🏛️', title: '國家博物館', description: '了解沙國歷史' },
-          { icon: '🕌', title: 'Masmak堡壘', description: '沙國建國起源地' }
+          { icon: '🕌', title: 'Masmak堡壘', description: '沙國建國起源地' },
         ],
         recommendations: ['德拉伊耶遺址', '傳統市集'],
         meals: { breakfast: '飯店內', lunch: '阿拉伯料理', dinner: '烤全羊' },
-        accommodation: '利雅德五星飯店'
+        accommodation: '利雅德五星飯店',
       },
       {
         dayLabel: 'Day 3',
@@ -1054,14 +1053,14 @@ const SAMPLE_ITINERARIES = [
         activities: [
           { icon: '🚙', title: '四輪驅動車', description: '穿越沙漠' },
           { icon: '🏜️', title: '世界之崖', description: '壯觀懸崖奇景' },
-          { icon: '🌅', title: '沙漠日落', description: '金色夕陽' }
+          { icon: '🌅', title: '沙漠日落', description: '金色夕陽' },
         ],
         recommendations: ['沙漠露營', '阿拉伯咖啡'],
         meals: { breakfast: '飯店內', lunch: '沙漠野餐', dinner: '沙漠營地' },
-        accommodation: '沙漠帳篷營地'
-      }
-    ]
-  }
+        accommodation: '沙漠帳篷營地',
+      },
+    ],
+  },
 ]
 
 // 新增缺少的城市資料（使用正確的機場代碼，限制 3 字元）
@@ -1073,7 +1072,7 @@ const ADDITIONAL_CITIES = [
   { name: '開羅', nameEn: 'Cairo', code: 'CAI', countryId: 'egypt' },
   { name: '盧克索', nameEn: 'Luxor', code: 'LXR', countryId: 'egypt' },
   { name: '利雅德', nameEn: 'Riyadh', code: 'RUH', countryId: 'saudi_arabia' },
-  { name: '吉達', nameEn: 'Jeddah', code: 'JED', countryId: 'saudi_arabia' }
+  { name: '吉達', nameEn: 'Jeddah', code: 'JED', countryId: 'saudi_arabia' },
 ]
 
 // 國家 ID 對應表（已存在的國家使用正確 ID）
@@ -1084,7 +1083,7 @@ const COUNTRY_ID_MAP = {
   vietnam: 'vietnam',
   france: 'france',
   egypt: 'egypt',
-  saudi: 'saudi_arabia'
+  saudi: 'saudi_arabia',
 }
 
 async function main() {
@@ -1108,7 +1107,7 @@ async function main() {
           airport_code: city.code,
           country_id: city.countryId,
           display_order: 100,
-          is_active: true
+          is_active: true,
         })
         if (error) console.error(`  ❌ 新增城市 ${city.name} 失敗:`, error.message)
         else console.log(`  ✅ 新增城市: ${city.name}`)
@@ -1166,7 +1165,7 @@ async function main() {
         focus_cards: itinerary.focus_cards,
         daily_itinerary: itinerary.daily_itinerary,
         departure_date: new Date().toISOString().split('T')[0],
-        cover_image: ''
+        cover_image: '',
       })
 
       if (error) {
@@ -1184,7 +1183,6 @@ async function main() {
     console.log(`  ⏭️ 跳過: ${skipCount} 筆`)
     console.log(`  ❌ 失敗: ${errorCount} 筆`)
     console.log('='.repeat(50))
-
   } catch (error) {
     console.error('❌ 執行失敗:', error)
     process.exit(1)

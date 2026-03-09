@@ -2,18 +2,25 @@
 
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useEffect } from 'react'
-import { Plus, Users, Car, Home, UtensilsCrossed, MapPin, MoreHorizontal, DollarSign, ChevronDown, ChevronRight, Map } from 'lucide-react'
+import {
+  Plus,
+  Users,
+  Car,
+  Home,
+  UtensilsCrossed,
+  MapPin,
+  MoreHorizontal,
+  DollarSign,
+  ChevronDown,
+  ChevronRight,
+  Map,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { CostCategory, CostItem } from '../types'
 import { CostItemRow } from './CostItemRow'
 import { AccommodationItemRow } from './AccommodationItemRow'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
   Select,
   SelectContent,
@@ -25,7 +32,7 @@ import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { RatesDetailDialog } from '@/features/transportation-rates/components/RatesDetailDialog'
 import { TransportationRate } from '@/types/transportation-rates.types'
 import type { Country as FullCountry } from '@/stores/region-store'
-import { CATEGORY_SECTION_LABELS } from '../constants/labels';
+import { CATEGORY_SECTION_LABELS } from '../constants/labels'
 
 const categoryIcons: Record<string, React.ElementType> = {
   transport: Car,
@@ -131,9 +138,9 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
 
     if (data) {
       const ratesData = data as Array<{ country_name: string }>
-      const uniqueCountries = Array.from(
-        new Set(ratesData.map(item => item.country_name))
-      ).map(name => ({ name }))
+      const uniqueCountries = Array.from(new Set(ratesData.map(item => item.country_name))).map(
+        name => ({ name })
+      )
       setCountries(uniqueCountries)
       setIsCountryDialogOpen(true)
     }
@@ -178,7 +185,8 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
     logger.log('🔄 [CategorySection] 插入車資:', rate)
 
     // 建立描述：使用 route（例如「包車1天（100公里／10小時）」）
-    const description = rate.route || rate.category || rate.vehicle_type || CATEGORY_SECTION_LABELS.車資
+    const description =
+      rate.route || rate.category || rate.vehicle_type || CATEGORY_SECTION_LABELS.車資
 
     // 建立完整的 CostItem
     const newItem: CostItem = {
@@ -433,8 +441,8 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
       </tr>
 
       {/* 項目明細行 - 折疊時隱藏 */}
-      {!isCollapsed && (
-        category.id === 'accommodation'
+      {!isCollapsed &&
+        (category.id === 'accommodation'
           ? // 住宿特殊渲染：按天分組，每天內顯示各房型
             (() => {
               const accommodationItems = category.items.filter(item => item.day !== undefined)
@@ -503,8 +511,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 handleUpdateItem={handleUpdateItem}
                 handleRemoveItem={handleRemoveItem}
               />
-            ))
-      )}
+            )))}
 
       {/* 小計行 - 只有當該分類有項目且未折疊時才顯示 */}
       {!isCollapsed && category.items.length > 0 && (

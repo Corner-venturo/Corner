@@ -81,4 +81,4 @@ export const WORKSPACES_LABELS = {
 
   LABEL_535: '編號前綴：',
   LABEL_243: '預設密碼：',
-};
+}

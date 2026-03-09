@@ -151,12 +151,18 @@ function renderShapeElement(el: ShapeElement, options: RenderOptions): FabricObj
   // 決定填充：漸層優先於純色
   const fill = el.gradient
     ? createFabricGradient(el.gradient, el.width, el.height)
-    : (el.fill || '#e0e0e0')
+    : el.fill || '#e0e0e0'
 
   switch (el.variant) {
     case 'rectangle':
       // 如果有四角不同圓角（borderRadius），使用 Path 來繪製
-      if (el.borderRadius && (el.borderRadius.topLeft || el.borderRadius.topRight || el.borderRadius.bottomLeft || el.borderRadius.bottomRight)) {
+      if (
+        el.borderRadius &&
+        (el.borderRadius.topLeft ||
+          el.borderRadius.topRight ||
+          el.borderRadius.bottomLeft ||
+          el.borderRadius.bottomRight)
+      ) {
         const pathData = createRoundedRectPath(x, y, el.width, el.height, el.borderRadius)
         return new Path(pathData, {
           ...commonProps,
@@ -205,7 +211,7 @@ function renderShapeElement(el: ShapeElement, options: RenderOptions): FabricObj
         ...commonProps,
         left: x,
         top: y,
-        rx: el.width / 2,  // 水平半徑
+        rx: el.width / 2, // 水平半徑
         ry: el.height / 2, // 垂直半徑
         fill: fill,
         stroke: el.stroke,
@@ -270,10 +276,7 @@ function renderTextElement(el: TextElement, options: RenderOptions): FabricObjec
   return textbox
 }
 
-async function renderImageElement(
-  el: ImageElement,
-  options: RenderOptions
-): Promise<FabricObject> {
+async function renderImageElement(el: ImageElement, options: RenderOptions): Promise<FabricObject> {
   const { isEditable } = options
 
   try {
@@ -350,7 +353,13 @@ async function renderImageElement(
     const ctx = tempCanvas.getContext('2d')!
 
     // 2. 如果有圓角，設定裁切路徑
-    if (el.borderRadius && (el.borderRadius.topLeft || el.borderRadius.topRight || el.borderRadius.bottomLeft || el.borderRadius.bottomRight)) {
+    if (
+      el.borderRadius &&
+      (el.borderRadius.topLeft ||
+        el.borderRadius.topRight ||
+        el.borderRadius.bottomLeft ||
+        el.borderRadius.bottomRight)
+    ) {
       const br = el.borderRadius
       const tl = Math.min(br.topLeft || 0, targetWidth / 2, targetHeight / 2)
       const tr = Math.min(br.topRight || 0, targetWidth / 2, targetHeight / 2)
@@ -639,10 +648,7 @@ function renderStickerElement(el: StickerElement, options: RenderOptions): Fabri
  * - 創建群組後，Fabric.js 會重新計算子元素的相對位置
  * - 為避免複雜的計算，我們直接創建子元素（不使用 origin 設置）
  */
-async function renderGroupElement(
-  el: GroupElement,
-  options: RenderOptions
-): Promise<Group | null> {
+async function renderGroupElement(el: GroupElement, options: RenderOptions): Promise<Group | null> {
   const { isEditable } = options
 
   if (!el.children || el.children.length === 0) {
@@ -795,7 +801,7 @@ export async function renderPageOnCanvas(
     try {
       await (canvas as Canvas).loadFromJSON(pageWithFabricData.fabricData)
       canvas.renderAll()
-      return  // 載入成功，直接返回
+      return // 載入成功，直接返回
     } catch (err) {
       logger.warn('Failed to load from fabricData, falling back to elements:', err)
       // 載入失敗，繼續使用 elements 生成
@@ -809,7 +815,7 @@ export async function renderPageOnCanvas(
   const sortedElements = [...page.elements].sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0))
 
   // 建立所有 Fabric 物件
-  const fabricObjectPromises = sortedElements.map((el) => {
+  const fabricObjectPromises = sortedElements.map(el => {
     switch (el.type) {
       case 'shape':
         return Promise.resolve(renderShapeElement(el as ShapeElement, options))
@@ -834,7 +840,7 @@ export async function renderPageOnCanvas(
   const fabricObjectsOrArrays = await Promise.all(fabricObjectPromises)
 
   // 扁平化陣列（處理線條元素返回的多個物件）
-  const fabricObjects = fabricObjectsOrArrays.flatMap((obj) => {
+  const fabricObjects = fabricObjectsOrArrays.flatMap(obj => {
     if (Array.isArray(obj)) return obj
     return obj ? [obj] : []
   })

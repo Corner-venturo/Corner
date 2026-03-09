@@ -19,6 +19,6 @@ export async function createSupabaseServerClient() {
           cookieStore.set({ name, value: '', ...options })
         },
       },
-    },
+    }
   )
 }

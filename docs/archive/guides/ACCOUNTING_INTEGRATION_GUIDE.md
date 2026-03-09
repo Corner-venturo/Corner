@@ -20,10 +20,13 @@
 ## 1️⃣ 收款流程整合（訂單 → 傳票）
 
 ### 觸發時機
+
 當訂單的 `paid_amount` 增加時（收到客戶付款）
 
 ### 整合位置
+
 找到處理訂單收款的函數，例如：
+
 - `src/stores/order-store.ts` 的 `updatePaidAmount()`
 - 或收款按鈕的 onClick handler
 
@@ -67,6 +70,7 @@ async function handlePayment(orderId: string, amount: number, paymentMethod: 'ca
 ```
 
 ### 傳票內容
+
 ```
 借：銀行存款（或現金）  $收款金額
 貸：預收團費            $收款金額
@@ -77,10 +81,13 @@ async function handlePayment(orderId: string, amount: number, paymentMethod: 'ca
 ## 2️⃣ 付款流程整合（請款單 → 傳票）
 
 ### 觸發時機
+
 當請款單的 `status` 從 `confirmed` → `paid`（會計確認已付款）
 
 ### 整合位置
+
 找到處理請款單付款確認的函數，例如：
+
 - `src/stores/payment-request-store.ts` 的 `markAsPaid()`
 - 或付款確認按鈕的 onClick handler
 
@@ -120,6 +127,7 @@ async function markPaymentRequestAsPaid(requestId: string) {
 ```
 
 ### 傳票內容
+
 ```
 借：預付團費    $付款金額
 貸：銀行存款    $付款金額
@@ -130,6 +138,7 @@ async function markPaymentRequestAsPaid(requestId: string) {
 ## 3️⃣ 結團流程整合（團體 → 收入/成本傳票）
 
 ### 觸發時機
+
 當團體的 `closing_status` 變成 `closed`（結團）
 
 ### 資料表修改需求
@@ -152,7 +161,9 @@ COMMIT;
 ```
 
 ### 整合位置
+
 建立結團功能頁面或按鈕，例如：
+
 - `src/app/tours/[id]/close-tour-dialog.tsx`
 - 或在團體詳情頁加入「結團」按鈕
 
@@ -219,12 +230,14 @@ async function closeTour(tourId: string) {
 ### 傳票內容（兩張）
 
 **傳票 1：轉收入**
+
 ```
 借：預收團費    $總收入
 貸：團費收入    $總收入
 ```
 
 **傳票 2：轉成本**
+
 ```
 借：旅遊成本-交通    $交通費
 借：旅遊成本-住宿    $住宿費

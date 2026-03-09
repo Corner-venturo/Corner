@@ -26,7 +26,7 @@ export function useInlineEditing({ updateItem }: UseInlineEditingOptions) {
       value,
       dirty: true,
     }
-    forceUpdate((n) => n + 1)
+    forceUpdate(n => n + 1)
   }, [])
 
   const handleExpectedCostFormulaChange = useCallback(
@@ -68,7 +68,7 @@ export function useInlineEditing({ updateItem }: UseInlineEditingOptions) {
 
   const handleNotesChange = useCallback((itemId: string, value: string) => {
     localNotesRef.current[itemId] = { value, dirty: true }
-    forceUpdate((n) => n + 1)
+    forceUpdate(n => n + 1)
   }, [])
 
   const handleNotesBlur = useCallback(

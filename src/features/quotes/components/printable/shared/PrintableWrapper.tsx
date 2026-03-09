@@ -5,7 +5,6 @@
  * 統一快速報價單和團體報價單的列印結構
  */
 
-
 import React, { useState, useEffect, ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { PrintHeader } from './PrintHeader'

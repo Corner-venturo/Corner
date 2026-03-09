@@ -36,7 +36,10 @@ describe('TourService - updateTourStatus', () => {
       getByIdMock.mockResolvedValue(tour)
 
       await expect(tourService.updateTourStatus('test-tour-id', '待出發')).resolves.not.toThrow()
-      expect(updateMock).toHaveBeenCalledWith('test-tour-id', { status: '待出發', updated_at: expect.any(String) })
+      expect(updateMock).toHaveBeenCalledWith('test-tour-id', {
+        status: '待出發',
+        updated_at: expect.any(String),
+      })
     })
 
     it('should allow transition from "待出發" to "已結團"', async () => {
@@ -44,7 +47,10 @@ describe('TourService - updateTourStatus', () => {
       getByIdMock.mockResolvedValue(tour)
 
       await expect(tourService.updateTourStatus('test-tour-id', '已結團')).resolves.not.toThrow()
-      expect(updateMock).toHaveBeenCalledWith('test-tour-id', { status: '已結團', updated_at: expect.any(String) })
+      expect(updateMock).toHaveBeenCalledWith('test-tour-id', {
+        status: '已結團',
+        updated_at: expect.any(String),
+      })
     })
 
     it('should allow transition from "待出發" to "取消"', async () => {
@@ -52,7 +58,10 @@ describe('TourService - updateTourStatus', () => {
       getByIdMock.mockResolvedValue(tour)
 
       await expect(tourService.updateTourStatus('test-tour-id', '取消')).resolves.not.toThrow()
-      expect(updateMock).toHaveBeenCalledWith('test-tour-id', { status: '取消', updated_at: expect.any(String) })
+      expect(updateMock).toHaveBeenCalledWith('test-tour-id', {
+        status: '取消',
+        updated_at: expect.any(String),
+      })
     })
 
     it('should allow transition from "待出發" back to "開團" (unlock)', async () => {
@@ -60,7 +69,10 @@ describe('TourService - updateTourStatus', () => {
       getByIdMock.mockResolvedValue(tour)
 
       await expect(tourService.updateTourStatus('test-tour-id', '開團')).resolves.not.toThrow()
-      expect(updateMock).toHaveBeenCalledWith('test-tour-id', { status: '開團', updated_at: expect.any(String) })
+      expect(updateMock).toHaveBeenCalledWith('test-tour-id', {
+        status: '開團',
+        updated_at: expect.any(String),
+      })
     })
 
     it('should allow cancellation from "開團"', async () => {
@@ -68,7 +80,10 @@ describe('TourService - updateTourStatus', () => {
       getByIdMock.mockResolvedValue(tour)
 
       await expect(tourService.updateTourStatus('test-tour-id', '取消')).resolves.not.toThrow()
-      expect(updateMock).toHaveBeenCalledWith('test-tour-id', { status: '取消', updated_at: expect.any(String) })
+      expect(updateMock).toHaveBeenCalledWith('test-tour-id', {
+        status: '取消',
+        updated_at: expect.any(String),
+      })
     })
   })
 
@@ -77,7 +92,9 @@ describe('TourService - updateTourStatus', () => {
       const tour = mockTour('開團')
       getByIdMock.mockResolvedValue(tour)
 
-      await expect(tourService.updateTourStatus('test-tour-id', '已結團')).rejects.toThrow(ValidationError)
+      await expect(tourService.updateTourStatus('test-tour-id', '已結團')).rejects.toThrow(
+        ValidationError
+      )
       await expect(tourService.updateTourStatus('test-tour-id', '已結團')).rejects.toThrow(
         '不允許的狀態轉換：無法從 "開團" 更新為 "已結團"'
       )
@@ -88,7 +105,9 @@ describe('TourService - updateTourStatus', () => {
       const tour = mockTour('已結團')
       getByIdMock.mockResolvedValue(tour)
 
-      await expect(tourService.updateTourStatus('test-tour-id', '開團')).rejects.toThrow(ValidationError)
+      await expect(tourService.updateTourStatus('test-tour-id', '開團')).rejects.toThrow(
+        ValidationError
+      )
       expect(updateMock).not.toHaveBeenCalled()
     })
   })
@@ -98,7 +117,9 @@ describe('TourService - updateTourStatus', () => {
       const tour = mockTour('已結團')
       getByIdMock.mockResolvedValue(tour)
 
-      await expect(tourService.updateTourStatus('test-tour-id', '待出發')).rejects.toThrow(ValidationError)
+      await expect(tourService.updateTourStatus('test-tour-id', '待出發')).rejects.toThrow(
+        ValidationError
+      )
       expect(updateMock).not.toHaveBeenCalled()
     })
 
@@ -106,7 +127,9 @@ describe('TourService - updateTourStatus', () => {
       const tour = mockTour('取消')
       getByIdMock.mockResolvedValue(tour)
 
-      await expect(tourService.updateTourStatus('test-tour-id', '開團')).rejects.toThrow(ValidationError)
+      await expect(tourService.updateTourStatus('test-tour-id', '開團')).rejects.toThrow(
+        ValidationError
+      )
       expect(updateMock).not.toHaveBeenCalled()
     })
   })
@@ -125,7 +148,9 @@ describe('TourService - updateTourStatus', () => {
     it('should throw an error if tour is not found', async () => {
       getByIdMock.mockResolvedValue(undefined)
 
-      await expect(tourService.updateTourStatus('non-existent-id', '開團')).rejects.toThrow('Tour not found')
+      await expect(tourService.updateTourStatus('non-existent-id', '開團')).rejects.toThrow(
+        'Tour not found'
+      )
       expect(updateMock).not.toHaveBeenCalled()
     })
   })

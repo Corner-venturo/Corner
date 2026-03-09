@@ -3,12 +3,20 @@
  * CompanyAssetsList - 公司資源列表
  */
 
-
 import React from 'react'
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Pencil, Trash2, Eye, FileText, Image as ImageIcon, Video, Download, Lock } from 'lucide-react'
+import {
+  Pencil,
+  Trash2,
+  Eye,
+  FileText,
+  Image as ImageIcon,
+  Video,
+  Download,
+  Lock,
+} from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { format } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
@@ -71,10 +79,7 @@ export const CompanyAssetsList: React.FC<CompanyAssetsListProps> = ({
             }}
           >
             {asset.asset_type === 'image' ? (
-              <img src={data.publicUrl}
-                alt={asset.name}
-                className="w-full h-full object-cover"
-              />
+              <img src={data.publicUrl} alt={asset.name} className="w-full h-full object-cover" />
             ) : asset.asset_type === 'video' ? (
               <Video className="h-5 w-5 text-morandi-secondary" />
             ) : (

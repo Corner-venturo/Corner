@@ -143,8 +143,7 @@ export const DISBURSEMENT_LABELS = {
   儲存中: '儲存中...',
   出納單已更新: (orderNumber: string) => `出納單 ${orderNumber} 已更新`,
   更新出納單失敗_hook: (errorMessage: string) => `更新出納單失敗: ${errorMessage}`,
-};
-
+}
 
 export const PRINT_LABELS = {
   PAYEE: '付款對象',

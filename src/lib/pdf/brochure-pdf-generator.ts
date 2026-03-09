@@ -19,7 +19,10 @@ import type {
   StickerElement,
   GroupElement,
 } from '@/features/designer/components/types'
-import { MATERIAL_ICON_PATHS, ICON_VIEWBOX_SIZE } from '@/features/designer/components/core/icon-paths'
+import {
+  MATERIAL_ICON_PATHS,
+  ICON_VIEWBOX_SIZE,
+} from '@/features/designer/components/core/icon-paths'
 import { STICKER_PATHS, getStickerViewBox } from '@/features/designer/components/core/sticker-paths'
 import { loadFontsForPDF, getFontName, type FontStyle } from './font-loader'
 import { renderSvgPath, renderGradientShape } from './svg-renderer'
@@ -104,7 +107,8 @@ function renderText(doc: jsPDF, el: TextElement): void {
 
   // 設定字體
   const fontName = getFontName(el.style.fontFamily)
-  const fontStyle: FontStyle = el.style.fontWeight === 'bold' || parseInt(el.style.fontWeight) >= 700 ? 'bold' : 'normal'
+  const fontStyle: FontStyle =
+    el.style.fontWeight === 'bold' || parseInt(el.style.fontWeight) >= 700 ? 'bold' : 'normal'
 
   try {
     doc.setFont(fontName, fontStyle)
@@ -140,9 +144,9 @@ function renderText(doc: jsPDF, el: TextElement): void {
   let lines: string[]
   if (maxWidth > 0) {
     // 先按 \n 分行，再用 jsPDF 根據寬度自動換行
-    lines = el.content.split('\n').flatMap(line =>
-      line === '' ? [''] : doc.splitTextToSize(line, maxWidth) as string[]
-    )
+    lines = el.content
+      .split('\n')
+      .flatMap(line => (line === '' ? [''] : (doc.splitTextToSize(line, maxWidth) as string[])))
   } else {
     lines = el.content.split('\n')
   }
@@ -168,13 +172,14 @@ function renderText(doc: jsPDF, el: TextElement): void {
     const pdfCy = pageHeight - cy
     const pdfTmx = pdfCx - pdfCx * cos + pdfCy * sin
     const pdfTmy = pdfCy - pdfCx * sin - pdfCy * cos
-    pdfWrite(doc,
+    pdfWrite(
+      doc,
       `${cos.toFixed(6)} ${sin.toFixed(6)} ${(-sin).toFixed(6)} ${cos.toFixed(6)} ${pdfTmx.toFixed(4)} ${pdfTmy.toFixed(4)} cm`
     )
   }
 
   lines.forEach((line, index) => {
-    const lineY = y + (index * lineHeight) + fontSize // 加上 fontSize 是因為 jsPDF 的 y 是基線位置
+    const lineY = y + index * lineHeight + fontSize // 加上 fontSize 是因為 jsPDF 的 y 是基線位置
     doc.text(line, textX, lineY, { align })
   })
 
@@ -199,7 +204,14 @@ function pdfWrite(doc: jsPDF, content: string): void {
   ;(doc.internal as unknown as { write: (s: string) => void }).write(content)
 }
 
-function applyRotation(doc: jsPDF, x: number, y: number, width: number, height: number, rotation: number): boolean {
+function applyRotation(
+  doc: jsPDF,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  rotation: number
+): boolean {
   if (!rotation) return false
   const cx = x + width / 2
   const cy = y + height / 2
@@ -212,7 +224,8 @@ function applyRotation(doc: jsPDF, x: number, y: number, width: number, height: 
   const pdfCy = pageHeight - cy
   const tmx = pdfCx - pdfCx * cos + pdfCy * sin
   const tmy = pdfCy - pdfCx * sin - pdfCy * cos
-  pdfWrite(doc,
+  pdfWrite(
+    doc,
     `${cos.toFixed(6)} ${sin.toFixed(6)} ${(-sin).toFixed(6)} ${cos.toFixed(6)} ${tmx.toFixed(4)} ${tmy.toFixed(4)} cm`
   )
   return true
@@ -258,7 +271,15 @@ async function renderShape(doc: jsPDF, el: ShapeElement): Promise<void> {
   switch (el.variant) {
     case 'rectangle':
       if (el.cornerRadius) {
-        doc.roundedRect(x, y, width, height, pxToMm(el.cornerRadius), pxToMm(el.cornerRadius), style)
+        doc.roundedRect(
+          x,
+          y,
+          width,
+          height,
+          pxToMm(el.cornerRadius),
+          pxToMm(el.cornerRadius),
+          style
+        )
       } else {
         doc.rect(x, y, width, height, style)
       }
@@ -284,7 +305,10 @@ async function renderShape(doc: jsPDF, el: ShapeElement): Promise<void> {
     const angle = el.gradient.direction === 'horizontal' ? 0 : 90
     await renderGradientShape(doc, {
       shape: shapeMap[el.variant] ?? 'rect',
-      x, y, width, height,
+      x,
+      y,
+      width,
+      height,
       gradient: {
         type: el.gradient.type,
         angle,
@@ -395,7 +419,8 @@ async function renderIcon(doc: jsPDF, el: IconElement): Promise<void> {
   try {
     await renderSvgPath(doc, {
       pathData: pathData,
-      x, y,
+      x,
+      y,
       width: size,
       height: size,
       fill: el.color,
@@ -478,7 +503,10 @@ async function renderSticker(doc: jsPDF, el: StickerElement): Promise<void> {
       const vb = stickerDef.viewBox
       await renderSvgPath(doc, {
         pathData: stickerDef.path,
-        x, y, width, height,
+        x,
+        y,
+        width,
+        height,
         fill: el.primaryColor ?? stickerDef.defaultColor ?? 'var(--morandi-primary)',
         opacity: el.opacity,
         viewBox: `0 0 ${vb.width} ${vb.height}`,

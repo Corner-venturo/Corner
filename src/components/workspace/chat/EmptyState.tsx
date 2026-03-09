@@ -19,7 +19,10 @@ export function EmptyState({ channelName, channelType, currentUserId }: EmptySta
   const displayInfo = useMemo(() => {
     // 檢查是否為 DM 頻道 (格式: dm:userId1:userId2)
     if (channelName.startsWith('dm:') || channelType === 'DIRECT' || channelType === 'direct') {
-      const parts = channelName.replace('dm:', '').split(':').filter(id => id !== '')
+      const parts = channelName
+        .replace('dm:', '')
+        .split(':')
+        .filter(id => id !== '')
 
       // 檢查是否是機器人
       if (parts.includes(SYSTEM_BOT_ID)) {
@@ -65,8 +68,13 @@ export function EmptyState({ channelName, channelType, currentUserId }: EmptySta
 
   return (
     <div className="flex flex-col items-center justify-center text-center">
-      <div className={`p-4 rounded-full mb-4 ${displayInfo.isBot ? 'bg-morandi-gold/20' : 'bg-morandi-container/50'}`}>
-        <Icon size={48} className={displayInfo.isBot ? 'text-morandi-gold' : 'text-morandi-secondary/50'} />
+      <div
+        className={`p-4 rounded-full mb-4 ${displayInfo.isBot ? 'bg-morandi-gold/20' : 'bg-morandi-container/50'}`}
+      >
+        <Icon
+          size={48}
+          className={displayInfo.isBot ? 'text-morandi-gold' : 'text-morandi-secondary/50'}
+        />
       </div>
       <h3 className="text-lg font-medium text-morandi-primary mb-2">
         {displayInfo.isDm ? `與 ${displayInfo.name} 的對話` : `歡迎來到 #${displayInfo.name}`}

@@ -14,22 +14,29 @@ import { REQUESTS_PAGE_LABELS } from '../constants/labels'
 
 // Dynamic imports for dialogs (reduce initial bundle)
 const AddRequestDialog = dynamic(
-  () => import('@/features/finance/requests/components/AddRequestDialog').then(m => m.AddRequestDialog),
+  () =>
+    import('@/features/finance/requests/components/AddRequestDialog').then(m => m.AddRequestDialog),
   { loading: () => null }
 )
 const RequestDetailDialog = dynamic(
-  () => import('@/features/finance/requests/components/RequestDetailDialog').then(m => m.RequestDetailDialog),
+  () =>
+    import('@/features/finance/requests/components/RequestDetailDialog').then(
+      m => m.RequestDetailDialog
+    ),
   {
     loading: () => (
       <Dialog open>
-        <DialogContent level={1} className="bg-transparent border-none shadow-none flex items-center justify-center">
+        <DialogContent
+          level={1}
+          className="bg-transparent border-none shadow-none flex items-center justify-center"
+        >
           <VisuallyHidden>
             <DialogTitle>{REQUESTS_PAGE_LABELS.LOADING}</DialogTitle>
           </VisuallyHidden>
           <Loader2 className="animate-spin text-white" size={32} />
         </DialogContent>
       </Dialog>
-    )
+    ),
   }
 )
 
@@ -103,7 +110,7 @@ export default function RequestsPage() {
       <RequestDetailDialog
         request={selectedRequest}
         open={!!selectedRequest}
-        onOpenChange={(open) => !open && setSelectedRequest(null)}
+        onOpenChange={open => !open && setSelectedRequest(null)}
       />
     </>
   )

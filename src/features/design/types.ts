@@ -1,7 +1,11 @@
 /**
  * 設計模組類型定義
  */
-import { DESIGN_TYPE_LABELS, DESIGN_CATEGORY_LABELS, DESIGN_STATUS_LABELS } from './constants/labels'
+import {
+  DESIGN_TYPE_LABELS,
+  DESIGN_CATEGORY_LABELS,
+  DESIGN_STATUS_LABELS,
+} from './constants/labels'
 
 export type DesignType =
   // 手冊
@@ -62,14 +66,17 @@ export interface DesignVersion {
 }
 
 // 設計類型配置
-export const DESIGN_TYPE_CONFIG: Record<DesignType, {
-  label: string
-  category: DesignCategory
-  size: string
-  width: number
-  height: number
-  unit: 'mm' | 'px'
-}> = {
+export const DESIGN_TYPE_CONFIG: Record<
+  DesignType,
+  {
+    label: string
+    category: DesignCategory
+    size: string
+    width: number
+    height: number
+    unit: 'mm' | 'px'
+  }
+> = {
   // 手冊
   brochure_a5: {
     label: DESIGN_TYPE_LABELS.手冊A5,
@@ -132,10 +139,13 @@ export const DESIGN_TYPE_CONFIG: Record<DesignType, {
 }
 
 // 分類配置
-export const DESIGN_CATEGORY_CONFIG: Record<DesignCategory, {
-  label: string
-  description: string
-}> = {
+export const DESIGN_CATEGORY_CONFIG: Record<
+  DesignCategory,
+  {
+    label: string
+    description: string
+  }
+> = {
   brochure: {
     label: DESIGN_CATEGORY_LABELS.手冊,
     description: DESIGN_CATEGORY_LABELS.手冊傳單,
@@ -151,10 +161,13 @@ export const DESIGN_CATEGORY_CONFIG: Record<DesignCategory, {
 }
 
 // 設計狀態配置
-export const DESIGN_STATUS_CONFIG: Record<DesignStatus, {
-  label: string
-  color: string
-}> = {
+export const DESIGN_STATUS_CONFIG: Record<
+  DesignStatus,
+  {
+    label: string
+    color: string
+  }
+> = {
   draft: {
     label: DESIGN_STATUS_LABELS.草稿,
     color: 'text-morandi-secondary',

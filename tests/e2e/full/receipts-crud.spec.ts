@@ -80,7 +80,7 @@ test.describe('收款單 CRUD 測試', () => {
 
       // 找到金額輸入框並填入
       const amountInputs = dialog.locator('input[type="number"]')
-      if (await amountInputs.count() > 0) {
+      if ((await amountInputs.count()) > 0) {
         await amountInputs.first().fill('1000')
         console.log('✅ 已輸入收款金額')
       }

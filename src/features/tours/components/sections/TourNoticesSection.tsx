@@ -12,7 +12,11 @@ interface TourNoticesSectionProps {
   coverStyle?: CoverStyleType
 }
 
-export function TourNoticesSection({ data, viewMode = 'desktop', coverStyle = 'original' }: TourNoticesSectionProps) {
+export function TourNoticesSection({
+  data,
+  viewMode = 'desktop',
+  coverStyle = 'original',
+}: TourNoticesSectionProps) {
   const notices = data.notices || []
   const cancellationPolicy = data.cancellationPolicy || []
 
@@ -28,10 +32,12 @@ export function TourNoticesSection({ data, viewMode = 'desktop', coverStyle = 'o
   return (
     <section className={cn('py-12 bg-muted', isMobile && 'py-8')}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={cn(
-          'grid gap-8',
-          hasNotices && hasCancellation ? 'lg:grid-cols-2' : 'grid-cols-1'
-        )}>
+        <div
+          className={cn(
+            'grid gap-8',
+            hasNotices && hasCancellation ? 'lg:grid-cols-2' : 'grid-cols-1'
+          )}
+        >
           {/* 提醒事項 */}
           {hasNotices && (
             <div className="bg-card rounded-2xl p-6 shadow-sm border border-border">

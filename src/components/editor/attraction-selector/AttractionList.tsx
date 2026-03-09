@@ -48,7 +48,11 @@ export function AttractionList({
   if (attractions.length === 0) {
     return (
       <div className="h-full flex items-center justify-center text-morandi-secondary">
-        {!selectedCountryId ? COMP_EDITOR_LABELS.請先選擇國家 : searchQuery ? COMP_EDITOR_LABELS.找不到符合的景點 : COMP_EDITOR_LABELS.沒有可選擇的景點}
+        {!selectedCountryId
+          ? COMP_EDITOR_LABELS.請先選擇國家
+          : searchQuery
+            ? COMP_EDITOR_LABELS.找不到符合的景點
+            : COMP_EDITOR_LABELS.沒有可選擇的景點}
       </div>
     )
   }

@@ -10,7 +10,6 @@
  * 5. Realtime 即時同步
  */
 
-
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
@@ -31,7 +30,13 @@ const BatchConfirmReceiptDialog = dynamic(
 const ReceiptConfirmDialog = dynamic(
   () => import('@/features/finance/payments').then(m => m.ReceiptConfirmDialog),
   /* eslint-disable venturo/no-custom-modal -- 動態載入時的 loading 狀態 */
-  { loading: () => <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9000]"><Loader2 className="animate-spin text-white" size={32} /></div> }
+  {
+    loading: () => (
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9000]">
+        <Loader2 className="animate-spin text-white" size={32} />
+      </div>
+    ),
+  }
 )
 const AddReceiptDialog = dynamic(
   () => import('@/features/finance/payments').then(m => m.AddReceiptDialog),
@@ -57,7 +62,15 @@ export default function PaymentsPage() {
   const router = useRouter()
 
   // 資料與業務邏輯
-  const { receipts, availableOrders, invalidateReceipts, handleCreateReceipt, handleConfirmReceipt, handleUpdateReceipt, handleDeleteReceipt } = usePaymentData()
+  const {
+    receipts,
+    availableOrders,
+    invalidateReceipts,
+    handleCreateReceipt,
+    handleConfirmReceipt,
+    handleUpdateReceipt,
+    handleDeleteReceipt,
+  } = usePaymentData()
   const { user } = useAuthStore()
 
   // 檢查是否為可批量確認的角色（管理員、會計、超級管理員）
@@ -108,9 +121,12 @@ export default function PaymentsPage() {
   }, [])
 
   // 處理列點擊 - 開啟編輯對話框
-  const handleRowClick = useCallback((receipt: Receipt) => {
-    loadReceiptForEdit(receipt)
-  }, [loadReceiptForEdit])
+  const handleRowClick = useCallback(
+    (receipt: Receipt) => {
+      loadReceiptForEdit(receipt)
+    },
+    [loadReceiptForEdit]
+  )
 
   const handleSubmit = async (data: { selectedOrderId: string; paymentItems: ReceiptItem[] }) => {
     try {
@@ -129,14 +145,49 @@ export default function PaymentsPage() {
   // 表格欄位
   const columns: TableColumn<Receipt>[] = [
     { key: 'receipt_number', label: FinanceLabels.receiptNumber, sortable: true },
-    { key: 'receipt_date', label: FinanceLabels.receiptDate, sortable: true, render: (value) => <DateCell date={String(value)} /> },
+    {
+      key: 'receipt_date',
+      label: FinanceLabels.receiptDate,
+      sortable: true,
+      render: value => <DateCell date={String(value)} />,
+    },
     { key: 'order_number', label: FinanceLabels.orderNumber, sortable: true },
     { key: 'tour_name', label: FinanceLabels.tourName, sortable: true },
-    { key: 'receipt_amount', label: FinanceLabels.receiptAmount, sortable: true, render: (value) => <CurrencyCell amount={Number(value)} /> },
-    { key: 'actual_amount', label: FinanceLabels.actualAmount, sortable: true, render: (value) => <CurrencyCell amount={Number(value) || 0} /> },
-    { key: 'payment_method', label: FinanceLabels.paymentMethod, render: (value) => <span className="text-sm">{PAYMENT_METHOD_MAP[String(value)] || String(value || '-')}</span> },
-    { key: 'status', label: FinanceLabels.status, render: (value) => <StatusCell type="receipt" status={String(value)} /> },
-    { key: 'actions', label: FinanceLabels.actions, render: (_, row) => <ActionCell actions={[{ icon: Edit2, label: FinanceLabels.edit, onClick: () => loadReceiptForEdit(row) }]} /> },
+    {
+      key: 'receipt_amount',
+      label: FinanceLabels.receiptAmount,
+      sortable: true,
+      render: value => <CurrencyCell amount={Number(value)} />,
+    },
+    {
+      key: 'actual_amount',
+      label: FinanceLabels.actualAmount,
+      sortable: true,
+      render: value => <CurrencyCell amount={Number(value) || 0} />,
+    },
+    {
+      key: 'payment_method',
+      label: FinanceLabels.paymentMethod,
+      render: value => (
+        <span className="text-sm">{PAYMENT_METHOD_MAP[String(value)] || String(value || '-')}</span>
+      ),
+    },
+    {
+      key: 'status',
+      label: FinanceLabels.status,
+      render: value => <StatusCell type="receipt" status={String(value)} />,
+    },
+    {
+      key: 'actions',
+      label: FinanceLabels.actions,
+      render: (_, row) => (
+        <ActionCell
+          actions={[
+            { icon: Edit2, label: FinanceLabels.edit, onClick: () => loadReceiptForEdit(row) },
+          ]}
+        />
+      ),
+    },
   ]
 
   return (

@@ -8,12 +8,13 @@ import {
 } from './geo-utils'
 import type { Attraction } from '@/features/attractions/types'
 
-const makeAttraction = (id: string, lat: number, lon: number): Attraction => ({
-  id,
-  name: id,
-  latitude: lat,
-  longitude: lon,
-} as Attraction)
+const makeAttraction = (id: string, lat: number, lon: number): Attraction =>
+  ({
+    id,
+    name: id,
+    latitude: lat,
+    longitude: lon,
+  }) as Attraction
 
 describe('calculateDistance', () => {
   it('returns 0 for same point', () => {
@@ -98,10 +99,7 @@ describe('optimizeAttractionOrder', () => {
     expect(result[0].id).toBe('near')
   })
   it('handles attractions without coords', () => {
-    const attractions = [
-      { id: 'nocoord', name: 'no' } as Attraction,
-      makeAttraction('a', 25, 121),
-    ]
+    const attractions = [{ id: 'nocoord', name: 'no' } as Attraction, makeAttraction('a', 25, 121)]
     const result = optimizeAttractionOrder(attractions)
     expect(result).toHaveLength(1) // only valid ones
   })
@@ -109,10 +107,7 @@ describe('optimizeAttractionOrder', () => {
 
 describe('filterNearbyAttractions', () => {
   it('filters by radius', () => {
-    const attractions = [
-      makeAttraction('near', 25.01, 121.01),
-      makeAttraction('far', 30.0, 130.0),
-    ]
+    const attractions = [makeAttraction('near', 25.01, 121.01), makeAttraction('far', 30.0, 130.0)]
     const result = filterNearbyAttractions(25.0, 121.0, attractions, 10)
     expect(result).toHaveLength(1)
     expect(result[0].id).toBe('near')
@@ -122,10 +117,7 @@ describe('filterNearbyAttractions', () => {
     expect(filterNearbyAttractions(25, 121, attractions, 1)).toHaveLength(0)
   })
   it('sorts by distance', () => {
-    const attractions = [
-      makeAttraction('b', 25.05, 121.05),
-      makeAttraction('a', 25.01, 121.01),
-    ]
+    const attractions = [makeAttraction('b', 25.05, 121.05), makeAttraction('a', 25.01, 121.01)]
     const result = filterNearbyAttractions(25.0, 121.0, attractions, 50)
     expect(result[0].id).toBe('a')
   })

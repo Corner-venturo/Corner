@@ -2,7 +2,7 @@
 
 /**
  * CompanyAssetsTree - 公司資源樹狀展開介面
- * 
+ *
  * 參考 TourFilesTree，使用 TreeView 組件
  * - 點擊展開/收合資料夾
  * - 支援新增/刪除/重命名資料夾
@@ -58,7 +58,7 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
   const [assets, setAssets] = useState<CompanyAsset[]>([])
   const [loading, setLoading] = useState(true)
   const [items, setItems] = useState<TreeItem[]>([])
-  
+
   // 新增資料夾 Dialog
   const [showFolderDialog, setShowFolderDialog] = useState(false)
   const [newFolderName, setNewFolderName] = useState('')
@@ -77,7 +77,7 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
         .order('sort_order', { ascending: true })
         .order('name', { ascending: true })
         .limit(500)
-      
+
       if (workspaceId) {
         folderQuery = folderQuery.eq('workspace_id', workspaceId)
       }
@@ -106,7 +106,7 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
   useEffect(() => {
     const buildTree = () => {
       const treeItems: TreeItem[] = []
-      
+
       // 建立資料夾 Map
       const folderMap = new Map<string | null, CompanyAssetFolder[]>()
       folders.forEach(f => {
@@ -130,13 +130,13 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
       // 遞迴建構樹
       const buildNode = (parentId: string | null): TreeItem[] => {
         const items: TreeItem[] = []
-        
+
         // 加入子資料夾
         const subFolders = folderMap.get(parentId) || []
         subFolders.forEach(folder => {
           const childFolders = folderMap.get(folder.id) || []
           const childAssets = assetMap.get(folder.id) || []
-          
+
           items.push({
             id: `folder-${folder.id}`,
             name: folder.name,
@@ -183,39 +183,48 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
   }
 
   // 處理項目選取
-  const handleSelect = useCallback((item: TreeItem) => {
-    if (!item.data?.isFolder && item.data?.asset) {
-      onSelectFile?.(item.data.asset as CompanyAsset)
-    }
-  }, [onSelectFile])
+  const handleSelect = useCallback(
+    (item: TreeItem) => {
+      if (!item.data?.isFolder && item.data?.asset) {
+        onSelectFile?.(item.data.asset as CompanyAsset)
+      }
+    },
+    [onSelectFile]
+  )
 
   // 處理雙擊（預覽）
-  const handleDoubleClick = useCallback((item: TreeItem) => {
-    if (!item.data?.isFolder && item.data?.asset) {
-      onSelectFile?.(item.data.asset as CompanyAsset)
-    }
-  }, [onSelectFile])
+  const handleDoubleClick = useCallback(
+    (item: TreeItem) => {
+      if (!item.data?.isFolder && item.data?.asset) {
+        onSelectFile?.(item.data.asset as CompanyAsset)
+      }
+    },
+    [onSelectFile]
+  )
 
   // 處理拖曳移動
-  const handleMove = useCallback(async (sourceId: string, targetId: string) => {
-    const sourceIsFile = sourceId.startsWith('file-')
-    const targetFolderId = targetId.startsWith('folder-') ? targetId.replace('folder-', '') : null
+  const handleMove = useCallback(
+    async (sourceId: string, targetId: string) => {
+      const sourceIsFile = sourceId.startsWith('file-')
+      const targetFolderId = targetId.startsWith('folder-') ? targetId.replace('folder-', '') : null
 
-    if (sourceIsFile) {
-      const assetId = sourceId.replace('file-', '')
-      const { error } = await supabase
-        .from('company_assets')
-        .update({ folder_id: targetFolderId })
-        .eq('id', assetId)
+      if (sourceIsFile) {
+        const assetId = sourceId.replace('file-', '')
+        const { error } = await supabase
+          .from('company_assets')
+          .update({ folder_id: targetFolderId })
+          .eq('id', assetId)
 
-      if (error) {
-        toast.error(COMPANY_ASSETS_LABELS.移動失敗)
-        return
+        if (error) {
+          toast.error(COMPANY_ASSETS_LABELS.移動失敗)
+          return
+        }
+        toast.success(COMPANY_ASSETS_LABELS.已移動)
+        loadData()
       }
-      toast.success(COMPANY_ASSETS_LABELS.已移動)
-      loadData()
-    }
-  }, [loadData])
+    },
+    [loadData]
+  )
 
   // 新增資料夾
   const handleCreateFolder = useCallback(async () => {
@@ -242,13 +251,11 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
         toast.success(COMPANY_ASSETS_LABELS.已更新)
       } else {
         // 新增模式
-        const { error } = await supabase
-          .from('company_asset_folders')
-          .insert({
-            workspace_id: workspaceId,
-            name: newFolderName.trim(),
-            parent_id: parentFolderId,
-          })
+        const { error } = await supabase.from('company_asset_folders').insert({
+          workspace_id: workspaceId,
+          name: newFolderName.trim(),
+          parent_id: parentFolderId,
+        })
 
         if (error) throw error
         toast.success(COMPANY_ASSETS_LABELS.資料夾已建立)
@@ -268,42 +275,45 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
   }, [newFolderName, workspaceId, parentFolderId, editingFolder, loadData, creatingFolder])
 
   // 刪除資料夾
-  const handleDeleteFolder = useCallback(async (folderId: string) => {
-    const confirmed = await confirm(COMPANY_ASSETS_LABELS.確定要刪除此資料夾嗎_資料夾內的檔案會移到根目錄, {
-      title: COMPANY_ASSETS_LABELS.刪除資料夾,
-      type: 'warning',
-    })
-    if (!confirmed) return
+  const handleDeleteFolder = useCallback(
+    async (folderId: string) => {
+      const confirmed = await confirm(
+        COMPANY_ASSETS_LABELS.確定要刪除此資料夾嗎_資料夾內的檔案會移到根目錄,
+        {
+          title: COMPANY_ASSETS_LABELS.刪除資料夾,
+          type: 'warning',
+        }
+      )
+      if (!confirmed) return
 
-    try {
-      // 先把資料夾內的檔案移到根目錄
-      await supabase
-        .from('company_assets')
-        .update({ folder_id: null })
-        .eq('folder_id', folderId)
+      try {
+        // 先把資料夾內的檔案移到根目錄
+        await supabase.from('company_assets').update({ folder_id: null }).eq('folder_id', folderId)
 
-      // 刪除資料夾
-      const { error } = await supabase
-        .from('company_asset_folders')
-        .delete()
-        .eq('id', folderId)
+        // 刪除資料夾
+        const { error } = await supabase.from('company_asset_folders').delete().eq('id', folderId)
 
-      if (error) throw error
-      toast.success(COMPANY_ASSETS_LABELS.資料夾已刪除)
-      loadData()
-    } catch (err) {
-      logger.error(COMPANY_ASSETS_LABELS.刪除資料夾失敗, err)
-      toast.error(COMPANY_ASSETS_LABELS.刪除失敗)
-    }
-  }, [loadData])
+        if (error) throw error
+        toast.success(COMPANY_ASSETS_LABELS.資料夾已刪除)
+        loadData()
+      } catch (err) {
+        logger.error(COMPANY_ASSETS_LABELS.刪除資料夾失敗, err)
+        toast.error(COMPANY_ASSETS_LABELS.刪除失敗)
+      }
+    },
+    [loadData]
+  )
 
   // 右鍵選單處理（簡化版：用長按或選取後顯示按鈕）
   const [selectedItem, setSelectedItem] = useState<TreeItem | null>(null)
 
-  const handleItemSelect = useCallback((item: TreeItem) => {
-    setSelectedItem(item)
-    handleSelect(item)
-  }, [handleSelect])
+  const handleItemSelect = useCallback(
+    (item: TreeItem) => {
+      setSelectedItem(item)
+      handleSelect(item)
+    },
+    [handleSelect]
+  )
 
   if (loading) {
     return (
@@ -383,15 +393,17 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
         <DialogContent level={1} className="max-w-sm">
           <DialogHeader>
             <DialogTitle>
-              {editingFolder ? COMPANY_ASSETS_LABELS.重命名資料夾 : COMPANY_ASSETS_LABELS.新增資料夾}
+              {editingFolder
+                ? COMPANY_ASSETS_LABELS.重命名資料夾
+                : COMPANY_ASSETS_LABELS.新增資料夾}
             </DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <Input
               placeholder={COMPANY_ASSETS_LABELS.資料夾名稱}
               value={newFolderName}
-              onChange={(e) => setNewFolderName(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleCreateFolder()}
+              onChange={e => setNewFolderName(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleCreateFolder()}
               autoFocus
             />
           </div>
@@ -400,7 +412,11 @@ export function CompanyAssetsTree({ onSelectFile, onAddFile }: CompanyAssetsTree
               {COMPANY_ASSETS_LABELS.CANCEL}
             </Button>
             <Button onClick={handleCreateFolder} disabled={!newFolderName.trim() || creatingFolder}>
-              {creatingFolder ? COMPANY_ASSETS_LABELS.處理中 : (editingFolder ? COMPANY_ASSETS_LABELS.儲存 : COMPANY_ASSETS_LABELS.建立)}
+              {creatingFolder
+                ? COMPANY_ASSETS_LABELS.處理中
+                : editingFolder
+                  ? COMPANY_ASSETS_LABELS.儲存
+                  : COMPANY_ASSETS_LABELS.建立}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -2,22 +2,14 @@
 /**
  * 顧客資料驗證對話框
  * 功能：護照圖片檢視、編輯、OCR 辨識、資料比對
- * 
+ *
  * 2025-06-27: 改用統一的 ImageEditor 元件
  * 2025-06-27: 改用 i18n 多語系
  */
 
 import { useState, useCallback, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
-import {
-  Check,
-  AlertTriangle,
-  RefreshCw,
-  X,
-  Upload,
-  ImageOff,
-  Pencil,
-} from 'lucide-react'
+import { Check, AlertTriangle, RefreshCw, X, Upload, ImageOff, Pencil } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -58,12 +50,12 @@ export function CustomerVerifyDialog({
   onUpdate,
 }: CustomerVerifyDialogProps) {
   const t = useTranslations()
-  
+
   // 表單資料
   const [formData, setFormData] = useState<Partial<UpdateCustomerData>>({})
   const [isSaving, setIsSaving] = useState(false)
   const [localImageUrl, setLocalImageUrl] = useState<string | null>(null)
-  
+
   // 圖片編輯器狀態
   const [isEditorOpen, setIsEditorOpen] = useState(false)
 
@@ -98,7 +90,8 @@ export function CustomerVerifyDialog({
         .from('passport-images')
         .createSignedUrl(fileName, 3600)
 
-      if (urlError || !urlData?.signedUrl) throw urlError || new Error('Failed to create signed URL')
+      if (urlError || !urlData?.signedUrl)
+        throw urlError || new Error('Failed to create signed URL')
       const newUrl = urlData.signedUrl
 
       // 更新本地顯示
@@ -108,7 +101,7 @@ export function CustomerVerifyDialog({
 
       // 自動進行 OCR 辨識
       try {
-        await recognizePassport(newUrl, (result) => {
+        await recognizePassport(newUrl, result => {
           setFormData(prev => ({
             ...prev,
             ...result,
@@ -155,7 +148,7 @@ export function CustomerVerifyDialog({
         ...formData,
         verification_status: 'verified',
       }
-      
+
       if (localImageUrl) {
         updateData.passport_image_url = localImageUrl
         // 刪除舊照片
@@ -178,7 +171,7 @@ export function CustomerVerifyDialog({
     const imageUrl = localImageUrl || customer?.passport_image_url
     if (!imageUrl) return
     try {
-      await recognizePassport(imageUrl, (result) => {
+      await recognizePassport(imageUrl, result => {
         setFormData(prev => ({
           ...prev,
           ...result,
@@ -205,7 +198,7 @@ export function CustomerVerifyDialog({
       // 上傳裁切後的圖片
       const random = Math.random().toString(36).substring(2, 8)
       const fileName = `passport_${Date.now()}_${random}.jpg`
-      
+
       const { error: uploadError } = await supabase.storage
         .from('passport-images')
         .upload(fileName, blob, { upsert: true })
@@ -216,7 +209,8 @@ export function CustomerVerifyDialog({
         .from('passport-images')
         .createSignedUrl(fileName, 3600)
 
-      if (urlError || !urlData?.signedUrl) throw urlError || new Error('Failed to create signed URL')
+      if (urlError || !urlData?.signedUrl)
+        throw urlError || new Error('Failed to create signed URL')
       // 更新本地顯示
       setLocalImageUrl(urlData.signedUrl)
 
@@ -290,7 +284,8 @@ export function CustomerVerifyDialog({
                   style={{ height: '320px' }}
                   onClick={() => setIsEditorOpen(true)}
                 >
-                  <img src={currentImageUrl}
+                  <img
+                    src={currentImageUrl}
                     alt={t('passport.title')}
                     className="w-full h-full object-contain"
                     draggable={false}
@@ -300,7 +295,7 @@ export function CustomerVerifyDialog({
                     htmlFor="customer-passport-reupload"
                     className="absolute bottom-2 right-2 p-2 bg-white/90 hover:bg-white rounded-lg cursor-pointer shadow-sm border"
                     title={t('passport.reupload')}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={e => e.stopPropagation()}
                   >
                     <Upload size={16} className="text-morandi-gold" />
                     <input
@@ -313,7 +308,9 @@ export function CustomerVerifyDialog({
                   </label>
                   {/* 編輯提示 */}
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">{t('passport.clickToEdit')}</span>
+                    <span className="text-white text-sm font-medium">
+                      {t('passport.clickToEdit')}
+                    </span>
                   </div>
                 </div>
               ) : (
@@ -337,34 +334,48 @@ export function CustomerVerifyDialog({
 
             {/* 右邊：表單 */}
             <div className="space-y-4">
-              <h3 className="text-sm font-medium text-morandi-primary">{t('customer.customerDetail')}</h3>
+              <h3 className="text-sm font-medium text-morandi-primary">
+                {t('customer.customerDetail')}
+              </h3>
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs text-morandi-primary">{t('customer.chineseName')}</label>
+                  <label className="text-xs text-morandi-primary">
+                    {t('customer.chineseName')}
+                  </label>
                   <Input
                     value={formData.name || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-morandi-primary">{t('customer.passportName')}</label>
+                  <label className="text-xs text-morandi-primary">
+                    {t('customer.passportName')}
+                  </label>
                   <Input
                     value={formData.passport_name || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, passport_name: e.target.value }))}
+                    onChange={e =>
+                      setFormData(prev => ({ ...prev, passport_name: e.target.value }))
+                    }
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-morandi-primary">{t('customer.passportNumber')}</label>
+                  <label className="text-xs text-morandi-primary">
+                    {t('customer.passportNumber')}
+                  </label>
                   <Input
                     value={formData.passport_number || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, passport_number: e.target.value }))}
+                    onChange={e =>
+                      setFormData(prev => ({ ...prev, passport_number: e.target.value }))
+                    }
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-morandi-primary">{t('customer.passportExpiry')}</label>
+                  <label className="text-xs text-morandi-primary">
+                    {t('customer.passportExpiry')}
+                  </label>
                   <DatePicker
                     value={formData.passport_expiry || ''}
-                    onChange={(date) => setFormData(prev => ({ ...prev, passport_expiry: date }))}
+                    onChange={date => setFormData(prev => ({ ...prev, passport_expiry: date }))}
                     placeholder={t('common.select')}
                   />
                 </div>
@@ -372,7 +383,7 @@ export function CustomerVerifyDialog({
                   <label className="text-xs text-morandi-primary">{t('customer.birthDate')}</label>
                   <DatePicker
                     value={formData.birth_date || ''}
-                    onChange={(date) => setFormData(prev => ({ ...prev, birth_date: date }))}
+                    onChange={date => setFormData(prev => ({ ...prev, birth_date: date }))}
                     placeholder={t('common.select')}
                   />
                 </div>
@@ -380,7 +391,7 @@ export function CustomerVerifyDialog({
                   <label className="text-xs text-morandi-primary">{t('customer.idNumber')}</label>
                   <Input
                     value={formData.national_id || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, national_id: e.target.value }))}
+                    onChange={e => setFormData(prev => ({ ...prev, national_id: e.target.value }))}
                   />
                 </div>
               </div>
@@ -393,7 +404,11 @@ export function CustomerVerifyDialog({
               <X size={16} />
               {t('common.cancel')}
             </Button>
-            <Button onClick={handleSave} disabled={isSaving} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+            <Button
+              onClick={handleSave}
+              disabled={isSaving}
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
+            >
               <Check size={16} />
               {isSaving ? t('common.saving') : t('common.confirm')}
             </Button>
@@ -407,10 +422,10 @@ export function CustomerVerifyDialog({
           open={isEditorOpen}
           onClose={() => setIsEditorOpen(false)}
           imageSrc={currentImageUrl}
-          aspectRatio={3 / 2}  // 護照比例
+          aspectRatio={3 / 2} // 護照比例
           onSave={handleEditorSave}
           onCropAndSave={handleEditorCropAndSave}
-          showAi={false}  // 護照不需要 AI 美化
+          showAi={false} // 護照不需要 AI 美化
         />
       )}
     </>

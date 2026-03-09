@@ -80,13 +80,13 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, React.ComponentProps<'tex
         ref={ref}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        onCompositionStart={(e) => {
+        onCompositionStart={e => {
           isComposingRef.current = true
           if (onCompositionStart) {
             onCompositionStart(e)
           }
         }}
-        onCompositionEnd={(e) => {
+        onCompositionEnd={e => {
           handleCompositionEnd(e)
           if (onCompositionEnd) {
             onCompositionEnd(e)

@@ -18,7 +18,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { ATTRACTIONS_LIST_LABELS, MICHELIN_RESTAURANTS_TAB_LABELS } from '../../constants/labels';
+import { ATTRACTIONS_LIST_LABELS, MICHELIN_RESTAURANTS_TAB_LABELS } from '../../constants/labels'
 
 interface MichelinRestaurant {
   id: string
@@ -44,7 +44,9 @@ interface MichelinRestaurantsTabProps {
 export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRestaurantsTabProps) {
   const [restaurants, setRestaurants] = useState<MichelinRestaurant[]>([])
   const [loading, setLoading] = useState(true)
-  const [countries, setCountries] = useState<Array<{ id: string; name: string; emoji?: string }>>([])
+  const [countries, setCountries] = useState<Array<{ id: string; name: string; emoji?: string }>>(
+    []
+  )
   const [cities, setCities] = useState<Array<{ id: string; name: string }>>([])
 
   const [editingRestaurant, setEditingRestaurant] = useState<MichelinRestaurant | null>(null)
@@ -79,7 +81,10 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
             .in('id', countryIds)
             .limit(500)
             .then(({ data }) => {
-              if (data) setCountries(data.map(c => ({ id: c.id, name: c.name, emoji: c.emoji ?? undefined })))
+              if (data)
+                setCountries(
+                  data.map(c => ({ id: c.id, name: c.name, emoji: c.emoji ?? undefined }))
+                )
             })
         }
 
@@ -204,7 +209,9 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
           <div className="min-w-[180px]">
             <div className="font-medium text-morandi-primary line-clamp-1">{restaurant.name}</div>
             {restaurant.english_name && (
-              <div className="text-xs text-morandi-muted line-clamp-1">{restaurant.english_name}</div>
+              <div className="text-xs text-morandi-muted line-clamp-1">
+                {restaurant.english_name}
+              </div>
             )}
           </div>
         ),
@@ -213,7 +220,8 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
         key: 'michelin_stars',
         label: MICHELIN_RESTAURANTS_TAB_LABELS.星級,
         sortable: true,
-        render: (_: unknown, restaurant: MichelinRestaurant) => renderStars(restaurant.michelin_stars),
+        render: (_: unknown, restaurant: MichelinRestaurant) =>
+          renderStars(restaurant.michelin_stars),
       },
       {
         key: 'city',
@@ -223,9 +231,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
           const country = countries.find(c => c.id === restaurant.country_id)
           const city = cities.find(c => c.id === restaurant.city_id)
           return (
-            <div className="text-sm text-morandi-secondary line-clamp-1">
-              {city?.name || '-'}
-            </div>
+            <div className="text-sm text-morandi-secondary line-clamp-1">{city?.name || '-'}</div>
           )
         },
       },
@@ -313,48 +319,51 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
             actions={(row: unknown) => {
               const restaurant = row as MichelinRestaurant
               return (
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={e => {
-                    e.stopPropagation()
-                    handleEdit(restaurant)
-                  }}
-                  className="h-8 px-2 text-morandi-blue hover:bg-morandi-blue/10"
-                  title={ATTRACTIONS_LIST_LABELS.編輯}
-                >
-                  <Edit2 size={14} />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={e => {
-                    e.stopPropagation()
-                    handleToggleStatus(restaurant)
-                  }}
-                  className="h-8 px-2"
-                  title={restaurant.is_active ? '停用' : ATTRACTIONS_LIST_LABELS.啟用}
-                >
-                  <Power
-                    size={14}
-                    className={restaurant.is_active ? 'text-morandi-green' : 'text-morandi-secondary'}
-                  />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={e => {
-                    e.stopPropagation()
-                    handleDelete(restaurant.id)
-                  }}
-                  className="h-8 px-2 hover:text-morandi-red hover:bg-morandi-red/10"
-                  title={ATTRACTIONS_LIST_LABELS.刪除}
-                >
-                  <Trash2 size={14} />
-                </Button>
-              </div>
-            )}}
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={e => {
+                      e.stopPropagation()
+                      handleEdit(restaurant)
+                    }}
+                    className="h-8 px-2 text-morandi-blue hover:bg-morandi-blue/10"
+                    title={ATTRACTIONS_LIST_LABELS.編輯}
+                  >
+                    <Edit2 size={14} />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={e => {
+                      e.stopPropagation()
+                      handleToggleStatus(restaurant)
+                    }}
+                    className="h-8 px-2"
+                    title={restaurant.is_active ? '停用' : ATTRACTIONS_LIST_LABELS.啟用}
+                  >
+                    <Power
+                      size={14}
+                      className={
+                        restaurant.is_active ? 'text-morandi-green' : 'text-morandi-secondary'
+                      }
+                    />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={e => {
+                      e.stopPropagation()
+                      handleDelete(restaurant.id)
+                    }}
+                    className="h-8 px-2 hover:text-morandi-red hover:bg-morandi-red/10"
+                    title={ATTRACTIONS_LIST_LABELS.刪除}
+                  >
+                    <Trash2 size={14} />
+                  </Button>
+                </div>
+              )
+            }}
           />
         </div>
       </div>
@@ -369,7 +378,9 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium">{MICHELIN_RESTAURANTS_TAB_LABELS.餐廳名稱}</label>
+                  <label className="text-sm font-medium">
+                    {MICHELIN_RESTAURANTS_TAB_LABELS.餐廳名稱}
+                  </label>
                   <Input
                     value={editingRestaurant.name}
                     onChange={e =>
@@ -378,7 +389,9 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">{MICHELIN_RESTAURANTS_TAB_LABELS.LABEL_3778}</label>
+                  <label className="text-sm font-medium">
+                    {MICHELIN_RESTAURANTS_TAB_LABELS.LABEL_3778}
+                  </label>
                   <Input
                     value={editingRestaurant.english_name || ''}
                     onChange={e =>
@@ -389,7 +402,9 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium">{MICHELIN_RESTAURANTS_TAB_LABELS.LABEL_9629}</label>
+                  <label className="text-sm font-medium">
+                    {MICHELIN_RESTAURANTS_TAB_LABELS.LABEL_9629}
+                  </label>
                   <Input
                     value={editingRestaurant.chef_name || ''}
                     onChange={e =>
@@ -398,7 +413,9 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">{MICHELIN_RESTAURANTS_TAB_LABELS.電話}</label>
+                  <label className="text-sm font-medium">
+                    {MICHELIN_RESTAURANTS_TAB_LABELS.電話}
+                  </label>
                   <Input
                     value={editingRestaurant.phone || ''}
                     onChange={e =>
@@ -409,7 +426,9 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium">{MICHELIN_RESTAURANTS_TAB_LABELS.LABEL_5803}</label>
+                  <label className="text-sm font-medium">
+                    {MICHELIN_RESTAURANTS_TAB_LABELS.LABEL_5803}
+                  </label>
                   <Input
                     type="number"
                     value={editingRestaurant.avg_price_dinner || ''}
@@ -422,7 +441,9 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">{MICHELIN_RESTAURANTS_TAB_LABELS.LABEL_3529}</label>
+                  <label className="text-sm font-medium">
+                    {MICHELIN_RESTAURANTS_TAB_LABELS.LABEL_3529}
+                  </label>
                   <Input
                     value={editingRestaurant.currency || ''}
                     onChange={e =>
@@ -438,7 +459,10 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
               <X size={16} />
               {MICHELIN_RESTAURANTS_TAB_LABELS.CANCEL}
             </Button>
-            <Button onClick={() => editingRestaurant && handleUpdate(editingRestaurant)} className="gap-2">
+            <Button
+              onClick={() => editingRestaurant && handleUpdate(editingRestaurant)}
+              className="gap-2"
+            >
               <Save size={16} />
               {MICHELIN_RESTAURANTS_TAB_LABELS.SAVE}
             </Button>

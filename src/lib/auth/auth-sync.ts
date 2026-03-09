@@ -82,7 +82,12 @@ interface SyncOptions {
  * 帶 timeout 的 getSession wrapper
  * 避免 getSession 掛住導致整個應用卡住
  */
-async function getSessionWithTimeout(timeoutMs: number = 10000): Promise<{ session: Awaited<ReturnType<typeof supabase.auth.getSession>>['data']['session'] | null; error: Error | null }> {
+async function getSessionWithTimeout(
+  timeoutMs: number = 10000
+): Promise<{
+  session: Awaited<ReturnType<typeof supabase.auth.getSession>>['data']['session'] | null
+  error: Error | null
+}> {
   try {
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(() => reject(new Error('getSession timeout')), timeoutMs)
@@ -227,14 +232,14 @@ export function resetAuthSyncState(): void {
  * 只處理登出，其他情況不需要自動同步（登入時已處理）
  */
 export function setupAuthSyncListener(): () => void {
-  const { data: { subscription } } = supabase.auth.onAuthStateChange(
-    (event) => {
-      // 只在登出時重置狀態，其他事件不處理
-      if (event === 'SIGNED_OUT') {
-        resetAuthSyncState()
-      }
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange(event => {
+    // 只在登出時重置狀態，其他事件不處理
+    if (event === 'SIGNED_OUT') {
+      resetAuthSyncState()
     }
-  )
+  })
 
   return () => {
     subscription.unsubscribe()

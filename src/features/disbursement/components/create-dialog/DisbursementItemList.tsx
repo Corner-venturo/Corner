@@ -4,7 +4,6 @@
  * 請款單列表區塊（搜尋、篩選、列表）
  */
 
-
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -66,17 +65,24 @@ export function DisbursementItemList({
           {DISBURSEMENT_LABELS.LABEL_623}
           {selectedRequestIds.length > 0 && (
             <span className="ml-2 text-morandi-gold">
-              {DISBURSEMENT_LABELS.SELECTED_PAREN_PREFIX}{selectedRequestIds.length}{DISBURSEMENT_LABELS.SELECTED_PAREN_MID}{selectedAmount.toLocaleString()}{DISBURSEMENT_LABELS.SELECTED_PAREN_SUFFIX}
+              {DISBURSEMENT_LABELS.SELECTED_PAREN_PREFIX}
+              {selectedRequestIds.length}
+              {DISBURSEMENT_LABELS.SELECTED_PAREN_MID}
+              {selectedAmount.toLocaleString()}
+              {DISBURSEMENT_LABELS.SELECTED_PAREN_SUFFIX}
             </span>
           )}
         </h3>
         <div className="flex items-center gap-2">
           {/* 搜尋 */}
           <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-muted" />
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-muted"
+            />
             <Input
               value={searchTerm}
-              onChange={(e) => onSearchChange(e.target.value)}
+              onChange={e => onSearchChange(e.target.value)}
               placeholder={DISBURSEMENT_LABELS.搜尋請款編號或團名}
               className="pl-9 w-56"
             />
@@ -89,12 +95,7 @@ export function DisbursementItemList({
             className="w-40"
           />
           {/* 當日按鈕 */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onSetToday}
-            className="whitespace-nowrap"
-          >
+          <Button variant="outline" size="sm" onClick={onSetToday} className="whitespace-nowrap">
             <Calendar size={14} className="mr-1" />
             {DISBURSEMENT_LABELS.LABEL_2377}
           </Button>
@@ -118,16 +119,31 @@ export function DisbursementItemList({
             <tr className="border-b border-morandi-container/20">
               <th className="py-3 px-4 text-left w-12">
                 <Checkbox
-                  checked={selectedRequestIds.length === filteredRequests.length && filteredRequests.length > 0}
+                  checked={
+                    selectedRequestIds.length === filteredRequests.length &&
+                    filteredRequests.length > 0
+                  }
                   onCheckedChange={onToggleSelectAll}
                 />
               </th>
-              <th className="py-3 px-4 text-left text-morandi-muted font-medium">{DISBURSEMENT_LABELS.LABEL_6208}</th>
-              <th className="py-3 px-4 text-left text-morandi-muted font-medium">{DISBURSEMENT_LABELS.團名_th}</th>
-              <th className="py-3 px-4 text-left text-morandi-muted font-medium">{DISBURSEMENT_LABELS.出帳日期_label}</th>
-              <th className="py-3 px-4 text-left text-morandi-muted font-medium">{DISBURSEMENT_LABELS.請款人}</th>
-              <th className="py-3 px-4 text-right text-morandi-muted font-medium">{DISBURSEMENT_LABELS.總金額_label}</th>
-              <th className="py-3 px-4 text-center text-morandi-muted font-medium">{DISBURSEMENT_LABELS.狀態}</th>
+              <th className="py-3 px-4 text-left text-morandi-muted font-medium">
+                {DISBURSEMENT_LABELS.LABEL_6208}
+              </th>
+              <th className="py-3 px-4 text-left text-morandi-muted font-medium">
+                {DISBURSEMENT_LABELS.團名_th}
+              </th>
+              <th className="py-3 px-4 text-left text-morandi-muted font-medium">
+                {DISBURSEMENT_LABELS.出帳日期_label}
+              </th>
+              <th className="py-3 px-4 text-left text-morandi-muted font-medium">
+                {DISBURSEMENT_LABELS.請款人}
+              </th>
+              <th className="py-3 px-4 text-right text-morandi-muted font-medium">
+                {DISBURSEMENT_LABELS.總金額_label}
+              </th>
+              <th className="py-3 px-4 text-center text-morandi-muted font-medium">
+                {DISBURSEMENT_LABELS.狀態}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -147,7 +163,7 @@ export function DisbursementItemList({
                   )}
                   onClick={() => onToggleSelect(request.id)}
                 >
-                  <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
+                  <td className="py-3 px-4" onClick={e => e.stopPropagation()}>
                     <Checkbox
                       checked={selectedRequestIds.includes(request.id)}
                       onCheckedChange={() => onToggleSelect(request.id)}
@@ -159,7 +175,9 @@ export function DisbursementItemList({
                     </span>
                   </td>
                   <td className="py-3 px-4 text-morandi-primary max-w-[200px] truncate">
-                    {request.request_category === 'company' ? DISBURSEMENT_LABELS.公司 : (request.tour_name || '-')}
+                    {request.request_category === 'company'
+                      ? DISBURSEMENT_LABELS.公司
+                      : request.tour_name || '-'}
                   </td>
                   <td className="py-3 px-4 text-morandi-secondary">
                     {request.created_at?.split('T')[0] || '-'}

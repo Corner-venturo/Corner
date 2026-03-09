@@ -5,7 +5,7 @@ import * as fabric from 'fabric'
 
 /**
  * useCanvasTransform - 變形操作 Hook
- * 
+ *
  * 功能：
  * - groupSelected, ungroupSelected
  * - flipHorizontal, flipVertical
@@ -41,7 +41,7 @@ export function useCanvasTransform(options: UseCanvasTransformOptions): UseCanva
     const objects = (activeSelection as fabric.ActiveSelection).getObjects()
     if (objects.length < 2) return
 
-    objects.forEach((obj) => canvas.remove(obj))
+    objects.forEach(obj => canvas.remove(obj))
 
     const group = new fabric.Group(objects)
     ;(group as fabric.Group & { id: string }).id = `group-${Date.now()}`
@@ -69,7 +69,7 @@ export function useCanvasTransform(options: UseCanvasTransformOptions): UseCanva
 
     canvas.remove(group)
 
-    items.forEach((item) => {
+    items.forEach(item => {
       item.set({
         left: groupLeft + (item.left || 0),
         top: groupTop + (item.top || 0),

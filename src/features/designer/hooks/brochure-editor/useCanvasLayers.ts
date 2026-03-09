@@ -6,7 +6,7 @@ import type { FabricObjectWithId } from './types'
 
 /**
  * useCanvasLayers - 圖層操作 Hook
- * 
+ *
  * 功能：
  * - bringForward, sendBackward, bringToFront, sendToBack
  * - getObjects, selectObjectById
@@ -92,17 +92,20 @@ export function useCanvasLayers(options: UseCanvasLayersOptions): UseCanvasLayer
   // ============================================
   // Select Object by ID
   // ============================================
-  const selectObjectById = useCallback((id: string) => {
-    const canvas = getCanvas()
-    if (!canvas) return
+  const selectObjectById = useCallback(
+    (id: string) => {
+      const canvas = getCanvas()
+      if (!canvas) return
 
-    const objects = canvas.getObjects()
-    const target = objects.find(obj => (obj as FabricObjectWithId).id === id)
-    if (target) {
-      canvas.setActiveObject(target)
-      canvas.renderAll()
-    }
-  }, [getCanvas])
+      const objects = canvas.getObjects()
+      const target = objects.find(obj => (obj as FabricObjectWithId).id === id)
+      if (target) {
+        canvas.setActiveObject(target)
+        canvas.renderAll()
+      }
+    },
+    [getCanvas]
+  )
 
   return {
     bringForward,

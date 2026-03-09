@@ -2,7 +2,13 @@
 
 import React, { useState } from 'react'
 import { logger } from '@/lib/utils/logger'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { FileText, Upload, CheckCircle, X } from 'lucide-react'
@@ -75,9 +81,7 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
             <FileText className="h-5 w-5 text-morandi-sky" />
             {LABELS.IMPORT_PNR_TITLE}
           </DialogTitle>
-          <DialogDescription>
-            {LABELS.IMPORT_PNR_DESC}
-          </DialogDescription>
+          <DialogDescription>{LABELS.IMPORT_PNR_DESC}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -120,7 +124,9 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-morandi-success" />
-                    <h3 className="text-sm font-semibold text-morandi-primary">{LABELS.PARSE_SUCCESS_TITLE}</h3>
+                    <h3 className="text-sm font-semibold text-morandi-primary">
+                      {LABELS.PARSE_SUCCESS_TITLE}
+                    </h3>
                   </div>
                   <button
                     onClick={() => {
@@ -137,7 +143,9 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
                   {/* 電腦代號 */}
                   {parsedData.recordLocator && (
                     <div className="bg-card p-3 rounded border border-border">
-                      <span className="font-semibold text-morandi-primary">{LABELS.COMPUTER_CODE}</span>
+                      <span className="font-semibold text-morandi-primary">
+                        {LABELS.COMPUTER_CODE}
+                      </span>
                       <span className="text-morandi-secondary">{parsedData.recordLocator}</span>
                     </div>
                   )}
@@ -145,7 +153,9 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
                   {/* 旅客姓名 */}
                   {parsedData.passengerNames.length > 0 && (
                     <div className="bg-card p-3 rounded border border-border">
-                      <span className="font-semibold text-morandi-primary">{LABELS.PASSENGER_NAME_LABEL_COLON}</span>
+                      <span className="font-semibold text-morandi-primary">
+                        {LABELS.PASSENGER_NAME_LABEL_COLON}
+                      </span>
                       <div className="mt-1 space-y-1">
                         {parsedData.passengerNames.map((name, idx) => (
                           <div key={idx} className="text-morandi-secondary">
@@ -159,15 +169,21 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
                   {/* 航班資訊 */}
                   {parsedData.segments.length > 0 && (
                     <div className="bg-card p-3 rounded border border-border">
-                      <span className="font-semibold text-morandi-primary block mb-2">{LABELS.FLIGHT_INFO_LABEL}</span>
+                      <span className="font-semibold text-morandi-primary block mb-2">
+                        {LABELS.FLIGHT_INFO_LABEL}
+                      </span>
                       <div className="space-y-2">
                         {parsedData.segments.map((seg, idx) => (
-                          <div key={idx} className="text-morandi-secondary pl-2 border-l-2 border-morandi-sky">
+                          <div
+                            key={idx}
+                            className="text-morandi-secondary pl-2 border-l-2 border-morandi-sky"
+                          >
                             <div className="font-medium">
                               {seg.airline} ({seg.flightNumber})
                             </div>
                             <div className="text-xs">
-                              {seg.departureDate} {seg.departureTime} {seg.departureAirport} → {seg.arrivalTime} {seg.arrivalAirport}
+                              {seg.departureDate} {seg.departureTime} {seg.departureAirport} →{' '}
+                              {seg.arrivalTime} {seg.arrivalAirport}
                             </div>
                           </div>
                         ))}
@@ -178,7 +194,9 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
                   {/* 機票號碼 */}
                   {parsedData.ticketNumbers.length > 0 && (
                     <div className="bg-card p-3 rounded border border-border">
-                      <span className="font-semibold text-morandi-primary">{LABELS.TICKET_NUMBER_LABEL}</span>
+                      <span className="font-semibold text-morandi-primary">
+                        {LABELS.TICKET_NUMBER_LABEL}
+                      </span>
                       <div className="mt-1 space-y-1">
                         {parsedData.ticketNumbers.map((ticket, idx) => (
                           <div key={idx} className="text-morandi-secondary">

@@ -35,13 +35,7 @@ function formatYearMonth(yearMonth: string): string {
 }
 
 // 月份選擇器
-function MonthSelector({
-  value,
-  onChange,
-}: {
-  value: string
-  onChange: (value: string) => void
-}) {
+function MonthSelector({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   const handlePrev = () => {
     const [year, month] = value.split('-').map(Number)
     const prevMonth = month === 1 ? 12 : month - 1
@@ -118,20 +112,20 @@ export default function MonthlyIncomeReportPage() {
 
   // 計算統計數據
   const stats = useMemo(() => {
-    const totalAmount = filteredReceiptOrders.reduce(
-      (sum, ro) => sum + (ro.amount || 0),
-      0
-    )
+    const totalAmount = filteredReceiptOrders.reduce((sum, ro) => sum + (ro.amount || 0), 0)
     // 按付款方式分組統計
-    const byPaymentMethod = filteredReceiptOrders.reduce((acc, ro) => {
-      const method = ro.payment_method || 'other'
-      if (!acc[method]) {
-        acc[method] = { count: 0, amount: 0 }
-      }
-      acc[method].count += 1
-      acc[method].amount += ro.amount || 0
-      return acc
-    }, {} as Record<string, { count: number; amount: number }>)
+    const byPaymentMethod = filteredReceiptOrders.reduce(
+      (acc, ro) => {
+        const method = ro.payment_method || 'other'
+        if (!acc[method]) {
+          acc[method] = { count: 0, amount: 0 }
+        }
+        acc[method].count += 1
+        acc[method].amount += ro.amount || 0
+        return acc
+      },
+      {} as Record<string, { count: number; amount: number }>
+    )
 
     return {
       receiptCount: filteredReceiptOrders.length,
@@ -146,9 +140,7 @@ export default function MonthlyIncomeReportPage() {
       key: 'code',
       label: MONTHLY_INCOME_LABELS.COL_RECEIPT_CODE,
       width: '150',
-      render: value => (
-        <span className="font-mono text-sm">{String(value || '')}</span>
-      ),
+      render: value => <span className="font-mono text-sm">{String(value || '')}</span>,
     },
     {
       key: 'receipt_date',
@@ -163,9 +155,7 @@ export default function MonthlyIncomeReportPage() {
       render: value => {
         const method = String(value || '')
         return (
-          <span className="text-sm">
-            {RECEIPT_PAYMENT_METHOD_LABELS[method] || method || '-'}
-          </span>
+          <span className="text-sm">{RECEIPT_PAYMENT_METHOD_LABELS[method] || method || '-'}</span>
         )
       },
     },
@@ -179,17 +169,13 @@ export default function MonthlyIncomeReportPage() {
       key: 'handled_by',
       label: MONTHLY_INCOME_LABELS.COL_HANDLED_BY,
       width: '100',
-      render: value => (
-        <span className="text-sm">{String(value || '-')}</span>
-      ),
+      render: value => <span className="text-sm">{String(value || '-')}</span>,
     },
     {
       key: 'notes',
       label: MONTHLY_INCOME_LABELS.COL_NOTES,
       width: '150',
-      render: value => (
-        <span className="text-sm truncate">{String(value || '-')}</span>
-      ),
+      render: value => <span className="text-sm truncate">{String(value || '-')}</span>,
     },
   ]
 
@@ -205,7 +191,6 @@ export default function MonthlyIncomeReportPage() {
       headerActions={<MonthSelector value={selectedMonth} onChange={setSelectedMonth} />}
       className="space-y-6"
     >
-
       {/* 統計卡片 */}
       <ContentContainer>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -244,7 +229,8 @@ export default function MonthlyIncomeReportPage() {
                   {RECEIPT_PAYMENT_METHOD_LABELS[method] || method}
                 </p>
                 <p className="text-lg font-semibold text-morandi-primary">
-                  {data.count}{MONTHLY_INCOME_LABELS.COUNT_SUFFIX}
+                  {data.count}
+                  {MONTHLY_INCOME_LABELS.COUNT_SUFFIX}
                 </p>
                 <CurrencyCell amount={data.amount} variant="income" className="text-sm" />
               </div>

@@ -19,13 +19,10 @@ export function SystemSettings({
   setClearingCache,
 }: SystemSettingsProps) {
   const handleClearCache = async () => {
-    const confirmed = await confirm(
-      LABELS.CLEAR_CACHE_CONFIRM_MSG,
-      {
-        type: 'warning',
-        title: LABELS.CLEAR_CACHE_CONFIRM_TITLE,
-      }
-    )
+    const confirmed = await confirm(LABELS.CLEAR_CACHE_CONFIRM_MSG, {
+      type: 'warning',
+      title: LABELS.CLEAR_CACHE_CONFIRM_TITLE,
+    })
 
     if (!confirmed) return
 
@@ -94,9 +91,7 @@ export function SystemSettings({
                 <Trash2 className="h-5 w-5 text-morandi-gold" />
                 <h3 className="font-medium">{LABELS.CLEAR_LOCAL_CACHE}</h3>
               </div>
-              <p className="text-sm text-morandi-secondary mb-3">
-                {LABELS.CLEAR_CACHE_DESC}
-              </p>
+              <p className="text-sm text-morandi-secondary mb-3">{LABELS.CLEAR_CACHE_DESC}</p>
 
               {cacheInfo && (
                 <div className="mt-3 p-3 bg-morandi-container/20 rounded-lg text-sm">
@@ -108,7 +103,8 @@ export function SystemSettings({
                       )}
                     />
                     <span className="font-medium">
-                      {LABELS.DB_STATUS}：{cacheInfo.dbExists ? LABELS.DB_CREATED : LABELS.DB_NOT_CREATED}
+                      {LABELS.DB_STATUS}：
+                      {cacheInfo.dbExists ? LABELS.DB_CREATED : LABELS.DB_NOT_CREATED}
                     </span>
                   </div>
                   {cacheInfo.dbExists && (

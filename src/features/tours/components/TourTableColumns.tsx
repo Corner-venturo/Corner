@@ -3,7 +3,6 @@
  * TourTableColumns - Table column definitions for tours list
  */
 
-
 import { useMemo } from 'react'
 import Link from 'next/link'
 import { TableColumn } from '@/components/ui/enhanced-table'
@@ -18,7 +17,6 @@ interface UseTourTableColumnsParams {
 }
 
 export function useTourTableColumns({ ordersByTourId }: UseTourTableColumnsParams) {
-
   return useMemo<TableColumn[]>(
     () => [
       {
@@ -27,11 +25,11 @@ export function useTourTableColumns({ ordersByTourId }: UseTourTableColumnsParam
         sortable: true,
         width: '110px',
         render: (value, row) => {
-          const code = String(value || "")
+          const code = String(value || '')
           return (
             <Link
               href={`/tours/${code}`}
-              onClick={(e) => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
               className="text-sm text-morandi-gold hover:text-morandi-gold-hover hover:underline font-medium"
             >
               {code}
@@ -44,7 +42,9 @@ export function useTourTableColumns({ ordersByTourId }: UseTourTableColumnsParam
         label: TOUR_TABLE.col_name,
         sortable: true,
         width: '180px',
-        render: (value) => <span className="text-sm text-morandi-primary">{String(value || "")}</span>,
+        render: value => (
+          <span className="text-sm text-morandi-primary">{String(value || '')}</span>
+        ),
       },
       {
         key: 'departure_date',
@@ -73,7 +73,9 @@ export function useTourTableColumns({ ordersByTourId }: UseTourTableColumnsParam
         render: (_value, row) => {
           const tour = row as Tour
           const orderInfo = ordersByTourId?.get(tour.id)
-          return <span className="text-sm text-morandi-primary">{orderInfo?.sales_person || '-'}</span>
+          return (
+            <span className="text-sm text-morandi-primary">{orderInfo?.sales_person || '-'}</span>
+          )
         },
       },
       {
@@ -96,7 +98,14 @@ export function useTourTableColumns({ ordersByTourId }: UseTourTableColumnsParam
           const status = tour.status || ''
           const config = getStatusConfig('tour', status)
           return (
-            <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border', config.bgColor, config.color, config.borderColor)}>
+            <span
+              className={cn(
+                'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border',
+                config.bgColor,
+                config.color,
+                config.borderColor
+              )}
+            >
               {status}
             </span>
           )

@@ -41,7 +41,6 @@ export function useChannelEffects(
     if (currentWorkspace?.id) {
       loadChannels(currentWorkspace.id)
     }
-     
   }, [currentWorkspace?.id])
 
   // 選擇預設頻道（只從已加入的頻道中選擇）
@@ -102,7 +101,6 @@ export function useChannelEffects(
     ]).catch(error => {
       // Silent error handling
     })
-     
   }, [selectedChannel?.id])
 
   // Realtime 訂閱：當前頻道的訊息變更時即時更新
@@ -127,7 +125,7 @@ export function useChannelEffects(
           table: 'messages',
           filter: `channel_id=eq.${selectedChannel.id}`,
         },
-        (payload) => {
+        payload => {
           logger.log(COMP_WORKSPACE_LABELS.Workspace_Realtime_訊息更新, payload.eventType)
           // 重新載入訊息
           loadMessages(selectedChannel.id)
@@ -143,6 +141,5 @@ export function useChannelEffects(
         channelSubscriptionRef.current = null
       }
     }
-     
   }, [selectedChannel?.id])
 }

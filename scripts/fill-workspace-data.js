@@ -6,7 +6,8 @@
 const { createClient } = require('@supabase/supabase-js')
 
 const supabaseUrl = 'https://pfqvdacxowpgfamuvnsn.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE' // service_role key
+const supabaseKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcXZkYWN4b3dwZ2ZhbXV2bnNuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTEwODMyMCwiZXhwIjoyMDc0Njg0MzIwfQ.kbJbdYHtOWudBGzV3Jv5OWzWQQZT4aBFFgfUczaVdIE' // service_role key
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
@@ -63,7 +64,9 @@ async function fillWorkspaceId() {
       return
     }
 
-    console.log(`✅ 成功將 ${nullEmployees.length} 位員工設定為 workspace: ${defaultWorkspace.name} (${defaultWorkspace.id})`)
+    console.log(
+      `✅ 成功將 ${nullEmployees.length} 位員工設定為 workspace: ${defaultWorkspace.name} (${defaultWorkspace.id})`
+    )
 
     // 4. 驗證結果
     const { data: verifyNull, error: verifyError } = await supabase
@@ -76,7 +79,6 @@ async function fillWorkspaceId() {
     } else {
       console.log(`🔍 驗證：剩餘 ${verifyNull?.length || 0} 位員工的 workspace_id 是 NULL`)
     }
-
   } catch (error) {
     console.error('❌ 執行失敗:', error)
   }

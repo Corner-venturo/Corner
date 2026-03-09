@@ -1,6 +1,6 @@
 /**
  * 地區型別定義
- * 
+ *
  * ⚠️ Store 邏輯已遷移到 @/data (useCountries, useCities, useRegions)
  * 此檔案僅保留型別定義供既有 import 使用
  */

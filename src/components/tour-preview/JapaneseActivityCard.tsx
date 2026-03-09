@@ -63,7 +63,7 @@ export function JapaneseActivityCard({
         <div
           className="absolute inset-0 opacity-20 pointer-events-none"
           style={{
-            backgroundImage: "url('https://www.transparenttextures.com/patterns/cream-paper.png')"
+            backgroundImage: "url('https://www.transparenttextures.com/patterns/cream-paper.png')",
           }}
         />
 
@@ -73,7 +73,7 @@ export function JapaneseActivityCard({
             className="text-lg sm:text-2xl md:text-3xl font-bold tracking-wide sm:tracking-widest mb-3 sm:mb-5 relative pl-3 sm:pl-4"
             style={{
               color: '#5D4037',
-              fontFamily: '"Zen Old Mincho", serif'
+              fontFamily: '"Zen Old Mincho", serif',
             }}
           >
             {/* 左邊框裝飾 */}

@@ -1,7 +1,19 @@
 'use client'
 
 import { forwardRef } from 'react'
-import { Receipt, DollarSign, Wallet, CheckSquare, Paperclip, Luggage, Plane, ListTodo, Ticket, Calendar, type LucideIcon } from 'lucide-react'
+import {
+  Receipt,
+  DollarSign,
+  Wallet,
+  CheckSquare,
+  Paperclip,
+  Luggage,
+  Plane,
+  ListTodo,
+  Ticket,
+  Calendar,
+  type LucideIcon,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { COMP_WORKSPACE_LABELS } from '../constants/labels'
 
@@ -125,20 +137,28 @@ export const createQuickActions = (handlers: {
     color: 'text-morandi-secondary',
     action: handlers.onUploadFile,
   },
-  ...(handlers.onTicketStatus ? [{
-    id: 'ticket-status',
-    icon: Plane,
-    label: COMP_WORKSPACE_LABELS.開票狀態,
-    color: 'text-morandi-gold',
-    action: handlers.onTicketStatus,
-  }] : []),
-  ...(handlers.onBaggageInfo ? [{
-    id: 'baggage-info',
-    icon: Luggage,
-    label: COMP_WORKSPACE_LABELS.行李資訊,
-    color: 'text-morandi-secondary',
-    action: handlers.onBaggageInfo,
-  }] : []),
+  ...(handlers.onTicketStatus
+    ? [
+        {
+          id: 'ticket-status',
+          icon: Plane,
+          label: COMP_WORKSPACE_LABELS.開票狀態,
+          color: 'text-morandi-gold',
+          action: handlers.onTicketStatus,
+        },
+      ]
+    : []),
+  ...(handlers.onBaggageInfo
+    ? [
+        {
+          id: 'baggage-info',
+          icon: Luggage,
+          label: COMP_WORKSPACE_LABELS.行李資訊,
+          color: 'text-morandi-secondary',
+          action: handlers.onBaggageInfo,
+        },
+      ]
+    : []),
 ]
 
 /**

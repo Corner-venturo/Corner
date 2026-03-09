@@ -24,10 +24,10 @@ interface TourCardProps {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  '開團': { label: '開團', color: 'text-amber-700', bg: 'bg-amber-100' },
-  '待出發': { label: '待出發', color: 'text-green-700', bg: 'bg-green-100' },
-  '已結團': { label: '已結團', color: 'text-morandi-secondary', bg: 'bg-morandi-container' },
-  '取消': { label: '取消', color: 'text-red-700', bg: 'bg-red-100' },
+  開團: { label: '開團', color: 'text-amber-700', bg: 'bg-amber-100' },
+  待出發: { label: '待出發', color: 'text-green-700', bg: 'bg-green-100' },
+  已結團: { label: '已結團', color: 'text-morandi-secondary', bg: 'bg-morandi-container' },
+  取消: { label: '取消', color: 'text-red-700', bg: 'bg-red-100' },
 }
 
 export function TourCard({ tour, showActions = true, children, className }: TourCardProps) {
@@ -47,10 +47,7 @@ export function TourCard({ tour, showActions = true, children, className }: Tour
 
   return (
     <div
-      className={cn(
-        'bg-card rounded-xl border border-border shadow-sm overflow-hidden',
-        className
-      )}
+      className={cn('bg-card rounded-xl border border-border shadow-sm overflow-hidden', className)}
     >
       {/* 主要內容 */}
       <Link href={`/m/tours/${tour.id}`} className="block p-4">

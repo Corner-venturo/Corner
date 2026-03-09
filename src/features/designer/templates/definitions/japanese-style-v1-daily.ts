@@ -46,7 +46,20 @@ function formatDate(dateStr: string): { month: string; day: string; weekday: str
 
   try {
     const date = new Date(dateStr)
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ]
     const weekdays = ['Sun.', 'Mon.', 'Tue.', 'Wed.', 'Thu.', 'Fri.', 'Sat.']
 
     return {
@@ -507,7 +520,11 @@ export const japaneseStyleV1Daily: PageTemplate = {
 
     // 餐食資訊
     const meals = dayDetail.meals || {}
-    const mealTypes: Array<{ type: 'breakfast' | 'lunch' | 'dinner'; label: string; content: string }> = [
+    const mealTypes: Array<{
+      type: 'breakfast' | 'lunch' | 'dinner'
+      label: string
+      content: string
+    }> = [
       { type: 'breakfast', label: '早', content: meals.breakfast || '' },
       { type: 'lunch', label: '午', content: meals.lunch || '' },
       { type: 'dinner', label: '晚', content: meals.dinner || '' },

@@ -3,7 +3,13 @@ import React from 'react'
 import { TourFormData, CityOption, CoverStyleType } from '../../types'
 import { Combobox } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
 import { Button } from '@/components/ui/button'
@@ -54,7 +60,9 @@ export function CoverInfoForm({
     <div className="space-y-4">
       {/* 主題風格選擇器 */}
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-2">{COMP_EDITOR_LABELS.LABEL_1339}</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-2">
+          {COMP_EDITOR_LABELS.LABEL_1339}
+        </label>
         {templatesLoading ? (
           <div className="flex items-center justify-center py-4">
             <Loader2 className="w-5 h-5 animate-spin text-morandi-gold" />
@@ -62,13 +70,13 @@ export function CoverInfoForm({
         ) : (
           <Select
             value={data.coverStyle || 'original'}
-            onValueChange={(value) => onCoverStyleChange(value as CoverStyleType)}
+            onValueChange={value => onCoverStyleChange(value as CoverStyleType)}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder={COMP_EDITOR_LABELS.選擇主題風格} />
             </SelectTrigger>
             <SelectContent>
-              {coverStyleOptions.map((option) => (
+              {coverStyleOptions.map(option => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
@@ -83,7 +91,9 @@ export function CoverInfoForm({
         <div>
           <label className="block text-sm font-medium text-morandi-primary mb-1">
             {COMP_EDITOR_LABELS.LABEL_1694}
-            <span className="ml-2 text-xs text-morandi-secondary font-normal">{COMP_EDITOR_LABELS.LABEL_4233}</span>
+            <span className="ml-2 text-xs text-morandi-secondary font-normal">
+              {COMP_EDITOR_LABELS.LABEL_4233}
+            </span>
           </label>
           <RichTextInput
             value={data.tagline || ''}
@@ -94,7 +104,9 @@ export function CoverInfoForm({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_147}</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              {COMP_EDITOR_LABELS.LABEL_147}
+            </label>
             <RichTextInput
               value={data.title || ''}
               onChange={value => updateField('title', value)}
@@ -102,22 +114,24 @@ export function CoverInfoForm({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.副標題}</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              {COMP_EDITOR_LABELS.副標題}
+            </label>
             <RichTextInput
               value={data.subtitle || ''}
               onChange={value => updateField('subtitle', value)}
               placeholder={data.coverStyle === 'art' ? 'Odyssey' : COMP_EDITOR_LABELS.半自由行}
             />
             {data.coverStyle === 'art' && !data.subtitle && (
-              <p className="text-xs text-morandi-secondary mt-1">
-                {COMP_EDITOR_LABELS.LABEL_463}
-              </p>
+              <p className="text-xs text-morandi-secondary mt-1">{COMP_EDITOR_LABELS.LABEL_463}</p>
             )}
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_3951}</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">
+            {COMP_EDITOR_LABELS.LABEL_3951}
+          </label>
           <RichTextInput
             value={data.description || ''}
             onChange={value => updateField('description', value)}
@@ -128,7 +142,9 @@ export function CoverInfoForm({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5040}</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              {COMP_EDITOR_LABELS.LABEL_5040}
+            </label>
             <Combobox
               value={selectedCountry}
               onChange={newCountry => {
@@ -148,7 +164,9 @@ export function CoverInfoForm({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_5461}</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              {COMP_EDITOR_LABELS.LABEL_5461}
+            </label>
             <Combobox
               value={data.city || ''}
               onChange={value => updateCity(value)}
@@ -163,7 +181,9 @@ export function CoverInfoForm({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_4513}</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              {COMP_EDITOR_LABELS.LABEL_4513}
+            </label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -180,20 +200,30 @@ export function CoverInfoForm({
               <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
                   mode="single"
-                  selected={data.departureDate ? new Date(data.departureDate.replace(/\//g, '-')) : undefined}
-                  onSelect={(date) => {
+                  selected={
+                    data.departureDate
+                      ? new Date(data.departureDate.replace(/\//g, '-'))
+                      : undefined
+                  }
+                  onSelect={date => {
                     if (date && date instanceof Date) {
                       const formatted = `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`
                       updateField('departureDate', formatted)
                     }
                   }}
-                  defaultMonth={data.departureDate ? new Date(data.departureDate.replace(/\//g, '-')) : new Date()}
+                  defaultMonth={
+                    data.departureDate
+                      ? new Date(data.departureDate.replace(/\//g, '-'))
+                      : new Date()
+                  }
                 />
               </PopoverContent>
             </Popover>
           </div>
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_1470}</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              {COMP_EDITOR_LABELS.LABEL_1470}
+            </label>
             <Input
               type="text"
               value={data.tourCode || ''}
@@ -206,7 +236,9 @@ export function CoverInfoForm({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.價格}</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              {COMP_EDITOR_LABELS.價格}
+            </label>
             <Input
               type="text"
               value={data.price || ''}
@@ -221,8 +253,13 @@ export function CoverInfoForm({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_EDITOR_LABELS.LABEL_9062}</label>
-            <Select value={data.priceNote || COMP_EDITOR_LABELS.人} onValueChange={(value) => updateField('priceNote', value)}>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              {COMP_EDITOR_LABELS.LABEL_9062}
+            </label>
+            <Select
+              value={data.priceNote || COMP_EDITOR_LABELS.人}
+              onValueChange={value => updateField('priceNote', value)}
+            >
               <SelectTrigger className="h-9">
                 <SelectValue placeholder={COMP_EDITOR_LABELS.選擇單位} />
               </SelectTrigger>

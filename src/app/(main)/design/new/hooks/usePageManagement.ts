@@ -7,7 +7,10 @@ import { useCallback, useMemo } from 'react'
 import type { CanvasPage } from '@/features/designer/components/types'
 import type { StyleSeries, TemplateData } from '@/features/designer/templates/engine'
 import { generatePageFromTemplate } from '@/features/designer/templates/engine'
-import { getMemoSettingsByCountry, getCountryCodeFromName } from '@/features/designer/templates/definitions/country-presets'
+import {
+  getMemoSettingsByCountry,
+  getCountryCodeFromName,
+} from '@/features/designer/templates/definitions/country-presets'
 import type { MemoItem, MemoSettings } from '@/features/designer/templates/definitions/types'
 import type { MemoPageContent } from '@/features/designer/components/PageListSidebar'
 
@@ -88,69 +91,101 @@ export function usePageManagement({
     return dailyCount
   }, [generatedPages, currentPageIndex])
 
-  const handleSelectPage = useCallback(async (index: number) => {
-    if (index < 0 || index >= generatedPages.length) return
-    if (index === currentPageIndex) return
+  const handleSelectPage = useCallback(
+    async (index: number) => {
+      if (index < 0 || index >= generatedPages.length) return
+      if (index === currentPageIndex) return
 
-    saveCurrentPageHistory()
+      saveCurrentPageHistory()
 
-    const currentCanvasData = exportCanvasData() as Record<string, unknown>
-    const updatedPages = generatedPages.map((page, i) => {
-      if (i === currentPageIndex) {
-        return { ...page, fabricData: currentCanvasData }
+      const currentCanvasData = exportCanvasData() as Record<string, unknown>
+      const updatedPages = generatedPages.map((page, i) => {
+        if (i === currentPageIndex) {
+          return { ...page, fabricData: currentCanvasData }
+        }
+        return page
+      })
+      setGeneratedPages(updatedPages as CanvasPage[])
+
+      setCurrentPageIndex(index)
+      const targetPage = updatedPages[index] as CanvasPage & {
+        fabricData?: Record<string, unknown>
       }
-      return page
-    })
-    setGeneratedPages(updatedPages as CanvasPage[])
 
-    setCurrentPageIndex(index)
-    const targetPage = updatedPages[index] as CanvasPage & { fabricData?: Record<string, unknown> }
+      const hasValidFabricData =
+        targetPage?.fabricData &&
+        typeof targetPage.fabricData === 'object' &&
+        Array.isArray((targetPage.fabricData as { objects?: unknown[] }).objects)
 
-    const hasValidFabricData = targetPage?.fabricData &&
-      typeof targetPage.fabricData === 'object' &&
-      Array.isArray((targetPage.fabricData as { objects?: unknown[] }).objects)
-
-    if (hasValidFabricData && targetPage.fabricData) {
-      await loadCanvasData(targetPage.fabricData)
-      loadPageHistory(targetPage.id)
-    } else if (targetPage) {
-      await loadCanvasPage(targetPage)
-      initPageHistory(targetPage.id)
-    }
-  }, [generatedPages, currentPageIndex, exportCanvasData, loadCanvasData, loadCanvasPage, saveCurrentPageHistory, loadPageHistory, initPageHistory, setGeneratedPages, setCurrentPageIndex])
-
-  const handleAddPage = useCallback(async (templateKey: string) => {
-    saveCurrentPageHistory()
-
-    let newPage: CanvasPage
-
-    if (templateKey === 'blank') {
-      newPage = {
-        id: `blank-${crypto.randomUUID()}`,
-        name: '空白頁',
-        templateKey: 'blank',
-        width: canvasWidth,
-        height: canvasHeight,
-        backgroundColor: '#ffffff',
-        elements: [],
+      if (hasValidFabricData && targetPage.fabricData) {
+        await loadCanvasData(targetPage.fabricData)
+        loadPageHistory(targetPage.id)
+      } else if (targetPage) {
+        await loadCanvasPage(targetPage)
+        initPageHistory(targetPage.id)
       }
-    } else {
-      if (!selectedStyle || !templateData) return
+    },
+    [
+      generatedPages,
+      currentPageIndex,
+      exportCanvasData,
+      loadCanvasData,
+      loadCanvasPage,
+      saveCurrentPageHistory,
+      loadPageHistory,
+      initPageHistory,
+      setGeneratedPages,
+      setCurrentPageIndex,
+    ]
+  )
 
-      const templateId = selectedStyle.templates[templateKey as keyof typeof selectedStyle.templates]
-      if (!templateId) return
+  const handleAddPage = useCallback(
+    async (templateKey: string) => {
+      saveCurrentPageHistory()
 
-      newPage = generatePageFromTemplate(templateId, templateData as TemplateData)
-    }
+      let newPage: CanvasPage
 
-    setGeneratedPages(prev => [...prev, newPage])
+      if (templateKey === 'blank') {
+        newPage = {
+          id: `blank-${crypto.randomUUID()}`,
+          name: '空白頁',
+          templateKey: 'blank',
+          width: canvasWidth,
+          height: canvasHeight,
+          backgroundColor: '#ffffff',
+          elements: [],
+        }
+      } else {
+        if (!selectedStyle || !templateData) return
 
-    const newIndex = generatedPages.length
-    setCurrentPageIndex(newIndex)
-    await loadCanvasPage(newPage)
+        const templateId =
+          selectedStyle.templates[templateKey as keyof typeof selectedStyle.templates]
+        if (!templateId) return
 
-    initPageHistory(newPage.id)
-  }, [selectedStyle, templateData, generatedPages.length, loadCanvasPage, saveCurrentPageHistory, initPageHistory, canvasWidth, canvasHeight, setGeneratedPages, setCurrentPageIndex])
+        newPage = generatePageFromTemplate(templateId, templateData as TemplateData)
+      }
+
+      setGeneratedPages(prev => [...prev, newPage])
+
+      const newIndex = generatedPages.length
+      setCurrentPageIndex(newIndex)
+      await loadCanvasPage(newPage)
+
+      initPageHistory(newPage.id)
+    },
+    [
+      selectedStyle,
+      templateData,
+      generatedPages.length,
+      loadCanvasPage,
+      saveCurrentPageHistory,
+      initPageHistory,
+      canvasWidth,
+      canvasHeight,
+      setGeneratedPages,
+      setCurrentPageIndex,
+    ]
+  )
 
   const handleAddDailyPages = useCallback(async () => {
     if (!selectedStyle || !templateData) return
@@ -167,7 +202,9 @@ export function usePageManagement({
     const newPages: (CanvasPage & { dayIndex: number })[] = []
     for (let dayIndex = 0; dayIndex < totalDays; dayIndex++) {
       const dataWithDay = { ...data, currentDayIndex: dayIndex }
-      const newPage = generatePageFromTemplate(templateId, dataWithDay) as CanvasPage & { dayIndex: number }
+      const newPage = generatePageFromTemplate(templateId, dataWithDay) as CanvasPage & {
+        dayIndex: number
+      }
       newPage.name = `第 ${dayIndex + 1} 天行程`
       newPage.dayIndex = dayIndex
       newPages.push(newPage)
@@ -181,147 +218,190 @@ export function usePageManagement({
       await loadCanvasPage(newPages[0])
       initPageHistory(newPages[0].id)
     }
-  }, [selectedStyle, templateData, generatedPages.length, loadCanvasPage, saveCurrentPageHistory, initPageHistory, setGeneratedPages, setCurrentPageIndex])
+  }, [
+    selectedStyle,
+    templateData,
+    generatedPages.length,
+    loadCanvasPage,
+    saveCurrentPageHistory,
+    initPageHistory,
+    setGeneratedPages,
+    setCurrentPageIndex,
+  ])
 
-  const handleAddMemoPage = useCallback(async (content: MemoPageContent) => {
-    if (!selectedStyle || !memoSettings) return
+  const handleAddMemoPage = useCallback(
+    async (content: MemoPageContent) => {
+      if (!selectedStyle || !memoSettings) return
 
-    const templateId = selectedStyle.templates.memo
-    if (!templateId) return
+      const templateId = selectedStyle.templates.memo
+      if (!templateId) return
 
-    saveCurrentPageHistory()
-
-    const existingMemoPages = generatedPages.filter((p) => p.templateKey === 'memo')
-    const memoPageIndex = existingMemoPages.length
-
-    const memoTemplateData: TemplateData = {
-      ...templateData as TemplateData,
-      memoSettings,
-      currentMemoPageIndex: memoPageIndex,
-      memoPageContent: content,
-    } as TemplateData & { memoPageContent: MemoPageContent }
-
-    const newPage = generatePageFromTemplate(templateId, memoTemplateData)
-    newPage.name = content.isWeatherPage ? '天氣/緊急資訊' : `旅遊提醒 ${memoPageIndex + 1}`
-
-    const pageWithMemo = newPage as CanvasPage & { memoPageContent?: MemoPageContent }
-    pageWithMemo.memoPageContent = content
-
-    setGeneratedPages((prev) => [...prev, pageWithMemo as CanvasPage])
-
-    const newIndex = generatedPages.length
-    setCurrentPageIndex(newIndex)
-    await loadCanvasPage(newPage)
-
-    initPageHistory(newPage.id)
-  }, [selectedStyle, memoSettings, templateData, generatedPages, loadCanvasPage, saveCurrentPageHistory, initPageHistory, setGeneratedPages, setCurrentPageIndex])
-
-  const handleDeletePage = useCallback((index: number) => {
-    if (index <= 0 || index >= generatedPages.length) return
-
-    setGeneratedPages(prev => prev.filter((_, i) => i !== index))
-
-    if (currentPageIndex >= index) {
-      const newIndex = Math.max(0, currentPageIndex - 1)
-      setCurrentPageIndex(newIndex)
-      const page = generatedPages[newIndex === index ? newIndex - 1 : newIndex]
-      if (page) {
-        loadCanvasPage(page)
-      }
-    }
-  }, [generatedPages, currentPageIndex, loadCanvasPage, setGeneratedPages, setCurrentPageIndex])
-
-  const handleDuplicatePage = useCallback(async (index: number) => {
-    if (index < 0 || index >= generatedPages.length) return
-
-    const pageToDuplicate = generatedPages[index]
-
-    let fabricDataToCopy: Record<string, unknown> | undefined
-    if (index === currentPageIndex) {
       saveCurrentPageHistory()
-      fabricDataToCopy = exportCanvasData() as Record<string, unknown>
-    } else {
-      fabricDataToCopy = (pageToDuplicate as { fabricData?: Record<string, unknown> }).fabricData
-    }
 
-    let sourceDayIndex: number | undefined
-    const pageWithDayIndex = pageToDuplicate as CanvasPage & { dayIndex?: number }
-    if (pageToDuplicate.templateKey === 'daily') {
-      if (typeof pageWithDayIndex.dayIndex === 'number') {
-        sourceDayIndex = pageWithDayIndex.dayIndex
+      const existingMemoPages = generatedPages.filter(p => p.templateKey === 'memo')
+      const memoPageIndex = existingMemoPages.length
+
+      const memoTemplateData: TemplateData = {
+        ...(templateData as TemplateData),
+        memoSettings,
+        currentMemoPageIndex: memoPageIndex,
+        memoPageContent: content,
+      } as TemplateData & { memoPageContent: MemoPageContent }
+
+      const newPage = generatePageFromTemplate(templateId, memoTemplateData)
+      newPage.name = content.isWeatherPage ? '天氣/緊急資訊' : `旅遊提醒 ${memoPageIndex + 1}`
+
+      const pageWithMemo = newPage as CanvasPage & { memoPageContent?: MemoPageContent }
+      pageWithMemo.memoPageContent = content
+
+      setGeneratedPages(prev => [...prev, pageWithMemo as CanvasPage])
+
+      const newIndex = generatedPages.length
+      setCurrentPageIndex(newIndex)
+      await loadCanvasPage(newPage)
+
+      initPageHistory(newPage.id)
+    },
+    [
+      selectedStyle,
+      memoSettings,
+      templateData,
+      generatedPages,
+      loadCanvasPage,
+      saveCurrentPageHistory,
+      initPageHistory,
+      setGeneratedPages,
+      setCurrentPageIndex,
+    ]
+  )
+
+  const handleDeletePage = useCallback(
+    (index: number) => {
+      if (index <= 0 || index >= generatedPages.length) return
+
+      setGeneratedPages(prev => prev.filter((_, i) => i !== index))
+
+      if (currentPageIndex >= index) {
+        const newIndex = Math.max(0, currentPageIndex - 1)
+        setCurrentPageIndex(newIndex)
+        const page = generatedPages[newIndex === index ? newIndex - 1 : newIndex]
+        if (page) {
+          loadCanvasPage(page)
+        }
+      }
+    },
+    [generatedPages, currentPageIndex, loadCanvasPage, setGeneratedPages, setCurrentPageIndex]
+  )
+
+  const handleDuplicatePage = useCallback(
+    async (index: number) => {
+      if (index < 0 || index >= generatedPages.length) return
+
+      const pageToDuplicate = generatedPages[index]
+
+      let fabricDataToCopy: Record<string, unknown> | undefined
+      if (index === currentPageIndex) {
+        saveCurrentPageHistory()
+        fabricDataToCopy = exportCanvasData() as Record<string, unknown>
       } else {
+        fabricDataToCopy = (pageToDuplicate as { fabricData?: Record<string, unknown> }).fabricData
+      }
+
+      let sourceDayIndex: number | undefined
+      const pageWithDayIndex = pageToDuplicate as CanvasPage & { dayIndex?: number }
+      if (pageToDuplicate.templateKey === 'daily') {
+        if (typeof pageWithDayIndex.dayIndex === 'number') {
+          sourceDayIndex = pageWithDayIndex.dayIndex
+        } else {
+          let dailyCount = 0
+          for (let i = 0; i < index; i++) {
+            if (generatedPages[i]?.templateKey === 'daily') {
+              dailyCount++
+            }
+          }
+          sourceDayIndex = dailyCount
+        }
+      }
+
+      const duplicatedPage: CanvasPage = {
+        ...pageToDuplicate,
+        id: `${pageToDuplicate.templateKey || 'page'}-${crypto.randomUUID()}`,
+        name: `${pageToDuplicate.name} (複製)`,
+        elements: [...pageToDuplicate.elements],
+      }
+
+      if (pageToDuplicate.templateKey === 'daily' && typeof sourceDayIndex === 'number') {
+        ;(duplicatedPage as CanvasPage & { dayIndex?: number }).dayIndex = sourceDayIndex
+      }
+
+      if (fabricDataToCopy) {
+        ;(duplicatedPage as { fabricData?: Record<string, unknown> }).fabricData = JSON.parse(
+          JSON.stringify(fabricDataToCopy)
+        )
+      }
+
+      setGeneratedPages(prev => {
         let dailyCount = 0
-        for (let i = 0; i < index; i++) {
-          if (generatedPages[i]?.templateKey === 'daily') {
+        const pagesWithFixedDayIndex = prev.map(page => {
+          if (page.templateKey === 'daily') {
+            const p = page as CanvasPage & { dayIndex?: number }
+            if (typeof p.dayIndex !== 'number') {
+              return { ...page, dayIndex: dailyCount++ }
+            }
             dailyCount++
           }
-        }
-        sourceDayIndex = dailyCount
-      }
-    }
+          return page
+        })
 
-    const duplicatedPage: CanvasPage = {
-      ...pageToDuplicate,
-      id: `${pageToDuplicate.templateKey || 'page'}-${crypto.randomUUID()}`,
-      name: `${pageToDuplicate.name} (複製)`,
-      elements: [...pageToDuplicate.elements],
-    }
-
-    if (pageToDuplicate.templateKey === 'daily' && typeof sourceDayIndex === 'number') {
-      (duplicatedPage as CanvasPage & { dayIndex?: number }).dayIndex = sourceDayIndex
-    }
-
-    if (fabricDataToCopy) {
-      (duplicatedPage as { fabricData?: Record<string, unknown> }).fabricData = JSON.parse(JSON.stringify(fabricDataToCopy))
-    }
-
-    setGeneratedPages(prev => {
-      let dailyCount = 0
-      const pagesWithFixedDayIndex = prev.map((page) => {
-        if (page.templateKey === 'daily') {
-          const p = page as CanvasPage & { dayIndex?: number }
-          if (typeof p.dayIndex !== 'number') {
-            return { ...page, dayIndex: dailyCount++ }
-          }
-          dailyCount++
-        }
-        return page
+        const newPages = [...pagesWithFixedDayIndex]
+        newPages.splice(index + 1, 0, duplicatedPage)
+        return newPages
       })
-      
-      const newPages = [...pagesWithFixedDayIndex]
-      newPages.splice(index + 1, 0, duplicatedPage)
-      return newPages
-    })
 
-    const newIndex = index + 1
-    setCurrentPageIndex(newIndex)
-    if (fabricDataToCopy) {
-      await loadCanvasData(fabricDataToCopy)
-    } else {
-      await loadCanvasPage(duplicatedPage)
-    }
+      const newIndex = index + 1
+      setCurrentPageIndex(newIndex)
+      if (fabricDataToCopy) {
+        await loadCanvasData(fabricDataToCopy)
+      } else {
+        await loadCanvasPage(duplicatedPage)
+      }
 
-    initPageHistory(duplicatedPage.id)
-  }, [generatedPages, currentPageIndex, exportCanvasData, loadCanvasData, loadCanvasPage, saveCurrentPageHistory, initPageHistory, setGeneratedPages, setCurrentPageIndex])
+      initPageHistory(duplicatedPage.id)
+    },
+    [
+      generatedPages,
+      currentPageIndex,
+      exportCanvasData,
+      loadCanvasData,
+      loadCanvasPage,
+      saveCurrentPageHistory,
+      initPageHistory,
+      setGeneratedPages,
+      setCurrentPageIndex,
+    ]
+  )
 
-  const handleReorderPages = useCallback((fromIndex: number, toIndex: number) => {
-    if (fromIndex <= 0 || toIndex <= 0) return
+  const handleReorderPages = useCallback(
+    (fromIndex: number, toIndex: number) => {
+      if (fromIndex <= 0 || toIndex <= 0) return
 
-    setGeneratedPages(prev => {
-      const newPages = [...prev]
-      const [removed] = newPages.splice(fromIndex, 1)
-      newPages.splice(toIndex, 0, removed)
-      return newPages
-    })
+      setGeneratedPages(prev => {
+        const newPages = [...prev]
+        const [removed] = newPages.splice(fromIndex, 1)
+        newPages.splice(toIndex, 0, removed)
+        return newPages
+      })
 
-    if (currentPageIndex === fromIndex) {
-      setCurrentPageIndex(toIndex)
-    } else if (fromIndex < currentPageIndex && toIndex >= currentPageIndex) {
-      setCurrentPageIndex(currentPageIndex - 1)
-    } else if (fromIndex > currentPageIndex && toIndex <= currentPageIndex) {
-      setCurrentPageIndex(currentPageIndex + 1)
-    }
-  }, [currentPageIndex, setGeneratedPages, setCurrentPageIndex])
+      if (currentPageIndex === fromIndex) {
+        setCurrentPageIndex(toIndex)
+      } else if (fromIndex < currentPageIndex && toIndex >= currentPageIndex) {
+        setCurrentPageIndex(currentPageIndex - 1)
+      } else if (fromIndex > currentPageIndex && toIndex <= currentPageIndex) {
+        setCurrentPageIndex(currentPageIndex + 1)
+      }
+    },
+    [currentPageIndex, setGeneratedPages, setCurrentPageIndex]
+  )
 
   return {
     memoSettings,

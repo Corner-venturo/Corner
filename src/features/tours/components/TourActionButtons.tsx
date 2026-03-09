@@ -70,13 +70,13 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                onClick={(e) => e.stopPropagation()}
+                onClick={e => e.stopPropagation()}
                 className="p-1 rounded hover:bg-morandi-container/50 transition-colors"
               >
                 <MoreVertical size={16} className="text-morandi-secondary" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+            <DropdownMenuContent align="end" onClick={e => e.stopPropagation()}>
               {canEdit && (
                 <DropdownMenuItem onClick={() => onProposalArchive?.(proposal)}>
                   <Archive size={14} className="mr-2" />
@@ -104,13 +104,13 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              onClick={(e) => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
               className="p-1 rounded hover:bg-morandi-container/50 transition-colors"
             >
               <MoreVertical size={16} className="text-morandi-secondary" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+          <DropdownMenuContent align="end" onClick={e => e.stopPropagation()}>
             <DropdownMenuItem onClick={() => onEditTour(tour)}>
               <Edit size={14} className="mr-2" />
               {TOURS_LABELS.EDIT}
@@ -149,7 +149,14 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
         </DropdownMenu>
       )
     },
-    [operations, onEditTour, setDeleteConfirm, onOpenArchiveDialog, onProposalArchive, onProposalDelete]
+    [
+      operations,
+      onEditTour,
+      setDeleteConfirm,
+      onOpenArchiveDialog,
+      onProposalArchive,
+      onProposalDelete,
+    ]
   )
 
   return {

@@ -22,7 +22,7 @@ async function checkIsAdmin(employeeId: string): Promise<boolean> {
   if (error || !data) return false
 
   const roles = data.roles as string[] | null
-  return roles?.some((r) => r === 'admin' || r === 'super_admin') ?? false
+  return roles?.some(r => r === 'admin' || r === 'super_admin') ?? false
 }
 
 /**
@@ -62,17 +62,16 @@ export async function POST(request: NextRequest) {
       return errorResponse('查詢使用者失敗', 500, ErrorCode.DATABASE_ERROR)
     }
 
-    const user = users.users.find((u) => u.email === email)
+    const user = users.users.find(u => u.email === email)
 
     if (!user) {
       return errorResponse('找不到此電子郵件的使用者', 404, ErrorCode.NOT_FOUND)
     }
 
     // 使用 admin API 更新密碼
-    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-      user.id,
-      { password: new_password }
-    )
+    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(user.id, {
+      password: new_password,
+    })
 
     if (updateError) {
       logger.error('Update password error:', updateError)

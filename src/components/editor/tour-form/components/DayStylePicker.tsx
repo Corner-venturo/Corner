@@ -15,11 +15,36 @@ interface DayStylePickerProps {
   departureDate?: string
 }
 
-const styleOptions: { value: DayDisplayStyle; icon: React.ReactNode; label: string; color: string }[] = [
-  { value: 'single-image', icon: <Image size={16} />, label: COMP_EDITOR_LABELS.單張大圖, color: '#c76d54' },
-  { value: 'multi-image', icon: <Images size={16} />, label: COMP_EDITOR_LABELS.多圖輪播, color: '#8da399' },
-  { value: 'card-grid', icon: <LayoutGrid size={16} />, label: COMP_EDITOR_LABELS.卡片網格, color: '#B8A99A' },
-  { value: 'timeline', icon: <GitBranch size={16} />, label: COMP_EDITOR_LABELS.時間軸, color: '#4a6fa5' },
+const styleOptions: {
+  value: DayDisplayStyle
+  icon: React.ReactNode
+  label: string
+  color: string
+}[] = [
+  {
+    value: 'single-image',
+    icon: <Image size={16} />,
+    label: COMP_EDITOR_LABELS.單張大圖,
+    color: '#c76d54',
+  },
+  {
+    value: 'multi-image',
+    icon: <Images size={16} />,
+    label: COMP_EDITOR_LABELS.多圖輪播,
+    color: '#8da399',
+  },
+  {
+    value: 'card-grid',
+    icon: <LayoutGrid size={16} />,
+    label: COMP_EDITOR_LABELS.卡片網格,
+    color: '#B8A99A',
+  },
+  {
+    value: 'timeline',
+    icon: <GitBranch size={16} />,
+    label: COMP_EDITOR_LABELS.時間軸,
+    color: '#4a6fa5',
+  },
 ]
 
 export function DayStylePicker({
@@ -53,9 +78,7 @@ export function DayStylePicker({
               type="button"
               onClick={() => handleStyleClick(option.value)}
               className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-xs transition-all ${
-                currentStyle === option.value
-                  ? 'bg-card shadow-sm'
-                  : 'hover:bg-card/50'
+                currentStyle === option.value ? 'bg-card shadow-sm' : 'hover:bg-card/50'
               }`}
               style={{
                 color: currentStyle === option.value ? option.color : undefined,

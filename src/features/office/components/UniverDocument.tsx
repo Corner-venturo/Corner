@@ -65,11 +65,5 @@ export function UniverDocument({ className }: UniverDocumentProps) {
     }
   }, [])
 
-  return (
-    <div
-      ref={containerRef}
-      className={className}
-      style={{ width: '100%', height: '100%' }}
-    />
-  )
+  return <div ref={containerRef} className={className} style={{ width: '100%', height: '100%' }} />
 }

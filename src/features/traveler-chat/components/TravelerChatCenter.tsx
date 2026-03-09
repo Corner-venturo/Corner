@@ -59,10 +59,7 @@ export function TravelerChatCenter() {
             disabled={isLoadingConversations}
             className="h-8 w-8 p-0"
           >
-            <RefreshCw
-              size={14}
-              className={isLoadingConversations ? 'animate-spin' : ''}
-            />
+            <RefreshCw size={14} className={isLoadingConversations ? 'animate-spin' : ''} />
           </Button>
         </div>
 

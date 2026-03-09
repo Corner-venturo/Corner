@@ -34,14 +34,22 @@ function resolveStyle(
   if (flightStyle && flightStyle !== 'none') {
     if (flightStyle === 'chinese') return 'nature'
     if (flightStyle === 'japanese') return 'nature'
-    if (['original', 'luxury', 'art', 'dreamscape', 'collage', 'nature', 'gemini'].includes(flightStyle)) {
+    if (
+      ['original', 'luxury', 'art', 'dreamscape', 'collage', 'nature', 'gemini'].includes(
+        flightStyle
+      )
+    ) {
       return flightStyle as TourStyle
     }
   }
 
   // 根據 coverStyle 推斷
   if (coverStyle) {
-    if (['original', 'luxury', 'art', 'dreamscape', 'collage', 'nature', 'gemini'].includes(coverStyle)) {
+    if (
+      ['original', 'luxury', 'art', 'dreamscape', 'collage', 'nature', 'gemini'].includes(
+        coverStyle
+      )
+    ) {
       return coverStyle as TourStyle
     }
   }
@@ -49,7 +57,11 @@ function resolveStyle(
   return 'original'
 }
 
-export function TourFlightSectionUnified({ data, viewMode, forceStyle }: TourFlightSectionUnifiedProps) {
+export function TourFlightSectionUnified({
+  data,
+  viewMode,
+  forceStyle,
+}: TourFlightSectionUnifiedProps) {
   const isMobile = viewMode === 'mobile'
 
   // 國內無航班
@@ -112,26 +124,25 @@ export function TourFlightSectionUnified({ data, viewMode, forceStyle }: TourFli
 
   // 區塊背景樣式
   const sectionStyle: React.CSSProperties = {
-    backgroundColor: typeof theme.colors.background === 'string' && theme.colors.background.startsWith('linear')
-      ? undefined
-      : theme.colors.background,
-    background: typeof theme.colors.background === 'string' && theme.colors.background.startsWith('linear')
-      ? theme.colors.background
-      : undefined,
+    backgroundColor:
+      typeof theme.colors.background === 'string' && theme.colors.background.startsWith('linear')
+        ? undefined
+        : theme.colors.background,
+    background:
+      typeof theme.colors.background === 'string' && theme.colors.background.startsWith('linear')
+        ? theme.colors.background
+        : undefined,
   }
 
   // Nature 風格加紙張紋理
   if (style === 'nature') {
-    sectionStyle.backgroundImage = "url('https://www.transparenttextures.com/patterns/cream-paper.png')"
+    sectionStyle.backgroundImage =
+      "url('https://www.transparenttextures.com/patterns/cream-paper.png')"
     sectionStyle.backgroundBlendMode = 'multiply'
   }
 
   return (
-    <section
-      id="flight"
-      className={isMobile ? 'pt-4 pb-8' : 'pt-8 pb-16'}
-      style={sectionStyle}
-    >
+    <section id="flight" className={isMobile ? 'pt-4 pb-8' : 'pt-8 pb-16'} style={sectionStyle}>
       <div className={isMobile ? 'px-4' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'}>
         {/* 標題（部分風格顯示） */}
         {style === 'nature' && (
@@ -146,7 +157,9 @@ export function TourFlightSectionUnified({ data, viewMode, forceStyle }: TourFli
         )}
 
         {/* 航班卡片 */}
-        <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 gap-6'}`}>
+        <div
+          className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 gap-6'}`}
+        >
           {data.outboundFlight && (
             <UnifiedFlightCard
               flight={data.outboundFlight}

@@ -47,7 +47,7 @@ export const TourOverview = React.memo(function TourOverview({
   const router = useRouter()
   const { items: orders } = useOrdersSlim()
   const { channels } = useWorkspaceChannels()
-  
+
   // 健康度資料
   const healthData = useTourHealth(tour.id)
 
@@ -55,7 +55,11 @@ export const TourOverview = React.memo(function TourOverview({
   const existingChannel = channels.find((ch: { tour_id?: string | null }) => ch.tour_id === tour.id)
 
   // Stub actions for channel operations
-  const noopActions: TourStoreActions = { fetchAll: async () => { /* noop */ } }
+  const noopActions: TourStoreActions = {
+    fetchAll: async () => {
+      /* noop */
+    },
+  }
   const { handleCreateChannel } = useTourChannelOperations({ actions: noopActions })
 
   const handleChannelClick = async () => {
@@ -172,13 +176,16 @@ export const TourOverview = React.memo(function TourOverview({
   }
 
   // 健康度項目
-  const healthItems = !healthData.isLoading && !healthData.error ? [
-    { emoji: '📋', label: TOUR_HEALTH_LABELS.需求單狀態, data: healthData.requirements },
-    { emoji: '🛂', label: TOUR_HEALTH_LABELS.護照資料, data: healthData.passports },
-    { emoji: '✈️', label: TOUR_HEALTH_LABELS.機票狀態, data: healthData.tickets },
-    { emoji: '🏨', label: TOUR_HEALTH_LABELS.飯店確認, data: healthData.hotels },
-    { emoji: '👥', label: TOUR_HEALTH_LABELS.團員人數, data: healthData.participants },
-  ] : []
+  const healthItems =
+    !healthData.isLoading && !healthData.error
+      ? [
+          { emoji: '📋', label: TOUR_HEALTH_LABELS.需求單狀態, data: healthData.requirements },
+          { emoji: '🛂', label: TOUR_HEALTH_LABELS.護照資料, data: healthData.passports },
+          { emoji: '✈️', label: TOUR_HEALTH_LABELS.機票狀態, data: healthData.tickets },
+          { emoji: '🏨', label: TOUR_HEALTH_LABELS.飯店確認, data: healthData.hotels },
+          { emoji: '👥', label: TOUR_HEALTH_LABELS.團員人數, data: healthData.participants },
+        ]
+      : []
 
   return (
     <div className="border border-border rounded-lg overflow-hidden bg-card">
@@ -193,9 +200,16 @@ export const TourOverview = React.memo(function TourOverview({
             </div>
             <div className="flex items-center gap-1.5 text-morandi-secondary">
               <Calendar size={14} />
-              <span>{tour.departure_date} ~ {tour.return_date}</span>
+              <span>
+                {tour.departure_date} ~ {tour.return_date}
+              </span>
             </div>
-            <span className={cn('px-2 py-0.5 rounded text-xs font-medium', getStatusBadge(tour.status ?? ''))}>
+            <span
+              className={cn(
+                'px-2 py-0.5 rounded text-xs font-medium',
+                getStatusBadge(tour.status ?? '')
+              )}
+            >
               {tour.status}
             </span>
           </div>
@@ -204,19 +218,27 @@ export const TourOverview = React.memo(function TourOverview({
 
       {/* 動作列 */}
       <div className="px-5 py-2.5 border-b border-border/40 bg-morandi-container/30 flex items-center gap-2 flex-wrap">
-        <Button onClick={onManageQuote} size="sm" className="h-7 text-xs bg-morandi-gold hover:bg-morandi-gold-hover text-white">
-          <Calculator size={12} className="mr-1" />{COMP_TOURS_LABELS.LABEL_4601}
+        <Button
+          onClick={onManageQuote}
+          size="sm"
+          className="h-7 text-xs bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+        >
+          <Calculator size={12} className="mr-1" />
+          {COMP_TOURS_LABELS.LABEL_4601}
         </Button>
         {onManageItinerary && (
           <Button onClick={onManageItinerary} size="sm" variant="outline" className="h-7 text-xs">
-            <FileText size={12} className="mr-1" />{COMP_TOURS_LABELS.行程表}
+            <FileText size={12} className="mr-1" />
+            {COMP_TOURS_LABELS.行程表}
           </Button>
         )}
         <Button size="sm" variant="outline" className="h-7 text-xs" onClick={onOpenContractDialog}>
           {TOUR_OVERVIEW.action_contract}
         </Button>
         <Button size="sm" variant="outline" className="h-7 text-xs" onClick={handleChannelClick}>
-          {existingChannel ? TOUR_OVERVIEW.action_enter_channel : TOUR_OVERVIEW.action_create_channel}
+          {existingChannel
+            ? TOUR_OVERVIEW.action_enter_channel
+            : TOUR_OVERVIEW.action_create_channel}
         </Button>
         <Button onClick={onEdit} size="sm" variant="outline" className="h-7 text-xs">
           {COMP_TOURS_LABELS.EDIT}
@@ -239,9 +261,14 @@ export const TourOverview = React.memo(function TourOverview({
                 <div className="min-w-0">
                   <p className="text-[11px] text-morandi-secondary leading-tight">{card.title}</p>
                   {card.amount !== undefined ? (
-                    <CurrencyCell amount={card.amount} className="text-sm font-semibold text-morandi-primary" />
+                    <CurrencyCell
+                      amount={card.amount}
+                      className="text-sm font-semibold text-morandi-primary"
+                    />
                   ) : (
-                    <p className="text-sm font-semibold text-morandi-primary truncate">{card.value}</p>
+                    <p className="text-sm font-semibold text-morandi-primary truncate">
+                      {card.value}
+                    </p>
                   )}
                 </div>
               </div>
@@ -253,7 +280,9 @@ export const TourOverview = React.memo(function TourOverview({
       {/* 團況健康度 — 兩欄緊湊 */}
       <div className="px-5 py-3">
         {healthData.isLoading ? (
-          <div className="text-center py-2 text-sm text-morandi-secondary">{TOUR_HEALTH_LABELS.載入中}</div>
+          <div className="text-center py-2 text-sm text-morandi-secondary">
+            {TOUR_HEALTH_LABELS.載入中}
+          </div>
         ) : healthData.error ? (
           <div className="text-center py-2 text-sm text-morandi-red">{healthData.error}</div>
         ) : (
@@ -261,8 +290,15 @@ export const TourOverview = React.memo(function TourOverview({
             {healthItems.map((item, index) => (
               <div key={index} className="flex items-center gap-2">
                 <span className="text-sm">{getHealthStatusEmoji(item.data.status)}</span>
-                <span className="text-xs text-morandi-secondary">{item.emoji} {item.label}</span>
-                <span className={cn('text-xs font-medium ml-auto', getHealthStatusColor(item.data.status))}>
+                <span className="text-xs text-morandi-secondary">
+                  {item.emoji} {item.label}
+                </span>
+                <span
+                  className={cn(
+                    'text-xs font-medium ml-auto',
+                    getHealthStatusColor(item.data.status)
+                  )}
+                >
                   {item.data.message}
                 </span>
               </div>

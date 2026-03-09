@@ -1,11 +1,10 @@
 'use client'
 /**
  * PassportSection - 護照圖片編輯區塊
- * 
+ *
  * 2025-06-27: 改用統一的 ImageEditor 元件
  * 2025-06-27: 改用 i18n 多語系
  */
-
 
 import React, { useState } from 'react'
 import { useTranslations } from 'next-intl'
@@ -67,7 +66,7 @@ export function PassportSection({
       // 上傳裁切後的圖片
       const random = Math.random().toString(36).substring(2, 8)
       const fileName = `passport_${Date.now()}_${random}.jpg`
-      
+
       const { error: uploadError } = await supabase.storage
         .from('passport-images')
         .upload(fileName, blob, { upsert: true })
@@ -146,7 +145,8 @@ export function PassportSection({
             style={{ height: '320px' }}
             onClick={() => setIsEditorOpen(true)}
           >
-            <img src={editingMember.passport_image_url}
+            <img
+              src={editingMember.passport_image_url}
               alt={t('passport.image')}
               className="w-full h-full object-contain"
               draggable={false}
@@ -156,7 +156,7 @@ export function PassportSection({
               htmlFor="edit-passport-upload"
               className="absolute bottom-2 right-2 p-2 bg-white/90 hover:bg-white rounded-lg cursor-pointer shadow-sm border"
               title={t('passport.reupload')}
-              onClick={(e) => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
             >
               <Upload size={16} className="text-morandi-gold" />
               <input
@@ -193,9 +193,7 @@ export function PassportSection({
         {/* 驗證模式提示 */}
         {editMode === 'verify' && (
           <div className="bg-status-warning-bg border border-morandi-gold/30 rounded-lg p-3">
-            <p className="text-xs text-morandi-gold">
-              {t('order.verifyMemberNote')}
-            </p>
+            <p className="text-xs text-morandi-gold">{t('order.verifyMemberNote')}</p>
           </div>
         )}
       </div>
@@ -206,10 +204,10 @@ export function PassportSection({
           open={isEditorOpen}
           onClose={() => setIsEditorOpen(false)}
           imageSrc={editingMember.passport_image_url}
-          aspectRatio={3 / 2}  // 護照比例
+          aspectRatio={3 / 2} // 護照比例
           onSave={handleEditorSave}
           onCropAndSave={handleEditorCropAndSave}
-          showAi={false}  // 護照不需要 AI 美化
+          showAi={false} // 護照不需要 AI 美化
         />
       )}
     </>

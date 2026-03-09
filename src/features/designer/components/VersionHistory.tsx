@@ -20,13 +20,7 @@ interface VersionHistoryProps {
 }
 
 export function VersionHistory({ onClose, onPreview }: VersionHistoryProps) {
-  const {
-    versions,
-    currentVersion,
-    fetchVersions,
-    restoreVersion,
-    isLoading,
-  } = useDocumentStore()
+  const { versions, currentVersion, fetchVersions, restoreVersion, isLoading } = useDocumentStore()
 
   const [restoringId, setRestoringId] = useState<string | null>(null)
 
@@ -67,7 +61,7 @@ export function VersionHistory({ onClose, onPreview }: VersionHistoryProps) {
           </div>
         ) : (
           <div className="p-2 space-y-2">
-            {versions.map((version) => {
+            {versions.map(version => {
               const isCurrent = version.id === currentVersion?.id
               const isRestoring = restoringId === version.id
 
@@ -84,7 +78,8 @@ export function VersionHistory({ onClose, onPreview }: VersionHistoryProps) {
                   <div className="flex gap-3">
                     <div className="w-16 h-20 bg-morandi-container rounded overflow-hidden flex-shrink-0">
                       {version.thumbnail_url ? (
-                        <img src={version.thumbnail_url}
+                        <img
+                          src={version.thumbnail_url}
                           alt={`版本 ${version.version_number}`}
                           className="w-full h-full object-cover"
                         />

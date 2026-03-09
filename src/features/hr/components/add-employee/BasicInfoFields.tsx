@@ -16,11 +16,15 @@ interface BasicInfoFieldsProps {
 export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps) {
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-morandi-primary border-b pb-2">{COMP_HR_LABELS.基本資料}</h3>
+      <h3 className="text-lg font-semibold text-morandi-primary border-b pb-2">
+        {COMP_HR_LABELS.基本資料}
+      </h3>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_4383}</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">
+            {COMP_HR_LABELS.LABEL_4383}
+          </label>
           <Input
             value={formData.display_name}
             onChange={e => setFormData({ ...formData, display_name: e.target.value })}
@@ -28,7 +32,9 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_9768}</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">
+            {COMP_HR_LABELS.LABEL_9768}
+          </label>
           <Input
             value={formData.chinese_name}
             onChange={e => setFormData({ ...formData, chinese_name: e.target.value })}
@@ -70,13 +76,13 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
           disabled
           className="bg-morandi-container/20"
         />
-        <p className="text-xs text-morandi-muted mt-1">
-          格式：E001, E002...
-        </p>
+        <p className="text-xs text-morandi-muted mt-1">格式：E001, E002...</p>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_3405}</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">
+          {COMP_HR_LABELS.LABEL_3405}
+        </label>
         <Input
           value={formData.personal_info.national_id}
           onChange={e =>
@@ -89,7 +95,9 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_8658}</label>
+        <label className="block text-sm font-medium text-morandi-primary mb-1">
+          {COMP_HR_LABELS.LABEL_8658}
+        </label>
         <DatePicker
           value={formData.personal_info.birth_date}
           onChange={date =>

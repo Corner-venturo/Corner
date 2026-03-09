@@ -24,14 +24,14 @@ export const ITINERARY_LABELS = {
   晚餐: '晚餐',
   住宿: '住宿',
   刪除: '刪除',
-  
+
   // Messages
   請先選擇城市: '請先選擇城市',
   生成失敗: '生成失敗',
   請重試: '請重試',
   AI生成中: 'AI生成中...',
   生成封面: '生成封面',
-  
+
   // Placeholders
   輸入標語: '輸入標語...',
   輸入英文標語: '輸入英文標語...',
@@ -74,7 +74,7 @@ export const ITINERARY_LABELS = {
   PRICE_LABEL_HINT: '價格 (不含NT$和起)',
   AI_GENERATE_DESC: 'AI 生成描述',
   AI_GENERATE_IMAGE: 'AI 生成圖片',
-};
+}
 // Template styles
 export const TEMPLATE_LABELS = {
   CLASSIC: '經典',

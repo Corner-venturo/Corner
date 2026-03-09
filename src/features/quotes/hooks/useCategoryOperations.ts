@@ -52,13 +52,12 @@ export const useCategoryOperations = ({
   })
 
   // 使用 Accommodation Operations hook
-  const { handleAddAccommodationRoomType, handleAddAccommodationDay } =
-    useAccommodationOperations({
-      categories,
-      setCategories,
-      accommodationDays,
-      setAccommodationDays,
-    })
+  const { handleAddAccommodationRoomType, handleAddAccommodationDay } = useAccommodationOperations({
+    categories,
+    setCategories,
+    accommodationDays,
+    setAccommodationDays,
+  })
 
   // 使用 Meal Operations hook
   const { handleAddLunchMeal, handleAddDinnerMeal } = useMealOperations({

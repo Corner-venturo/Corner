@@ -14,13 +14,13 @@
 
 ### 🟢 重複 index（可考慮清理）
 
-| 表 | 重複 index | 說明 |
-|---|---|---|
-| itineraries | `idx_itineraries_tour_id` + `itineraries_tour_id_idx` | 完全重複 |
-| itineraries | `idx_itineraries_created_by` + `itineraries_created_by_idx` | 完全重複 |
-| itinerary_days | `idx_itinerary_days_itinerary` + `idx_itinerary_days_itinerary_id` | 完全重複 |
-| itinerary_items | `idx_itinerary_items_day` + `idx_itinerary_items_day_id` | 完全重複 |
-| order_members | `idx_order_members_order` + `idx_order_members_order_id` | 完全重複 |
+| 表              | 重複 index                                                         | 說明     |
+| --------------- | ------------------------------------------------------------------ | -------- |
+| itineraries     | `idx_itineraries_tour_id` + `itineraries_tour_id_idx`              | 完全重複 |
+| itineraries     | `idx_itineraries_created_by` + `itineraries_created_by_idx`        | 完全重複 |
+| itinerary_days  | `idx_itinerary_days_itinerary` + `idx_itinerary_days_itinerary_id` | 完全重複 |
+| itinerary_items | `idx_itinerary_items_day` + `idx_itinerary_items_day_id`           | 完全重複 |
+| order_members   | `idx_order_members_order` + `idx_order_members_order_id`           | 完全重複 |
 
 ---
 
@@ -137,4 +137,4 @@ DROP INDEX CONCURRENTLY idx_order_members_order;
 
 ---
 
-*審查人：Claude (AI) | 待 William 審核後執行*
+_審查人：Claude (AI) | 待 William 審核後執行_

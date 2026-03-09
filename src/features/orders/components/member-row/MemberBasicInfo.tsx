@@ -4,7 +4,6 @@
  * 包含：中文姓名、出生年月日、性別、身分證號
  */
 
-
 import React, { useState } from 'react'
 import { Eye } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -81,19 +80,27 @@ export function MemberBasicInfo({
   return (
     <>
       {/* 序號 - 凍結欄位（使用實色背景避免內容穿透） */}
-      <td className={cn(
-        "border border-morandi-gold/20 px-2 py-1 bg-[#f5f3f0] text-center sticky z-10",
-        seqLeft
-      )}>
+      <td
+        className={cn(
+          'border border-morandi-gold/20 px-2 py-1 bg-[#f5f3f0] text-center sticky z-10',
+          seqLeft
+        )}
+      >
         <span className="text-xs text-morandi-secondary">{index + 1}</span>
       </td>
 
       {/* 中文姓名 - 凍結欄位（使用實色背景避免內容穿透） */}
-      <td className={cn(
-        "border border-morandi-gold/20 px-2 py-1 sticky z-10",
-        nameLeft,
-        isEditMode ? 'bg-card' : (member.customer_verification_status === 'unverified' ? 'bg-[#fde8e8]' : 'bg-[#f5f3f0]')
-      )}>
+      <td
+        className={cn(
+          'border border-morandi-gold/20 px-2 py-1 sticky z-10',
+          nameLeft,
+          isEditMode
+            ? 'bg-card'
+            : member.customer_verification_status === 'unverified'
+              ? 'bg-[#fde8e8]'
+              : 'bg-[#f5f3f0]'
+        )}
+      >
         <div className="flex items-center gap-1">
           {isEditMode ? (
             <input
@@ -124,18 +131,26 @@ export function MemberBasicInfo({
               data-member={member.id}
               data-field="chinese_name"
               className={cn(
-                "flex-1 bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 min-w-0",
-                member.customer_verification_status === 'unverified' ? 'text-status-danger font-medium' : 'text-morandi-primary'
+                'flex-1 bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 min-w-0',
+                member.customer_verification_status === 'unverified'
+                  ? 'text-status-danger font-medium'
+                  : 'text-morandi-primary'
               )}
             />
           ) : (
             <div className="flex-1 flex items-center gap-1">
               <span
                 className={cn(
-                  "text-xs",
-                  member.customer_verification_status === 'unverified' ? 'text-status-danger font-medium' : 'text-morandi-primary'
+                  'text-xs',
+                  member.customer_verification_status === 'unverified'
+                    ? 'text-status-danger font-medium'
+                    : 'text-morandi-primary'
                 )}
-                title={member.customer_verification_status === 'unverified' ? COMP_ORDERS_LABELS.待驗證_請點擊編輯按鈕 : ''}
+                title={
+                  member.customer_verification_status === 'unverified'
+                    ? COMP_ORDERS_LABELS.待驗證_請點擊編輯按鈕
+                    : ''
+                }
               >
                 {member.chinese_name || '-'}
               </span>
@@ -168,26 +183,44 @@ export function MemberBasicInfo({
 
       {/* 身份（領隊勾選） */}
       {showIdentityColumn && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1 text-center", isEditMode ? "bg-card" : "bg-muted")}>
+        <td
+          className={cn(
+            'border border-morandi-gold/20 px-2 py-1 text-center',
+            isEditMode ? 'bg-card' : 'bg-muted'
+          )}
+        >
           {isEditMode ? (
             <input
               type="checkbox"
               checked={member.identity === COMP_ORDERS_LABELS.領隊_2}
-              onChange={e => onUpdateField(member.id, 'identity', e.target.checked ? COMP_ORDERS_LABELS.領隊_2 : COMP_ORDERS_LABELS.大人)}
+              onChange={e =>
+                onUpdateField(
+                  member.id,
+                  'identity',
+                  e.target.checked ? COMP_ORDERS_LABELS.領隊_2 : COMP_ORDERS_LABELS.大人
+                )
+              }
               data-member={member.id}
               data-field="identity"
               className="w-4 h-4 cursor-pointer accent-morandi-primary"
               title={COMP_ORDERS_LABELS.勾選設為領隊}
             />
           ) : (
-            <span className="text-xs text-morandi-primary">{member.identity === COMP_ORDERS_LABELS.領隊_2 ? COMP_ORDERS_LABELS.領隊 : '-'}</span>
+            <span className="text-xs text-morandi-primary">
+              {member.identity === COMP_ORDERS_LABELS.領隊_2 ? COMP_ORDERS_LABELS.領隊 : '-'}
+            </span>
           )}
         </td>
       )}
 
       {/* 護照拼音 */}
       {cv.passport_name && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-card" : "bg-muted")}>
+        <td
+          className={cn(
+            'border border-morandi-gold/20 px-2 py-1',
+            isEditMode ? 'bg-card' : 'bg-muted'
+          )}
+        >
           {isEditMode ? (
             <input
               type="text"
@@ -196,7 +229,10 @@ export function MemberBasicInfo({
               onCompositionStart={() => setIsComposing(true)}
               onCompositionEnd={e => {
                 setIsComposing(false)
-                setTimeout(() => onUpdateField(member.id, 'passport_name', e.currentTarget.value), 0)
+                setTimeout(
+                  () => onUpdateField(member.id, 'passport_name', e.currentTarget.value),
+                  0
+                )
               }}
               onKeyDown={e => {
                 if (isComposing) return
@@ -214,7 +250,12 @@ export function MemberBasicInfo({
 
       {/* 出生年月日 */}
       {cv.birth_date && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-card" : "bg-muted")}>
+        <td
+          className={cn(
+            'border border-morandi-gold/20 px-2 py-1',
+            isEditMode ? 'bg-card' : 'bg-muted'
+          )}
+        >
           {isEditMode ? (
             <input
               type="text"
@@ -233,7 +274,12 @@ export function MemberBasicInfo({
 
       {/* 性別 */}
       {cv.gender && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1 text-xs text-center", isEditMode ? "bg-card" : "bg-muted")}>
+        <td
+          className={cn(
+            'border border-morandi-gold/20 px-2 py-1 text-xs text-center',
+            isEditMode ? 'bg-card' : 'bg-muted'
+          )}
+        >
           {isEditMode ? (
             <select
               value={member.gender || ''}
@@ -248,7 +294,11 @@ export function MemberBasicInfo({
             </select>
           ) : (
             <span className="text-morandi-primary">
-              {member.gender === 'M' ? COMP_ORDERS_LABELS.男 : member.gender === 'F' ? COMP_ORDERS_LABELS.女 : '-'}
+              {member.gender === 'M'
+                ? COMP_ORDERS_LABELS.男
+                : member.gender === 'F'
+                  ? COMP_ORDERS_LABELS.女
+                  : '-'}
             </span>
           )}
         </td>
@@ -256,7 +306,12 @@ export function MemberBasicInfo({
 
       {/* 身分證號 */}
       {cv.id_number && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-card" : "bg-muted")}>
+        <td
+          className={cn(
+            'border border-morandi-gold/20 px-2 py-1',
+            isEditMode ? 'bg-card' : 'bg-muted'
+          )}
+        >
           {isEditMode ? (
             <input
               type="text"
@@ -276,7 +331,7 @@ export function MemberBasicInfo({
               data-member={member.id}
               data-field="id_number"
               className="bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
-                          />
+            />
           ) : (
             <span className="text-xs text-morandi-primary">{member.id_number || '-'}</span>
           )}

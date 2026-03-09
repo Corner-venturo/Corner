@@ -5,29 +5,36 @@
  * 元件只需接受 style prop，根據主題渲染
  */
 
-export type TourStyle = 'original' | 'luxury' | 'art' | 'dreamscape' | 'collage' | 'nature' | 'gemini'
+export type TourStyle =
+  | 'original'
+  | 'luxury'
+  | 'art'
+  | 'dreamscape'
+  | 'collage'
+  | 'nature'
+  | 'gemini'
 
 export interface TourTheme {
   name: TourStyle
   colors: {
-    primary: string      // 主要強調色
-    secondary: string    // 次要強調色
-    accent: string       // 點綴色
-    background: string   // 區塊背景
-    surface: string      // 卡片表面
-    text: string         // 主要文字
-    muted: string        // 次要文字
-    border: string       // 邊框
+    primary: string // 主要強調色
+    secondary: string // 次要強調色
+    accent: string // 點綴色
+    background: string // 區塊背景
+    surface: string // 卡片表面
+    text: string // 主要文字
+    muted: string // 次要文字
+    border: string // 邊框
   }
   fonts: {
-    heading: string      // 標題字體
-    body: string         // 內文字體
-    accent: string       // 裝飾字體
+    heading: string // 標題字體
+    body: string // 內文字體
+    accent: string // 裝飾字體
   }
   effects: {
-    shadow: string       // 陰影效果
+    shadow: string // 陰影效果
     borderRadius: string // 圓角
-    borderWidth: string  // 邊框粗細
+    borderWidth: string // 邊框粗細
   }
 }
 
@@ -39,7 +46,7 @@ export const themes: Record<TourStyle, TourTheme> = {
   original: {
     name: 'original',
     colors: {
-      primary: '#B5986D',      // 莫蘭迪金
+      primary: '#B5986D', // 莫蘭迪金
       secondary: '#8B7355',
       accent: '#D4C5A9',
       background: '#FAF9F6',
@@ -63,9 +70,9 @@ export const themes: Record<TourStyle, TourTheme> = {
   luxury: {
     name: 'luxury',
     colors: {
-      primary: '#2C5F4D',      // 深綠
-      secondary: '#C69C6D',    // 金棕
-      accent: '#8F4F4F',       // 酒紅
+      primary: '#2C5F4D', // 深綠
+      secondary: '#C69C6D', // 金棕
+      accent: '#8F4F4F', // 酒紅
       background: '#FDFBF7',
       surface: '#FFFFFF',
       text: '#2D3436',
@@ -87,10 +94,10 @@ export const themes: Record<TourStyle, TourTheme> = {
   art: {
     name: 'art',
     colors: {
-      primary: '#1C1C1C',      // 墨黑
-      secondary: '#BF5B3D',    // 陶土
-      accent: '#C6A87C',       // 金褐
-      background: '#F2F0E9',   // 紙色
+      primary: '#1C1C1C', // 墨黑
+      secondary: '#BF5B3D', // 陶土
+      accent: '#C6A87C', // 金褐
+      background: '#F2F0E9', // 紙色
       surface: '#FFFFFF',
       text: '#1C1C1C',
       muted: '#8b8680',
@@ -111,9 +118,9 @@ export const themes: Record<TourStyle, TourTheme> = {
   dreamscape: {
     name: 'dreamscape',
     colors: {
-      primary: '#6366F1',      // 靛藍
-      secondary: '#A78BFA',    // 紫羅蘭
-      accent: '#F472B6',       // 粉紅
+      primary: '#6366F1', // 靛藍
+      secondary: '#A78BFA', // 紫羅蘭
+      accent: '#F472B6', // 粉紅
       background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%)',
       surface: 'rgba(255,255,255,0.1)',
       text: '#FFFFFF',
@@ -135,9 +142,9 @@ export const themes: Record<TourStyle, TourTheme> = {
   collage: {
     name: 'collage',
     colors: {
-      primary: '#FF6B35',      // 珊瑚橘
-      secondary: '#004E89',    // 深藍
-      accent: '#F7C59F',       // 奶油黃
+      primary: '#FF6B35', // 珊瑚橘
+      secondary: '#004E89', // 深藍
+      accent: '#F7C59F', // 奶油黃
       background: '#FFFCF2',
       surface: '#FFFFFF',
       text: '#1A1A2E',
@@ -159,10 +166,10 @@ export const themes: Record<TourStyle, TourTheme> = {
   nature: {
     name: 'nature',
     colors: {
-      primary: '#8B4513',      // 褐色
-      secondary: '#D2691E',    // 橙褐
-      accent: '#228B22',       // 森林綠
-      background: '#FFF8DC',   // 米色
+      primary: '#8B4513', // 褐色
+      secondary: '#D2691E', // 橙褐
+      accent: '#228B22', // 森林綠
+      background: '#FFF8DC', // 米色
       surface: '#FFFFFF',
       text: '#3D2914',
       muted: '#8B7355',
@@ -183,9 +190,9 @@ export const themes: Record<TourStyle, TourTheme> = {
   gemini: {
     name: 'gemini',
     colors: {
-      primary: '#4285F4',      // Google 藍
-      secondary: '#34A853',    // Google 綠
-      accent: '#FBBC05',       // Google 黃
+      primary: '#4285F4', // Google 藍
+      secondary: '#34A853', // Google 綠
+      accent: '#FBBC05', // Google 黃
       background: '#FFFFFF',
       surface: '#F8F9FA',
       text: '#202124',

@@ -9,11 +9,13 @@
 ## 執行摘要
 
 ### 整體完成度
+
 - **資料結構層**: ✅ **95% 完整** - 型別定義、Service Layer、Store 架構優秀
 - **業務邏輯層**: ⚠️ **70% 完整** - 核心邏輯完整，但缺少批量操作和計算功能
 - **使用者介面層**: ❌ **40% 完整** - 大量 UI 功能缺失，特別是收款單模組
 
 ### 關鍵結論
+
 **新系統架構遠優於舊系統**（Service Layer、離線支援、型別安全），但**缺少約 60% 的使用者介面功能**。需補齊以下模組才能達到生產就緒：
 
 1. **Receipts (收款單)** - 完整 CRUD + LinkPay 整合
@@ -25,73 +27,77 @@
 
 ## 模組對照表
 
-| 功能模組 | 舊系統路徑 | 新系統路徑 | 完成度 | 說明 |
-|---------|----------|----------|--------|------|
-| **請款單** | `/invoices` | `/finance/requests` | ⚠️ 70% | Service Layer 完整，UI 功能不足 |
-| **收款單** | `/receipts` | `/finance/payments` | ❌ 30% | 僅有型別定義，UI 完全缺失 |
-| **出納單** | `/bills` | `/finance/treasury/disbursement` | ✅ 90% | 功能完整，僅缺 PDF 生成 |
-| **訂單** | `/orders` | `/orders` | ✅ 85% | 基本功能完整 |
-| **團體** | `/groups` | `/tours` | ⚠️ 60% | 缺少利潤計算、獎金設定 |
-| **客戶** | `/customers` | `/customers` | ✅ 80% | 基本功能完整 |
-| **供應商** | `/suppliers` | `/database/suppliers` | ⚠️ 50% | 剛簡化完成，缺少歷史記錄 |
-| **行事曆** | `/calendar` | `/calendar` | ✅ 85% | 功能完整 |
-| **eSIM** | `/esims` | `/esims` | ✅ 80% | 功能完整 |
-| **使用者** | `/users` | `/hr` | ✅ 75% | 功能完整 |
+| 功能模組   | 舊系統路徑   | 新系統路徑                       | 完成度 | 說明                            |
+| ---------- | ------------ | -------------------------------- | ------ | ------------------------------- |
+| **請款單** | `/invoices`  | `/finance/requests`              | ⚠️ 70% | Service Layer 完整，UI 功能不足 |
+| **收款單** | `/receipts`  | `/finance/payments`              | ❌ 30% | 僅有型別定義，UI 完全缺失       |
+| **出納單** | `/bills`     | `/finance/treasury/disbursement` | ✅ 90% | 功能完整，僅缺 PDF 生成         |
+| **訂單**   | `/orders`    | `/orders`                        | ✅ 85% | 基本功能完整                    |
+| **團體**   | `/groups`    | `/tours`                         | ⚠️ 60% | 缺少利潤計算、獎金設定          |
+| **客戶**   | `/customers` | `/customers`                     | ✅ 80% | 基本功能完整                    |
+| **供應商** | `/suppliers` | `/database/suppliers`            | ⚠️ 50% | 剛簡化完成，缺少歷史記錄        |
+| **行事曆** | `/calendar`  | `/calendar`                      | ✅ 85% | 功能完整                        |
+| **eSIM**   | `/esims`     | `/esims`                         | ✅ 80% | 功能完整                        |
+| **使用者** | `/users`     | `/hr`                            | ✅ 75% | 功能完整                        |
 
 ---
 
 ## 1. Invoices (請款單) → Payment Requests (請款申請)
 
 ### 舊系統結構
+
 **路徑**: `/cornerERP-master/src/app/(control-panel)/invoices`
 
 **資料模型**:
+
 ```typescript
 // InvoiceModel.ts
 {
-  invoiceNumber: string;     // 請款單號 (主鍵)
-  groupCode: string;         // 團號
-  orderNumber: string;       // 訂單編號
-  invoiceDate: Date;         // 請款日期
-  status: number;            // 0:待確認 1:已確認 2:已出帳
-  createdAt: Date;
-  createdBy: string;
-  modifiedAt: Date;
-  modifiedBy: string;
+  invoiceNumber: string // 請款單號 (主鍵)
+  groupCode: string // 團號
+  orderNumber: string // 訂單編號
+  invoiceDate: Date // 請款日期
+  status: number // 0:待確認 1:已確認 2:已出帳
+  createdAt: Date
+  createdBy: string
+  modifiedAt: Date
+  modifiedBy: string
 }
 
 // InvoiceItemModel.ts (子項目)
 {
-  id: number;
-  invoiceNumber: string;
-  invoiceType: number;       // 0-12 共 13 種類型
-  payFor: string;            // 供應商代碼
-  price: number;
-  quantity: number;
-  note: string;
+  id: number
+  invoiceNumber: string
+  invoiceType: number // 0-12 共 13 種類型
+  payFor: string // 供應商代碼
+  price: number
+  quantity: number
+  note: string
 }
 ```
 
 **請款項目類型** (invoiceItemTypes.ts):
+
 ```typescript
 INVOICE_ITEM_TYPES = {
-  HOTEL: 0,        // 飯店
-  TRANSPORT: 1,    // 交通
-  MEAL: 2,         // 餐飲
-  ACTIVITY: 3,     // 活動
+  HOTEL: 0, // 飯店
+  TRANSPORT: 1, // 交通
+  MEAL: 2, // 餐飲
+  ACTIVITY: 3, // 活動
   TOUR_PAYMENT: 4, // 出團款
-  TOUR_RETURN: 5,  // 回團款
-  OTHER: 6,        // 其他
-  INSURANCE: 7,    // 保險
-  BONUS: 8,        // 獎金
-  REFUND: 9,       // 退預收款
-  B2B: 10,         // 同業
-  ESIM: 11,        // 網卡
-  EMPLOYEE: 999    // 員工
+  TOUR_RETURN: 5, // 回團款
+  OTHER: 6, // 其他
+  INSURANCE: 7, // 保險
+  BONUS: 8, // 獎金
+  REFUND: 9, // 退預收款
+  B2B: 10, // 同業
+  ESIM: 11, // 網卡
+  EMPLOYEE: 999, // 員工
 }
 ```
 
 **功能清單**:
+
 - ✅ 列表頁 (InvoicesTable.tsx)
 - ✅ 詳情頁 (3 個分頁：BasicInfo, Preview, LivePreview)
 - ✅ 搜尋對話框 (InvoiceSearchDialog.tsx)
@@ -103,9 +109,11 @@ INVOICE_ITEM_TYPES = {
 ---
 
 ### 新系統結構
+
 **路徑**: `/Corner/src/features/finance/requests`
 
 **資料模型**:
+
 ```typescript
 // payment-request.types.ts
 {
@@ -135,6 +143,7 @@ INVOICE_ITEM_TYPES = {
 ```
 
 **功能清單**:
+
 - ✅ Service Layer (`payment-request.service.ts`) - 完整
 - ✅ Store 整合 (`usePaymentRequestStore`)
 - ✅ IndexedDB 離線支援
@@ -155,12 +164,14 @@ INVOICE_ITEM_TYPES = {
 **實作狀態**: ⚠️ **70% 完整**
 
 **架構優勢** (新系統):
+
 1. ✅ Service Layer 分層清晰
 2. ✅ 離線優先策略
 3. ✅ 週四請款日驗證（業務規則自動化）
 4. ✅ 型別安全 (TypeScript)
 
 **功能缺失**:
+
 1. ❌ 請款項目類型未標準化（舊系統有 13 種固定類型）
 2. ❌ 搜尋/過濾對話框
 3. ❌ 依團號批量查詢
@@ -168,6 +179,7 @@ INVOICE_ITEM_TYPES = {
 5. ❌ PDF 預覽/下載
 
 **資料結構差異**:
+
 - 新系統用 `tour_id` (UUID)，舊系統用 `groupCode` (字串)
 - 新系統強制週四請款日，舊系統無限制
 - 新系統加入 `allocation_mode` (single/shared) 概念
@@ -178,9 +190,11 @@ INVOICE_ITEM_TYPES = {
 ## 2. Receipts (收款單) → Payments (付款記錄)
 
 ### 舊系統結構
+
 **路徑**: `/cornerERP-master/src/app/(control-panel)/receipts`
 
 **資料模型**:
+
 ```typescript
 // ReceiptModel.ts
 {
@@ -202,17 +216,19 @@ INVOICE_ITEM_TYPES = {
 ```
 
 **收款方式** (receiptTypes.ts):
+
 ```typescript
 RECEIPT_TYPES = {
-  BANK_TRANSFER: 0,  // 匯款
-  CASH: 1,           // 現金
-  CREDIT_CARD: 2,    // 刷卡
-  CHECK: 3,          // 支票
-  LINK_PAY: 4        // LinkPay
+  BANK_TRANSFER: 0, // 匯款
+  CASH: 1, // 現金
+  CREDIT_CARD: 2, // 刷卡
+  CHECK: 3, // 支票
+  LINK_PAY: 4, // LinkPay
 }
 ```
 
 **功能清單**:
+
 - ✅ 列表頁 (ReceiptsTable.tsx + ReceiptsHeader.tsx)
 - ✅ 詳情頁 (`receipts/[receiptNumber]/[[...handle]]/page.tsx`)
 - ✅ **批量建立** (`receipts/batch-create/BatchCreateReceipt.tsx`)
@@ -226,6 +242,7 @@ RECEIPT_TYPES = {
 - ✅ 依團號查詢 (`/api/supabase/receipts/by-group/[groupCode]`)
 
 **API 路由**:
+
 ```
 GET  /api/supabase/receipts
 POST /api/supabase/receipts
@@ -240,49 +257,52 @@ POST /api/supabase/linkpay
 ---
 
 ### 新系統結構
+
 **路徑**: `/Corner/src/types/receipt.types.ts`
 
 **資料模型**:
+
 ```typescript
 // receipt.types.ts
 {
-  id: string;
-  receipt_number: string;
-  order_id: string;
-  receipt_date: string;
-  receipt_type: ReceiptType;      // 0-4
-  receipt_amount: number;
-  actual_amount: number;
-  status: ReceiptStatus;          // 0:待確認 1:已確認
+  id: string
+  receipt_number: string
+  order_id: string
+  receipt_date: string
+  receipt_type: ReceiptType // 0-4
+  receipt_amount: number
+  actual_amount: number
+  status: ReceiptStatus // 0:待確認 1:已確認
 
   // 各收款方式專屬欄位
-  handler_name: string | null;    // 經手人
-  account_info: string | null;    // 帳號資訊
-  fees: number | null;            // 手續費
-  card_last_four: string | null;  // 卡號後四碼
-  check_number: string | null;    // 支票號碼
-  check_date: string | null;      // 支票日期
+  handler_name: string | null // 經手人
+  account_info: string | null // 帳號資訊
+  fees: number | null // 手續費
+  card_last_four: string | null // 卡號後四碼
+  check_number: string | null // 支票號碼
+  check_date: string | null // 支票日期
 
-  created_at: string;
-  created_by: string;
-  updated_at: string;
-  updated_by: string;
+  created_at: string
+  created_by: string
+  updated_at: string
+  updated_by: string
 }
 
 // LinkPayLog (獨立表格)
 {
-  id: string;
-  receipt_id: string;
-  linkpay_order_number: string;
-  amount: number;
-  status: string;
-  link: string;
-  end_date: string;
-  created_at: string;
+  id: string
+  receipt_id: string
+  linkpay_order_number: string
+  amount: number
+  status: string
+  link: string
+  end_date: string
+  created_at: string
 }
 ```
 
 **功能清單**:
+
 - ✅ 完整的型別定義
 - ✅ ReceiptType enum (5 種收款方式)
 - ✅ ReceiptStatus enum
@@ -297,6 +317,7 @@ POST /api/supabase/linkpay
 - ❌ **Excel 匯出功能**
 
 **API 狀態**:
+
 ```typescript
 // POST /api/linkpay
 // 🚧 測試模式 - 返回假資料
@@ -306,8 +327,8 @@ return NextResponse.json({
     linkpay_order_number: `LP${Date.now()}`,
     link: 'https://linkpay.test/fake-link',
     status: 'pending',
-    end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-  }
+    end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+  },
 })
 ```
 
@@ -318,11 +339,13 @@ return NextResponse.json({
 **實作狀態**: ❌ **30% 完整**
 
 **架構優勢** (新系統):
+
 1. ✅ 資料結構更細緻（各收款方式專屬欄位）
 2. ✅ LinkPay 資料分離為獨立表格（更清晰）
 3. ✅ 型別定義完整
 
 **嚴重缺失** (關鍵功能):
+
 1. ❌ **收款單 CRUD 完全缺失**（無列表、新增、編輯、詳情頁面）
 2. ❌ **LinkPay 整合未完成**（API 僅 mock，無 UI）
 3. ❌ **批量創建收款單**（舊系統核心功能）
@@ -332,11 +355,13 @@ return NextResponse.json({
 7. ❌ **LinkPay Webhook**（已註解，未實作）
 
 **資料結構差異**:
+
 - 新系統缺少 `groupCode`/`groupName`（需透過 JOIN 查詢）
 - 新系統的欄位設計更好（各收款方式專屬欄位）
 - 新系統的 LinkPay 資料分離（更好的設計）
 
 **實作建議**:
+
 1. **Priority 1**: 建立收款單 CRUD 頁面（參考舊系統 ReceiptsPage）
 2. **Priority 2**: 實作 LinkPay Hook (`useCreateLinkPayHandler` 等價物)
 3. **Priority 3**: 批量創建收款單對話框
@@ -348,9 +373,11 @@ return NextResponse.json({
 ## 3. Bills (出納單) → Disbursement Orders (出納命令)
 
 ### 舊系統結構
+
 **路徑**: `/cornerERP-master/src/app/(control-panel)/bills`
 
 **資料模型**:
+
 ```typescript
 // BillModel.ts
 {
@@ -366,14 +393,16 @@ return NextResponse.json({
 ```
 
 **狀態定義** (billStatuses.ts):
+
 ```typescript
 BILL_STATUSES = {
-  CONFIRMED: 1,  // 已確認
-  PAID: 2        // 已出帳
+  CONFIRMED: 1, // 已確認
+  PAID: 2, // 已出帳
 }
 ```
 
 **功能清單**:
+
 - ✅ 列表頁 (BillsTable.tsx + BillsHeader.tsx)
 - ✅ 詳情頁 (3 個分頁：BasicInfo, Preview, LivePreview)
 - ✅ **請款單整合**
@@ -394,6 +423,7 @@ BILL_STATUSES = {
 - ✅ 搜尋功能 (出納單號/日期/狀態)
 
 **API 路由**:
+
 ```
 GET  /api/supabase/bills
 POST /api/supabase/bills
@@ -405,9 +435,11 @@ PUT  /api/supabase/bills/[billNumber]
 ---
 
 ### 新系統結構
+
 **路徑**: `/Corner/src/features/disbursement`
 
 **資料模型**:
+
 ```typescript
 // disbursement-order.types.ts
 {
@@ -427,6 +459,7 @@ PUT  /api/supabase/bills/[billNumber]
 ```
 
 **功能清單**:
+
 - ✅ Service Layer (`disbursement-order.service.ts`) - **完整**
 - ✅ 週四日期驗證與自動計算 (`getNextThursday`)
 - ✅ 批量管理請款單 (`createWithRequests`, `addPaymentRequests`)
@@ -452,6 +485,7 @@ PUT  /api/supabase/bills/[billNumber]
 **實作狀態**: ✅ **90% 完整**
 
 **架構優勢** (新系統):
+
 1. ✅ Service Layer 邏輯清晰
 2. ✅ 週四出納日自動化（業務規則內建）
 3. ✅ 當週自動歸併（智慧化流程）
@@ -459,6 +493,7 @@ PUT  /api/supabase/bills/[billNumber]
 5. ✅ 狀態聯動自動化
 
 **功能缺失**:
+
 1. ❌ **PDF 生成**（舊系統核心功能）
 2. ❌ **預覽列印**（BillPreviewTable, BillPreviewContainer）
 3. ❌ **利潤計算**（useBillCalculation）
@@ -466,11 +501,13 @@ PUT  /api/supabase/bills/[billNumber]
 5. ❌ **請款單搜尋對話框**（InvoiceSearchBar, InvoiceDialog）
 
 **資料結構差異**:
+
 - 新系統加入審核記錄（`confirmed_by`, `confirmed_at`）- 更好
 - 新系統強制週四出納日（自動化）- 更好
 - 新系統缺少按供應商分組的計算邏輯
 
 **實作建議**:
+
 1. **Priority 1**: 實作出納單 PDF 生成（參考 QuickQuotePdf.ts）
 2. **Priority 2**: 請款單選擇對話框（可複選、顯示金額）
 3. **Priority 3**: 按供應商分組計算（useBillCalculation）
@@ -483,11 +520,13 @@ PUT  /api/supabase/bills/[billNumber]
 ### 舊系統 - 完整實作
 
 **核心檔案**:
+
 - `LinkPayExpandableRow.tsx` - 可展開查看 LinkPay 記錄
 - `useCreateLinkPayHandler.ts` - LinkPay 創建 Hook
 - `/api/supabase/linkpay` - LinkPay API
 
 **完整流程**:
+
 ```typescript
 // 1. 創建 LinkPay
 const handleCreateLinkPay = async (receipt: Receipt) => {
@@ -497,8 +536,8 @@ const handleCreateLinkPay = async (receipt: Receipt) => {
       receiptNumber: receipt.receiptNumber,
       amount: receipt.receiptAmount,
       email: receipt.email,
-      endDate: receipt.payDateline
-    })
+      endDate: receipt.payDateline,
+    }),
   })
 
   const { linkpay } = await response.json()
@@ -506,7 +545,7 @@ const handleCreateLinkPay = async (receipt: Receipt) => {
   // 2. 自動更新 Receipt
   await updateReceipt({
     ...receipt,
-    linkpay: [...receipt.linkpay, linkpay]
+    linkpay: [...receipt.linkpay, linkpay],
   })
 
   // 3. 發送 Email（內建 Supabase Edge Function）
@@ -514,7 +553,7 @@ const handleCreateLinkPay = async (receipt: Receipt) => {
 
 // 4. Webhook 處理（付款完成後）
 // POST /api/supabase/linkpay/webhook
-const handleWebhook = async (data) => {
+const handleWebhook = async data => {
   // 更新 LinkPay 狀態
   // 更新 Receipt.actualAmount
   // 發送通知
@@ -522,13 +561,16 @@ const handleWebhook = async (data) => {
 ```
 
 **UI 展示**:
+
 ```tsx
 <LinkPayExpandableRow receipt={receipt}>
   {receipt.linkpay.map(log => (
     <div key={log.linkpay_order_number}>
       <span>訂單號: {log.linkpay_order_number}</span>
       <span>狀態: {log.status}</span>
-      <span>連結: <a href={log.link}>前往付款</a></span>
+      <span>
+        連結: <a href={log.link}>前往付款</a>
+      </span>
       <span>到期日: {log.endDate}</span>
     </div>
   ))}
@@ -540,11 +582,13 @@ const handleWebhook = async (data) => {
 ### 新系統 - 骨架存在，功能缺失
 
 **現有檔案**:
+
 - `/api/linkpay/route.ts` - **測試模式 (mock 資料)**
 - `linkpay-log-store.ts` - Store 完整
 - `receipt.types.ts` - 型別定義完整
 
 **目前實作**:
+
 ```typescript
 // /api/linkpay/route.ts
 export async function POST(request: Request) {
@@ -555,8 +599,8 @@ export async function POST(request: Request) {
       linkpay_order_number: `LP${Date.now()}`,
       link: 'https://linkpay.test/fake-link',
       status: 'pending',
-      end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-    }
+      end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    },
   })
 
   // TODO: 真實 API 串接
@@ -574,12 +618,14 @@ export async function POST(request: Request) {
 **實作狀態**: ⚠️ **20% 完整**
 
 **已實作**:
+
 - ✅ API Route 骨架
 - ✅ LinkPayLog 資料結構
 - ✅ Store (`linkpay-log-store.ts`)
 - ✅ 型別定義完整
 
 **缺失功能**:
+
 1. ❌ **真實 API 串接**（目前返回 mock 資料）
 2. ❌ **Webhook 接收**（已註解，未實作）
 3. ❌ **UI 整合**（無創建 LinkPay 的按鈕/對話框）
@@ -589,6 +635,7 @@ export async function POST(request: Request) {
 7. ❌ **展開式查看**（無 LinkPayExpandableRow）
 
 **實作建議**:
+
 ```typescript
 // 1. 實作 useCreateLinkPay Hook
 export const useCreateLinkPay = () => {
@@ -632,6 +679,7 @@ export async function POST(request: Request) {
 ### 舊系統 - 完整實作
 
 **出納單 PDF** (`BillPdf.tsx`):
+
 ```typescript
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
@@ -661,12 +709,12 @@ export const generateBillPdf = (bill: Bill) => {
       inv.invoiceNumber,
       inv.supplierName,
       formatCurrency(inv.amount),
-      inv.note
+      inv.note,
     ]),
     foot: [['', '', `總計: ${formatCurrency(bill.totalAmount)}`, '']],
     theme: 'grid',
     headStyles: { fillColor: [66, 139, 202] },
-    footStyles: { fillColor: [240, 240, 240], fontStyle: 'bold' }
+    footStyles: { fillColor: [240, 240, 240], fontStyle: 'bold' },
   })
 
   // 5. 頁尾
@@ -679,6 +727,7 @@ export const generateBillPdf = (bill: Bill) => {
 ```
 
 **紅利 PDF** (`BonusPdf.tsx`):
+
 - 類似結構
 - 包含獎金計算明細
 - 多頁支援
@@ -688,6 +737,7 @@ export const generateBillPdf = (bill: Bill) => {
 ### 新系統 - 僅報價單有 PDF
 
 **報價單 PDF** (`QuickQuotePdf.ts`):
+
 ```typescript
 export const generateQuickQuotePDF = async (quote: Quote) => {
   const doc = new jsPDF()
@@ -701,6 +751,7 @@ export const generateQuickQuotePDF = async (quote: Quote) => {
 ```
 
 **缺失功能**:
+
 - ❌ 出納單 PDF
 - ❌ 收款單 PDF
 - ❌ 請款單 PDF
@@ -713,17 +764,20 @@ export const generateQuickQuotePDF = async (quote: Quote) => {
 **實作狀態**: ⚠️ **25% 完整**
 
 **已實作**:
+
 - ✅ 報價請款單 PDF (`generateQuickQuotePDF`)
 - ✅ 使用相同技術（jsPDF + autoTable）
 - ✅ 相同字體設定
 
 **缺失功能**:
+
 1. ❌ **出納單 PDF** - 核心功能
 2. ❌ **收款單 PDF**
 3. ❌ **請款單 PDF**
 4. ❌ **批量列印功能**
 
 **實作建議**:
+
 ```typescript
 // 1. 實作 generateDisbursementPDF
 export const generateDisbursementPDF = async (order: DisbursementOrder) => {
@@ -749,12 +803,13 @@ export const generatePaymentRequestPDF = async (request: PaymentRequest) => {
 ### 舊系統 - 完整實作
 
 **核心 Hook** (`useBillCalculation.ts`):
+
 ```typescript
 export const useBillCalculation = ({
   invoices,
   getUserName,
   getSupplierName,
-  getInvoiceItemTypeName
+  getInvoiceItemTypeName,
 }) => {
   const [invoiceGroups, setInvoiceGroups] = useState([])
   const [totalAmount, setTotalAmount] = useState(0)
@@ -769,9 +824,9 @@ export const useBillCalculation = ({
       items: items.map(item => ({
         ...item,
         typeName: getInvoiceItemTypeName(item.invoiceType),
-        subtotal: item.price * item.quantity
+        subtotal: item.price * item.quantity,
       })),
-      total: sumBy(items, i => i.price * i.quantity)
+      total: sumBy(items, i => i.price * i.quantity),
     }))
 
     // 3. 處理特殊項目
@@ -790,6 +845,7 @@ export const useBillCalculation = ({
 ```
 
 **團體利潤計算** (`useProfitCalculation.ts`):
+
 ```typescript
 export const useProfitCalculation = ({ groupCode }) => {
   const receipts = useReceipts({ groupCode })
@@ -805,7 +861,7 @@ export const useProfitCalculation = ({ groupCode }) => {
   // 獎金
   const bonuses = bonusSettings.map(setting => {
     if (setting.bonusType === 'percent') {
-      return revenue * setting.bonus / 100
+      return (revenue * setting.bonus) / 100
     } else {
       return setting.bonus
     }
@@ -824,6 +880,7 @@ export const useProfitCalculation = ({ groupCode }) => {
 ### 新系統 - 未實作
 
 **缺失功能**:
+
 - ❌ 無利潤計算 Hook
 - ❌ 無供應商分組邏輯
 - ❌ 無請款類型分類
@@ -837,6 +894,7 @@ export const useProfitCalculation = ({ groupCode }) => {
 **實作狀態**: ❌ **0% 完整**
 
 **實作建議**:
+
 ```typescript
 // 1. 實作 useDisbursementCalculation
 export const useDisbursementCalculation = (requestIds: string[]) => {
@@ -855,12 +913,8 @@ export const useDisbursementCalculation = (requestIds: string[]) => {
 
 // 2. 實作 useTourProfitCalculation
 export const useTourProfitCalculation = (tourId: string) => {
-  const receipts = useReceiptStore(state =>
-    state.items.filter(r => r.tour_id === tourId)
-  )
-  const requests = usePaymentRequestStore(state =>
-    state.items.filter(r => r.tour_id === tourId)
-  )
+  const receipts = useReceiptStore(state => state.items.filter(r => r.tour_id === tourId))
+  const requests = usePaymentRequestStore(state => state.items.filter(r => r.tour_id === tourId))
 
   const revenue = sumBy(receipts, 'actual_amount')
   const expense = sumBy(requests, 'total_amount')
@@ -877,26 +931,28 @@ export const useTourProfitCalculation = (tourId: string) => {
 ### 舊系統 - 完整實作
 
 **批量創建收款單** (`batch-create/BatchCreateReceipt.tsx`):
+
 ```tsx
 export const BatchCreateReceipt = () => {
   const [receiptItems, setReceiptItems] = useState<ReceiptItem[]>([])
 
   const handleAddItem = () => {
-    setReceiptItems([...receiptItems, {
-      orderNumber: '',
-      receiptAmount: 0,
-      receiptType: 0,
-      receiptDate: new Date(),
-      email: '',
-      note: ''
-    }])
+    setReceiptItems([
+      ...receiptItems,
+      {
+        orderNumber: '',
+        receiptAmount: 0,
+        receiptType: 0,
+        receiptDate: new Date(),
+        email: '',
+        note: '',
+      },
+    ])
   }
 
   const handleSubmit = async () => {
     // 批量創建
-    await Promise.all(receiptItems.map(item =>
-      createReceipt(item)
-    ))
+    await Promise.all(receiptItems.map(item => createReceipt(item)))
 
     toast.success(`成功創建 ${receiptItems.length} 筆收款單`)
   }
@@ -908,7 +964,7 @@ export const BatchCreateReceipt = () => {
           <ReceiptItemRow
             key={index}
             item={item}
-            onChange={(updated) => {
+            onChange={updated => {
               const newItems = [...receiptItems]
               newItems[index] = updated
               setReceiptItems(newItems)
@@ -924,6 +980,7 @@ export const BatchCreateReceipt = () => {
 ```
 
 **Excel 匯入** (`ImportTravellersDialog.tsx`):
+
 ```tsx
 import * as XLSX from 'xlsx'
 
@@ -935,9 +992,7 @@ export const ImportTravellersDialog = () => {
     const rows = XLSX.utils.sheet_to_json(sheet)
 
     // 批量創建
-    await Promise.all(rows.map(row =>
-      createTraveller(row)
-    ))
+    await Promise.all(rows.map(row => createTraveller(row)))
   }
 
   return <FileUpload onUpload={handleFileUpload} />
@@ -949,6 +1004,7 @@ export const ImportTravellersDialog = () => {
 ### 新系統 - 未實作
 
 **缺失功能**:
+
 - ❌ 無批量創建收款單介面
 - ❌ 無批量創建請款單介面
 - ❌ 無 Excel 匯入功能
@@ -961,6 +1017,7 @@ export const ImportTravellersDialog = () => {
 **實作狀態**: ❌ **0% 完整**
 
 **實作建議**:
+
 ```typescript
 // 1. 實作 BatchCreateReceiptDialog
 export const BatchCreateReceiptDialog = () => {
@@ -1006,15 +1063,15 @@ export const ImportReceiptsDialog = () => {
 
 ### 功能完整度統計
 
-| 模組 | 資料層 | 業務層 | UI 層 | 總分 |
-|------|--------|--------|-------|------|
-| 請款單 | ✅ 95% | ✅ 85% | ⚠️ 60% | ⚠️ 70% |
-| 收款單 | ✅ 90% | ❌ 30% | ❌ 10% | ❌ 30% |
-| 出納單 | ✅ 95% | ✅ 95% | ✅ 85% | ✅ 90% |
-| LinkPay | ✅ 90% | ❌ 20% | ❌ 10% | ❌ 20% |
+| 模組     | 資料層  | 業務層 | UI 層  | 總分   |
+| -------- | ------- | ------ | ------ | ------ |
+| 請款單   | ✅ 95%  | ✅ 85% | ⚠️ 60% | ⚠️ 70% |
+| 收款單   | ✅ 90%  | ❌ 30% | ❌ 10% | ❌ 30% |
+| 出納單   | ✅ 95%  | ✅ 95% | ✅ 85% | ✅ 90% |
+| LinkPay  | ✅ 90%  | ❌ 20% | ❌ 10% | ❌ 20% |
 | PDF 生成 | ✅ 100% | ⚠️ 25% | ⚠️ 25% | ⚠️ 25% |
-| 利潤計算 | ✅ 80% | ❌ 0% | ❌ 0% | ❌ 0% |
-| 批量操作 | ✅ 90% | ❌ 0% | ❌ 0% | ❌ 0% |
+| 利潤計算 | ✅ 80%  | ❌ 0%  | ❌ 0%  | ❌ 0%  |
+| 批量操作 | ✅ 90%  | ❌ 0%  | ❌ 0%  | ❌ 0%  |
 
 **整體評分**: ⚠️ **55% 完整**
 
@@ -1023,6 +1080,7 @@ export const ImportReceiptsDialog = () => {
 ### 實作優先順序
 
 #### Phase 1: 收款單系統 (最高優先)
+
 **預估工時**: 3-4 天
 
 1. **收款單 CRUD 頁面** (1.5 天)
@@ -1053,6 +1111,7 @@ export const ImportReceiptsDialog = () => {
 ---
 
 #### Phase 2: LinkPay 完整整合 (高優先)
+
 **預估工時**: 2 天
 
 1. **Webhook 實作** (1 天)
@@ -1074,6 +1133,7 @@ export const ImportReceiptsDialog = () => {
 ---
 
 #### Phase 3: PDF 生成功能 (高優先)
+
 **預估工時**: 2 天
 
 1. **出納單 PDF** (1 天)
@@ -1089,6 +1149,7 @@ export const ImportReceiptsDialog = () => {
 ---
 
 #### Phase 4: 批量操作與匯入 (中優先)
+
 **預估工時**: 2 天
 
 1. **Excel 匯入功能** (1 天)
@@ -1107,6 +1168,7 @@ export const ImportReceiptsDialog = () => {
 ---
 
 #### Phase 5: 利潤計算功能 (中優先)
+
 **預估工時**: 2-3 天
 
 1. **出納單計算邏輯** (1 天)
@@ -1127,6 +1189,7 @@ export const ImportReceiptsDialog = () => {
 ---
 
 #### Phase 6: 請款單功能增強 (低優先)
+
 **預估工時**: 1-2 天
 
 1. **請款項目類型管理** (0.5 天)
@@ -1144,6 +1207,7 @@ export const ImportReceiptsDialog = () => {
 ---
 
 ### 總計工時估算
+
 - Phase 1: 3-4 天
 - Phase 2: 2 天
 - Phase 3: 2 天
@@ -1160,6 +1224,7 @@ export const ImportReceiptsDialog = () => {
 ### 新系統的架構優勢
 
 1. **Service Layer 分層清晰**
+
    ```
    UI Layer (React Components)
      ↓
@@ -1222,57 +1287,57 @@ export const ImportReceiptsDialog = () => {
 
 ### 請款單 (Invoices → Payment Requests)
 
-| 功能 | 舊系統檔案 | 新系統檔案 | 狀態 |
-|------|----------|----------|------|
-| 資料模型 | `InvoiceModel.ts` | `payment-request.types.ts` | ✅ |
-| Service | `InvoiceApi.ts` | `payment-request.service.ts` | ✅ |
-| Store | RTK Query | `payment-request-store.ts` | ✅ |
-| 列表頁 | `Invoices.tsx` | `RequestsPage.tsx` | ⚠️ |
-| 詳情頁 | `invoices/[invoiceNumber]/page.tsx` | - | ❌ |
-| 項目管理 | `InvoiceItemDialog.tsx` | `AddRequestDialog.tsx` | ⚠️ |
-| 搜尋對話框 | `InvoiceSearchDialog.tsx` | - | ❌ |
+| 功能       | 舊系統檔案                          | 新系統檔案                   | 狀態 |
+| ---------- | ----------------------------------- | ---------------------------- | ---- |
+| 資料模型   | `InvoiceModel.ts`                   | `payment-request.types.ts`   | ✅   |
+| Service    | `InvoiceApi.ts`                     | `payment-request.service.ts` | ✅   |
+| Store      | RTK Query                           | `payment-request-store.ts`   | ✅   |
+| 列表頁     | `Invoices.tsx`                      | `RequestsPage.tsx`           | ⚠️   |
+| 詳情頁     | `invoices/[invoiceNumber]/page.tsx` | -                            | ❌   |
+| 項目管理   | `InvoiceItemDialog.tsx`             | `AddRequestDialog.tsx`       | ⚠️   |
+| 搜尋對話框 | `InvoiceSearchDialog.tsx`           | -                            | ❌   |
 
 ---
 
 ### 收款單 (Receipts → Receipts)
 
-| 功能 | 舊系統檔案 | 新系統檔案 | 狀態 |
-|------|----------|----------|------|
-| 資料模型 | `ReceiptModel.ts` | `receipt.types.ts` | ✅ |
-| Service | `ReceiptApi.ts` | - | ❌ |
-| Store | RTK Query | `receipt-store.ts` (僅結構) | ⚠️ |
-| 列表頁 | `Receipts.tsx` | - | ❌ |
-| 詳情頁 | `receipts/[receiptNumber]/page.tsx` | - | ❌ |
-| 批量創建 | `batch-create/BatchCreateReceipt.tsx` | - | ❌ |
-| 依訂單查看 | `by-order/[orderNumber]/ReceiptByOrder.tsx` | - | ❌ |
-| LinkPay Hook | `useCreateLinkPayHandler.ts` | - | ❌ |
-| LinkPay UI | `LinkPayExpandableRow.tsx` | - | ❌ |
+| 功能         | 舊系統檔案                                  | 新系統檔案                  | 狀態 |
+| ------------ | ------------------------------------------- | --------------------------- | ---- |
+| 資料模型     | `ReceiptModel.ts`                           | `receipt.types.ts`          | ✅   |
+| Service      | `ReceiptApi.ts`                             | -                           | ❌   |
+| Store        | RTK Query                                   | `receipt-store.ts` (僅結構) | ⚠️   |
+| 列表頁       | `Receipts.tsx`                              | -                           | ❌   |
+| 詳情頁       | `receipts/[receiptNumber]/page.tsx`         | -                           | ❌   |
+| 批量創建     | `batch-create/BatchCreateReceipt.tsx`       | -                           | ❌   |
+| 依訂單查看   | `by-order/[orderNumber]/ReceiptByOrder.tsx` | -                           | ❌   |
+| LinkPay Hook | `useCreateLinkPayHandler.ts`                | -                           | ❌   |
+| LinkPay UI   | `LinkPayExpandableRow.tsx`                  | -                           | ❌   |
 
 ---
 
 ### 出納單 (Bills → Disbursement Orders)
 
-| 功能 | 舊系統檔案 | 新系統檔案 | 狀態 |
-|------|----------|----------|------|
-| 資料模型 | `BillModel.ts` | `disbursement-order.types.ts` | ✅ |
-| Service | `BillApi.ts` | `disbursement-order.service.ts` | ✅ |
-| Store | RTK Query | `disbursement-order-store.ts` | ✅ |
-| 列表頁 | `Bills.tsx` | `DisbursementPage.tsx` | ✅ |
-| 詳情頁 | `bills/[billNumber]/page.tsx` | - | ⚠️ |
-| PDF 生成 | `BillPdf.tsx` | - | ❌ |
-| 計算邏輯 | `useBillCalculation.ts` | - | ❌ |
+| 功能     | 舊系統檔案                    | 新系統檔案                      | 狀態 |
+| -------- | ----------------------------- | ------------------------------- | ---- |
+| 資料模型 | `BillModel.ts`                | `disbursement-order.types.ts`   | ✅   |
+| Service  | `BillApi.ts`                  | `disbursement-order.service.ts` | ✅   |
+| Store    | RTK Query                     | `disbursement-order-store.ts`   | ✅   |
+| 列表頁   | `Bills.tsx`                   | `DisbursementPage.tsx`          | ✅   |
+| 詳情頁   | `bills/[billNumber]/page.tsx` | -                               | ⚠️   |
+| PDF 生成 | `BillPdf.tsx`                 | -                               | ❌   |
+| 計算邏輯 | `useBillCalculation.ts`       | -                               | ❌   |
 
 ---
 
 ### LinkPay 整合
 
-| 功能 | 舊系統檔案 | 新系統檔案 | 狀態 |
-|------|----------|----------|------|
-| API Route | `/api/supabase/linkpay` | `/api/linkpay/route.ts` | ⚠️ Mock |
-| Webhook | `/api/supabase/linkpay/webhook` | - (已註解) | ❌ |
-| Hook | `useCreateLinkPayHandler.ts` | - | ❌ |
-| UI | `LinkPayExpandableRow.tsx` | - | ❌ |
-| Store | RTK Query | `linkpay-log-store.ts` | ✅ |
+| 功能      | 舊系統檔案                      | 新系統檔案              | 狀態    |
+| --------- | ------------------------------- | ----------------------- | ------- |
+| API Route | `/api/supabase/linkpay`         | `/api/linkpay/route.ts` | ⚠️ Mock |
+| Webhook   | `/api/supabase/linkpay/webhook` | - (已註解)              | ❌      |
+| Hook      | `useCreateLinkPayHandler.ts`    | -                       | ❌      |
+| UI        | `LinkPayExpandableRow.tsx`      | -                       | ❌      |
+| Store     | RTK Query                       | `linkpay-log-store.ts`  | ✅      |
 
 ---
 
@@ -1281,6 +1346,7 @@ export const ImportReceiptsDialog = () => {
 **新系統的架構設計遠優於舊系統**，但需要補齊約 **60% 的 UI 功能**才能達到生產環境的功能完整度。
 
 **最關鍵的缺失**:
+
 1. **收款單系統** (完全缺失)
 2. **LinkPay 整合** (僅骨架)
 3. **PDF 生成** (僅報價單)

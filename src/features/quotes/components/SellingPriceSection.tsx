@@ -24,7 +24,12 @@ import {
   generateUniqueId,
 } from '../utils/priceCalculations'
 import { PriceInputRow } from './PriceInputRow'
-import { CATEGORY_SECTION_LABELS, COST_ITEM_ROW_LABELS, PRICE_SUMMARY_CARD_LABELS, SELLING_PRICE_SECTION_LABELS } from '../constants/labels';
+import {
+  CATEGORY_SECTION_LABELS,
+  COST_ITEM_ROW_LABELS,
+  PRICE_SUMMARY_CARD_LABELS,
+  SELLING_PRICE_SECTION_LABELS,
+} from '../constants/labels'
 
 interface SellingPriceSectionProps {
   participantCounts: ParticipantCounts
@@ -121,7 +126,13 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
     const newTier: TierPricing = {
       id: generateUniqueId(),
       participant_count: 0,
-      participant_counts: { adult: 0, child_with_bed: 0, child_no_bed: 0, single_room: 0, infant: 0 },
+      participant_counts: {
+        adult: 0,
+        child_with_bed: 0,
+        child_no_bed: 0,
+        single_room: 0,
+        infant: 0,
+      },
       identity_costs: { adult: 0, child_with_bed: 0, child_no_bed: 0, single_room: 0, infant: 0 },
       selling_prices: { ...sellingPrices },
       identity_profits: { adult: 0, child_with_bed: 0, child_no_bed: 0, single_room: 0, infant: 0 },
@@ -181,8 +192,8 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
             handleGenerateQuotation(undefined, undefined, undefined, tierPricingsData)
           }}
           className={cn(
-            "h-9 text-sm bg-morandi-secondary hover:bg-morandi-secondary/90 text-white gap-1.5",
-            handleSave ? "flex-1" : "w-full"
+            'h-9 text-sm bg-morandi-secondary hover:bg-morandi-secondary/90 text-white gap-1.5',
+            handleSave ? 'flex-1' : 'w-full'
           )}
           type="button"
         >
@@ -228,16 +239,26 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
                 isReadOnly && 'cursor-not-allowed opacity-60'
               )}
             />
-            <span className="text-sm font-semibold text-morandi-primary">{SELLING_PRICE_SECTION_LABELS.LABEL_2543}</span>
+            <span className="text-sm font-semibold text-morandi-primary">
+              {SELLING_PRICE_SECTION_LABELS.LABEL_2543}
+            </span>
           </div>
         </div>
         <table className="w-full text-sm">
           <thead className="border-b border-morandi-container/60">
             <tr>
-              <th className="text-left py-2 px-4 text-xs font-medium text-morandi-secondary">{SELLING_PRICE_SECTION_LABELS.LABEL_8725}</th>
-              <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">{SELLING_PRICE_SECTION_LABELS.LABEL_7178}</th>
-              <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">{SELLING_PRICE_SECTION_LABELS.LABEL_561}</th>
-              <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">{SELLING_PRICE_SECTION_LABELS.LABEL_7705}</th>
+              <th className="text-left py-2 px-4 text-xs font-medium text-morandi-secondary">
+                {SELLING_PRICE_SECTION_LABELS.LABEL_8725}
+              </th>
+              <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">
+                {SELLING_PRICE_SECTION_LABELS.LABEL_7178}
+              </th>
+              <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">
+                {SELLING_PRICE_SECTION_LABELS.LABEL_561}
+              </th>
+              <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">
+                {SELLING_PRICE_SECTION_LABELS.LABEL_7705}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -287,7 +308,10 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
               accommodationSummary.slice(1).map(room => (
                 <React.Fragment key={room.name}>
                   <tr className="border-b border-morandi-container/60">
-                    <td colSpan={4} className="py-2 px-3 text-xs font-medium text-morandi-secondary">
+                    <td
+                      colSpan={4}
+                      className="py-2 px-3 text-xs font-medium text-morandi-secondary"
+                    >
                       {room.name}
                     </td>
                   </tr>
@@ -295,7 +319,13 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
                     label={CATEGORY_SECTION_LABELS.成人}
                     cost={getRoomTypeCost(room.name, 'adult', accommodationSummary, identityCosts)}
                     sellingPrice={sellingPrices.room_types?.[room.name]?.adult || 0}
-                    profit={getRoomTypeProfit(room.name, 'adult', sellingPrices, accommodationSummary, identityCosts)}
+                    profit={getRoomTypeProfit(
+                      room.name,
+                      'adult',
+                      sellingPrices,
+                      accommodationSummary,
+                      identityCosts
+                    )}
                     onPriceChange={value => handleRoomTypePriceChange(room.name, 'adult', value)}
                     isReadOnly={isReadOnly}
                     indented
@@ -304,7 +334,13 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
                     label={PRICE_SUMMARY_CARD_LABELS.小孩}
                     cost={getRoomTypeCost(room.name, 'child', accommodationSummary, identityCosts)}
                     sellingPrice={sellingPrices.room_types?.[room.name]?.child || 0}
-                    profit={getRoomTypeProfit(room.name, 'child', sellingPrices, accommodationSummary, identityCosts)}
+                    profit={getRoomTypeProfit(
+                      room.name,
+                      'child',
+                      sellingPrices,
+                      accommodationSummary,
+                      identityCosts
+                    )}
                     onPriceChange={value => handleRoomTypePriceChange(room.name, 'child', value)}
                     isReadOnly={isReadOnly}
                     indented
@@ -317,7 +353,10 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
 
       {/* 檻次表列表 */}
       {tierPricings.map(tier => (
-        <div key={tier.id} className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+        <div
+          key={tier.id}
+          className="bg-card border border-border rounded-xl overflow-hidden shadow-sm"
+        >
           <div className="bg-morandi-container/30 px-4 py-2 flex items-center justify-between border-b border-border">
             <div className="flex items-center gap-1">
               <input
@@ -334,7 +373,9 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
                   isReadOnly && 'cursor-not-allowed opacity-60'
                 )}
               />
-              <span className="text-sm font-medium text-morandi-primary">{SELLING_PRICE_SECTION_LABELS.LABEL_2543}</span>
+              <span className="text-sm font-medium text-morandi-primary">
+                {SELLING_PRICE_SECTION_LABELS.LABEL_2543}
+              </span>
             </div>
             <div className="flex items-center gap-1.5">
               <Button
@@ -362,10 +403,18 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
           <table className="w-full text-sm">
             <thead className="border-b border-border/60">
               <tr>
-                <th className="text-left py-2 px-4 text-xs font-medium text-morandi-secondary">{SELLING_PRICE_SECTION_LABELS.LABEL_8725}</th>
-                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">{SELLING_PRICE_SECTION_LABELS.LABEL_7178}</th>
-                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">{SELLING_PRICE_SECTION_LABELS.LABEL_561}</th>
-                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">{SELLING_PRICE_SECTION_LABELS.LABEL_7705}</th>
+                <th className="text-left py-2 px-4 text-xs font-medium text-morandi-secondary">
+                  {SELLING_PRICE_SECTION_LABELS.LABEL_8725}
+                </th>
+                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">
+                  {SELLING_PRICE_SECTION_LABELS.LABEL_7178}
+                </th>
+                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">
+                  {SELLING_PRICE_SECTION_LABELS.LABEL_561}
+                </th>
+                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-secondary">
+                  {SELLING_PRICE_SECTION_LABELS.LABEL_7705}
+                </th>
               </tr>
             </thead>
             <tbody>

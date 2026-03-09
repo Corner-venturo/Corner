@@ -92,12 +92,10 @@ export async function searchPexelsPhotos(
 /**
  * 取得精選圖片
  */
-export async function getCuratedPhotos(
-  options?: {
-    page?: number
-    perPage?: number
-  }
-): Promise<PexelsSearchResult> {
+export async function getCuratedPhotos(options?: {
+  page?: number
+  perPage?: number
+}): Promise<PexelsSearchResult> {
   if (!API_KEY) {
     throw new Error('Pexels API 未設定')
   }
@@ -125,15 +123,47 @@ export async function getCuratedPhotos(
  */
 export const PEXELS_TRAVEL_KEYWORDS = {
   zh: [
-    '旅行', '海灘', '山景', '都市', '建築',
-    '美食', '咖啡廳', '夜景', '黃昏', '日出',
-    '度假村', '機場', '寺廟', '古城', '街道',
-    '熱帶', '雪景', '楓葉', '花海', '叢林',
+    '旅行',
+    '海灘',
+    '山景',
+    '都市',
+    '建築',
+    '美食',
+    '咖啡廳',
+    '夜景',
+    '黃昏',
+    '日出',
+    '度假村',
+    '機場',
+    '寺廟',
+    '古城',
+    '街道',
+    '熱帶',
+    '雪景',
+    '楓葉',
+    '花海',
+    '叢林',
   ],
   en: [
-    'travel', 'beach', 'mountain', 'city', 'architecture',
-    'food', 'cafe', 'night', 'sunset', 'sunrise',
-    'resort', 'airport', 'temple', 'ancient', 'street',
-    'tropical', 'snow', 'autumn', 'flowers', 'jungle',
+    'travel',
+    'beach',
+    'mountain',
+    'city',
+    'architecture',
+    'food',
+    'cafe',
+    'night',
+    'sunset',
+    'sunrise',
+    'resort',
+    'airport',
+    'temple',
+    'ancient',
+    'street',
+    'tropical',
+    'snow',
+    'autumn',
+    'flowers',
+    'jungle',
   ],
 }

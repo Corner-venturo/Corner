@@ -6,14 +6,17 @@
 ## ✅ 已完成的工作
 
 ### 1. 新增 workspace_id 欄位
+
 所有需要的表格都已成功新增 `workspace_id` 欄位（uuid 類型）並建立外鍵約束。
 
 ### 2. 建立索引
+
 為所有重要表格建立 `idx_<table>_workspace_id` 索引以提升查詢效能。
 
 ### 3. 資料填充狀態
 
 #### ✅ 完全就緒（7 個表格）
+
 - `tours`: 3 筆資料
 - `orders`: 2 筆資料
 - `todos`: 22 筆資料
@@ -23,7 +26,9 @@
 - `employees`: 5 筆資料
 
 #### ⚠️ 空白表格（9 個）
+
 以下表格沒有任何資料，因此不需要填充：
+
 - `itineraries`
 - `customers`
 - `payments`
@@ -37,6 +42,7 @@
 ## ❌ 需要修復（1 個表格）
 
 ### messages 表格
+
 - **問題**: 9 筆資料缺少 workspace_id
 - **原因**: 表格有 `updated_at` 觸發器，但觸發器的 PL/pgSQL 函數有錯誤
 - **錯誤**: `record "new" has no field "updated_at"`
@@ -51,8 +57,8 @@
 SET session_replication_role = replica;
 
 -- 更新 messages 表格
-UPDATE public.messages 
-SET workspace_id = '4df21741-2760-444b-930a-e37fe341405c'::uuid 
+UPDATE public.messages
+SET workspace_id = '4df21741-2760-444b-930a-e37fe341405c'::uuid
 WHERE workspace_id IS NULL;
 
 -- 重新啟用觸發器
@@ -77,7 +83,7 @@ SET session_replication_role = DEFAULT;
 
 - ✅ 欄位新增: 100% (17/17 tables)
 - ✅ 索引建立: 100%
-- ✅ 資料填充: 95% (16/17 tables) 
+- ✅ 資料填充: 95% (16/17 tables)
 - ⚠️ 待修復: 5% (1/17 tables - messages)
 
 ## 📝 Migration 記錄

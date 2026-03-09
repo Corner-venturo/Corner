@@ -25,28 +25,36 @@ export function useVehicleScheduleConflict() {
     error: null,
   })
 
-  const checkConflict = useCallback(async (
-    vehicleId: string,
-    startDate: string,
-    endDate: string,
-    excludeId?: string
-  ): Promise<boolean> => {
-    if (!vehicleId || !startDate || !endDate) {
-      return false
-    }
+  const checkConflict = useCallback(
+    async (
+      vehicleId: string,
+      startDate: string,
+      endDate: string,
+      excludeId?: string
+    ): Promise<boolean> => {
+      if (!vehicleId || !startDate || !endDate) {
+        return false
+      }
 
-    setResult(prev => ({ ...prev, loading: true, error: null }))
+      setResult(prev => ({ ...prev, loading: true, error: null }))
 
-    try {
-      const hasConflict = await checkVehicleConflictService(vehicleId, startDate, endDate, excludeId)
-      setResult({ hasConflict, loading: false, error: null })
-      return hasConflict
-    } catch (err) {
-      logger.error('檢查車輛調度衝突異常:', err)
-      setResult({ hasConflict: false, loading: false, error: '檢查失敗' })
-      return false
-    }
-  }, [])
+      try {
+        const hasConflict = await checkVehicleConflictService(
+          vehicleId,
+          startDate,
+          endDate,
+          excludeId
+        )
+        setResult({ hasConflict, loading: false, error: null })
+        return hasConflict
+      } catch (err) {
+        logger.error('檢查車輛調度衝突異常:', err)
+        setResult({ hasConflict: false, loading: false, error: '檢查失敗' })
+        return false
+      }
+    },
+    []
+  )
 
   return { ...result, checkConflict }
 }
@@ -61,28 +69,36 @@ export function useLeaderScheduleConflict() {
     error: null,
   })
 
-  const checkConflict = useCallback(async (
-    leaderId: string,
-    startDate: string,
-    endDate: string,
-    excludeId?: string
-  ): Promise<boolean> => {
-    if (!leaderId || !startDate || !endDate) {
-      return false
-    }
+  const checkConflict = useCallback(
+    async (
+      leaderId: string,
+      startDate: string,
+      endDate: string,
+      excludeId?: string
+    ): Promise<boolean> => {
+      if (!leaderId || !startDate || !endDate) {
+        return false
+      }
 
-    setResult(prev => ({ ...prev, loading: true, error: null }))
+      setResult(prev => ({ ...prev, loading: true, error: null }))
 
-    try {
-      const hasConflict = await checkLeaderConflictService(leaderId, startDate, endDate, excludeId)
-      setResult({ hasConflict, loading: false, error: null })
-      return hasConflict
-    } catch (err) {
-      logger.error('檢查領隊調度衝突異常:', err)
-      setResult({ hasConflict: false, loading: false, error: '檢查失敗' })
-      return false
-    }
-  }, [])
+      try {
+        const hasConflict = await checkLeaderConflictService(
+          leaderId,
+          startDate,
+          endDate,
+          excludeId
+        )
+        setResult({ hasConflict, loading: false, error: null })
+        return hasConflict
+      } catch (err) {
+        logger.error('檢查領隊調度衝突異常:', err)
+        setResult({ hasConflict: false, loading: false, error: '檢查失敗' })
+        return false
+      }
+    },
+    []
+  )
 
   return { ...result, checkConflict }
 }

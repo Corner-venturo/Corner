@@ -35,10 +35,14 @@ const TABS: { id: TabType; label: string; icon: typeof FileText }[] = [
 ]
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  '開團': { label: ID_LABELS.STATUS_PROPOSAL, color: 'text-amber-700', bg: 'bg-amber-100' },
-  '待出發': { label: ID_LABELS.STATUS_IN_PROGRESS, color: 'text-green-700', bg: 'bg-green-100' },
-  '已結團': { label: ID_LABELS.STATUS_CLOSED, color: 'text-morandi-secondary', bg: 'bg-morandi-container' },
-  '取消': { label: ID_LABELS.STATUS_CANCELLED, color: 'text-red-700', bg: 'bg-red-100' },
+  開團: { label: ID_LABELS.STATUS_PROPOSAL, color: 'text-amber-700', bg: 'bg-amber-100' },
+  待出發: { label: ID_LABELS.STATUS_IN_PROGRESS, color: 'text-green-700', bg: 'bg-green-100' },
+  已結團: {
+    label: ID_LABELS.STATUS_CLOSED,
+    color: 'text-morandi-secondary',
+    bg: 'bg-morandi-container',
+  },
+  取消: { label: ID_LABELS.STATUS_CANCELLED, color: 'text-red-700', bg: 'bg-red-100' },
 }
 
 // 資料庫類型
@@ -136,10 +140,14 @@ interface Vehicle {
 // 工具函數
 function priorityNumberToString(priority: number): 'low' | 'medium' | 'high' | 'urgent' {
   switch (priority) {
-    case 4: return 'urgent'
-    case 3: return 'high'
-    case 2: return 'medium'
-    default: return 'low'
+    case 4:
+      return 'urgent'
+    case 3:
+      return 'high'
+    case 2:
+      return 'medium'
+    default:
+      return 'low'
   }
 }
 
@@ -148,7 +156,6 @@ function calculateNights(start: string, end: string): number {
   const endDate = new Date(end)
   return Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
 }
-
 
 export default function TourDetailPage() {
   const params = useParams()
@@ -191,10 +198,7 @@ export default function TourDetailPage() {
 
     async function loadMembers() {
       // 先取得該團的所有訂單 ID
-      const { data: orders } = await supabase
-        .from('orders')
-        .select('id')
-        .eq('tour_id', tourId)
+      const { data: orders } = await supabase.from('orders').select('id').eq('tour_id', tourId)
 
       if (!orders || orders.length === 0) {
         setMembers([])
@@ -226,7 +230,8 @@ export default function TourDetailPage() {
     async function loadRooms() {
       const { data } = await supabase
         .from('tour_rooms')
-        .select(`
+        .select(
+          `
           id,
           room_number,
           room_type,
@@ -237,7 +242,8 @@ export default function TourDetailPage() {
             order_member_id,
             order_members(id, chinese_name)
           )
-        `)
+        `
+        )
         .eq('tour_id', tourId)
         .order('night_number')
         .order('room_number')
@@ -255,14 +261,14 @@ export default function TourDetailPage() {
         }>
       }
 
-      const formattedRooms = ((data || []) as RoomData[]).map((room) => ({
+      const formattedRooms = ((data || []) as RoomData[]).map(room => ({
         id: room.id,
         room_number: room.room_number,
         room_type: room.room_type,
         hotel_name: room.hotel_name,
         night_number: room.night_number,
         capacity: room.capacity,
-        assigned_members: (room.tour_room_assignments || []).map((a) => ({
+        assigned_members: (room.tour_room_assignments || []).map(a => ({
           id: a.order_members?.id || '',
           name: a.order_members?.chinese_name || ID_LABELS.UNNAMED,
         })),
@@ -281,7 +287,8 @@ export default function TourDetailPage() {
     async function loadVehicles() {
       const { data } = await supabase
         .from('tour_vehicles')
-        .select(`
+        .select(
+          `
           id,
           vehicle_name,
           vehicle_type,
@@ -292,7 +299,8 @@ export default function TourDetailPage() {
             seat_number,
             order_members(id, chinese_name)
           )
-        `)
+        `
+        )
         .eq('tour_id', tourId)
         .order('display_order')
 
@@ -309,13 +317,13 @@ export default function TourDetailPage() {
         }>
       }
 
-      const formattedVehicles = ((data || []) as VehicleData[]).map((v) => ({
+      const formattedVehicles = ((data || []) as VehicleData[]).map(v => ({
         id: v.id,
         vehicle_name: v.vehicle_name,
         vehicle_type: v.vehicle_type,
         capacity: v.capacity,
         driver_name: v.driver_name,
-        assigned_members: (v.tour_vehicle_assignments || []).map((a) => ({
+        assigned_members: (v.tour_vehicle_assignments || []).map(a => ({
           id: a.order_members?.id || '',
           name: a.order_members?.chinese_name || ID_LABELS.UNNAMED,
           seat_number: a.seat_number ?? undefined,
@@ -339,7 +347,7 @@ export default function TourDetailPage() {
         .eq('tour_id', tourId)
         .order('created_at', { ascending: false })
 
-      const formatted: DisplayPayment[] = ((data || []) as DbPayment[]).map((p) => ({
+      const formatted: DisplayPayment[] = ((data || []) as DbPayment[]).map(p => ({
         id: p.id,
         code: p.code,
         description: p.notes || ID_LABELS.NO_DESCRIPTION,
@@ -370,7 +378,7 @@ export default function TourDetailPage() {
         .order('deadline', { ascending: true })
         .limit(20)
 
-      const formatted: DisplayTodo[] = ((data || []) as DbTodo[]).map((t) => ({
+      const formatted: DisplayTodo[] = ((data || []) as DbTodo[]).map(t => ({
         id: t.id,
         title: t.title,
         description: typeof t.notes === 'string' ? t.notes : null,
@@ -417,7 +425,8 @@ export default function TourDetailPage() {
                 </span>
               </div>
               <div className="text-sm text-morandi-secondary">
-                {tour.name} {durationNights}{ID_LABELS.NIGHTS_SUFFIX}
+                {tour.name} {durationNights}
+                {ID_LABELS.NIGHTS_SUFFIX}
               </div>
             </div>
           </div>
@@ -428,7 +437,7 @@ export default function TourDetailPage() {
 
         {/* Tab 切換 */}
         <div className="flex overflow-x-auto scrollbar-hide border-t border-border">
-          {TABS.map((tab) => {
+          {TABS.map(tab => {
             const Icon = tab.icon
             return (
               <button
@@ -468,7 +477,9 @@ export default function TourDetailPage() {
                 <div className="flex items-center gap-3">
                   <Users size={16} className="text-morandi-secondary" />
                   <span className="text-morandi-secondary">{ID_LABELS.TOTAL_4426}</span>
-                  <span className="ml-auto text-morandi-primary">{tour.current_participants || 0} 人</span>
+                  <span className="ml-auto text-morandi-primary">
+                    {tour.current_participants || 0} 人
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <UserCheck size={16} className="text-morandi-secondary" />
@@ -502,7 +513,7 @@ export default function TourDetailPage() {
             </div>
 
             {/* 成員列表 */}
-            {members.map((member) => (
+            {members.map(member => (
               <MemberCard
                 key={member.id}
                 member={member}
@@ -521,12 +532,14 @@ export default function TourDetailPage() {
         {/* 分房 Tab */}
         {activeTab === 'rooms' && (
           <div className="space-y-3">
-            {rooms.map((room) => (
+            {rooms.map(room => (
               <div key={room.id} className="bg-card rounded-xl border border-border p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <Bed size={16} className="text-morandi-secondary" />
-                    <span className="font-medium text-morandi-primary">{room.room_number || '未編號'}</span>
+                    <span className="font-medium text-morandi-primary">
+                      {room.room_number || '未編號'}
+                    </span>
                     <span className="text-xs px-2 py-0.5 rounded-full bg-morandi-container text-morandi-secondary">
                       {room.room_type}
                     </span>
@@ -539,7 +552,7 @@ export default function TourDetailPage() {
                   {room.hotel_name} · 第{room.night_number}晚
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {room.assigned_members.map((m) => (
+                  {room.assigned_members.map(m => (
                     <span
                       key={m.id}
                       className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700"
@@ -563,7 +576,7 @@ export default function TourDetailPage() {
         {/* 分車 Tab */}
         {activeTab === 'vehicles' && (
           <div className="space-y-3">
-            {vehicles.map((vehicle) => (
+            {vehicles.map(vehicle => (
               <div key={vehicle.id} className="bg-card rounded-xl border border-border p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -583,7 +596,7 @@ export default function TourDetailPage() {
                   </div>
                 )}
                 <div className="flex flex-wrap gap-2">
-                  {vehicle.assigned_members.map((m) => (
+                  {vehicle.assigned_members.map(m => (
                     <span
                       key={m.id}
                       className="text-xs px-2 py-1 rounded-full bg-green-50 text-green-700"
@@ -614,13 +627,16 @@ export default function TourDetailPage() {
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
                   <div className="text-lg font-bold text-green-600">
-                    {payments.filter((p) => p.status === 'billed').length}
+                    {payments.filter(p => p.status === 'billed').length}
                   </div>
                   <div className="text-xs text-morandi-secondary">{ID_LABELS.LABEL_9075}</div>
                 </div>
                 <div>
                   <div className="text-lg font-bold text-amber-600">
-                    {payments.filter((p) => p.status === 'pending' || p.status === 'confirmed').length}
+                    {
+                      payments.filter(p => p.status === 'pending' || p.status === 'confirmed')
+                        .length
+                    }
                   </div>
                   <div className="text-xs text-morandi-secondary">{ID_LABELS.PROCESSING}</div>
                 </div>
@@ -638,11 +654,13 @@ export default function TourDetailPage() {
             {/* 請款列表 */}
             <div className="space-y-3">
               <h3 className="font-medium text-morandi-primary">{ID_LABELS.LABEL_9799}</h3>
-              {payments.map((payment) => (
+              {payments.map(payment => (
                 <PaymentCard key={payment.id} payment={payment} />
               ))}
               {payments.length === 0 && (
-                <div className="text-center py-8 text-morandi-secondary">{ID_LABELS.EMPTY_2322}</div>
+                <div className="text-center py-8 text-morandi-secondary">
+                  {ID_LABELS.EMPTY_2322}
+                </div>
               )}
             </div>
           </div>
@@ -651,11 +669,13 @@ export default function TourDetailPage() {
         {/* 待辦 Tab */}
         {activeTab === 'todos' && (
           <div className="space-y-3">
-            {todos.map((todo) => (
+            {todos.map(todo => (
               <TodoCard key={todo.id} todo={todo} />
             ))}
             {todos.length === 0 && (
-              <div className="text-center py-8 text-morandi-secondary">{ID_LABELS.NOT_FOUND_500}</div>
+              <div className="text-center py-8 text-morandi-secondary">
+                {ID_LABELS.NOT_FOUND_500}
+              </div>
             )}
           </div>
         )}

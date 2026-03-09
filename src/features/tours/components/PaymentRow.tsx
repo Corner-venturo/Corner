@@ -82,7 +82,11 @@ export const PaymentRow = React.memo(function PaymentRow({
         <div className="flex items-center space-x-2">
           {getPaymentTypeIcon(payment.type)}
           <span className="text-morandi-primary">
-            {payment.type === 'receipt' ? COMP_TOURS_LABELS.收款 : payment.type === 'request' ? COMP_TOURS_LABELS.請款 : COMP_TOURS_LABELS.出納}
+            {payment.type === 'receipt'
+              ? COMP_TOURS_LABELS.收款
+              : payment.type === 'request'
+                ? COMP_TOURS_LABELS.請款
+                : COMP_TOURS_LABELS.出納}
           </span>
         </div>
       </td>

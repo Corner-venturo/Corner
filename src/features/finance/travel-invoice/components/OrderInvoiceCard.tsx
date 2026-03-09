@@ -59,7 +59,8 @@ export function OrderInvoiceCard({ orderId, onIssue }: OrderInvoiceCardProps) {
       // 查詢已開立的發票
       const { data: invoicesData } = await supabase
         .from('invoice_orders')
-        .select(`
+        .select(
+          `
           amount,
           travel_invoices (
             id,
@@ -69,7 +70,8 @@ export function OrderInvoiceCard({ orderId, onIssue }: OrderInvoiceCardProps) {
             invoice_date,
             status
           )
-        `)
+        `
+        )
         .eq('order_id', orderId)
 
       if (invoicesData) {
@@ -134,7 +136,9 @@ export function OrderInvoiceCard({ orderId, onIssue }: OrderInvoiceCardProps) {
         {/* 已開發票列表 */}
         {invoices.length > 0 && (
           <div className="border-t pt-4">
-            <p className="text-sm text-morandi-secondary mb-2">{TRAVEL_INVOICE_LABELS.LABEL_9887}</p>
+            <p className="text-sm text-morandi-secondary mb-2">
+              {TRAVEL_INVOICE_LABELS.LABEL_9887}
+            </p>
             <div className="space-y-2">
               {invoices.map(inv => (
                 <div key={inv.id} className="flex justify-between text-sm">

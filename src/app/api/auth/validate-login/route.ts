@@ -65,9 +65,7 @@ export async function POST(request: NextRequest) {
     let authEmail: string | undefined
 
     if (employee.supabase_user_id) {
-      const { data: authUser } = await supabase.auth.admin.getUserById(
-        employee.supabase_user_id
-      )
+      const { data: authUser } = await supabase.auth.admin.getUserById(employee.supabase_user_id)
       authEmail = authUser?.user?.email ?? undefined
     }
 
@@ -94,15 +92,15 @@ export async function POST(request: NextRequest) {
     const { password_hash: _, ...employeeData } = employee
 
     // 7. 產生 JWT（server-side 簽名）
-    const mergedPermissions = [
-      ...(employeeData.permissions || []),
-      ...(employeeData.roles || []),
-    ]
+    const mergedPermissions = [...(employeeData.permissions || []), ...(employeeData.roles || [])]
     const jwt = await new SignJWT({
       sub: employeeData.id,
       employee_number: employeeData.employee_number,
       permissions: mergedPermissions,
-      role: mergedPermissions.includes('admin') || mergedPermissions.includes('*') ? 'admin' : 'employee',
+      role:
+        mergedPermissions.includes('admin') || mergedPermissions.includes('*')
+          ? 'admin'
+          : 'employee',
       workspace_id: workspace.id,
     })
       .setProtectedHeader({ alg: 'HS256' })

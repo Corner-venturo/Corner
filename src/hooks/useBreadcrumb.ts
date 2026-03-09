@@ -86,13 +86,7 @@ export interface UseBreadcrumbOptions {
  */
 export function useBreadcrumb(options: UseBreadcrumbOptions = {}): BreadcrumbItem[] {
   const pathname = usePathname()
-  const {
-    customItems,
-    lastItemLabel,
-    appendItems,
-    params = {},
-    includeHome = true,
-  } = options
+  const { customItems, lastItemLabel, appendItems, params = {}, includeHome = true } = options
 
   const breadcrumb = useMemo(() => {
     // 如果提供了自訂項目，直接使用

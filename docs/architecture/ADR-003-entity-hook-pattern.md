@@ -6,6 +6,7 @@
 
 ERP 系統有 30+ 個實體（tours、orders、customers、receipts、quotes 等），
 每個實體都需要：
+
 - CRUD 操作（Supabase query）
 - SWR 快取管理
 - 樂觀更新（Optimistic Update）
@@ -23,6 +24,7 @@ ERP 系統有 30+ 個實體（tours、orders、customers、receipts、quotes 等
 所有實體都透過這個 factory 產生統一的 hooks 和操作函數。
 
 產出的 API：
+
 - `useList()` — 列表 Hook（含 SWR + IndexedDB fallback）
 - `useListSlim()` — 精簡列表（只 fetch 指定欄位）
 - `useDetail(id)` — 單筆 Hook（Skip Pattern：id 為 null 時不發請求）
@@ -34,6 +36,7 @@ ERP 系統有 30+ 個實體（tours、orders、customers、receipts、quotes 等
 - `invalidate()` — 手動使快取失效
 
 Config 可配置：
+
 - `list.select` — 列表查詢的欄位
 - `list.orderBy` — 預設排序
 - `list.defaultFilter` — 預設過濾條件
@@ -53,17 +56,20 @@ Config 可配置：
 ## 後果
 
 ### 正面
+
 - 新增實體只需 `export const { useList, create, ... } = createEntityHook('table', config)`
 - 修 bug（如快取不更新）只需改 factory，所有實體都修好
 - 樂觀更新和 IndexedDB fallback 是免費的
 - TypeScript 泛型確保型別安全
 
 ### 負面
+
 - Factory 本身邏輯較複雜（~500 行），需要深入理解才能修改
 - 特殊需求可能需要繞過 factory（如複雜 join query）
 - 所有實體的行為被綁定，很難對單一實體做例外處理
 
 ### 與 BaseService 的關係
+
 - `createEntityHook` 是新架構（直接操作 Supabase + SWR）
 - `BaseService` 是舊架構（透過 Zustand Store 間接操作）
 - 兩者並存，新實體優先使用 `createEntityHook`

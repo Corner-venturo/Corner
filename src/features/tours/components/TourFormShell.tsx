@@ -7,12 +7,7 @@ import { AlertCircle, X } from 'lucide-react'
 import { NewTourData } from '../types'
 import type { OrderFormData } from '@/features/orders/components/add-order-form'
 import { useTourForm } from '../hooks/useTourForm'
-import {
-  TourBasicInfo,
-  TourFlightInfo,
-  TourSettings,
-  TourOrderSection,
-} from './tour-form'
+import { TourBasicInfo, TourFlightInfo, TourSettings, TourOrderSection } from './tour-form'
 import { TOUR_FORM } from '../constants'
 
 interface TourFormShellProps {
@@ -44,12 +39,7 @@ export function TourFormShell({
   isFromProposal,
 }: TourFormShellProps) {
   // 使用自定義 hook 處理航班查詢邏輯
-  const {
-    loadingOutbound,
-    loadingReturn,
-    handleSearchOutbound,
-    handleSearchReturn,
-  } = useTourForm({
+  const { loadingOutbound, loadingReturn, handleSearchOutbound, handleSearchReturn } = useTourForm({
     newTour,
     setNewTour,
   })
@@ -105,12 +95,11 @@ export function TourFormShell({
           {/* Left side - Tour info */}
           <div className={`flex-1 ${mode === 'create' ? 'pr-6 border-r border-border' : ''}`}>
             <div className="h-full overflow-y-auto">
-              <h3 className="text-lg font-medium text-morandi-primary mb-4">{TOUR_FORM.section_info}</h3>
+              <h3 className="text-lg font-medium text-morandi-primary mb-4">
+                {TOUR_FORM.section_info}
+              </h3>
               <div className="space-y-4">
-                <TourBasicInfo
-                  newTour={newTour}
-                  setNewTour={setNewTour}
-                />
+                <TourBasicInfo newTour={newTour} setNewTour={setNewTour} />
 
                 <TourFlightInfo
                   newTour={newTour}
@@ -155,21 +144,22 @@ export function TourFormShell({
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
             {mode === 'edit'
-              ? (submitting ? TOUR_FORM.submit_saving : TOUR_FORM.submit_save)
+              ? submitting
+                ? TOUR_FORM.submit_saving
+                : TOUR_FORM.submit_save
               : isFromProposal
-                ? (submitting
-                    ? TOUR_FORM.submit_converting
-                    : newOrder.contact_person
-                      ? TOUR_FORM.submit_convert_with_order
-                      : TOUR_FORM.submit_convert)
-                : (submitting
-                    ? TOUR_FORM.submit_creating
-                    : newOrder.contact_person
-                      ? TOUR_FORM.submit_create_with_order
-                      : TOUR_FORM.submit_create)}
+                ? submitting
+                  ? TOUR_FORM.submit_converting
+                  : newOrder.contact_person
+                    ? TOUR_FORM.submit_convert_with_order
+                    : TOUR_FORM.submit_convert
+                : submitting
+                  ? TOUR_FORM.submit_creating
+                  : newOrder.contact_person
+                    ? TOUR_FORM.submit_create_with_order
+                    : TOUR_FORM.submit_create}
           </Button>
         </div>
-
       </DialogContent>
     </Dialog>
   )

@@ -28,7 +28,11 @@ export function OrderListCard({
   const totalGap = orderList.orders.reduce((sum, order) => sum + order.gap, 0)
   const canProcess = userRole === 'admin' || userRole === 'finance'
 
-  const getOrderStatus = (order: { total_amount: number; paid_amount: number; collection_rate: number }) => {
+  const getOrderStatus = (order: {
+    total_amount: number
+    paid_amount: number
+    collection_rate: number
+  }) => {
     const isFullyUnpaid = order.total_amount > 0 && order.paid_amount === 0
     const isLowRate = order.collection_rate < 30
 
@@ -78,17 +82,25 @@ export function OrderListCard({
               <div className="text-2xl">💰</div>
               <div>
                 <div className="font-medium text-morandi-primary flex items-center gap-1">
-                  📋 待處理訂單 ({orderList.orders.length}筆 / <CurrencyCell amount={totalGap} className="inline" />)
+                  📋 待處理訂單 ({orderList.orders.length}筆 /{' '}
+                  <CurrencyCell amount={totalGap} className="inline" />)
                 </div>
                 <div className="text-xs text-morandi-secondary mt-1">
-                  {isExpanded ? COMP_WORKSPACE_LABELS.點擊收合詳情 : COMP_WORKSPACE_LABELS.點擊展開詳情}
+                  {isExpanded
+                    ? COMP_WORKSPACE_LABELS.點擊收合詳情
+                    : COMP_WORKSPACE_LABELS.點擊展開詳情}
                 </div>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <div className="text-xs text-morandi-secondary">{COMP_WORKSPACE_LABELS.TOTAL_3430}</div>
-                <CurrencyCell amount={totalGap} className="text-lg font-semibold text-status-danger" />
+                <div className="text-xs text-morandi-secondary">
+                  {COMP_WORKSPACE_LABELS.TOTAL_3430}
+                </div>
+                <CurrencyCell
+                  amount={totalGap}
+                  className="text-lg font-semibold text-status-danger"
+                />
               </div>
               {isExpanded ? (
                 <ChevronUp className="text-morandi-secondary" size={20} />
@@ -130,7 +142,7 @@ export function OrderListCard({
                   </tr>
                 </thead>
                 <tbody>
-                  {orderList.orders.map((order) => {
+                  {orderList.orders.map(order => {
                     const status = getOrderStatus(order)
                     const isProcessed = order.receipt_status === 'received'
 
@@ -178,7 +190,9 @@ export function OrderListCard({
                               <span>{COMP_WORKSPACE_LABELS.LABEL_1761}</span>
                             </button>
                           ) : (
-                            <div className="text-xs text-morandi-secondary">{COMP_WORKSPACE_LABELS.待處理}</div>
+                            <div className="text-xs text-morandi-secondary">
+                              {COMP_WORKSPACE_LABELS.待處理}
+                            </div>
                           )}
                         </td>
                       </tr>
@@ -201,7 +215,8 @@ export function OrderListCard({
                   )}
                 </div>
                 <div className="font-medium text-morandi-primary flex items-center gap-1">
-                  總缺口：<CurrencyCell amount={totalGap} className="inline" />
+                  總缺口：
+                  <CurrencyCell amount={totalGap} className="inline" />
                 </div>
               </div>
             </div>

@@ -84,17 +84,15 @@ function extractPassengerSSR(
 /**
  * 從解析結果自動比對旅客與團員
  */
-export function buildPassengerMatches(
-  result: ParsedPNR,
-  members: OrderMember[]
-): PassengerMatch[] {
+export function buildPassengerMatches(result: ParsedPNR, members: OrderMember[]): PassengerMatch[] {
   return result.passengers.map((passenger, index) => {
     const matchedMember = matchPassengerToMember(passenger.name, members)
     const { baggage, meal } = extractPassengerSSR(result.specialRequests, index)
 
     let ticketNumber: string | null = null
-    const ticketByName = result.ticketNumbers.find(t =>
-      t.passenger && normalizeNameForMatch(t.passenger) === normalizeNameForMatch(passenger.name)
+    const ticketByName = result.ticketNumbers.find(
+      t =>
+        t.passenger && normalizeNameForMatch(t.passenger) === normalizeNameForMatch(passenger.name)
     )
     if (ticketByName) {
       ticketNumber = ticketByName.number

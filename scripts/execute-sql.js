@@ -4,23 +4,23 @@
  * 使用方式: node scripts/execute-sql.js scripts/clear-test-data.sql
  */
 
-const fs = require('fs');
-const https = require('https');
+const fs = require('fs')
+const https = require('https')
 
-const PROJECT_REF = 'pfqvdacxowpgfamuvnsn';
-const ACCESS_TOKEN = 'sbp_653aa28afea3e6a714e2acc536eed313bc7b85a0';
+const PROJECT_REF = 'pfqvdacxowpgfamuvnsn'
+const ACCESS_TOKEN = 'sbp_653aa28afea3e6a714e2acc536eed313bc7b85a0'
 
 // 讀取 SQL 檔案
-const sqlFile = process.argv[2] || 'scripts/clear-test-data.sql';
-const sqlContent = fs.readFileSync(sqlFile, 'utf8');
+const sqlFile = process.argv[2] || 'scripts/clear-test-data.sql'
+const sqlContent = fs.readFileSync(sqlFile, 'utf8')
 
-console.log(`📄 讀取 SQL 檔案: ${sqlFile}`);
-console.log(`🔗 連接 Supabase 專案: ${PROJECT_REF}\n`);
+console.log(`📄 讀取 SQL 檔案: ${sqlFile}`)
+console.log(`🔗 連接 Supabase 專案: ${PROJECT_REF}\n`)
 
 // Supabase Management API - Execute SQL
 const data = JSON.stringify({
-  query: sqlContent
-});
+  query: sqlContent,
+})
 
 const options = {
   hostname: 'api.supabase.com',
@@ -28,50 +28,50 @@ const options = {
   path: `/v1/projects/${PROJECT_REF}/database/query`,
   method: 'POST',
   headers: {
-    'Authorization': `Bearer ${ACCESS_TOKEN}`,
+    Authorization: `Bearer ${ACCESS_TOKEN}`,
     'Content-Type': 'application/json',
-    'Content-Length': data.length
-  }
-};
+    'Content-Length': data.length,
+  },
+}
 
-const req = https.request(options, (res) => {
-  let responseData = '';
+const req = https.request(options, res => {
+  let responseData = ''
 
-  res.on('data', (chunk) => {
-    responseData += chunk;
-  });
+  res.on('data', chunk => {
+    responseData += chunk
+  })
 
   res.on('end', () => {
-    console.log(`📡 HTTP Status: ${res.statusCode}\n`);
-    
+    console.log(`📡 HTTP Status: ${res.statusCode}\n`)
+
     if (res.statusCode === 200 || res.statusCode === 201) {
       try {
-        const result = JSON.parse(responseData);
-        console.log('✅ SQL 執行成功！\n');
-        
+        const result = JSON.parse(responseData)
+        console.log('✅ SQL 執行成功！\n')
+
         if (result.result && result.result.length > 0) {
-          console.log('📊 執行結果:\n');
-          console.table(result.result);
+          console.log('📊 執行結果:\n')
+          console.table(result.result)
         } else if (Array.isArray(result) && result.length > 0) {
-          console.log('📊 執行結果:\n');
-          console.table(result);
+          console.log('📊 執行結果:\n')
+          console.table(result)
         } else {
-          console.log('執行完成（無回傳資料）');
+          console.log('執行完成（無回傳資料）')
         }
       } catch (e) {
-        console.log('執行完成');
-        console.log('回應:', responseData);
+        console.log('執行完成')
+        console.log('回應:', responseData)
       }
     } else {
-      console.error('❌ 執行失敗\n');
-      console.error('錯誤訊息:', responseData);
+      console.error('❌ 執行失敗\n')
+      console.error('錯誤訊息:', responseData)
     }
-  });
-});
+  })
+})
 
-req.on('error', (error) => {
-  console.error('❌ 連線錯誤:', error.message);
-});
+req.on('error', error => {
+  console.error('❌ 連線錯誤:', error.message)
+})
 
-req.write(data);
-req.end();
+req.write(data)
+req.end()

@@ -30,7 +30,9 @@ export function AttractionCard({
   onViewOnMap,
   selectedMapAttractionId,
 }: AttractionCardProps) {
-  const image = attraction.thumbnail || (attraction.images && attraction.images.length > 0 ? attraction.images[0] : null)
+  const image =
+    attraction.thumbnail ||
+    (attraction.images && attraction.images.length > 0 ? attraction.images[0] : null)
   const hasCoordinates = attraction.latitude && attraction.longitude
 
   return (
@@ -38,18 +40,21 @@ export function AttractionCard({
       className={`
         relative flex gap-3 p-2.5 rounded-xl transition-all
         border hover:shadow-sm
-        ${isExisting
-          ? 'border-border bg-muted opacity-60'
-          : isSelected
-            ? 'border-morandi-gold bg-morandi-gold/5'
-            : isSuggested
-              ? 'border-morandi-gold/30 bg-morandi-gold/10'
-              : 'border-transparent bg-morandi-container/20 hover:bg-morandi-container/30'
+        ${
+          isExisting
+            ? 'border-border bg-muted opacity-60'
+            : isSelected
+              ? 'border-morandi-gold bg-morandi-gold/5'
+              : isSuggested
+                ? 'border-morandi-gold/30 bg-morandi-gold/10'
+                : 'border-transparent bg-morandi-container/20 hover:bg-morandi-container/30'
         }
       `}
     >
       {/* 勾選框 */}
-      <label className={`flex items-center ${isExisting ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+      <label
+        className={`flex items-center ${isExisting ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+      >
         <input
           type="checkbox"
           checked={isSelected || isExisting}
@@ -62,10 +67,7 @@ export function AttractionCard({
       {/* 縮圖 */}
       <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-morandi-container/30">
         {image ? (
-          <img src={image}
-            alt={attraction.name}
-            className="w-full h-full object-cover"
-          />
+          <img src={image} alt={attraction.name} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-morandi-secondary/50">
             <ImageIcon size={20} />
@@ -76,9 +78,7 @@ export function AttractionCard({
       {/* 資訊 */}
       <div className="flex-1 min-w-0 flex flex-col justify-center">
         <div className="font-medium text-morandi-primary text-sm leading-tight line-clamp-1 flex items-center gap-1">
-          {isSuggested && (
-            <Sparkles size={12} className="text-morandi-gold flex-shrink-0" />
-          )}
+          {isSuggested && <Sparkles size={12} className="text-morandi-gold flex-shrink-0" />}
           {attraction.name}
           {isExisting && (
             <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-morandi-container text-morandi-secondary rounded">
@@ -91,9 +91,7 @@ export function AttractionCard({
             {attraction.city_name}
           </span>
           {attraction.category && (
-            <span className="text-morandi-secondary/70">
-              {attraction.category}
-            </span>
+            <span className="text-morandi-secondary/70">{attraction.category}</span>
           )}
         </div>
       </div>

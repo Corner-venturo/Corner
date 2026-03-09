@@ -13,14 +13,17 @@ export function useRequestOperations() {
 
   // 根據團號生成請款單編號：團號-I01, 團號-I02, ...
   // I = Invoice (請款單)
-  const generateRequestCode = useCallback((tourCode: string) => {
-    // 找到該團已有的請款單數量
-    const existingCount = payment_requests.filter(r =>
-      r.tour_code === tourCode || r.code?.startsWith(`${tourCode}-I`)
-    ).length
-    const nextNumber = existingCount + 1
-    return `${tourCode}-I${nextNumber.toString().padStart(2, '0')}`
-  }, [payment_requests])
+  const generateRequestCode = useCallback(
+    (tourCode: string) => {
+      // 找到該團已有的請款單數量
+      const existingCount = payment_requests.filter(
+        r => r.tour_code === tourCode || r.code?.startsWith(`${tourCode}-I`)
+      ).length
+      const nextNumber = existingCount + 1
+      return `${tourCode}-I${nextNumber.toString().padStart(2, '0')}`
+    },
+    [payment_requests]
+  )
 
   // Generate request number preview (舊方法，保留向下相容)
   const generateRequestNumber = useCallback(() => {
@@ -80,17 +83,20 @@ export function useRequestOperations() {
         })
 
         // Batch insert all items
-        await addPaymentItems(request.id, items.map((item, i) => ({
-          category: item.category,
-          supplier_id: item.supplier_id,
-          supplier_name: item.supplierName,
-          description: item.description,
-          unit_price: item.unit_price,
-          quantity: item.quantity,
-          notes: '',
-          sort_order: i + 1,
-          tour_request_id: item.tour_request_id || null,
-        })))
+        await addPaymentItems(
+          request.id,
+          items.map((item, i) => ({
+            category: item.category,
+            supplier_id: item.supplier_id,
+            supplier_name: item.supplierName,
+            description: item.description,
+            unit_price: item.unit_price,
+            quantity: item.quantity,
+            notes: '',
+            sort_order: i + 1,
+            tour_request_id: item.tour_request_id || null,
+          }))
+        )
 
         return request
       } else {
@@ -121,17 +127,20 @@ export function useRequestOperations() {
         })
 
         // Batch insert all items
-        await addPaymentItems(request.id, items.map((item, i) => ({
-          category: item.category,
-          supplier_id: item.supplier_id,
-          supplier_name: item.supplierName,
-          description: item.description,
-          unit_price: item.unit_price,
-          quantity: item.quantity,
-          notes: '',
-          sort_order: i + 1,
-          tour_request_id: item.tour_request_id || null,
-        })))
+        await addPaymentItems(
+          request.id,
+          items.map((item, i) => ({
+            category: item.category,
+            supplier_id: item.supplier_id,
+            supplier_name: item.supplierName,
+            description: item.description,
+            unit_price: item.unit_price,
+            quantity: item.quantity,
+            notes: '',
+            sort_order: i + 1,
+            tour_request_id: item.tour_request_id || null,
+          }))
+        )
 
         // 重算團成本 (already handled inside addItems, but ensure for tour)
         if (formData.tour_id) {
@@ -141,7 +150,13 @@ export function useRequestOperations() {
         return request
       }
     },
-    [createPaymentRequest, addPaymentItems, generateRequestCode, generateCompanyRequestCode, workspaceId]
+    [
+      createPaymentRequest,
+      addPaymentItems,
+      generateRequestCode,
+      generateCompanyRequestCode,
+      workspaceId,
+    ]
   )
 
   // Create batch requests
@@ -179,17 +194,20 @@ export function useRequestOperations() {
         })
 
         // Batch insert all items
-        await addPaymentItems(request.id, items.map((item, i) => ({
-          category: item.category,
-          supplier_id: item.supplier_id,
-          supplier_name: item.supplierName,
-          description: item.description,
-          unit_price: item.unit_price,
-          quantity: item.quantity,
-          notes: '',
-          sort_order: i + 1,
-          tour_request_id: item.tour_request_id || null,
-        })))
+        await addPaymentItems(
+          request.id,
+          items.map((item, i) => ({
+            category: item.category,
+            supplier_id: item.supplier_id,
+            supplier_name: item.supplierName,
+            description: item.description,
+            unit_price: item.unit_price,
+            quantity: item.quantity,
+            notes: '',
+            sort_order: i + 1,
+            tour_request_id: item.tour_request_id || null,
+          }))
+        )
 
         createdRequests.push(request)
 

@@ -29,7 +29,9 @@ export function PersonalInfoSection({
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_9773}</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              {COMP_HR_LABELS.LABEL_9773}
+            </label>
             {isEditing ? (
               <Input
                 value={formData.display_name}
@@ -40,7 +42,9 @@ export function PersonalInfoSection({
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_9768}</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              {COMP_HR_LABELS.LABEL_9768}
+            </label>
             {isEditing ? (
               <Input
                 value={formData.chinese_name}
@@ -54,7 +58,9 @@ export function PersonalInfoSection({
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_739}</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              {COMP_HR_LABELS.LABEL_739}
+            </label>
             {isEditing ? (
               <Input
                 value={formData.english_name}
@@ -65,7 +71,9 @@ export function PersonalInfoSection({
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_PINYIN}</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              {COMP_HR_LABELS.LABEL_PINYIN}
+            </label>
             {isEditing ? (
               <Input
                 value={formData.pinyin}
@@ -79,13 +87,17 @@ export function PersonalInfoSection({
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_4929}</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              {COMP_HR_LABELS.LABEL_4929}
+            </label>
             <p className="text-morandi-primary py-2 bg-morandi-container/20 px-3 rounded">
               {employee.employee_number}
             </p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_AUTH_EMAIL}</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              {COMP_HR_LABELS.LABEL_AUTH_EMAIL}
+            </label>
             <p className="text-morandi-primary py-2 bg-morandi-container/20 px-3 rounded">
               {employee.email || '-'}
             </p>
@@ -93,7 +105,9 @@ export function PersonalInfoSection({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">{COMP_HR_LABELS.LABEL_3405}</label>
+          <label className="block text-sm font-medium text-morandi-primary mb-1">
+            {COMP_HR_LABELS.LABEL_3405}
+          </label>
           {isEditing ? (
             <Input
               value={formData.personal_info.national_id}

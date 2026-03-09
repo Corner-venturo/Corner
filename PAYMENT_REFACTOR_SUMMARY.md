@@ -10,6 +10,7 @@
 ### ✅ 已完成項目
 
 1. **建立完整的 Feature 架構**
+
    ```
    src/features/finance/payments/
    ├── components/
@@ -46,6 +47,7 @@
 ## 🎨 UI 對比
 
 ### Before (舊版)
+
 ```tsx
 // ❌ 獨立頁面 + 卡片式表單
 /finance/payments/new → 傳統多層 Card 佈局
@@ -56,6 +58,7 @@
 ```
 
 ### After (新版)
+
 ```tsx
 // ✅ Dialog 彈窗 + 表格式輸入
 <AddReceiptDialog />
@@ -69,19 +72,21 @@
 
 ## 🔄 現在與請款管理完全一致
 
-| 比較項目 | 請款管理 (Requests) | 收款管理 (Payments) |
-|---------|-------------------|-------------------|
-| **新增方式** | ✅ Dialog | ✅ Dialog（已統一） |
-| **UI 風格** | ✅ 表格式 | ✅ 表格式（已統一） |
+| 比較項目         | 請款管理 (Requests)             | 收款管理 (Payments)                       |
+| ---------------- | ------------------------------- | ----------------------------------------- |
+| **新增方式**     | ✅ Dialog                       | ✅ Dialog（已統一）                       |
+| **UI 風格**      | ✅ 表格式                       | ✅ 表格式（已統一）                       |
 | **Feature 架構** | ✅ `features/finance/requests/` | ✅ `features/finance/payments/`（已建立） |
-| **批次功能** | ✅ `BatchRequestDialog` | ✅ `BatchReceiptDialog`（已移動） |
+| **批次功能**     | ✅ `BatchRequestDialog`         | ✅ `BatchReceiptDialog`（已移動）         |
 
 ---
 
 ## 📦 新增的組件
 
 ### 1. AddReceiptDialog
+
 **功能**：
+
 - 選擇團體 → 自動過濾訂單
 - 表格式輸入收款項目
 - 支援 5 種收款方式（現金/匯款/刷卡/支票/LinkPay）
@@ -89,6 +94,7 @@
 - 即時驗證和計算
 
 **使用方式**：
+
 ```tsx
 <AddReceiptDialog
   open={isDialogOpen}
@@ -98,19 +104,24 @@
 ```
 
 ### 2. PaymentItemRow
+
 **功能**：
+
 - 單一收款項目的表格行
 - 支援 `<tr>` + 額外欄位的雙行設計
 - 動態顯示不同收款方式的專屬欄位
 
 **特色**：
+
 - LinkPay: Email、付款截止日、付款名稱
 - 匯款: 匯入帳戶、手續費
 - 刷卡: 卡號後四碼、授權碼、手續費
 - 支票: 支票號碼、開票銀行
 
 ### 3. usePaymentForm Hook
+
 **功能**：
+
 - 表單資料管理
 - 訂單過濾（根據選中的團體）
 - 收款項目的增刪改
@@ -118,6 +129,7 @@
 - 完整表單驗證
 
 **返回值**：
+
 ```ts
 {
   // 資料
@@ -158,6 +170,7 @@
 ## ⚠️ 待實作項目
 
 1. **AddReceiptDialog 的儲存邏輯**
+
    ```tsx
    // TODO: 實作儲存邏輯
    // 1. 建立收款單

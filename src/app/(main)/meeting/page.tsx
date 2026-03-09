@@ -1,61 +1,61 @@
-'use client';
+'use client'
 
-import { useState, useEffect, useRef } from 'react';
-import { AI_ENDPOINTS } from '@/lib/meeting/ai-endpoints';
+import { useState, useEffect, useRef } from 'react'
+import { AI_ENDPOINTS } from '@/lib/meeting/ai-endpoints'
 import { MEETING_LABELS } from './constants/labels'
 
 interface Message {
-  id: string;
-  user: string;
-  message: string;
-  timestamp: Date;
-  isAI?: boolean;
+  id: string
+  user: string
+  message: string
+  timestamp: Date
+  isAI?: boolean
 }
 
 interface AIResponse {
-  aiId: string;
-  aiName: string;
-  aiEmoji: string;
-  message: string;
+  aiId: string
+  aiName: string
+  aiEmoji: string
+  message: string
 }
 
 export default function MeetingRoomPage() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [isConnected, setIsConnected] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const wsRef = useRef<WebSocket | null>(null);
+  const [messages, setMessages] = useState<Message[]>([])
+  const [input, setInput] = useState('')
+  const [isConnected, setIsConnected] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const wsRef = useRef<WebSocket | null>(null)
 
   // 自動滾動到最新訊息
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   // WebSocket 連線（稍後實作）
   useEffect(() => {
     // TODO: 連接 WebSocket server
-    setIsConnected(true);
-    
+    setIsConnected(true)
+
     return () => {
       if (wsRef.current) {
-        wsRef.current.close();
+        wsRef.current.close()
       }
-    };
-  }, []);
+    }
+  }, [])
 
   const sendMessage = async () => {
-    if (!input.trim()) return;
+    if (!input.trim()) return
 
-    const messageText = input;
+    const messageText = input
     const newMessage: Message = {
       id: Date.now().toString(),
       user: 'William',
       message: messageText,
       timestamp: new Date(),
-    };
+    }
 
-    setMessages(prev => [...prev, newMessage]);
-    setInput('');
+    setMessages(prev => [...prev, newMessage])
+    setInput('')
 
     // 呼叫 API 檢查是否需要 AI 回應
     try {
@@ -66,9 +66,9 @@ export default function MeetingRoomPage() {
           message: messageText,
           user: 'William',
         }),
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (data.needsAI && data.responses) {
         // 處理多個 AI 回應
@@ -79,12 +79,12 @@ export default function MeetingRoomPage() {
             message: aiResponse.message,
             timestamp: new Date(data.timestamp),
             isAI: true,
-          };
-          setMessages(prev => [...prev, aiMessage]);
-        });
+          }
+          setMessages(prev => [...prev, aiMessage])
+        })
       }
     } catch (error) {
-      console.error('發送訊息失敗:', error);
+      console.error('發送訊息失敗:', error)
       // 顯示錯誤訊息
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -92,58 +92,60 @@ export default function MeetingRoomPage() {
         message: '⚠️ 無法連接到 AI 系統',
         timestamp: new Date(),
         isAI: true,
-      };
-      setMessages(prev => [...prev, errorMessage]);
+      }
+      setMessages(prev => [...prev, errorMessage])
     }
-  };
+  }
 
   const endMeeting = async () => {
-    if (!confirm('確定要結束會議並生成摘要嗎？')) return;
+    if (!confirm('確定要結束會議並生成摘要嗎？')) return
 
     try {
       const response = await fetch('/api/meeting/summary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages }),
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (data.success) {
         // 顯示摘要
-        alert(`會議摘要已生成：\n\n${data.summary}`);
-        
+        alert(`會議摘要已生成：\n\n${data.summary}`)
+
         // 可以選擇清空訊息或跳轉
         // setMessages([]);
       } else {
-        alert('摘要生成失敗，請稍後再試');
+        alert('摘要生成失敗，請稍後再試')
       }
     } catch (error) {
-      console.error('結束會議失敗:', error);
-      alert('無法生成摘要，請檢查系統連線');
+      console.error('結束會議失敗:', error)
+      alert('無法生成摘要，請檢查系統連線')
     }
-  };
+  }
 
   return (
     <div className="flex h-screen bg-gray-900">
       {/* 左側：成員列表 */}
       <aside className="w-64 bg-gray-800 p-4 border-r border-[var(--border)]">
         <h2 className="text-white text-lg font-bold mb-4">👥 在線成員</h2>
-        
+
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-white">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             <span>William (你)</span>
           </div>
-          
+
           {/* 動態顯示所有 AI */}
           {AI_ENDPOINTS.map(ai => (
             <div key={ai.id} className="flex items-center gap-2 text-white">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>{ai.emoji} {ai.name} (AI)</span>
+              <span>
+                {ai.emoji} {ai.name} (AI)
+              </span>
             </div>
           ))}
-          
+
           <div className="flex items-center gap-2 text-gray-500">
             <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
             <span>Carson (離線)</span>
@@ -193,9 +195,9 @@ export default function MeetingRoomPage() {
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-white font-semibold">{msg.user}</span>
                   <span className="text-gray-500 text-xs">
-                    {msg.timestamp.toLocaleTimeString('zh-TW', { 
-                      hour: '2-digit', 
-                      minute: '2-digit' 
+                    {msg.timestamp.toLocaleTimeString('zh-TW', {
+                      hour: '2-digit',
+                      minute: '2-digit',
                     })}
                   </span>
                 </div>
@@ -212,8 +214,8 @@ export default function MeetingRoomPage() {
             <input
               type="text"
               value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+              onChange={e => setInput(e.target.value)}
+              onKeyPress={e => e.key === 'Enter' && sendMessage()}
               placeholder={MEETING_LABELS.LABEL_8571}
               className="flex-1 px-4 py-3 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -236,5 +238,5 @@ export default function MeetingRoomPage() {
         </div>
       </main>
     </div>
-  );
+  )
 }

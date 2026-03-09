@@ -16,7 +16,10 @@ interface UseContractFormProps {
 }
 
 // 合約專用的成員類型（擴展標準 OrderMember）
-type ContractMember = Pick<OrderMember, 'id' | 'order_id' | 'chinese_name' | 'id_number' | 'passport_name' | 'gender' | 'birth_date'> & {
+type ContractMember = Pick<
+  OrderMember,
+  'id' | 'order_id' | 'chinese_name' | 'id_number' | 'passport_name' | 'gender' | 'birth_date'
+> & {
   contract_created_at?: string | null
   name?: string // 兼容舊資料
 }
@@ -59,7 +62,9 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
       const orderIds = tourOrders.map(o => o.id)
       const { data, error } = await supabase
         .from('order_members')
-        .select('id, order_id, chinese_name, id_number, passport_name, gender, birth_date, contract_created_at')
+        .select(
+          'id, order_id, chinese_name, id_number, passport_name, gender, birth_date, contract_created_at'
+        )
         .in('order_id', orderIds)
         .order('created_at', { ascending: true })
 
@@ -96,7 +101,8 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
     if (selectedMemberId && selectedMember) {
       setContractData(prev => ({
         ...prev,
-        travelerName: selectedMember.chinese_name || selectedMember.passport_name || prev.travelerName || '',
+        travelerName:
+          selectedMember.chinese_name || selectedMember.passport_name || prev.travelerName || '',
         travelerIdNumber: selectedMember.id_number || prev.travelerIdNumber || '',
       }))
     }
@@ -149,7 +155,12 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
             // 如果 contract_content 不是 JSON,就重新準備資料
             if (selectedOrder) {
               const firstMember = selectedOrderMembers[0]
-              const autoData = prepareContractData(tour, selectedOrder as Order, firstMember as unknown as Member, itinerary)
+              const autoData = prepareContractData(
+                tour,
+                selectedOrder as Order,
+                firstMember as unknown as Member,
+                itinerary
+              )
               setContractData(autoData)
             } else if (linkedQuote) {
               // 沒有訂單，從報價單帶入
@@ -180,7 +191,12 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
           }
         } else if (selectedOrder) {
           const firstMember = selectedOrderMembers[0]
-          const autoData = prepareContractData(tour, selectedOrder as Order, firstMember as unknown as Member, itinerary)
+          const autoData = prepareContractData(
+            tour,
+            selectedOrder as Order,
+            firstMember as unknown as Member,
+            itinerary
+          )
           setContractData(autoData)
         } else if (linkedQuote) {
           // 沒有訂單也沒有已存的合約資料，從報價單帶入
@@ -218,7 +234,12 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
         if (selectedOrder) {
           // 有訂單資料，自動帶入
           const firstMember = selectedOrderMembers[0]
-          const autoData = prepareContractData(tour, selectedOrder as Order, firstMember as unknown as Member, itinerary)
+          const autoData = prepareContractData(
+            tour,
+            selectedOrder as Order,
+            firstMember as unknown as Member,
+            itinerary
+          )
           setContractData(autoData)
         } else {
           // 沒有訂單資料，但可能有行程表的集合資訊
@@ -257,7 +278,9 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
               }
             } else {
               // 從航班計算集合時間（起飛前3小時）
-              const outboundFlight = Array.isArray(itinerary.outbound_flight) ? itinerary.outbound_flight[0] : itinerary.outbound_flight
+              const outboundFlight = Array.isArray(itinerary.outbound_flight)
+                ? itinerary.outbound_flight[0]
+                : itinerary.outbound_flight
               if (outboundFlight?.departureTime) {
                 const [hourStr, minuteStr] = outboundFlight.departureTime.split(':')
                 let hour = parseInt(hourStr) - 3
@@ -276,7 +299,34 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
               // 根據航空公司判斷航廈
               if (!gatherLocation && outboundFlight?.airline) {
                 const airline = outboundFlight.airline.toUpperCase()
-                const terminal2Airlines = [COMP_CONTRACTS_LABELS.中華航空, 'CI', 'CHINA AIRLINES', COMP_CONTRACTS_LABELS.華航, COMP_CONTRACTS_LABELS.長榮航空, 'BR', 'EVA', COMP_CONTRACTS_LABELS.星宇航空, 'JX', 'STARLUX', COMP_CONTRACTS_LABELS.台灣虎航, 'IT', 'TIGERAIR', COMP_CONTRACTS_LABELS.樂桃航空, 'MM', 'PEACH', COMP_CONTRACTS_LABELS.捷星航空, 'GK', 'JETSTAR', COMP_CONTRACTS_LABELS.酷航, 'TR', 'SCOOT', COMP_CONTRACTS_LABELS.亞洲航空, 'AK', 'D7', 'AIRASIA']
+                const terminal2Airlines = [
+                  COMP_CONTRACTS_LABELS.中華航空,
+                  'CI',
+                  'CHINA AIRLINES',
+                  COMP_CONTRACTS_LABELS.華航,
+                  COMP_CONTRACTS_LABELS.長榮航空,
+                  'BR',
+                  'EVA',
+                  COMP_CONTRACTS_LABELS.星宇航空,
+                  'JX',
+                  'STARLUX',
+                  COMP_CONTRACTS_LABELS.台灣虎航,
+                  'IT',
+                  'TIGERAIR',
+                  COMP_CONTRACTS_LABELS.樂桃航空,
+                  'MM',
+                  'PEACH',
+                  COMP_CONTRACTS_LABELS.捷星航空,
+                  'GK',
+                  'JETSTAR',
+                  COMP_CONTRACTS_LABELS.酷航,
+                  'TR',
+                  'SCOOT',
+                  COMP_CONTRACTS_LABELS.亞洲航空,
+                  'AK',
+                  'D7',
+                  'AIRASIA',
+                ]
                 const isTerminal2 = terminal2Airlines.some(t => airline.includes(t.toUpperCase()))
                 gatherLocation = isTerminal2 ? COMP_CONTRACTS_LABELS.桃園國際機場第二航廈 : ''
               }
@@ -316,7 +366,6 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
         }
       }
     }
-     
   }, [isOpen, mode, tour.id, itinerary?.id, linkedQuote?.id])
 
   const handleFieldChange = (field: keyof ContractData, value: string) => {
@@ -378,7 +427,8 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
       }
 
       // 如果有選擇成員，批量標記成員已建立合約
-      const idsToUpdate = memberIds && memberIds.length > 0 ? memberIds : (selectedMemberId ? [selectedMemberId] : [])
+      const idsToUpdate =
+        memberIds && memberIds.length > 0 ? memberIds : selectedMemberId ? [selectedMemberId] : []
       if (idsToUpdate.length > 0 && !isCorporateContract) {
         const { error: memberError } = await supabase
           .from('order_members')
@@ -393,7 +443,11 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
         void loadOrderMembers()
       }
 
-      void alertSuccess(hasExistingContract ? COMP_CONTRACTS_LABELS.合約更新成功 : COMP_CONTRACTS_LABELS.合約建立成功)
+      void alertSuccess(
+        hasExistingContract
+          ? COMP_CONTRACTS_LABELS.合約更新成功
+          : COMP_CONTRACTS_LABELS.合約建立成功
+      )
       return true
     } catch (error) {
       void alertError(COMP_CONTRACTS_LABELS.儲存合約失敗_請稍後再試)

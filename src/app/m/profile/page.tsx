@@ -72,9 +72,7 @@ export default function MobileProfilePage() {
         <div className="bg-card rounded-xl border border-border p-4">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-morandi-gold/20 flex items-center justify-center">
-              <span className="text-2xl font-bold text-morandi-gold">
-                {user?.name?.[0] || 'U'}
-              </span>
+              <span className="text-2xl font-bold text-morandi-gold">{user?.name?.[0] || 'U'}</span>
             </div>
             <div className="flex-1">
               <h2 className="text-lg font-bold text-morandi-primary">{user?.name || '使用者'}</h2>
@@ -93,7 +91,7 @@ export default function MobileProfilePage() {
 
       {/* 選單列表 */}
       <div className="px-4 space-y-4">
-        {menuItems.map((section) => (
+        {menuItems.map(section => (
           <div key={section.title}>
             <h3 className="text-sm font-medium text-morandi-secondary mb-2 px-1">
               {section.title}
@@ -143,9 +141,7 @@ export default function MobileProfilePage() {
       </div>
 
       {/* 版本資訊 */}
-      <div className="text-center py-4 text-xs text-morandi-muted">
-        Venturo ERP v1.0.0
-      </div>
+      <div className="text-center py-4 text-xs text-morandi-muted">Venturo ERP v1.0.0</div>
     </div>
   )
 }

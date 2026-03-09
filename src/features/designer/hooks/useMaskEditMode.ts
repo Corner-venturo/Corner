@@ -36,29 +36,32 @@ export function useMaskEditMode({ canvas, onUpdate }: UseMaskEditModeOptions) {
   })
 
   // 進入編輯模式
-  const enterEditMode = useCallback((image: fabric.FabricImage) => {
-    if (!canvas) return
+  const enterEditMode = useCallback(
+    (image: fabric.FabricImage) => {
+      if (!canvas) return
 
-    setEditState({
-      isEditing: true,
-      targetImage: image,
-    })
+      setEditState({
+        isEditing: true,
+        targetImage: image,
+      })
 
-    // 鎖定圖片的移動（只允許調整遮罩內的位置）
-    image.set({
-      lockMovementX: true,
-      lockMovementY: true,
-      lockRotation: true,
-      lockScalingX: true,
-      lockScalingY: true,
-      hasControls: false,
-      hasBorders: true,
-      borderColor: '#c9aa7c',
-      borderDashArray: [5, 5],
-    })
+      // 鎖定圖片的移動（只允許調整遮罩內的位置）
+      image.set({
+        lockMovementX: true,
+        lockMovementY: true,
+        lockRotation: true,
+        lockScalingX: true,
+        lockScalingY: true,
+        hasControls: false,
+        hasBorders: true,
+        borderColor: '#c9aa7c',
+        borderDashArray: [5, 5],
+      })
 
-    canvas.renderAll()
-  }, [canvas])
+      canvas.renderAll()
+    },
+    [canvas]
+  )
 
   // 退出編輯模式
   const exitEditMode = useCallback(() => {
@@ -89,64 +92,70 @@ export function useMaskEditMode({ canvas, onUpdate }: UseMaskEditModeOptions) {
   }, [canvas, editState.targetImage, onUpdate])
 
   // 調整遮罩內圖片的位置
-  const adjustMaskOffset = useCallback((deltaX: number, deltaY: number) => {
-    if (!editState.targetImage || !canvas) return
+  const adjustMaskOffset = useCallback(
+    (deltaX: number, deltaY: number) => {
+      if (!editState.targetImage || !canvas) return
 
-    const image = editState.targetImage
-    const clipPath = image.clipPath
-    if (!clipPath) return
+      const image = editState.targetImage
+      const clipPath = image.clipPath
+      if (!clipPath) return
 
-    // 取得當前 clipPath 位置
-    const currentLeft = clipPath.left || 0
-    const currentTop = clipPath.top || 0
+      // 取得當前 clipPath 位置
+      const currentLeft = clipPath.left || 0
+      const currentTop = clipPath.top || 0
 
-    // 計算新位置（反向移動 clipPath 來模擬圖片移動）
-    // 縮放係數讓移動更順暢
-    const scaleFactor = 1
+      // 計算新位置（反向移動 clipPath 來模擬圖片移動）
+      // 縮放係數讓移動更順暢
+      const scaleFactor = 1
 
-    clipPath.set({
-      left: currentLeft - deltaX * scaleFactor,
-      top: currentTop - deltaY * scaleFactor,
-    })
+      clipPath.set({
+        left: currentLeft - deltaX * scaleFactor,
+        top: currentTop - deltaY * scaleFactor,
+      })
 
-    // 儲存到自訂屬性
-    const obj = image as unknown as Record<string, unknown>
-    obj.__maskOffsetX = ((obj.__maskOffsetX as number) || 0) + deltaX
-    obj.__maskOffsetY = ((obj.__maskOffsetY as number) || 0) + deltaY
+      // 儲存到自訂屬性
+      const obj = image as unknown as Record<string, unknown>
+      obj.__maskOffsetX = ((obj.__maskOffsetX as number) || 0) + deltaX
+      obj.__maskOffsetY = ((obj.__maskOffsetY as number) || 0) + deltaY
 
-    image.setCoords()
-    canvas.renderAll()
-  }, [canvas, editState.targetImage])
+      image.setCoords()
+      canvas.renderAll()
+    },
+    [canvas, editState.targetImage]
+  )
 
   // 調整遮罩內圖片的縮放
-  const adjustMaskZoom = useCallback((delta: number) => {
-    if (!editState.targetImage || !canvas) return
+  const adjustMaskZoom = useCallback(
+    (delta: number) => {
+      if (!editState.targetImage || !canvas) return
 
-    const image = editState.targetImage
-    const clipPath = image.clipPath
-    if (!clipPath) return
+      const image = editState.targetImage
+      const clipPath = image.clipPath
+      if (!clipPath) return
 
-    // 取得當前縮放
-    const currentScaleX = clipPath.scaleX || 1
-    const currentScaleY = clipPath.scaleY || 1
+      // 取得當前縮放
+      const currentScaleX = clipPath.scaleX || 1
+      const currentScaleY = clipPath.scaleY || 1
 
-    // 計算新縮放（delta > 0 = 圖片放大 = clipPath 縮小）
-    const zoomFactor = 1 - delta * 0.001
-    const newScaleX = Math.max(0.2, Math.min(3, currentScaleX * zoomFactor))
-    const newScaleY = Math.max(0.2, Math.min(3, currentScaleY * zoomFactor))
+      // 計算新縮放（delta > 0 = 圖片放大 = clipPath 縮小）
+      const zoomFactor = 1 - delta * 0.001
+      const newScaleX = Math.max(0.2, Math.min(3, currentScaleX * zoomFactor))
+      const newScaleY = Math.max(0.2, Math.min(3, currentScaleY * zoomFactor))
 
-    clipPath.set({
-      scaleX: newScaleX,
-      scaleY: newScaleY,
-    })
+      clipPath.set({
+        scaleX: newScaleX,
+        scaleY: newScaleY,
+      })
 
-    // 儲存到自訂屬性
-    const obj = image as unknown as Record<string, unknown>
-    obj.__maskZoom = 100 / newScaleX // 反向計算用戶感知的縮放值
+      // 儲存到自訂屬性
+      const obj = image as unknown as Record<string, unknown>
+      obj.__maskZoom = 100 / newScaleX // 反向計算用戶感知的縮放值
 
-    image.setCoords()
-    canvas.renderAll()
-  }, [canvas, editState.targetImage])
+      image.setCoords()
+      canvas.renderAll()
+    },
+    [canvas, editState.targetImage]
+  )
 
   // 監聽 canvas 事件
   useEffect(() => {
@@ -230,7 +239,16 @@ export function useMaskEditMode({ canvas, onUpdate }: UseMaskEditModeOptions) {
       canvas.off('mouse:up', handleMouseUp)
       canvas.off('mouse:wheel', handleWheel)
     }
-  }, [canvas, editState.isEditing, editState.targetImage, enterEditMode, exitEditMode, adjustMaskOffset, adjustMaskZoom, onUpdate])
+  }, [
+    canvas,
+    editState.isEditing,
+    editState.targetImage,
+    enterEditMode,
+    exitEditMode,
+    adjustMaskOffset,
+    adjustMaskZoom,
+    onUpdate,
+  ])
 
   // 監聽 Escape 鍵退出編輯模式
   useEffect(() => {

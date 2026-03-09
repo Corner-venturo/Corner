@@ -5,6 +5,7 @@
 ✅ **95% 完成** - 16/17 個表格已準備好 RLS
 
 ### 已完成的表格（7 個有資料）
+
 - tours (3 筆)
 - orders (2 筆)
 - todos (22 筆)
@@ -14,7 +15,9 @@
 - employees (5 筆)
 
 ### 空白表格（9 個）
+
 這些表格目前沒有資料，所以不需要處理：
+
 - itineraries, customers, payments, payment_requests
 - disbursement_orders, channels, channel_members
 - personal_canvases, rich_documents
@@ -29,18 +32,18 @@
 BEGIN;
 
 -- 新增 updated_at 欄位（修復觸發器問題）
-ALTER TABLE public.messages 
+ALTER TABLE public.messages
 ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
 
 -- 填充 workspace_id
-UPDATE public.messages 
+UPDATE public.messages
 SET workspace_id = (
-  SELECT id FROM public.workspaces 
+  SELECT id FROM public.workspaces
   ORDER BY created_at LIMIT 1
 ),
 updated_at = COALESCE(
-  edited_at::timestamptz, 
-  created_at::timestamptz, 
+  edited_at::timestamptz,
+  created_at::timestamptz,
   now()
 )
 WHERE workspace_id IS NULL;
@@ -57,6 +60,7 @@ node verify-final-status.js
 ```
 
 應該會看到：
+
 ```
 messages: READY (9 rows, all have workspace_id)
 ...

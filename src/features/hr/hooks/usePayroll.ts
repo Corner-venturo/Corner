@@ -122,515 +122,538 @@ export function usePayroll() {
   /**
    * 取得薪資期間列表
    */
-  const fetchPeriods = useCallback(async (year?: number) => {
-    if (!user) return
+  const fetchPeriods = useCallback(
+    async (year?: number) => {
+      if (!user) return
 
-    setLoading(true)
-    setError(null)
+      setLoading(true)
+      setError(null)
 
-    try {
-      let query = supabase
-        .from('payroll_periods')
-        .select('*')
-        .limit(500)
-        
-        .order('year', { ascending: false })
-        .order('month', { ascending: false })
+      try {
+        let query = supabase
+          .from('payroll_periods')
+          .select('*')
+          .limit(500)
 
-      if (year) {
-        query = query.eq('year', year)
+          .order('year', { ascending: false })
+          .order('month', { ascending: false })
+
+        if (year) {
+          query = query.eq('year', year)
+        }
+
+        const { data, error: queryError } = await query.limit(100)
+
+        if (queryError) throw queryError
+
+        setPeriods(
+          (data || []).map(item => ({
+            ...item,
+            status: item.status as PayrollPeriodStatus,
+          }))
+        )
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '載入薪資期間失敗'
+        setError(message)
+        logger.error('載入薪資期間失敗:', err)
+      } finally {
+        setLoading(false)
       }
-
-      const { data, error: queryError } = await query.limit(100)
-
-      if (queryError) throw queryError
-
-      setPeriods((data || []).map(item => ({
-        ...item,
-        status: item.status as PayrollPeriodStatus,
-      })))
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '載入薪資期間失敗'
-      setError(message)
-      logger.error('載入薪資期間失敗:', err)
-    } finally {
-      setLoading(false)
-    }
-  }, [user])
+    },
+    [user]
+  )
 
   /**
    * 建立薪資期間
    */
-  const createPeriod = useCallback(async (year: number, month: number): Promise<PayrollPeriod | null> => {
-    if (!user) return null
+  const createPeriod = useCallback(
+    async (year: number, month: number): Promise<PayrollPeriod | null> => {
+      if (!user) return null
 
-    setLoading(true)
-    setError(null)
+      setLoading(true)
+      setError(null)
 
-    try {
-      // 檢查是否已存在
-      const { data: existing } = await supabase
-        .from('payroll_periods')
-        .select('id')
-        
-        .eq('year', year)
-        .eq('month', month)
-        .single()
+      try {
+        // 檢查是否已存在
+        const { data: existing } = await supabase
+          .from('payroll_periods')
+          .select('id')
 
-      if (existing) {
-        setError('該月份薪資期間已存在')
+          .eq('year', year)
+          .eq('month', month)
+          .single()
+
+        if (existing) {
+          setError('該月份薪資期間已存在')
+          return null
+        }
+
+        // 計算起訖日期
+        const startDate = new Date(year, month - 1, 1)
+        const endDate = new Date(year, month, 0) // 該月最後一天
+
+        const { data, error: insertError } = await supabase
+          .from('payroll_periods')
+          .insert({
+            workspace_id: getRequiredWorkspaceId(),
+            year,
+            month,
+            start_date: startDate.toISOString().split('T')[0],
+            end_date: endDate.toISOString().split('T')[0],
+            status: 'draft',
+          })
+          .select()
+          .single()
+
+        if (insertError) throw insertError
+
+        await fetchPeriods()
+        return {
+          ...data,
+          status: data.status as PayrollPeriodStatus,
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '建立薪資期間失敗'
+        setError(message)
+        logger.error('建立薪資期間失敗:', err)
         return null
+      } finally {
+        setLoading(false)
       }
-
-      // 計算起訖日期
-      const startDate = new Date(year, month - 1, 1)
-      const endDate = new Date(year, month, 0) // 該月最後一天
-
-      const { data, error: insertError } = await supabase
-        .from('payroll_periods')
-        .insert({
-          workspace_id: getRequiredWorkspaceId(),
-          year,
-          month,
-          start_date: startDate.toISOString().split('T')[0],
-          end_date: endDate.toISOString().split('T')[0],
-          status: 'draft',
-        })
-        .select()
-        .single()
-
-      if (insertError) throw insertError
-
-      await fetchPeriods()
-      return {
-        ...data,
-        status: data.status as PayrollPeriodStatus,
-      }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '建立薪資期間失敗'
-      setError(message)
-      logger.error('建立薪資期間失敗:', err)
-      return null
-    } finally {
-      setLoading(false)
-    }
-  }, [user, fetchPeriods])
+    },
+    [user, fetchPeriods]
+  )
 
   /**
    * 取得薪資紀錄
    */
-  const fetchRecords = useCallback(async (periodId: string) => {
-    if (!user) return
+  const fetchRecords = useCallback(
+    async (periodId: string) => {
+      if (!user) return
 
-    setLoading(true)
-    setError(null)
+      setLoading(true)
+      setError(null)
 
-    try {
-      const { data, error: queryError } = await supabase
-        .from('payroll_records')
-        .select(`
+      try {
+        const { data, error: queryError } = await supabase
+          .from('payroll_records')
+          .select(
+            `
           *,
           employee:employees!payroll_records_employee_id_fkey(id, chinese_name, display_name)
-        `)
-        
-        .eq('payroll_period_id', periodId)
-        .order('created_at', { ascending: true })
+        `
+          )
 
-      if (queryError) throw queryError
+          .eq('payroll_period_id', periodId)
+          .order('created_at', { ascending: true })
 
-      const mappedData: PayrollRecord[] = (data || []).map(item => {
-        const employee = item.employee as { id: string; chinese_name: string | null; display_name: string | null } | null
-        return {
-          id: item.id,
-          workspace_id: item.workspace_id,
-          payroll_period_id: item.payroll_period_id,
-          employee_id: item.employee_id,
-          base_salary: item.base_salary || 0,
-          overtime_pay: item.overtime_pay || 0,
-          bonus: item.bonus || 0,
-          allowances: item.allowances || 0,
-          meal_allowance: item.meal_allowance || 0,
-          transportation_allowance: item.transportation_allowance || 0,
-          other_additions: item.other_additions || 0,
-          unpaid_leave_deduction: item.unpaid_leave_deduction || 0,
-          late_deduction: item.late_deduction || 0,
-          other_deductions: item.other_deductions || 0,
-          gross_salary: item.gross_salary || 0,
-          total_deductions: item.total_deductions || 0,
-          net_salary: item.net_salary || 0,
-          work_days: item.work_days || 0,
-          actual_work_days: item.actual_work_days || 0,
-          overtime_hours: item.overtime_hours || 0,
-          paid_leave_days: item.paid_leave_days || 0,
-          unpaid_leave_days: item.unpaid_leave_days || 0,
-          late_count: item.late_count || 0,
-          overtime_details: item.overtime_details as Record<string, unknown> | null,
-          allowance_details: item.allowance_details as Record<string, unknown> | null,
-          deduction_details: item.deduction_details as Record<string, unknown> | null,
-          notes: item.notes,
-          created_at: item.created_at,
-          updated_at: item.updated_at,
-          employee_name: employee?.display_name || employee?.chinese_name || '未知',
-        }
-      })
+        if (queryError) throw queryError
 
-      setRecords(mappedData)
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '載入薪資紀錄失敗'
-      setError(message)
-      logger.error('載入薪資紀錄失敗:', err)
-    } finally {
-      setLoading(false)
-    }
-  }, [user])
+        const mappedData: PayrollRecord[] = (data || []).map(item => {
+          const employee = item.employee as {
+            id: string
+            chinese_name: string | null
+            display_name: string | null
+          } | null
+          return {
+            id: item.id,
+            workspace_id: item.workspace_id,
+            payroll_period_id: item.payroll_period_id,
+            employee_id: item.employee_id,
+            base_salary: item.base_salary || 0,
+            overtime_pay: item.overtime_pay || 0,
+            bonus: item.bonus || 0,
+            allowances: item.allowances || 0,
+            meal_allowance: item.meal_allowance || 0,
+            transportation_allowance: item.transportation_allowance || 0,
+            other_additions: item.other_additions || 0,
+            unpaid_leave_deduction: item.unpaid_leave_deduction || 0,
+            late_deduction: item.late_deduction || 0,
+            other_deductions: item.other_deductions || 0,
+            gross_salary: item.gross_salary || 0,
+            total_deductions: item.total_deductions || 0,
+            net_salary: item.net_salary || 0,
+            work_days: item.work_days || 0,
+            actual_work_days: item.actual_work_days || 0,
+            overtime_hours: item.overtime_hours || 0,
+            paid_leave_days: item.paid_leave_days || 0,
+            unpaid_leave_days: item.unpaid_leave_days || 0,
+            late_count: item.late_count || 0,
+            overtime_details: item.overtime_details as Record<string, unknown> | null,
+            allowance_details: item.allowance_details as Record<string, unknown> | null,
+            deduction_details: item.deduction_details as Record<string, unknown> | null,
+            notes: item.notes,
+            created_at: item.created_at,
+            updated_at: item.updated_at,
+            employee_name: employee?.display_name || employee?.chinese_name || '未知',
+          }
+        })
+
+        setRecords(mappedData)
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '載入薪資紀錄失敗'
+        setError(message)
+        logger.error('載入薪資紀錄失敗:', err)
+      } finally {
+        setLoading(false)
+      }
+    },
+    [user]
+  )
 
   /**
    * 計算並建立薪資紀錄
    */
-  const calculatePayroll = useCallback(async (periodId: string): Promise<boolean> => {
-    if (!user) return false
+  const calculatePayroll = useCallback(
+    async (periodId: string): Promise<boolean> => {
+      if (!user) return false
 
-    setLoading(true)
-    setError(null)
+      setLoading(true)
+      setError(null)
 
-    try {
-      // 取得期間資訊
-      const { data: period, error: periodError } = await supabase
-        .from('payroll_periods')
-        .select('*')
-        .eq('id', periodId)
-        .single()
+      try {
+        // 取得期間資訊
+        const { data: period, error: periodError } = await supabase
+          .from('payroll_periods')
+          .select('*')
+          .eq('id', periodId)
+          .single()
 
-      if (periodError) throw periodError
-      if (!period) throw new Error('找不到薪資期間')
+        if (periodError) throw periodError
+        if (!period) throw new Error('找不到薪資期間')
 
-      // 狀態轉換驗證
-      const VALID_PAYROLL_TRANSITIONS: Record<string, string[]> = {
-        'draft': ['processing', 'confirmed'],
-        'processing': ['draft'],
-        'confirmed': ['paid', 'draft'],
-        'paid': [],
-      }
-
-      if (!VALID_PAYROLL_TRANSITIONS[period.status]?.includes('processing')) {
-        throw new Error(`無法從「${period.status}」轉為「processing」`)
-      }
-
-      // 更新狀態為計算中
-      await supabase
-        .from('payroll_periods')
-        .update({ status: 'processing' })
-        .eq('id', periodId)
-
-      // 取得所有在職員工
-      const { data: employees, error: empError } = await supabase
-        .from('employees')
-        .select('id, chinese_name, display_name, salary_info')
-        
-        .eq('is_active', true)
-
-      if (empError) throw empError
-
-      // 取得出勤紀錄
-      const { data: attendanceRecords, error: attError } = await supabase
-        .from('attendance_records')
-        .select('*')
-        .limit(500)
-        
-        .gte('date', period.start_date)
-        .lte('date', period.end_date)
-
-      if (attError) throw attError
-
-      // 取得請假紀錄
-      const { data: leaveRequests, error: leaveError } = await supabase
-        .from('leave_requests')
-        .select(`
-          *,
-          leave_type:leave_types!leave_requests_leave_type_id_fkey(id, is_paid)
-        `)
-        
-        .eq('status', 'approved')
-        .gte('start_date', period.start_date)
-        .lte('end_date', period.end_date)
-
-      if (leaveError) throw leaveError
-
-      // 計算工作天數（不含週末）
-      const workDays = countWorkDays(period.start_date, period.end_date)
-
-      // 刪除現有薪資紀錄
-      await supabase
-        .from('payroll_records')
-        .delete()
-        .eq('payroll_period_id', periodId)
-
-      // 為每位員工計算薪資
-      const payrollRecords = []
-      for (const emp of employees || []) {
-        const salaryInfo = emp.salary_info as { base_salary?: number; bonus?: number; allowances?: number } | null
-        const baseSalary = salaryInfo?.base_salary || 0
-
-        // 計算出勤
-        const empAttendance = (attendanceRecords || []).filter(a => a.employee_id === emp.id)
-        const actualWorkDays = empAttendance.filter(a => a.status === 'present' || a.status === 'late').length
-        const overtimeHours = empAttendance.reduce((sum, a) => sum + (a.overtime_hours || 0), 0)
-        const lateCount = empAttendance.filter(a => a.status === 'late').length
-
-        // 計算請假
-        const empLeaves = (leaveRequests || []).filter(l => l.employee_id === emp.id)
-        let paidLeaveDays = 0
-        let unpaidLeaveDays = 0
-        for (const leave of empLeaves) {
-          const leaveType = leave.leave_type as { id: string; is_paid: boolean | null } | null
-          if (leaveType?.is_paid !== false) {
-            paidLeaveDays += leave.days
-          } else {
-            unpaidLeaveDays += leave.days
-          }
+        // 狀態轉換驗證
+        const VALID_PAYROLL_TRANSITIONS: Record<string, string[]> = {
+          draft: ['processing', 'confirmed'],
+          processing: ['draft'],
+          confirmed: ['paid', 'draft'],
+          paid: [],
         }
 
-        // 計算加班費（依台灣勞基法分段計算）
-        const hourlyRate = baseSalary / 30 / 8
-        const overtimePay = calculateOvertimePay(hourlyRate, overtimeHours)
+        if (!VALID_PAYROLL_TRANSITIONS[period.status]?.includes('processing')) {
+          throw new Error(`無法從「${period.status}」轉為「processing」`)
+        }
 
-        // 計算無薪假扣款
-        const dailyRate = baseSalary / 30
-        const unpaidLeaveDeduction = Math.round(dailyRate * unpaidLeaveDays)
+        // 更新狀態為計算中
+        await supabase.from('payroll_periods').update({ status: 'processing' }).eq('id', periodId)
 
-        // 加項
-        const bonus = salaryInfo?.bonus || 0
-        const allowances = salaryInfo?.allowances || 0
+        // 取得所有在職員工
+        const { data: employees, error: empError } = await supabase
+          .from('employees')
+          .select('id, chinese_name, display_name, salary_info')
 
-        // 總額計算
-        const totalDeductions = unpaidLeaveDeduction
-        const grossSalary = baseSalary + overtimePay + bonus + allowances
-        const netSalary = grossSalary - totalDeductions
+          .eq('is_active', true)
 
-        payrollRecords.push({
-          workspace_id: getRequiredWorkspaceId(),
-          payroll_period_id: periodId,
-          employee_id: emp.id,
-          base_salary: baseSalary,
-          overtime_pay: overtimePay,
-          bonus,
-          allowances,
-          meal_allowance: 0,
-          transportation_allowance: 0,
-          other_additions: 0,
-          unpaid_leave_deduction: unpaidLeaveDeduction,
-          late_deduction: 0,
-          other_deductions: 0,
-          gross_salary: grossSalary,
-          total_deductions: totalDeductions,
-          net_salary: netSalary,
-          work_days: workDays,
-          actual_work_days: actualWorkDays,
-          overtime_hours: overtimeHours,
-          paid_leave_days: paidLeaveDays,
-          unpaid_leave_days: unpaidLeaveDays,
-          late_count: lateCount,
-        })
+        if (empError) throw empError
+
+        // 取得出勤紀錄
+        const { data: attendanceRecords, error: attError } = await supabase
+          .from('attendance_records')
+          .select('*')
+          .limit(500)
+
+          .gte('date', period.start_date)
+          .lte('date', period.end_date)
+
+        if (attError) throw attError
+
+        // 取得請假紀錄
+        const { data: leaveRequests, error: leaveError } = await supabase
+          .from('leave_requests')
+          .select(
+            `
+          *,
+          leave_type:leave_types!leave_requests_leave_type_id_fkey(id, is_paid)
+        `
+          )
+
+          .eq('status', 'approved')
+          .gte('start_date', period.start_date)
+          .lte('end_date', period.end_date)
+
+        if (leaveError) throw leaveError
+
+        // 計算工作天數（不含週末）
+        const workDays = countWorkDays(period.start_date, period.end_date)
+
+        // 刪除現有薪資紀錄
+        await supabase.from('payroll_records').delete().eq('payroll_period_id', periodId)
+
+        // 為每位員工計算薪資
+        const payrollRecords = []
+        for (const emp of employees || []) {
+          const salaryInfo = emp.salary_info as {
+            base_salary?: number
+            bonus?: number
+            allowances?: number
+          } | null
+          const baseSalary = salaryInfo?.base_salary || 0
+
+          // 計算出勤
+          const empAttendance = (attendanceRecords || []).filter(a => a.employee_id === emp.id)
+          const actualWorkDays = empAttendance.filter(
+            a => a.status === 'present' || a.status === 'late'
+          ).length
+          const overtimeHours = empAttendance.reduce((sum, a) => sum + (a.overtime_hours || 0), 0)
+          const lateCount = empAttendance.filter(a => a.status === 'late').length
+
+          // 計算請假
+          const empLeaves = (leaveRequests || []).filter(l => l.employee_id === emp.id)
+          let paidLeaveDays = 0
+          let unpaidLeaveDays = 0
+          for (const leave of empLeaves) {
+            const leaveType = leave.leave_type as { id: string; is_paid: boolean | null } | null
+            if (leaveType?.is_paid !== false) {
+              paidLeaveDays += leave.days
+            } else {
+              unpaidLeaveDays += leave.days
+            }
+          }
+
+          // 計算加班費（依台灣勞基法分段計算）
+          const hourlyRate = baseSalary / 30 / 8
+          const overtimePay = calculateOvertimePay(hourlyRate, overtimeHours)
+
+          // 計算無薪假扣款
+          const dailyRate = baseSalary / 30
+          const unpaidLeaveDeduction = Math.round(dailyRate * unpaidLeaveDays)
+
+          // 加項
+          const bonus = salaryInfo?.bonus || 0
+          const allowances = salaryInfo?.allowances || 0
+
+          // 總額計算
+          const totalDeductions = unpaidLeaveDeduction
+          const grossSalary = baseSalary + overtimePay + bonus + allowances
+          const netSalary = grossSalary - totalDeductions
+
+          payrollRecords.push({
+            workspace_id: getRequiredWorkspaceId(),
+            payroll_period_id: periodId,
+            employee_id: emp.id,
+            base_salary: baseSalary,
+            overtime_pay: overtimePay,
+            bonus,
+            allowances,
+            meal_allowance: 0,
+            transportation_allowance: 0,
+            other_additions: 0,
+            unpaid_leave_deduction: unpaidLeaveDeduction,
+            late_deduction: 0,
+            other_deductions: 0,
+            gross_salary: grossSalary,
+            total_deductions: totalDeductions,
+            net_salary: netSalary,
+            work_days: workDays,
+            actual_work_days: actualWorkDays,
+            overtime_hours: overtimeHours,
+            paid_leave_days: paidLeaveDays,
+            unpaid_leave_days: unpaidLeaveDays,
+            late_count: lateCount,
+          })
+        }
+
+        // 批量新增薪資紀錄
+        if (payrollRecords.length > 0) {
+          const { error: insertError } = await supabase
+            .from('payroll_records')
+            .insert(payrollRecords)
+
+          if (insertError) throw insertError
+        }
+
+        // 更新狀態為草稿（計算完成）
+        await supabase.from('payroll_periods').update({ status: 'draft' }).eq('id', periodId)
+
+        await fetchPeriods()
+        await fetchRecords(periodId)
+        return true
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '計算薪資失敗'
+        setError(message)
+        logger.error('計算薪資失敗:', err)
+
+        // 錯誤時回復狀態
+        await supabase.from('payroll_periods').update({ status: 'draft' }).eq('id', periodId)
+
+        return false
+      } finally {
+        setLoading(false)
       }
-
-      // 批量新增薪資紀錄
-      if (payrollRecords.length > 0) {
-        const { error: insertError } = await supabase
-          .from('payroll_records')
-          .insert(payrollRecords)
-
-        if (insertError) throw insertError
-      }
-
-      // 更新狀態為草稿（計算完成）
-      await supabase
-        .from('payroll_periods')
-        .update({ status: 'draft' })
-        .eq('id', periodId)
-
-      await fetchPeriods()
-      await fetchRecords(periodId)
-      return true
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '計算薪資失敗'
-      setError(message)
-      logger.error('計算薪資失敗:', err)
-
-      // 錯誤時回復狀態
-      await supabase
-        .from('payroll_periods')
-        .update({ status: 'draft' })
-        .eq('id', periodId)
-
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }, [user, fetchPeriods, fetchRecords])
+    },
+    [user, fetchPeriods, fetchRecords]
+  )
 
   /**
    * 更新薪資紀錄
    */
-  const updateRecord = useCallback(async (id: string, input: Partial<PayrollRecordInput>): Promise<boolean> => {
-    if (!user) return false
+  const updateRecord = useCallback(
+    async (id: string, input: Partial<PayrollRecordInput>): Promise<boolean> => {
+      if (!user) return false
 
-    setLoading(true)
-    setError(null)
+      setLoading(true)
+      setError(null)
 
-    try {
-      // 重新計算總額
-      const { data: existing, error: fetchError } = await supabase
-        .from('payroll_records')
-        .select('*')
-        .eq('id', id)
-        .single()
+      try {
+        // 重新計算總額
+        const { data: existing, error: fetchError } = await supabase
+          .from('payroll_records')
+          .select('*')
+          .eq('id', id)
+          .single()
 
-      if (fetchError) throw fetchError
+        if (fetchError) throw fetchError
 
-      const baseSalary = input.base_salary ?? existing.base_salary ?? 0
-      const overtimePay = input.overtime_pay ?? existing.overtime_pay ?? 0
-      const bonus = input.bonus ?? existing.bonus ?? 0
-      const allowances = input.allowances ?? existing.allowances ?? 0
-      const otherAdditions = input.other_additions ?? existing.other_additions ?? 0
-      const unpaidLeaveDeduction = input.unpaid_leave_deduction ?? existing.unpaid_leave_deduction ?? 0
-      const otherDeductions = input.other_deductions ?? existing.other_deductions ?? 0
+        const baseSalary = input.base_salary ?? existing.base_salary ?? 0
+        const overtimePay = input.overtime_pay ?? existing.overtime_pay ?? 0
+        const bonus = input.bonus ?? existing.bonus ?? 0
+        const allowances = input.allowances ?? existing.allowances ?? 0
+        const otherAdditions = input.other_additions ?? existing.other_additions ?? 0
+        const unpaidLeaveDeduction =
+          input.unpaid_leave_deduction ?? existing.unpaid_leave_deduction ?? 0
+        const otherDeductions = input.other_deductions ?? existing.other_deductions ?? 0
 
-      const grossSalary = baseSalary + overtimePay + bonus + allowances + otherAdditions
-      const totalDeductions = unpaidLeaveDeduction + otherDeductions
-      const netSalary = grossSalary - totalDeductions
+        const grossSalary = baseSalary + overtimePay + bonus + allowances + otherAdditions
+        const totalDeductions = unpaidLeaveDeduction + otherDeductions
+        const netSalary = grossSalary - totalDeductions
 
-      const { error: updateError } = await supabase
-        .from('payroll_records')
-        .update({
-          ...input,
-          gross_salary: grossSalary,
-          total_deductions: totalDeductions,
-          net_salary: netSalary,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', id)
-        
+        const { error: updateError } = await supabase
+          .from('payroll_records')
+          .update({
+            ...input,
+            gross_salary: grossSalary,
+            total_deductions: totalDeductions,
+            net_salary: netSalary,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', id)
 
-      if (updateError) throw updateError
+        if (updateError) throw updateError
 
-      await fetchRecords(existing.payroll_period_id)
-      return true
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '更新薪資紀錄失敗'
-      setError(message)
-      logger.error('更新薪資紀錄失敗:', err)
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }, [user, fetchRecords])
+        await fetchRecords(existing.payroll_period_id)
+        return true
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '更新薪資紀錄失敗'
+        setError(message)
+        logger.error('更新薪資紀錄失敗:', err)
+        return false
+      } finally {
+        setLoading(false)
+      }
+    },
+    [user, fetchRecords]
+  )
 
   /**
    * 確認薪資期間
    */
-  const confirmPeriod = useCallback(async (periodId: string): Promise<boolean> => {
-    if (!user?.id) return false
+  const confirmPeriod = useCallback(
+    async (periodId: string): Promise<boolean> => {
+      if (!user?.id) return false
 
-    setLoading(true)
-    setError(null)
+      setLoading(true)
+      setError(null)
 
-    try {
-      // 狀態轉換驗證
-      const { data: period, error: fetchError } = await supabase
-        .from('payroll_periods')
-        .select('status')
-        .eq('id', periodId)
-        .single()
+      try {
+        // 狀態轉換驗證
+        const { data: period, error: fetchError } = await supabase
+          .from('payroll_periods')
+          .select('status')
+          .eq('id', periodId)
+          .single()
 
-      if (fetchError || !period) throw new Error('找不到薪資期間')
+        if (fetchError || !period) throw new Error('找不到薪資期間')
 
-      const VALID_PAYROLL_TRANSITIONS: Record<string, string[]> = {
-        'draft': ['processing', 'confirmed'],
-        'processing': ['draft'],
-        'confirmed': ['paid', 'draft'],
-        'paid': [],
+        const VALID_PAYROLL_TRANSITIONS: Record<string, string[]> = {
+          draft: ['processing', 'confirmed'],
+          processing: ['draft'],
+          confirmed: ['paid', 'draft'],
+          paid: [],
+        }
+
+        if (!VALID_PAYROLL_TRANSITIONS[period.status]?.includes('confirmed')) {
+          throw new Error(`無法從「${period.status}」轉為「confirmed」`)
+        }
+
+        const { error: updateError } = await supabase
+          .from('payroll_periods')
+          .update({
+            status: 'confirmed',
+            confirmed_by: user.id,
+            confirmed_at: new Date().toISOString(),
+          })
+          .eq('id', periodId)
+
+        if (updateError) throw updateError
+
+        await fetchPeriods()
+        return true
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '確認薪資期間失敗'
+        setError(message)
+        logger.error('確認薪資期間失敗:', err)
+        return false
+      } finally {
+        setLoading(false)
       }
-
-      if (!VALID_PAYROLL_TRANSITIONS[period.status]?.includes('confirmed')) {
-        throw new Error(`無法從「${period.status}」轉為「confirmed」`)
-      }
-
-      const { error: updateError } = await supabase
-        .from('payroll_periods')
-        .update({
-          status: 'confirmed',
-          confirmed_by: user.id,
-          confirmed_at: new Date().toISOString(),
-        })
-        .eq('id', periodId)
-        
-
-      if (updateError) throw updateError
-
-      await fetchPeriods()
-      return true
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '確認薪資期間失敗'
-      setError(message)
-      logger.error('確認薪資期間失敗:', err)
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }, [user?.id, fetchPeriods])
+    },
+    [user?.id, fetchPeriods]
+  )
 
   /**
    * 標記為已發放
    */
-  const markAsPaid = useCallback(async (periodId: string): Promise<boolean> => {
-    if (!user) return false
+  const markAsPaid = useCallback(
+    async (periodId: string): Promise<boolean> => {
+      if (!user) return false
 
-    setLoading(true)
-    setError(null)
+      setLoading(true)
+      setError(null)
 
-    try {
-      // 狀態轉換驗證
-      const { data: period, error: fetchError } = await supabase
-        .from('payroll_periods')
-        .select('status')
-        .eq('id', periodId)
-        .single()
+      try {
+        // 狀態轉換驗證
+        const { data: period, error: fetchError } = await supabase
+          .from('payroll_periods')
+          .select('status')
+          .eq('id', periodId)
+          .single()
 
-      if (fetchError || !period) throw new Error('找不到薪資期間')
+        if (fetchError || !period) throw new Error('找不到薪資期間')
 
-      const VALID_PAYROLL_TRANSITIONS: Record<string, string[]> = {
-        'draft': ['processing', 'confirmed'],
-        'processing': ['draft'],
-        'confirmed': ['paid', 'draft'],
-        'paid': [],
+        const VALID_PAYROLL_TRANSITIONS: Record<string, string[]> = {
+          draft: ['processing', 'confirmed'],
+          processing: ['draft'],
+          confirmed: ['paid', 'draft'],
+          paid: [],
+        }
+
+        if (!VALID_PAYROLL_TRANSITIONS[period.status]?.includes('paid')) {
+          throw new Error(`無法從「${period.status}」轉為「paid」`)
+        }
+
+        const { error: updateError } = await supabase
+          .from('payroll_periods')
+          .update({
+            status: 'paid',
+            paid_at: new Date().toISOString(),
+          })
+          .eq('id', periodId)
+
+        if (updateError) throw updateError
+
+        await fetchPeriods()
+        return true
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '更新發放狀態失敗'
+        setError(message)
+        logger.error('更新發放狀態失敗:', err)
+        return false
+      } finally {
+        setLoading(false)
       }
-
-      if (!VALID_PAYROLL_TRANSITIONS[period.status]?.includes('paid')) {
-        throw new Error(`無法從「${period.status}」轉為「paid」`)
-      }
-
-      const { error: updateError } = await supabase
-        .from('payroll_periods')
-        .update({
-          status: 'paid',
-          paid_at: new Date().toISOString(),
-        })
-        .eq('id', periodId)
-        
-
-      if (updateError) throw updateError
-
-      await fetchPeriods()
-      return true
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '更新發放狀態失敗'
-      setError(message)
-      logger.error('更新發放狀態失敗:', err)
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }, [user, fetchPeriods])
+    },
+    [user, fetchPeriods]
+  )
 
   /**
    * 計算薪資統計
@@ -667,12 +690,12 @@ export function usePayroll() {
 
 /**
  * 計算加班費（依台灣勞基法分段計算）
- * 
+ *
  * 台灣勞基法規定：
  * - 前 2 小時：1.34 倍（時薪 × 4/3）
  * - 第 3-4 小時：1.67 倍（時薪 × 5/3）
  * - 超過 4 小時或休息日：2 倍
- * 
+ *
  * @param hourlyRate 時薪
  * @param overtimeHours 加班時數
  * @returns 加班費總額

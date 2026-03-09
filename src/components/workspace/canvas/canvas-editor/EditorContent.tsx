@@ -3,7 +3,6 @@
  * Editor Content - rich text editing area with drag & drop support
  */
 
-
 import { EditorContent as TiptapEditorContent } from '@tiptap/react'
 import { Editor } from '@tiptap/react'
 import { Image as ImageIcon } from 'lucide-react'
@@ -40,7 +39,9 @@ export function EditorContent({
         <div className="absolute inset-0 bg-morandi-gold/10 border-2 border-dashed border-morandi-gold flex items-center justify-center z-50">
           <div className="text-center">
             <ImageIcon size={48} className="mx-auto mb-2 text-morandi-gold" />
-            <p className="text-lg font-medium text-morandi-primary">{CANVAS_EDITOR_LABELS.UPLOADING_115}</p>
+            <p className="text-lg font-medium text-morandi-primary">
+              {CANVAS_EDITOR_LABELS.UPLOADING_115}
+            </p>
             <p className="text-sm text-morandi-secondary mt-1">{CANVAS_EDITOR_LABELS.LABEL_7307}</p>
           </div>
         </div>
@@ -54,7 +55,9 @@ export function EditorContent({
               <ImageIcon size={20} className="text-morandi-gold" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-morandi-primary">{CANVAS_EDITOR_LABELS.UPLOADING_2213}</p>
+              <p className="text-sm font-medium text-morandi-primary">
+                {CANVAS_EDITOR_LABELS.UPLOADING_2213}
+              </p>
               <div className="w-48 h-1.5 bg-morandi-container/20 rounded-full mt-2 overflow-hidden">
                 <div
                   className="h-full bg-morandi-gold transition-all duration-300"

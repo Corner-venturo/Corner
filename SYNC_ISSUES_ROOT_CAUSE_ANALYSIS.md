@@ -36,11 +36,13 @@
 **Migration**: `_applied_20251119080200_add_created_updated_by_to_all_tables.sql`
 
 **問題**:
+
 1. **前端 TypeScript 定義沒有同步更新** → 型別不一致
 2. **IndexedDB schema 沒有更新** → 本地快取欄位缺失
 3. **Create/Update 操作缺少必填欄位** → Supabase 插入失敗
 
 **受影響的表格**:
+
 - ✅ vouchers
 - ✅ companies
 - ✅ confirmations
@@ -61,21 +63,25 @@
 ### 問題 2: payment_requests 欄位混亂
 
 **同時存在兩個欄位**:
+
 - ❌ `notes` (舊欄位，TypeScript 定義)
 - ❌ `note` (新欄位，資料庫)
 
 **時間軸**:
+
 1. 舊版 TypeScript: `notes?: string | null`
 2. 新 Migration (20251119171000): 新增 `note` 欄位
 3. **資料庫同時有兩個欄位** → Schema cache 混亂
 4. 前端用 `note`，但 TypeScript 定義是 `notes` → 型別錯誤
 
 **錯誤訊息**:
+
 ```
 Could not find the 'note' column of 'payment_requests' in the schema cache
 ```
 
 **已修復**:
+
 - ✅ Migration (20251119172000): 刪除 `notes` 欄位
 - ✅ TypeScript: 改為 `note?: string | null`
 
@@ -86,14 +92,17 @@ Could not find the 'note' column of 'payment_requests' in the schema cache
 **Migration**: `b0d8f01`
 
 **問題**:
+
 - 程式碼使用: `'syncqueue'` (小寫)
 - Schema 定義: `'syncQueue'` (駝峰)
 
 **影響**:
+
 - 所有背景同步的**刪除操作失敗**
 - 離線資料無法正確標記為已同步
 
 **已修復**:
+
 - ✅ 統一使用 `TABLES.SYNC_QUEUE` 常數
 
 ---
@@ -111,6 +120,7 @@ Could not find the 'note' column of 'payment_requests' in the schema cache
 ```
 
 **教訓**: 資料庫 schema 變更必須同步更新：
+
 - TypeScript 型別定義
 - IndexedDB schema
 - Store create/update 邏輯
@@ -129,11 +139,13 @@ supabase/migrations/
 ```
 
 **問題**:
+
 - 沒有自動化工具追蹤哪些已執行
 - 手動改名容易遺漏
 - 無法回滾到穩定版本
 
 **已建立工具**:
+
 - ✅ `db-migrate.js` - 自動化 migration 執行
 - ✅ `check-all-tables-schema.js` - 檢查欄位一致性
 
@@ -141,12 +153,12 @@ supabase/migrations/
 
 #### 3. **欄位命名不一致**
 
-| 表格 | TypeScript | 資料庫 | 狀態 |
-|------|-----------|--------|------|
-| PaymentRequest | `notes` | `note` | ❌ 不一致 → 已修復 |
-| QuoteItem | `note` | `note` | ✅ 一致 |
-| Visa | `note` | `note` | ✅ 一致 |
-| Company | `note` | `note` | ✅ 一致 |
+| 表格           | TypeScript | 資料庫 | 狀態               |
+| -------------- | ---------- | ------ | ------------------ |
+| PaymentRequest | `notes`    | `note` | ❌ 不一致 → 已修復 |
+| QuoteItem      | `note`     | `note` | ✅ 一致            |
+| Visa           | `note`     | `note` | ✅ 一致            |
+| Company        | `note`     | `note` | ✅ 一致            |
 
 **原因**: 歷史遺留 + 沒有統一規範
 
@@ -180,12 +192,14 @@ ALTER TABLE payment_requests DROP COLUMN notes;
 ### 1. 所有表格的 created_by/updated_by
 
 **檢查清單**:
+
 - [ ] TypeScript 型別是否都有 `created_by`, `updated_by`？
 - [ ] Store 的 `create()` 是否自動填入 `created_by`？
 - [ ] Store 的 `update()` 是否自動填入 `updated_by`？
 - [ ] IndexedDB schema 是否包含這些欄位？
 
 **建議**: 執行全面檢查
+
 ```bash
 node check-all-tables-schema.js
 ```
@@ -195,6 +209,7 @@ node check-all-tables-schema.js
 ### 2. 其他可能的欄位不一致
 
 **需要檢查**:
+
 - `TourRefund.notes` (TypeScript) vs 資料庫？
 - `QuickQuoteItem.notes` (TypeScript) vs 資料庫？
 - 其他 10+ 個有 `note/notes` 的 interface
@@ -291,6 +306,7 @@ describe('Schema Consistency', () => {
 ### 1. Schema 變更必須是原子操作
 
 **錯誤做法**:
+
 ```
 Day 1: 修改資料庫 schema
 Day 2: 發現問題
@@ -299,6 +315,7 @@ Day 4: 還有問題...
 ```
 
 **正確做法**:
+
 ```
 1. 建立 Migration
 2. 更新 TypeScript 型別
@@ -315,6 +332,7 @@ Day 4: 還有問題...
 **當前問題**: 一次修改 14+ 個表格
 
 **建議**:
+
 1. 先修改 1-2 個高風險表格
 2. 測試 1-2 天
 3. 確認穩定後再批次處理
@@ -324,11 +342,13 @@ Day 4: 還有問題...
 ### 3. Migration 需要可回滾
 
 **當前缺失**:
+
 - ❌ 沒有 down migration
 - ❌ 沒有版本標記
 - ❌ 無法快速回滾到穩定版
 
 **建議工具**:
+
 ```bash
 npm run db:rollback  # 回滾最後一次 migration
 npm run db:status    # 查看 migration 狀態
@@ -363,16 +383,19 @@ npm run db:version   # 標記穩定版本
 ## 📚 相關檔案
 
 ### Migration 檔案
+
 - `supabase/migrations/20251119171000_add_payment_requests_missing_columns.sql`
 - `supabase/migrations/20251119172000_fix_payment_requests_note_field.sql`
 - `supabase/migrations/_applied_20251119080200_add_created_updated_by_to_all_tables.sql`
 
 ### 程式碼檔案
+
 - `src/stores/types.ts` (已修改 line 532)
 - `src/stores/core/create-store-new.ts` (需要檢查)
 - `src/lib/db/schemas.ts` (需要更新)
 
 ### 檢查工具
+
 - `check-all-tables-schema.js`
 - `db-migrate.js`
 
@@ -421,7 +444,7 @@ if (error.code === 'PGRST204') {
   // Schema cache 錯誤 → 立即告警
   Sentry.captureException(error, {
     level: 'critical',
-    tags: { type: 'schema_mismatch' }
+    tags: { type: 'schema_mismatch' },
   })
 }
 ```
@@ -431,16 +454,19 @@ if (error.code === 'PGRST204') {
 ## 結論
 
 **根本原因**:
+
 1. 大批量資料庫 schema 變更（14+ 表格）
 2. 沒有同步更新前端型別定義和 IndexedDB schema
 3. 欄位命名不一致（note vs notes）
 4. 缺乏自動化檢查工具
 
 **已修復**:
+
 - ✅ payment_requests 欄位問題
 - ✅ TypeScript 型別定義
 
 **還需要做**:
+
 - ⏳ 全面檢查所有表格的 created_by/updated_by
 - ⏳ 建立自動化檢查和測試
 - ⏳ 更新文檔和工作流程

@@ -110,7 +110,8 @@ function PolaroidCard({
           onClick={() => image && onImageClick(feature.images || [], 0)}
         >
           {image ? (
-            <img src={image}
+            <img
+              src={image}
               alt={feature.title}
               className="w-full h-full object-cover border border-border grayscale group-hover:grayscale-0 transition-all duration-500"
             />
@@ -140,7 +141,10 @@ function PolaroidCard({
 
       {/* 描述浮層 */}
       <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4 rounded">
-        <p className="text-white text-sm text-center" style={{ fontFamily: "'Space Mono', monospace" }}>
+        <p
+          className="text-white text-sm text-center"
+          style={{ fontFamily: "'Space Mono', monospace" }}
+        >
           {feature.description}
         </p>
       </div>
@@ -185,14 +189,17 @@ function DiptychCard({
         }}
       >
         {/* 圖片區域 */}
-        <div className={`grid ${hasTwo ? 'grid-cols-2' : 'grid-cols-1'} gap-1 ${isMobile ? 'h-40' : 'h-52'}`}>
+        <div
+          className={`grid ${hasTwo ? 'grid-cols-2' : 'grid-cols-1'} gap-1 ${isMobile ? 'h-40' : 'h-52'}`}
+        >
           {hasTwo ? (
             <>
               <div
                 className="overflow-hidden border border-border/50"
                 onClick={() => onImageClick(images, 0)}
               >
-                <img src={images[0]}
+                <img
+                  src={images[0]}
                   alt={`${feature.title} 1`}
                   className="w-full h-full object-cover"
                 />
@@ -201,7 +208,8 @@ function DiptychCard({
                 className="overflow-hidden border border-border/50"
                 onClick={() => onImageClick(images, 1)}
               >
-                <img src={images[1]}
+                <img
+                  src={images[1]}
                   alt={`${feature.title} 2`}
                   className="w-full h-full object-cover"
                 />
@@ -212,10 +220,7 @@ function DiptychCard({
               className="overflow-hidden border border-border/50"
               onClick={() => onImageClick(images, 0)}
             >
-              <img src={images[0]}
-                alt={feature.title}
-                className="w-full h-full object-cover"
-              />
+              <img src={images[0]} alt={feature.title} className="w-full h-full object-cover" />
             </div>
           ) : (
             <div className="w-full h-full bg-muted flex items-center justify-center text-4xl">
@@ -237,7 +242,10 @@ function DiptychCard({
           <h3 className="font-bold text-lg" style={{ fontFamily: "'Zen Old Mincho', serif" }}>
             {feature.title}
           </h3>
-          <p className="text-xs text-morandi-muted mt-1" style={{ fontFamily: "'Space Mono', monospace" }}>
+          <p
+            className="text-xs text-morandi-muted mt-1"
+            style={{ fontFamily: "'Space Mono', monospace" }}
+          >
             {feature.description.slice(0, 30)}...
           </p>
         </div>
@@ -281,7 +289,13 @@ function FrameCard({
   onImageClick: (images: string[], startIndex: number) => void
 }) {
   const image = feature.images?.[0]
-  const bgColors = [SCRAPBOOK.mint, SCRAPBOOK.pink, SCRAPBOOK.blue, SCRAPBOOK.yellow, SCRAPBOOK.purple]
+  const bgColors = [
+    SCRAPBOOK.mint,
+    SCRAPBOOK.pink,
+    SCRAPBOOK.blue,
+    SCRAPBOOK.yellow,
+    SCRAPBOOK.purple,
+  ]
   const bgColor = bgColors[index % bgColors.length]
   const stickerEmojis = ['🎯', '⭐', '🔥', '💫', '✨', '🌟', '🎪', '🎨']
   const stickerEmoji = stickerEmojis[index % stickerEmojis.length]
@@ -308,7 +322,8 @@ function FrameCard({
         }}
       >
         {image ? (
-          <img src={image}
+          <img
+            src={image}
             alt={feature.title}
             className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-700"
           />
@@ -389,7 +404,8 @@ function RecipeCard({
         onClick={() => image && onImageClick(feature.images || [], 0)}
       >
         {image ? (
-          <img src={image}
+          <img
+            src={image}
             alt={feature.title}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
@@ -423,17 +439,13 @@ function RecipeCard({
             </span>
             <h3 className="font-bold text-base mt-1">{feature.title}</h3>
           </div>
-          <div
-            className="w-7 h-7 rounded-full border border-[var(--morandi-primary)] flex items-center justify-center group-hover:bg-black group-hover:text-white transition-colors"
-          >
+          <div className="w-7 h-7 rounded-full border border-[var(--morandi-primary)] flex items-center justify-center group-hover:bg-black group-hover:text-white transition-colors">
             →
           </div>
         </div>
 
         {/* 描述 */}
-        <p className="text-xs text-morandi-secondary line-clamp-2 mb-3">
-          {feature.description}
-        </p>
+        <p className="text-xs text-morandi-secondary line-clamp-2 mb-3">{feature.description}</p>
 
         {/* 標籤 */}
         {feature.tags && feature.tags.length > 0 && (
@@ -482,11 +494,11 @@ export function TourFeaturesSectionCollage({
   }
 
   const goToPrev = () => {
-    setLightboxIndex((prev) => (prev > 0 ? prev - 1 : lightboxImages.length - 1))
+    setLightboxIndex(prev => (prev > 0 ? prev - 1 : lightboxImages.length - 1))
   }
 
   const goToNext = () => {
-    setLightboxIndex((prev) => (prev < lightboxImages.length - 1 ? prev + 1 : 0))
+    setLightboxIndex(prev => (prev < lightboxImages.length - 1 ? prev + 1 : 0))
   }
 
   // 根據卡片風格渲染
@@ -542,13 +554,14 @@ export function TourFeaturesSectionCollage({
   }
 
   // Grid 設定
-  const gridClass = displayMode === 'small'
-    ? isMobile
-      ? 'grid-cols-2 gap-4'
-      : 'grid-cols-4 gap-6'
-    : isMobile
-      ? 'grid-cols-1 gap-8'
-      : 'grid-cols-3 gap-10'
+  const gridClass =
+    displayMode === 'small'
+      ? isMobile
+        ? 'grid-cols-2 gap-4'
+        : 'grid-cols-4 gap-6'
+      : isMobile
+        ? 'grid-cols-1 gap-8'
+        : 'grid-cols-3 gap-10'
 
   return (
     <section
@@ -584,7 +597,7 @@ export function TourFeaturesSectionCollage({
       </div>
 
       {/* Lightbox */}
-      <Dialog open={lightboxImages.length > 0} onOpenChange={(open) => !open && closeLightbox()}>
+      <Dialog open={lightboxImages.length > 0} onOpenChange={open => !open && closeLightbox()}>
         <DialogContent level={1} className="max-w-[95vw] max-h-[95vh] p-0 bg-black/90 border-none">
           <div className="relative flex items-center justify-center min-h-[60vh]">
             {/* 左箭頭 */}
@@ -607,7 +620,8 @@ export function TourFeaturesSectionCollage({
                 transition={{ duration: 0.2 }}
                 className="flex items-center justify-center"
               >
-                <img src={lightboxImages[lightboxIndex]}
+                <img
+                  src={lightboxImages[lightboxIndex]}
                   alt={`圖片 ${lightboxIndex + 1}`}
                   className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg"
                 />

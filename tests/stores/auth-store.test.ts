@@ -12,7 +12,7 @@ vi.mock('@/stores/user-store', () => ({
 }))
 
 vi.mock('@/lib/auth', () => ({
-  generateToken: vi.fn((payload) => 'mock-token'),
+  generateToken: vi.fn(payload => 'mock-token'),
 }))
 
 vi.mock('@/lib/auth/local-auth-manager', () => ({

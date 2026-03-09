@@ -1,11 +1,17 @@
 'use client'
 
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { AttractionFormData } from '../../types'
 import type { Country, Region, City } from '@/stores/region-store'
-import { ATTRACTION_FORM_LABELS, DATABASE_MANAGEMENT_PAGE_LABELS } from '../../constants/labels';
+import { ATTRACTION_FORM_LABELS, DATABASE_MANAGEMENT_PAGE_LABELS } from '../../constants/labels'
 
 interface AttractionFormProps {
   formData: AttractionFormData
@@ -81,7 +87,7 @@ export function AttractionForm({
               <SelectValue placeholder={ATTRACTION_FORM_LABELS.請選擇} />
             </SelectTrigger>
             <SelectContent>
-              {countries.map((c) => (
+              {countries.map(c => (
                 <SelectItem key={c.id} value={c.id}>
                   {c.name}
                 </SelectItem>
@@ -107,7 +113,7 @@ export function AttractionForm({
                 <SelectValue placeholder={ATTRACTION_FORM_LABELS.請選擇} />
               </SelectTrigger>
               <SelectContent>
-                {availableRegions.map((r) => (
+                {availableRegions.map(r => (
                   <SelectItem key={r.id} value={r.id}>
                     {r.name}
                   </SelectItem>
@@ -121,14 +127,16 @@ export function AttractionForm({
           <label className="text-sm font-medium">{ATTRACTION_FORM_LABELS.CITY_SELECT}</label>
           <Select
             value={formData.city_id || '_none_'}
-            onValueChange={value => setFormData(prev => ({ ...prev, city_id: value === '_none_' ? '' : value }))}
+            onValueChange={value =>
+              setFormData(prev => ({ ...prev, city_id: value === '_none_' ? '' : value }))
+            }
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder={ATTRACTION_FORM_LABELS.不指定} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="_none_">{ATTRACTION_FORM_LABELS.NOT_SPECIFIED}</SelectItem>
-              {availableCities.map((c) => (
+              {availableCities.map(c => (
                 <SelectItem key={c.id} value={c.id}>
                   {c.name}
                 </SelectItem>
@@ -228,7 +236,9 @@ export function AttractionForm({
       <div className="flex items-center gap-2">
         <Checkbox
           checked={formData.is_active}
-          onCheckedChange={checked => setFormData(prev => ({ ...prev, is_active: checked as boolean }))}
+          onCheckedChange={checked =>
+            setFormData(prev => ({ ...prev, is_active: checked as boolean }))
+          }
         />
         <label className="text-sm">{ATTRACTION_FORM_LABELS.ENABLE_ATTRACTION}</label>
       </div>

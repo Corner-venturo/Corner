@@ -3,12 +3,14 @@
 import { formatDate, toTaipeiDateString, toTaipeiTimeString } from '@/lib/utils/format-date'
 
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react'
+import { useCalendarStore, useAuthStore, useWorkspaceStore } from '@/stores'
 import {
-  useCalendarStore,
-  useAuthStore,
-  useWorkspaceStore,
-} from '@/stores'
-import { useToursForCalendar, useCustomersSlim, useEmployeesSlim, useCalendarEvents as useCalendarEventList, invalidateCalendarEvents } from '@/data'
+  useToursForCalendar,
+  useCustomersSlim,
+  useEmployeesSlim,
+  useCalendarEvents as useCalendarEventList,
+  invalidateCalendarEvents,
+} from '@/data'
 import { supabase } from '@/lib/supabase/client'
 import { FullCalendarEvent } from '../types'
 import type { CalendarEvent } from '@/types/calendar.types'
@@ -52,7 +54,8 @@ export function useCalendarEvents() {
 
   // Workspace 篩選狀態（只有超級管理員能用）
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(null)
-  const isSuperAdmin = user?.roles?.includes('super_admin') || user?.permissions?.includes('super_admin')
+  const isSuperAdmin =
+    user?.roles?.includes('super_admin') || user?.permissions?.includes('super_admin')
 
   // 初始化時從 localStorage 讀取篩選狀態
   const workspaceInitRef = useRef(false)
@@ -95,14 +98,10 @@ export function useCalendarEvents() {
   useEffect(() => {
     const channel = supabase
       .channel('calendar_events_realtime')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'calendar_events' },
-        () => {
-          // 重新抓取資料（使用 SWR invalidate）
-          invalidateCalendarEvents()
-        }
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'calendar_events' }, () => {
+        // 重新抓取資料（使用 SWR invalidate）
+        invalidateCalendarEvents()
+      })
       .subscribe()
 
     return () => {
@@ -229,17 +228,12 @@ export function useCalendarEvents() {
         } else {
           const creator = employees?.find(emp => emp.id === event.created_by)
           creatorName =
-            creator?.display_name ||
-            creator?.chinese_name ||
-            creator?.english_name ||
-            '未知使用者'
+            creator?.display_name || creator?.chinese_name || creator?.english_name || '未知使用者'
         }
 
         const isAllDay = event.all_day ?? false // 轉換 null 為 false
         const timeStr = getDisplayTime(event.start, isAllDay)
-        const displayTitle = timeStr
-          ? `${timeStr} 公司｜${event.title}`
-          : `公司｜${event.title}`
+        const displayTitle = timeStr ? `${timeStr} 公司｜${event.title}` : `公司｜${event.title}`
 
         // 🔧 修正：全天事件只傳日期字串，避免 FullCalendar 時區轉換問題
         const startDate = isAllDay ? getDateInTaipei(event.start) : event.start

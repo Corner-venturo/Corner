@@ -1,11 +1,8 @@
 'use client'
 
 import { Combobox } from '@/components/ui/combobox'
-import {
-  CompanyExpenseType,
-  EXPENSE_TYPE_CONFIG,
-} from '@/stores/types/finance.types'
-import { EXPENSE_TYPE_SELECTOR_LABELS } from '../../constants/labels';
+import { CompanyExpenseType, EXPENSE_TYPE_CONFIG } from '@/stores/types/finance.types'
+import { EXPENSE_TYPE_SELECTOR_LABELS } from '../../constants/labels'
 
 interface ExpenseTypeSelectorProps {
   value: CompanyExpenseType | ''
@@ -15,12 +12,10 @@ interface ExpenseTypeSelectorProps {
 }
 
 // 費用類型選項
-const expenseTypeOptions = Object.entries(EXPENSE_TYPE_CONFIG).map(
-  ([code, config]) => ({
-    value: code as CompanyExpenseType,
-    label: config.name,
-  })
-)
+const expenseTypeOptions = Object.entries(EXPENSE_TYPE_CONFIG).map(([code, config]) => ({
+  value: code as CompanyExpenseType,
+  label: config.name,
+}))
 
 export function ExpenseTypeSelector({
   value,
