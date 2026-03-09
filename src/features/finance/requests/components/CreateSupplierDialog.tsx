@@ -110,7 +110,7 @@ export function CreateSupplierDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent level={3} className="max-w-md">
         <DialogHeader>
           <DialogTitle>新增供應商</DialogTitle>
         </DialogHeader>
