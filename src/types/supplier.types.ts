@@ -31,6 +31,7 @@ export interface Supplier extends SyncableEntity {
   // 財務資訊
   tax_id?: string | null // 統編
   bank_name?: string | null
+  bank_account_name?: string | null // 戶名
   bank_account?: string | null
   payment_terms?: string | null // 付款條件
   currency?: string | null

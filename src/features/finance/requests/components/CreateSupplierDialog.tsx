@@ -55,6 +55,7 @@ export function CreateSupplierDialog({
     email: '',
     tax_id: '',
     bank_name: '',
+    bank_account_name: '',
     bank_account: '',
     notes: '',
   })
@@ -84,6 +85,7 @@ export function CreateSupplierDialog({
         email: formData.email || null,
         tax_id: formData.tax_id || null,
         bank_name: formData.bank_name || null,
+        bank_account_name: formData.bank_account_name || null,
         bank_account: formData.bank_account || null,
         notes: formData.notes || null,
         is_active: true,
@@ -105,6 +107,7 @@ export function CreateSupplierDialog({
           email: '',
           tax_id: '',
           bank_name: '',
+          bank_account_name: '',
           bank_account: '',
           notes: '',
         })
@@ -119,7 +122,7 @@ export function CreateSupplierDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent level={3} className="max-w-md max-h-[90vh] flex flex-col">
+      <DialogContent level={3} className="max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>新增供應商</DialogTitle>
         </DialogHeader>
@@ -209,6 +212,16 @@ export function CreateSupplierDialog({
               value={formData.bank_name}
               onChange={e => setFormData(prev => ({ ...prev, bank_name: e.target.value }))}
               placeholder="例：台灣銀行"
+            />
+          </div>
+
+          {/* 戶名 */}
+          <div>
+            <Label>戶名</Label>
+            <Input
+              value={formData.bank_account_name}
+              onChange={e => setFormData(prev => ({ ...prev, bank_account_name: e.target.value }))}
+              placeholder="例：角落旅行社有限公司"
             />
           </div>
 
