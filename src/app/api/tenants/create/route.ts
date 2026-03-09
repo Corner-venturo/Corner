@@ -43,13 +43,28 @@ export async function POST(request: NextRequest) {
     // 檢查當前用戶是否為 Corner 的 super_admin
     const { data: currentEmployee } = await supabaseAdmin
       .from('employees')
-      .select('roles, workspaces!inner(code)')
+      .select('roles, workspace_id')
       .eq('id', auth.data.employeeId)
       .single()
 
-    const roles = currentEmployee?.roles as string[] | null
+    if (!currentEmployee || !currentEmployee.workspace_id) {
+      logger.error('Employee not found or no workspace')
+      return errorResponse('找不到員工資料', 403, ErrorCode.FORBIDDEN)
+    }
+
+    const roles = currentEmployee.roles as string[] | null
     const isSuperAdmin = roles?.includes('super_admin') ?? false
-    const workspaceCode = (currentEmployee?.workspaces as any)?.code
+
+    // 查詢 workspace 取得 code
+    const { data: currentWorkspace } = await supabaseAdmin
+      .from('workspaces')
+      .select('code')
+      .eq('id', currentEmployee.workspace_id as string)
+      .single()
+
+    const workspaceCode = currentWorkspace?.code
+
+    logger.log(`Permission check: isSuperAdmin=${isSuperAdmin}, workspace=${workspaceCode || 'unknown'}`)
 
     if (!isSuperAdmin || workspaceCode !== 'Corner') {
       logger.error(`Permission denied: isSuperAdmin=${isSuperAdmin}, workspace=${workspaceCode}`)
