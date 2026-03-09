@@ -149,6 +149,7 @@ export function EditableRequestItemList({
                 className="input-no-focus [&_input]:h-9 [&_input]:px-1 [&_input]:bg-transparent"
                 onCreate={onCreateSupplier}
                 showSearchIcon={false}
+                disablePortal={true}
               />
             </div>
 
