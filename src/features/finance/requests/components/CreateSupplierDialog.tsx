@@ -53,6 +53,9 @@ export function CreateSupplierDialog({
     contact_person: '',
     phone: '',
     email: '',
+    tax_id: '',
+    bank_name: '',
+    bank_account: '',
     notes: '',
   })
   const [submitting, setSubmitting] = useState(false)
@@ -79,6 +82,9 @@ export function CreateSupplierDialog({
         contact_person: formData.contact_person || null,
         phone: formData.phone || null,
         email: formData.email || null,
+        tax_id: formData.tax_id || null,
+        bank_name: formData.bank_name || null,
+        bank_account: formData.bank_account || null,
         notes: formData.notes || null,
         is_active: true,
         workspace_id: workspaceId,
@@ -97,6 +103,9 @@ export function CreateSupplierDialog({
           contact_person: '',
           phone: '',
           email: '',
+          tax_id: '',
+          bank_name: '',
+          bank_account: '',
           notes: '',
         })
       }
@@ -110,12 +119,12 @@ export function CreateSupplierDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent level={3} className="max-w-md">
+      <DialogContent level={3} className="max-w-md max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>新增供應商</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 py-4 overflow-y-auto flex-1">
           {/* 供應商名稱（必填） */}
           <div>
             <Label>
@@ -179,6 +188,37 @@ export function CreateSupplierDialog({
               value={formData.email}
               onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
               placeholder="例：contact@hotel.com"
+            />
+          </div>
+
+          {/* 統編 */}
+          <div>
+            <Label>統編</Label>
+            <Input
+              value={formData.tax_id}
+              onChange={e => setFormData(prev => ({ ...prev, tax_id: e.target.value }))}
+              placeholder="例：12345678"
+              maxLength={8}
+            />
+          </div>
+
+          {/* 銀行名稱 */}
+          <div>
+            <Label>銀行名稱</Label>
+            <Input
+              value={formData.bank_name}
+              onChange={e => setFormData(prev => ({ ...prev, bank_name: e.target.value }))}
+              placeholder="例：台灣銀行"
+            />
+          </div>
+
+          {/* 銀行帳號 */}
+          <div>
+            <Label>銀行帳號</Label>
+            <Input
+              value={formData.bank_account}
+              onChange={e => setFormData(prev => ({ ...prev, bank_account: e.target.value }))}
+              placeholder="例：1234-5678-9012-3456"
             />
           </div>
 
