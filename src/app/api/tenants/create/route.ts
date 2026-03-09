@@ -66,9 +66,9 @@ export async function POST(request: NextRequest) {
 
     logger.log(`Permission check: isSuperAdmin=${isSuperAdmin}, workspace=${workspaceCode || 'unknown'}`)
 
-    if (!isSuperAdmin || workspaceCode !== 'Corner') {
+    if (!isSuperAdmin || workspaceCode !== 'CORNER') {
       logger.error(`Permission denied: isSuperAdmin=${isSuperAdmin}, workspace=${workspaceCode}`)
-      return errorResponse('只有 Corner 的 super_admin 可以建立租戶', 403, ErrorCode.FORBIDDEN)
+      return errorResponse('只有 CORNER 的 super_admin 可以建立租戶', 403, ErrorCode.FORBIDDEN)
     }
 
     // 解析請求
