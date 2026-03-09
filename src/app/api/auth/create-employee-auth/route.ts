@@ -40,10 +40,14 @@ export async function POST(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdminClient()
 
-    // 🔒 安全檢查：判斷是否為系統初始化（建立第一個租戶管理員）
-    let isSystemInit = false
-    
-    // 檢查該 workspace 是否已有員工
+    // 🔒 安全檢查：需要已登入
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      return errorResponse('請先登入才能建立員工帳號', 401, ErrorCode.UNAUTHORIZED)
+    }
+
+    // 檢查該 workspace 是否已有員工（判斷是否為新租戶）
+    let isNewTenant = false
     if (workspace_code) {
       const { data: workspace } = await supabaseAdmin
         .from('workspaces')
@@ -57,32 +61,33 @@ export async function POST(request: NextRequest) {
           .select('id', { count: 'exact', head: true })
           .eq('workspace_id', workspace.id)
 
-        // 如果該 workspace 沒有任何員工，視為系統初始化
-        isSystemInit = (count ?? 0) === 0
+        // 如果該 workspace 沒有任何員工，視為新租戶
+        isNewTenant = (count ?? 0) === 0
       }
     }
 
-    // 已登入用戶建立員工：需要管理員權限
-    const auth = await getServerAuth()
-    if (auth.success && !isSystemInit) {
-      const { data: employee } = await supabaseAdmin
-        .from('employees')
-        .select('roles')
-        .eq('id', auth.data.employeeId)
-        .single()
+    // 權限檢查
+    const { data: employee } = await supabaseAdmin
+      .from('employees')
+      .select('roles, workspace_id, workspaces!inner(code)')
+      .eq('id', auth.data.employeeId)
+      .single()
 
-      const roles = employee?.roles as string[] | null
-      const isSuperAdmin = roles?.includes('super_admin') ?? false
-      const isAdmin = roles?.includes('admin') ?? false
+    const roles = employee?.roles as string[] | null
+    const isSuperAdmin = roles?.includes('super_admin') ?? false
+    const isAdmin = roles?.includes('admin') ?? false
+    const workspaceCode = (employee?.workspaces as any)?.code
 
+    // 建立新租戶的第一個管理員：只有 Corner 的 super_admin 可以
+    if (isNewTenant) {
+      if (!isSuperAdmin || workspaceCode !== 'Corner') {
+        return errorResponse('建立新租戶需要 Corner 的 super_admin 權限', 403, ErrorCode.FORBIDDEN)
+      }
+    } else {
+      // 一般建立員工：需要該 workspace 的管理員權限
       if (!isSuperAdmin && !isAdmin) {
         return errorResponse('需要管理員權限', 403, ErrorCode.FORBIDDEN)
       }
-    }
-
-    // 未登入且非系統初始化：拒絕請求
-    if (!auth.success && !isSystemInit) {
-      return errorResponse('請先登入才能建立員工帳號', 401, ErrorCode.UNAUTHORIZED)
     }
 
     // 優先使用前端傳入的真實 email；若無則使用自動生成的格式（向後兼容）
