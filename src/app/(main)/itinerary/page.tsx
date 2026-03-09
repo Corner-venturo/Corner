@@ -14,7 +14,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
-import { Building2, Plane, Search, CalendarDays, Loader2, X, Check } from 'lucide-react'
+import { Building2, Plane, Search, CalendarDays, Loader2, X, Check, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
   Select,
@@ -126,6 +126,7 @@ export default function ItineraryPage() {
     statusFilter: pageState.statusFilter,
     searchTerm: pageState.searchTerm,
     authorFilter: pageState.authorFilter,
+    viewMode: pageState.viewMode,
     userId: user?.id,
     isSuperAdmin: !!isSuperAdmin,
     isItineraryClosed: actions.isItineraryClosed,
@@ -172,6 +173,42 @@ export default function ItineraryPage() {
       }
       headerChildren={
         <div className="flex items-center gap-4">
+          {/* 分頁選擇 */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => pageState.setViewMode('my')}
+              className={cn(
+                'px-3 py-1 rounded-lg text-sm font-medium transition-colors',
+                pageState.viewMode === 'my'
+                  ? 'bg-morandi-gold text-white'
+                  : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30'
+              )}
+            >
+              我的行程
+            </button>
+            <button
+              onClick={() => pageState.setViewMode('all')}
+              className={cn(
+                'px-3 py-1 rounded-lg text-sm font-medium transition-colors',
+                pageState.viewMode === 'all'
+                  ? 'bg-morandi-gold text-white'
+                  : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30'
+              )}
+            >
+              全部
+            </button>
+            <button
+              onClick={() => pageState.setViewMode('templates')}
+              className={cn(
+                'px-3 py-1 rounded-lg text-sm font-medium transition-colors',
+                pageState.viewMode === 'templates'
+                  ? 'bg-morandi-gold text-white'
+                  : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30'
+              )}
+            >
+              模板
+            </button>
+          </div>
 
           <div className="flex items-center gap-2">
             <Select value={pageState.authorFilter} onValueChange={pageState.setAuthorFilter}>
@@ -293,16 +330,24 @@ function CreateItineraryDialog({
   countries,
   onCreateItinerary,
 }: CreateItineraryDialogProps) {
-  const [step, setStep] = useState<'selectTour' | 'createItinerary'>('selectTour')
+  const [step, setStep] = useState<'selectType' | 'selectTour' | 'createTemplate' | 'createItinerary'>('selectType')
   const [selectedTourId, setSelectedTourId] = useState('')
   const { items: tours } = useToursSlim()
   const [loadingTourData, setLoadingTourData] = useState(false)
   
+  // 模板資料
+  const [templateCode, setTemplateCode] = useState('')
+  const [templateName, setTemplateName] = useState('')
+  const [templateDays, setTemplateDays] = useState('')
+  
   // 重置步驟當對話框關閉
   useEffect(() => {
     if (!isOpen) {
-      setStep('selectTour')
+      setStep('selectType')
       setSelectedTourId('')
+      setTemplateCode('')
+      setTemplateName('')
+      setTemplateDays('')
     }
   }, [isOpen])
 
@@ -371,6 +416,50 @@ function CreateItineraryDialog({
     }
   }
 
+  // Step 1: 選擇類型（開團 / 新增模板）
+  if (step === 'selectType') {
+    return (
+      <Dialog open={isOpen} onOpenChange={onOpenChange}>
+        <DialogContent level={1} className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarDays className="w-5 h-5 text-morandi-gold" />
+              請選擇建立方式
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-6 space-y-3">
+            <button
+              onClick={() => setStep('selectTour')}
+              className="w-full p-6 border border-morandi-border rounded-lg hover:bg-morandi-container/30 text-left transition-colors"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <CalendarDays className="w-6 h-6 text-morandi-gold" />
+                <h3 className="text-lg font-medium">開團</h3>
+              </div>
+              <p className="text-sm text-morandi-secondary">
+                從現有團號建立行程
+              </p>
+            </button>
+
+            <button
+              onClick={() => setStep('createTemplate')}
+              className="w-full p-6 border border-morandi-border rounded-lg hover:bg-morandi-container/30 text-left transition-colors"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <FileText className="w-6 h-6 text-morandi-gold" />
+                <h3 className="text-lg font-medium">新增模板</h3>
+              </div>
+              <p className="text-sm text-morandi-secondary">
+                建立可重複使用的範本
+              </p>
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    )
+  }
+
+  // Step 2A: 選擇團號
   if (step === 'selectTour') {
     return (
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -420,6 +509,74 @@ function CreateItineraryDialog({
     )
   }
 
+  // Step 2B: 建立模板
+  if (step === 'createTemplate') {
+    return (
+      <Dialog open={isOpen} onOpenChange={onOpenChange}>
+        <DialogContent level={1} className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-morandi-gold" />
+              建立行程模板
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-6 space-y-4">
+            <div>
+              <Label className="mb-2 block">模板代號</Label>
+              <Input
+                value={templateCode}
+                onChange={(e) => setTemplateCode(e.target.value)}
+                placeholder="例如：TPL-JPN-001"
+              />
+              <p className="text-xs text-morandi-secondary mt-1">
+                建議格式：TPL-[國家代碼]-[編號]
+              </p>
+            </div>
+            
+            <div>
+              <Label className="mb-2 block">模板名稱</Label>
+              <Input
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+                placeholder="例如：日本東京經典 5 日遊"
+              />
+            </div>
+            
+            <div>
+              <Label className="mb-2 block">天數</Label>
+              <Input
+                type="number"
+                min="1"
+                max="30"
+                value={templateDays}
+                onChange={(e) => setTemplateDays(e.target.value)}
+                placeholder="請輸入天數"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setStep('selectType')}>
+              返回
+            </Button>
+            <Button
+              onClick={() => {
+                // TODO: 建立模板並進入行程規劃頁面
+                formState.setNewItineraryTitle(templateName)
+                formState.setNewItineraryDays(templateDays)
+                setStep('createItinerary')
+              }}
+              disabled={!templateCode || !templateName || !templateDays}
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            >
+              下一步
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    )
+  }
+
+  // Step 3: 行程規劃頁面（開團和模板共用）
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent level={1} className="max-w-5xl h-[90vh] overflow-hidden p-0">

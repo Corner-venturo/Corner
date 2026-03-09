@@ -264,6 +264,11 @@ export interface Itinerary {
   quote_id?: string // 關聯的報價單 ID（選填）
   proposal_package_id?: string // 關聯的提案套件 ID（選填）
 
+  // 模板支援
+  template_id?: string | null // 模板 ID（模板時有值，實際團時為 null）
+  template_code?: string | null // 模板代號（例如：TPL-JPN-001）
+  template_name?: string | null // 模板名稱（例如：日本東京經典 5 日遊）
+
   // 多租戶支援
   workspace_id?: string // Workspace ID（多租戶隔離）
 

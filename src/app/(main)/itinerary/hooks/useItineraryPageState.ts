@@ -17,6 +17,7 @@ export function useItineraryPageState() {
   const [statusFilter, setStatusFilter] = useState<string>('全部')
   const [authorFilter, setAuthorFilter] = useState<string>('__mine__')
   const [searchTerm, setSearchTerm] = useState('')
+  const [viewMode, setViewMode] = useState<'my' | 'all' | 'templates'>('my')
 
   // Dialog states
   const [isTypeSelectOpen, setIsTypeSelectOpen] = useState(false)
@@ -42,6 +43,9 @@ export function useItineraryPageState() {
 
   const searchTermRef = useRef(searchTerm)
   searchTermRef.current = searchTerm
+
+  const viewModeRef = useRef(viewMode)
+  viewModeRef.current = viewMode
 
   const isTypeSelectOpenRef = useRef(isTypeSelectOpen)
   isTypeSelectOpenRef.current = isTypeSelectOpen
@@ -74,6 +78,7 @@ export function useItineraryPageState() {
   const getStatusFilter = useCallback(() => statusFilterRef.current, [])
   const getAuthorFilter = useCallback(() => authorFilterRef.current, [])
   const getSearchTerm = useCallback(() => searchTermRef.current, [])
+  const getViewMode = useCallback(() => viewModeRef.current, [])
   const getIsTypeSelectOpen = useCallback(() => isTypeSelectOpenRef.current, [])
   const getIsPasswordDialogOpen = useCallback(() => isPasswordDialogOpenRef.current, [])
   const getIsDuplicateDialogOpen = useCallback(() => isDuplicateDialogOpenRef.current, [])
@@ -94,6 +99,7 @@ export function useItineraryPageState() {
       setStatusFilter,
       setAuthorFilter,
       setSearchTerm,
+      setViewMode,
       setIsTypeSelectOpen,
       setIsPasswordDialogOpen,
       setIsDuplicateDialogOpen,
@@ -108,6 +114,7 @@ export function useItineraryPageState() {
       getStatusFilter,
       getAuthorFilter,
       getSearchTerm,
+      getViewMode,
       getIsTypeSelectOpen,
       getIsPasswordDialogOpen,
       getIsDuplicateDialogOpen,
@@ -130,6 +137,7 @@ export function useItineraryPageState() {
     statusFilter,
     authorFilter,
     searchTerm,
+    viewMode,
     isTypeSelectOpen,
     isPasswordDialogOpen,
     isDuplicateDialogOpen,

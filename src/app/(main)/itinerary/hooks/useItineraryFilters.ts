@@ -9,6 +9,7 @@ interface UseItineraryFiltersProps {
   statusFilter: string
   searchTerm: string
   authorFilter: string
+  viewMode: 'my' | 'all' | 'templates'
   userId?: string
   isSuperAdmin: boolean
   isItineraryClosed: (itinerary: Itinerary) => boolean
@@ -19,6 +20,7 @@ export function useItineraryFilters({
   statusFilter,
   searchTerm,
   authorFilter,
+  viewMode,
   userId,
   isSuperAdmin,
   isItineraryClosed,
@@ -26,29 +28,18 @@ export function useItineraryFilters({
   const filteredItineraries = useMemo(() => {
     let filtered = itineraries
 
-    switch (statusFilter) {
-      case '開團':
-        // 提案狀態不受出發日期影響，只檢查 closed_at
-        filtered = filtered.filter(
-          item =>
-            item.status === '開團' && !item.closed_at && !item.archived_at && !item.is_template
-        )
-        break
-      case '待出發':
-        // 進行中狀態不受出發日期影響，只檢查 closed_at
-        filtered = filtered.filter(
-          item =>
-            item.status === '待出發' && !item.closed_at && !item.archived_at && !item.is_template
-        )
-        break
-      case '公司範例':
-        filtered = filtered.filter(item => item.is_template && !item.archived_at)
-        break
-      case '已結團':
-        filtered = filtered.filter(item => isItineraryClosed(item) && !item.archived_at)
-        break
-      default:
-        filtered = filtered.filter(item => !item.archived_at && !item.is_template)
+    // 根據 viewMode 篩選
+    if (viewMode === 'templates') {
+      // 模板分頁：只顯示模板
+      filtered = filtered.filter(item => item.template_id && !item.archived_at)
+    } else if (viewMode === 'my') {
+      // 我的行程：只顯示我建立的實際團（不含模板）
+      filtered = filtered.filter(
+        item => !item.template_id && item.created_by === userId && !item.archived_at
+      )
+    } else {
+      // 全部：顯示所有實際團（不含模板）
+      filtered = filtered.filter(item => !item.template_id && !item.archived_at)
     }
 
     const effectiveAuthorFilter = authorFilter === '__mine__' ? userId : authorFilter
@@ -89,7 +80,16 @@ export function useItineraryFilters({
     })
 
     return filtered
-  }, [itineraries, statusFilter, searchTerm, isItineraryClosed, authorFilter, userId, isSuperAdmin])
+  }, [
+    itineraries,
+    statusFilter,
+    searchTerm,
+    isItineraryClosed,
+    authorFilter,
+    viewMode,
+    userId,
+    isSuperAdmin,
+  ])
 
   return { filteredItineraries }
 }
