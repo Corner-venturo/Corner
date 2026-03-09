@@ -19,6 +19,7 @@ import { RequestDateInput } from './RequestDateInput'
 import { ExpenseTypeSelector } from './ExpenseTypeSelector'
 import { CurrencyCell } from '@/components/table-cells'
 import { EditableRequestItemList } from './RequestItemList'
+import { CreateSupplierDialog } from './CreateSupplierDialog'
 import { useRequestForm } from '../hooks/useRequestForm'
 import { useRequestOperations } from '../hooks/useRequestOperations'
 import { useTourRequestItems } from '../hooks/useTourRequestItems'
@@ -135,13 +136,18 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
 
   // === 批量請款狀態 ===
   const [batchDate, setBatchDate] = useState(getNextThursdayDate())
-  const [batchCategory, setBatchCategory] = useState<PaymentItemCategory>(REQUEST_TYPE_LABELS.CAT_OTHER as PaymentItemCategory)
+  const [batchCategory, setBatchCategory] = useState<PaymentItemCategory>('' as PaymentItemCategory) // 不預設類別，由用戶選擇
   const [batchSupplierId, setBatchSupplierId] = useState('')
   const [batchDescription, setBatchDescription] = useState('')
   const [batchTotalAmount, setBatchTotalAmount] = useState(0)
   const [batchNote, setBatchNote] = useState('')
   const [tourAllocations, setTourAllocations] = useState<TourAllocation[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // === 新增供應商對話框狀態 ===
+  const [createSupplierDialogOpen, setCreateSupplierDialogOpen] = useState(false)
+  const [pendingSupplierName, setPendingSupplierName] = useState('')
+  const [supplierCreateResolver, setSupplierCreateResolver] = useState<((id: string | null) => void) | null>(null)
 
   // === 計算值 ===
 
@@ -208,24 +214,41 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
     return supplier?.name || ''
   }, [suppliers, batchSupplierId])
 
-  // 快速新增供應商
+  // 快速新增供應商（打開對話框）
   const handleCreateSupplier = async (name: string): Promise<string | null> => {
-    try {
-      const result = await createSupplier({
-        name,
-        code: name.substring(0, 10).toUpperCase(),
-        type: 'other',
-        is_active: true,
-        workspace_id: workspaceId,
-      })
-      if (result?.id) {
-        await invalidateSuppliers()
-        return result.id
-      }
-      return null
-    } catch (error) {
-      logger.error('Quick-create supplier failed:', error)
-      return null
+    return new Promise((resolve) => {
+      setPendingSupplierName(name)
+      setSupplierCreateResolver(() => resolve)
+      setCreateSupplierDialogOpen(true)
+    })
+  }
+
+  // 供應商建立成功的回調
+  const handleSupplierCreated = (supplierId: string) => {
+    // 呼叫 resolver 回傳 ID
+    if (supplierCreateResolver) {
+      supplierCreateResolver(supplierId)
+      setSupplierCreateResolver(null)
+    }
+    
+    // 根據當前 tab 設定供應商
+    if (activeTab === 'batch') {
+      setBatchSupplierId(supplierId)
+    }
+    
+    // 清空待建立名稱
+    setPendingSupplierName('')
+  }
+
+  // 供應商對話框關閉的回調
+  const handleSupplierDialogClose = (open: boolean) => {
+    setCreateSupplierDialogOpen(open)
+    
+    // 如果關閉對話框但沒有建立供應商，回傳 null
+    if (!open && supplierCreateResolver) {
+      supplierCreateResolver(null)
+      setSupplierCreateResolver(null)
+      setPendingSupplierName('')
     }
   }
 
@@ -501,6 +524,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
 
   // === 渲染 ===
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent level={2} className="max-w-[95vw] w-[95vw] h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader>
@@ -676,7 +700,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                 <div>
                   <Label>{ADD_REQUEST_FORM_LABELS.類別}</Label>
                   <Select value={batchCategory} onValueChange={(value) => setBatchCategory(value as PaymentItemCategory)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="請選擇類別" /></SelectTrigger>
                     <SelectContent>
                       {categoryOptions.map(cat => (
                         <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
@@ -875,5 +899,14 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
         </div>
       </DialogContent>
     </Dialog>
+
+      {/* 新增供應商對話框 */}
+      <CreateSupplierDialog
+        open={createSupplierDialogOpen}
+        onOpenChange={handleSupplierDialogClose}
+        defaultName={pendingSupplierName}
+        onSuccess={handleSupplierCreated}
+      />
+    </>
   )
 }

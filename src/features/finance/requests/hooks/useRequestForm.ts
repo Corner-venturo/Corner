@@ -29,7 +29,7 @@ export function useRequestForm() {
   const [requestItems, setRequestItems] = useState<RequestItem[]>(() => [
     {
       id: Math.random().toString(36).substr(2, 9),
-      category: REQUEST_FORM_HOOK_LABELS.OTHER as PaymentItemCategory, // Default category
+      category: '' as PaymentItemCategory, // 不預設類別，由用戶選擇
       supplier_id: '',
       supplierName: '',
       description: '',
@@ -115,7 +115,7 @@ export function useRequestForm() {
   const addNewEmptyItem = useCallback(() => {
     const newItem: RequestItem = {
       id: Math.random().toString(36).substr(2, 9),
-      category: REQUEST_FORM_HOOK_LABELS.OTHER as PaymentItemCategory,
+      category: '' as PaymentItemCategory, // 不預設類別，由用戶選擇
       supplier_id: '',
       supplierName: '',
       description: '',

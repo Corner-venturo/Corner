@@ -40,6 +40,7 @@ import {
   LineChart,
   Gamepad2,
   MessagesSquare,
+  Route,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
@@ -67,6 +68,7 @@ const menuItems: MenuItem[] = [
   { href: '/todos', label: COMP_LAYOUT_LABELS.待辦事項, icon: CheckSquare, requiredPermission: 'todos' },
   { href: '/tours', label: COMP_LAYOUT_LABELS.旅遊團, icon: MapPin, requiredPermission: 'tours' },
   { href: '/orders', label: COMP_LAYOUT_LABELS.訂單, icon: ShoppingCart, requiredPermission: 'orders' },
+  { href: '/itinerary', label: COMP_LAYOUT_LABELS.行程管理, icon: Route, requiredPermission: 'itinerary' },
   {
     href: '/finance',
     label: COMP_LAYOUT_LABELS.財務系統,

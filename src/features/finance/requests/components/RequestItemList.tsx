@@ -99,7 +99,7 @@ export function EditableRequestItemList({
                 <SelectTrigger
                   className="input-no-focus h-9 border-0 shadow-none bg-transparent text-sm px-1"
                 >
-                  <SelectValue />
+                  <SelectValue placeholder="類別" />
                 </SelectTrigger>
                 <SelectContent>
                   {categoryOptions.map(option => (
