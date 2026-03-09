@@ -139,6 +139,26 @@ export function useRequestForm() {
     setRequestItems(prev => prev.filter(item => item.id !== itemId))
   }, [])
 
+  // 計算下一個週四（如果今天是週四，跳到下週四）
+  const getNextThursdayDate = useCallback((): string => {
+    const today = new Date()
+    const dayOfWeek = today.getDay() // 0=週日, 1=週一, ..., 4=週四
+
+    let daysUntilThursday = 4 - dayOfWeek
+    if (daysUntilThursday <= 0) {
+      // 今天是週四或之後，跳到下週四
+      daysUntilThursday += 7
+    }
+
+    const nextThursday = new Date(today)
+    nextThursday.setDate(today.getDate() + daysUntilThursday)
+
+    const year = nextThursday.getFullYear()
+    const month = String(nextThursday.getMonth() + 1).padStart(2, '0')
+    const day = String(nextThursday.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }, [])
+
   // Reset form
   const resetForm = useCallback(() => {
     setFormData({
@@ -146,7 +166,7 @@ export function useRequestForm() {
       tour_id: '',
       order_id: '',
       expense_type: '',
-      request_date: '',
+      request_date: getNextThursdayDate(),  // ✅ 預設下週四
       notes: '',
       is_special_billing: false,
       created_by: currentUser?.id || '',
@@ -154,7 +174,7 @@ export function useRequestForm() {
     setRequestItems([
       {
         id: Math.random().toString(36).substr(2, 9),
-        category: REQUEST_FORM_HOOK_LABELS.OTHER as PaymentItemCategory, // Default category
+        category: '' as PaymentItemCategory, // 不預設類別，由用戶選擇
         supplier_id: '',
         supplierName: '',
         description: '',
@@ -166,7 +186,7 @@ export function useRequestForm() {
     setOrderSearchValue('')
     setShowTourDropdown(false)
     setShowOrderDropdown(false)
-  }, [currentUser?.id])
+  }, [currentUser?.id, getNextThursdayDate])
 
   return {
     formData,
