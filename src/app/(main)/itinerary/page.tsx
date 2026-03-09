@@ -296,6 +296,7 @@ function CreateItineraryDialog({
   const [step, setStep] = useState<'selectTour' | 'createItinerary'>('selectTour')
   const [selectedTourId, setSelectedTourId] = useState('')
   const { items: tours } = useToursSlim()
+  const [loadingTourData, setLoadingTourData] = useState(false)
   
   // 重置步驟當對話框關閉
   useEffect(() => {
@@ -306,10 +307,67 @@ function CreateItineraryDialog({
   }, [isOpen])
 
   // 選擇團後進入行程規劃
-  const handleTourSelected = () => {
-    if (selectedTourId) {
-      // TODO: 將選擇的團資訊帶入 formState
+  const handleTourSelected = async () => {
+    if (!selectedTourId) return
+    
+    setLoadingTourData(true)
+    try {
+      // 查詢選中的團資料
+      const selectedTour = tours.find(t => t.id === selectedTourId)
+      if (!selectedTour) return
+      
+      // 帶入基本資訊
+      formState.setNewItineraryTitle(selectedTour.name)
+      formState.setNewItineraryTourCode(selectedTour.code)
+      formState.setNewItineraryDepartureDate(selectedTour.departure_date)
+      
+      // 計算天數
+      const departureDate = new Date(selectedTour.departure_date)
+      const returnDate = new Date(selectedTour.return_date)
+      const days = Math.ceil((returnDate.getTime() - departureDate.getTime()) / (1000 * 60 * 60 * 24))
+      formState.setNewItineraryDays(String(days))
+      
+      // 查詢該團的 tour_itinerary_items（核心表格）
+      const { supabase } = await import('@/lib/supabase/client')
+      
+      const { data: itineraryItems } = await supabase
+        .from('tour_itinerary_items')
+        .select('*')
+        .eq('tour_id', selectedTourId)
+        .order('day_number', { ascending: true })
+      
+      // 將 itinerary_items 資料轉換為每日行程格式
+      if (itineraryItems && itineraryItems.length > 0) {
+        const dailyData: Array<{
+          title: string
+          breakfast: string
+          lunch: string
+          dinner: string
+          accommodation: string
+          isSameAccommodation: boolean
+        }> = []
+        
+        for (let day = 1; day <= days; day++) {
+          const dayItems = itineraryItems.filter((item: any) => item.day_number === day)
+          
+          dailyData.push({
+            title: dayItems.find((item: any) => item.resource_type === 'attraction')?.resource_name || '',
+            breakfast: dayItems.find((item: any) => item.resource_type === 'meal' && item.meal_type === 'breakfast')?.resource_name || '',
+            lunch: dayItems.find((item: any) => item.resource_type === 'meal' && item.meal_type === 'lunch')?.resource_name || '',
+            dinner: dayItems.find((item: any) => item.resource_type === 'meal' && item.meal_type === 'dinner')?.resource_name || '',
+            accommodation: dayItems.find((item: any) => item.resource_type === 'hotel')?.resource_name || '',
+            isSameAccommodation: false,
+          })
+        }
+        
+        formState.setNewItineraryDailyData(dailyData)
+      }
+      
       setStep('createItinerary')
+    } catch (error) {
+      console.error('Failed to load tour data:', error)
+    } finally {
+      setLoadingTourData(false)
     }
   }
 
@@ -339,15 +397,22 @@ function CreateItineraryDialog({
             </Select>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loadingTourData}>
               取消
             </Button>
             <Button
               onClick={handleTourSelected}
-              disabled={!selectedTourId}
-              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+              disabled={!selectedTourId || loadingTourData}
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
             >
-              下一步
+              {loadingTourData ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  載入中...
+                </>
+              ) : (
+                '下一步'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
