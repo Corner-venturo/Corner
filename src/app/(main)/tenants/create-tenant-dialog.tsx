@@ -15,9 +15,7 @@ import { Card } from '@/components/ui/card'
 import { Copy, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
-import { useWorkspaceChannels } from '@/stores/workspace'
 import { useAuthStore } from '@/stores/auth-store'
-import { supabase } from '@/lib/supabase/client'
 import { LABELS } from './constants/labels'
 
 const WORKSPACE_TYPES = [
@@ -60,7 +58,6 @@ export function CreateTenantDialog({
   onComplete,
   existingCodes,
 }: CreateTenantDialogProps) {
-  const { createWorkspace, createChannel } = useWorkspaceChannels()
   const user = useAuthStore(state => state.user)
 
   const [step, setStep] = useState<1 | 2 | 3>(1)
@@ -139,137 +136,40 @@ export function CreateTenantDialog({
     setCreating(true)
 
     try {
-      // 1. Create workspace
-      const createdWs = await createWorkspace({
-        name: step1.name,
-        code: step1.code,
-        type: step1.type || null,
-        is_active: true,
-      })
-
-      if (!createdWs) {
-        toast.error(LABELS.TOAST_CREATE_FAILED)
-        setCreating(false)
-        return
-      }
-
-      logger.log(`Workspace created: ${createdWs.id}`)
-
-      // Create announcement channel
-      try {
-        await createChannel({
-          workspace_id: createdWs.id,
-          name: '公告',
-          description: '公司公告頻道',
-          type: 'PUBLIC',
-          is_announcement: true,
-          created_by: user.id,
-        })
-      } catch (channelError) {
-        logger.warn('Failed to create announcement channel:', channelError)
-      }
-
-      // Setup workspace bots
-      try {
-        const botResponse = await fetch('/api/debug/setup-workspace-bots', {
-          method: 'POST',
-        })
-        if (botResponse.ok) {
-          logger.log(`Bot created for workspace: ${createdWs.id}`)
-        }
-      } catch (botError) {
-        logger.warn('Failed to create bot:', botError)
-      }
-
-      // Seed base data (countries, cities)
-      try {
-        const seedResponse = await fetch('/api/tenants/seed-base-data', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ targetWorkspaceId: createdWs.id }),
-        })
-        if (seedResponse.ok) {
-          logger.log(`Base data seeded for workspace: ${createdWs.id}`)
-        } else {
-          logger.warn('Failed to seed base data')
-        }
-      } catch (seedError) {
-        logger.warn('Failed to seed base data:', seedError)
-      }
-
-      toast.success(LABELS.TOAST_WORKSPACE_CREATED)
-
-      // 2. Insert employee
-      const { data: employee, error: empError } = await supabase
-        .from('employees')
-        .insert({
-          workspace_id: createdWs.id,
-          employee_number: step2.employeeNumber,
-          chinese_name: step2.name,
-          display_name: step2.name,
-          roles: ['admin'],
-          is_active: true,
-        })
-        .select('id')
-        .single()
-
-      if (empError || !employee) {
-        logger.error('Failed to create employee:', empError)
-        toast.error(LABELS.TOAST_ADMIN_FAILED)
-        setCreating(false)
-        return
-      }
-
-      // 3. Create auth user
-      const authResponse = await fetch('/api/auth/create-employee-auth', {
+      // 呼叫統一的建立租戶 API
+      const response = await fetch('/api/tenants/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          employee_number: step2.employeeNumber,
-          password: step2.password,
-          workspace_code: step1.code,
-          email: step2.email,
+          workspaceName: step1.name,
+          workspaceCode: step1.code,
+          workspaceType: step1.type || null,
+          adminEmployeeNumber: step2.employeeNumber,
+          adminName: step2.name,
+          adminEmail: step2.email,
+          adminPassword: step2.password,
         }),
       })
 
-      const authResult = (await authResponse.json()) as {
-        success: boolean
-        data?: { user: { id: string } }
-        message?: string
-      }
+      const result = await response.json()
 
-      if (!authResult.success || !authResult.data?.user) {
-        logger.error('Failed to create auth user:', authResult.message)
-        toast.error(LABELS.TOAST_ADMIN_FAILED)
+      if (!result.success) {
+        logger.error('Failed to create tenant:', result.message)
+        toast.error(result.message || LABELS.TOAST_CREATE_FAILED)
         setCreating(false)
         return
       }
 
-      const authUserId = authResult.data.user.id
-
-      // 4. Update employee with supabase_user_id
-      await supabase
-        .from('employees')
-        .update({ supabase_user_id: authUserId })
-        .eq('id', employee.id)
-
-      // 5. Insert profile
-      await supabase.from('profiles').insert({
-        id: authUserId,
-        workspace_id: createdWs.id,
-        employee_id: employee.id,
-        display_name: step2.name,
-        is_employee: true,
-      })
-
+      logger.log('Tenant created successfully:', result.data)
+      toast.success(LABELS.TOAST_WORKSPACE_CREATED)
       toast.success(LABELS.TOAST_ADMIN_CREATED)
 
       // Move to step 3 - show login info
       setLoginInfo({
-        workspaceCode: step1.code,
-        employeeNumber: step2.employeeNumber,
-        email: step2.email,
-        password: step2.password,
+        workspaceCode: result.data.login.workspaceCode,
+        employeeNumber: result.data.login.employeeNumber,
+        email: result.data.login.email,
+        password: result.data.login.password,
       })
       setStep(3)
     } catch (error) {
