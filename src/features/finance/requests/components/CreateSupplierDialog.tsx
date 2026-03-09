@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -58,11 +58,11 @@ export function CreateSupplierDialog({
   const [submitting, setSubmitting] = useState(false)
 
   // 當 defaultName 改變時更新 formData.name
-  useState(() => {
+  useEffect(() => {
     if (defaultName && defaultName !== formData.name) {
       setFormData(prev => ({ ...prev, name: defaultName }))
     }
-  })
+  }, [defaultName])
 
   const handleSubmit = async () => {
     if (!formData.name.trim()) {
