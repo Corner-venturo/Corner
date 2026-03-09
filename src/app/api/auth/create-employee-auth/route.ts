@@ -71,23 +71,36 @@ export async function POST(request: NextRequest) {
     // 權限檢查
     const { data: employee } = await supabaseAdmin
       .from('employees')
-      .select('roles, workspace_id, workspaces!inner(code)')
+      .select('roles, workspace_id')
       .eq('id', auth.data.employeeId)
       .single()
 
-    const roles = employee?.roles as string[] | null
+    if (!employee || !employee.workspace_id) {
+      logger.error('Employee not found or no workspace')
+      return errorResponse('找不到員工資料', 403, ErrorCode.FORBIDDEN)
+    }
+
+    const roles = employee.roles as string[] | null
     const isSuperAdmin = roles?.includes('super_admin') ?? false
     const isAdmin = roles?.includes('admin') ?? false
-    const currentUserWorkspaceCode = (employee?.workspaces as any)?.code
 
-    logger.log(`Current user: workspace=${currentUserWorkspaceCode}, isSuperAdmin=${isSuperAdmin}, isAdmin=${isAdmin}`)
+    // 查詢 workspace 取得 code
+    const { data: currentWorkspace } = await supabaseAdmin
+      .from('workspaces')
+      .select('code')
+      .eq('id', employee.workspace_id as string)
+      .single()
 
-    // 建立新租戶的第一個管理員：只有 Corner 的 super_admin 可以
+    const currentUserWorkspaceCode = currentWorkspace?.code
+
+    logger.log(`Current user: workspace=${currentUserWorkspaceCode || 'unknown'}, isSuperAdmin=${isSuperAdmin}, isAdmin=${isAdmin}`)
+
+    // 建立新租戶的第一個管理員：只有 CORNER 的 super_admin 可以
     if (isNewTenant) {
       logger.log(`Creating first admin for new tenant: ${workspace_code}`)
-      if (!isSuperAdmin || currentUserWorkspaceCode !== 'Corner') {
+      if (!isSuperAdmin || currentUserWorkspaceCode !== 'CORNER') {
         logger.error(`Permission denied: isSuperAdmin=${isSuperAdmin}, workspace=${currentUserWorkspaceCode}`)
-        return errorResponse('建立新租戶需要 Corner 的 super_admin 權限', 403, ErrorCode.FORBIDDEN)
+        return errorResponse('建立新租戶需要 CORNER 的 super_admin 權限', 403, ErrorCode.FORBIDDEN)
       }
     } else {
       // 一般建立員工：需要該 workspace 的管理員權限
