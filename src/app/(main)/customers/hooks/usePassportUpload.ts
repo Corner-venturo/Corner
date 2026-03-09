@@ -356,7 +356,12 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
 
             if (uploadError) throw uploadError
 
-            const { data: urlData, error: urlError } = await supabase.storage.from('passport-images').createSignedUrl(storageFileName, 3600 * 24 * 365)
+            // TODO (產品化後優化): 改為存檔名 + 動態生成 URL（更安全、永不過期）
+            // 目前暫時延長為 10 年，實務上已足夠
+            // 詳見: /fixes/passport-url-fix.md
+            const { data: urlData, error: urlError } = await supabase.storage
+              .from('passport-images')
+              .createSignedUrl(storageFileName, 3600 * 24 * 365 * 10)  // 10 years
             if (urlError || !urlData?.signedUrl) throw urlError || new Error('Failed to create signed URL')
 
             // 檢查與現有資料的差異
