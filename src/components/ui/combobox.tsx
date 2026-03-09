@@ -370,7 +370,7 @@ export function Combobox<T = unknown>({
               role="listbox"
               className={cn(
                 'bg-card border border-border rounded-lg shadow-lg overflow-hidden',
-                disablePortal ? 'absolute left-0 right-0 top-full mt-1 z-50' : 'fixed z-[10010]'
+                disablePortal ? 'absolute left-0 right-0 top-full mt-1 z-[9999]' : 'fixed z-[10010]'
               )}
               style={
                 disablePortal
