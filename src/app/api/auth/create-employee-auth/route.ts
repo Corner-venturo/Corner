@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
       return errorResponse('請先登入才能建立員工帳號', 401, ErrorCode.UNAUTHORIZED)
     }
 
-    // 檢查該 workspace 是否已有員工（判斷是否為新租戶）
+    // 檢查該 workspace 是否已有「有 auth 的員工」（判斷是否為新租戶）
     let isNewTenant = false
     if (workspace_code) {
       const { data: workspace } = await supabaseAdmin
@@ -60,9 +60,11 @@ export async function POST(request: NextRequest) {
           .from('employees')
           .select('id', { count: 'exact', head: true })
           .eq('workspace_id', workspace.id)
+          .not('supabase_user_id', 'is', null)
 
-        // 如果該 workspace 沒有任何員工，視為新租戶
+        // 如果該 workspace 沒有任何「有 auth 的員工」，視為新租戶
         isNewTenant = (count ?? 0) === 0
+        logger.log(`Workspace ${workspace_code}: 已有 ${count} 個有 auth 的員工, isNewTenant=${isNewTenant}`)
       }
     }
 
@@ -76,16 +78,22 @@ export async function POST(request: NextRequest) {
     const roles = employee?.roles as string[] | null
     const isSuperAdmin = roles?.includes('super_admin') ?? false
     const isAdmin = roles?.includes('admin') ?? false
-    const workspaceCode = (employee?.workspaces as any)?.code
+    const currentUserWorkspaceCode = (employee?.workspaces as any)?.code
+
+    logger.log(`Current user: workspace=${currentUserWorkspaceCode}, isSuperAdmin=${isSuperAdmin}, isAdmin=${isAdmin}`)
 
     // 建立新租戶的第一個管理員：只有 Corner 的 super_admin 可以
     if (isNewTenant) {
-      if (!isSuperAdmin || workspaceCode !== 'Corner') {
+      logger.log(`Creating first admin for new tenant: ${workspace_code}`)
+      if (!isSuperAdmin || currentUserWorkspaceCode !== 'Corner') {
+        logger.error(`Permission denied: isSuperAdmin=${isSuperAdmin}, workspace=${currentUserWorkspaceCode}`)
         return errorResponse('建立新租戶需要 Corner 的 super_admin 權限', 403, ErrorCode.FORBIDDEN)
       }
     } else {
       // 一般建立員工：需要該 workspace 的管理員權限
+      logger.log(`Creating employee for existing tenant: ${workspace_code}`)
       if (!isSuperAdmin && !isAdmin) {
+        logger.error(`Permission denied: not admin`)
         return errorResponse('需要管理員權限', 403, ErrorCode.FORBIDDEN)
       }
     }
