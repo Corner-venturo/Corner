@@ -161,24 +161,17 @@ export default function ItineraryPage() {
       onSearchChange={pageState.setSearchTerm}
       searchPlaceholder={LABELS.SEARCH_ITINERARY}
       contentClassName="flex-1 overflow-hidden"
+      headerActions={
+        <Button
+          onClick={handleOpenTypeSelect}
+          className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
+        >
+          <CalendarDays size={16} />
+          {LABELS.NEW_ITINERARY_TABLE}
+        </Button>
+      }
       headerChildren={
         <div className="flex items-center gap-4">
-          <div className="flex gap-2">
-            {statusFilters.map(filter => (
-              <button
-                key={filter}
-                onClick={() => pageState.setStatusFilter(filter)}
-                className={cn(
-                  'px-3 py-1 rounded-lg text-sm font-medium transition-colors',
-                  pageState.statusFilter === filter
-                    ? 'bg-morandi-gold text-white'
-                    : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30'
-                )}
-              >
-                {filter}
-              </button>
-            ))}
-          </div>
 
           <div className="flex items-center gap-2">
             <Select value={pageState.authorFilter} onValueChange={pageState.setAuthorFilter}>
@@ -300,6 +293,68 @@ function CreateItineraryDialog({
   countries,
   onCreateItinerary,
 }: CreateItineraryDialogProps) {
+  const [step, setStep] = useState<'selectTour' | 'createItinerary'>('selectTour')
+  const [selectedTourId, setSelectedTourId] = useState('')
+  const { items: tours } = useToursSlim()
+  
+  // 重置步驟當對話框關閉
+  useEffect(() => {
+    if (!isOpen) {
+      setStep('selectTour')
+      setSelectedTourId('')
+    }
+  }, [isOpen])
+
+  // 選擇團後進入行程規劃
+  const handleTourSelected = () => {
+    if (selectedTourId) {
+      // TODO: 將選擇的團資訊帶入 formState
+      setStep('createItinerary')
+    }
+  }
+
+  if (step === 'selectTour') {
+    return (
+      <Dialog open={isOpen} onOpenChange={onOpenChange}>
+        <DialogContent level={1} className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarDays className="w-5 h-5 text-morandi-gold" />
+              選擇團號
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-6">
+            <Label className="mb-2 block">選擇團號</Label>
+            <Select value={selectedTourId} onValueChange={setSelectedTourId}>
+              <SelectTrigger>
+                <SelectValue placeholder="請選擇團號" />
+              </SelectTrigger>
+              <SelectContent>
+                {tours.map(tour => (
+                  <SelectItem key={tour.id} value={tour.id}>
+                    {tour.code} - {tour.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              取消
+            </Button>
+            <Button
+              onClick={handleTourSelected}
+              disabled={!selectedTourId}
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            >
+              下一步
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    )
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent level={1} className="max-w-5xl h-[90vh] overflow-hidden p-0">
