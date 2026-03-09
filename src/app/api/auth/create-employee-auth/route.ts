@@ -34,23 +34,57 @@ async function checkIsAdmin(employeeId: string): Promise<boolean> {
 
 export async function POST(request: NextRequest) {
   try {
-    // 🔒 安全檢查：需要已登入用戶才能建立新帳號
-    const auth = await getServerAuth()
-    if (!auth.success) {
-      return errorResponse('請先登入才能建立員工帳號', 401, ErrorCode.UNAUTHORIZED)
-    }
-
-    // 🔒 管理員權限檢查（2026-02-19）
-    const isAdmin = await checkIsAdmin(auth.data.employeeId)
-    if (!isAdmin) {
-      return errorResponse('需要管理員權限', 403, ErrorCode.FORBIDDEN)
-    }
-
     const validation = await validateBody(request, createEmployeeAuthSchema)
     if (!validation.success) return validation.error
     const { employee_number, password, workspace_code, email: providedEmail } = validation.data
 
     const supabaseAdmin = getSupabaseAdminClient()
+
+    // 🔒 安全檢查：判斷是否為系統初始化（建立第一個租戶管理員）
+    let isSystemInit = false
+    
+    // 檢查該 workspace 是否已有員工
+    if (workspace_code) {
+      const { data: workspace } = await supabaseAdmin
+        .from('workspaces')
+        .select('id')
+        .eq('code', workspace_code)
+        .single()
+
+      if (workspace) {
+        const { count } = await supabaseAdmin
+          .from('employees')
+          .select('id', { count: 'exact', head: true })
+          .eq('workspace_id', workspace.id)
+
+        // 如果該 workspace 沒有任何員工，視為系統初始化
+        isSystemInit = (count ?? 0) === 0
+      }
+    }
+
+    // 已登入用戶建立員工：需要管理員權限
+    const auth = await getServerAuth()
+    if (auth.success && !isSystemInit) {
+      const { data: employee } = await supabaseAdmin
+        .from('employees')
+        .select('roles')
+        .eq('id', auth.data.employeeId)
+        .single()
+
+      const roles = employee?.roles as string[] | null
+      const isSuperAdmin = roles?.includes('super_admin') ?? false
+      const isAdmin = roles?.includes('admin') ?? false
+
+      if (!isSuperAdmin && !isAdmin) {
+        return errorResponse('需要管理員權限', 403, ErrorCode.FORBIDDEN)
+      }
+    }
+
+    // 未登入且非系統初始化：拒絕請求
+    if (!auth.success && !isSystemInit) {
+      return errorResponse('請先登入才能建立員工帳號', 401, ErrorCode.UNAUTHORIZED)
+    }
+
     // 優先使用前端傳入的真實 email；若無則使用自動生成的格式（向後兼容）
     const email = providedEmail
       ? providedEmail.toLowerCase()
