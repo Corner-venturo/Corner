@@ -102,7 +102,7 @@ function AccommodationDialog({
           .order('name')
           .limit(200)
         if (data) {
-          setHotelOptions((data as HotelOption[]).map(h => ({ value: h.id, label: h.name })))
+          setHotelOptions((data as HotelOption[]).map(h => ({ value: h.name, label: h.name })))
         }
       } catch (err) {
         logger.error('載入飯店失敗', err)
@@ -167,9 +167,7 @@ function AccommodationDialog({
                   <Combobox
                     value={day.accommodation || ''}
                     onChange={val => {
-                      // If user picked from list, val is the hotel id — find label
-                      const opt = hotelOptions.find(o => o.value === val)
-                      onUpdateAccommodation(i, 'accommodation', opt ? opt.label : val)
+                      onUpdateAccommodation(i, 'accommodation', val)
                     }}
                     options={getFilteredOptions(i)}
                     placeholder={TOUR_ITINERARY_TAB_LABELS.搜尋飯店}
@@ -177,8 +175,8 @@ function AccommodationDialog({
                     showClearButton
                     disablePortal
                     onCreate={async (name) => {
-                      // 直接用輸入的名字作為住宿值（不需寫入 hotels 表）
-                      // 回傳 name 讓 Combobox onChange 接手處理
+                      // 新增到本地選項，讓 Combobox 能正確顯示
+                      setHotelOptions(prev => [...prev, { value: name, label: name }])
                       return name
                     }}
                   />
