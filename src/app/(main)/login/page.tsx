@@ -85,7 +85,7 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
 
-    const trimmedCode = code.trim().toLowerCase()
+    const trimmedCode = code.trim().toUpperCase()
     if (!trimmedCode) {
       setError(LABELS.ERROR_ENTER_CODE)
       return
