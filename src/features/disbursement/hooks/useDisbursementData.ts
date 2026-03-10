@@ -182,9 +182,9 @@ export function useDisbursementData() {
         })
       }
 
-      // 更新請款單狀態為 billed（已加入出納單）
+      // 更新請款單狀態為 confirmed（已加入出納單，尚未出帳）
       for (const id of requestIds) {
-        await updatePaymentRequestApi(id, { status: 'billed' })
+        await updatePaymentRequestApi(id, { status: 'confirmed' })
       }
     },
     [currentOrder, payment_requests, disbursement_orders, nextThursday]
@@ -275,17 +275,17 @@ export function useDisbursementData() {
         status: 'pending',
       })
 
-      // 更新請款單狀態為 billed（已加入出納單）
+      // 更新請款單狀態為 confirmed（已加入出納單，尚未出帳）
       const tour_ids_to_recalculate = new Set<string>()
       for (const id of requestIds) {
-        await updatePaymentRequestApi(id, { status: 'billed' })
+        await updatePaymentRequestApi(id, { status: 'confirmed' })
         const request = payment_requests.find(r => r.id === id)
         if (request?.tour_id) {
           tour_ids_to_recalculate.add(request.tour_id)
         }
       }
 
-      // 重算相關團的成本（processing 不計入成本）
+      // 重算相關團的成本
       for (const tour_id of tour_ids_to_recalculate) {
         await recalculateExpenseStats(tour_id)
       }

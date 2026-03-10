@@ -190,10 +190,10 @@ export function useCreateDisbursement({
         throw new Error(error.message)
       }
 
-      // 更新請款單狀態為 billed（已加入出納單）
+      // 更新請款單狀態為 confirmed（已加入出納單，尚未出帳）
       const tour_ids_to_recalculate = new Set<string>()
       for (const id of selectedRequestIds) {
-        await updatePaymentRequestApi(id, { status: 'billed' })
+        await updatePaymentRequestApi(id, { status: 'confirmed' })
         const req = pendingRequests.find(r => r.id === id)
         if (req?.tour_id) {
           tour_ids_to_recalculate.add(req.tour_id)

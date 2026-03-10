@@ -6,9 +6,10 @@ import { generateCompanyPaymentRequestCode } from '@/stores/utils/code-generator
 import { EXPENSE_TYPE_CONFIG, CompanyExpenseType } from '@/stores/types/finance.types'
 import { recalculateExpenseStats } from '@/features/finance/payments/services/expense-core.service'
 import { REQUEST_OPERATIONS_LABELS } from '../../constants/labels'
+import { logger } from '@/lib/utils/logger'
 
 export function useRequestOperations() {
-  const { payment_requests, createPaymentRequest, addPaymentItem, addPaymentItems } = usePayments()
+  const { payment_requests, createPaymentRequest, addPaymentItems, deletePaymentRequest } = usePayments()
   const workspaceId = useWorkspaceId()
 
   // 根據團號生成請款單編號：團號-I01, 團號-I02, ...
@@ -82,21 +83,27 @@ export function useRequestOperations() {
           is_special_billing: formData.is_special_billing,
         })
 
-        // Batch insert all items
-        await addPaymentItems(
-          request.id,
-          items.map((item, i) => ({
-            category: item.category,
-            supplier_id: item.supplier_id,
-            supplier_name: item.supplierName,
-            description: item.description,
-            unit_price: item.unit_price,
-            quantity: item.quantity,
-            notes: '',
-            sort_order: i + 1,
-            tour_request_id: item.tour_request_id || null,
-          }))
-        )
+        // Batch insert all items — 失敗時刪除剛建的請款單
+        try {
+          await addPaymentItems(
+            request.id,
+            items.map((item, i) => ({
+              category: item.category,
+              supplier_id: item.supplier_id,
+              supplier_name: item.supplierName,
+              description: item.description,
+              unit_price: item.unit_price,
+              quantity: item.quantity,
+              notes: '',
+              sort_order: i + 1,
+              tour_request_id: item.tour_request_id || null,
+            }))
+          )
+        } catch (itemError) {
+          logger.error('新增請款項目失敗，回滾請款單:', itemError)
+          await deletePaymentRequest(request.id).catch(() => {})
+          throw itemError
+        }
 
         return request
       } else {
@@ -126,21 +133,27 @@ export function useRequestOperations() {
           is_special_billing: formData.is_special_billing,
         })
 
-        // Batch insert all items
-        await addPaymentItems(
-          request.id,
-          items.map((item, i) => ({
-            category: item.category,
-            supplier_id: item.supplier_id,
-            supplier_name: item.supplierName,
-            description: item.description,
-            unit_price: item.unit_price,
-            quantity: item.quantity,
-            notes: '',
-            sort_order: i + 1,
-            tour_request_id: item.tour_request_id || null,
-          }))
-        )
+        // Batch insert all items — 失敗時刪除剛建的請款單
+        try {
+          await addPaymentItems(
+            request.id,
+            items.map((item, i) => ({
+              category: item.category,
+              supplier_id: item.supplier_id,
+              supplier_name: item.supplierName,
+              description: item.description,
+              unit_price: item.unit_price,
+              quantity: item.quantity,
+              notes: '',
+              sort_order: i + 1,
+              tour_request_id: item.tour_request_id || null,
+            }))
+          )
+        } catch (itemError) {
+          logger.error('新增請款項目失敗，回滾請款單:', itemError)
+          await deletePaymentRequest(request.id).catch(() => {})
+          throw itemError
+        }
 
         // 重算團成本 (already handled inside addItems, but ensure for tour)
         if (formData.tour_id) {
@@ -153,6 +166,7 @@ export function useRequestOperations() {
     [
       createPaymentRequest,
       addPaymentItems,
+      deletePaymentRequest,
       generateRequestCode,
       generateCompanyRequestCode,
       workspaceId,
@@ -193,21 +207,27 @@ export function useRequestOperations() {
           request_type: REQUEST_OPERATIONS_LABELS.SUPPLIER_EXPENSE, // Default value for now
         })
 
-        // Batch insert all items
-        await addPaymentItems(
-          request.id,
-          items.map((item, i) => ({
-            category: item.category,
-            supplier_id: item.supplier_id,
-            supplier_name: item.supplierName,
-            description: item.description,
-            unit_price: item.unit_price,
-            quantity: item.quantity,
-            notes: '',
-            sort_order: i + 1,
-            tour_request_id: item.tour_request_id || null,
-          }))
-        )
+        // Batch insert all items — 失敗時刪除剛建的請款單
+        try {
+          await addPaymentItems(
+            request.id,
+            items.map((item, i) => ({
+              category: item.category,
+              supplier_id: item.supplier_id,
+              supplier_name: item.supplierName,
+              description: item.description,
+              unit_price: item.unit_price,
+              quantity: item.quantity,
+              notes: '',
+              sort_order: i + 1,
+              tour_request_id: item.tour_request_id || null,
+            }))
+          )
+        } catch (itemError) {
+          logger.error('新增請款項目失敗，回滾請款單:', itemError)
+          await deletePaymentRequest(request.id).catch(() => {})
+          throw itemError
+        }
 
         createdRequests.push(request)
 
@@ -217,7 +237,7 @@ export function useRequestOperations() {
 
       return createdRequests
     },
-    [createPaymentRequest, addPaymentItems, generateRequestCode, workspaceId]
+    [createPaymentRequest, addPaymentItems, deletePaymentRequest, generateRequestCode, workspaceId]
   )
 
   return {

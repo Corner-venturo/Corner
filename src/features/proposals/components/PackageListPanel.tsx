@@ -351,7 +351,7 @@ export function PackageListPanel({
             group_size: groupSize,
             participant_counts: participantCounts,
             proposal_package_id: pkg.id,
-            workspace_id: user?.workspace_id,
+            workspace_id: user?.workspace_id || '',
             created_by: user?.id,
             itinerary_id: pkg.itinerary_id || null,
             accommodation_days: accommodationDays,

@@ -38,7 +38,6 @@ export async function POST(request: NextRequest) {
 
     // 呼叫 DB function 複製基礎資料
     const supabase = supabaseAdmin
-    // @ts-expect-error - seed_tenant_base_data 是手動建立的 DB function，不在 generated types 裡
     const { error } = (await supabase.rpc('seed_tenant_base_data', {
       source_workspace_id: CORNER_WORKSPACE_ID,
       target_workspace_id: targetWorkspaceId,

@@ -486,9 +486,12 @@ export function AddRequestDialog({
             })
 
             // 建立品項（帶獨立編號如 HND260328A-I01-1）
+            // 員工不在 suppliers 表，supplier_id 設空避免 FK 衝突
+            const batchSupplier = suppliers.find(s => s.id === batchSupplierId)
+            const isEmployee = batchSupplier?.type === 'employee'
             await addPaymentItem(request.id, {
               category: batchCategory,
-              supplier_id: batchSupplierId || '',
+              supplier_id: isEmployee ? '' : (batchSupplierId || ''),
               supplier_name: batchSupplierName || null,
               description: batchDescription || batchCategory,
               unit_price: allocation.allocated_amount,
@@ -566,7 +569,11 @@ export function AddRequestDialog({
     } catch (error) {
       logger.error('Failed to create payment request:', error)
       const message =
-        error instanceof Error ? error.message : ADD_REQUEST_EXTRA_LABELS.CREATE_FAILED
+        error instanceof Error
+          ? error.message
+          : typeof error === 'object' && error !== null && 'message' in error
+            ? String((error as { message: string }).message)
+            : ADD_REQUEST_EXTRA_LABELS.CREATE_FAILED
       void alert(message, 'error')
     } finally {
       setIsSubmitting(false)

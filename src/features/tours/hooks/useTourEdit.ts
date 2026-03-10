@@ -442,7 +442,7 @@ export function useTourEdit(params: UseTourEditParams) {
         description: formData.description.trim(),
         outbound_flight: cleanFlightInfo(formData.outboundFlight),
         return_flight: cleanFlightInfo(formData.returnFlight),
-        status: formData.isSpecial ? COMP_TOURS_LABELS.特殊團 : tour.status,
+        status: formData.isSpecial ? COMP_TOURS_LABELS.特殊團 : (tour.status || undefined),
         enable_checkin: formData.enable_checkin,
         updated_at: new Date().toISOString(),
       }
@@ -461,6 +461,7 @@ export function useTourEdit(params: UseTourEditParams) {
       // Reload data
       mutate(`tour-${tour.id}`)
       mutate('tours')
+      mutate((key: string) => typeof key === 'string' && key.startsWith('tours-paginated-'), undefined, { revalidate: true })
 
       const updatedTour = data as Tour
 

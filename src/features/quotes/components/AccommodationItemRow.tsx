@@ -120,7 +120,7 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
 
       {/* 小計欄 */}
       <td className="py-3 px-4 text-sm text-morandi-primary text-center font-medium table-divider whitespace-nowrap">
-        {isSameAsPrevious ? '-' : item.total.toLocaleString()}
+        {item.total.toLocaleString()}
       </td>
 
       {/* 備註 / 操作合併欄 */}

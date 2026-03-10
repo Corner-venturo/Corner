@@ -148,7 +148,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       request_id: requestId,
       item_number: itemNumber,
       category: itemData.category,
-      supplier_id: itemData.supplier_id,
+      supplier_id: itemData.supplier_id || null,
       supplier_name: itemData.supplier_name,
       description: itemData.description,
       unitprice: itemData.unit_price, // 資料庫欄位名稱
@@ -219,7 +219,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
         request_id: requestId,
         item_number: itemNumber,
         category: itemData.category,
-        supplier_id: itemData.supplier_id,
+        supplier_id: itemData.supplier_id || null,
         supplier_name: itemData.supplier_name,
         description: itemData.description,
         unitprice: itemData.unit_price, // 資料庫欄位名稱
@@ -295,7 +295,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       updated_at: now,
     }
     if (itemData.category !== undefined) dbUpdate.category = itemData.category
-    if (itemData.supplier_id !== undefined) dbUpdate.supplier_id = itemData.supplier_id
+    if (itemData.supplier_id !== undefined) dbUpdate.supplier_id = itemData.supplier_id || null
     if (itemData.supplier_name !== undefined) dbUpdate.supplier_name = itemData.supplier_name
     if (itemData.description !== undefined) dbUpdate.description = itemData.description
     if (itemData.quantity !== undefined) dbUpdate.quantity = itemData.quantity

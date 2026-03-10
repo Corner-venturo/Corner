@@ -140,8 +140,10 @@ export function EditableRequestItemList({
                 value={item.supplier_id}
                 onChange={value => {
                   const supplier = suppliers.find(s => s.id === value)
+                  const isEmployee = supplier?.type === 'employee'
                   updateItem(item.id, {
-                    supplier_id: value,
+                    // 員工不在 suppliers 表，supplier_id 設 null 避免 FK 衝突
+                    supplier_id: isEmployee ? '' : value,
                     supplierName: supplier?.name || '',
                   })
                 }}
