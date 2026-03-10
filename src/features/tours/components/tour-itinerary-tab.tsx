@@ -695,16 +695,16 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                 <th className="border border-morandi-gold/50 px-3 py-2 text-left">
                   {TOUR_ITINERARY_TAB_LABELS.行程內容}
                 </th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">
+                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-28">
                   {TOUR_ITINERARY_TAB_LABELS.早餐_表頭}
                 </th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">
+                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-28">
                   {TOUR_ITINERARY_TAB_LABELS.午餐_表頭}
                 </th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">
+                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-28">
                   {TOUR_ITINERARY_TAB_LABELS.晚餐_表頭}
                 </th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-left w-32">
+                <th className="border border-morandi-gold/50 px-3 py-2 text-left w-40">
                   {TOUR_ITINERARY_TAB_LABELS.住宿_表頭}
                 </th>
               </tr>
