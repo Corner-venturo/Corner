@@ -176,6 +176,11 @@ function AccommodationDialog({
                     showSearchIcon
                     showClearButton
                     disablePortal
+                    onCreate={async (name) => {
+                      // 直接用輸入的名字作為住宿值（不需寫入 hotels 表）
+                      // 回傳 name 讓 Combobox onChange 接手處理
+                      return name
+                    }}
                   />
                 )}
               </div>
