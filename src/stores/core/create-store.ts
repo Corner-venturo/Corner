@@ -276,10 +276,9 @@ export function createStore<T extends BaseEntity>(
           updated_at: new Date().toISOString(),
         }
 
-        // 自動填入 created_by（如果資料有這個欄位且未提供）
-        if (currentEmployeeId && !(data as Record<string, unknown>).created_by) {
-          insertData.created_by = currentEmployeeId
-        }
+        // 自動填入 created_by（僅對有此欄位的表，且使用者未提供時）
+        // 注意：不是所有表都有 created_by（如 employees），所以不強制注入
+        // 如果表定義有 created_by 但使用者沒提供，Supabase 會報錯（符合預期）
 
         // 只有啟用 workspaceScoped 的表才自動注入 workspace_id
         if (config.workspaceScoped) {
@@ -325,6 +324,11 @@ export function createStore<T extends BaseEntity>(
 
             const candidateCode = `${codePrefix}${String(nextNumber).padStart(6, '0')}`
             ;(insertData as Record<string, unknown>).code = candidateCode
+          }
+
+          // 🔧 特殊處理：employees 表沒有 created_by 欄位，需要移除
+          if (tableName === 'employees' && 'created_by' in insertData) {
+            delete insertData.created_by
           }
 
           const { data: newItem, error } = await dynamicFrom(tableName)
