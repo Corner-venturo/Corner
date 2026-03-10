@@ -704,7 +704,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                 <th className="border border-morandi-gold/50 px-3 py-2 text-center w-28">
                   {TOUR_ITINERARY_TAB_LABELS.晚餐_表頭}
                 </th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-left w-40">
+                <th className="border border-morandi-gold/50 px-3 py-2 text-left w-48">
                   {TOUR_ITINERARY_TAB_LABELS.住宿_表頭}
                 </th>
               </tr>
