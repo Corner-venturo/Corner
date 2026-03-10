@@ -438,8 +438,12 @@ export default function HRPage() {
               {LABELS.LABEL_5426}
             </Button>
             <Button
-              onClick={() => setIsAddDialogOpen(true)}
+              onClick={() => {
+                alert('按鈕被點擊了！')
+                setIsAddDialogOpen(true)
+              }}
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center"
+              style={{ pointerEvents: 'auto', position: 'relative', zIndex: 9999 }}
             >
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -462,14 +466,21 @@ export default function HRPage() {
         />
       )}
 
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+      <Dialog 
+        open={isAddDialogOpen} 
+        onOpenChange={setIsAddDialogOpen}
+      >
         <DialogContent level={1} className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{LABELS.ADD_EMPLOYEE}</DialogTitle>
           </DialogHeader>
           <AddEmployeeForm
-            onSubmit={() => setIsAddDialogOpen(false)}
-            onCancel={() => setIsAddDialogOpen(false)}
+            onSubmit={() => {
+              setIsAddDialogOpen(false)
+            }}
+            onCancel={() => {
+              setIsAddDialogOpen(false)
+            }}
           />
         </DialogContent>
       </Dialog>

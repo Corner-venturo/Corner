@@ -137,6 +137,7 @@ export async function POST(request: NextRequest) {
         display_name: adminName,
         email: adminEmail.toLowerCase(),
         roles: ['admin'],
+        permissions: ['*', 'todos', 'payments', 'requests', 'visas', 'calendar', 'workspace', 'quotes', 'tours', 'orders', 'customers', 'hr'], // 完整權限
         is_active: true,
       })
       .select('id')
