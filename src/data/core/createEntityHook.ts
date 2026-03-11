@@ -164,6 +164,7 @@ export function createEntityHook<T extends BaseEntity>(
 
   // 判斷是否需要 workspace 隔離
   const isWorkspaceScoped = config.workspaceScoped ?? WORKSPACE_SCOPED_TABLES.includes(tableName)
+  const skipAudit = config.skipAuditFields ?? false
 
   // 合併快取配置
   const cacheConfig = {
@@ -574,7 +575,7 @@ export function createEntityHook<T extends BaseEntity>(
         updated_at: now,
         ...(isWorkspaceScoped && workspace_id ? { workspace_id } : {}),
         ...(generatedCode ? { code: generatedCode } : {}),
-        ...(ctxUserId ? { created_by: ctxUserId, updated_by: ctxUserId } : {}),
+        ...(!skipAudit && ctxUserId ? { created_by: ctxUserId, updated_by: ctxUserId } : {}),
       }
 
       // 樂觀更新
@@ -630,7 +631,7 @@ export function createEntityHook<T extends BaseEntity>(
     const updateData = {
       ...data,
       updated_at: new Date().toISOString(),
-      ...(currentUserId ? { updated_by: currentUserId } : {}),
+      ...(!skipAudit && currentUserId ? { updated_by: currentUserId } : {}),
     }
 
     // 樂觀更新

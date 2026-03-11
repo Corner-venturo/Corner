@@ -1,7 +1,7 @@
 'use client'
 /**
  * ToursPage - Main tours list page component
- * 提案功能已移除，純粹管理旅遊團
+ * 支援三種開團方式：正式開團 / 提案 / 模板
  */
 
 import React, { useCallback, useEffect, useState, useMemo } from 'react'
@@ -25,8 +25,7 @@ import { LinkDocumentsToTourDialog } from './LinkDocumentsToTourDialog'
 import { TourItineraryDialog } from './TourItineraryDialog'
 import { ContractDialog } from '@/features/contracts/components/ContractDialog'
 import { TourClosingDialog } from './TourClosingDialog'
-// TourControlDialogWrapper 已移除，功能整合到團確單
-// TourRequirementsDialog removed — use tour detail page instead
+import { ConvertToTourDialog } from './ConvertToTourDialog'
 import { TourEditDialog } from '@/features/tours/components/tour-edit-dialog'
 import { alert } from '@/lib/ui/alert-dialog'
 
@@ -35,10 +34,11 @@ export const ToursPage: React.FC = () => {
   const router = useRouter()
   const { user } = useAuthStore()
 
-  // requirementsDialogTour removed — use tour detail page instead
-
   // Edit dialog state (using TourEditDialog instead of TourForm for edit mode)
   const [editDialogTour, setEditDialogTour] = useState<Tour | null>(null)
+
+  // Convert dialog state (提案/模板轉正式團)
+  const [convertDialogTour, setConvertDialogTour] = useState<Tour | null>(null)
 
   // 🔧 優化：只保留 quotes（TourActionButtons 需要），其他由 useTourOperations 內部處理
   const { items: quotes } = useQuotesListSlim()
@@ -72,10 +72,6 @@ export const ToursPage: React.FC = () => {
   const closeDialog = useCallback(() => {
     setDialogState({ isOpen: false, type: null, data: null })
   }, [])
-
-  // 🔧 優化：移除無條件載入 regions
-  // 提案已有 destination 欄位，不需要 country_id/city_id 轉換
-  // 如果未來需要 regions，可以在 TourForm 開啟時才載入
 
   const {
     filteredTours,
@@ -145,7 +141,6 @@ export const ToursPage: React.FC = () => {
   }, [])
 
   // 🔧 優化：useTourOperations 不再需要外部傳入 quotes/itineraries/addOrder 等
-  // 🔧 編輯模式已移至 TourEditDialog + useTourEdit hook
   const operations = useTourOperations({
     actions,
     resetForm,
@@ -198,12 +193,49 @@ export const ToursPage: React.FC = () => {
     [router]
   )
 
+  // 開新增對話框（根據 activeTab 設定 tour_type）
+  const handleOpenCreateDialogWithType = useCallback(() => {
+    const tourType = activeStatusTab === 'proposal' ? 'proposal'
+      : activeStatusTab === 'template' ? 'template'
+      : undefined
+
+    if (tourType) {
+      // 提案/模板新增
+      setNewTour({
+        name: '',
+        tour_type: tourType,
+        countryCode: '',
+        cityCode: '',
+        departure_date: '',
+        return_date: '',
+        price: 0,
+        status: '待出發',
+        isSpecial: false,
+        max_participants: 20,
+        description: '',
+      })
+      openDialog('create')
+    } else {
+      // 正式團新增
+      handleOpenCreateDialog()
+    }
+  }, [activeStatusTab, setNewTour, openDialog, handleOpenCreateDialog])
+
+  // 開團轉換（提案/模板 → 正式團）
+  const handleConvertTour = useCallback((tour: Tour) => {
+    setConvertDialogTour(tour)
+  }, [])
+
+  const handleConvertConfirm = useCallback(
+    async (tour: Tour, departure_date: string, return_date: string, orderData?: { contact_person?: string; sales_person?: string; assistant?: string; member_count?: number; total_amount?: number }) => {
+      await operations.handleConvertToOfficial(tour, departure_date, return_date, orderData)
+    },
+    [operations]
+  )
+
   useEffect(() => {
     handleNavigationEffect()
   }, [handleNavigationEffect])
-
-  // 移除完整頁面載入阻擋，改為讓表格結構先顯示
-  // loading 狀態由 TourTable 內部處理
 
   return (
     <div className="h-full flex flex-col">
@@ -215,7 +247,7 @@ export const ToursPage: React.FC = () => {
           setActiveStatusTab(tab)
           setCurrentPage(1)
         }}
-        onAddTour={() => handleOpenCreateDialog()}
+        onAddTour={handleOpenCreateDialogWithType}
       />
 
       <div className="flex-1 overflow-hidden flex flex-col">
@@ -228,6 +260,8 @@ export const ToursPage: React.FC = () => {
             renderActions={renderActions}
             getStatusColor={getStatusColor}
             ordersByTourId={ordersByTourId}
+            activeTab={activeStatusTab}
+            onConvertTour={handleConvertTour}
           />
         </div>
       </div>
@@ -261,6 +295,14 @@ export const ToursPage: React.FC = () => {
           }}
         />
       )}
+
+      {/* ConvertToTourDialog for proposal/template → official */}
+      <ConvertToTourDialog
+        isOpen={!!convertDialogTour}
+        onClose={() => setConvertDialogTour(null)}
+        tour={convertDialogTour}
+        onConvert={handleConvertConfirm}
+      />
 
       <DeleteConfirmDialog
         isOpen={deleteConfirm.isOpen}
@@ -318,8 +360,6 @@ export const ToursPage: React.FC = () => {
           onSuccess={closeClosingDialog}
         />
       )}
-
-      {/* 需求總表對話框已移除 — 統一使用詳情頁 */}
     </div>
   )
 }

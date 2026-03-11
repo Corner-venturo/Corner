@@ -112,6 +112,8 @@ export interface EntityConfig {
   cache?: CacheConfig
   /** 是否啟用 workspace 隔離（預設根據表格名稱自動判斷）*/
   workspaceScoped?: boolean
+  /** 跳過自動加入 created_by / updated_by 欄位（適用於沒有 audit 欄位的表）*/
+  skipAuditFields?: boolean
 }
 
 // ============================================

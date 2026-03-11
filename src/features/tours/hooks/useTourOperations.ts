@@ -71,19 +71,29 @@ export function useTourOperations(params: UseTourOperationsParams) {
 
   const handleAddTour = useCallback(
     async (newTour: NewTourData, newOrder: Partial<OrderFormData>, fromQuoteId?: string) => {
-      // Zod schema 驗證必填欄位
-      const { createTourSchema } = await import('@/lib/validations/schemas')
-      const validation = createTourSchema.safeParse({
-        name: newTour.name.trim(),
-        departure_date: newTour.departure_date,
-        return_date: newTour.return_date,
-      })
-      if (!validation.success) {
-        setFormError(validation.error.issues[0].message)
-        return
+      const isProposalOrTemplate = newTour.tour_type === 'proposal' || newTour.tour_type === 'template'
+
+      // 提案/模板只需要名稱，正式團需要日期
+      if (!isProposalOrTemplate) {
+        // Zod schema 驗證必填欄位
+        const { createTourSchema } = await import('@/lib/validations/schemas')
+        const validation = createTourSchema.safeParse({
+          name: newTour.name.trim(),
+          departure_date: newTour.departure_date,
+          return_date: newTour.return_date,
+        })
+        if (!validation.success) {
+          setFormError(validation.error.issues[0].message)
+          return
+        }
+      } else {
+        if (!newTour.name.trim()) {
+          setFormError('請輸入名稱')
+          return
+        }
       }
 
-      // Check custom destination
+      // Check custom destination (正式團 and 有填自訂國家時)
       if (newTour.countryCode === '__custom__') {
         if (!newTour.customCountry?.trim()) {
           alert(TOUR_OPERATIONS_LABELS.FILL_COUNTRY_NAME)
@@ -107,8 +117,6 @@ export function useTourOperations(params: UseTourOperationsParams) {
         setSubmitting(true)
         setFormError(null)
 
-        const departure_date = new Date(newTour.departure_date)
-
         // Determine city code and name
         const cityCode =
           newTour.countryCode === '__custom__' ? newTour.customCityCode! : newTour.cityCode
@@ -117,15 +125,22 @@ export function useTourOperations(params: UseTourOperationsParams) {
             ? newTour.customLocation!
             : newTour.cityName || newTour.cityCode
 
-        // 驗證城市代碼（團號需要 3 碼英文城市代碼）
-        if (!cityCode || cityCode.length < 2) {
-          setFormError(TOUR_OPERATIONS_LABELS.SELECT_CITY_OR_SET_AIRPORT)
-          setSubmitting(false)
-          return
-        }
+        let code: string
 
-        // Create new tour (edit mode now uses TourEditDialog with useTourEdit hook)
-        const code = await tourService.generateTourCode(cityCode, departure_date, newTour.isSpecial)
+        if (isProposalOrTemplate) {
+          // 提案/模板：用 DRAFT- 前綴的臨時編號
+          const prefix = newTour.tour_type === 'proposal' ? 'PROP' : 'TMPL'
+          code = `${prefix}-${Date.now().toString(36).toUpperCase()}`
+        } else {
+          // 正式團：驗證城市代碼（團號需要 3 碼英文城市代碼）
+          if (!cityCode || cityCode.length < 2) {
+            setFormError(TOUR_OPERATIONS_LABELS.SELECT_CITY_OR_SET_AIRPORT)
+            setSubmitting(false)
+            return
+          }
+          const departure_date = new Date(newTour.departure_date)
+          code = await tourService.generateTourCode(cityCode, departure_date, newTour.isSpecial)
+        }
 
         // 解析航班文字為 FlightInfo（簡單格式：航空公司 班次 時間）
         const parseFlightText = (text?: string): import('@/stores/types').FlightInfo | null => {
@@ -143,9 +158,11 @@ export function useTourOperations(params: UseTourOperationsParams) {
 
         const tourData = {
           name: newTour.name,
-          location: cityName,
-          departure_date: newTour.departure_date,
-          return_date: newTour.return_date,
+          tour_type: newTour.tour_type || 'official',
+          days_count: isProposalOrTemplate ? (newTour.days_count || null) : null,
+          location: cityName || '',
+          departure_date: isProposalOrTemplate ? null : newTour.departure_date,
+          return_date: isProposalOrTemplate ? null : newTour.return_date,
           status: newTour.status,
           price: newTour.price,
           max_participants: newTour.max_participants,
@@ -156,10 +173,10 @@ export function useTourOperations(params: UseTourOperationsParams) {
           profit: 0,
           current_participants: 0,
           quote_id: fromQuoteId || undefined,
-          enable_checkin: newTour.enable_checkin || false,
-          controller_id: newTour.controller_id || undefined,
-          outbound_flight: parseFlightText(newTour.outbound_flight_text),
-          return_flight: parseFlightText(newTour.return_flight_text),
+          enable_checkin: isProposalOrTemplate ? false : (newTour.enable_checkin || false),
+          controller_id: isProposalOrTemplate ? undefined : (newTour.controller_id || undefined),
+          outbound_flight: isProposalOrTemplate ? undefined : parseFlightText(newTour.outbound_flight_text),
+          return_flight: isProposalOrTemplate ? undefined : parseFlightText(newTour.return_flight_text),
         }
 
         const createdTour = await actions.create(tourData)
@@ -174,55 +191,59 @@ export function useTourOperations(params: UseTourOperationsParams) {
           incrementCityUsage(cityName)
         }
 
-        // If contact person is filled, also add order (業務必填)
-        if (newOrder.contact_person?.trim() && newOrder.sales_person?.trim()) {
-          // 🔧 優化：直接用 supabase insert，不依賴外部 hook
-          const order_number = `${code}-O01`
-          const memberCount = newOrder.member_count || 1
-          const totalAmount = newOrder.total_amount || newTour.price * memberCount
-          const now = new Date().toISOString()
-          try {
-            await createOrder({
-              order_number,
-              tour_id: createdTour.id,
-              tour_name: newTour.name,
-              contact_person: newOrder.contact_person,
-              sales_person: newOrder.sales_person || '',
-              assistant: newOrder.assistant || '',
-              member_count: memberCount,
-              payment_status: 'unpaid',
-              total_amount: totalAmount,
-              paid_amount: 0,
-              remaining_amount: totalAmount,
-              code,
-              workspace_id: workspaceId,
-            } as Parameters<typeof createOrder>[0])
-          } catch (orderErr) {
-            logger.warn('建立訂單失敗:', (orderErr as Error).message)
+        // 提案/模板不需要建立訂單和連結報價單
+        if (!isProposalOrTemplate) {
+          // If contact person is filled, also add order (業務必填)
+          if (newOrder.contact_person?.trim() && newOrder.sales_person?.trim()) {
+            // 🔧 優化：直接用 supabase insert，不依賴外部 hook
+            const order_number = `${code}-O01`
+            const memberCount = newOrder.member_count || 1
+            const totalAmount = newOrder.total_amount || newTour.price * memberCount
+            try {
+              await createOrder({
+                order_number,
+                tour_id: createdTour.id,
+                tour_name: newTour.name,
+                contact_person: newOrder.contact_person,
+                sales_person: newOrder.sales_person || '',
+                assistant: newOrder.assistant || '',
+                member_count: memberCount,
+                payment_status: 'unpaid',
+                total_amount: totalAmount,
+                paid_amount: 0,
+                remaining_amount: totalAmount,
+                code,
+                workspace_id: workspaceId,
+              } as Parameters<typeof createOrder>[0])
+            } catch (orderErr) {
+              logger.warn('建立訂單失敗:', (orderErr as Error).message)
+            }
           }
-        }
 
-        // If created from quote, update quote's tourId
-        if (fromQuoteId) {
-          // 🔧 優化：直接用 supabase update
-          try {
-            await updateQuote(fromQuoteId, { tour_id: createdTour.id } as Parameters<
-              typeof updateQuote
-            >[1])
-          } catch (quoteError) {
-            logger.warn(
-              '更新報價單失敗:',
-              quoteError instanceof Error ? quoteError.message : quoteError
-            )
+          // If created from quote, update quote's tourId
+          if (fromQuoteId) {
+            // 🔧 優化：直接用 supabase update
+            try {
+              await updateQuote(fromQuoteId, { tour_id: createdTour.id } as Parameters<
+                typeof updateQuote
+              >[1])
+            } catch (quoteError) {
+              logger.warn(
+                '更新報價單失敗:',
+                quoteError instanceof Error ? quoteError.message : quoteError
+              )
+            }
+            onQuoteLinked?.(fromQuoteId, createdTour.id)
           }
-          onQuoteLinked?.(fromQuoteId, createdTour.id)
         }
 
         resetForm()
         closeDialog()
 
-        // 開團成功後跳轉到詳情頁
-        router.push(`/tours/${code}`)
+        // 提案/模板建立後不導航（留在列表頁），正式團跳轉到詳情頁
+        if (!isProposalOrTemplate) {
+          router.push(`/tours/${code}`)
+        }
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : TOUR_OPERATIONS_LABELS.CREATE_TOUR_FAILED
@@ -318,9 +339,94 @@ export function useTourOperations(params: UseTourOperationsParams) {
     [actions]
   )
 
+  /**
+   * handleConvertToOfficial - 將提案/模板轉為正式團
+   * - 提案：直接更新 tour_type='official'，填入日期，產生團號
+   * - 模板：複製一份新團，tour_type='official'，填入日期，產生團號（模板保留）
+   */
+  const handleConvertToOfficial = useCallback(
+    async (tour: Tour, departure_date: string, return_date: string, orderData?: { contact_person?: string; sales_person?: string; assistant?: string; member_count?: number; total_amount?: number }) => {
+      try {
+        // Determine city code from existing location or code
+        const cityCode = tour.code?.slice(0, 3) || 'TYO'
+        const departureDate = new Date(departure_date)
+        const code = await tourService.generateTourCode(cityCode, departureDate, false)
+
+        let tourId = tour.id
+
+        if (tour.tour_type === 'proposal') {
+          // 提案 → 直接更新
+          await actions.update(tour.id, {
+            tour_type: 'official',
+            departure_date,
+            return_date,
+            code,
+            status: '待出發',
+          } as Partial<Tour>)
+        } else {
+          // 模板 → 複製一份新團（用 unknown 繞過嚴格型別，實際欄位由 Supabase 驗證）
+          const newTourData = {
+            name: tour.name,
+            location: tour.location || '',
+            tour_type: 'official' as const,
+            departure_date,
+            return_date,
+            code,
+            status: '待出發' as const,
+            contract_status: 'pending' as const,
+            price: tour.price || 0,
+            max_participants: tour.max_participants || 20,
+            total_revenue: 0,
+            total_cost: 0,
+            profit: 0,
+            current_participants: 0,
+            description: tour.description,
+            days_count: tour.days_count,
+          }
+          const createdTour = await (actions.create as (data: unknown) => Promise<Tour>)(newTourData)
+          tourId = createdTour.id
+        }
+
+        // 有填訂單資料就建立訂單
+        if (orderData?.contact_person?.trim() && orderData?.sales_person?.trim()) {
+          const orderNumber = `${code}-O01`
+          const memberCount = orderData.member_count || 1
+          const totalAmount = orderData.total_amount || (tour.price || 0) * memberCount
+          try {
+            await createOrder({
+              order_number: orderNumber,
+              tour_id: tourId,
+              tour_name: tour.name,
+              contact_person: orderData.contact_person,
+              sales_person: orderData.sales_person,
+              assistant: orderData.assistant || '',
+              member_count: memberCount,
+              payment_status: 'unpaid',
+              total_amount: totalAmount,
+              paid_amount: 0,
+              remaining_amount: totalAmount,
+              code,
+              workspace_id: workspaceId,
+            } as Parameters<typeof createOrder>[0])
+          } catch (orderErr) {
+            logger.warn('轉開團建立訂單失敗:', (orderErr as Error).message)
+          }
+        }
+
+        // 導航到新團號
+        router.push(`/tours/${code}`)
+      } catch (err) {
+        logger.error('轉開團失敗:', err)
+        throw err
+      }
+    },
+    [actions, router, workspaceId]
+  )
+
   return {
     handleAddTour,
     handleDeleteTour,
     handleArchiveTour,
+    handleConvertToOfficial,
   }
 }

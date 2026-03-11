@@ -5,7 +5,7 @@ import { MapPin } from 'lucide-react'
 import { Tour } from '@/stores/types'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { TourMobileCard } from './TourMobileCard'
-import { useTourTableColumns } from './TourTableColumns'
+import { useTourTableColumns, useTemplateTableColumns } from './TourTableColumns'
 import { TOUR_TABLE } from '../constants'
 
 interface TourTableProps {
@@ -16,6 +16,8 @@ interface TourTableProps {
   renderActions: (row: unknown) => React.ReactNode
   getStatusColor?: (status: string) => string
   ordersByTourId?: Map<string, { sales_person: string | null; assistant: string | null }>
+  activeTab?: string
+  onConvertTour?: (tour: Tour) => void
 }
 
 export const TourTable: React.FC<TourTableProps> = ({
@@ -26,8 +28,14 @@ export const TourTable: React.FC<TourTableProps> = ({
   renderActions,
   getStatusColor,
   ordersByTourId,
+  activeTab,
+  onConvertTour,
 }) => {
-  const columns = useTourTableColumns({ ordersByTourId })
+  const officialColumns = useTourTableColumns({ ordersByTourId })
+  const templateColumns = useTemplateTableColumns({ onConvert: onConvertTour })
+
+  const isTemplateTab = activeTab === 'proposal' || activeTab === 'template'
+  const columns = isTemplateTab ? templateColumns : officialColumns
 
   return (
     <>

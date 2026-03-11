@@ -18,6 +18,7 @@ export const cityEntity = createEntityHook<City>('cities', {
   },
   detail: { select: '*' },
   cache: CACHE_PRESETS.low, // 基礎資料，變動少
+  skipAuditFields: true,
 })
 
 export const useCities = cityEntity.useList

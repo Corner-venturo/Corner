@@ -73,6 +73,11 @@ const TourQuoteTab = dynamic(
   { loading: () => <TabLoading /> }
 )
 
+const TourQuickQuoteTab = dynamic(
+  () => import('@/features/tours/components/tour-quick-quote-tab').then(m => m.TourQuickQuoteTab),
+  { loading: () => <TabLoading /> }
+)
+
 const TourItineraryTab = dynamic(
   () => import('@/features/tours/components/tour-itinerary-tab').then(m => m.TourItineraryTab),
   { loading: () => <TabLoading /> }
@@ -98,6 +103,7 @@ export const TOUR_TABS = [
   { value: 'members', label: COMP_TOURS_LABELS.團員 },
   { value: 'itinerary', label: COMP_TOURS_LABELS.行程 },
   { value: 'quote', label: COMP_TOURS_LABELS.報價 },
+  { value: 'quick-quote', label: COMP_TOURS_LABELS.快速報價 },
   { value: 'requirements', label: COMP_TOURS_LABELS.需求 },
   { value: 'tracking', label: COMP_TOURS_LABELS.追蹤 },
   { value: 'checkin', label: COMP_TOURS_LABELS.報到 },
@@ -173,6 +179,8 @@ export function TourTabContent({
       )
     case 'quote':
       return <TourQuoteTab tour={tour} />
+    case 'quick-quote':
+      return <TourQuickQuoteTab tour={tour} />
     case 'itinerary':
       return <TourItineraryTab tour={tour} />
     case 'files':

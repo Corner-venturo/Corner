@@ -20,13 +20,14 @@ export function useTourPageState() {
   const [selectedRows, setSelectedRows] = useState<string[]>([])
   const [expandedRows, setExpandedRows] = useState<string[]>([])
 
-  // 從 localStorage 讀取上次的狀態 Tab
-  const [activeStatusTab, setActiveStatusTabState] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem(STATUS_TAB_KEY) || 'all'
-    }
-    return 'all'
-  })
+  // 先用預設值，避免 hydration mismatch
+  const [activeStatusTab, setActiveStatusTabState] = useState('all')
+
+  // 客戶端 mount 後從 localStorage 讀取上次的狀態 Tab
+  useEffect(() => {
+    const saved = localStorage.getItem(STATUS_TAB_KEY)
+    if (saved) setActiveStatusTabState(saved)
+  }, [])
 
   // 包裝 setActiveStatusTab，同時保存到 localStorage
   const setActiveStatusTab = useCallback((tab: string) => {
