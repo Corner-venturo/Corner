@@ -261,6 +261,12 @@ export async function syncItineraryToQuote(
     const newMealsItems = convertDailyItineraryToMeals(dailyData)
     const newAccommodationItems = convertDailyItineraryToAccommodation(dailyData)
 
+    console.log('[SYNC DEBUG] dailyData 天數:', dailyData.length)
+    console.log('[SYNC DEBUG] 第1天 meals:', JSON.stringify(dailyData[0]?.meals))
+    console.log('[SYNC DEBUG] newMealsItems 數量:', newMealsItems.length, newMealsItems.map(i => i.name))
+    console.log('[SYNC DEBUG] newAccommodationItems 數量:', newAccommodationItems.length)
+    console.log('[SYNC DEBUG] existingCategories IDs:', existingCategories.map(c => c.id))
+
     // 4. 更新 categories，保留其他分類和現有價格資訊
     const updatedCategories = existingCategories.map(cat => {
       if (cat.id === 'meals') {
@@ -336,6 +342,8 @@ export async function syncItineraryToQuote(
     }
 
     // 6. 更新報價單
+    const mealsCategory = updatedCategories.find(c => c.id === 'meals')
+    console.log('[SYNC DEBUG] 更新前 meals items:', mealsCategory?.items?.length, mealsCategory?.items?.map(i => i.name))
     const { error } = await quotesDb()
       .update({
         categories: updatedCategories,

@@ -1,8 +1,9 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Combobox } from '@/components/ui/combobox'
 import {
   Select,
   SelectContent,
@@ -49,24 +50,26 @@ export function AttractionSearchBar({
   onManualAttractionChange,
   onManualAdd,
 }: AttractionSearchBarProps) {
+  const countryOptions = useMemo(
+    () => countries.map(c => ({ value: c.id, label: c.name })),
+    [countries]
+  )
+
   return (
     <div className="p-4 space-y-3">
       {/* 篩選區 */}
       <div className="flex gap-2 flex-wrap">
-        {/* 國家選擇 */}
-        <Select value={selectedCountryId || '__all__'} onValueChange={onCountryChange}>
-          <SelectTrigger className="h-9 px-3 border-morandi-container rounded-lg text-sm bg-card min-w-[120px]">
-            <SelectValue placeholder={COMP_EDITOR_LABELS.全部國家} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="__all__">{COMP_EDITOR_LABELS.全部國家}</SelectItem>
-            {countries.map(country => (
-              <SelectItem key={country.id} value={country.id}>
-                {country.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {/* 國家選擇（可搜尋） */}
+        <Combobox
+          value={selectedCountryId}
+          onChange={val => onCountryChange(val || '__all__')}
+          options={countryOptions}
+          placeholder={COMP_EDITOR_LABELS.全部國家}
+          className="min-w-[140px] max-w-[180px]"
+          showSearchIcon={false}
+          showClearButton
+          disablePortal
+        />
 
         {/* 城市選擇 */}
         {selectedCountryId && cities.length > 0 && (

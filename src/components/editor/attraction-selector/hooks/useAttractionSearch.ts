@@ -95,7 +95,12 @@ export function useAttractionSearch({
   // 打開對話框時自動選擇行程的國家
   useEffect(() => {
     if (isOpen && countries.length > 0 && tourCountryName) {
-      const matchedCountry = countries.find(c => c.name === tourCountryName)
+      // 精確比對 → 包含比對 → 被包含比對
+      const name = tourCountryName.trim()
+      const matchedCountry =
+        countries.find(c => c.name === name) ||
+        countries.find(c => c.name.includes(name)) ||
+        countries.find(c => name.includes(c.name))
       if (matchedCountry && matchedCountry.id !== savedCountryId) {
         setSelectedCountryId(matchedCountry.id)
         savedCountryId = matchedCountry.id

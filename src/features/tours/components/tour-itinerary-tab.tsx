@@ -8,7 +8,7 @@
  * - 下半部：每日分頁 tab（Day 1 | Day 2 | ...）
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import {
   Loader2,
   FileText,
@@ -25,13 +25,14 @@ import {
   Sparkles,
   Hotel,
   Plus,
+  MapPin,
+  X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Combobox } from '@/components/ui/combobox'
 import type { ComboboxOption } from '@/components/ui/combobox'
 import { logger } from '@/lib/utils/logger'
@@ -46,6 +47,8 @@ import type { Tour } from '@/stores/types'
 import type { FlightInfo } from '@/types/flight.types'
 import { COMP_TOURS_LABELS, TOUR_ITINERARY_TAB_LABELS } from '../constants/labels'
 import { getPreviewDailyData as computePreviewData } from '@/features/proposals/components/package-itinerary/format-itinerary'
+import { AttractionSelector } from '@/components/editor/attraction-selector'
+import { MentionInput, type MentionInputHandle } from './mention-input'
 
 // 每日行程項目
 interface DailyScheduleItem {
@@ -57,6 +60,7 @@ interface DailyScheduleItem {
   lunchSelf?: boolean
   dinnerSelf?: boolean
   sameAsPrevious?: boolean
+  attractions?: { id: string; name: string }[]
 }
 
 interface TourItineraryTabProps {
@@ -203,6 +207,9 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
   const [currentItineraryId, setCurrentItineraryId] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'edit' | 'preview'>('edit')
   const [accommodationOpen, setAccommodationOpen] = useState(false)
+  const [attractionSelectorOpen, setAttractionSelectorOpen] = useState(false)
+  const [attractionDayIndex, setAttractionDayIndex] = useState<number>(0)
+  const mentionInputRefs = useRef<Record<number, MentionInputHandle | null>>({})
 
   // Form data
   const [title, setTitle] = useState('')
@@ -377,21 +384,28 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                 meals?: { breakfast?: string; lunch?: string; dinner?: string }
                 accommodation?: string
                 isSameAccommodation?: boolean
+                activities?: Array<{ title?: string; attraction_id?: string }>
               }>
-            ).map((day, idx) => ({
-              day: idx + 1,
-              route: day.title || '',
-              meals: {
-                breakfast: day.meals?.breakfast || '',
-                lunch: day.meals?.lunch || '',
-                dinner: day.meals?.dinner || '',
-              },
-              accommodation: day.accommodation || '',
-              hotelBreakfast: day.meals?.breakfast === COMP_TOURS_LABELS.飯店早餐,
-              lunchSelf: day.meals?.lunch === COMP_TOURS_LABELS.敬請自理,
-              dinnerSelf: day.meals?.dinner === COMP_TOURS_LABELS.敬請自理,
-              sameAsPrevious: day.isSameAccommodation || false,
-            }))
+            ).map((day, idx) => {
+              const attractions = (day.activities || [])
+                .filter(a => a.attraction_id)
+                .map(a => ({ id: a.attraction_id!, name: a.title || '' }))
+              return {
+                day: idx + 1,
+                route: day.title || '',
+                meals: {
+                  breakfast: day.meals?.breakfast || '',
+                  lunch: day.meals?.lunch || '',
+                  dinner: day.meals?.dinner || '',
+                },
+                accommodation: day.accommodation || '',
+                hotelBreakfast: day.meals?.breakfast === COMP_TOURS_LABELS.飯店早餐,
+                lunchSelf: day.meals?.lunch === COMP_TOURS_LABELS.敬請自理,
+                dinnerSelf: day.meals?.dinner === COMP_TOURS_LABELS.敬請自理,
+                sameAsPrevious: day.isSameAccommodation || false,
+                attractions: attractions.length > 0 ? attractions : undefined,
+              }
+            })
             setDailySchedule(schedule)
             setNumDays(schedule.length)
           } else {
@@ -448,6 +462,60 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
     [dailySchedule]
   )
 
+  // All existing attraction IDs across all days (for AttractionSelector dedup)
+  const allExistingAttractionIds = useMemo(() => {
+    return dailySchedule.flatMap(day => (day.attractions || []).map(a => a.id))
+  }, [dailySchedule])
+
+  // Handle attraction selection from AttractionSelector
+  const handleSelectAttractions = useCallback(
+    (selected: { id: string; name: string }[]) => {
+      if (selected.length === 0) return
+      setDailySchedule(prev => {
+        const newSchedule = [...prev]
+        const day = newSchedule[attractionDayIndex]
+        if (!day) return prev
+        const existingAttractions = day.attractions || []
+        const newAttractions = [...existingAttractions, ...selected.map(a => ({ id: a.id, name: a.name }))]
+        const namesStr = selected.map(a => a.name).join(' → ')
+        const newRoute = day.route ? `${day.route} → ${namesStr}` : namesStr
+        newSchedule[attractionDayIndex] = {
+          ...day,
+          route: newRoute,
+          attractions: newAttractions,
+        }
+        return newSchedule
+      })
+    },
+    [attractionDayIndex]
+  )
+
+  // Remove an attraction from a day
+  const removeAttraction = useCallback((dayIdx: number, attractionId: string) => {
+    setDailySchedule(prev => {
+      const newSchedule = [...prev]
+      const day = newSchedule[dayIdx]
+      if (!day) return prev
+      const updated = (day.attractions || []).filter(a => a.id !== attractionId)
+      newSchedule[dayIdx] = { ...day, attractions: updated }
+      return newSchedule
+    })
+  }, [])
+
+  // Handle mention (@) attraction selection
+  const handleMentionSelect = useCallback((dayIdx: number, attraction: { id: string; name: string }) => {
+    setDailySchedule(prev => {
+      const newSchedule = [...prev]
+      const day = newSchedule[dayIdx]
+      if (!day) return prev
+      const existing = day.attractions || []
+      // Avoid duplicates
+      if (existing.some(a => a.id === attraction.id)) return prev
+      newSchedule[dayIdx] = { ...day, attractions: [...existing, attraction] }
+      return newSchedule
+    })
+  }, [])
+
   // Preview data
   const getPreviewDailyData = useCallback(() => {
     const scheduleForPreview = dailySchedule.map(day => ({
@@ -500,7 +568,12 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           title: dayTitle,
           highlight: '',
           description: '',
-          activities: [],
+          activities: (day.attractions || []).map(a => ({
+            icon: '📍',
+            title: a.name,
+            description: '',
+            attraction_id: a.id,
+          })),
           recommendations: [],
           meals: { breakfast, lunch, dinner },
           accommodation: day.sameAsPrevious
@@ -1294,9 +1367,13 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                   {/* Route + symbol buttons */}
                   <td className="px-2 py-1.5 border-b border-border/20 align-top">
                     <div className="flex items-center gap-1">
-                      <Input
+                      <MentionInput
+                        ref={el => { mentionInputRefs.current[idx] = el }}
                         value={day.route || ''}
-                        onChange={e => updateDaySchedule(idx, 'route', e.target.value)}
+                        onChange={val => updateDaySchedule(idx, 'route', val)}
+                        onAttractionSelect={attraction => handleMentionSelect(idx, attraction)}
+                        countryName={tour.location || ''}
+                        attractions={day.attractions}
                         placeholder={
                           isFirst
                             ? COMP_TOURS_LABELS.抵達目的地
@@ -1309,7 +1386,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                       <div className="flex items-center gap-px shrink-0 opacity-40 group-hover:opacity-100 transition-opacity">
                         <button
                           type="button"
-                          onClick={() => updateDaySchedule(idx, 'route', (day.route || '') + ' → ')}
+                          onClick={() => mentionInputRefs.current[idx]?.insertAtCursor(' → ')}
                           className="p-0.5 hover:bg-morandi-gold/20 rounded"
                           title={COMP_TOURS_LABELS.插入箭頭}
                         >
@@ -1317,7 +1394,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                         </button>
                         <button
                           type="button"
-                          onClick={() => updateDaySchedule(idx, 'route', (day.route || '') + ' ⇀ ')}
+                          onClick={() => mentionInputRefs.current[idx]?.insertAtCursor(' ⇀ ')}
                           className="px-1 py-0.5 text-[9px] hover:bg-morandi-gold/20 rounded text-muted-foreground"
                           title={COMP_TOURS_LABELS.插入鉤箭頭}
                         >
@@ -1325,7 +1402,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                         </button>
                         <button
                           type="button"
-                          onClick={() => updateDaySchedule(idx, 'route', (day.route || '') + ' · ')}
+                          onClick={() => mentionInputRefs.current[idx]?.insertAtCursor(' · ')}
                           className="px-1 py-0.5 text-[9px] hover:bg-morandi-gold/20 rounded text-muted-foreground"
                           title={COMP_TOURS_LABELS.插入間隔點}
                         >
@@ -1333,7 +1410,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                         </button>
                         <button
                           type="button"
-                          onClick={() => updateDaySchedule(idx, 'route', (day.route || '') + ' | ')}
+                          onClick={() => mentionInputRefs.current[idx]?.insertAtCursor(' | ')}
                           className="p-0.5 hover:bg-morandi-gold/20 rounded"
                           title={COMP_TOURS_LABELS.插入直線}
                         >
@@ -1341,9 +1418,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                         </button>
                         <button
                           type="button"
-                          onClick={() =>
-                            updateDaySchedule(idx, 'route', (day.route || '') + ' ⭐ ')
-                          }
+                          onClick={() => mentionInputRefs.current[idx]?.insertAtCursor(' ⭐ ')}
                           className="p-0.5 hover:bg-morandi-gold/20 rounded"
                           title={COMP_TOURS_LABELS.插入星號}
                         >
@@ -1351,11 +1426,22 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                         </button>
                         <button
                           type="button"
-                          onClick={() => updateDaySchedule(idx, 'route', (day.route || '') + ' ✈ ')}
+                          onClick={() => mentionInputRefs.current[idx]?.insertAtCursor(' ✈ ')}
                           className="px-1 py-0.5 text-[9px] hover:bg-morandi-gold/20 rounded text-muted-foreground"
                           title={COMP_TOURS_LABELS.插入飛機}
                         >
                           ✈
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAttractionDayIndex(idx)
+                            setAttractionSelectorOpen(true)
+                          }}
+                          className="p-0.5 hover:bg-blue-100 rounded"
+                          title="選擇景點"
+                        >
+                          <MapPin size={10} className="text-blue-500" />
                         </button>
                       </div>
                     </div>
@@ -1451,6 +1537,16 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
         dailySchedule={dailySchedule}
         onUpdateAccommodation={updateDaySchedule}
         getPreviousAccommodation={getPreviousAccommodation}
+      />
+
+      {/* Attraction Selector */}
+      <AttractionSelector
+        isOpen={attractionSelectorOpen}
+        onClose={() => setAttractionSelectorOpen(false)}
+        tourCountryName={tour.location || ''}
+        dayTitle={dailySchedule[attractionDayIndex]?.route || ''}
+        existingIds={allExistingAttractionIds}
+        onSelect={handleSelectAttractions}
       />
     </div>
   )
