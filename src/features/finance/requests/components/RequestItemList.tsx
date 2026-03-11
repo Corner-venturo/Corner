@@ -137,14 +137,16 @@ export function EditableRequestItemList({
             <div>
               <Combobox
                 options={supplierOptions}
-                value={item.supplier_id}
+                value={item.selected_id || item.supplier_id}
                 onChange={value => {
                   const supplier = suppliers.find(s => s.id === value)
                   const isEmployee = supplier?.type === 'employee'
                   updateItem(item.id, {
-                    // 員工不在 suppliers 表，supplier_id 設 null 避免 FK 衝突
+                    // 員工不在 suppliers 表，supplier_id 設空避免 FK 衝突
                     supplier_id: isEmployee ? '' : value,
                     supplierName: supplier?.name || '',
+                    is_employee: isEmployee,
+                    selected_id: value, // 保留選中 ID 供 Combobox 顯示
                   })
                 }}
                 placeholder={REQUEST_ITEM_LIST_LABELS.選擇供應商}

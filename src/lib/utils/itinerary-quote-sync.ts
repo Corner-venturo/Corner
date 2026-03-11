@@ -16,12 +16,18 @@ interface DailyMeals {
   dinner: string
 }
 
+interface DailyActivity {
+  title: string
+  attraction_id?: string
+}
+
 interface DailyItineraryDay {
   dayLabel: string
   date: string
   title: string
   meals: DailyMeals
   accommodation: string
+  activities?: DailyActivity[]
 }
 
 // Database helpers using dynamicFrom (for tables with JSONB columns requiring custom types)
@@ -118,6 +124,38 @@ function convertDailyItineraryToAccommodation(dailyItinerary: DailyItineraryDay[
       total: 0,
       day: dayNum,
     })
+  }
+
+  return items
+}
+
+/**
+ * 將行程表的景點資訊轉換為報價單的 activities 分類格式
+ * 只取有 attraction_id 的項目（已標注景點）
+ */
+function convertDailyItineraryToActivities(dailyItinerary: DailyItineraryDay[]): CostItem[] {
+  const items: CostItem[] = []
+
+  for (let i = 0; i < dailyItinerary.length; i++) {
+    const day = dailyItinerary[i]
+    const dayNum = i + 1
+
+    if (!day.activities) continue
+
+    for (const activity of day.activities) {
+      if (!activity.attraction_id || !activity.title) continue
+
+      items.push({
+        id: generateUUID(),
+        name: `Day${dayNum}：${activity.title}`,
+        quantity: null,
+        unit_price: 0,
+        total: 0,
+        day: dayNum,
+        resource_type: 'attraction',
+        resource_id: activity.attraction_id,
+      })
+    }
   }
 
   return items
@@ -257,9 +295,10 @@ export async function syncItineraryToQuote(
 
     const existingCategories = (quote.categories as CostCategory[]) || []
 
-    // 3. 轉換餐食和住宿資料
+    // 3. 轉換餐食、住宿、活動資料
     const newMealsItems = convertDailyItineraryToMeals(dailyData)
     const newAccommodationItems = convertDailyItineraryToAccommodation(dailyData)
+    const newActivitiesItems = convertDailyItineraryToActivities(dailyData)
 
     console.log('[SYNC DEBUG] dailyData 天數:', dailyData.length)
     console.log('[SYNC DEBUG] 第1天 meals:', JSON.stringify(dailyData[0]?.meals))
@@ -317,10 +356,31 @@ export async function syncItineraryToQuote(
           total: itemsWithPrices.reduce((sum, item) => sum + item.total, 0),
         }
       }
+      if (cat.id === 'activities') {
+        // 活動（景點）：用 day + 景點名稱匹配舊項目，保留已填價格
+        const itemsWithPrices = newActivitiesItems.map(newItem => {
+          const existingItem = cat.items.find(
+            old => old.day === newItem.day && old.name === newItem.name
+          )
+          if (existingItem) {
+            return {
+              ...newItem,
+              unit_price: existingItem.unit_price,
+              total: existingItem.total,
+            }
+          }
+          return newItem
+        })
+        return {
+          ...cat,
+          items: itemsWithPrices,
+          total: itemsWithPrices.reduce((sum, item) => sum + item.total, 0),
+        }
+      }
       return cat
     })
 
-    // 5. 如果 categories 中沒有 meals 或 accommodation，則新增
+    // 5. 如果 categories 中沒有 meals / accommodation / activities，則新增
     if (!updatedCategories.find(c => c.id === 'meals') && newMealsItems.length > 0) {
       updatedCategories.push({
         id: 'meals',
@@ -337,6 +397,17 @@ export async function syncItineraryToQuote(
         id: 'accommodation',
         name: '住宿',
         items: newAccommodationItems,
+        total: 0,
+      })
+    }
+    if (
+      !updatedCategories.find(c => c.id === 'activities') &&
+      newActivitiesItems.length > 0
+    ) {
+      updatedCategories.push({
+        id: 'activities',
+        name: '活動',
+        items: newActivitiesItems,
         total: 0,
       })
     }
