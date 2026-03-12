@@ -169,7 +169,7 @@ export function ActivitiesSection({
 
     if (!over || active.id === over.id) return
 
-    const activities = day.activities
+    const activities = day.activities || []
     const oldIndex = activities.findIndex((_, i) => `activity-${dayIndex}-${i}` === active.id)
     const newIndex = activities.findIndex((_, i) => `activity-${dayIndex}-${i}` === over.id)
 

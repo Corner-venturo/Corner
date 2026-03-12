@@ -32,7 +32,7 @@ export function useDayTemplate({ dayData, style }: UseDayTemplateProps) {
   const updateActivity = (actIndex: number, field: keyof Activity, value: string) => {
     setEditingDay(prev => ({
       ...prev,
-      activities: prev.activities.map((act, i) =>
+      activities: (prev.activities || []).map((act, i) =>
         i === actIndex ? { ...act, [field]: value } : act
       ),
     }))
@@ -42,7 +42,7 @@ export function useDayTemplate({ dayData, style }: UseDayTemplateProps) {
   const addActivity = () => {
     setEditingDay(prev => ({
       ...prev,
-      activities: [...prev.activities, { icon: '📍', title: '', description: '', image: '' }],
+      activities: [...(prev.activities || []), { icon: '📍', title: '', description: '', image: '' }],
     }))
   }
 
@@ -94,7 +94,7 @@ export function useDayTemplate({ dayData, style }: UseDayTemplateProps) {
 
   // 取得主圖（第一個有圖的活動或每日圖片）
   const mainImage =
-    editingDay.activities.find(a => a.image)?.image ||
+    (editingDay.activities || []).find(a => a.image)?.image ||
     (editingDay.images?.[0] &&
       (typeof editingDay.images[0] === 'string' ? editingDay.images[0] : editingDay.images[0].url))
 

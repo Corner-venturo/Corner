@@ -157,7 +157,7 @@ export function usePublish({
 
         // 同步餐食/住宿資料到關聯的報價單
         if (data.dailyItinerary && data.dailyItinerary.length > 0) {
-          await syncItineraryToQuote(data.id, data.dailyItinerary)
+          await syncItineraryToQuote(data.id, data.dailyItinerary as any)
         }
       } else {
         const firstVersion: ItineraryVersionRecord = {
@@ -219,7 +219,7 @@ export function usePublish({
 
       // 同步餐食/住宿資料到關聯的報價單
       if (data.dailyItinerary && data.dailyItinerary.length > 0) {
-        await syncItineraryToQuote(data.id, data.dailyItinerary)
+        await syncItineraryToQuote(data.id, data.dailyItinerary as any)
       }
 
       setVersionNote('')

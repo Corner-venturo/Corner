@@ -55,7 +55,7 @@ export function MultiImageTemplate({
       {/* 圖片輪播區 */}
       <div className="p-4 bg-muted">
         <div className="flex gap-3 overflow-x-auto pb-2">
-          {editingDay.activities.map((act, i) => (
+          {(editingDay.activities || []).map((act, i) => (
             <div key={i} className="flex-shrink-0 w-40">
               <UploadableImage
                 src={act.image}

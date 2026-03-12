@@ -14,6 +14,7 @@ import { useAuthStore } from '@/stores'
 import { useItineraries, useToursSlim } from '@/data'
 import { formatDateTW } from '@/lib/utils/format-date'
 import type { Itinerary, Tour } from '@/stores/types'
+import { useTourDailyData } from '@/features/tours/hooks/useTourDailyData'
 
 function ItineraryPrintContent() {
   const searchParams = useSearchParams()
@@ -64,6 +65,20 @@ function ItineraryPrintContent() {
     )
   }
 
+  // 使用 useTourDailyData 從核心表組合每日資料
+  const {
+    days: enrichedDays,
+    loading: loadingDailyData,
+  } = useTourDailyData(
+    itinerary?.tour_id || null,
+    itinerary?.daily_itinerary || null,
+    {
+      includeHidden: false,
+      hiddenItemIds: (itinerary as Itinerary & { hidden_items_for_brochure?: string[] })?.hidden_items_for_brochure || [],
+      context: 'brochure',
+    }
+  )
+
   if (!itinerary) {
     return (
       <div className="h-screen flex flex-col items-center justify-center gap-4">
@@ -76,7 +91,15 @@ function ItineraryPrintContent() {
     )
   }
 
-  const dailyItinerary = itinerary.daily_itinerary || []
+  if (loadingDailyData) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-morandi-gold" />
+      </div>
+    )
+  }
+
+  const dailyItinerary = enrichedDays
   const companyName = user?.workspace_code || PRINT_LABELS.DEFAULT_COMPANY
 
   return (

@@ -67,7 +67,7 @@ export function CardGridTemplate({
       {/* 景點卡片網格 */}
       <div className="p-6">
         <div className="grid grid-cols-2 gap-4">
-          {editingDay.activities.map((act, i) => (
+          {(editingDay.activities || []).map((act, i) => (
             <div key={i} className="group relative bg-muted rounded-xl overflow-hidden">
               <UploadableImage
                 src={act.image}

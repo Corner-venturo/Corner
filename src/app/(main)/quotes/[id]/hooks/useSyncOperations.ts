@@ -155,7 +155,7 @@ export function useSyncOperations({
         const newValue = updates.lunch.isSelfArranged
           ? QUOTE_SYNC_LABELS.MEAL_SELF
           : updates.lunch.name || ''
-        const oldValue = day.meals.lunch || ''
+        const oldValue = day.meals?.lunch || ''
         if (newValue && newValue !== oldValue) {
           diffs.push({
             day: dayNumber,
@@ -171,7 +171,7 @@ export function useSyncOperations({
         const newValue = updates.dinner.isSelfArranged
           ? QUOTE_SYNC_LABELS.MEAL_SELF
           : updates.dinner.name || ''
-        const oldValue = day.meals.dinner || ''
+        const oldValue = day.meals?.dinner || ''
         if (newValue && newValue !== oldValue) {
           diffs.push({
             day: dayNumber,
@@ -200,7 +200,7 @@ export function useSyncOperations({
         const dayDiffs = syncDiffs.filter(d => d.day === dayNumber)
         if (dayDiffs.length === 0) return day
 
-        const newMeals = { ...day.meals }
+        const newMeals = day.meals ? { ...day.meals } : { breakfast: '', lunch: '', dinner: '' }
         dayDiffs.forEach(diff => {
           if (diff.type === 'lunch') {
             newMeals.lunch = diff.newValue

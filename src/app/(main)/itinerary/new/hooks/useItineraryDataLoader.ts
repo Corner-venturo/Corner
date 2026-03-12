@@ -490,16 +490,18 @@ function createDailyItineraryFromQuote(
   mealsFromQuote.forEach((meal: { day: number; type: string; name: string; note?: string }) => {
     const dayIndex = meal.day - 1
     if (dayIndex >= 0 && dayIndex < dailyItinerary.length) {
+      const day = dailyItinerary[dayIndex]
+      if (!day.meals) day.meals = { breakfast: '', lunch: '', dinner: '' }
       const mealName = meal.name + (meal.note ? ` (${meal.note})` : '')
       switch (meal.type) {
         case '早餐':
-          dailyItinerary[dayIndex].meals.breakfast = mealName
+          day.meals.breakfast = mealName
           break
         case '午餐':
-          dailyItinerary[dayIndex].meals.lunch = mealName
+          day.meals.lunch = mealName
           break
         case '晚餐':
-          dailyItinerary[dayIndex].meals.dinner = mealName
+          day.meals.dinner = mealName
           break
       }
     }
@@ -517,7 +519,9 @@ function createDailyItineraryFromQuote(
   activitiesFromQuote.forEach((activity: { day: number; title: string; description?: string }) => {
     const dayIndex = activity.day - 1
     if (dayIndex >= 0 && dayIndex < dailyItinerary.length) {
-      dailyItinerary[dayIndex].activities.push({
+      const day = dailyItinerary[dayIndex]
+      if (!day.activities) day.activities = []
+      day.activities.push({
         icon: '🎯',
         title: activity.title,
         description: activity.description || '',

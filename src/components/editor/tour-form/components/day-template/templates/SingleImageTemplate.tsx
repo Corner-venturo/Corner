@@ -93,7 +93,7 @@ export function SingleImageTemplate({
               <Plus size={12} /> {COMP_EDITOR_LABELS.新增}
             </button>
           </div>
-          {editingDay.activities.map((act, i) => (
+          {(editingDay.activities || []).map((act, i) => (
             <div key={i} className="flex items-center gap-3 p-2 bg-muted rounded-lg">
               <UploadableImage
                 src={act.image}

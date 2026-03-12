@@ -361,7 +361,7 @@ export async function POST(request: NextRequest) {
           city: cityName,
           stats: {
             totalAttractions: geminiResult.dailyItinerary.reduce(
-              (sum, day) => sum + day.activities.length,
+              (sum, day) => sum + (day.activities || []).length,
               0
             ),
             totalDuration: 0,

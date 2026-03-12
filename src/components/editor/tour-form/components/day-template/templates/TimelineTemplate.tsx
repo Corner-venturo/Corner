@@ -63,7 +63,7 @@ export function TimelineTemplate({
           <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-[#4a6fa5]/20" />
 
           {/* 景點 */}
-          {editingDay.activities.map((act, i) => (
+          {(editingDay.activities || []).map((act, i) => (
             <div key={i} className="relative mb-6 last:mb-0">
               {/* 時間點 */}
               <div className="absolute -left-5 w-4 h-4 rounded-full bg-[#4a6fa5] border-4 border-white shadow" />

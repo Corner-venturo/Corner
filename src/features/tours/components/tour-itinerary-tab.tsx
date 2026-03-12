@@ -425,7 +425,8 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
 
     setSaving(true)
     try {
-      const formattedDailyItinerary = dailySchedule.map((day, idx) => {
+      // 建立完整資料（給 syncToCore 用）
+      const fullDailyItinerary = dailySchedule.map((day, idx) => {
         let dateLabel = ''
         if (tour.departure_date) {
           const date = new Date(tour.departure_date)
@@ -450,7 +451,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           accommodation = getPreviousAccommodation(idx) || COMP_TOURS_LABELS.續住
         }
 
-        // 儲存完整資料（用於 syncToCore 寫入核心表）
+        // 完整資料（用於 syncToCore）
         return {
           dayLabel: `Day ${day.day}`,
           date: dateLabel,
@@ -473,6 +474,17 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
         }
       })
 
+      // 建立展示資料（只存展示設定，不存實際資料）
+      const displayDailyItinerary = fullDailyItinerary.map(day => ({
+        dayLabel: day.dayLabel,
+        date: day.date,
+        title: day.title,
+        highlight: day.highlight || '',
+        description: day.description || '',
+        images: day.images || [],
+        // 不存 meals, accommodation, activities（從核心表 JOIN 取得）
+      }))
+
       const itineraryData = {
         tour_id: tour.id,
         title,
@@ -487,7 +499,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
         status: '開團' as const,
         features: [],
         focus_cards: [],
-        daily_itinerary: formattedDailyItinerary,
+        daily_itinerary: displayDailyItinerary,  // 只存展示設定
         // 支援多航段（轉機）- 儲存為陣列
         outbound_flight:
           outboundFlights.length > 0
@@ -521,7 +533,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
 
       if (currentItineraryId) {
         await updateItinerary(currentItineraryId, itineraryData)
-        await syncItineraryToQuote(currentItineraryId, formattedDailyItinerary)
+        await syncItineraryToQuote(currentItineraryId, fullDailyItinerary)
         toast.success(TOUR_ITINERARY_TAB_LABELS.行程表已更新)
       } else {
         const newItinerary = await createItinerary({
@@ -535,12 +547,12 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
         }
       }
 
-      // 同步到核心表 tour_itinerary_items
+      // 同步到核心表 tour_itinerary_items（使用完整資料）
       if (savedItineraryId) {
         syncToCore({
           itinerary_id: savedItineraryId,
           tour_id: tour.id,
-          daily_itinerary: formattedDailyItinerary as DailyItinerary[],
+          daily_itinerary: fullDailyItinerary as DailyItinerary[],
         }).catch(err => logger.error('syncToCore error:', err))
       }
 

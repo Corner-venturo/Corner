@@ -310,7 +310,7 @@ export function TourItinerarySection({
                             title={day.activities[0].title}
                             description={day.activities[0].description || ''}
                             image={day.activities[0].image}
-                            onClick={() => handleActivityClick(day.activities[0])}
+                            onClick={() => handleActivityClick(day.activities![0])}
                           />
                         ) : (
                           // 多個景點：根據數量智能排版

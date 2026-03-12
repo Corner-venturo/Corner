@@ -230,8 +230,8 @@ export function useTourFormHandlers(
 
   const updateActivity = (dayIndex: number, actIndex: number, field: string, value: string) => {
     const newItinerary = [...data.dailyItinerary]
-    newItinerary[dayIndex].activities[actIndex] = {
-      ...newItinerary[dayIndex].activities[actIndex],
+    newItinerary[dayIndex].activities![actIndex] = {
+      ...newItinerary[dayIndex].activities![actIndex],
       [field]: value,
     }
     onChange({ ...data, dailyItinerary: newItinerary })
@@ -239,7 +239,7 @@ export function useTourFormHandlers(
 
   const removeActivity = (dayIndex: number, actIndex: number) => {
     const newItinerary = [...data.dailyItinerary]
-    newItinerary[dayIndex].activities = newItinerary[dayIndex].activities.filter(
+    newItinerary[dayIndex].activities = (newItinerary[dayIndex].activities || []).filter(
       (_: Activity, i: number) => i !== actIndex
     )
     onChange({ ...data, dailyItinerary: newItinerary })
@@ -254,13 +254,13 @@ export function useTourFormHandlers(
 
   const updateRecommendation = (dayIndex: number, recIndex: number, value: string) => {
     const newItinerary = [...data.dailyItinerary]
-    newItinerary[dayIndex].recommendations[recIndex] = value
+    newItinerary[dayIndex].recommendations![recIndex] = value
     onChange({ ...data, dailyItinerary: newItinerary })
   }
 
   const removeRecommendation = (dayIndex: number, recIndex: number) => {
     const newItinerary = [...data.dailyItinerary]
-    newItinerary[dayIndex].recommendations = newItinerary[dayIndex].recommendations.filter(
+    newItinerary[dayIndex].recommendations = (newItinerary[dayIndex].recommendations || []).filter(
       (_: string, i: number) => i !== recIndex
     )
     onChange({ ...data, dailyItinerary: newItinerary })

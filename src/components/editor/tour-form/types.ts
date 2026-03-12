@@ -82,11 +82,11 @@ export interface DailyItinerary {
   title: string
   highlight?: string
   description?: string
-  // 以下欄位用於 syncToCore 寫入核心表，展示時從核心表 JOIN 取得
-  activities: Activity[]
-  recommendations: string[]
-  meals: Meals
-  accommodation: string
+  // 以下欄位不存資料庫，展示時從核心表 JOIN 取得（syncToCore 時才用完整資料）
+  activities?: Activity[]
+  recommendations?: string[]
+  meals?: Meals
+  accommodation?: string
   accommodationUrl?: string // 飯店官網或訂房連結
   accommodationRating?: number // 飯店星級（1-5）
   isSameAccommodation?: boolean // 是否續住（與前一天相同住宿）
