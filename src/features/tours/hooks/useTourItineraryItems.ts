@@ -233,14 +233,15 @@ export function useSyncItineraryToCore() {
           // Activities
           if (day.activities) {
             for (const activity of day.activities) {
-              // 跳過已有下游資料的項目（用 day_number + title 做 fuzzy match）
-              const has_downstream = items_with_downstream.some(
+              // 活動：檢查同一天同一活動是否已有項目（用 title 比對）
+              const already_exists = (existing_items ?? []).some(
                 item =>
                   item.day_number === day_number &&
                   item.category === ITINERARY_ITEM_CATEGORIES.ACTIVITIES &&
                   item.title === activity.title
               )
-              if (!has_downstream) {
+              
+              if (!already_exists) {
                 new_items.push(
                   activityToItem(
                     activity,
@@ -266,13 +267,15 @@ export function useSyncItineraryToCore() {
               [meals.dinner, MEAL_SUB_CATEGORIES.DINNER],
             ]
             for (const [meal_name, sub_cat] of meal_entries) {
-              const has_downstream = items_with_downstream.some(
+              // 餐食：檢查同一天同一餐是否已有項目（不管狀態）
+              const already_exists = (existing_items ?? []).some(
                 item =>
                   item.day_number === day_number &&
                   item.category === ITINERARY_ITEM_CATEGORIES.MEALS &&
                   item.sub_category === sub_cat
               )
-              if (!has_downstream) {
+              
+              if (!already_exists) {
                 const item = mealToItem(
                   meal_name,
                   sub_cat,
@@ -309,12 +312,14 @@ export function useSyncItineraryToCore() {
               }
             }
 
-            const has_downstream = items_with_downstream.some(
+            // 住宿：檢查同一天是否已有任何住宿項目（不管狀態）
+            const already_exists = (existing_items ?? []).some(
               item =>
                 item.day_number === day_number &&
                 item.category === ITINERARY_ITEM_CATEGORIES.ACCOMMODATION
             )
-            if (!has_downstream) {
+            
+            if (!already_exists) {
               const item = accommodationToItem(
                 resolvedAccommodation,
                 day_number,

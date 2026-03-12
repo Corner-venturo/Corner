@@ -450,6 +450,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           accommodation = getPreviousAccommodation(idx) || COMP_TOURS_LABELS.續住
         }
 
+        // 儲存完整資料（用於 syncToCore 寫入核心表）
         return {
           dayLabel: `Day ${day.day}`,
           date: dateLabel,
@@ -465,7 +466,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           recommendations: [],
           meals: { breakfast, lunch, dinner },
           accommodation: day.sameAsPrevious
-            ? `${TOUR_ITINERARY_TAB_LABELS.同上} (${getPreviousAccommodation(idx) || ''})`
+            ? `同上 (${getPreviousAccommodation(idx) || ''})`
             : accommodation,
           isSameAccommodation: day.sameAsPrevious || false,
           images: [],

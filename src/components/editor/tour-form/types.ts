@@ -82,6 +82,7 @@ export interface DailyItinerary {
   title: string
   highlight?: string
   description?: string
+  // 以下欄位用於 syncToCore 寫入核心表，展示時從核心表 JOIN 取得
   activities: Activity[]
   recommendations: string[]
   meals: Meals
