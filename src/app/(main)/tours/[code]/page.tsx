@@ -55,8 +55,8 @@ export default function TourDetailPage() {
       if (lastTab) return lastTab
     }
 
-    // 3. 最後使用預設值
-    return 'members'
+    // 3. 最後使用預設值：總覽（overview）
+    return 'overview'
   }
 
   const [activeTab, setActiveTab] = useState(getInitialTab())
