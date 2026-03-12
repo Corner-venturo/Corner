@@ -358,7 +358,9 @@ export interface Itinerary {
   show_pricing_details?: boolean
 
   // 價格方案（多種人數價格）
+  /** @deprecated Use tours.tier_pricings instead. This field is removed from DB. */
   price_tiers?: PriceTier[] | null
+  /** @deprecated Use tours.show_price_tiers instead (if needed) */
   show_price_tiers?: boolean
 
   // 常見問題

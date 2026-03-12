@@ -179,7 +179,8 @@ export function useItineraryDataLoader({
           ],
           notes: [],
         },
-        priceTiers: itinerary.price_tiers || [],
+        // 從關聯的 tour 讀取 tier_pricings（price_tiers 欄位已從 DB 移除）
+        priceTiers: [],
         showPriceTiers: itinerary.show_price_tiers || false,
         faqs: itinerary.faqs || [],
         showFaqs: itinerary.show_faqs || false,

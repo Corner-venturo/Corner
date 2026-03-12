@@ -108,7 +108,8 @@ function BlockEditorPageContent() {
           itineraryStyle: itinerary.itinerary_style as TourFormData['itineraryStyle'],
           pricingDetails: itinerary.pricing_details,
           showPricingDetails: itinerary.show_pricing_details || false,
-          priceTiers: itinerary.price_tiers || undefined,
+          // priceTiers 改從 tours.tier_pricings 讀取（price_tiers 已從 DB 移除）
+          priceTiers: undefined,
           showPriceTiers: itinerary.show_price_tiers || false,
           faqs: itinerary.faqs || undefined,
           showFaqs: itinerary.show_faqs || false,
@@ -209,7 +210,7 @@ function BlockEditorPageContent() {
         show_hotels: data.showHotels,
         show_pricing_details: data.showPricingDetails,
         pricing_details: data.pricingDetails,
-        price_tiers: data.priceTiers || null,
+        // price_tiers: 欄位已從 DB 移除，改用 tours.tier_pricings
         show_price_tiers: data.showPriceTiers || false,
         faqs: data.faqs || null,
         show_faqs: data.showFaqs || false,
