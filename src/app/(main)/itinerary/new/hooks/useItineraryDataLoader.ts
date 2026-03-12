@@ -16,7 +16,7 @@ import { formatDateTW, formatDateCompactPadded } from '@/lib/utils/format-date'
 import type { LocalTourData } from './useItineraryEditor'
 import type { DailyItinerary, HotelInfo, FlightInfo } from '@/components/editor/tour-form/types'
 import type { TierPricing } from '@/stores/types/quote.types'
-import type { Itinerary } from '@/stores/types'
+import type { Itinerary, Tour } from '@/stores/types'
 import { ITINERARY_DATA_LOADER_LABELS } from '../../constants/labels'
 import { getWorkspaceTagline } from '@/lib/workspace-helpers'
 
@@ -191,11 +191,17 @@ export function useItineraryDataLoader({
       })
       setCurrentVersionIndex(-1)
 
-      // 載入關聯報價單的砍次表
-      if (setQuoteTierPricings && itinerary.quote_id) {
-        const quote = quotes.find(q => q.id === itinerary.quote_id)
-        if (quote?.tier_pricings && quote.tier_pricings.length > 0) {
-          setQuoteTierPricings(quote.tier_pricings as TierPricing[])
+      // 載入砍次表（優先從 tour，fallback 到 quote）
+      if (setQuoteTierPricings) {
+        const relatedTour = itinerary.tour_id ? tours.find(t => t.id === itinerary.tour_id) : null
+        const tp = (relatedTour as Tour & { tier_pricings?: TierPricing[] })?.tier_pricings
+        if (tp && tp.length > 0) {
+          setQuoteTierPricings(tp)
+        } else if (itinerary.quote_id) {
+          const quote = quotes.find(q => q.id === itinerary.quote_id)
+          if (quote?.tier_pricings && quote.tier_pricings.length > 0) {
+            setQuoteTierPricings(quote.tier_pricings as TierPricing[])
+          }
         }
       }
 
@@ -363,8 +369,8 @@ export function useItineraryDataLoader({
       const country = tour.country_id ? countries.find(c => c.id === tour.country_id) : null
       const city = tour.main_city_id ? cities.find(c => c.id === tour.main_city_id) : null
 
-      const departureDate = new Date(tour.departure_date)
-      const returnDate = new Date(tour.return_date)
+      const departureDate = tour.departure_date ? new Date(tour.departure_date) : new Date()
+      const returnDate = tour.return_date ? new Date(tour.return_date) : new Date()
       const days =
         Math.ceil((returnDate.getTime() - departureDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
 

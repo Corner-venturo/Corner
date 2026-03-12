@@ -115,3 +115,73 @@ export function useTourTableColumns({ ordersByTourId }: UseTourTableColumnsParam
     [ordersByTourId]
   )
 }
+
+/**
+ * useTemplateTableColumns - 提案/模板精簡版表格欄位
+ */
+interface UseTemplateTableColumnsParams {
+  onConvert?: (tour: Tour) => void
+}
+
+export function useTemplateTableColumns({ onConvert }: UseTemplateTableColumnsParams) {
+  return useMemo<TableColumn[]>(
+    () => [
+      {
+        key: 'name',
+        label: TOUR_TABLE.col_name,
+        sortable: true,
+        width: '240px',
+        render: value => (
+          <span className="text-sm text-morandi-primary font-medium">{String(value || '')}</span>
+        ),
+      },
+      {
+        key: 'location',
+        label: TOUR_TABLE.col_location,
+        sortable: true,
+        width: '120px',
+        render: value => (
+          <span className="text-sm text-morandi-primary">{String(value || '-')}</span>
+        ),
+      },
+      {
+        key: 'days_count',
+        label: TOUR_TABLE.col_days,
+        sortable: true,
+        width: '80px',
+        render: value => (
+          <span className="text-sm text-morandi-primary">
+            {value ? `${value} ${TOUR_TABLE.col_days_unit}` : '-'}
+          </span>
+        ),
+      },
+      {
+        key: 'created_at',
+        label: TOUR_TABLE.col_created,
+        sortable: true,
+        width: '120px',
+        render: value => <DateCell date={value as string | null} showIcon={false} />,
+      },
+      {
+        key: 'actions',
+        label: TOUR_TABLE.col_actions,
+        width: '100px',
+        render: (_value, row) => {
+          const tour = row as Tour
+          return (
+            <button
+              onClick={e => {
+                e.stopPropagation()
+                onConvert?.(tour)
+              }}
+              className="text-xs px-3 py-1 rounded-md bg-morandi-gold text-white hover:bg-morandi-gold-hover transition-colors"
+            >
+              {TOUR_TABLE.convert_to_tour}
+            </button>
+          )
+        },
+      },
+    ],
+    [onConvert]
+  )
+}

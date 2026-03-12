@@ -40,8 +40,9 @@ interface AttractionWithCity extends Attraction {
 interface AttractionSelectorProps {
   isOpen: boolean
   onClose: () => void
+  countryId?: string // 直接傳國家 ID（優先於 tourCountryName）
   tourCountries?: TourCountry[] // 用於預設選擇第一個國家（舊版）
-  tourCountryName?: string // 行程的國家名稱（新版，來自 CoverInfo）
+  tourCountryName?: string // 行程的國家名稱（舊版，來自 CoverInfo）
   onSelect: (attractions: AttractionWithCity[]) => void
   dayTitle?: string // 當天的行程標題，用於智能建議
   existingIds?: string[] // 已選過的景點 ID（顯示鎖定狀態）
@@ -50,6 +51,7 @@ interface AttractionSelectorProps {
 export function AttractionSelector({
   isOpen,
   onClose,
+  countryId,
   tourCountries = [],
   tourCountryName = '',
   onSelect,
@@ -74,6 +76,7 @@ export function AttractionSelector({
     setSearchQuery,
   } = useAttractionSearch({
     isOpen,
+    countryId,
     tourCountryName,
     dayTitle,
   })
@@ -193,6 +196,7 @@ export function AttractionSelector({
               searchQuery={searchQuery}
               showManualInput={showManualInput}
               manualAttractionName={manualAttractionName}
+              hideFilters={!!countryId}
               onCountryChange={handleCountryChange}
               onCityChange={handleCityChange}
               onSearchChange={setSearchQuery}

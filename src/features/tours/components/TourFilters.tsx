@@ -3,7 +3,7 @@
 import React from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
-import { Calendar, FileCheck, MapPin, BarChart3, Archive, Star, Plus, Plane } from 'lucide-react'
+import { Calendar, FileCheck, MapPin, BarChart3, Archive, Star, Plus, FileText, Copy } from 'lucide-react'
 import { TOUR_FILTERS } from '../constants'
 
 interface TourFiltersProps {
@@ -21,12 +21,19 @@ export const TourFilters: React.FC<TourFiltersProps> = ({
   onTabChange,
   onAddTour,
 }) => {
+  // 按鈕文字隨分頁變化
+  const addButtonLabel =
+    activeTab === 'proposal'
+      ? TOUR_FILTERS.add_proposal
+      : activeTab === 'template'
+        ? TOUR_FILTERS.add_template
+        : TOUR_FILTERS.add_tour_direct
+
   return (
     <ResponsiveHeader
       title={TOUR_FILTERS.page_title}
       icon={MapPin}
       breadcrumb={[
-        { label: TOUR_FILTERS.breadcrumb_home, href: '/dashboard' },
         { label: TOUR_FILTERS.breadcrumb_tours, href: '/tours' },
       ]}
       showSearch={true}
@@ -39,6 +46,8 @@ export const TourFilters: React.FC<TourFiltersProps> = ({
         { value: '已結團', label: TOUR_FILTERS.tab_closed, icon: FileCheck },
         { value: '特殊團', label: TOUR_FILTERS.tab_special, icon: Star },
         { value: 'archived', label: TOUR_FILTERS.tab_archived, icon: Archive },
+        { value: 'proposal', label: TOUR_FILTERS.tab_proposals, icon: FileText },
+        { value: 'template', label: TOUR_FILTERS.tab_templates, icon: Copy },
       ]}
       activeTab={activeTab}
       onTabChange={onTabChange}
@@ -48,7 +57,7 @@ export const TourFilters: React.FC<TourFiltersProps> = ({
           className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1.5"
         >
           <Plus size={16} />
-          {TOUR_FILTERS.add_tour_direct}
+          {addButtonLabel}
         </Button>
       }
     />

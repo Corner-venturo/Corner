@@ -37,6 +37,8 @@ interface CompanyFormData {
   name: string
   description: string
   logo_url: string
+  legal_name: string
+  subtitle: string
   address: string
   phone: string
   fax: string
@@ -55,6 +57,8 @@ const INITIAL_FORM: CompanyFormData = {
   name: '',
   description: '',
   logo_url: '',
+  legal_name: '',
+  subtitle: '',
   address: '',
   phone: '',
   fax: '',
@@ -208,7 +212,7 @@ export default function CompanySettingsPage() {
       const { data, error } = await supabase
         .from('workspaces')
         .select(
-          'name, description, logo_url, address, phone, fax, email, website, tax_id, bank_name, bank_branch, bank_account, bank_account_name, seal_image_url, invoice_seal_image_url'
+          'name, description, logo_url, legal_name, subtitle, address, phone, fax, email, website, tax_id, bank_name, bank_branch, bank_account, bank_account_name, seal_image_url, invoice_seal_image_url'
         )
         .eq('id', workspaceId)
         .single()
@@ -219,6 +223,8 @@ export default function CompanySettingsPage() {
           name: data.name ?? '',
           description: data.description ?? '',
           logo_url: data.logo_url ?? '',
+          legal_name: data.legal_name ?? '',
+          subtitle: data.subtitle ?? '',
           address: data.address ?? '',
           phone: data.phone ?? '',
           fax: data.fax ?? '',
@@ -367,6 +373,30 @@ export default function CompanySettingsPage() {
                 placeholder={COMPANY_LABELS.DESCRIPTION_PLACEHOLDER}
                 className="mt-1.5"
                 rows={3}
+              />
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium text-morandi-primary">
+                {COMPANY_LABELS.LEGAL_NAME}
+              </Label>
+              <Input
+                value={form.legal_name}
+                onChange={e => updateField('legal_name', e.target.value)}
+                placeholder={COMPANY_LABELS.LEGAL_NAME_PLACEHOLDER}
+                className="mt-1.5"
+              />
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium text-morandi-primary">
+                {COMPANY_LABELS.SUBTITLE_LABEL}
+              </Label>
+              <Input
+                value={form.subtitle}
+                onChange={e => updateField('subtitle', e.target.value)}
+                placeholder={COMPANY_LABELS.SUBTITLE_PLACEHOLDER}
+                className="mt-1.5"
               />
             </div>
           </div>

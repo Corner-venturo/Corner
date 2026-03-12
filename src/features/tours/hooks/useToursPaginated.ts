@@ -52,7 +52,9 @@ function buildSwrKey(params: UseToursPaginatedParams): string {
 }
 
 export function useToursPaginated(params: UseToursPaginatedParams): UseToursPaginatedResult {
-  const { page, pageSize, status, search, sortBy = 'departure_date', sortOrder = 'desc' } = params
+  const { page, pageSize, status, search, sortOrder = 'desc' } = params
+  const defaultSort = (status === 'proposal' || status === 'template') ? 'created_at' : 'departure_date'
+  const sortBy = params.sortBy || defaultSort
 
   // Auth check - 只用於寫入操作，讀取不需要等待 hydration
   const user = useAuthStore(state => state.user)
@@ -76,14 +78,20 @@ export function useToursPaginated(params: UseToursPaginatedParams): UseToursPagi
       let query = supabase
         .from('tours')
         .select(
-          'id, code, name, location, status, departure_date, return_date, price, selling_price_per_person, max_participants, current_participants, total_revenue, total_cost, profit, archived, is_active, quote_id, itinerary_id, controller_id, closing_status, workspace_id, created_at',
+          'id, code, name, location, status, departure_date, return_date, price, selling_price_per_person, max_participants, current_participants, total_revenue, total_cost, profit, archived, is_active, quote_id, itinerary_id, controller_id, closing_status, workspace_id, created_at, tour_type, days_count',
           { count: 'exact' }
         )
         .range(from, to) // ✅ Server-side pagination
         .order(sortBy, { ascending: sortOrder === 'asc' })
 
       // ✅ Server-side status filtering
-      if (status && status !== 'all') {
+      if (status === 'proposal') {
+        // 提案分頁：只顯示 tour_type=proposal
+        query = query.eq('tour_type', 'proposal').neq('archived', true)
+      } else if (status === 'template') {
+        // 模板分頁：只顯示 tour_type=template
+        query = query.eq('tour_type', 'template').neq('archived', true)
+      } else if (status && status !== 'all') {
         if (status === 'archived') {
           // Show archived tours
           query = query.eq('archived', true)
@@ -91,21 +99,23 @@ export function useToursPaginated(params: UseToursPaginatedParams): UseToursPagi
           // Show special tours (not archived)
           query = query.eq('status', TOUR_SERVICE_LABELS.STATUS_SPECIAL).neq('archived', true)
         } else {
-          // Show specific status (not archived, not special)
+          // Show specific status (not archived, not special, exclude proposal/template)
           query = query
             .eq('status', status)
             .neq('archived', true)
             .neq('status', TOUR_SERVICE_LABELS.STATUS_SPECIAL)
             .not('code', 'like', 'VISA%')
             .not('code', 'like', 'ESIM%')
+            .or('tour_type.eq.official,tour_type.is.null')
         }
       } else {
-        // 'all' tab: exclude archived, special tours, and utility tours (visa/esim)
+        // 'all' tab: exclude archived, special tours, utility tours, and proposal/template
         query = query
           .neq('archived', true)
           .neq('status', TOUR_SERVICE_LABELS.STATUS_SPECIAL)
           .not('code', 'like', 'VISA%')
           .not('code', 'like', 'ESIM%')
+          .or('tour_type.eq.official,tour_type.is.null')
       }
 
       // ✅ Server-side search

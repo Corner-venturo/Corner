@@ -16,11 +16,13 @@ import { cn } from '@/lib/utils'
 import { ParticipantCounts, SellingPrices, CostCategory, CostItem } from '@/features/quotes/types'
 import type { Tour } from '@/types/tour.types'
 import { useQuotes } from '@/features/quotes/hooks/useQuotes'
-import { useQuote as useQuoteDetail } from '@/data'
+import { useQuote as useQuoteDetail, useTour } from '@/data'
 import { useCategoryOperations } from '@/features/quotes/hooks/useCategoryOperations'
 import { useQuoteCalculations } from '@/features/quotes/hooks/useQuoteCalculations'
 import { useQuoteActions } from '@/features/quotes/hooks/useQuoteActions'
 import { useToursSlim, useItineraries, updateItinerary, createTour } from '@/data'
+import { useTourItineraryItemsByTour } from '@/features/tours/hooks/useTourItineraryItems'
+import { coreItemsToCostCategories } from '@/features/quotes/utils/core-table-adapter'
 import { useAuthStore } from '@/stores'
 import { toast } from 'sonner'
 import type { QuoteConfirmationStatus } from '@/types/quote.types'
@@ -31,8 +33,6 @@ import {
   SyncToItineraryDialog,
   PrintableQuotation,
   LinkTourDialog,
-  ImportMealsDialog,
-  ImportActivitiesDialog,
   LocalPricingDialog,
 } from '@/features/quotes/components'
 import type { LocalTier } from '@/features/quotes/components/LocalPricingDialog'
@@ -68,6 +68,26 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
   const scrollRef = useRef<HTMLDivElement>(null)
   const scrollTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
+  // 完整 tour（含定價欄位）
+  const { item: fullTour } = useTour(quote?.tour_id ?? null)
+
+  // 核心表資料
+  const { items: coreItems, loading: coreItemsLoading, refresh: refreshCoreItems } = useTourItineraryItemsByTour(
+    quote?.tour_id ?? null
+  )
+
+  // 檢查核心表是否有行程更新但報價還沒看過的項目
+  const hasCoreChanges = useMemo(() => {
+    if (!quote || coreItems.length === 0) return false
+    return coreItems.some(item => item.quote_status === 'none')
+  }, [coreItems, quote?.id])
+
+  // 行程資料（用於列印報價單）
+  const itinerary = useMemo(() => {
+    if (!quote?.tour_id) return null
+    return itineraries.find(i => i.tour_id === quote.tour_id) || null
+  }, [itineraries, quote?.tour_id])
+
   // 檢查是否為特殊團報價單
   const relatedTour = quote?.tour_id ? tours.find(t => t.id === quote.tour_id) : null
   const isSpecialTour = relatedTour?.status === QUOTE_DETAIL_EMBED_LABELS.特殊團
@@ -95,20 +115,30 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
   const [tierPricings, setTierPricings] = useState<TierPricing[]>([])
   const [hasLoaded, setHasLoaded] = useState(false)
 
-  // 初始化資料
+  // 初始化資料：categories 從核心表讀取，定價從 fullTour 讀取（fallback 到 quote）
   useEffect(() => {
     if (quote && !hasLoaded) {
-      setCategories(
-        quote.categories && quote.categories.length > 0
-          ? quote.categories.map(cat => ({
-              ...cat,
-              total: cat.items.reduce((sum: number, item: CostItem) => sum + (item.total || 0), 0),
-            }))
-          : costCategories
-      )
-      setAccommodationDays(quote.accommodation_days || 0)
+      // 有 tour_id 時，等核心表載入完成再決定資料來源（避免 race condition）
+      if (quote.tour_id && coreItemsLoading) return
+
+      // categories 優先從核心表讀取
+      if (coreItems.length > 0) {
+        setCategories(coreItemsToCostCategories(coreItems))
+      } else if (quote.categories && quote.categories.length > 0) {
+        setCategories(
+          quote.categories.map(cat => ({
+            ...cat,
+            total: cat.items.reduce((sum: number, item: CostItem) => sum + (item.total || 0), 0),
+          }))
+        )
+      } else {
+        setCategories(costCategories)
+      }
+
+      // 定價欄位優先從 fullTour 讀取
+      setAccommodationDays(fullTour?.accommodation_days ?? quote.accommodation_days ?? 0)
       setParticipantCounts(
-        quote.participant_counts || {
+        (fullTour?.participant_counts ?? quote.participant_counts) as ParticipantCounts || {
           adult: quote.group_size || 20,
           child_with_bed: 0,
           child_no_bed: 0,
@@ -118,7 +148,7 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
       )
       setQuoteName(quote.name || '')
       setSellingPrices(
-        quote.selling_prices || {
+        (fullTour?.selling_prices ?? quote.selling_prices) as SellingPrices || {
           adult: 0,
           child_with_bed: 0,
           child_no_bed: 0,
@@ -126,10 +156,10 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
           infant: 0,
         }
       )
-      setTierPricings(quote.tier_pricings || [])
+      setTierPricings((fullTour?.tier_pricings ?? quote.tier_pricings ?? []) as TierPricing[])
       setHasLoaded(true)
     }
-  }, [quote, hasLoaded])
+  }, [quote, hasLoaded, fullTour, coreItems, coreItemsLoading])
 
   // Group size calculations
   const groupSize = useMemo(() => {
@@ -193,6 +223,8 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
     setSaveSuccess,
     setCategories,
     tierPricings,
+    coreItems,
+    refreshCoreItems,
   })
   const { handleSave, handleCreateTour } = actions
 
@@ -204,8 +236,6 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
   // 報價單預覽
   const [showQuotationPreview, setShowQuotationPreview] = useState(false)
   const [showLinkTourDialog, setShowLinkTourDialog] = useState(false)
-  const [showImportMealsDialog, setShowImportMealsDialog] = useState(false)
-  const [showImportActivitiesDialog, setShowImportActivitiesDialog] = useState(false)
   const [showLocalPricingDialog, setShowLocalPricingDialog] = useState(false)
 
   const [previewParticipantCounts, setPreviewParticipantCounts] =
@@ -276,56 +306,6 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
   const handleSyncToItinerary = useCallback(() => {
     toast.info(QUOTE_DETAIL_EMBED_LABELS.同步功能開發中)
   }, [])
-
-  const handleSyncAccommodationFromItinerary = useCallback(() => {
-    toast.info('同步功能開發中')
-  }, [])
-
-  // Import handlers
-  const handleImportMeals = useCallback((items: CostItem[]) => {
-    setCategories(prev => {
-      const newCategories = [...prev]
-      const mealsCategory = newCategories.find(cat => cat.id === 'meals')
-      if (mealsCategory) {
-        mealsCategory.items = [...mealsCategory.items, ...items]
-        mealsCategory.total = mealsCategory.items.reduce((sum, item) => sum + (item.total || 0), 0)
-      }
-      return newCategories
-    })
-    toast.success(`已匯入 ${items.length} 筆餐飲`)
-  }, [])
-
-  const handleImportActivities = useCallback((items: CostItem[]) => {
-    setCategories(prev => {
-      const newCategories = [...prev]
-      const activitiesCategory = newCategories.find(cat => cat.id === 'activities')
-      if (activitiesCategory) {
-        activitiesCategory.items = [...activitiesCategory.items, ...items]
-        activitiesCategory.total = activitiesCategory.items.reduce(
-          (sum, item) => sum + (item.total || 0),
-          0
-        )
-      }
-      return newCategories
-    })
-    toast.success(`已匯入 ${items.length} 筆景點`)
-  }, [])
-
-  const handleOpenMealsImportDialog = useCallback(() => {
-    if (!quote?.itinerary_id) {
-      toast.error(QUOTE_DETAIL_EMBED_LABELS.此報價單沒有關聯的行程表)
-      return
-    }
-    setShowImportMealsDialog(true)
-  }, [quote])
-
-  const handleOpenActivitiesImportDialog = useCallback(() => {
-    if (!quote?.itinerary_id) {
-      toast.error(QUOTE_DETAIL_EMBED_LABELS.此報價單沒有關聯的行程表)
-      return
-    }
-    setShowImportActivitiesDialog(true)
-  }, [quote])
 
   // 計算總人數
   const totalParticipants = useMemo(() => {
@@ -441,6 +421,12 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
         resourceName={QUOTE_DETAIL_EMBED_LABELS.此報價單}
       />
 
+      {hasCoreChanges && (
+        <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2 rounded-md text-sm">
+          行程表已更新，有新的項目尚未報價。儲存時會自動更新。
+        </div>
+      )}
+
       {showHeader && (
         <QuoteHeader
           isSpecialTour={isSpecialTour}
@@ -456,7 +442,7 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
           handleCreateTour={handleCreateTour}
           handleGenerateQuotation={handleGenerateQuotation}
           handleSyncToItinerary={handleSyncToItinerary}
-          handleSyncAccommodationFromItinerary={handleSyncAccommodationFromItinerary}
+  
           onStatusChange={handleStatusChange}
           router={router}
           accommodationDays={accommodationDays}
@@ -533,8 +519,6 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
                         handleAddActivity={categoryOps.handleAddActivity}
                         handleUpdateItem={categoryOps.handleUpdateItem}
                         handleRemoveItem={categoryOps.handleRemoveItem}
-                        onOpenMealsImportDialog={handleOpenMealsImportDialog}
-                        onOpenActivitiesImportDialog={handleOpenActivitiesImportDialog}
                         onOpenLocalPricingDialog={
                           category.id === 'group-transport'
                             ? () => setShowLocalPricingDialog(true)
@@ -589,6 +573,8 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
         accommodationSummary={accommodationSummary}
         tierLabel={previewTierLabel}
         tierPricings={previewTierPricings}
+        itinerary={itinerary}
+        departureDate={relatedTour?.departure_date || null}
       />
 
       <LinkTourDialog
@@ -608,20 +594,6 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
             toast.success(`已關聯旅遊團：${tour.code}`)
           }
         }}
-      />
-
-      <ImportMealsDialog
-        isOpen={showImportMealsDialog}
-        onClose={() => setShowImportMealsDialog(false)}
-        meals={[]}
-        onImport={handleImportMeals}
-      />
-
-      <ImportActivitiesDialog
-        isOpen={showImportActivitiesDialog}
-        onClose={() => setShowImportActivitiesDialog(false)}
-        activities={[]}
-        onImport={handleImportActivities}
       />
 
       <LocalPricingDialog

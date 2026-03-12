@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo } from 'react'
+import { useCallback } from 'react'
 import { toast } from 'sonner'
 import type { Quote, Itinerary } from '@/stores/types'
 import type { CostCategory, CostItem } from '@/features/quotes/types'
@@ -12,8 +12,6 @@ interface UseSyncOperationsProps {
   quote: Quote | null
   categories: CostCategory[]
   accommodationDays: number
-  setCategories: React.Dispatch<React.SetStateAction<CostCategory[]>>
-  setAccommodationDays: React.Dispatch<React.SetStateAction<number>>
   itineraries: Itinerary[]
   updateItinerary: (id: string, data: Partial<Itinerary>) => Promise<void>
   router: AppRouterInstance
@@ -23,8 +21,6 @@ export function useSyncOperations({
   quote,
   categories,
   accommodationDays,
-  setCategories,
-  setAccommodationDays,
   itineraries,
   updateItinerary,
   router,
@@ -225,140 +221,9 @@ export function useSyncOperations({
     [quote, itineraries, updateItinerary]
   )
 
-  // 從行程表同步住宿名稱
-  const handleSyncAccommodationFromItinerary = useCallback(() => {
-    if (!quote?.itinerary_id) {
-      toast.error(QUOTE_SYNC_LABELS.NO_LINKED_ITINERARY)
-      return
-    }
-
-    const itinerary = itineraries.find(i => i.id === quote.itinerary_id)
-    if (!itinerary?.daily_itinerary) {
-      toast.error(QUOTE_SYNC_LABELS.ITINERARY_NOT_FOUND)
-      return
-    }
-
-    const itineraryHotels: Array<{ day: number; name: string }> = []
-    itinerary.daily_itinerary.forEach((day, index) => {
-      const dayNumber = index + 1
-      const hotelName = day.accommodation || ''
-      if (hotelName) {
-        itineraryHotels.push({ day: dayNumber, name: hotelName })
-      }
-    })
-
-    if (itineraryHotels.length === 0) {
-      toast.info(QUOTE_SYNC_LABELS.NO_ACCOMMODATION_DATA)
-      return
-    }
-
-    setCategories(prev => {
-      const newCategories = [...prev]
-      const accommodationCategory = newCategories.find(cat => cat.id === 'accommodation')
-      if (!accommodationCategory) return prev
-
-      const maxDay = Math.max(...itineraryHotels.map(h => h.day), accommodationDays)
-
-      const existingByDay: Record<number, CostItem> = {}
-      accommodationCategory.items.forEach((item: CostItem) => {
-        if (item.day) {
-          existingByDay[item.day] = item
-        }
-      })
-
-      const updatedItems: typeof accommodationCategory.items = []
-      let hasChanges = false
-
-      for (let day = 1; day <= maxDay; day++) {
-        const itineraryHotel = itineraryHotels.find(h => h.day === day)
-        const existingItem = existingByDay[day]
-
-        if (existingItem) {
-          if (itineraryHotel && existingItem.name !== itineraryHotel.name) {
-            updatedItems.push({ ...existingItem, name: itineraryHotel.name })
-            hasChanges = true
-          } else {
-            updatedItems.push(existingItem)
-          }
-        } else if (itineraryHotel) {
-          updatedItems.push({
-            id: `accommodation-day${day}-${Date.now()}`,
-            name: itineraryHotel.name,
-            quantity: 0,
-            unit_price: 0,
-            total: 0,
-            note: '',
-            day: day,
-            room_type: '',
-          })
-          hasChanges = true
-        }
-      }
-
-      if (!hasChanges) {
-        toast.info(QUOTE_SYNC_LABELS.ACCOMMODATION_UP_TO_DATE)
-        return prev
-      }
-
-      accommodationCategory.items = updatedItems
-      if (maxDay > accommodationDays) {
-        setAccommodationDays(maxDay)
-      }
-      toast.success(QUOTE_SYNC_LABELS.SYNC_ACCOMMODATION(itineraryHotels.length))
-      return newCategories
-    })
-  }, [quote, itineraries, accommodationDays, setCategories, setAccommodationDays])
-
-  // 取得行程表的餐飲資料
-  const itineraryMealsData = useMemo(() => {
-    if (!quote?.itinerary_id) return []
-    const itinerary = itineraries.find(i => i.id === quote.itinerary_id)
-    if (!itinerary?.daily_itinerary) return []
-
-    const meals: Array<{ day: number; type: '早餐' | '午餐' | '晚餐'; name: string }> = []
-    itinerary.daily_itinerary.forEach((day, index) => {
-      const dayNumber = index + 1
-      if (day.meals?.breakfast && !day.meals.breakfast.includes(QUOTE_SYNC_LABELS.MEAL_SELF)) {
-        meals.push({ day: dayNumber, type: '早餐', name: day.meals.breakfast })
-      }
-      if (day.meals?.lunch && !day.meals.lunch.includes(QUOTE_SYNC_LABELS.MEAL_SELF)) {
-        meals.push({ day: dayNumber, type: '午餐', name: day.meals.lunch })
-      }
-      if (day.meals?.dinner && !day.meals.dinner.includes(QUOTE_SYNC_LABELS.MEAL_SELF)) {
-        meals.push({ day: dayNumber, type: '晚餐', name: day.meals.dinner })
-      }
-    })
-    return meals
-  }, [quote, itineraries])
-
-  // 取得行程表的景點資料
-  const itineraryActivitiesData = useMemo(() => {
-    if (!quote?.itinerary_id) return []
-    const itinerary = itineraries.find(i => i.id === quote.itinerary_id)
-    if (!itinerary?.daily_itinerary) return []
-
-    const activities: Array<{ day: number; title: string; description?: string }> = []
-    itinerary.daily_itinerary.forEach((day, index) => {
-      const dayNumber = index + 1
-      if (day.activities) {
-        day.activities.forEach((activity: { title: string; description?: string }) => {
-          activities.push({
-            day: dayNumber,
-            title: activity.title,
-            description: activity.description,
-          })
-        })
-      }
-    })
-    return activities
-  }, [quote, itineraries])
-
   return {
     handleCreateItinerary,
     calculateSyncDiffs,
     handleConfirmSync,
-    handleSyncAccommodationFromItinerary,
-    itineraryMealsData,
-    itineraryActivitiesData,
   }
 }

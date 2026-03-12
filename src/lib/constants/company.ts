@@ -7,6 +7,9 @@ export const COMPANY = {
   /** 公司名稱 */
   name: 'VENTURO',
 
+  /** 公司法定名稱（用於報價單頁尾等正式文件） */
+  legalName: '角落旅行社股份有限公司',
+
   /** 公司副標題/標語 */
   subtitle: '如果可以，讓我們一起探索世界的每個角落',
 

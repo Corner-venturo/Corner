@@ -126,7 +126,7 @@ export function CreateDisbursementDialog({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={selectedRequestIds.length === 0 || isSubmitting}
+            disabled={(!isEditMode && selectedRequestIds.length === 0) || isSubmitting}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
             {submitLabel}

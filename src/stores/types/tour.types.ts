@@ -24,6 +24,7 @@ export type {
   Itinerary,
   PriceTier,
   FAQ,
+  TourType,
   TourStatus,
   ContractStatus,
   ContractTemplate,

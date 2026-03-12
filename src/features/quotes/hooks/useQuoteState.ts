@@ -2,7 +2,7 @@ import { getTodayString } from '@/lib/utils/format-date'
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useQuotes } from './useQuotes'
-import { useToursSlim, useItineraries, useOrdersSlim, createTour } from '@/data'
+import { useToursSlim, useTour, useItineraries, useOrdersSlim, createTour } from '@/data'
 import { useWorkspaceChannels } from '@/stores/workspace'
 import {
   CostCategory,
@@ -15,6 +15,8 @@ import {
 import { QuickQuoteItem } from '@/types/quote.types'
 import type { FlightInfo } from '@/stores/types/tour.types'
 import { QUOTE_HOOKS_LABELS } from '../constants/labels'
+import { useTourItineraryItemsByTour } from '@/features/tours/hooks/useTourItineraryItems'
+import { coreItemsToCostCategories } from '../utils/core-table-adapter'
 
 export const useQuoteState = () => {
   const params = useParams()
@@ -42,6 +44,9 @@ export const useQuoteState = () => {
     }
   }, [])
 
+  // 完整 tour 資料（含定價欄位）
+  const { item: fullTour } = useTour(quote?.tour_id ?? null)
+
   // 檢查是否為特殊團報價單
   const relatedTour = quote?.tour_id ? tours.find(t => t.id === quote.tour_id) : null
   const isSpecialTour = relatedTour?.status === '特殊團' // 使用中文狀態值
@@ -64,6 +69,18 @@ export const useQuoteState = () => {
     return null
   }, [quote?.itinerary_id, quote?.proposal_package_id, itineraries])
 
+  // === 核心表資料（有 tour_id 的報價單直接讀核心表）===
+  const { items: coreItems, refresh: refreshCoreItems } = useTourItineraryItemsByTour(
+    quote?.tour_id ?? null
+  )
+  const hasInitializedFromCore = useRef(false)
+
+  // 檢查核心表是否有行程更新但報價還沒看過的項目
+  const hasCoreChanges = useMemo(() => {
+    if (!quote || coreItems.length === 0) return false
+    return coreItems.some(item => item.quote_status === 'none')
+  }, [coreItems, quote?.id])
+
   // 格式化航班資訊
   const formatFlightInfo = useCallback(
     (flight: FlightInfo | null, type: '去程' | '回程'): string => {
@@ -84,156 +101,41 @@ export const useQuoteState = () => {
   // 追蹤是否已添加過航班資訊，避免重複添加
   const hasAddedFlightInfo = useRef(false)
   const lastQuoteId = useRef<string | null>(null)
+  const hasLoadedPricingFromTour = useRef(false)
 
-  // 當 quote.id 改變時，重置航班添加狀態
+  // 當 quote.id 改變時，重置航班添加狀態和核心表初始化狀態
   useEffect(() => {
     if (quote_id !== lastQuoteId.current) {
       hasAddedFlightInfo.current = false
+      hasInitializedFromCore.current = false
+      hasLoadedPricingFromTour.current = false
+      hasLoadedTierPricings.current = false
       lastQuoteId.current = quote_id
     }
   }, [quote_id])
 
-  const [categories, setCategories] = useState<CostCategory[]>(() => {
-    // 注意：空陣列 [] 是 truthy，所以要用 length 檢查
-    const initialCategories =
-      quote?.categories && quote.categories.length > 0 ? quote.categories : costCategories
-    // 確保每個分類的總計都正確計算
-    let processedCategories = initialCategories.map(cat => ({
-      ...cat,
-      total: cat.items.reduce((sum, item) => sum + (item.total || 0), 0),
-    }))
+  // categories 初始為空分類，由核心表效果填入
+  const [categories, setCategories] = useState<CostCategory[]>(
+    () => costCategories.map(cat => ({ ...cat, items: [], total: 0 }))
+  )
 
-    // 修復住宿天數與項目不一致的問題：
-    // 如果 accommodation_days > 0 但住宿項目為空，根據天數初始化空的住宿項目
-    const savedAccommodationDays = quote?.accommodation_days || 0
-    if (savedAccommodationDays > 0) {
-      const accommodationCategory = processedCategories.find(cat => cat.id === 'accommodation')
-      if (accommodationCategory && accommodationCategory.items.length === 0) {
-        const newItems = []
-        for (let day = 1; day <= savedAccommodationDays; day++) {
-          newItems.push({
-            id: `accommodation-day${day}-${Date.now()}-${day}`,
-            name: '', // 飯店名稱（待填）
-            quantity: null,
-            unit_price: null,
-            total: 0,
-            note: '',
-            day: day,
-            room_type: '',
-          })
-        }
-        accommodationCategory.items = newItems
-      }
-    }
+  const [accommodationDays, setAccommodationDays] = useState<number>(0)
 
-    return processedCategories
-  })
-
-  const [accommodationDays, setAccommodationDays] = useState<number>(quote?.accommodation_days || 0)
-
-  // 多身份人數統計（初始值：從 quote 載入，或從 tour/order 推算，最後才用預設值 1）
-  const [participantCounts, setParticipantCounts] = useState<ParticipantCounts>(() => {
-    if (quote?.participant_counts) {
-      return quote.participant_counts
-    }
-
-    // 如果有 tour，從 tour 的訂單計算預計人數
-    if (quote?.tour_id && relatedTour) {
-      const tourOrders = orders.filter(order => order.tour_id === relatedTour.id)
-      const totalMembers = tourOrders.reduce((sum, order) => sum + (order.member_count || 0), 0)
-
-      if (totalMembers > 0) {
-        return {
-          adult: totalMembers,
-          child_with_bed: 0,
-          child_no_bed: 0,
-          single_room: 0,
-          infant: 0,
-        }
-      }
-
-      // 如果訂單沒有人數，用 tour 的 max_participants
-      if (relatedTour.max_participants) {
-        return {
-          adult: relatedTour.max_participants,
-          child_with_bed: 0,
-          child_no_bed: 0,
-          single_room: 0,
-          infant: 0,
-        }
-      }
-    }
-
-    // 如果 quote 有 group_size，使用它
-    const quoteGroupSize = quote?.group_size
-    if (quoteGroupSize && quoteGroupSize > 0) {
-      return {
-        adult: quoteGroupSize,
-        child_with_bed: 0,
-        child_no_bed: 0,
-        single_room: 0,
-        infant: 0,
-      }
-    }
-
-    // 最後才用預設值
-    return {
-      adult: 1,
-      child_with_bed: 0,
-      child_no_bed: 0,
-      single_room: 0,
-      infant: 0,
-    }
+  // 多身份人數統計（初始值先用預設，由 effect 從 fullTour 或 quote 載入）
+  const [participantCounts, setParticipantCounts] = useState<ParticipantCounts>({
+    adult: 1,
+    child_with_bed: 0,
+    child_no_bed: 0,
+    single_room: 0,
+    infant: 0,
   })
 
   // 追蹤是否已經載入過砍次表，避免重複載入覆蓋用戶編輯
   const hasLoadedTierPricings = useRef(false)
 
-  // 當 quote 載入後，更新所有狀態
+  // 當 quote 載入後，更新 header 狀態（categories 由核心表效果處理）
   useEffect(() => {
     if (quote) {
-      // 空陣列 [] 是 truthy，所以要用 length 檢查
-      if (quote.categories && quote.categories.length > 0) {
-        const loadedCategories = quote.categories.map(cat => ({
-          ...cat,
-          total: cat.items.reduce((sum, item) => sum + (item.total || 0), 0),
-        }))
-        setCategories(loadedCategories)
-      } else {
-        // 沒有 categories 或是空陣列，使用預設分類
-        // 同時根據 accommodation_days 初始化住宿項目
-        const initialCategories = costCategories.map(cat => ({ ...cat, items: [...cat.items] }))
-        const savedAccommodationDays = quote.accommodation_days || 0
-        if (savedAccommodationDays > 0) {
-          const accommodationCategory = initialCategories.find(cat => cat.id === 'accommodation')
-          if (accommodationCategory) {
-            const newItems = []
-            for (let day = 1; day <= savedAccommodationDays; day++) {
-              newItems.push({
-                id: `accommodation-day${day}-${Date.now()}-${day}`,
-                name: '',
-                quantity: null,
-                unit_price: null,
-                total: 0,
-                note: '',
-                day: day,
-                room_type: '',
-              })
-            }
-            accommodationCategory.items = newItems
-          }
-        }
-        setCategories(initialCategories)
-      }
-      if (quote.accommodation_days !== undefined) {
-        setAccommodationDays(quote.accommodation_days)
-      }
-      if (quote.participant_counts) {
-        setParticipantCounts(quote.participant_counts)
-      }
-      if (quote.selling_prices) {
-        setSellingPrices(quote.selling_prices)
-      }
       if (quote.name) {
         setQuoteName(quote.name)
       }
@@ -243,7 +145,7 @@ export const useQuoteState = () => {
       }
       // 快速報價單客戶資訊
       setQuickQuoteCustomerInfo({
-        customer_name: quote.customer_name || quote.name || '', // 優先用 customer_name，否則用團體名稱
+        customer_name: quote.customer_name || quote.name || '',
         contact_person: quote.contact_person || '',
         contact_phone: quote.contact_phone || '',
         contact_address: quote.contact_address || '',
@@ -254,17 +156,71 @@ export const useQuoteState = () => {
         expense_description:
           (quote as typeof quote & { expense_description?: string })?.expense_description || '',
       })
-      // 載入砍次表資料（只在第一次載入時執行）
-      if (!hasLoadedTierPricings.current) {
-        const quoteWithTierPricings = quote as typeof quote & { tier_pricings?: TierPricing[] }
-        const savedTierPricings = quoteWithTierPricings.tier_pricings
-        if (savedTierPricings && Array.isArray(savedTierPricings)) {
-          setTierPricings(savedTierPricings)
-        }
-        hasLoadedTierPricings.current = true
-      }
     }
-  }, [quote?.id, quote?.updated_at, relatedTour?.code]) // 當 quote.id 或 quote 資料更新時執行
+  }, [quote?.id, quote?.updated_at, relatedTour?.code])
+
+  // 定價欄位從 fullTour 讀取（fallback 到 quote）
+  useEffect(() => {
+    if (hasLoadedPricingFromTour.current) return
+    // 優先從 fullTour 讀取
+    const source = fullTour || quote
+    if (!source) return
+
+    const accDays = fullTour?.accommodation_days ?? quote?.accommodation_days
+    if (accDays !== undefined && accDays !== null) {
+      setAccommodationDays(accDays)
+    }
+
+    const pc = fullTour?.participant_counts ?? quote?.participant_counts
+    if (pc) {
+      setParticipantCounts(pc as ParticipantCounts)
+    } else if (quote?.tour_id && relatedTour) {
+      // fallback: 從訂單或 tour 推算
+      const tourOrders = orders.filter(order => order.tour_id === relatedTour.id)
+      const totalMembers = tourOrders.reduce((sum, order) => sum + (order.member_count || 0), 0)
+      if (totalMembers > 0) {
+        setParticipantCounts({ adult: totalMembers, child_with_bed: 0, child_no_bed: 0, single_room: 0, infant: 0 })
+      } else if (relatedTour.max_participants) {
+        setParticipantCounts({ adult: relatedTour.max_participants, child_with_bed: 0, child_no_bed: 0, single_room: 0, infant: 0 })
+      }
+    } else if (quote?.group_size && quote.group_size > 0) {
+      setParticipantCounts({ adult: quote.group_size, child_with_bed: 0, child_no_bed: 0, single_room: 0, infant: 0 })
+    }
+
+    const sp = fullTour?.selling_prices ?? quote?.selling_prices
+    if (sp) {
+      setSellingPrices(sp as SellingPrices)
+    }
+
+    // 砍次表
+    if (!hasLoadedTierPricings.current) {
+      const tp = (fullTour?.tier_pricings ?? (quote as typeof quote & { tier_pricings?: TierPricing[] })?.tier_pricings) as TierPricing[] | undefined
+      if (tp && Array.isArray(tp) && tp.length > 0) {
+        setTierPricings(tp)
+      }
+      hasLoadedTierPricings.current = true
+    }
+
+    hasLoadedPricingFromTour.current = true
+  }, [fullTour?.id, quote?.id])
+
+  // === 核心表初始化：從核心表讀取分類 ===
+  useEffect(() => {
+    if (coreItems.length > 0 && !hasInitializedFromCore.current) {
+      const coreCategories = coreItemsToCostCategories(coreItems)
+      setCategories(coreCategories)
+
+      // 從核心表推算住宿天數
+      const maxAccDay = coreItems
+        .filter(item => item.category === 'accommodation' && item.day_number)
+        .reduce((max, item) => Math.max(max, item.day_number!), 0)
+      if (maxAccDay > 0) {
+        setAccommodationDays(maxAccDay)
+      }
+
+      hasInitializedFromCore.current = true
+    }
+  }, [coreItems])
 
   // 當行程表載入後，自動添加航班資訊到交通類別
   useEffect(() => {
@@ -344,16 +300,14 @@ export const useQuoteState = () => {
   const [quoteName, setQuoteName] = useState<string>(quote?.name || '')
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false)
 
-  // 多身份售價
-  const [sellingPrices, setSellingPrices] = useState<SellingPrices>(
-    quote?.selling_prices || {
-      adult: 0,
-      child_with_bed: 0,
-      child_no_bed: 0,
-      single_room: 0,
-      infant: 0,
-    }
-  )
+  // 多身份售價（由 effect 從 fullTour 或 quote 載入）
+  const [sellingPrices, setSellingPrices] = useState<SellingPrices>({
+    adult: 0,
+    child_with_bed: 0,
+    child_no_bed: 0,
+    single_room: 0,
+    infant: 0,
+  })
 
   // 快速報價單相關狀態
   const [quickQuoteItems, setQuickQuoteItems] = useState<QuickQuoteItem[]>(
@@ -372,11 +326,8 @@ export const useQuoteState = () => {
       (quote as typeof quote & { expense_description?: string })?.expense_description || '',
   })
 
-  // 砍次表狀態 - 從 quote 載入或初始化為空陣列
-  const [tierPricings, setTierPricings] = useState<TierPricing[]>(() => {
-    const quoteWithTierPricings = quote as typeof quote & { tier_pricings?: TierPricing[] }
-    return quoteWithTierPricings?.tier_pricings || []
-  })
+  // 砍次表狀態（由 effect 從 fullTour 或 quote 載入）
+  const [tierPricings, setTierPricings] = useState<TierPricing[]>([])
 
   // 檢查是否為 404 狀態（資料已載入但找不到對應的 quote）
   const [notFound, setNotFound] = useState(false)
@@ -440,6 +391,12 @@ export const useQuoteState = () => {
     // 砍次表相關
     tierPricings,
     setTierPricings,
+    // 核心表
+    coreItems,
+    refreshCoreItems,
+    hasCoreChanges,
+    // 完整 tour（含定價欄位）
+    fullTour,
     // 404 狀態
     notFound,
     hasLoaded,

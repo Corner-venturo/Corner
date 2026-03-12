@@ -88,9 +88,11 @@ export const useQuoteTour = ({
       profit: 0,
     })
 
-    // 更新報價單的 tour_id
+    // 更新報價單的 tour_id + 反向設定 tour.quote_id
     if (newTour?.id) {
       await updateQuote(quote.id, { tour_id: newTour.id })
+      const { updateTour } = await import('@/data')
+      await updateTour(newTour.id, { quote_id: quote.id })
     }
 
     // 跳轉到旅遊團管理頁面，並高亮新建的團

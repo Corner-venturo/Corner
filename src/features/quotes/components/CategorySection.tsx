@@ -84,8 +84,6 @@ interface CategorySectionProps {
     value: unknown
   ) => void
   handleRemoveItem: (categoryId: string, itemId: string) => void
-  onOpenMealsImportDialog?: () => void
-  onOpenActivitiesImportDialog?: () => void
   // Local 報價相關
   onOpenLocalPricingDialog?: () => void
 }
@@ -108,8 +106,6 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   handleAddActivity,
   handleUpdateItem,
   handleRemoveItem,
-  onOpenMealsImportDialog,
-  onOpenActivitiesImportDialog,
   onOpenLocalPricingDialog,
 }) => {
   const Icon = categoryIcons[category.id]

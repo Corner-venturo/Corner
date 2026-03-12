@@ -16127,7 +16127,8 @@ export type Database = {
           created_by: string | null
           current_participants: number | null
           custom_cost_fields: Json | null
-          departure_date: string
+          days_count: number | null
+          departure_date: string | null
           description: string | null
           enable_checkin: boolean | null
           envelope_records: string | null
@@ -16155,13 +16156,14 @@ export type Database = {
           proposal_package_id: string | null
           quote_cost_structure: Json | null
           quote_id: string | null
-          return_date: string
+          return_date: string | null
           return_flight: Json | null
           selling_price_per_person: number | null
           status: string
           total_cost: number
           total_revenue: number
           tour_leader_id: string | null
+          tour_type: string
           updated_at: string
           updated_by: string | null
           workspace_id: string
@@ -16192,7 +16194,8 @@ export type Database = {
           created_by?: string | null
           current_participants?: number | null
           custom_cost_fields?: Json | null
-          departure_date: string
+          days_count?: number | null
+          departure_date?: string | null
           description?: string | null
           enable_checkin?: boolean | null
           envelope_records?: string | null
@@ -16220,13 +16223,14 @@ export type Database = {
           proposal_package_id?: string | null
           quote_cost_structure?: Json | null
           quote_id?: string | null
-          return_date: string
+          return_date?: string | null
           return_flight?: Json | null
           selling_price_per_person?: number | null
           status?: string
           total_cost?: number
           total_revenue?: number
           tour_leader_id?: string | null
+          tour_type?: string
           updated_at?: string
           updated_by?: string | null
           workspace_id: string
@@ -16257,7 +16261,8 @@ export type Database = {
           created_by?: string | null
           current_participants?: number | null
           custom_cost_fields?: Json | null
-          departure_date?: string
+          days_count?: number | null
+          departure_date?: string | null
           description?: string | null
           enable_checkin?: boolean | null
           envelope_records?: string | null
@@ -16285,13 +16290,14 @@ export type Database = {
           proposal_package_id?: string | null
           quote_cost_structure?: Json | null
           quote_id?: string | null
-          return_date?: string
+          return_date?: string | null
           return_flight?: Json | null
           selling_price_per_person?: number | null
           status?: string
           total_cost?: number
           total_revenue?: number
           tour_leader_id?: string | null
+          tour_type?: string
           updated_at?: string
           updated_by?: string | null
           workspace_id?: string
@@ -19091,11 +19097,13 @@ export type Database = {
           id: string
           invoice_seal_image_url: string | null
           is_active: boolean | null
+          legal_name: string | null
           logo_url: string | null
           name: string
           payment_config: Json | null
           phone: string | null
           seal_image_url: string | null
+          subtitle: string | null
           tax_id: string | null
           type: string | null
           updated_at: string | null
@@ -19123,11 +19131,13 @@ export type Database = {
           id?: string
           invoice_seal_image_url?: string | null
           is_active?: boolean | null
+          legal_name?: string | null
           logo_url?: string | null
           name: string
           payment_config?: Json | null
           phone?: string | null
           seal_image_url?: string | null
+          subtitle?: string | null
           tax_id?: string | null
           type?: string | null
           updated_at?: string | null
@@ -19155,11 +19165,13 @@ export type Database = {
           id?: string
           invoice_seal_image_url?: string | null
           is_active?: boolean | null
+          legal_name?: string | null
           logo_url?: string | null
           name?: string
           payment_config?: Json | null
           phone?: string | null
           seal_image_url?: string | null
+          subtitle?: string | null
           tax_id?: string | null
           type?: string | null
           updated_at?: string | null

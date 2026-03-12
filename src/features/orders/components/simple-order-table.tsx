@@ -92,30 +92,8 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
         className
       )}
     >
-      {/* 工具列 */}
-      {onAdd && (
-        <div className="flex items-center justify-between px-4 py-2 border-b border-border/60">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-morandi-secondary">
-              ({orders.length} {COMP_ORDERS_LABELS.筆})
-            </span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Button variant="default" size="sm" className="h-8 px-3" onClick={onAdd}>
-              <Plus size={14} className="mr-1" />
-              {COMP_ORDERS_LABELS.新增}
-            </Button>
-          </div>
-        </div>
-      )}
-
       {/* 表頭 */}
-      <div
-        className={cn(
-          'bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40 border-b border-border/60',
-          !onAdd && 'rounded-t-xl'
-        )}
-      >
+      <div className="bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40 border-b border-border/60 rounded-t-xl">
         <div className="grid" style={{ gridTemplateColumns: gridCols }}>
           <div className="text-left py-2.5 px-4 text-xs relative">
             <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
@@ -149,8 +127,15 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
               {COMP_ORDERS_LABELS.LABEL_PAID_AMOUNT}
             </span>
           </div>
-          <div className="text-left py-2.5 px-4 text-xs relative">
-            <span className="font-medium text-morandi-secondary">{COMP_ORDERS_LABELS.ACTIONS}</span>
+          <div className="py-1 px-4 flex items-center justify-end">
+            {onAdd ? (
+              <Button variant="default" size="sm" className="h-7 px-2 text-xs" onClick={onAdd}>
+                <Plus size={12} className="mr-1" />
+                {COMP_ORDERS_LABELS.新增}
+              </Button>
+            ) : (
+              <span className="text-xs font-medium text-morandi-secondary">{COMP_ORDERS_LABELS.ACTIONS}</span>
+            )}
           </div>
         </div>
       </div>

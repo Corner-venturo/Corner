@@ -226,12 +226,9 @@ export function useCreateDisbursement({
   const handleUpdate = useCallback(async () => {
     if (!editingOrder) return
 
-    const validation = createDisbursementSchema.safeParse({
-      selectedRequestIds,
-      disbursementDate,
-    })
-    if (!validation.success) {
-      void alert(validation.error.issues[0].message, 'warning')
+    // 編輯模式允許清空請款單（這期不出帳），只驗日期
+    if (!disbursementDate) {
+      void alert('請選擇出納日期', 'warning')
       return
     }
 
@@ -253,17 +250,8 @@ export function useCreateDisbursement({
 
       const tour_ids_to_recalculate = new Set<string>()
 
-      // 新增的請款單：狀態改為 billed
+      // 新增的請款單：狀態改為 confirmed（加入出納單，尚未出帳）
       for (const id of addedIds) {
-        await updatePaymentRequestApi(id, { status: 'billed' })
-        const req = pendingRequests.find(r => r.id === id)
-        if (req?.tour_id) {
-          tour_ids_to_recalculate.add(req.tour_id)
-        }
-      }
-
-      // 移除的請款單：狀態改回 confirmed
-      for (const id of removedIds) {
         await updatePaymentRequestApi(id, { status: 'confirmed' })
         const req = pendingRequests.find(r => r.id === id)
         if (req?.tour_id) {
@@ -271,9 +259,22 @@ export function useCreateDisbursement({
         }
       }
 
-      // 重算相關團的成本
+      // 移除的請款單：狀態改回 pending（從出納單移除，回到待處理）
+      for (const id of removedIds) {
+        await updatePaymentRequestApi(id, { status: 'pending' })
+        const req = pendingRequests.find(r => r.id === id)
+        if (req?.tour_id) {
+          tour_ids_to_recalculate.add(req.tour_id)
+        }
+      }
+
+      // 重算相關團的成本（忽略錯誤，不影響主流程）
       for (const tour_id of tour_ids_to_recalculate) {
-        await recalculateExpenseStats(tour_id)
+        try {
+          await recalculateExpenseStats(tour_id)
+        } catch (calcErr) {
+          logger.warn('重算團成本失敗:', tour_id, calcErr)
+        }
       }
 
       // SWR 快取失效
@@ -284,9 +285,9 @@ export function useCreateDisbursement({
       resetForm()
       onSuccess()
     } catch (error) {
-      logger.error(DISBURSEMENT_LABELS.更新出納單失敗_2, error)
-      const errorMessage = error instanceof Error ? error.message : DISBURSEMENT_LABELS.未知錯誤
-      await alert(DISBURSEMENT_LABELS.更新出納單失敗_hook(errorMessage), 'error')
+      const msg = error instanceof Error ? error.message : JSON.stringify(error)
+      logger.error(DISBURSEMENT_LABELS.更新出納單失敗_2, msg, error)
+      await alert(DISBURSEMENT_LABELS.更新出納單失敗_hook(msg || DISBURSEMENT_LABELS.未知錯誤), 'error')
     } finally {
       setIsSubmitting(false)
     }

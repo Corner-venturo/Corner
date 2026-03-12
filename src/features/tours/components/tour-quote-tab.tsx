@@ -3,15 +3,14 @@
 /**
  * TourQuoteTab - 旅遊團報價單分頁
  *
- * 直接嵌入報價單頁面內容
- * - 如果有報價單，顯示完整報價單編輯介面
- * - 如果沒有，顯示建立報價單按鈕
+ * 一團只有一個標準報價單：
+ * - 有報價單 → 嵌入完整編輯介面
+ * - 沒有 → 簡潔的建立按鈕
  */
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
-import { Loader2, Plus, Calculator } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import type { Tour } from '@/stores/types'
@@ -95,7 +94,14 @@ export function TourQuoteTab({ tour }: TourQuoteTabProps) {
     }
   }
 
-  if (loading) {
+  // 沒有報價單 → 自動建立
+  useEffect(() => {
+    if (!loading && !quoteId && !creating) {
+      handleCreateQuote()
+    }
+  }, [loading, quoteId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (loading || !quoteId) {
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="animate-spin text-muted-foreground" size={24} />
@@ -103,27 +109,5 @@ export function TourQuoteTab({ tour }: TourQuoteTabProps) {
     )
   }
 
-  // 沒有報價單 - 顯示建立按鈕
-  if (!quoteId) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <Calculator className="w-12 h-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium text-morandi-primary mb-2">
-          {COMP_TOURS_LABELS.LABEL_1448}
-        </h3>
-        <p className="text-sm text-muted-foreground mb-6">{COMP_TOURS_LABELS.CALCULATING_1295}</p>
-        <Button onClick={handleCreateQuote} disabled={creating}>
-          {creating ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          ) : (
-            <Plus className="w-4 h-4 mr-2" />
-          )}
-          建立報價單
-        </Button>
-      </div>
-    )
-  }
-
-  // 有報價單 - 嵌入完整報價單編輯介面
   return <QuoteDetailEmbed quoteId={quoteId} showHeader={true} />
 }

@@ -12,7 +12,7 @@ import { PrintFooter } from './PrintFooter'
 import { PrintControls } from './PrintControls'
 import { usePrintLogo } from './usePrintLogo'
 
-// 列印專用樣式 - 內嵌確保優先級
+// 列印專用樣式 - 用 #print-overlay 前綴提高優先級，避免被 globals.css 覆蓋
 const PRINT_CSS = `
   @media print {
     /* 隱藏頁面其他元素 */
@@ -28,57 +28,84 @@ const PRINT_CSS = `
       height: auto !important;
       background: transparent !important;
       padding: 0 !important;
+      margin: 0 !important;
       display: block !important;
       z-index: 1 !important;
     }
 
-    /* 重置內部容器 */
+    /* 重置內部容器 — 用高優先級覆蓋 globals.css 的 div { padding: 0 } */
     #print-overlay > div {
       max-width: 100% !important;
       max-height: none !important;
       overflow: visible !important;
       border-radius: 0 !important;
       box-shadow: none !important;
+      margin: 0 !important;
       padding: 0 !important;
     }
 
     /* 隱藏控制按鈕和螢幕版本 */
-    .print-controls,
-    .screen-only {
+    #print-overlay .print-controls,
+    #print-overlay .screen-only {
       display: none !important;
     }
 
-    /* 顯示列印版本 */
-    .print-only {
+    /* 顯示列印版本 — #print-overlay 前綴覆蓋 globals.css 的 .print-only { display: block } */
+    #print-overlay .print-only {
       display: table !important;
       visibility: visible !important;
       width: 100% !important;
+      height: 100vh !important;
     }
 
-    .print-only * {
+    #print-overlay .print-only * {
       visibility: visible !important;
     }
 
-    .print-only thead {
-      display: table-header-group;
+    #print-overlay .print-only thead {
+      display: table-header-group !important;
     }
 
-    .print-only tfoot {
-      display: table-footer-group;
+    /* tfoot 僅作佔位（預留頁尾空間），不顯示內容 */
+    #print-overlay .print-only tfoot {
+      display: table-footer-group !important;
+    }
+    #print-overlay .print-only tfoot td > * {
+      visibility: hidden !important;
     }
 
-    .print-only tbody {
-      display: table-row-group;
+    /* 固定頁尾 — position:fixed 讓每頁底部都出現 */
+    #print-overlay .print-fixed-footer {
+      display: block !important;
+      visibility: visible !important;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0 10mm;
+      background: white;
+    }
+    #print-overlay .print-fixed-footer * {
+      visibility: visible !important;
     }
 
-    .print-only tbody > tr > td {
+    #print-overlay .print-only tbody {
+      display: table-row-group !important;
+    }
+
+    #print-overlay .print-only tbody > tr > td {
       vertical-align: top;
+      height: 100% !important;
     }
 
-    /* 內容區域 */
-    #print-content {
+    /* 內容區域 — 覆蓋 globals.css 的 #print-content { position: absolute } */
+    #print-overlay #print-content {
+      position: static !important;
       padding: 0 !important;
+      margin: 0 !important;
       width: 100% !important;
+      background: white !important;
+      z-index: auto !important;
     }
 
     /* 頁面設定 */
@@ -88,12 +115,13 @@ const PRINT_CSS = `
     }
 
     /* 表格設定 */
-    table {
+    #print-overlay table {
       max-width: 100% !important;
       table-layout: fixed !important;
     }
 
-    td, th {
+    #print-overlay td,
+    #print-overlay th {
       word-break: break-word;
       overflow-wrap: break-word;
     }
@@ -171,6 +199,7 @@ export const PrintableWrapper: React.FC<PrintableWrapperProps> = ({
             <tfoot>
               <tr>
                 <td>
+                  {/* 佔位用，實際頁尾由 print-fixed-footer 顯示 */}
                   <PrintFooter />
                 </td>
               </tr>
@@ -182,6 +211,11 @@ export const PrintableWrapper: React.FC<PrintableWrapperProps> = ({
               </tr>
             </tbody>
           </table>
+
+          {/* 固定頁尾 — 每頁底部都顯示 */}
+          <div className="print-fixed-footer hidden">
+            <PrintFooter />
+          </div>
 
           {/* 螢幕版本 */}
           <div className="screen-only">

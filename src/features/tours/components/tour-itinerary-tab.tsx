@@ -8,7 +8,7 @@
  * - 下半部：每日分頁 tab（Day 1 | Day 2 | ...）
  */
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, Fragment } from 'react'
 import {
   Loader2,
   FileText,
@@ -21,8 +21,6 @@ import {
   Trash2,
   Check,
   ArrowRight,
-  Minus,
-  Sparkles,
   Hotel,
   Plus,
   MapPin,
@@ -32,9 +30,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { DatePicker } from '@/components/ui/date-picker'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Combobox } from '@/components/ui/combobox'
-import type { ComboboxOption } from '@/components/ui/combobox'
 import { logger } from '@/lib/utils/logger'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores'
@@ -43,6 +38,8 @@ import { updateTour } from '@/data/entities/tours'
 import { useFlightSearch } from '@/hooks'
 import { supabase } from '@/lib/supabase/client'
 import { syncItineraryToQuote } from '@/lib/utils/itinerary-quote-sync'
+import { useSyncItineraryToCore } from '@/features/tours/hooks/useTourItineraryItems'
+import type { DailyItinerary } from '@/components/editor/tour-form/types'
 import type { Tour } from '@/stores/types'
 import type { FlightInfo } from '@/types/flight.types'
 import { COMP_TOURS_LABELS, TOUR_ITINERARY_TAB_LABELS } from '../constants/labels'
@@ -61,137 +58,11 @@ interface DailyScheduleItem {
   dinnerSelf?: boolean
   sameAsPrevious?: boolean
   attractions?: { id: string; name: string }[]
+  note?: string
 }
 
 interface TourItineraryTabProps {
   tour: Tour
-}
-
-// ============================================================
-// AccommodationDialog
-// ============================================================
-interface AccommodationDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  dailySchedule: DailyScheduleItem[]
-  onUpdateAccommodation: (index: number, field: string, value: string | boolean) => void
-  getPreviousAccommodation: (index: number) => string
-}
-
-interface HotelOption {
-  id: string
-  name: string
-}
-
-function AccommodationDialog({
-  open,
-  onOpenChange,
-  dailySchedule,
-  onUpdateAccommodation,
-  getPreviousAccommodation,
-}: AccommodationDialogProps) {
-  const nights = dailySchedule.length - 1
-  const [hotelOptions, setHotelOptions] = useState<ComboboxOption[]>([])
-  const [hotelSearches, setHotelSearches] = useState<Record<number, string>>({})
-
-  // Load hotel options from DB
-  useEffect(() => {
-    if (!open) return
-    const loadHotels = async () => {
-      try {
-        const { data } = await supabase
-          .from('hotels')
-          .select('id, name')
-          .eq('is_active', true)
-          .order('name')
-          .limit(200)
-        if (data) {
-          setHotelOptions((data as HotelOption[]).map(h => ({ value: h.name, label: h.name })))
-        }
-      } catch (err) {
-        logger.error('載入飯店失敗', err)
-      }
-    }
-    loadHotels()
-  }, [open])
-
-  // Filter options based on search text for each night
-  const getFilteredOptions = useCallback(
-    (nightIndex: number): ComboboxOption[] => {
-      const search = (hotelSearches[nightIndex] || '').toLowerCase()
-      if (!search) return hotelOptions
-      return hotelOptions.filter(o => o.label.toLowerCase().includes(search))
-    },
-    [hotelOptions, hotelSearches]
-  )
-
-  if (nights <= 0) return null
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent level={2} className="max-w-lg max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Hotel className="w-5 h-5 text-morandi-gold" />
-            {TOUR_ITINERARY_TAB_LABELS.住宿設定}
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-4 pt-2">
-          {Array.from({ length: nights }, (_, i) => {
-            const day = dailySchedule[i]
-            if (!day) return null
-            const isContinueStay = day.sameAsPrevious
-            const prevAccom = getPreviousAccommodation(i)
-
-            return (
-              <div key={i} className="space-y-2 border rounded-lg p-3">
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm font-medium">
-                    {TOUR_ITINERARY_TAB_LABELS.第N晚(i + 1)}
-                  </Label>
-                  {i > 0 && (
-                    <label className="flex items-center gap-1.5 text-xs cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={!!isContinueStay}
-                        onChange={() => onUpdateAccommodation(i, 'sameAsPrevious', !isContinueStay)}
-                        className="rounded border-morandi-secondary"
-                      />
-                      {TOUR_ITINERARY_TAB_LABELS.續住_同上一晚}
-                    </label>
-                  )}
-                </div>
-
-                {isContinueStay ? (
-                  <div className="text-sm text-muted-foreground bg-muted/50 rounded px-3 py-2">
-                    {TOUR_ITINERARY_TAB_LABELS.同上} ({prevAccom || '-'})
-                  </div>
-                ) : (
-                  <Combobox
-                    value={day.accommodation || ''}
-                    onChange={val => {
-                      onUpdateAccommodation(i, 'accommodation', val)
-                    }}
-                    options={getFilteredOptions(i)}
-                    placeholder={TOUR_ITINERARY_TAB_LABELS.搜尋飯店}
-                    showSearchIcon
-                    showClearButton
-                    disablePortal
-                    onCreate={async (name) => {
-                      // 新增到本地選項，讓 Combobox 能正確顯示
-                      setHotelOptions(prev => [...prev, { value: name, label: name }])
-                      return name
-                    }}
-                  />
-                )}
-              </div>
-            )
-          })}
-        </div>
-      </DialogContent>
-    </Dialog>
-  )
 }
 
 // ============================================================
@@ -200,13 +71,13 @@ function AccommodationDialog({
 export function TourItineraryTab({ tour }: TourItineraryTabProps) {
   const { user: currentUser } = useAuthStore()
   const { items: itineraries, refresh } = useItineraries()
+  const { syncToCore } = useSyncItineraryToCore()
 
   // State
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [currentItineraryId, setCurrentItineraryId] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'edit' | 'preview'>('edit')
-  const [accommodationOpen, setAccommodationOpen] = useState(false)
   const [attractionSelectorOpen, setAttractionSelectorOpen] = useState(false)
   const [attractionDayIndex, setAttractionDayIndex] = useState<number>(0)
   const mentionInputRefs = useRef<Record<number, MentionInputHandle | null>>({})
@@ -256,15 +127,18 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
     )
   }, [tour.location])
 
-  // Calculate days from tour dates
+  // Calculate days: 日期差 > days_count > 預設 5
   const calculateDays = useCallback(() => {
     if (tour.departure_date && tour.return_date) {
       const start = new Date(tour.departure_date)
       const end = new Date(tour.return_date)
       return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
     }
+    if (tour.days_count && tour.days_count > 0) {
+      return tour.days_count
+    }
     return 5
-  }, [tour.departure_date, tour.return_date])
+  }, [tour.departure_date, tour.return_date, tour.days_count])
 
   // Flight search hook
   const {
@@ -281,17 +155,29 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
   } = useFlightSearch({
     outboundFlight: searchOutboundFlight,
     setOutboundFlight: flight => {
-      // 加入陣列（支援多航段轉機）
+      // 搜尋結果填入空白列，沒有空白列才新增
       if (flight) {
-        setOutboundFlights(prev => [...prev, flight])
+        setOutboundFlights(prev => {
+          const emptyIdx = prev.findIndex(f => !f.flightNumber && !f.airline)
+          if (emptyIdx !== -1) {
+            return prev.map((f, i) => (i === emptyIdx ? flight : f))
+          }
+          return [...prev, flight]
+        })
       }
       setOutboundFlightNumber('')
     },
     returnFlight: searchReturnFlight,
     setReturnFlight: flight => {
-      // 加入陣列（支援多航段轉機）
+      // 搜尋結果填入空白列，沒有空白列才新增
       if (flight) {
-        setReturnFlights(prev => [...prev, flight])
+        setReturnFlights(prev => {
+          const emptyIdx = prev.findIndex(f => !f.flightNumber && !f.airline)
+          if (emptyIdx !== -1) {
+            return prev.map((f, i) => (i === emptyIdx ? flight : f))
+          }
+          return [...prev, flight]
+        })
       }
       setReturnFlightNumber('')
     },
@@ -381,6 +267,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
             const schedule = (
               itinerary.daily_itinerary as Array<{
                 title?: string
+                description?: string
                 meals?: { breakfast?: string; lunch?: string; dinner?: string }
                 accommodation?: string
                 isSameAccommodation?: boolean
@@ -404,6 +291,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                 dinnerSelf: day.meals?.dinner === COMP_TOURS_LABELS.敬請自理,
                 sameAsPrevious: day.isSameAccommodation || false,
                 attractions: attractions.length > 0 ? attractions : undefined,
+                note: day.description || undefined,
               }
             })
             setDailySchedule(schedule)
@@ -432,7 +320,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
   }, [tour.id, itineraries, tour.name, tour.departure_date, tour.return_date])
 
   // Update day schedule
-  const updateDaySchedule = useCallback((index: number, field: string, value: string | boolean) => {
+  const updateDaySchedule = useCallback((index: number, field: string, value: string | boolean | undefined) => {
     setDailySchedule(prev => {
       const newSchedule = [...prev]
       if (field.startsWith('meals.')) {
@@ -567,7 +455,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           date: dateLabel,
           title: dayTitle,
           highlight: '',
-          description: '',
+          description: day.note || '',
           activities: (day.attractions || []).map(a => ({
             icon: '📍',
             title: a.name,
@@ -628,6 +516,8 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
             : undefined,
       }
 
+      let savedItineraryId = currentItineraryId
+
       if (currentItineraryId) {
         await updateItinerary(currentItineraryId, itineraryData)
         await syncItineraryToQuote(currentItineraryId, formattedDailyItinerary)
@@ -638,10 +528,21 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           created_by: currentUser?.id || undefined,
         } as Parameters<typeof createItinerary>[0])
         if (newItinerary?.id) {
+          savedItineraryId = newItinerary.id
           setCurrentItineraryId(newItinerary.id)
           toast.success(TOUR_ITINERARY_TAB_LABELS.行程表已建立)
         }
       }
+
+      // 同步到核心表 tour_itinerary_items
+      if (savedItineraryId) {
+        syncToCore({
+          itinerary_id: savedItineraryId,
+          tour_id: tour.id,
+          daily_itinerary: formattedDailyItinerary as DailyItinerary[],
+        }).catch(err => logger.error('syncToCore error:', err))
+      }
+
       refresh()
     } catch (error) {
       logger.error(TOUR_ITINERARY_TAB_LABELS.儲存行程表失敗, error)
@@ -651,36 +552,90 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
     }
   }
 
-  // Print
+  // Print ref
+  const printContentRef = useRef<HTMLDivElement>(null)
+
+  // Print（iframe 方式，與快速報價單同邏輯）
   const handlePrint = useCallback(() => {
-    const printWindow = window.open('', '_blank')
-    if (!printWindow) return
+    if (!printContentRef.current) return
 
-    const dailyData = getPreviewDailyData()
-    // TODO: 需要重新實作 generatePrintHtml 函數（從 proposals feature 移除後）
-    const printContent = `
+    const originalTitle = document.title
+    const printTitle = `${title || tour.name || TOUR_ITINERARY_TAB_LABELS.行程表}`
+    document.title = printTitle
+
+    const iframe = document.createElement('iframe')
+    iframe.style.position = 'absolute'
+    iframe.style.width = '0'
+    iframe.style.height = '0'
+    iframe.style.border = 'none'
+    iframe.style.left = '-9999px'
+    document.body.appendChild(iframe)
+
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
+    if (!iframeDoc) {
+      document.body.removeChild(iframe)
+      document.title = originalTitle
+      return
+    }
+
+    iframeDoc.open()
+    iframeDoc.write(`
+      <!DOCTYPE html>
       <html>
-        <head><title>${title || TOUR_ITINERARY_TAB_LABELS.行程表}</title></head>
-        <body>
-          <h1>{TOUR_ITINERARY_TAB_LABELS.PRINT_5670}</h1>
-          <p>{TOUR_ITINERARY_TAB_LABELS.PRINT_5535}</p>
-        </body>
+      <head>
+        <meta charset="utf-8">
+        <title>${printTitle}</title>
+        <style>
+          @page { size: A4; margin: 10mm; }
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #333;
+            background: white;
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+          }
+          .print-container { padding: 16px; }
+          h1 { font-size: 20px; font-weight: bold; color: #4a4a4a; }
+          .header-bar { border-bottom: 2px solid #B8A99A; padding-bottom: 12px; margin-bottom: 20px; }
+          .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+          .workspace-code { font-size: 14px; font-weight: 600; color: #B8A99A; }
+          .meta-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 12px; font-size: 13px; }
+          .meta-label { color: #999; }
+          .flight-section { margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 13px; }
+          .flight-title { font-weight: 600; color: #B8A99A; margin-bottom: 6px; }
+          .flight-info { color: #666; }
+          .flight-info span.bold { font-weight: 500; color: #4a4a4a; }
+          table { width: 100%; border-collapse: collapse; font-size: 13px; }
+          thead tr { background-color: #B8A99A !important; color: white; }
+          th { padding: 8px 10px; text-align: left; border: 1px solid rgba(184,169,154,0.5); font-weight: 600; }
+          th.center { text-align: center; }
+          td { padding: 8px 10px; border: 1px solid #e5e5e5; }
+          td.center { text-align: center; }
+          tr:nth-child(even) { background-color: #fafafa; }
+          .day-label { font-weight: 600; color: #B8A99A; }
+          .day-date { font-size: 11px; color: #999; }
+          .footer { margin-top: 24px; text-align: center; font-size: 11px; color: #ccc; border-top: 1px solid #eee; padding-top: 12px; }
+          svg { display: none; }
+        </style>
+      </head>
+      <body>
+        ${printContentRef.current.innerHTML}
+      </body>
       </html>
-    `
+    `)
+    iframeDoc.close()
 
-    printWindow.document.write(printContent)
-    printWindow.document.close()
-    printWindow.print()
-  }, [
-    getPreviewDailyData,
-    title,
-    outboundFlights,
-    returnFlights,
-    tour.departure_date,
-    tour.location,
-    currentUser?.workspace_code,
-    isDomestic,
-  ])
+    setTimeout(() => {
+      iframe.contentWindow?.print()
+      setTimeout(() => {
+        document.body.removeChild(iframe)
+        document.title = originalTitle
+      }, 1000)
+    }, 100)
+  }, [title, tour.name])
 
   // Compute date label for a given day index
   const getDateLabel = useCallback(
@@ -727,31 +682,31 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           </div>
         </div>
 
-        <div className="border rounded-lg p-6 bg-card">
-          <div className="border-b-2 border-morandi-gold pb-4 mb-6">
-            <div className="flex items-start justify-between">
+        <div ref={printContentRef} className="border rounded-lg p-6 bg-card print-container">
+          <div className="header-bar border-b-2 border-morandi-gold pb-4 mb-6">
+            <div className="header-top flex items-start justify-between">
               <h1 className="text-xl font-bold text-morandi-primary">
                 {title || TOUR_ITINERARY_TAB_LABELS.行程表}
               </h1>
-              <span className="text-sm font-semibold text-morandi-gold">
+              <span className="workspace-code text-sm font-semibold text-morandi-gold">
                 {currentUser?.workspace_code || TOUR_ITINERARY_TAB_LABELS.TRAVEL_AGENCY}
               </span>
             </div>
-            <div className="mt-4 grid grid-cols-3 gap-4 text-sm">
+            <div className="meta-grid mt-4 grid grid-cols-3 gap-4 text-sm">
               <div>
-                <span className="text-muted-foreground">
+                <span className="meta-label text-muted-foreground">
                   {TOUR_ITINERARY_TAB_LABELS.目的地_冒號}
                 </span>
                 {tour.location || '-'}
               </div>
               <div>
-                <span className="text-muted-foreground">
+                <span className="meta-label text-muted-foreground">
                   {TOUR_ITINERARY_TAB_LABELS.出發日期}：
                 </span>
                 {tour.departure_date || '-'}
               </div>
               <div>
-                <span className="text-muted-foreground">
+                <span className="meta-label text-muted-foreground">
                   {TOUR_ITINERARY_TAB_LABELS.行程天數_冒號}
                 </span>
                 {dailyData.length} {TOUR_ITINERARY_TAB_LABELS.天}
@@ -759,51 +714,108 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
             </div>
           </div>
 
-          <table className="w-full border-collapse text-sm">
+          {/* 航班資訊 */}
+          {outboundFlights.some(f => f.flightNumber) || returnFlights.some(f => f.flightNumber) ? (
+            <div className="flight-section mb-6 grid grid-cols-2 gap-4 text-sm">
+              {outboundFlights.some(f => f.flightNumber) && (
+                <div>
+                  <h4 className="flight-title font-semibold text-morandi-gold mb-2 flex items-center gap-1">
+                    <Plane className="w-4 h-4" />
+                    去程
+                  </h4>
+                  {outboundFlights.filter(f => f.flightNumber).map((f, i) => (
+                    <div key={i} className="flight-info flex items-center gap-2 text-muted-foreground">
+                      <span className="bold font-medium text-morandi-primary">{f.airline} {f.flightNumber}</span>
+                      <span>{f.departureAirport} {f.departureTime}</span>
+                      <span>→</span>
+                      <span>{f.arrivalAirport} {f.arrivalTime}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {returnFlights.some(f => f.flightNumber) && (
+                <div>
+                  <h4 className="flight-title font-semibold text-morandi-gold mb-2 flex items-center gap-1">
+                    <Plane className="w-4 h-4" />
+                    回程
+                  </h4>
+                  {returnFlights.filter(f => f.flightNumber).map((f, i) => (
+                    <div key={i} className="flight-info flex items-center gap-2 text-muted-foreground">
+                      <span className="bold font-medium text-morandi-primary">{f.airline} {f.flightNumber}</span>
+                      <span>{f.departureAirport} {f.departureTime}</span>
+                      <span>→</span>
+                      <span>{f.arrivalAirport} {f.arrivalTime}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : null}
+
+          <table className="w-full border-collapse text-[13px]">
             <thead>
               <tr className="bg-morandi-gold text-white">
-                <th className="border border-morandi-gold/50 px-3 py-2 text-left w-20">
+                <th className="border border-morandi-gold/50 px-3 py-2 text-left w-16">
                   {TOUR_ITINERARY_TAB_LABELS.日期_表頭}
                 </th>
                 <th className="border border-morandi-gold/50 px-3 py-2 text-left">
                   {TOUR_ITINERARY_TAB_LABELS.行程內容}
                 </th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-28">
-                  {TOUR_ITINERARY_TAB_LABELS.早餐_表頭}
-                </th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-28">
-                  {TOUR_ITINERARY_TAB_LABELS.午餐_表頭}
-                </th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-center w-28">
-                  {TOUR_ITINERARY_TAB_LABELS.晚餐_表頭}
-                </th>
-                <th className="border border-morandi-gold/50 px-3 py-2 text-left w-48">
-                  {TOUR_ITINERARY_TAB_LABELS.住宿_表頭}
-                </th>
               </tr>
             </thead>
             <tbody>
-              {dailyData.map((day, index) => (
-                <tr key={index} className={index % 2 === 0 ? 'bg-card' : 'bg-muted/20'}>
-                  <td className="border border-muted px-3 py-2">
-                    <div className="font-semibold text-morandi-gold">{day.dayLabel}</div>
-                    <div className="text-xs text-muted-foreground">{day.date}</div>
-                  </td>
-                  <td className="border border-muted px-3 py-2 font-medium">{day.title}</td>
-                  <td className="border border-muted px-3 py-2 text-center text-xs">
-                    {day.meals.breakfast || '-'}
-                  </td>
-                  <td className="border border-muted px-3 py-2 text-center text-xs">
-                    {day.meals.lunch || '-'}
-                  </td>
-                  <td className="border border-muted px-3 py-2 text-center text-xs">
-                    {day.meals.dinner || '-'}
-                  </td>
-                  <td className="border border-muted px-3 py-2 text-xs">
-                    {day.accommodation || '-'}
-                  </td>
-                </tr>
-              ))}
+              {dailyData.map((day, index) => {
+                const rowCount = 2 + (day.note ? 1 : 0) + (day.accommodation ? 1 : 0)
+                return (
+                  <Fragment key={index}>
+                    {/* 行程路線 */}
+                    <tr className={index % 2 === 0 ? 'bg-card' : 'bg-muted/20'}>
+                      <td className="border border-muted px-3 py-2 align-middle text-center font-semibold text-morandi-gold" rowSpan={rowCount}>
+                        {day.date || day.dayLabel}
+                      </td>
+                      <td className="border border-muted px-3 py-2 font-medium">
+                        {day.title}
+                      </td>
+                    </tr>
+                    {/* 備註 */}
+                    {day.note && (
+                      <tr className={index % 2 === 0 ? 'bg-card' : 'bg-muted/20'}>
+                        <td className="border border-muted px-3 py-1.5">
+                          <span className="text-morandi-gold text-[12px]">※{day.note}</span>
+                        </td>
+                      </tr>
+                    )}
+                    {/* 餐食 */}
+                    <tr className={index % 2 === 0 ? 'bg-card' : 'bg-muted/20'}>
+                      <td className="border border-muted px-0 py-1.5">
+                        <div className="grid grid-cols-3 text-[12px]">
+                          <div className="flex items-center gap-2 px-3">
+                            <span className="font-medium text-muted-foreground shrink-0">{TOUR_ITINERARY_TAB_LABELS.早餐_表頭}</span>
+                            <span>{day.meals.breakfast || 'X'}</span>
+                          </div>
+                          <div className="flex items-center gap-2 px-3 border-l border-muted">
+                            <span className="font-medium text-muted-foreground shrink-0">{TOUR_ITINERARY_TAB_LABELS.午餐_表頭}</span>
+                            <span>{day.meals.lunch || 'X'}</span>
+                          </div>
+                          <div className="flex items-center gap-2 px-3 border-l border-muted">
+                            <span className="font-medium text-muted-foreground shrink-0">{TOUR_ITINERARY_TAB_LABELS.晚餐_表頭}</span>
+                            <span>{day.meals.dinner || 'X'}</span>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                    {/* 住宿 */}
+                    {day.accommodation && (
+                      <tr className={index % 2 === 0 ? 'bg-card' : 'bg-muted/20'}>
+                        <td className="border border-muted px-3 py-1.5 text-[12px]">
+                          <span className="font-medium text-muted-foreground mr-2">{TOUR_ITINERARY_TAB_LABELS.住宿_表頭}</span>
+                          <span>{day.accommodation}</span>
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
+                )
+              })}
             </tbody>
           </table>
         </div>
@@ -896,15 +908,6 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
               className="h-8 text-sm"
             />
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setAccommodationOpen(true)}
-            className="h-8 gap-1"
-          >
-            <Hotel size={14} />
-            {TOUR_ITINERARY_TAB_LABELS.住宿設定}
-          </Button>
         </div>
 
         {/* Flights row (hidden for domestic) - Excel 風格可編輯欄位 */}
@@ -1009,21 +1012,80 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                       }
                       className="h-7 text-sm w-16 px-1 border-0 border-b border-border/30 rounded-none bg-transparent focus-visible:bg-white focus-visible:border focus-visible:rounded"
                     />
-                    <div className="flex-1 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setOutboundFlights(prev => prev.filter((_, i) => i !== index))
-                        }
-                        className="text-destructive/60 hover:text-destructive p-0.5"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
+                    {/* 右邊：第一列顯示搜尋控制，其他列顯示刪除鈕 */}
+                    {index === 0 ? (
+                      <div className="flex-1 flex items-center justify-end gap-1">
+                        <Input
+                          value={outboundFlightNumber}
+                          onChange={e => setOutboundFlightNumber(e.target.value.toUpperCase())}
+                          placeholder={TOUR_ITINERARY_TAB_LABELS.SEARCH_8458}
+                          className="h-7 text-xs w-36 px-1"
+                          onKeyDown={e => {
+                            if (e.key === 'Enter' && outboundFlightNumber) {
+                              handleSearchOutboundFlight()
+                            }
+                          }}
+                        />
+                        <DatePicker
+                          value={outboundFlightDate}
+                          onChange={date => setOutboundFlightDate(date || '')}
+                          placeholder={TOUR_ITINERARY_TAB_LABELS.日期_表頭}
+                          className="h-7 text-xs w-24"
+                        />
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={handleSearchOutboundFlight}
+                          disabled={searchingOutbound || !outboundFlightNumber}
+                          className="h-7 w-7 p-0 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                          title={TOUR_ITINERARY_TAB_LABELS.SEARCH_3338}
+                        >
+                          {searchingOutbound ? (
+                            <Loader2 size={12} className="animate-spin" />
+                          ) : (
+                            <Search size={12} />
+                          )}
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            setOutboundFlights(prev => [
+                              ...prev,
+                              {
+                                airline: '',
+                                flightNumber: '',
+                                departureAirport: '',
+                                departureTime: '',
+                                arrivalAirport: '',
+                                arrivalTime: '',
+                              },
+                            ])
+                          }
+                          className="h-7 w-7 p-0"
+                          title={TOUR_ITINERARY_TAB_LABELS.ADD_9636}
+                        >
+                          <Plus size={12} />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex-1 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setOutboundFlights(prev => prev.filter((_, i) => i !== index))
+                          }
+                          className="text-destructive/60 hover:text-destructive p-0.5"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
-                {/* 搜尋 / 新增列（表格最後一行） */}
-                {outboundSegments.length > 0 ? (
+                {/* 多航段選擇 */}
+                {outboundSegments.length > 0 && (
                   <div className="space-y-1 px-2 py-1.5 bg-morandi-gold/5">
                     <p className="text-xs text-muted-foreground">
                       {TOUR_ITINERARY_TAB_LABELS.此航班有多個航段_請選擇}
@@ -1048,73 +1110,6 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                     >
                       {COMP_TOURS_LABELS.取消}
                     </button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-1.5 text-sm px-2 py-1.5 bg-muted/5 border-t border-dashed border-border/30">
-                    <Input
-                      value={outboundFlightNumber}
-                      onChange={e => setOutboundFlightNumber(e.target.value.toUpperCase())}
-                      placeholder={TOUR_ITINERARY_TAB_LABELS.SEARCH_8458}
-                      className="h-7 text-sm w-40 px-1"
-                      onKeyDown={e =>
-                        e.key === 'Enter' &&
-                        (outboundFlightNumber
-                          ? handleSearchOutboundFlight()
-                          : setOutboundFlights(prev => [
-                              ...prev,
-                              {
-                                airline: '',
-                                flightNumber: '',
-                                departureAirport: '',
-                                departureTime: '',
-                                arrivalAirport: '',
-                                arrivalTime: '',
-                              },
-                            ]))
-                      }
-                    />
-                    <DatePicker
-                      value={outboundFlightDate}
-                      onChange={date => setOutboundFlightDate(date || '')}
-                      placeholder={TOUR_ITINERARY_TAB_LABELS.日期_表頭}
-                      className="h-7 text-sm w-28"
-                    />
-                    <Button
-                      type="button"
-                      size="sm"
-                      onClick={handleSearchOutboundFlight}
-                      disabled={searchingOutbound || !outboundFlightNumber}
-                      className="h-7 px-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-                      title={TOUR_ITINERARY_TAB_LABELS.SEARCH_3338}
-                    >
-                      {searchingOutbound ? (
-                        <Loader2 size={12} className="animate-spin" />
-                      ) : (
-                        <Search size={12} />
-                      )}
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() =>
-                        setOutboundFlights(prev => [
-                          ...prev,
-                          {
-                            airline: '',
-                            flightNumber: '',
-                            departureAirport: '',
-                            departureTime: '',
-                            arrivalAirport: '',
-                            arrivalTime: '',
-                          },
-                        ])
-                      }
-                      className="h-7 px-2 text-xs"
-                      title={TOUR_ITINERARY_TAB_LABELS.ADD_9636}
-                    >
-                      <Plus size={12} />
-                    </Button>
                   </div>
                 )}
               </div>
@@ -1219,19 +1214,78 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                       }
                       className="h-7 text-sm w-16 px-1 border-0 border-b border-border/30 rounded-none bg-transparent focus-visible:bg-white focus-visible:border focus-visible:rounded"
                     />
-                    <div className="flex-1 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        type="button"
-                        onClick={() => setReturnFlights(prev => prev.filter((_, i) => i !== index))}
-                        className="text-destructive/60 hover:text-destructive p-0.5"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
+                    {/* 右邊：第一列顯示搜尋控制，其他列顯示刪除鈕 */}
+                    {index === 0 ? (
+                      <div className="flex-1 flex items-center justify-end gap-1">
+                        <Input
+                          value={returnFlightNumber}
+                          onChange={e => setReturnFlightNumber(e.target.value.toUpperCase())}
+                          placeholder={TOUR_ITINERARY_TAB_LABELS.SEARCH_8458}
+                          className="h-7 text-xs w-36 px-1"
+                          onKeyDown={e => {
+                            if (e.key === 'Enter' && returnFlightNumber) {
+                              handleSearchReturnFlight()
+                            }
+                          }}
+                        />
+                        <DatePicker
+                          value={returnFlightDate}
+                          onChange={date => setReturnFlightDate(date || '')}
+                          placeholder={TOUR_ITINERARY_TAB_LABELS.日期_表頭}
+                          className="h-7 text-xs w-24"
+                        />
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={handleSearchReturnFlight}
+                          disabled={searchingReturn || !returnFlightNumber}
+                          className="h-7 w-7 p-0 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                          title={TOUR_ITINERARY_TAB_LABELS.SEARCH_3338}
+                        >
+                          {searchingReturn ? (
+                            <Loader2 size={12} className="animate-spin" />
+                          ) : (
+                            <Search size={12} />
+                          )}
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            setReturnFlights(prev => [
+                              ...prev,
+                              {
+                                airline: '',
+                                flightNumber: '',
+                                departureAirport: '',
+                                departureTime: '',
+                                arrivalAirport: '',
+                                arrivalTime: '',
+                              },
+                            ])
+                          }
+                          className="h-7 w-7 p-0"
+                          title={TOUR_ITINERARY_TAB_LABELS.ADD_9636}
+                        >
+                          <Plus size={12} />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex-1 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          type="button"
+                          onClick={() => setReturnFlights(prev => prev.filter((_, i) => i !== index))}
+                          className="text-destructive/60 hover:text-destructive p-0.5"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
-                {/* 搜尋 / 新增列（表格最後一行） */}
-                {returnSegments.length > 0 ? (
+                {/* 多航段選擇 */}
+                {returnSegments.length > 0 && (
                   <div className="space-y-1 px-2 py-1.5 bg-morandi-gold/5">
                     <p className="text-xs text-muted-foreground">
                       {TOUR_ITINERARY_TAB_LABELS.此航班有多個航段_請選擇}
@@ -1257,73 +1311,6 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                       {COMP_TOURS_LABELS.取消}
                     </button>
                   </div>
-                ) : (
-                  <div className="flex items-center gap-1.5 text-sm px-2 py-1.5 bg-muted/5 border-t border-dashed border-border/30">
-                    <Input
-                      value={returnFlightNumber}
-                      onChange={e => setReturnFlightNumber(e.target.value.toUpperCase())}
-                      placeholder={TOUR_ITINERARY_TAB_LABELS.SEARCH_8458}
-                      className="h-7 text-sm w-40 px-1"
-                      onKeyDown={e =>
-                        e.key === 'Enter' &&
-                        (returnFlightNumber
-                          ? handleSearchReturnFlight()
-                          : setReturnFlights(prev => [
-                              ...prev,
-                              {
-                                airline: '',
-                                flightNumber: '',
-                                departureAirport: '',
-                                departureTime: '',
-                                arrivalAirport: '',
-                                arrivalTime: '',
-                              },
-                            ]))
-                      }
-                    />
-                    <DatePicker
-                      value={returnFlightDate}
-                      onChange={date => setReturnFlightDate(date || '')}
-                      placeholder={TOUR_ITINERARY_TAB_LABELS.日期_表頭}
-                      className="h-7 text-sm w-28"
-                    />
-                    <Button
-                      type="button"
-                      size="sm"
-                      onClick={handleSearchReturnFlight}
-                      disabled={searchingReturn || !returnFlightNumber}
-                      className="h-7 px-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-                      title={TOUR_ITINERARY_TAB_LABELS.SEARCH_3338}
-                    >
-                      {searchingReturn ? (
-                        <Loader2 size={12} className="animate-spin" />
-                      ) : (
-                        <Search size={12} />
-                      )}
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() =>
-                        setReturnFlights(prev => [
-                          ...prev,
-                          {
-                            airline: '',
-                            flightNumber: '',
-                            departureAirport: '',
-                            departureTime: '',
-                            arrivalAirport: '',
-                            arrivalTime: '',
-                          },
-                        ])
-                      }
-                      className="h-7 px-2 text-xs"
-                      title={TOUR_ITINERARY_TAB_LABELS.ADD_9636}
-                    >
-                      <Plus size={12} />
-                    </Button>
-                  </div>
                 )}
               </div>
             </div>
@@ -1331,19 +1318,22 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
         )}
 
         {/* ── Daily schedule table ── */}
-        <table className="w-full border-collapse text-sm">
+        <table className="w-full border-collapse text-sm border border-border/30">
           <thead className="sticky top-0 z-10">
             <tr className="bg-morandi-gold text-white text-xs">
-              <th className="px-2 py-1.5 text-left w-16 font-medium">
+              <th className="px-2 py-1.5 text-left w-16 font-medium border-r border-white/20">
                 {TOUR_ITINERARY_TAB_LABELS.日期_表頭}
               </th>
-              <th className="px-2 py-1.5 text-left font-medium">
+              <th className="px-2 py-1.5 text-left font-medium border-r border-white/20">
                 {TOUR_ITINERARY_TAB_LABELS.行程內容}
               </th>
-              <th className="px-1 py-1.5 text-center w-[120px] font-medium">
+              <th className="px-1 py-1.5 text-center w-24 font-medium border-r border-white/20">
+                工具
+              </th>
+              <th className="px-1 py-1.5 text-center w-[120px] font-medium border-r border-white/20">
                 {TOUR_ITINERARY_TAB_LABELS.早餐_表頭}
               </th>
-              <th className="px-1 py-1.5 text-center w-[120px] font-medium">
+              <th className="px-1 py-1.5 text-center w-[120px] font-medium border-r border-white/20">
                 {TOUR_ITINERARY_TAB_LABELS.午餐_表頭}
               </th>
               <th className="px-1 py-1.5 text-center w-[120px] font-medium">
@@ -1356,98 +1346,87 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
               const isFirst = idx === 0
               const isLast = idx === dailySchedule.length - 1
               return (
-                <tr key={idx} className={`${idx % 2 === 1 ? 'bg-muted/10' : ''} group`}>
+                <Fragment key={idx}>
+                <tr className={`${idx % 2 === 1 ? 'bg-muted/5' : ''} group hover:bg-morandi-gold/5`}>
                   {/* Day + date */}
-                  <td className="px-2 py-1.5 border-b border-border/20 align-top">
+                  <td className="px-2 py-1 border border-border/20 align-middle">
                     <div className="font-semibold text-morandi-gold text-xs">Day {day.day}</div>
                     {getDateLabel(idx) && (
                       <div className="text-[10px] text-muted-foreground">{getDateLabel(idx)}</div>
                     )}
                   </td>
-                  {/* Route + symbol buttons */}
-                  <td className="px-2 py-1.5 border-b border-border/20 align-top">
-                    <div className="flex items-center gap-1">
-                      <MentionInput
-                        ref={el => { mentionInputRefs.current[idx] = el }}
-                        value={day.route || ''}
-                        onChange={val => updateDaySchedule(idx, 'route', val)}
-                        onAttractionSelect={attraction => handleMentionSelect(idx, attraction)}
-                        countryName={tour.location || ''}
-                        attractions={day.attractions}
-                        placeholder={
-                          isFirst
-                            ? COMP_TOURS_LABELS.抵達目的地
-                            : isLast
-                              ? COMP_TOURS_LABELS.返回台灣
-                              : COMP_TOURS_LABELS.今日行程標題
-                        }
-                        className="h-7 text-xs flex-1"
-                      />
-                      <div className="flex items-center gap-px shrink-0 opacity-40 group-hover:opacity-100 transition-opacity">
-                        <button
-                          type="button"
-                          onClick={() => mentionInputRefs.current[idx]?.insertAtCursor(' → ')}
-                          className="p-0.5 hover:bg-morandi-gold/20 rounded"
-                          title={COMP_TOURS_LABELS.插入箭頭}
-                        >
-                          <ArrowRight size={10} className="text-muted-foreground" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => mentionInputRefs.current[idx]?.insertAtCursor(' ⇀ ')}
-                          className="px-1 py-0.5 text-[9px] hover:bg-morandi-gold/20 rounded text-muted-foreground"
-                          title={COMP_TOURS_LABELS.插入鉤箭頭}
-                        >
-                          ⇀
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => mentionInputRefs.current[idx]?.insertAtCursor(' · ')}
-                          className="px-1 py-0.5 text-[9px] hover:bg-morandi-gold/20 rounded text-muted-foreground"
-                          title={COMP_TOURS_LABELS.插入間隔點}
-                        >
-                          ·
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => mentionInputRefs.current[idx]?.insertAtCursor(' | ')}
-                          className="p-0.5 hover:bg-morandi-gold/20 rounded"
-                          title={COMP_TOURS_LABELS.插入直線}
-                        >
-                          <Minus size={10} className="text-muted-foreground" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => mentionInputRefs.current[idx]?.insertAtCursor(' ⭐ ')}
-                          className="p-0.5 hover:bg-morandi-gold/20 rounded"
-                          title={COMP_TOURS_LABELS.插入星號}
-                        >
-                          <Sparkles size={10} className="text-muted-foreground" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => mentionInputRefs.current[idx]?.insertAtCursor(' ✈ ')}
-                          className="px-1 py-0.5 text-[9px] hover:bg-morandi-gold/20 rounded text-muted-foreground"
-                          title={COMP_TOURS_LABELS.插入飛機}
-                        >
-                          ✈
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setAttractionDayIndex(idx)
-                            setAttractionSelectorOpen(true)
-                          }}
-                          className="p-0.5 hover:bg-blue-100 rounded"
-                          title="選擇景點"
-                        >
-                          <MapPin size={10} className="text-blue-500" />
-                        </button>
-                      </div>
+                  {/* Route */}
+                  <td className="px-0 py-0 border border-border/20 align-middle">
+                    <MentionInput
+                      ref={el => { mentionInputRefs.current[idx] = el }}
+                      value={day.route || ''}
+                      onChange={val => updateDaySchedule(idx, 'route', val)}
+                      onAttractionSelect={attraction => handleMentionSelect(idx, attraction)}
+                      countryName={tour.location || ''}
+                      attractions={day.attractions}
+                      placeholder={
+                        isFirst
+                          ? COMP_TOURS_LABELS.抵達目的地
+                          : isLast
+                            ? COMP_TOURS_LABELS.返回台灣
+                            : COMP_TOURS_LABELS.今日行程標題
+                      }
+                      className="h-8 text-sm w-full border-0 shadow-none focus-visible:ring-0 rounded-none px-2 bg-transparent"
+                    />
+                  </td>
+                  {/* Tools */}
+                  <td className="px-1 py-0 border border-border/20 align-middle">
+                    <div className="flex items-center justify-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => mentionInputRefs.current[idx]?.insertAtCursor(' → ')}
+                        className="p-1 hover:bg-morandi-gold/20 rounded"
+                        title={COMP_TOURS_LABELS.插入箭頭}
+                      >
+                        <ArrowRight size={12} className="text-muted-foreground" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => mentionInputRefs.current[idx]?.insertAtCursor(' ⇀ ')}
+                        className="px-1 py-0.5 text-[10px] hover:bg-morandi-gold/20 rounded text-muted-foreground"
+                        title={COMP_TOURS_LABELS.插入鉤箭頭}
+                      >
+                        ⇀
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => mentionInputRefs.current[idx]?.insertAtCursor(' · ')}
+                        className="px-1 py-0.5 text-[10px] hover:bg-morandi-gold/20 rounded text-muted-foreground"
+                        title={COMP_TOURS_LABELS.插入間隔點}
+                      >
+                        ·
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAttractionDayIndex(idx)
+                          setAttractionSelectorOpen(true)
+                        }}
+                        className="p-1 hover:bg-blue-100 rounded"
+                        title="選擇景點"
+                      >
+                        <MapPin size={12} className="text-blue-500" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const hasNote = day.note !== undefined
+                          updateDaySchedule(idx, 'note', hasNote ? undefined : '')
+                        }}
+                        className={`px-1 py-0.5 text-[10px] font-medium rounded ${day.note !== undefined ? 'bg-morandi-gold/20 text-morandi-gold' : 'hover:bg-morandi-gold/20 text-muted-foreground'}`}
+                        title="備註"
+                      >
+                        PS
+                      </button>
                     </div>
                   </td>
                   {/* Breakfast */}
-                  <td className="px-1 py-1.5 border-b border-border/20 align-top">
+                  <td className="px-0 py-0 border border-border/20 align-middle">
                     <div className="relative">
                       <Input
                         value={
@@ -1457,7 +1436,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                         }
                         onChange={e => updateDaySchedule(idx, 'meals.breakfast', e.target.value)}
                         placeholder={COMP_TOURS_LABELS.早餐}
-                        className={`h-7 text-xs ${!isFirst ? 'pr-6' : ''}`}
+                        className={`h-8 text-sm border-0 shadow-none focus-visible:ring-0 rounded-none px-2 bg-transparent ${!isFirst ? 'pr-6' : ''}`}
                         disabled={day.hotelBreakfast}
                       />
                       {!isFirst && (
@@ -1478,13 +1457,13 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                     </div>
                   </td>
                   {/* Lunch */}
-                  <td className="px-1 py-1.5 border-b border-border/20 align-top">
+                  <td className="px-0 py-0 border border-border/20 align-middle">
                     <div className="relative">
                       <Input
                         value={day.lunchSelf ? COMP_TOURS_LABELS.敬請自理 : day.meals.lunch || ''}
                         onChange={e => updateDaySchedule(idx, 'meals.lunch', e.target.value)}
                         placeholder={COMP_TOURS_LABELS.午餐}
-                        className="h-7 text-xs pr-6"
+                        className="h-8 text-sm pr-6 border-0 shadow-none focus-visible:ring-0 rounded-none px-2 bg-transparent"
                         disabled={day.lunchSelf}
                       />
                       <button
@@ -1501,13 +1480,13 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                     </div>
                   </td>
                   {/* Dinner */}
-                  <td className="px-1 py-1.5 border-b border-border/20 align-top">
+                  <td className="px-0 py-0 border border-border/20 align-middle">
                     <div className="relative">
                       <Input
                         value={day.dinnerSelf ? COMP_TOURS_LABELS.敬請自理 : day.meals.dinner || ''}
                         onChange={e => updateDaySchedule(idx, 'meals.dinner', e.target.value)}
                         placeholder={COMP_TOURS_LABELS.晚餐}
-                        className="h-7 text-xs pr-6"
+                        className="h-8 text-sm pr-6 border-0 shadow-none focus-visible:ring-0 rounded-none px-2 bg-transparent"
                         disabled={day.dinnerSelf}
                       />
                       <button
@@ -1524,25 +1503,70 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                     </div>
                   </td>
                 </tr>
+                {/* Accommodation row (not for last day) */}
+                {!isLast && (
+                  <tr className={idx % 2 === 1 ? 'bg-muted/5' : ''}>
+                    <td className="px-2 py-0 border border-border/20 align-middle text-[10px] text-morandi-gold font-medium">
+                      <Hotel size={10} className="inline" />
+                    </td>
+                    <td colSpan={4} className="px-0 py-0 border border-border/20 align-middle">
+                      {day.sameAsPrevious ? (
+                        <div className="h-7 flex items-center px-2 text-sm text-muted-foreground">
+                          同上 ({getPreviousAccommodation(idx) || '-'})
+                        </div>
+                      ) : (
+                        <Input
+                          value={day.accommodation || ''}
+                          onChange={e => updateDaySchedule(idx, 'accommodation', e.target.value)}
+                          placeholder="輸入住宿飯店..."
+                          className="h-7 text-sm border-0 shadow-none focus-visible:ring-0 rounded-none px-2 bg-transparent"
+                        />
+                      )}
+                    </td>
+                    <td className="px-1 py-0 border border-border/20 align-middle text-center">
+                      {idx > 0 && (
+                        <label className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={!!day.sameAsPrevious}
+                            onChange={() => updateDaySchedule(idx, 'sameAsPrevious', !day.sameAsPrevious)}
+                            className="rounded border-morandi-secondary w-3 h-3"
+                          />
+                          同上
+                        </label>
+                      )}
+                    </td>
+                  </tr>
+                )}
+                {/* Note row */}
+                {day.note !== undefined && (
+                  <tr className={idx % 2 === 1 ? 'bg-muted/5' : ''}>
+                    <td className="px-2 py-0 border border-border/20 align-middle text-[10px] text-morandi-gold font-medium">
+                      PS
+                    </td>
+                    <td colSpan={5} className="px-0 py-0 border border-border/20 align-middle">
+                      <Input
+                        value={day.note || ''}
+                        onChange={e => updateDaySchedule(idx, 'note', e.target.value)}
+                        placeholder="輸入備註..."
+                        className="h-7 text-sm border-0 shadow-none focus-visible:ring-0 rounded-none px-2 bg-transparent text-muted-foreground"
+                      />
+                    </td>
+                  </tr>
+                )}
+                </Fragment>
               )
             })}
           </tbody>
         </table>
       </div>
 
-      {/* Accommodation Dialog */}
-      <AccommodationDialog
-        open={accommodationOpen}
-        onOpenChange={setAccommodationOpen}
-        dailySchedule={dailySchedule}
-        onUpdateAccommodation={updateDaySchedule}
-        getPreviousAccommodation={getPreviousAccommodation}
-      />
 
       {/* Attraction Selector */}
       <AttractionSelector
         isOpen={attractionSelectorOpen}
         onClose={() => setAttractionSelectorOpen(false)}
+        countryId={tour.country_id || ''}
         tourCountryName={tour.location || ''}
         dayTitle={dailySchedule[attractionDayIndex]?.route || ''}
         existingIds={allExistingAttractionIds}

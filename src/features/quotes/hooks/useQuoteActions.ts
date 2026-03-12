@@ -5,6 +5,7 @@ import { CostCategory, ParticipantCounts, SellingPrices, TierPricing } from '../
 import type { Quote, Tour } from '@/stores/types'
 import type { CreateInput } from '@/stores/core/types'
 import type { QuickQuoteItem } from '@/types/quote.types'
+import type { TourItineraryItem } from '@/features/tours/types/tour-itinerary-item.types'
 import { useQuoteSave } from './useQuoteSave'
 import { useQuoteTour } from './useQuoteTour'
 import { useQuoteGroupCostUpdate } from './useQuoteGroupCostUpdate'
@@ -40,6 +41,9 @@ interface UseQuoteActionsProps {
   quickQuoteCustomerInfo?: QuickQuoteCustomerInfo
   // 砍次表相關
   tierPricings?: TierPricing[]
+  // 核心表相關
+  coreItems?: TourItineraryItem[]
+  refreshCoreItems?: () => Promise<TourItineraryItem[] | undefined>
 }
 
 export const useQuoteActions = ({
@@ -60,6 +64,8 @@ export const useQuoteActions = ({
   quickQuoteItems,
   quickQuoteCustomerInfo,
   tierPricings,
+  coreItems,
+  refreshCoreItems,
 }: UseQuoteActionsProps) => {
   // 使用分離的 hooks
   const { handleSave } = useQuoteSave({
@@ -73,9 +79,12 @@ export const useQuoteActions = ({
     participantCounts,
     sellingPrices,
     setSaveSuccess,
+    setCategories,
     quickQuoteItems,
     quickQuoteCustomerInfo,
     tierPricings,
+    coreItems,
+    refreshCoreItems,
   })
 
   const { handleCreateTour } = useQuoteTour({

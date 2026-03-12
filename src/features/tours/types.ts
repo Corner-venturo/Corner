@@ -2,6 +2,8 @@ import { Tour } from '@/stores/types'
 
 export interface NewTourData {
   name: string
+  tour_type?: 'official' | 'proposal' | 'template' // 團類型
+  days_count?: number | null // 天數（提案/模板用）
   countryCode: string // 國家名稱 (如: 日本, 泰國)
   cityCode: string // 機場代碼 (如: TYO, BKK)
   cityName?: string // 城市名稱 (如: 東京, 曼谷)

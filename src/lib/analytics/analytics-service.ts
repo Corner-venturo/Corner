@@ -211,6 +211,7 @@ export class AnalyticsService {
       const grouped = new Map<string, number>()
 
       for (const tour of tours || []) {
+        if (!tour.departure_date) continue
         const date = new Date(tour.departure_date)
         const key = this.getTimeSeriesKey(date, groupBy)
 

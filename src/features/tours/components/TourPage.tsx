@@ -37,12 +37,13 @@ import { TourPriceTiersSectionLuxury } from '@/features/tours/components/section
 import { TourFAQSection } from '@/features/tours/components/sections/TourFAQSection'
 import { TourNoticesSection } from '@/features/tours/components/sections/TourNoticesSection'
 import { TourNavigation } from '@/features/tours/components/sections/TourNavigation'
-import { COMPANY } from '@/lib/constants/company'
+import { useCompanyInfo } from '@/hooks/useCompanyInfo'
 import type { TourPageProps } from '@/features/tours'
 
 export default function TourPage({ data, isPreview = false, viewMode = 'desktop' }: TourPageProps) {
   const dailyItinerary = Array.isArray(data.dailyItinerary) ? data.dailyItinerary : []
   const [companyLogoUrl, setCompanyLogoUrl] = useState<string | null>(null)
+  const { legalName: companyName, subtitle: companySubtitle } = useCompanyInfo()
 
   // 統一風格 - 所有區塊跟隨 coverStyle
   const style = data.coverStyle || 'original'
@@ -292,13 +293,13 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
                 <h3
                   className={`font-bold text-morandi-gold ${viewMode === 'mobile' ? 'text-lg' : 'text-2xl'}`}
                 >
-                  {COMPANY.name}
+                  {companyName}
                 </h3>
               )}
             </div>
-            <p className="text-morandi-secondary mb-6 text-sm">{COMPANY.subtitle}</p>
+            <p className="text-morandi-secondary mb-6 text-sm">{companySubtitle}</p>
             <p className="text-morandi-secondary text-xs">
-              © {new Date().getFullYear()} {COMPANY.name}. All rights reserved.
+              © {new Date().getFullYear()} {companyName}. All rights reserved.
             </p>
           </div>
         </div>

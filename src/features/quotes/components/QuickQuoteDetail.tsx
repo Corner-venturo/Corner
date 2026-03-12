@@ -61,8 +61,8 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({
         title={`快速報價單 ${quote.code || ''}`}
         showBackButton={true}
         onBack={() => {
-          if (quote.tour_id) {
-            router.push(`/tours?highlight=${quote.tour_id}`)
+          if (quote.tour_code) {
+            router.push(`/tours/${quote.tour_code}?tab=quick-quote`)
           } else {
             router.push('/quotes')
           }

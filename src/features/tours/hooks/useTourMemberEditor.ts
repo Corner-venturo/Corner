@@ -251,7 +251,7 @@ export function useTourMemberEditor(
       }
     } else if (field === 'birth_date') {
       member.birth_date = value
-      member.age = calculateAge(value, tour.departure_date, tour.return_date)
+      member.age = calculateAge(value, tour.departure_date || '', tour.return_date || '')
     } else if (field === 'gender') {
       if (value === COMP_TOURS_LABELS.男 || value.toLowerCase() === 'm' || value === '1') {
         member.gender = 'M'

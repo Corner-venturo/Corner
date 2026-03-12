@@ -512,6 +512,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                         onChange={value => setNewItem({ ...newItem, supplier_id: value })}
                         placeholder={REQUEST_DETAIL_DIALOG_LABELS.選擇付款對象}
                         className="[&_input]:h-8 [&_input]:text-xs [&_input]:bg-transparent"
+                        disablePortal
                       />
                     </div>
                     <div>
@@ -619,6 +620,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                               onChange={value => setEditItem({ ...editItem, supplier_id: value })}
                               placeholder={REQUEST_DETAIL_DIALOG_LABELS.選擇付款對象}
                               className="[&_input]:h-8 [&_input]:text-xs [&_input]:bg-transparent"
+                              disablePortal
                             />
                           </div>
                           <div>

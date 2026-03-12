@@ -46,13 +46,21 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
         colSpan={2}
         className={`py-3 px-4 text-sm text-morandi-primary text-center ${item.quantity && item.quantity !== 1 ? 'table-divider' : ''}`}
       >
-        <input
-          type="text"
-          value={item.name}
-          onChange={e => handleUpdateItem(categoryId, item.id, 'name', e.target.value)}
-          className={`${inputClass} text-center`}
-          placeholder={COST_ITEM_ROW_LABELS.輸入項目名稱}
-        />
+        <div className="flex items-center gap-1">
+          {item.day && (
+            <span className="text-xs text-morandi-secondary/70 whitespace-nowrap shrink-0">
+              D{item.day}
+              {item.sub_category === 'breakfast' ? ' 早' : item.sub_category === 'lunch' ? ' 午' : item.sub_category === 'dinner' ? ' 晚' : ''}
+            </span>
+          )}
+          <input
+            type="text"
+            value={item.name}
+            onChange={e => handleUpdateItem(categoryId, item.id, 'name', e.target.value)}
+            className={`${inputClass} text-center`}
+            placeholder={COST_ITEM_ROW_LABELS.輸入項目名稱}
+          />
+        </div>
       </td>
       <td className="py-3 px-4 text-sm text-morandi-secondary text-center table-divider">
         <CalcInput

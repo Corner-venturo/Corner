@@ -107,7 +107,7 @@ export async function unlinkTourQuotes(tourId: string): Promise<number> {
 }
 
 /**
- * 斷開旅遊團關聯的行程表（不刪除，只解除連結）
+ * 刪除旅遊團關聯的行程表
  */
 export async function unlinkTourItineraries(tourId: string): Promise<number> {
   const { data: linkedItineraries, error: queryError } = await supabase
@@ -123,15 +123,10 @@ export async function unlinkTourItineraries(tourId: string): Promise<number> {
   if (linkedItineraries && linkedItineraries.length > 0) {
     const { error } = await supabase
       .from('itineraries')
-      .update({
-        tour_id: null,
-        tour_code: null,
-        status: 'draft',
-        updated_at: new Date().toISOString(),
-      })
+      .delete()
       .eq('tour_id', tourId)
     if (error) {
-      logger.error('斷開行程表失敗:', error.message)
+      logger.error('刪除關聯行程表失敗:', error.message)
       throw error
     }
   }

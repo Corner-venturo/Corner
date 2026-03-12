@@ -364,11 +364,11 @@ function CreateItineraryDialog({
       // 帶入基本資訊
       formState.setNewItineraryTitle(selectedTour.name)
       formState.setNewItineraryTourCode(selectedTour.code)
-      formState.setNewItineraryDepartureDate(selectedTour.departure_date)
-      
+      formState.setNewItineraryDepartureDate(selectedTour.departure_date || '')
+
       // 計算天數
-      const departureDate = new Date(selectedTour.departure_date)
-      const returnDate = new Date(selectedTour.return_date)
+      const departureDate = selectedTour.departure_date ? new Date(selectedTour.departure_date) : new Date()
+      const returnDate = selectedTour.return_date ? new Date(selectedTour.return_date) : new Date()
       const days = Math.ceil((returnDate.getTime() - departureDate.getTime()) / (1000 * 60 * 60 * 24))
       formState.setNewItineraryDays(String(days))
       

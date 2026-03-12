@@ -37,6 +37,7 @@ export interface CostItem {
 
   // === 核心表關聯 ===
   itinerary_item_id?: string // 對應 tour_itinerary_items.id
+  sub_category?: string // 餐飲: breakfast/lunch/dinner；住宿: 房型
 
   // === 資源關聯（餐廳/飯店/景點）===
   resource_type?: CostItemResourceType // 資源類型

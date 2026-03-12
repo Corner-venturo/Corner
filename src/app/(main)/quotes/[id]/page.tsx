@@ -20,8 +20,6 @@ import {
   SyncToItineraryDialog,
   PrintableQuotation,
   LinkTourDialog,
-  ImportMealsDialog,
-  ImportActivitiesDialog,
   LocalPricingDialog,
 } from '@/features/quotes/components'
 import type { LocalTier } from '@/features/quotes/components/LocalPricingDialog'
@@ -38,7 +36,7 @@ import {
   generateUniqueId,
 } from '@/features/quotes/utils/priceCalculations'
 import { ID_LABELS } from './constants/labels'
-import { QUOTE_PAGE_LABELS, QUOTE_SYNC_LABELS, QUOTE_IMPORT_LABELS } from './constants/labels'
+import { QUOTE_PAGE_LABELS, QUOTE_SYNC_LABELS } from './constants/labels'
 
 export default function QuoteDetailPage() {
   // Scroll handling refs (必須在任何條件判斷之前宣告)
@@ -69,6 +67,10 @@ export default function QuoteDetailPage() {
     // 砍次表相關
     tierPricings,
     setTierPricings,
+    // 核心表
+    coreItems,
+    refreshCoreItems,
+    hasCoreChanges,
     // 404 狀態
     notFound,
     hasLoaded,
@@ -102,8 +104,6 @@ export default function QuoteDetailPage() {
     quote: quote ?? null,
     categories,
     accommodationDays,
-    setCategories,
-    setAccommodationDays,
     itineraries,
     updateItinerary: updateItinerary as unknown as (
       id: string,
@@ -154,6 +154,8 @@ export default function QuoteDetailPage() {
     setSaveSuccess,
     setCategories,
     tierPricings,
+    coreItems,
+    refreshCoreItems,
   })
   const { handleSave, handleCreateTour } = actions
 
@@ -190,42 +192,10 @@ export default function QuoteDetailPage() {
     syncOps.handleConfirmSync(syncDiffs)
   }, [syncOps, syncDiffs])
 
-  // 從行程帶入
-  const [importingFromItinerary, setImportingFromItinerary] = React.useState(false)
-  const handleImportFromItinerary = React.useCallback(async () => {
-    const tour_id = quote?.tour_id
-    if (!tour_id) {
-      toast.error(QUOTE_IMPORT_LABELS.IMPORT_NO_TOUR)
-      return
-    }
-    setImportingFromItinerary(true)
-    try {
-      const { importItineraryItemsToQuote } =
-        await import('@/features/quotes/services/quoteCoreTableSync')
-      const result = await importItineraryItemsToQuote(tour_id, categories)
-      if (result.success && result.imported_count > 0) {
-        setCategories(result.categories)
-        toast.success(QUOTE_IMPORT_LABELS.IMPORT_SUCCESS(result.imported_count))
-      } else if (result.imported_count === 0) {
-        toast.info(QUOTE_IMPORT_LABELS.IMPORT_EMPTY)
-      } else {
-        toast.error(QUOTE_IMPORT_LABELS.IMPORT_FAILED)
-      }
-    } catch {
-      toast.error(QUOTE_IMPORT_LABELS.IMPORT_FAILED)
-    } finally {
-      setImportingFromItinerary(false)
-    }
-  }, [quote?.tour_id, categories, setCategories])
-
   // 報價單預覽
   const [showQuotationPreview, setShowQuotationPreview] = React.useState(false)
   // 關聯旅遊團對話框
   const [showLinkTourDialog, setShowLinkTourDialog] = React.useState(false)
-  // 匯入餐飲對話框
-  const [showImportMealsDialog, setShowImportMealsDialog] = React.useState(false)
-  // 匯入景點對話框
-  const [showImportActivitiesDialog, setShowImportActivitiesDialog] = React.useState(false)
   // Local 報價對話框
   const [showLocalPricingDialog, setShowLocalPricingDialog] = React.useState(false)
 
@@ -270,63 +240,6 @@ export default function QuoteDetailPage() {
     },
     [quote, updateQuote]
   )
-
-  // 處理匯入餐飲
-  const handleImportMeals = React.useCallback(
-    (items: CostItem[]) => {
-      setCategories(prev => {
-        const newCategories = [...prev]
-        const mealsCategory = newCategories.find(cat => cat.id === 'meals')
-        if (mealsCategory) {
-          mealsCategory.items = [...mealsCategory.items, ...items]
-          mealsCategory.total = mealsCategory.items.reduce(
-            (sum, item) => sum + (item.total || 0),
-            0
-          )
-        }
-        return newCategories
-      })
-      toast.success(QUOTE_PAGE_LABELS.IMPORTED_MEALS(items.length))
-    },
-    [setCategories]
-  )
-
-  // 處理匯入景點
-  const handleImportActivities = React.useCallback(
-    (items: CostItem[]) => {
-      setCategories(prev => {
-        const newCategories = [...prev]
-        const activitiesCategory = newCategories.find(cat => cat.id === 'activities')
-        if (activitiesCategory) {
-          activitiesCategory.items = [...activitiesCategory.items, ...items]
-          activitiesCategory.total = activitiesCategory.items.reduce(
-            (sum, item) => sum + (item.total || 0),
-            0
-          )
-        }
-        return newCategories
-      })
-      toast.success(QUOTE_PAGE_LABELS.IMPORTED_ATTRACTIONS(items.length))
-    },
-    [setCategories]
-  )
-
-  // 開啟匯入對話框（需要先有關聯的行程表）
-  const handleOpenMealsImportDialog = React.useCallback(() => {
-    if (!quote?.itinerary_id) {
-      toast.error(QUOTE_PAGE_LABELS.NO_LINKED_ITINERARY)
-      return
-    }
-    setShowImportMealsDialog(true)
-  }, [quote])
-
-  const handleOpenActivitiesImportDialog = React.useCallback(() => {
-    if (!quote?.itinerary_id) {
-      toast.error(QUOTE_PAGE_LABELS.NO_LINKED_ITINERARY)
-      return
-    }
-    setShowImportActivitiesDialog(true)
-  }, [quote])
 
   // 計算總人數（成人 + 兒童佔床 + 兒童不佔床 + 單人房）
   const totalParticipants = React.useMemo(() => {
@@ -528,6 +441,12 @@ export default function QuoteDetailPage() {
         resourceName={QUOTE_PAGE_LABELS.THIS_QUOTE}
       />
 
+      {hasCoreChanges && (
+        <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2 rounded-md text-sm">
+          行程表已更新，有新的項目尚未報價。儲存時會自動更新。
+        </div>
+      )}
+
       <QuoteHeader
         isSpecialTour={isSpecialTour}
         isReadOnly={isReadOnly}
@@ -542,9 +461,7 @@ export default function QuoteDetailPage() {
         handleCreateTour={handleCreateTour}
         handleGenerateQuotation={handleGenerateQuotation}
         handleSyncToItinerary={handleSyncToItinerary}
-        handleSyncAccommodationFromItinerary={syncOps.handleSyncAccommodationFromItinerary}
-        onImportFromItinerary={quote?.tour_id ? handleImportFromItinerary : undefined}
-        importingFromItinerary={importingFromItinerary}
+
         onStatusChange={handleStatusChange}
         router={router}
         accommodationDays={accommodationDays}
@@ -620,8 +537,6 @@ export default function QuoteDetailPage() {
                         handleAddActivity={categoryOps.handleAddActivity}
                         handleUpdateItem={categoryOps.handleUpdateItem}
                         handleRemoveItem={categoryOps.handleRemoveItem}
-                        onOpenMealsImportDialog={handleOpenMealsImportDialog}
-                        onOpenActivitiesImportDialog={handleOpenActivitiesImportDialog}
                         onOpenLocalPricingDialog={
                           category.id === 'group-transport'
                             ? () => setShowLocalPricingDialog(true)
@@ -685,22 +600,6 @@ export default function QuoteDetailPage() {
         onClose={() => setShowLinkTourDialog(false)}
         onCreateNew={handleCreateNewTour}
         onLinkExisting={handleLinkExistingTour}
-      />
-
-      {/* 匯入餐飲對話框 */}
-      <ImportMealsDialog
-        isOpen={showImportMealsDialog}
-        onClose={() => setShowImportMealsDialog(false)}
-        meals={syncOps.itineraryMealsData}
-        onImport={handleImportMeals}
-      />
-
-      {/* 匯入景點對話框 */}
-      <ImportActivitiesDialog
-        isOpen={showImportActivitiesDialog}
-        onClose={() => setShowImportActivitiesDialog(false)}
-        activities={syncOps.itineraryActivitiesData}
-        onImport={handleImportActivities}
       />
 
       {/* Local 報價對話框 */}

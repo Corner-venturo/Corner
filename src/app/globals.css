@@ -1648,11 +1648,10 @@ input[type='number'] {
     display: none !important;
   }
 
-  /* 移除所有容器的間距 - 滿版 */
+  /* 移除頁面容器間距 - 滿版（不含 #print-overlay，報價單列印需要保留 Tailwind 間距） */
   html,
   body,
-  main,
-  div {
+  main {
     margin: 0 !important;
     padding: 0 !important;
   }
@@ -1783,14 +1782,14 @@ input[type='number'] {
   }
 
   #print-content tfoot {
-    display: table-row-group !important;
+    display: table-row-group;
   }
 
   /* === 通用列印輔助 class（新增，不影響現有樣式） === */
 
-  /* 只在列印時顯示 */
+  /* 只在列印時顯示（注意：PrintableWrapper 用 #print-overlay 前綴覆蓋此規則） */
   .print-only {
-    display: block !important;
+    display: table !important;
     visibility: visible !important;
   }
 

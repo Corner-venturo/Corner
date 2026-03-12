@@ -44,6 +44,50 @@ export function TourFormShell({
     setNewTour,
   })
 
+  const isProposalOrTemplate = newTour.tour_type === 'proposal' || newTour.tour_type === 'template'
+
+  // 決定標題
+  const getTitle = () => {
+    if (mode === 'edit') return TOUR_FORM.title_edit
+    if (isFromProposal) return TOUR_FORM.title_convert
+    if (newTour.tour_type === 'proposal') return TOUR_FORM.title_create_proposal
+    if (newTour.tour_type === 'template') return TOUR_FORM.title_create_template
+    return TOUR_FORM.title_create
+  }
+
+  // 決定送出按鈕文字
+  const getSubmitLabel = () => {
+    if (mode === 'edit') return submitting ? TOUR_FORM.submit_saving : TOUR_FORM.submit_save
+    if (isFromProposal) {
+      return submitting
+        ? TOUR_FORM.submit_converting
+        : newOrder.contact_person
+          ? TOUR_FORM.submit_convert_with_order
+          : TOUR_FORM.submit_convert
+    }
+    if (newTour.tour_type === 'proposal') return submitting ? TOUR_FORM.submit_creating : TOUR_FORM.submit_create_proposal
+    if (newTour.tour_type === 'template') return submitting ? TOUR_FORM.submit_creating : TOUR_FORM.submit_create_template
+    return submitting
+      ? TOUR_FORM.submit_creating
+      : newOrder.contact_person
+        ? TOUR_FORM.submit_create_with_order
+        : TOUR_FORM.submit_create
+  }
+
+  // 送出按鈕 disabled 條件
+  const isSubmitDisabled = () => {
+    if (submitting || !newTour.name.trim()) return true
+    if (isProposalOrTemplate) return false // 提案/模板只需要名稱
+    // 正式團需要日期
+    if (!newTour.departure_date || !newTour.return_date) return true
+    // 如果有填聯絡人（要建訂單），業務必填
+    if (!!newOrder.contact_person?.trim() && !newOrder.sales_person?.trim()) return true
+    return false
+  }
+
+  // 提案/模板用窄版（不需要訂單區塊）
+  const dialogWidth = isProposalOrTemplate ? 'max-w-2xl' : mode === 'edit' ? 'max-w-3xl' : 'max-w-6xl'
+
   return (
     <Dialog
       open={isOpen}
@@ -55,7 +99,7 @@ export function TourFormShell({
     >
       <DialogContent
         level={1}
-        className={`${mode === 'edit' ? 'max-w-3xl' : 'max-w-6xl'} w-[90vw] h-[80vh] overflow-hidden`}
+        className={`${dialogWidth} w-[90vw] h-[80vh] overflow-hidden`}
         aria-describedby={undefined}
         onInteractOutside={e => {
           const target = e.target as HTMLElement
@@ -72,13 +116,7 @@ export function TourFormShell({
         }}
       >
         <DialogHeader>
-          <DialogTitle>
-            {mode === 'edit'
-              ? TOUR_FORM.title_edit
-              : isFromProposal
-                ? TOUR_FORM.title_convert
-                : TOUR_FORM.title_create}
-          </DialogTitle>
+          <DialogTitle>{getTitle()}</DialogTitle>
         </DialogHeader>
 
         {/* Error message */}
@@ -93,7 +131,7 @@ export function TourFormShell({
 
         <div className="flex h-full overflow-hidden">
           {/* Left side - Tour info */}
-          <div className={`flex-1 ${mode === 'create' ? 'pr-6 border-r border-border' : ''}`}>
+          <div className={`flex-1 ${mode === 'create' && !isProposalOrTemplate ? 'pr-6 border-r border-border' : ''}`}>
             <div className="h-full overflow-y-auto">
               <h3 className="text-lg font-medium text-morandi-primary mb-4">
                 {TOUR_FORM.section_info}
@@ -101,22 +139,27 @@ export function TourFormShell({
               <div className="space-y-4">
                 <TourBasicInfo newTour={newTour} setNewTour={setNewTour} />
 
-                <TourFlightInfo
-                  newTour={newTour}
-                  setNewTour={setNewTour}
-                  loadingOutbound={loadingOutbound}
-                  loadingReturn={loadingReturn}
-                  handleSearchOutbound={handleSearchOutbound}
-                  handleSearchReturn={handleSearchReturn}
-                />
+                {/* 提案/模板不顯示航班和設定 */}
+                {!isProposalOrTemplate && (
+                  <>
+                    <TourFlightInfo
+                      newTour={newTour}
+                      setNewTour={setNewTour}
+                      loadingOutbound={loadingOutbound}
+                      loadingReturn={loadingReturn}
+                      handleSearchOutbound={handleSearchOutbound}
+                      handleSearchReturn={handleSearchReturn}
+                    />
 
-                <TourSettings newTour={newTour} setNewTour={setNewTour} />
+                    <TourSettings newTour={newTour} setNewTour={setNewTour} />
+                  </>
+                )}
               </div>
             </div>
           </div>
 
-          {/* Right side - Order info (只在新增模式顯示) */}
-          {mode === 'create' && (
+          {/* Right side - Order info (只在正式團新增模式顯示) */}
+          {mode === 'create' && !isProposalOrTemplate && (
             <div className="flex-1 pl-6">
               <div className="h-full overflow-y-auto">
                 <TourOrderSection newOrder={newOrder} setNewOrder={setNewOrder} />
@@ -133,31 +176,10 @@ export function TourFormShell({
           </Button>
           <Button
             onClick={onSubmit}
-            disabled={
-              submitting ||
-              !newTour.name.trim() ||
-              !newTour.departure_date ||
-              !newTour.return_date ||
-              // 如果有填聯絡人（要建訂單），業務必填
-              (!!newOrder.contact_person?.trim() && !newOrder.sales_person?.trim())
-            }
+            disabled={isSubmitDisabled()}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
-            {mode === 'edit'
-              ? submitting
-                ? TOUR_FORM.submit_saving
-                : TOUR_FORM.submit_save
-              : isFromProposal
-                ? submitting
-                  ? TOUR_FORM.submit_converting
-                  : newOrder.contact_person
-                    ? TOUR_FORM.submit_convert_with_order
-                    : TOUR_FORM.submit_convert
-                : submitting
-                  ? TOUR_FORM.submit_creating
-                  : newOrder.contact_person
-                    ? TOUR_FORM.submit_create_with_order
-                    : TOUR_FORM.submit_create}
+            {getSubmitLabel()}
           </Button>
         </div>
       </DialogContent>

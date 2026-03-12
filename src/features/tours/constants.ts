@@ -17,8 +17,11 @@ export const TOUR_FILTERS = {
   tab_closed: '已結團',
   tab_special: '特殊團',
   tab_archived: '封存',
+  tab_proposals: '提案',
+  tab_templates: '模板',
   add_button: '新增',
   add_proposal: '新增提案',
+  add_template: '新增模板',
   add_tour_direct: '開團',
 } as const
 
@@ -33,6 +36,12 @@ export const TOUR_TABLE = {
   col_salesperson: '業務員',
   col_assistant: 'OP',
   col_status: '狀態',
+  col_location: '目的地',
+  col_days: '天數',
+  col_days_unit: '天',
+  col_created: '建立日期',
+  col_actions: '操作',
+  convert_to_tour: '開團',
   empty_title: '沒有找到旅遊團',
   empty_subtitle: '請調整篩選條件或新增旅遊團',
 } as const
@@ -90,6 +99,8 @@ export const TOUR_FORM = {
   title_edit: '編輯旅遊團',
   title_convert: '提案轉開團',
   title_create: '新增旅遊團 & 訂單',
+  title_create_proposal: '新增提案',
+  title_create_template: '新增模板',
   section_info: '旅遊團資訊',
   cancel: '取消',
   submit_saving: '儲存中...',
@@ -100,6 +111,8 @@ export const TOUR_FORM = {
   submit_creating: '建立中...',
   submit_create_with_order: '新增旅遊團 & 訂單',
   submit_create: '新增旅遊團',
+  submit_create_proposal: '新增提案',
+  submit_create_template: '新增模板',
 } as const
 
 // ============================================================
@@ -110,6 +123,25 @@ export const TOUR_BASIC_INFO = {
   label_departure: '出發日期',
   label_return: '返回日期',
   label_description: '描述',
+  label_days_count: '天數',
+} as const
+
+// ============================================================
+// ConvertToTourDialog
+// ============================================================
+export const TOUR_CONVERT = {
+  title_proposal: '提案轉開團',
+  title_template: '模板轉開團',
+  description_proposal: '填入出發和回程日期，將此提案轉為正式旅遊團。',
+  description_template: '填入出發和回程日期，從此模板複製一份新的正式旅遊團。模板本身不會變動。',
+  label_departure: '出發日期',
+  label_return: '回程日期',
+  cancel: '取消',
+  confirm: '確認開團',
+  confirming: '開團中...',
+  success_proposal: '提案已轉為正式團',
+  success_template: '已從模板建立正式團',
+  error: '開團失敗',
 } as const
 
 // ============================================================

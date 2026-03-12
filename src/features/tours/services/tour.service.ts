@@ -135,7 +135,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
       return { canCancel: false, reason: TOUR_SERVICE_LABELS.TOUR_ALREADY_CLOSED }
     }
 
-    const departure_date = new Date(tour.departure_date)
+    const departure_date = new Date(tour.departure_date || '')
     const now = new Date()
     const daysDiff = Math.ceil((departure_date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
 

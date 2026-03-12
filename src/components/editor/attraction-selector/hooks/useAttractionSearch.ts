@@ -60,12 +60,14 @@ function parseDayTitleForAttractions(title: string): string[] {
 
 interface UseAttractionSearchProps {
   isOpen: boolean
+  countryId?: string
   tourCountryName?: string
   dayTitle?: string
 }
 
 export function useAttractionSearch({
   isOpen,
+  countryId,
   tourCountryName = '',
   dayTitle = '',
 }: UseAttractionSearchProps) {
@@ -77,9 +79,9 @@ export function useAttractionSearch({
   const [cities, setCities] = useState<City[]>([])
   const [countries, setCountries] = useState<Country[]>([])
 
-  // 載入所有國家
+  // 載入所有國家（當有直接 countryId 時跳過）
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen || countryId) return
 
     const loadCountries = async () => {
       const { data } = await supabase
@@ -90,11 +92,23 @@ export function useAttractionSearch({
       setCountries(data || [])
     }
     loadCountries().catch(err => logger.error('[loadCountries]', err))
-  }, [isOpen])
+  }, [isOpen, countryId])
 
-  // 打開對話框時自動選擇行程的國家
+  // 當有直接 countryId 時，直接設定（跳過模糊比對）
   useEffect(() => {
-    if (isOpen && countries.length > 0 && tourCountryName) {
+    if (isOpen && countryId) {
+      if (countryId !== selectedCountryId) {
+        setSelectedCountryId(countryId)
+        savedCountryId = countryId
+        setSelectedCityId('')
+        savedCityId = ''
+      }
+    }
+  }, [isOpen, countryId])
+
+  // 打開對話框時自動選擇行程的國家（舊版 tourCountryName 模糊比對，向後相容）
+  useEffect(() => {
+    if (isOpen && !countryId && countries.length > 0 && tourCountryName) {
       // 精確比對 → 包含比對 → 被包含比對
       const name = tourCountryName.trim()
       const matchedCountry =
@@ -108,7 +122,7 @@ export function useAttractionSearch({
         savedCityId = ''
       }
     }
-  }, [isOpen, tourCountryName, countries])
+  }, [isOpen, countryId, tourCountryName, countries])
 
   // 打開對話框時清空搜尋框，讓建議景點排在最前面
   useEffect(() => {
@@ -133,9 +147,9 @@ export function useAttractionSearch({
     savedCityId = value
   }
 
-  // 載入城市列表（根據選擇的國家）
+  // 載入城市列表（當有直接 countryId 時跳過，不需要城市篩選）
   useEffect(() => {
-    if (!isOpen || !selectedCountryId) {
+    if (!isOpen || !selectedCountryId || countryId) {
       setCities([])
       return
     }
@@ -157,7 +171,7 @@ export function useAttractionSearch({
     }
 
     loadCities()
-  }, [isOpen, selectedCountryId])
+  }, [isOpen, selectedCountryId, countryId])
 
   // 載入景點資料（包含經緯度）
   useEffect(() => {

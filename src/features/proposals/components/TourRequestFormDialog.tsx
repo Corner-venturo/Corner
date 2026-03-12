@@ -24,7 +24,7 @@ import { Input } from '@/components/ui/input'
 import { X, Printer, FileText, Plus, Trash2, Loader2, Receipt, Send, Building2 } from 'lucide-react'
 import { SupplierSearchInput, type Supplier as SupplierData } from './SupplierSearchInput'
 import { usePrintLogo } from '@/features/quotes/components/printable/shared/usePrintLogo'
-import { COMPANY } from '@/lib/constants/company'
+import { useCompanyInfo } from '@/hooks/useCompanyInfo'
 import { supabase } from '@/lib/supabase/client'
 import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { useAuthStore, useEmployeeStore } from '@/stores'
@@ -143,6 +143,7 @@ export function TourRequestFormDialog({
   const router = useRouter()
   const { user } = useAuthStore()
   const { toast } = useToast()
+  const { subtitle: companySubtitle } = useCompanyInfo()
   const { items: employees, fetchAll: fetchEmployees } = useEmployeeStore()
 
   // 編輯狀態的項目
@@ -413,7 +414,7 @@ export function TourRequestFormDialog({
           </tbody>
         </table>
 
-        <div class="footer">${COMPANY.subtitle}</div>
+        <div class="footer">${companySubtitle}</div>
       </body>
       </html>
     `

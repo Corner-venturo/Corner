@@ -27,6 +27,9 @@ import {
   createTourLeader,
 } from '@/data'
 import { syncHotelsFromItineraryToQuote } from '@/features/quotes/services/quoteItinerarySync'
+import { useSyncItineraryToCore } from '@/features/tours/hooks/useTourItineraryItems'
+import { updateTour } from '@/data'
+import type { DailyItinerary } from '@/components/editor/tour-form/types'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { formatDateTW, formatDateCompactPadded } from '@/lib/utils/format-date'
 import type { Tour, Itinerary } from '@/stores/types'
@@ -137,6 +140,7 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
   const { items: quotes } = useQuotes()
   const { items: countries } = useCountries()
   const { items: cities } = useCities()
+  const { syncToCore } = useSyncItineraryToCore()
 
   // 狀態
   const [loading, setLoading] = useState(true)
@@ -266,9 +270,10 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
         version_records: itinerary.version_records || [],
       })
 
-      // 載入報價單檻次表
-      if (relatedQuote?.tier_pricings) {
-        setQuoteTierPricings(relatedQuote.tier_pricings as TierPricing[])
+      // 載入砍次表（優先從 tour，fallback 到 relatedQuote）
+      const tp = (relatedTour?.tier_pricings ?? relatedQuote?.tier_pricings) as TierPricing[] | undefined
+      if (tp && tp.length > 0) {
+        setQuoteTierPricings(tp)
       }
     },
     [tours, quotes, tour.id]
@@ -337,6 +342,15 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
             currentItineraryId,
             convertedData.daily_itinerary as { accommodation?: string }[]
           ).catch(err => logger.error('飯店同步錯誤:', err))
+
+          // 同步到核心表
+          logger.log('🔄 syncToCore called', { itinerary_id: currentItineraryId, tour_id: tour.id, days: (convertedData.daily_itinerary as DailyItinerary[]).length })
+          syncToCore({
+            itinerary_id: currentItineraryId,
+            tour_id: tour.id,
+            daily_itinerary: convertedData.daily_itinerary as DailyItinerary[],
+          }).then(result => logger.log('✅ syncToCore result:', result))
+            .catch(err => logger.error('❌ syncToCore error:', err))
         }
 
         // 同步領隊到 tour_leaders 表
@@ -379,6 +393,7 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
 
         if (newItinerary?.id) {
           setCurrentItineraryId(newItinerary.id)
+          updateTour(tour.id, { itinerary_id: newItinerary.id })
         }
       }
 
@@ -390,7 +405,7 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
       setAutoSaveStatus('error')
       toast.error(TOUR_WEBPAGE_TAB_LABELS.AUTO_SAVE_FAILED)
     }
-  }, [currentItineraryId, convertDataForSave, user?.id])
+  }, [currentItineraryId, convertDataForSave, user?.id, syncToCore, tour.id])
 
   // 保持 performAutoSave 的最新引用
   useEffect(() => {
@@ -465,6 +480,7 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
 
       if (newItinerary?.id) {
         setCurrentItineraryId(newItinerary.id)
+        updateTour(tour.id, { itinerary_id: newItinerary.id })
         toast.success(TOUR_WEBPAGE_TAB_LABELS.ITINERARY_CREATED)
       }
     } catch (error) {

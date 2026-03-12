@@ -309,7 +309,7 @@ export async function GET(request: NextRequest) {
         tour_id: tour.id,
         tour_code: tour.code,
         tour_name: tour.name,
-        departure_date: tour.departure_date,
+        departure_date: tour.departure_date || '',
         orders: orderStatsArray,
         total_ticketed: tourTotals.ticketed,
         total_needs_ticketing: tourTotals.needs_ticketing,

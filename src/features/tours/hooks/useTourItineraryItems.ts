@@ -289,8 +289,26 @@ export function useSyncItineraryToCore() {
             }
           }
 
-          // Accommodation
+          // Accommodation — 續住時解析完整飯店名稱
           if (day.accommodation) {
+            let resolvedAccommodation = day.accommodation
+            if (day.isSameAccommodation || resolvedAccommodation.startsWith('同上')) {
+              // 從「同上 (XXX)」提取飯店名，或往前找上一天的住宿
+              const match = resolvedAccommodation.match(/同上\s*[（(](.+?)[）)]/)
+              if (match) {
+                resolvedAccommodation = match[1]
+              } else if (day_index > 0) {
+                // 往前找最近一天有住宿的
+                for (let prev = day_index - 1; prev >= 0; prev--) {
+                  const prevAcc = daily_itinerary[prev].accommodation
+                  if (prevAcc && !prevAcc.startsWith('同上')) {
+                    resolvedAccommodation = prevAcc
+                    break
+                  }
+                }
+              }
+            }
+
             const has_downstream = items_with_downstream.some(
               item =>
                 item.day_number === day_number &&
@@ -298,7 +316,7 @@ export function useSyncItineraryToCore() {
             )
             if (!has_downstream) {
               const item = accommodationToItem(
-                day.accommodation,
+                resolvedAccommodation,
                 day_number,
                 sort,
                 service_date,

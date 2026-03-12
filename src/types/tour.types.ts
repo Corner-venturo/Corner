@@ -4,6 +4,7 @@
  */
 
 import { BaseEntity } from './base.types'
+import type { TierPricing } from './quote-store.types'
 
 // ============================================
 // 航班相關型別
@@ -419,11 +420,13 @@ export interface FAQ {
 export interface Tour extends BaseEntity {
   code: string // 團號（統一使用 code）
   name: string // 團名
+  tour_type?: TourType | null // 團類型：official/proposal/template
+  days_count?: number | null // 天數（提案/模板用）
   location?: string | null // 目的地（相容舊欄位：destination）
   country_id?: string | null // 國家 ID
   main_city_id?: string | null // 主要城市 ID
-  departure_date: string // 出發日期 (ISO 8601)（相容舊欄位：start_date）
-  return_date: string // 返回日期 (ISO 8601)（相容舊欄位：end_date）
+  departure_date: string | null // 出發日期 (ISO 8601)（提案/模板可為 null）
+  return_date: string | null // 返回日期 (ISO 8601)（提案/模板可為 null）
   status?: string | null // 狀態（英文）
   price?: number | null // 基本價格
   selling_price_per_person?: number | null // 每人售價（從報價單帶入）
@@ -462,6 +465,12 @@ export interface Tour extends BaseEntity {
   // 報到功能欄位
   enable_checkin?: boolean | null // 是否開啟報到功能
   checkin_qrcode?: string | null // 團體報到 QR Code 內容
+
+  // 定價欄位（從報價單搬過來，一個團 = 一個報價單）
+  selling_prices?: { adult: number; child_with_bed: number; child_no_bed: number; single_room: number; infant: number } | null
+  participant_counts?: { adult: number; child_with_bed: number; child_no_bed: number; single_room: number; infant: number } | null
+  tier_pricings?: TierPricing[] | null
+  accommodation_days?: number | null
 
   // 航班資訊（支援多航段轉機）
   outbound_flight?: FlightInfo | FlightInfo[] | null // 去程航班
@@ -521,6 +530,14 @@ export type ContractTemplate =
 /**
  * TourCategory - 旅遊團分類
  */
+/**
+ * TourType - 旅遊團類型
+ * - official: 正式開團（有日期、有團號）
+ * - proposal: 提案（沒有日期，開團時補日期產生團號）
+ * - template: 模板（沒有日期，開團時複製一份新團）
+ */
+export type TourType = 'official' | 'proposal' | 'template'
+
 export type TourCategory =
   | 'domestic' // 國內
   | 'international' // 國外
@@ -539,9 +556,11 @@ export type TourCategory =
 export interface CreateTourData {
   code?: string // 可選，由 createStore 自動生成
   name: string
+  tour_type?: TourType
+  days_count?: number | null
   location: string
-  departure_date: string
-  return_date: string
+  departure_date: string | null
+  return_date: string | null
   status: TourStatus
   price: number
   selling_price_per_person?: number
@@ -560,9 +579,11 @@ export interface CreateTourData {
 export interface UpdateTourData {
   code?: string
   name?: string
+  tour_type?: TourType
+  days_count?: number | null
   location?: string
-  departure_date?: string
-  return_date?: string
+  departure_date?: string | null
+  return_date?: string | null
   status?: TourStatus
   price?: number
   selling_price_per_person?: number
@@ -573,6 +594,11 @@ export interface UpdateTourData {
   profit?: number
   quote_id?: string
   quote_cost_structure?: unknown
+  // 定價欄位
+  selling_prices?: { adult: number; child_with_bed: number; child_no_bed: number; single_room: number; infant: number } | null
+  participant_counts?: { adult: number; child_with_bed: number; child_no_bed: number; single_room: number; infant: number } | null
+  tier_pricings?: TierPricing[] | null
+  accommodation_days?: number | null
 }
 
 // ============================================
@@ -599,9 +625,11 @@ export interface TourListItem {
   id: string
   code: string
   name: string
+  tour_type?: TourType | null
+  days_count?: number | null
   location: string
-  departure_date: string
-  return_date: string
+  departure_date: string | null
+  return_date: string | null
   status: TourStatus
   max_participants: number
   price: number

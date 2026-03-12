@@ -120,6 +120,7 @@ export function getPreviewDailyData(
       dayLabel: `Day ${day.day}`,
       date: dateLabel,
       title,
+      note: day.note || undefined,
       meals: { breakfast, lunch, dinner },
       accommodation: isLast ? '' : accommodation,
     }

@@ -17,8 +17,8 @@ interface Tour {
   id: string
   code: string
   name: string
-  departure_date: string
-  return_date: string
+  departure_date: string | null
+  return_date: string | null
   current_participants: number | null
   status: string | null
 }
@@ -101,7 +101,7 @@ export default function MobileHomePage() {
     return_date: tour.return_date,
     total_people: tour.current_participants || 0,
     status: tour.status || '開團',
-    duration_nights: calculateNights(tour.departure_date, tour.return_date),
+    duration_nights: calculateNights(tour.departure_date || '', tour.return_date || ''),
   })
 
   // 轉換 Todo 資料為 TodoCard 需要的格式

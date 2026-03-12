@@ -6,8 +6,11 @@ import { logger } from '@/lib/utils/logger'
 import { CostCategory, ParticipantCounts, SellingPrices, TierPricing } from '../types'
 import type { Quote } from '@/stores/types'
 import type { QuickQuoteItem } from '@/types/quote.types'
-import { syncHotelsFromQuoteToItinerary } from '../services/quoteItinerarySync'
-import { syncQuotePricingToCore } from '../services/quoteCoreTableSync'
+import type { TourItineraryItem } from '@/features/tours/types/tour-itinerary-item.types'
+import { useAuthStore } from '@/stores/auth-store'
+import { updateTour } from '@/data'
+import { writePricingToCore, coreItemsToCostCategories } from '../utils/core-table-adapter'
+import { supabase } from '@/lib/supabase/client'
 
 interface QuickQuoteCustomerInfo {
   customer_name: string
@@ -31,9 +34,13 @@ interface UseQuoteSaveProps {
   participantCounts: ParticipantCounts
   sellingPrices: SellingPrices
   setSaveSuccess: (value: boolean) => void
+  setCategories: React.Dispatch<React.SetStateAction<CostCategory[]>>
   quickQuoteItems?: QuickQuoteItem[]
   quickQuoteCustomerInfo?: QuickQuoteCustomerInfo
   tierPricings?: TierPricing[]
+  // 核心表相關（有 tour_id 時使用）
+  coreItems?: TourItineraryItem[]
+  refreshCoreItems?: () => Promise<TourItineraryItem[] | undefined>
 }
 
 export const useQuoteSave = ({
@@ -47,10 +54,15 @@ export const useQuoteSave = ({
   participantCounts,
   sellingPrices,
   setSaveSuccess,
+  setCategories,
   quickQuoteItems,
   quickQuoteCustomerInfo,
   tierPricings,
+  coreItems,
+  refreshCoreItems,
 }: UseQuoteSaveProps) => {
+  const { user } = useAuthStore()
+
   // 直接儲存到報價單主欄位
   const handleSave = useCallback(() => {
     if (!quote) {
@@ -77,41 +89,50 @@ export const useQuoteSave = ({
       // 砍次表資料
       const tierPricingsData = tierPricings || []
 
-      updateQuote(quote.id, {
+      // 報價單只存非定價 header + 快速報價欄位
+      const quoteHeaderData: Partial<Quote> = {
         name: quoteName,
-        categories: updatedCategories,
         total_cost,
         group_size: groupSize,
-        accommodation_days: accommodationDays,
-        participant_counts: participantCounts,
-        selling_prices: sellingPrices,
-        tier_pricings: tierPricingsData,
         ...quickQuoteData,
-      })
+      }
+      updateQuote(quote.id, quoteHeaderData)
+
+      // 定價欄位寫到 tour（只寫 tours 表實際存在的欄位）
+      if (quote.tour_id) {
+        updateTour(quote.tour_id, {
+          total_cost,
+          max_participants: groupSize,
+          selling_price_per_person: sellingPrices.adult,
+        })
+      }
 
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), UI_DELAYS.SUCCESS_MESSAGE)
 
-      // 同步報價欄位到核心表
-      syncQuotePricingToCore(updatedCategories, quote.tour_id ?? null)
-        .then(result => {
-          if (result.success && result.synced_count > 0) {
-            logger.log('核心表同步:', result.synced_count, 'items')
-          }
-        })
-        .catch(err => logger.error('核心表同步錯誤:', err))
-
-      // 同步飯店到行程表
-      const accommodationItems =
-        updatedCategories.find(cat => cat.id === 'accommodation')?.items || []
-      if (accommodationItems.length > 0) {
-        syncHotelsFromQuoteToItinerary(quote.id, accommodationItems)
-          .then(result => {
-            if (!result.success && result.message !== '無關聯行程表，跳過同步') {
-              logger.warn('飯店同步到行程表:', result.message)
+      // 背景寫入核心表
+      if (quote.tour_id) {
+        const workspace_id = user?.workspace_id || ''
+        writePricingToCore(updatedCategories, quote.tour_id, workspace_id, coreItems || [])
+          .then(async result => {
+            logger.log('核心表寫入:', result)
+            // 寫入完成後，重新讀取核心表並更新 categories（確保 ID 正確）
+            const { data: freshItems } = await supabase
+              .from('tour_itinerary_items')
+              .select('*')
+              .eq('tour_id', quote.tour_id!)
+              .order('day_number', { ascending: true })
+              .order('sort_order', { ascending: true })
+              .limit(500)
+            if (freshItems && freshItems.length > 0) {
+              setCategories(
+                coreItemsToCostCategories(freshItems as TourItineraryItem[])
+              )
             }
+            // 也更新 SWR 快取
+            refreshCoreItems?.()
           })
-          .catch(err => logger.error('飯店同步錯誤:', err))
+          .catch(err => logger.error('核心表寫入錯誤:', err))
       }
     } catch (error) {
       logger.error('儲存失敗:', error)
@@ -127,9 +148,13 @@ export const useQuoteSave = ({
     sellingPrices,
     updateQuote,
     setSaveSuccess,
+    setCategories,
     quickQuoteItems,
     quickQuoteCustomerInfo,
     tierPricings,
+    coreItems,
+    refreshCoreItems,
+    user?.workspace_id,
   ])
 
   return {

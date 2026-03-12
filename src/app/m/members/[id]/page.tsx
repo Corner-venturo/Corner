@@ -44,8 +44,8 @@ interface MemberDetail {
     id: string
     code: string
     name: string
-    departure_date: string
-    return_date: string
+    departure_date: string | null
+    return_date: string | null
   }
 }
 

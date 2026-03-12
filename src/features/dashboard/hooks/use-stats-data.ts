@@ -42,6 +42,7 @@ function getMonthRange(monthOffset = 0): { start: Date; end: Date } {
 // 篩選指定日期範圍內的旅遊團
 function filterToursByDateRange(tours: Tour[], start: Date, end: Date): Tour[] {
   return tours.filter(tour => {
+    if (!tour.departure_date) return false
     const departureDate = new Date(tour.departure_date)
     return departureDate >= start && departureDate <= end
   })
@@ -125,7 +126,7 @@ export function useStatsData() {
       if (order.payment_status === 'paid') return false
       if (!order.tour_id || !tourIdSet.has(order.tour_id)) return false
       const tour = normalTours.find(t => t.id === order.tour_id)
-      if (!tour) return false
+      if (!tour || !tour.departure_date) return false
       const departureDate = new Date(tour.departure_date)
       const daysUntilDeparture = Math.ceil(
         (departureDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)

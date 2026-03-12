@@ -27,6 +27,7 @@ interface AttractionSearchBarProps {
   searchQuery: string
   showManualInput: boolean
   manualAttractionName: string
+  hideFilters?: boolean
   onCountryChange: (countryId: string) => void
   onCityChange: (cityId: string) => void
   onSearchChange: (query: string) => void
@@ -43,6 +44,7 @@ export function AttractionSearchBar({
   searchQuery,
   showManualInput,
   manualAttractionName,
+  hideFilters,
   onCountryChange,
   onCityChange,
   onSearchChange,
@@ -59,33 +61,37 @@ export function AttractionSearchBar({
     <div className="p-4 space-y-3">
       {/* 篩選區 */}
       <div className="flex gap-2 flex-wrap">
-        {/* 國家選擇（可搜尋） */}
-        <Combobox
-          value={selectedCountryId}
-          onChange={val => onCountryChange(val || '__all__')}
-          options={countryOptions}
-          placeholder={COMP_EDITOR_LABELS.全部國家}
-          className="min-w-[140px] max-w-[180px]"
-          showSearchIcon={false}
-          showClearButton
-          disablePortal
-        />
+        {!hideFilters && (
+          <>
+            {/* 國家選擇（可搜尋） */}
+            <Combobox
+              value={selectedCountryId}
+              onChange={val => onCountryChange(val || '__all__')}
+              options={countryOptions}
+              placeholder={COMP_EDITOR_LABELS.全部國家}
+              className="min-w-[140px] max-w-[180px]"
+              showSearchIcon={false}
+              showClearButton
+              disablePortal
+            />
 
-        {/* 城市選擇 */}
-        {selectedCountryId && cities.length > 0 && (
-          <Select value={selectedCityId || '__all__'} onValueChange={onCityChange}>
-            <SelectTrigger className="h-9 px-3 border-morandi-container rounded-lg text-sm bg-card min-w-[120px]">
-              <SelectValue placeholder={COMP_EDITOR_LABELS.全部城市} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="__all__">{COMP_EDITOR_LABELS.全部城市}</SelectItem>
-              {cities.map(city => (
-                <SelectItem key={city.id} value={city.id}>
-                  {city.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            {/* 城市選擇 */}
+            {selectedCountryId && cities.length > 0 && (
+              <Select value={selectedCityId || '__all__'} onValueChange={onCityChange}>
+                <SelectTrigger className="h-9 px-3 border-morandi-container rounded-lg text-sm bg-card min-w-[120px]">
+                  <SelectValue placeholder={COMP_EDITOR_LABELS.全部城市} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all__">{COMP_EDITOR_LABELS.全部城市}</SelectItem>
+                  {cities.map(city => (
+                    <SelectItem key={city.id} value={city.id}>
+                      {city.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </>
         )}
 
         {/* 手動新增按鈕 */}

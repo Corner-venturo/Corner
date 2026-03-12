@@ -4,13 +4,11 @@
  */
 
 import React from 'react'
-import { COMPANY } from '@/lib/constants/company'
+import { useCompanyInfo } from '@/hooks/useCompanyInfo'
 import { MORANDI_COLORS } from './print-styles'
-import { useAuthStore } from '@/stores/auth-store'
 
 export const PrintFooter: React.FC = () => {
-  const workspaceName = useAuthStore(state => state.user?.workspace_name) || ''
-  const companyFullName = workspaceName ? `${workspaceName}股份有限公司` : ''
+  const { legalName, subtitle } = useCompanyInfo()
 
   return (
     <div
@@ -21,14 +19,14 @@ export const PrintFooter: React.FC = () => {
         paddingTop: '16px',
       }}
     >
-      <div className="text-center" style={{ marginBottom: '12px' }}>
-        <p className="text-sm italic" style={{ color: MORANDI_COLORS.lightGray, margin: 0 }}>
-          {COMPANY.subtitle}
-        </p>
-      </div>
+      {subtitle && (
+        <div className="text-center text-xs mb-1" style={{ color: MORANDI_COLORS.lightGray }}>
+          ─ {subtitle} ─
+        </div>
+      )}
       <div className="text-center text-xs" style={{ color: MORANDI_COLORS.lightGray }}>
         <span>
-          {companyFullName} © {new Date().getFullYear()}
+          {legalName} © {new Date().getFullYear()}
         </span>
       </div>
     </div>

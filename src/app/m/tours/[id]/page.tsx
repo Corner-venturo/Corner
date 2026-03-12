@@ -50,8 +50,8 @@ interface DbTour {
   id: string
   code: string
   name: string
-  departure_date: string
-  return_date: string
+  departure_date: string | null
+  return_date: string | null
   current_participants: number | null
   status: string | null
 }
@@ -403,7 +403,7 @@ export default function TourDetailPage() {
   }
 
   const status = STATUS_CONFIG[tour.status || '開團'] || STATUS_CONFIG['開團']
-  const durationNights = calculateNights(tour.departure_date, tour.return_date)
+  const durationNights = calculateNights(tour.departure_date || '', tour.return_date || '')
 
   return (
     <div className="min-h-screen bg-background">

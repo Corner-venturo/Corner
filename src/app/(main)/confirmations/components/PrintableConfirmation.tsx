@@ -10,7 +10,7 @@ import { createPortal } from 'react-dom'
 import { Button } from '@/components/ui/button'
 import { X, Printer } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
-import { COMPANY } from '@/lib/constants/company'
+import { useCompanyInfo } from '@/hooks/useCompanyInfo'
 import { LABELS } from '../constants/labels'
 import { getWorkspaceCompanyName } from '@/lib/workspace-helpers'
 import type { Confirmation, FlightData, AccommodationData } from '@/types/confirmation.types'
@@ -29,6 +29,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
   onPrint,
 }) => {
   const workspaceName = getWorkspaceCompanyName()
+  const { subtitle: companySubtitle } = useCompanyInfo()
   const [isMounted, setIsMounted] = useState(false)
   const [logoUrl, setLogoUrl] = useState<string>('')
 
@@ -256,7 +257,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
                   >
                     <div className="text-center" style={{ marginBottom: '12px' }}>
                       <p className="text-sm italic" style={{ color: '#6B7280', margin: 0 }}>
-                        {COMPANY.subtitle}
+                        {companySubtitle}
                       </p>
                     </div>
                     <div className="text-center text-xs" style={{ color: '#9CA3AF' }}>
@@ -371,7 +372,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
             >
               <div className="text-center" style={{ marginBottom: '12px' }}>
                 <p className="text-sm italic" style={{ color: '#6B7280', margin: 0 }}>
-                  {COMPANY.subtitle}
+                  {companySubtitle}
                 </p>
               </div>
               <div className="text-center text-xs" style={{ color: '#9CA3AF' }}>

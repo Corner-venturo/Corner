@@ -37,6 +37,7 @@ export interface DailyScheduleItem {
   lunchSelf: boolean
   dinnerSelf: boolean
   activities?: SimpleActivity[]
+  note?: string
 }
 
 /** AI 主題選項 */
@@ -61,6 +62,7 @@ export interface PreviewDayData {
   dayLabel: string
   date: string
   title: string
+  note?: string
   meals: {
     breakfast: string
     lunch: string

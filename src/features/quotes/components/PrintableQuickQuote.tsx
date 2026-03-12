@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { X, Printer } from 'lucide-react'
 import { Quote, QuickQuoteItem } from '@/types/quote.types'
 import { supabase } from '@/lib/supabase/client'
-import { COMPANY } from '@/lib/constants/company'
+import { useCompanyInfo } from '@/hooks/useCompanyInfo'
 import {
   PRINTABLE_QUICK_QUOTE_LABELS,
   PAYMENT_INFO_LABELS,
@@ -46,6 +46,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
   const workspaceName = useAuthStore(state => state.user?.workspace_name) || ''
   const companyFullName = workspaceName ? `${workspaceName}股份有限公司` : ''
   const ws = useWorkspaceSettings()
+  const { subtitle: companySubtitle } = useCompanyInfo()
   const hasBankInfo = !!(ws.bank_name || ws.bank_branch || ws.bank_account)
 
   useEffect(() => {
@@ -1068,7 +1069,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
                 marginBottom: '8px',
               }}
             >
-              {COMPANY.subtitle}
+              {companySubtitle}
             </div>
             <div className="footer-copyright" style={{ fontSize: '11px', color: '#D1D5DB' }}>
               {companyFullName} {PRINTABLE_QUICK_QUOTE_LABELS.版權前綴} {new Date().getFullYear()}

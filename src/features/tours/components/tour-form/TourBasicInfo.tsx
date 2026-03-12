@@ -15,6 +15,8 @@ interface TourBasicInfoProps {
 }
 
 export function TourBasicInfo({ newTour, setNewTour }: TourBasicInfoProps) {
+  const isProposalOrTemplate = newTour.tour_type === 'proposal' || newTour.tour_type === 'template'
+
   // 處理國家變更
   const handleCountryChange = (country: string, airportCode: string) => {
     setNewTour(prev => ({
@@ -57,48 +59,66 @@ export function TourBasicInfo({ newTour, setNewTour }: TourBasicInfoProps) {
         showLabels
       />
 
-      <div className="grid grid-cols-2 gap-4">
+      {isProposalOrTemplate ? (
+        /* 提案/模板：只顯示天數 */
         <div>
           <label className="text-sm font-medium text-morandi-primary">
-            {TOUR_BASIC_INFO.label_departure}
+            {TOUR_BASIC_INFO.label_days_count}
           </label>
-          <SimpleDateInput
-            value={newTour.departure_date}
-            onChange={departure_date => {
-              setNewTour(prev => {
-                const newReturnDate =
-                  prev.return_date && prev.return_date < departure_date
-                    ? departure_date
-                    : prev.return_date
+          <Input
+            type="number"
+            min={1}
+            max={30}
+            value={newTour.days_count || ''}
+            onChange={e => setNewTour(prev => ({ ...prev, days_count: parseInt(e.target.value) || null }))}
+            className="mt-1 w-32"
+          />
+        </div>
+      ) : (
+        /* 正式團：顯示出發和回程日期 */
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm font-medium text-morandi-primary">
+              {TOUR_BASIC_INFO.label_departure}
+            </label>
+            <SimpleDateInput
+              value={newTour.departure_date}
+              onChange={departure_date => {
+                setNewTour(prev => {
+                  const newReturnDate =
+                    prev.return_date && prev.return_date < departure_date
+                      ? departure_date
+                      : prev.return_date
 
-                return {
-                  ...prev,
-                  departure_date,
-                  return_date: newReturnDate,
-                }
-              })
-            }}
-            min={getTodayString()}
-            className="mt-1"
-            required
-          />
+                  return {
+                    ...prev,
+                    departure_date,
+                    return_date: newReturnDate,
+                  }
+                })
+              }}
+              min={getTodayString()}
+              className="mt-1"
+              required
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium text-morandi-primary">
+              {TOUR_BASIC_INFO.label_return}
+            </label>
+            <SimpleDateInput
+              value={newTour.return_date}
+              onChange={return_date => {
+                setNewTour(prev => ({ ...prev, return_date }))
+              }}
+              min={newTour.departure_date || getTodayString()}
+              defaultMonth={newTour.departure_date}
+              className="mt-1"
+              required
+            />
+          </div>
         </div>
-        <div>
-          <label className="text-sm font-medium text-morandi-primary">
-            {TOUR_BASIC_INFO.label_return}
-          </label>
-          <SimpleDateInput
-            value={newTour.return_date}
-            onChange={return_date => {
-              setNewTour(prev => ({ ...prev, return_date }))
-            }}
-            min={newTour.departure_date || getTodayString()}
-            defaultMonth={newTour.departure_date}
-            className="mt-1"
-            required
-          />
-        </div>
-      </div>
+      )}
 
       <div>
         <label className="text-sm font-medium text-morandi-primary">
