@@ -312,49 +312,75 @@ export function RequirementsList({
     [itemsByCategory, tour, pkg, startDate, onOpenRequestDialog]
   )
 
-  // 🆕 產生需求單
-  const handleGenerateRequests = useCallback(async () => {
-    if (!linkedQuoteId || !tourId || !user?.workspace_id) {
-      toast({
-        title: '無法產生需求單',
-        description: '缺少必要資訊（報價單或旅遊團）',
-        variant: 'destructive',
-      })
-      return
-    }
+  // 🆕 產生單一供應商的需求單
+  const handleGenerateSupplierRequest = useCallback(
+    async (category: string, supplierName: string, items: QuoteItem[]) => {
+      if (!tourId || !user?.workspace_id || !linkedQuoteId) {
+        toast({
+          title: '無法產生需求單',
+          description: '缺少必要資訊',
+          variant: 'destructive',
+        })
+        return
+      }
 
-    try {
-      setGeneratingRequests(true)
+      try {
+        setGeneratingRequests(true)
 
-      const { createRequestFromQuote } = await import(
-        '@/features/tour-documents/services/create-request-from-quote.service'
-      )
+        // 轉換為 RequestItem 格式
+        const requestItems = items.map(item => ({
+          service_date: item.serviceDate || null,
+          title: item.title,
+          quantity: item.quantity,
+          note: item.notes || '',
+          unit_price: 0,
+          total_price: 0,
+        }))
 
-      const result = await createRequestFromQuote({
-        quoteId: linkedQuoteId,
-        tourId: tourId,
-        workspaceId: user.workspace_id,
-        userId: user.id,
-      })
+        // 建立需求單記錄
+        const { data: request, error } = await supabase
+          .from('tour_requests')
+          .insert({
+            workspace_id: user.workspace_id,
+            tour_id: tourId,
+            source_type: 'quote',
+            source_id: linkedQuoteId,
+            code: `REQ-${Date.now()}`,
+            request_type: category,
+            supplier_name: supplierName,
+            items: requestItems as any,
+            status: '草稿',
+            created_by: user.id,
+            updated_by: user.id,
+          } as any)
+          .select()
+          .single()
 
-      toast({
-        title: '需求單已產生',
-        description: `成功建立 ${result.count} 張需求單`,
-      })
+        if (error) throw error
 
-      // 重新載入資料
-      await loadData(false)
-    } catch (error) {
-      logger.error('產生需求單失敗', error)
-      toast({
-        title: '產生需求單失敗',
-        description: error instanceof Error ? error.message : '未知錯誤',
-        variant: 'destructive',
-      })
-    } finally {
-      setGeneratingRequests(false)
-    }
-  }, [linkedQuoteId, tourId, user, toast, loadData])
+        toast({
+          title: '需求單已建立',
+          description: `${supplierName} 的 ${category} 需求單`,
+        })
+
+        // 重新載入
+        await loadData(false)
+
+        // TODO: 產生 PDF
+        // 可以導航到需求單詳細頁面或直接下載 PDF
+      } catch (error) {
+        logger.error('產生需求單失敗', error)
+        toast({
+          title: '產生需求單失敗',
+          description: error instanceof Error ? error.message : '未知錯誤',
+          variant: 'destructive',
+        })
+      } finally {
+        setGeneratingRequests(false)
+      }
+    },
+    [tourId, user, linkedQuoteId, toast, loadData]
+  )
 
   const totalItems = quoteItems.length
 
@@ -394,35 +420,19 @@ export function RequirementsList({
               {COMP_REQUIREMENTS_LABELS.刷新}
             </Button>
             {mode === 'tour' && quoteItems.length > 0 && (
-              <>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleGenerateRequests}
-                  disabled={generatingRequests}
-                  className="gap-1"
-                >
-                  {generatingRequests ? (
-                    <Loader2 size={14} className="animate-spin" />
-                  ) : (
-                    <FileText size={14} />
-                  )}
-                  產生需求單
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={handleGenerateConfirmationSheet}
-                  disabled={generatingSheet}
-                  className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-                >
-                  {generatingSheet ? (
-                    <Loader2 size={14} className="animate-spin" />
-                  ) : (
-                    <ClipboardList size={14} />
-                  )}
-                  {COMP_REQUIREMENTS_LABELS.產生團確單}
-                </Button>
-              </>
+              <Button
+                size="sm"
+                onClick={handleGenerateConfirmationSheet}
+                disabled={generatingSheet}
+                className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+              >
+                {generatingSheet ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <ClipboardList size={14} />
+                )}
+                {COMP_REQUIREMENTS_LABELS.產生團確單}
+              </Button>
             )}
           </div>
         </div>
@@ -576,6 +586,33 @@ export function RequirementsList({
                         </td>
                         <td className="px-3 py-2.5 text-center">
                           <div className="flex items-center justify-center gap-1">
+                            {/* 🆕 產生需求單按鈕（只在第一行顯示） */}
+                            {isFirstRowForSupplier && !isHidden && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  const supplierItems = categoryItems.filter(
+                                    i => getSupplierKey(i) === supplierKey
+                                  )
+                                  handleGenerateSupplierRequest(
+                                    cat.key,
+                                    item.supplierName || '未指定',
+                                    supplierItems
+                                  )
+                                }}
+                                className="h-7 px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                title="產生需求單 PDF"
+                                disabled={generatingRequests}
+                              >
+                                {generatingRequests ? (
+                                  <Loader2 size={12} className="animate-spin" />
+                                ) : (
+                                  <FileText size={12} />
+                                )}
+                              </Button>
+                            )}
+                            
                             {(isHidden || isFirstRowForSupplier) && (
                               <Button
                                 variant="ghost"
