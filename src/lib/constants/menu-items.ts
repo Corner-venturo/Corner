@@ -22,6 +22,13 @@ export const MENU_ITEMS: MenuItem[] = [
     canHide: false,
   },
   {
+    id: 'monitoring',
+    label: '監控中心',
+    description: 'AI Agents 狀態和任務監控',
+    category: 'core',
+    canHide: false,
+  },
+  {
     id: 'workspace',
     label: '工作區',
     description: '個人工作區和協作空間',
