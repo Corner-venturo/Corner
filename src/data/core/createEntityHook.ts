@@ -58,8 +58,6 @@ const WORKSPACE_SCOPED_TABLES = [
   'tours',
   'orders',
   'customers',
-  // === 提案系統 ===
-  'proposals',
   // === 行程與報價 ===
   'quotes',
   'itineraries',
