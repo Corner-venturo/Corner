@@ -21,7 +21,7 @@ export async function getRequestDocuments(requestId: string): Promise<RequestDoc
 }
 
 /**
- * 建立文件（新版本）
+ * 建立文件（新版本 - 我方發送）
  */
 export async function createRequestDocument(
   input: CreateRequestDocumentInput,
@@ -40,14 +40,58 @@ export async function createRequestDocument(
       file_size: input.file_size,
       mime_type: input.mime_type,
       note: input.note,
+      reply_type: 'sent',  // 我方發送
       status: '草稿',
       created_by: userId,
-    })
+    } as any)
     .select()
     .single()
 
   if (error) throw error
-  return data
+  return data as unknown as RequestDocument
+}
+
+/**
+ * 🆕 上傳供應商回覆
+ */
+export async function uploadSupplierReply(
+  input: {
+    request_id: string
+    parent_document_id: string  // 關聯到哪個需求單版本
+    file_name: string
+    file_url: string
+    file_size?: number
+    mime_type?: string
+    received_from?: string
+    note?: string
+  },
+  workspaceId: string,
+  userId: string
+): Promise<RequestDocument> {
+  const { data, error } = await supabase
+    .from('request_documents')
+    .insert({
+      workspace_id: workspaceId,
+      request_id: input.request_id,
+      parent_document_id: input.parent_document_id,
+      document_type: '供應商回覆',
+      version: 'reply',  // 供應商回覆不需要版本號
+      reply_type: 'received',  // 供應商回覆
+      file_name: input.file_name,
+      file_url: input.file_url,
+      file_size: input.file_size,
+      mime_type: input.mime_type,
+      received_from: input.received_from,
+      note: input.note,
+      status: '已收到',
+      received_at: new Date().toISOString(),
+      created_by: userId,
+    } as any)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data as unknown as RequestDocument
 }
 
 /**

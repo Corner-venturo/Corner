@@ -56,7 +56,7 @@ export function RequestDetailView({ requestId, onBack }: RequestDetailViewProps)
     }
   }
 
-  // 上傳新版本（需求單文件）
+  // 上傳新版本（需求單文件 - 我方發送）
   const handleUploadDocument = async (files: File[]) => {
     if (!request || !currentUser || !currentWorkspace) return
 
@@ -76,7 +76,7 @@ export function RequestDetailView({ requestId, onBack }: RequestDetailViewProps)
         // 取得下一個版本號
         const version = await getNextVersion(request.id)
 
-        // 建立文件記錄
+        // 建立文件記錄（reply_type = 'sent'）
         await createRequestDocument(
           {
             request_id: request.id,
@@ -92,7 +92,54 @@ export function RequestDetailView({ requestId, onBack }: RequestDetailViewProps)
         )
       }
 
-      toast.success('文件上傳成功')
+      toast.success('需求單上傳成功')
+      loadRequest()
+    } catch (error) {
+      toast.error('上傳失敗')
+      console.error(error)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  // 🆕 上傳供應商回覆（關聯到指定的需求單版本）
+  const handleUploadSupplierReply = async (files: File[], parentDocumentId: string) => {
+    if (!request || !currentUser || !currentWorkspace) return
+
+    try {
+      setUploading(true)
+
+      const { uploadSupplierReply } = await import(
+        '../services/request-document.service'
+      )
+
+      for (const file of files) {
+        // 上傳到 Storage
+        const { url, size } = await uploadFile(
+          file,
+          `requests/${request.id}/replies`,
+          progress => {
+            console.log(`Uploading ${file.name}: ${progress}%`)
+          }
+        )
+
+        // 建立供應商回覆記錄（reply_type = 'received'）
+        await uploadSupplierReply(
+          {
+            request_id: request.id,
+            parent_document_id: parentDocumentId,
+            file_name: file.name,
+            file_url: url,
+            file_size: size,
+            mime_type: file.type,
+            received_from: request.supplier_name || undefined,
+          },
+          currentWorkspace.id,
+          currentUser.id
+        )
+      }
+
+      toast.success('供應商回覆上傳成功')
       loadRequest()
     } catch (error) {
       toast.error('上傳失敗')
@@ -246,6 +293,7 @@ export function RequestDetailView({ requestId, onBack }: RequestDetailViewProps)
             documents={request.documents || []}
             onPreview={handlePreview}
             onDownload={handleDownload}
+            onUploadReply={handleUploadSupplierReply}
           />
         </TabsContent>
 

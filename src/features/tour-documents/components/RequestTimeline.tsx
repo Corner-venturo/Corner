@@ -33,6 +33,7 @@ interface RequestTimelineProps {
   onPreview?: (doc: RequestDocument) => void
   onDownload?: (doc: RequestDocument) => void
   onDelete?: (doc: RequestDocument) => void
+  onUploadReply?: (parentDocumentId: string, files: File[]) => void  // 🆕 上傳供應商回覆
 }
 
 // 狀態徽章
@@ -197,6 +198,7 @@ export function RequestTimeline({
   onPreview,
   onDownload,
   onDelete,
+  onUploadReply,
 }: RequestTimelineProps) {
   if (documents.length === 0) {
     return (
@@ -207,26 +209,79 @@ export function RequestTimeline({
     )
   }
 
+  // 🆕 分離「我方發送」和「供應商回覆」
+  const sentDocuments = documents.filter(d => d.reply_type === 'sent')
+  const receivedDocuments = documents.filter(d => d.reply_type === 'received')
+
+  // 建立階層結構
+  const grouped = sentDocuments.map(sentDoc => ({
+    sent: sentDoc,
+    replies: receivedDocuments.filter(r => r.parent_document_id === sentDoc.id),
+  }))
+
   return (
     <div className="space-y-6">
-      {documents.map((doc, idx) => (
-        <div key={doc.id} className="relative">
+      {grouped.map((group, idx) => (
+        <div key={group.sent.id} className="relative">
           {/* 時間軸連接線 */}
-          {idx < documents.length - 1 && (
+          {idx < grouped.length - 1 && (
             <div className="absolute left-[9px] top-[60px] bottom-[-24px] w-0.5 bg-morandi-muted" />
           )}
 
           {/* 時間軸圓點 */}
           <div className="absolute left-0 top-6 w-5 h-5 rounded-full bg-morandi-gold border-4 border-background z-10" />
 
-          {/* 文件卡片 */}
+          {/* 需求單文件卡片（我方發送） */}
           <div className="ml-8">
             <DocumentCard
-              doc={doc}
+              doc={group.sent}
               onPreview={onPreview}
               onDownload={onDownload}
               onDelete={onDelete}
             />
+
+            {/* 🆕 供應商回覆區塊 */}
+            {group.replies.length > 0 && (
+              <div className="mt-4 ml-6 space-y-3 border-l-2 border-blue-200 pl-4">
+                <div className="text-xs font-medium text-blue-600 mb-2">
+                  📨 供應商回覆 ({group.replies.length})
+                </div>
+                {group.replies.map(reply => (
+                  <DocumentCard
+                    key={reply.id}
+                    doc={reply}
+                    onPreview={onPreview}
+                    onDownload={onDownload}
+                    onDelete={onDelete}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* 🆕 上傳供應商回覆按鈕 */}
+            {onUploadReply && (
+              <div className="mt-3 ml-6">
+                <label
+                  htmlFor={`upload-reply-${group.sent.id}`}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded cursor-pointer hover:bg-blue-100 transition-colors"
+                >
+                  <Upload size={14} />
+                  上傳供應商回覆
+                </label>
+                <input
+                  id={`upload-reply-${group.sent.id}`}
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={e => {
+                    const files = Array.from(e.target.files || [])
+                    if (files.length > 0) {
+                      onUploadReply(group.sent.id, files)
+                    }
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
       ))}

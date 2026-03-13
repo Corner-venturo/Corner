@@ -84,6 +84,10 @@ export interface RequestDocument {
   document_type: DocumentType
   version: string  // 'v1.0', 'v2.0'
   
+  // 🆕 關聯和類型
+  parent_document_id?: string  // 關聯到哪個需求單版本（供應商回覆時使用）
+  reply_type: 'sent' | 'received'  // sent=我方發送, received=供應商回覆
+  
   // 檔案資訊
   file_name: string
   file_url: string
@@ -115,6 +119,7 @@ export interface RequestDocument {
 
 export type DocumentType = '需求單' | '供應商回覆' | '修改單' | '最終確認' | '其他'
 export type DocumentStatus = '草稿' | '已發送' | '已收到' | '已確認'
+export type ReplyType = 'sent' | 'received'
 
 // ============================================================
 // 旅遊團檔案（Tour File）
