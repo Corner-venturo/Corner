@@ -1,1 +1,0 @@
-export { TourDailyDataExample } from './TourDailyDataExample'
