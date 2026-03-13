@@ -3,7 +3,13 @@
 import React from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
-import { Calendar, FileCheck, MapPin, BarChart3, Archive, Star, Plus, FileText, Copy } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Calendar, FileCheck, MapPin, BarChart3, Archive, Star, Plus, FileText, Copy, ChevronDown } from 'lucide-react'
 import { TOUR_FILTERS } from '../constants'
 
 interface TourFiltersProps {
@@ -12,6 +18,8 @@ interface TourFiltersProps {
   activeTab: string
   onTabChange: (tab: string) => void
   onAddTour: () => void
+  onAddProposal?: () => void
+  onAddTemplate?: () => void
 }
 
 export const TourFilters: React.FC<TourFiltersProps> = ({
@@ -20,15 +28,9 @@ export const TourFilters: React.FC<TourFiltersProps> = ({
   activeTab,
   onTabChange,
   onAddTour,
+  onAddProposal,
+  onAddTemplate,
 }) => {
-  // 按鈕文字隨分頁變化
-  const addButtonLabel =
-    activeTab === 'proposal'
-      ? TOUR_FILTERS.add_proposal
-      : activeTab === 'template'
-        ? TOUR_FILTERS.add_template
-        : TOUR_FILTERS.add_tour_direct
-
   return (
     <ResponsiveHeader
       title={TOUR_FILTERS.page_title}
@@ -52,13 +54,32 @@ export const TourFilters: React.FC<TourFiltersProps> = ({
       activeTab={activeTab}
       onTabChange={onTabChange}
       customActions={
-        <Button
-          onClick={onAddTour}
-          className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1.5"
-        >
-          <Plus size={16} />
-          {addButtonLabel}
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1.5">
+              <Plus size={16} />
+              新增旅遊團
+              <ChevronDown size={16} />
+            </Button>
+          </DropdownMenuTrigger>
+          
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={onAddTour}>
+              <Calendar className="mr-2 h-4 w-4" />
+              開團（正式團）
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem onClick={onAddProposal}>
+              <FileText className="mr-2 h-4 w-4" />
+              提案（客戶詢價）
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem onClick={onAddTemplate}>
+              <Copy className="mr-2 h-4 w-4" />
+              開模板（標準行程）
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       }
     />
   )

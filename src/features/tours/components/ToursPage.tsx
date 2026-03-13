@@ -193,33 +193,46 @@ export const ToursPage: React.FC = () => {
     [router]
   )
 
-  // 開新增對話框（根據 activeTab 設定 tour_type）
-  const handleOpenCreateDialogWithType = useCallback(() => {
-    const tourType = activeStatusTab === 'proposal' ? 'proposal'
-      : activeStatusTab === 'template' ? 'template'
-      : undefined
+  // 開團（正式團）
+  const handleOpenTourDialog = useCallback(() => {
+    handleOpenCreateDialog()
+  }, [handleOpenCreateDialog])
 
-    if (tourType) {
-      // 提案/模板新增
-      setNewTour({
-        name: '',
-        tour_type: tourType,
-        countryCode: '',
-        cityCode: '',
-        departure_date: '',
-        return_date: '',
-        price: 0,
-        status: '待出發',
-        isSpecial: false,
-        max_participants: 20,
-        description: '',
-      })
-      openDialog('create')
-    } else {
-      // 正式團新增
-      handleOpenCreateDialog()
-    }
-  }, [activeStatusTab, setNewTour, openDialog, handleOpenCreateDialog])
+  // 提案（客戶詢價）
+  const handleOpenProposalDialog = useCallback(() => {
+    setNewTour({
+      name: '',
+      tour_type: 'proposal',
+      countryCode: '',
+      cityCode: '',
+      departure_date: '',
+      return_date: '',
+      price: 0,
+      status: '待出發',
+      isSpecial: false,
+      max_participants: 20,
+      description: '',
+    })
+    openDialog('create')
+  }, [setNewTour, openDialog])
+
+  // 開模板（標準行程）
+  const handleOpenTemplateDialog = useCallback(() => {
+    setNewTour({
+      name: '',
+      tour_type: 'template',
+      countryCode: '',
+      cityCode: '',
+      departure_date: '',
+      return_date: '',
+      price: 0,
+      status: '待出發',
+      isSpecial: false,
+      max_participants: 20,
+      description: '',
+    })
+    openDialog('create')
+  }, [setNewTour, openDialog])
 
   // 開團轉換（提案/模板 → 正式團）
   const handleConvertTour = useCallback((tour: Tour) => {
@@ -247,7 +260,9 @@ export const ToursPage: React.FC = () => {
           setActiveStatusTab(tab)
           setCurrentPage(1)
         }}
-        onAddTour={handleOpenCreateDialogWithType}
+        onAddTour={handleOpenTourDialog}
+        onAddProposal={handleOpenProposalDialog}
+        onAddTemplate={handleOpenTemplateDialog}
       />
 
       <div className="flex-1 overflow-hidden flex flex-col">
