@@ -5,7 +5,7 @@
 
 import { Input } from '@/components/ui/input'
 import type { DailyScheduleItem } from './types'
-import { DAILY_SCHEDULE_EDITOR_LABELS, ITINERARY_DIALOG_LABELS } from '../../constants/labels'
+import { DAILY_SCHEDULE_EDITOR_LABELS, ITINERARY_DIALOG_LABELS } from './labels'
 
 interface DailyScheduleEditorProps {
   dailySchedule: DailyScheduleItem[]
@@ -119,7 +119,7 @@ export function DailyScheduleEditor({
                 <Input
                   value={
                     day.sameAsPrevious
-                      ? `同上 (${getPreviousAccommodation(idx) || ''})`
+                      ? `續住 (${getPreviousAccommodation(idx) || ''})`
                       : day.accommodation || ''
                   }
                   onChange={e => onUpdateDay(idx, 'accommodation', e.target.value)}

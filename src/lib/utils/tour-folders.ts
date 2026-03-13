@@ -25,7 +25,7 @@ export const DEFAULT_TOUR_FOLDERS = [
     icon: '🗓️',
     color: '#8b7c9a',
     dataSource: 'db',
-    table: 'proposal_packages',
+    table: 'itineraries',
     createLabel: '建立行程表',
   },
   {

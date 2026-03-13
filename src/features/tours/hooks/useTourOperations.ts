@@ -156,11 +156,17 @@ export function useTourOperations(params: UseTourOperationsParams) {
           }
         }
 
+        // 解析國家名稱（countryCode 存的是國家名稱如「日本」）
+        const countryName =
+          newTour.countryCode === '__custom__' ? newTour.customCountry! : newTour.countryCode
+
         const tourData = {
           name: newTour.name,
           tour_type: newTour.tour_type || 'official',
           days_count: isProposalOrTemplate ? (newTour.days_count || null) : null,
           location: cityName || '',
+          country_id: countryName || undefined,
+          airport_code: cityCode || undefined,
           departure_date: isProposalOrTemplate ? null : newTour.departure_date,
           return_date: isProposalOrTemplate ? null : newTour.return_date,
           status: newTour.status,
@@ -182,8 +188,6 @@ export function useTourOperations(params: UseTourOperationsParams) {
         const createdTour = await actions.create(tourData)
 
         // 更新國家和城市的使用次數（讓常用的排在前面）
-        const countryName =
-          newTour.countryCode === '__custom__' ? newTour.customCountry! : newTour.countryCode
         if (countryName) {
           incrementCountryUsage(countryName)
         }

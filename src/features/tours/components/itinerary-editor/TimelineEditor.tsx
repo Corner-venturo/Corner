@@ -8,7 +8,7 @@ import { Plus, X, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AttractionSelector } from '@/components/editor/attraction-selector'
 import type { DailyScheduleItem, SimpleActivity } from './types'
-import { DAILY_SCHEDULE_EDITOR_LABELS, ITINERARY_DIALOG_LABELS } from '../../constants/labels'
+import { DAILY_SCHEDULE_EDITOR_LABELS, ITINERARY_DIALOG_LABELS } from './labels'
 
 interface TimelineEditorProps {
   dailySchedule: DailyScheduleItem[]
@@ -222,7 +222,7 @@ export function TimelineEditor({
                 type="text"
                 value={
                   day.sameAsPrevious
-                    ? `同上 (${getPreviousAccommodation(idx) || ''})`
+                    ? `續住 (${getPreviousAccommodation(idx) || ''})`
                     : day.accommodation || ''
                 }
                 onChange={e => onUpdateDay(idx, 'accommodation', e.target.value)}

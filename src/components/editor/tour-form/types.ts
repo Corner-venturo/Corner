@@ -121,7 +121,7 @@ export interface TourCountry {
   country_id: string
   country_name: string
   country_code?: string
-  main_city_id?: string
+  airport_code?: string
   main_city_name?: string
   is_primary: boolean // 是否為主要國家
 }

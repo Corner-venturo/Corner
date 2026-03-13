@@ -38,8 +38,6 @@ import type {
   AirportImage,
   CustomerGroup,
   CustomerGroupMember,
-  Proposal,
-  ProposalPackage,
 } from '@/stores/types'
 import type { QuoteItem } from '@/types/quote.types'
 
@@ -144,17 +142,6 @@ export const useCustomerGroupMembers = createCloudHook<CustomerGroupMember>(
   }
 )
 
-// ===== 提案系統 =====
-
-// 提案
-export const useProposals = createCloudHook<Proposal>('proposals', {
-  orderBy: { column: 'created_at', ascending: false },
-})
-
-// 團體套件
-export const useProposalPackages = createCloudHook<ProposalPackage>('proposal_packages', {
-  orderBy: { column: 'version_number', ascending: true },
-})
 
 // ===== 新架構 re-exports =====
 // 這些是從 @/data 導出的新架構 hooks，提供更好的關注點分離
@@ -213,24 +200,6 @@ export {
   updateItinerary,
   deleteItinerary,
   invalidateItineraries,
-
-  // Proposals
-  useProposal,
-  useProposalsPaginated,
-  useProposalDictionary,
-  createProposal,
-  updateProposal,
-  deleteProposal,
-  invalidateProposals,
-
-  // Proposal Packages
-  useProposalPackage,
-  useProposalPackagesPaginated,
-  useProposalPackageDictionary,
-  createProposalPackage,
-  updateProposalPackage,
-  deleteProposalPackage,
-  invalidateProposalPackages,
 
   // Payment Requests
   usePaymentRequest,

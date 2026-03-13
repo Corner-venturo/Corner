@@ -16,15 +16,13 @@ interface DesignItem {
   status: string
   updatedAt: string
   isSelected: boolean // 是否為選定版本
-  packageName?: string // 套件名稱（如果來自提案）
 }
 
 interface TourDesignsTabProps {
   tourId: string
-  proposalId?: string | null
 }
 
-export function TourDesignsTab({ tourId, proposalId }: TourDesignsTabProps) {
+export function TourDesignsTab({ tourId }: TourDesignsTabProps) {
   const router = useRouter()
   const [designs, setDesigns] = useState<DesignItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -34,7 +32,7 @@ export function TourDesignsTab({ tourId, proposalId }: TourDesignsTabProps) {
       setLoading(true)
       const allDesigns: DesignItem[] = []
 
-      // 1. 取得直接關聯到此團的設計（tour_id = tourId）
+      // 取得直接關聯到此團的設計（tour_id = tourId）
       const { data: directDesigns } = await supabase
         .from('itineraries')
         .select('id, title, status, updated_at')
@@ -53,43 +51,7 @@ export function TourDesignsTab({ tourId, proposalId }: TourDesignsTabProps) {
         })
       }
 
-      // 2. 如果有 proposalId，取得同提案下其他套件的設計
-      if (proposalId) {
-        const { data: packages } = await supabase
-          .from('proposal_packages')
-          .select('id, version_name, itinerary_id, is_selected')
-          .eq('proposal_id', proposalId)
-
-        if (packages) {
-          for (const pkg of packages) {
-            if (pkg.itinerary_id) {
-              // 檢查是否已經在 allDesigns 中（避免重複）
-              const exists = allDesigns.some(d => d.id === pkg.itinerary_id)
-              if (!exists) {
-                const { data: itinerary } = await supabase
-                  .from('itineraries')
-                  .select('id, title, status, updated_at')
-                  .eq('id', pkg.itinerary_id)
-                  .single()
-
-                if (itinerary) {
-                  allDesigns.push({
-                    id: itinerary.id,
-                    title: itinerary.title || COMP_TOURS_LABELS.未命名行程,
-                    type: 'itinerary',
-                    status: itinerary.status || COMP_TOURS_LABELS.草稿,
-                    updatedAt: itinerary.updated_at,
-                    isSelected: pkg.is_selected || false,
-                    packageName: pkg.version_name || undefined,
-                  })
-                }
-              }
-            }
-          }
-        }
-      }
-
-      // 按更新時間排序，選定版本置頂
+      // 按更新時間排序
       allDesigns.sort((a, b) => {
         if (a.isSelected && !b.isSelected) return -1
         if (!a.isSelected && b.isSelected) return 1
@@ -103,7 +65,7 @@ export function TourDesignsTab({ tourId, proposalId }: TourDesignsTabProps) {
     if (tourId) {
       fetchDesigns().catch(err => logger.error('[fetchDesigns]', err))
     }
-  }, [tourId, proposalId])
+  }, [tourId])
 
   const handleOpenDesign = (design: DesignItem) => {
     if (design.type === 'itinerary') {
@@ -162,11 +124,6 @@ export function TourDesignsTab({ tourId, proposalId }: TourDesignsTabProps) {
                   {design.isSelected && (
                     <span className="text-xs px-2 py-0.5 rounded-full bg-morandi-green/20 text-morandi-green">
                       {COMP_TOURS_LABELS.LABEL_6192}
-                    </span>
-                  )}
-                  {design.packageName && !design.isSelected && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-morandi-muted/20 text-morandi-secondary">
-                      {design.packageName}
                     </span>
                   )}
                 </div>

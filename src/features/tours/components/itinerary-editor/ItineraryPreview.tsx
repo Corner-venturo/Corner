@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import type { FlightInfo } from '@/types/flight.types'
 import type { PreviewDayData } from './types'
-import { BROCHURE_PREVIEW_DIALOG_LABELS } from '../../constants/labels'
+import { BROCHURE_PREVIEW_DIALOG_LABELS } from './labels'
 import {
   IMPORT_MEALS_DIALOG_LABELS,
   PRINTABLE_QUICK_QUOTE_LABELS,

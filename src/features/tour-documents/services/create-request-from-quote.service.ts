@@ -4,7 +4,10 @@
  */
 
 import { supabase } from '@/lib/supabase/client'
+import { dynamicFrom } from '@/lib/supabase/typed-client'
 import type { RequestItem } from '@/types/tour-documents.types'
+
+const tourRequestsDb = () => dynamicFrom('tour_requests')
 
 /**
  * 從報價單的 categories 建立需求單
@@ -66,8 +69,7 @@ export async function createRequestFromQuote(input: {
   const requestIds: string[] = []
 
   for (const [supplierKey, group] of Object.entries(groupedBySupplier)) {
-    const { data: request, error: insertError } = await supabase
-      .from('tour_requests')
+    const { data: request, error: insertError } = await tourRequestsDb()
       .insert({
         workspace_id: input.workspaceId,
         tour_id: input.tourId,

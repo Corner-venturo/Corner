@@ -67,7 +67,7 @@ export function formatDailyItinerary({
       recommendations: [],
       meals: { breakfast, lunch, dinner },
       accommodation: day.sameAsPrevious
-        ? `同上 (${getPreviousAccommodation(idx) || ''})`
+        ? `續住 (${getPreviousAccommodation(idx) || ''})`
         : accommodation,
       images: [],
     }

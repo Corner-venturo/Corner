@@ -242,36 +242,19 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
         <td className="py-3 px-4"></td>
         <td className="py-3 px-4 text-right">
           {category.id === 'accommodation' ? (
-            <div className="flex gap-1 justify-end">
-              <Button
-                variant="ghost"
-                size="xs"
-                onClick={handleAddAccommodationDay}
-                disabled={isReadOnly}
-                className={cn(
-                  'text-morandi-gold hover:bg-morandi-gold/10',
-                  isReadOnly && 'cursor-not-allowed opacity-60'
-                )}
-              >
-                <Plus size={12} className="mr-1" />
-                {CATEGORY_SECTION_LABELS.ADD_2985}
-              </Button>
-              {accommodationDays > 0 && (
-                <Button
-                  variant="ghost"
-                  size="xs"
-                  onClick={() => handleAddRow(category.id)}
-                  disabled={isReadOnly}
-                  className={cn(
-                    'text-morandi-secondary hover:bg-morandi-gold/10',
-                    isReadOnly && 'cursor-not-allowed opacity-60'
-                  )}
-                >
-                  <Plus size={12} className="mr-1" />
-                  {CATEGORY_SECTION_LABELS.ADD}
-                </Button>
+            <Button
+              variant="ghost"
+              size="xs"
+              onClick={() => handleAddRow(category.id)}
+              disabled={isReadOnly}
+              className={cn(
+                'text-morandi-gold hover:bg-morandi-gold/10',
+                isReadOnly && 'cursor-not-allowed opacity-60'
               )}
-            </div>
+            >
+              <Plus size={12} className="mr-1" />
+              {CATEGORY_SECTION_LABELS.新增房型}
+            </Button>
           ) : category.id === 'group-transport' ? (
             <div className="flex gap-1 justify-end">
               {onOpenLocalPricingDialog && (
@@ -468,9 +451,10 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                   }
                 })
 
-              return Object.keys(groupedByDay)
+              const sortedDays = Object.keys(groupedByDay)
                 .sort((a, b) => Number(a) - Number(b))
-                .map(dayStr => {
+
+              return sortedDays.map((dayStr, dayIndex) => {
                   const day = Number(dayStr)
                   const dayItems = groupedByDay[day]
                   const prevDayHotelName = day > 1 ? dayHotelNames[day - 1] : undefined
@@ -481,19 +465,13 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                       item={item}
                       categoryId={category.id}
                       day={day}
+                      dayIndex={dayIndex}
                       roomIndex={roomIndex}
+                      roomCount={dayItems.length}
                       prevDayHotelName={prevDayHotelName}
                       isReadOnly={isReadOnly}
                       handleUpdateItem={handleUpdateItem}
                       handleRemoveItem={handleRemoveItem}
-                      onToggleSameAsPrevious={(itemId, isSame, prevHotel) => {
-                        // 切換續住狀態
-                        handleUpdateItem(category.id, itemId, 'is_same_as_previous', isSame)
-                        if (isSame && prevHotel) {
-                          // 勾選續住時，自動帶入前一天的飯店名稱
-                          handleUpdateItem(category.id, itemId, 'name', prevHotel)
-                        }
-                      }}
                     />
                   ))
                 })

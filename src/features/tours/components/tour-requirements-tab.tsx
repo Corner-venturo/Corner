@@ -14,7 +14,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { RequirementsList } from '@/features/confirmations/components'
 import { COMP_TOURS_LABELS } from '../constants/labels'
 import type { Tour } from '@/stores/types'
-import type { ProposalPackage } from '@/types/proposal.types'
 
 const TourConfirmationSheetPage = dynamic(
   () =>
@@ -39,7 +38,6 @@ interface TourRequirementsTabProps {
     supplierName: string
     items: { serviceDate: string | null; title: string; quantity: number; note?: string }[]
     tour?: Tour
-    pkg?: ProposalPackage
     startDate: string | null
   }) => void
 }

@@ -1,7 +1,0 @@
-'use client'
-
-export { ProposalsTableContent } from './ProposalsTableContent'
-export { ProposalDialog } from './ProposalDialog'
-export { PackageDialog } from './PackageDialog'
-export { PackageListPanel } from './PackageListPanel'
-export { ArchiveProposalDialog } from './ArchiveProposalDialog'

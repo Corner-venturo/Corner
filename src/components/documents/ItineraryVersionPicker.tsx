@@ -67,7 +67,7 @@ export function ItineraryVersionPicker({ isOpen, onClose, tour }: ItineraryVersi
     i => i.tour_id === tour.id && !(i as { _deleted?: boolean })._deleted
   )
 
-  // 根據 country_id 和 main_city_id 查詢名稱
+  // 根據 country_id 和 airport_code 查詢名稱
   const countryName = (() => {
     if (!tour.country_id) return tour.location || ''
     const country = countries.find(c => c.id === tour.country_id)
@@ -75,8 +75,8 @@ export function ItineraryVersionPicker({ isOpen, onClose, tour }: ItineraryVersi
   })()
 
   const cityName = (() => {
-    if (!tour.main_city_id) return tour.location || ''
-    const city = cities.find(c => c.id === tour.main_city_id)
+    if (!tour.airport_code) return tour.location || ''
+    const city = cities.find(c => c.id === tour.airport_code)
     return city?.name || tour.location || ''
   })()
 

@@ -2,10 +2,6 @@
 
 /**
  * RequirementsList - 需求總覽共用組件
- *
- * 支援兩種模式：
- * - tourId: 旅遊團模式（開團後使用）
- * - proposalPackageId: 提案套件模式（提案階段使用）
  */
 
 import { useEffect, useState, useMemo, useCallback } from 'react'
@@ -16,7 +12,6 @@ import {
   AlertCircle,
   RefreshCw,
   FileText,
-  Plus,
   EyeOff,
   Eye,
   ChevronDown,
@@ -27,10 +22,8 @@ import {
 import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores'
-import { AddManualRequestDialog } from '@/features/proposals/components/AddManualRequestDialog'
 import type { Tour } from '@/stores/types'
 import type { CostCategory } from '@/features/quotes/types'
-import type { ProposalPackage } from '@/types/proposal.types'
 import { useToast } from '@/components/ui/use-toast'
 import { logger } from '@/lib/utils/logger'
 import { getStatusConfig } from '@/lib/status-config'
@@ -42,7 +35,7 @@ import type {
   QuoteItem,
   CategoryKey,
 } from './requirements-list.types'
-import { CATEGORIES, safeGetCategoryKey } from './requirements-list.types'
+import { CATEGORIES } from './requirements-list.types'
 import { COMP_REQUIREMENTS_LABELS } from './constants/labels'
 import { parseQuoteItems, groupItemsByCategory } from './parse-quote-items'
 import { useConfirmationSheet } from './use-confirmation-sheet'
@@ -53,7 +46,6 @@ import { useConfirmationSheet } from './use-confirmation-sheet'
 
 export function RequirementsList({
   tourId,
-  proposalPackageId,
   quoteId: propQuoteId,
   onOpenRequestDialog,
   className,
@@ -65,7 +57,6 @@ export function RequirementsList({
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [tour, setTour] = useState<Tour | null>(null)
-  const [pkg, setPkg] = useState<ProposalPackage | null>(null)
   const [linkedQuoteId, setLinkedQuoteId] = useState<string | null>(propQuoteId || null)
   const [existingRequests, setExistingRequests] = useState<TourRequest[]>([])
   const [quoteCategories, setQuoteCategories] = useState<CostCategory[]>([])
@@ -74,17 +65,12 @@ export function RequirementsList({
   const [outboundFlight, setOutboundFlight] = useState<FlightInfo | null>(null)
   const [returnFlight, setReturnFlight] = useState<FlightInfo | null>(null)
 
-  // Dialog 狀態
-  const [addManualDialogOpen, setAddManualDialogOpen] = useState(false)
-  const [addManualCategory, setAddManualCategory] = useState<string>('transport')
 
   // 隱藏項目展開狀態
   const [expandedHiddenCategories, setExpandedHiddenCategories] = useState<Set<string>>(new Set())
 
   // 🆕 產生需求單狀態
   const [generatingRequests, setGeneratingRequests] = useState(false)
-
-  const mode = tourId ? 'tour' : 'proposal'
 
   // ============================================
   // 載入資料
@@ -96,7 +82,7 @@ export function RequirementsList({
 
       try {
         let quoteId = propQuoteId || null
-        if (mode === 'tour' && tourId) {
+        if (tourId) {
           const { data: tourData } = await supabase
             .from('tours')
             .select('*')
@@ -115,23 +101,6 @@ export function RequirementsList({
               'id, code, category, supplier_name, title, service_date, quantity, notes, status, quoted_cost, hidden, resource_id, resource_type'
             )
             .eq('tour_id', tourId)
-            .order('created_at', { ascending: true })
-          setExistingRequests((requests as TourRequest[]) || [])
-        } else if (mode === 'proposal' && proposalPackageId) {
-          const { data: pkgData } = await supabase
-            .from('proposal_packages')
-            .select('*, proposals(*)')
-            .eq('id', proposalPackageId)
-            .single()
-          if (!pkgData) return
-          setPkg(pkgData as unknown as ProposalPackage)
-          quoteId = quoteId || (pkgData as { quote_id?: string | null }).quote_id || null
-          const { data: requests } = await supabase
-            .from('tour_requests')
-            .select(
-              'id, code, category, supplier_name, title, service_date, quantity, notes, status, quoted_cost, hidden, resource_id, resource_type'
-            )
-            .eq('proposal_package_id', proposalPackageId)
             .order('created_at', { ascending: true })
           setExistingRequests((requests as TourRequest[]) || [])
         }
@@ -158,7 +127,7 @@ export function RequirementsList({
         setRefreshing(false)
       }
     },
-    [tourId, proposalPackageId, propQuoteId, mode, tour?.departure_date]
+    [tourId, propQuoteId, tour?.departure_date]
   )
 
   useEffect(() => {
@@ -232,9 +201,8 @@ export function RequirementsList({
             code,
             workspace_id: user.workspace_id,
             tour_id: tourId || null,
-            proposal_package_id: proposalPackageId || null,
-            tour_code: tour?.code || pkg?.version_name || null,
-            tour_name: tour?.name || pkg?.version_name || null,
+            tour_code: tour?.code || null,
+            tour_name: tour?.name || null,
             category: itemData.category,
             supplier_name: itemData.supplierName || null,
             title: itemData.title,
@@ -266,7 +234,7 @@ export function RequirementsList({
         toast({ title: COMP_REQUIREMENTS_LABELS.操作失敗, variant: 'destructive' })
       }
     },
-    [toast, user, tourId, proposalPackageId, tour, pkg]
+    [toast, user, tourId, tour]
   )
 
   const toggleHiddenCategory = useCallback((category: string) => {
@@ -278,10 +246,6 @@ export function RequirementsList({
     })
   }, [])
 
-  const openAddManualDialog = useCallback((category: string) => {
-    setAddManualCategory(category)
-    setAddManualDialogOpen(true)
-  }, [])
 
   const formatDate = (dateStr: string | null | undefined) => {
     if (!dateStr) return '-'
@@ -305,11 +269,10 @@ export function RequirementsList({
         supplierName,
         items,
         tour: tour || undefined,
-        pkg: pkg || undefined,
         startDate,
       })
     },
-    [itemsByCategory, tour, pkg, startDate, onOpenRequestDialog]
+    [itemsByCategory, tour, startDate, onOpenRequestDialog]
   )
 
   // 🆕 產生單一供應商的需求單
@@ -419,7 +382,7 @@ export function RequirementsList({
               <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
               {COMP_REQUIREMENTS_LABELS.刷新}
             </Button>
-            {mode === 'tour' && quoteItems.length > 0 && (
+            {tourId && quoteItems.length > 0 && (
               <Button
                 size="sm"
                 onClick={handleGenerateConfirmationSheet}
@@ -443,9 +406,7 @@ export function RequirementsList({
             <AlertCircle className="mx-auto text-morandi-muted mb-3" size={48} />
             <p className="text-morandi-secondary mb-2">{COMP_REQUIREMENTS_LABELS.尚無報價單資料}</p>
             <p className="text-xs text-morandi-muted">
-              {mode === 'tour'
-                ? COMP_REQUIREMENTS_LABELS.請到_總覽_頁籤點擊_報價單_按鈕進行綁定
-                : COMP_REQUIREMENTS_LABELS.請先建立報價單}
+              {COMP_REQUIREMENTS_LABELS.請到_總覽_頁籤點擊_報價單_按鈕進行綁定}
             </p>
           </div>
         ) : quoteItems.length === 0 && existingRequests.length === 0 ? (
@@ -707,17 +668,7 @@ export function RequirementsList({
                           {categoryTotal > 0 ? `$${categoryTotal.toLocaleString()}` : ''}
                         </td>
                         <td></td>
-                        <td className="px-3 py-2 text-center">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => openAddManualDialog(cat.key)}
-                            className="h-7 px-2 text-xs text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10 gap-1"
-                          >
-                            <Plus size={14} />
-                            {COMP_REQUIREMENTS_LABELS.新增}
-                          </Button>
-                        </td>
+                        <td className="px-3 py-2 text-center"></td>
                       </tr>
                       {visibleItems.map((trackItem, idx) => renderItem(trackItem, idx, false))}
                       {isHiddenExpanded && hiddenItems.length > 0 && (
@@ -742,17 +693,6 @@ export function RequirementsList({
         )}
       </div>
 
-      <AddManualRequestDialog
-        isOpen={addManualDialogOpen}
-        onClose={() => setAddManualDialogOpen(false)}
-        tourId={tourId}
-        proposalPackageId={proposalPackageId}
-        tourCode={tour?.code || pkg?.version_name || ''}
-        tourName={tour?.name || pkg?.version_name || ''}
-        startDate={startDate}
-        defaultCategory={addManualCategory}
-        onSuccess={() => loadData(false)}
-      />
     </>
   )
 }

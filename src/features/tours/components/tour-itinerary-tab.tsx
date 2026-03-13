@@ -38,12 +38,12 @@ import { updateTour } from '@/data/entities/tours'
 import { useFlightSearch } from '@/hooks'
 import { supabase } from '@/lib/supabase/client'
 import { syncItineraryToQuote } from '@/lib/utils/itinerary-quote-sync'
-import { useSyncItineraryToCore } from '@/features/tours/hooks/useTourItineraryItems'
+import { useSyncItineraryToCore, useTourItineraryItemsByTour } from '@/features/tours/hooks/useTourItineraryItems'
 import type { DailyItinerary } from '@/components/editor/tour-form/types'
 import type { Tour } from '@/stores/types'
 import type { FlightInfo } from '@/types/flight.types'
 import { COMP_TOURS_LABELS, TOUR_ITINERARY_TAB_LABELS } from '../constants/labels'
-import { getPreviewDailyData as computePreviewData } from '@/features/proposals/components/package-itinerary/format-itinerary'
+import { getPreviewDailyData as computePreviewData } from '@/features/tours/components/itinerary-editor/format-itinerary'
 import { AttractionSelector } from '@/components/editor/attraction-selector'
 import { MentionInput, type MentionInputHandle } from './mention-input'
 
@@ -72,6 +72,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
   const { user: currentUser } = useAuthStore()
   const { items: itineraries, refresh } = useItineraries()
   const { syncToCore } = useSyncItineraryToCore()
+  const { items: coreItems, refresh: refreshCoreItems } = useTourItineraryItemsByTour(tour.id)
 
   // State
   const [loading, setLoading] = useState(true)
@@ -264,6 +265,25 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           }
 
           if (itinerary.daily_itinerary && Array.isArray(itinerary.daily_itinerary)) {
+            // 從核心表建立 day→meals/accommodation/activities 對應
+            const coreMealsByDay: Record<number, { breakfast: string; lunch: string; dinner: string }> = {}
+            const coreAccomByDay: Record<number, string> = {}
+            const coreActivitiesByDay: Record<number, Array<{ title: string; attraction_id?: string }>> = {}
+            for (const item of coreItems) {
+              const dn = item.day_number
+              if (!dn) continue
+              if (item.category === 'meals' && item.sub_category) {
+                if (!coreMealsByDay[dn]) coreMealsByDay[dn] = { breakfast: '', lunch: '', dinner: '' }
+                const key = item.sub_category === 'breakfast' ? 'breakfast' : item.sub_category === 'lunch' ? 'lunch' : 'dinner'
+                coreMealsByDay[dn][key] = item.title || ''
+              } else if (item.category === 'accommodation') {
+                coreAccomByDay[dn] = item.title || ''
+              } else if (item.category === 'activities') {
+                if (!coreActivitiesByDay[dn]) coreActivitiesByDay[dn] = []
+                coreActivitiesByDay[dn].push({ title: item.title || '', attraction_id: item.resource_id || undefined })
+              }
+            }
+
             const schedule = (
               itinerary.daily_itinerary as Array<{
                 title?: string
@@ -274,21 +294,30 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                 activities?: Array<{ title?: string; attraction_id?: string }>
               }>
             ).map((day, idx) => {
-              const attractions = (day.activities || [])
+              const dayNum = idx + 1
+              // 優先從核心表取得，fallback 到 daily_itinerary 欄位
+              const coreMeals = coreMealsByDay[dayNum]
+              const coreAccom = coreAccomByDay[dayNum]
+              const coreActs = coreActivitiesByDay[dayNum]
+
+              const breakfast = coreMeals?.breakfast || day.meals?.breakfast || ''
+              const lunch = coreMeals?.lunch || day.meals?.lunch || ''
+              const dinner = coreMeals?.dinner || day.meals?.dinner || ''
+              const accommodation = coreAccom || day.accommodation || ''
+
+              const activities = coreActs || day.activities || []
+              const attractions = activities
                 .filter(a => a.attraction_id)
                 .map(a => ({ id: a.attraction_id!, name: a.title || '' }))
+
               return {
-                day: idx + 1,
+                day: dayNum,
                 route: day.title || '',
-                meals: {
-                  breakfast: day.meals?.breakfast || '',
-                  lunch: day.meals?.lunch || '',
-                  dinner: day.meals?.dinner || '',
-                },
-                accommodation: day.accommodation || '',
-                hotelBreakfast: day.meals?.breakfast === COMP_TOURS_LABELS.飯店早餐,
-                lunchSelf: day.meals?.lunch === COMP_TOURS_LABELS.敬請自理,
-                dinnerSelf: day.meals?.dinner === COMP_TOURS_LABELS.敬請自理,
+                meals: { breakfast, lunch, dinner },
+                accommodation,
+                hotelBreakfast: breakfast === COMP_TOURS_LABELS.飯店早餐,
+                lunchSelf: lunch === COMP_TOURS_LABELS.敬請自理,
+                dinnerSelf: dinner === COMP_TOURS_LABELS.敬請自理,
                 sameAsPrevious: day.isSameAccommodation || false,
                 attractions: attractions.length > 0 ? attractions : undefined,
                 note: day.description || undefined,
@@ -317,7 +346,8 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
     }
 
     loadItinerary()
-  }, [tour.id, itineraries, tour.name, tour.departure_date, tour.return_date])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tour.id, tour.name, tour.departure_date, tour.return_date, itineraries.length, coreItems.length])
 
   // Update day schedule
   const updateDaySchedule = useCallback((index: number, field: string, value: string | boolean | undefined) => {
@@ -467,7 +497,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
           recommendations: [],
           meals: { breakfast, lunch, dinner },
           accommodation: day.sameAsPrevious
-            ? `同上 (${getPreviousAccommodation(idx) || ''})`
+            ? `續住 (${getPreviousAccommodation(idx) || ''})`
             : accommodation,
           isSameAccommodation: day.sameAsPrevious || false,
           images: [],
@@ -482,6 +512,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
         highlight: day.highlight || '',
         description: day.description || '',
         images: day.images || [],
+        isSameAccommodation: day.isSameAccommodation || false,
         // 不存 meals, accommodation, activities（從核心表 JOIN 取得）
       }))
 
@@ -549,11 +580,16 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
 
       // 同步到核心表 tour_itinerary_items（使用完整資料）
       if (savedItineraryId) {
-        syncToCore({
-          itinerary_id: savedItineraryId,
-          tour_id: tour.id,
-          daily_itinerary: fullDailyItinerary as DailyItinerary[],
-        }).catch(err => logger.error('syncToCore error:', err))
+        try {
+          await syncToCore({
+            itinerary_id: savedItineraryId,
+            tour_id: tour.id,
+            daily_itinerary: fullDailyItinerary as DailyItinerary[],
+          })
+          refreshCoreItems()
+        } catch (err) {
+          logger.error('syncToCore error:', err)
+        }
       }
 
       refresh()
@@ -1525,7 +1561,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                     <td colSpan={4} className="px-0 py-0 border border-border/20 align-middle">
                       {day.sameAsPrevious ? (
                         <div className="h-7 flex items-center px-2 text-sm text-muted-foreground">
-                          同上 ({getPreviousAccommodation(idx) || '-'})
+                          續住 ({getPreviousAccommodation(idx) || '-'})
                         </div>
                       ) : (
                         <Input
@@ -1545,7 +1581,7 @@ export function TourItineraryTab({ tour }: TourItineraryTabProps) {
                             onChange={() => updateDaySchedule(idx, 'sameAsPrevious', !day.sameAsPrevious)}
                             className="rounded border-morandi-secondary w-3 h-3"
                           />
-                          同上
+                          續住
                         </label>
                       )}
                     </td>

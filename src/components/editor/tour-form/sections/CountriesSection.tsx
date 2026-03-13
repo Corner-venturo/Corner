@@ -46,7 +46,7 @@ export function CountriesSection({
                 country_id: country.id,
                 country_name: country.name,
                 country_code: country.code,
-                main_city_id: city?.id,
+                airport_code: city?.id,
                 main_city_name: city?.name || data.city,
                 is_primary: true,
               },
@@ -90,7 +90,7 @@ export function CountriesSection({
       country_id: '',
       country_name: '',
       country_code: '',
-      main_city_id: '',
+      airport_code: '',
       main_city_name: '',
       is_primary: false,
     }
@@ -113,18 +113,18 @@ export function CountriesSection({
           country_id: country.id,
           country_name: country.name,
           country_code: country.code,
-          main_city_id: '',
+          airport_code: '',
           main_city_name: '',
         }
       }
-    } else if (field === 'main_city_id') {
+    } else if (field === 'airport_code') {
       // 當選擇城市時，自動填入城市名稱
       const cities = getCitiesByCountryId(updated[index].country_id)
       const city = cities.find(c => c.id === value)
       if (city) {
         updated[index] = {
           ...updated[index],
-          main_city_id: city.id,
+          airport_code: city.id,
           main_city_name: city.name,
         }
       }
@@ -193,11 +193,11 @@ export function CountriesSection({
                 {COMP_EDITOR_LABELS.LABEL_5566}
               </label>
               <Combobox
-                value={primaryCountry.main_city_id || ''}
+                value={primaryCountry.airport_code || ''}
                 onChange={value => {
                   const index = countries.findIndex(c => c.is_primary)
                   if (index !== -1) {
-                    updateCountry(index, 'main_city_id', value)
+                    updateCountry(index, 'airport_code', value)
                   }
                 }}
                 options={primaryCityOptions}
@@ -253,8 +253,8 @@ export function CountriesSection({
                     {COMP_EDITOR_LABELS.LABEL_5566}
                   </label>
                   <Combobox
-                    value={country.main_city_id || ''}
-                    onChange={value => updateCountry(actualIndex, 'main_city_id', value)}
+                    value={country.airport_code || ''}
+                    onChange={value => updateCountry(actualIndex, 'airport_code', value)}
                     options={cityOptionsMap[country.country_id] || []}
                     placeholder={COMP_EDITOR_LABELS.搜尋或選擇城市}
                     showSearchIcon

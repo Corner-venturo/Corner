@@ -9,11 +9,21 @@ import { useAuthStore } from '@/stores'
 import { logger } from '@/lib/utils/logger'
 import type { Tour } from '@/stores/types'
 import type { CostCategory } from '@/features/quotes/types'
-import type {
-  ConfirmedRequirementItem,
-  ConfirmedRequirementsSnapshot,
-  ProposalPackage,
-} from '@/types/proposal.types'
+interface ConfirmedRequirementItem {
+  id: string
+  category: string
+  supplier_name: string
+  service_date: string | null
+  title: string
+  quantity: number
+  notes?: string
+}
+
+interface ConfirmedRequirementsSnapshot {
+  snapshot: ConfirmedRequirementItem[]
+  confirmed_at: string
+  confirmed_by?: string
+}
 import type { FlightInfo } from '@/types/flight.types'
 
 // 需求單類型
@@ -70,13 +80,11 @@ export const CATEGORIES: { key: CategoryKey; label: string; quoteCategoryId: str
 
 interface UseRequirementsDataOptions {
   tourId?: string
-  proposalPackageId?: string
   quoteId?: string | null
 }
 
 export function useRequirementsData({
   tourId,
-  proposalPackageId,
   quoteId: propQuoteId,
 }: UseRequirementsDataOptions) {
   const { user } = useAuthStore()
@@ -85,7 +93,6 @@ export function useRequirementsData({
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [tour, setTour] = useState<Tour | null>(null)
-  const [pkg, setPkg] = useState<ProposalPackage | null>(null)
   const [linkedQuoteId, setLinkedQuoteId] = useState<string | null>(propQuoteId || null)
   const [existingRequests, setExistingRequests] = useState<TourRequest[]>([])
   const [quoteCategories, setQuoteCategories] = useState<CostCategory[]>([])
@@ -93,9 +100,6 @@ export function useRequirementsData({
   const [outboundFlight, setOutboundFlight] = useState<FlightInfo | null>(null)
   const [returnFlight, setReturnFlight] = useState<FlightInfo | null>(null)
   const [confirmedSnapshot, setConfirmedSnapshot] = useState<ConfirmedRequirementItem[]>([])
-
-  // 判斷模式
-  const mode = tourId ? 'tour' : 'proposal'
 
   // 載入資料
   const loadData = useCallback(
@@ -105,9 +109,8 @@ export function useRequirementsData({
 
       try {
         let quoteId = propQuoteId || null
-        let workspaceId: string | null = null
 
-        if (mode === 'tour' && tourId) {
+        if (tourId) {
           // 旅遊團模式：載入團資料
           const { data: tourData } = await supabase
             .from('tours')
@@ -118,7 +121,6 @@ export function useRequirementsData({
           if (!tourData) return
 
           setTour(tourData as Tour)
-          workspaceId = (tourData as Tour).workspace_id || null
 
           // 取得報價單 ID
           const tourQuoteId = (tourData as { quote_id?: string | null }).quote_id
@@ -164,44 +166,6 @@ export function useRequirementsData({
             .eq('tour_id', tourId)
             .order('created_at', { ascending: true })
           setExistingRequests((requests as TourRequest[]) || [])
-        } else if (mode === 'proposal' && proposalPackageId) {
-          // 提案套件模式：載入套件資料
-          const { data: pkgData } = await supabase
-            .from('proposal_packages')
-            .select('*, proposals(*)')
-            .eq('id', proposalPackageId)
-            .single()
-
-          if (!pkgData) return
-
-          setPkg(pkgData as unknown as ProposalPackage)
-          workspaceId = (pkgData as { workspace_id?: string }).workspace_id || null
-
-          // 取得報價單 ID
-          quoteId = quoteId || (pkgData as { quote_id?: string | null }).quote_id || null
-
-          // 載入已確認快照
-          if (
-            pkgData.confirmed_requirements &&
-            typeof pkgData.confirmed_requirements === 'object'
-          ) {
-            const snapshot = (
-              pkgData.confirmed_requirements as unknown as ConfirmedRequirementsSnapshot
-            )?.snapshot
-            setConfirmedSnapshot(snapshot || [])
-          } else {
-            setConfirmedSnapshot([])
-          }
-
-          // 載入現有需求單
-          const { data: requests } = await supabase
-            .from('tour_requests')
-            .select(
-              'id, code, category, supplier_name, title, service_date, quantity, notes, status, quoted_cost, hidden, resource_id, resource_type'
-            )
-            .eq('proposal_package_id', proposalPackageId)
-            .order('created_at', { ascending: true })
-          setExistingRequests((requests as TourRequest[]) || [])
         }
 
         setLinkedQuoteId(quoteId)
@@ -229,7 +193,7 @@ export function useRequirementsData({
         setRefreshing(false)
       }
     },
-    [tourId, proposalPackageId, propQuoteId, mode, tour?.departure_date]
+    [tourId, propQuoteId, tour?.departure_date]
   )
 
   useEffect(() => {
@@ -407,7 +371,6 @@ export function useRequirementsData({
     loading,
     refreshing,
     tour,
-    pkg,
     linkedQuoteId,
     existingRequests,
     quoteCategories,
@@ -415,7 +378,6 @@ export function useRequirementsData({
     outboundFlight,
     returnFlight,
     confirmedSnapshot,
-    mode,
     // 計算結果
     quoteItems,
     changeTrackByCategory,

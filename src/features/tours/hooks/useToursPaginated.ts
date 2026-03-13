@@ -198,7 +198,20 @@ export function useToursPaginated(params: UseToursPaginatedParams): UseToursPagi
 
       if (updateError) throw updateError
 
-      await invalidateAllPaginatedQueries()
+      // 封存/解封時：立即從列表移除（不等 refetch）
+      if ('archived' in updates) {
+        await mutateSelf(
+          prev => prev ? {
+            ...prev,
+            tours: prev.tours.filter(t => t.id !== id),
+            count: prev.count - 1,
+          } : prev,
+          { revalidate: true }
+        )
+        await mutate('tours')
+      } else {
+        await invalidateAllPaginatedQueries()
+      }
       return updated as Tour
     } catch (err) {
       await invalidateAllPaginatedQueries()

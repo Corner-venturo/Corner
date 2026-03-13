@@ -7,7 +7,6 @@
 import { useCallback } from 'react'
 import { MoreVertical, Archive, ArchiveRestore, Trash2, Edit } from 'lucide-react'
 import { Tour, User } from '@/stores/types'
-import type { Proposal } from '@/types/proposal.types'
 import { TOUR_ACTIONS } from '../constants'
 import {
   DropdownMenu,
@@ -16,12 +15,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { TOURS_LABELS } from './constants/labels'
-
-// 擴展 Tour 類型，增加提案標記
-type TourOrProposal = Tour & {
-  __isProposal?: boolean
-  __originalProposal?: Proposal
-}
 
 interface UseTourActionButtonsParams {
   quotes: unknown[]
@@ -40,10 +33,6 @@ interface UseTourActionButtonsParams {
   onCloseTour?: (tour: Tour) => void
   onOpenArchiveDialog?: (tour: Tour) => void
   onOpenRequirementsDialog?: ((tour: Tour) => void) | undefined
-  onProposalClick?: (proposal: Proposal) => void
-  onProposalEdit?: (proposal: Proposal) => void
-  onProposalArchive?: (proposal: Proposal) => void
-  onProposalDelete?: (proposal: Proposal) => void
 }
 
 export function useTourActionButtons(params: UseTourActionButtonsParams) {
@@ -52,53 +41,11 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
     onEditTour,
     setDeleteConfirm,
     onOpenArchiveDialog,
-    onProposalArchive,
-    onProposalDelete,
   } = params
 
   const renderActions = useCallback(
     (row: unknown) => {
-      const item = row as TourOrProposal
-
-      // 提案：只顯示封存和刪除
-      if (item.__isProposal && item.__originalProposal) {
-        const proposal = item.__originalProposal
-        const canEdit = proposal.status !== 'converted' && proposal.status !== 'archived'
-        const canDelete = proposal.status === 'draft' || proposal.status === 'negotiating'
-
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                onClick={e => e.stopPropagation()}
-                className="p-1 rounded hover:bg-morandi-container/50 transition-colors"
-              >
-                <MoreVertical size={16} className="text-morandi-secondary" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" onClick={e => e.stopPropagation()}>
-              {canEdit && (
-                <DropdownMenuItem onClick={() => onProposalArchive?.(proposal)}>
-                  <Archive size={14} className="mr-2" />
-                  {TOUR_ACTIONS.archive}
-                </DropdownMenuItem>
-              )}
-              {canDelete && (
-                <DropdownMenuItem
-                  onClick={() => onProposalDelete?.(proposal)}
-                  className="text-morandi-red focus:text-morandi-red"
-                >
-                  <Trash2 size={14} className="mr-2" />
-                  {TOUR_ACTIONS.delete}
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )
-      }
-
-      // 旅遊團：封存/解封 + 刪除
-      const tour = item as Tour
+      const tour = row as Tour
 
       return (
         <DropdownMenu>
@@ -154,8 +101,6 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
       onEditTour,
       setDeleteConfirm,
       onOpenArchiveDialog,
-      onProposalArchive,
-      onProposalDelete,
     ]
   )
 

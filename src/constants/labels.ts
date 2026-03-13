@@ -315,7 +315,7 @@ export const QUOTE_DIALOG_LABELS_EXTRA = {
 
 export const ACCOMMODATION_ITEM_ROW_LABELS_EXTRA = {
   DAY: 'DAY{day}',
-  同上: '同上 ({prevDayHotelName})',
+  續住: '續住 ({prevDayHotelName})',
 }
 
 export const TRAVEL_INVOICE_LABELS = {

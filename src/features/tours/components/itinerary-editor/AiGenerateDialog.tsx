@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { AI_THEMES, type AccommodationStatus } from './types'
-import { AI_GENERATE_DIALOG_LABELS } from '../../constants/labels'
+import { AI_GENERATE_DIALOG_LABELS } from './labels'
 
 interface AiGenerateDialogProps {
   isOpen: boolean

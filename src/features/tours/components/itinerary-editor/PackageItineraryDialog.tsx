@@ -1,6 +1,6 @@
 'use client'
 /**
- * PackageItineraryDialog - 提案套件行程表對話框
+ * PackageItineraryDialog - 行程表對話框
  * 功能：建立新行程表 / 查看已關聯行程表
  */
 
@@ -18,19 +18,17 @@ import { TimelineEditor } from './TimelineEditor'
 import { ItineraryPreviewContent } from './ItineraryPreview'
 import { AiGenerateDialog } from './AiGenerateDialog'
 import { VersionDropdown } from './VersionDropdown'
-import { PACKAGE_ITINERARY_DIALOG_LABELS } from '../../constants/labels'
+import { PACKAGE_ITINERARY_DIALOG_LABELS } from './labels'
 
 export function PackageItineraryDialog({
   isOpen,
   onClose,
-  pkg,
-  proposal,
+  context: ctx,
   onItineraryCreated,
 }: PackageItineraryDialogProps) {
   const hook = usePackageItinerary({
     isOpen,
-    pkg,
-    proposal,
+    context: ctx,
     onClose,
     onItineraryCreated,
   })
@@ -51,9 +49,9 @@ export function PackageItineraryDialog({
           ) : hook.viewMode === 'preview' ? (
             /* 預覽模式 */
             <ItineraryPreviewContent
-              title={hook.formData.title || proposal.title}
-              destination={pkg.destination || pkg.country_id || ''}
-              startDate={pkg.start_date ?? null}
+              title={hook.formData.title || ctx.title}
+              destination={ctx.destination || ctx.country_id || ''}
+              startDate={ctx.start_date ?? null}
               outboundFlight={hook.formData.outboundFlight}
               returnFlight={hook.formData.returnFlight}
               dailyData={hook.getPreviewDailyData()}
@@ -76,7 +74,7 @@ export function PackageItineraryDialog({
                       ? PACKAGE_ITINERARY_DIALOG_LABELS.編輯行程表
                       : PACKAGE_ITINERARY_DIALOG_LABELS.建立行程表}
                     <span className="text-sm font-normal text-morandi-secondary">
-                      {pkg.version_name} - {proposal.title}
+                      {ctx.version_name} - {ctx.title}
                     </span>
                     {/* 預覽按鈕 */}
                     <Button
@@ -110,9 +108,9 @@ export function PackageItineraryDialog({
                       </Label>
                       <Input
                         value={
-                          pkg.country_id && pkg.main_city_id
-                            ? `${pkg.country_id} (${pkg.main_city_id})`
-                            : pkg.country_id || PACKAGE_ITINERARY_DIALOG_LABELS.未設定_2
+                          ctx.country_id && ctx.airport_code
+                            ? `${ctx.country_id} (${ctx.airport_code})`
+                            : ctx.country_id || PACKAGE_ITINERARY_DIALOG_LABELS.未設定_2
                         }
                         disabled
                         className="bg-muted"
@@ -131,13 +129,13 @@ export function PackageItineraryDialog({
                       <Label className="text-xs text-morandi-primary">
                         {PACKAGE_ITINERARY_DIALOG_LABELS.LABEL_4513}
                       </Label>
-                      <Input value={pkg.start_date || '(未設定)'} disabled className="bg-muted" />
+                      <Input value={ctx.start_date || '(未設定)'} disabled className="bg-muted" />
                     </div>
                     <div className="space-y-2">
                       <Label className="text-xs text-morandi-primary">
                         {PACKAGE_ITINERARY_DIALOG_LABELS.LABEL_2731}
                       </Label>
-                      <Input value={pkg.end_date || '(未設定)'} disabled className="bg-muted" />
+                      <Input value={ctx.end_date || '(未設定)'} disabled className="bg-muted" />
                     </div>
                   </div>
 
@@ -277,7 +275,7 @@ export function PackageItineraryDialog({
                 {!hook.isTimelineMode && (
                   <DailyScheduleEditor
                     dailySchedule={hook.dailySchedule}
-                    startDate={pkg.start_date ?? null}
+                    startDate={ctx.start_date ?? null}
                     onUpdateDay={hook.updateDaySchedule}
                     getPreviousAccommodation={hook.getPreviousAccommodation}
                   />
@@ -288,8 +286,8 @@ export function PackageItineraryDialog({
                   <TimelineEditor
                     dailySchedule={hook.dailySchedule}
                     selectedDayIndex={hook.selectedDayIndex}
-                    startDate={pkg.start_date ?? null}
-                    tourCountryName={pkg.destination || pkg.country_id || ''}
+                    startDate={ctx.start_date ?? null}
+                    tourCountryName={ctx.destination || ctx.country_id || ''}
                     onSelectDay={hook.setSelectedDayIndex}
                     onUpdateDay={hook.updateDaySchedule}
                     onAddActivity={hook.addActivity}
@@ -309,7 +307,7 @@ export function PackageItineraryDialog({
       <AiGenerateDialog
         isOpen={hook.aiDialogOpen}
         onClose={() => hook.setAiDialogOpen(false)}
-        destination={pkg.destination || pkg.country_id || ''}
+        destination={ctx.destination || ctx.country_id || ''}
         numDays={hook.dailySchedule.length}
         accommodationStatus={hook.getAccommodationStatus()}
         arrivalTime={hook.aiArrivalTime}

@@ -264,7 +264,6 @@ export interface Itinerary {
   code?: string // 行程編號（如：I20240001）
   tour_id?: string // 關聯的團 ID（選填，因為可能只是草稿）
   quote_id?: string // 關聯的報價單 ID（選填）
-  proposal_package_id?: string // 關聯的提案套件 ID（選填）
 
   // 模板支援
   template_id?: string | null // 模板 ID（模板時有值，實際團時為 null）
@@ -427,7 +426,7 @@ export interface Tour extends BaseEntity {
   days_count?: number | null // 天數（提案/模板用）
   location?: string | null // 目的地（相容舊欄位：destination）
   country_id?: string | null // 國家 ID
-  main_city_id?: string | null // 主要城市 ID
+  airport_code?: string | null // 機場代號
   departure_date: string | null // 出發日期 (ISO 8601)（提案/模板可為 null）
   return_date: string | null // 返回日期 (ISO 8601)（提案/模板可為 null）
   status?: string | null // 狀態（英文）
@@ -446,8 +445,6 @@ export interface Tour extends BaseEntity {
   quote_id?: string | null // 關聯的報價單 ID（唯一）
   itinerary_id?: string | null // 關聯的行程表 ID（唯一）
   quote_cost_structure?: unknown // 報價成本結構快照（對應 Supabase Json）
-  proposal_package_id?: string | null // 關聯的提案套件 ID（來源追蹤）
-
   // 合約相關欄位
   contract_template?: string | null // 合約範本
   contract_content?: string | null // 合約內容

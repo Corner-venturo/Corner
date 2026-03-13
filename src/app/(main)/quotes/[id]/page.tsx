@@ -70,7 +70,6 @@ export default function QuoteDetailPage() {
     // 核心表
     coreItems,
     refreshCoreItems,
-    hasCoreChanges,
     // 404 狀態
     notFound,
     hasLoaded,
@@ -198,6 +197,8 @@ export default function QuoteDetailPage() {
   const [showLinkTourDialog, setShowLinkTourDialog] = React.useState(false)
   // Local 報價對話框
   const [showLocalPricingDialog, setShowLocalPricingDialog] = React.useState(false)
+  // Local 報價檔次資料持久化
+  const [localTiers, setLocalTiers] = React.useState<LocalTier[]>([])
 
   // 處理狀態變更
   const handleStatusChange = React.useCallback(
@@ -254,7 +255,9 @@ export default function QuoteDetailPage() {
   // 處理 Local 報價確認
   const handleLocalPricingConfirm = React.useCallback(
     (tiers: LocalTier[], _matchedTierIndex: number) => {
-      // 產生檻次表：第一個使用目前總人數，後續使用 Local 報價的檻次
+      // 儲存檔次資料（持久化）
+      setLocalTiers(tiers)
+
       const sortedTiers = [...tiers].sort((a, b) => a.participants - b.participants)
 
       // 找到目前人數對應的檻次索引
@@ -266,15 +269,10 @@ export default function QuoteDetailPage() {
       }
       const currentLocalPrice = sortedTiers[currentTierIdx]?.unitPrice || 0
 
-      // 先計算 baseCosts（不含 Local，用現有 categories）
-      // 然後再創建 Local 項目
-
-      // 產生檻次表
-      const newTierPricings = sortedTiers.map((tier, index) => {
-        // 第一個檻次使用目前總人數（並對應到符合的 Local 單價）
-        const participantCount = index === 0 ? totalParticipants : tier.participants
-        // 該檻次對應的 Local 單價（每人）
-        const localUnitPrice = index === 0 ? currentLocalPrice : tier.unitPrice
+      // 產生檻次表：全部使用用戶輸入的檻次人數
+      const newTierPricings = sortedTiers.map((tier) => {
+        const participantCount = tier.participants
+        const localUnitPrice = tier.unitPrice
 
         // 計算新的人數分布（保持原始比例）
         const newCounts = calculateTierParticipantCounts(participantCount, participantCounts)
@@ -441,12 +439,6 @@ export default function QuoteDetailPage() {
         resourceName={QUOTE_PAGE_LABELS.THIS_QUOTE}
       />
 
-      {hasCoreChanges && (
-        <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2 rounded-md text-sm">
-          行程表已更新，有新的項目尚未報價。儲存時會自動更新。
-        </div>
-      )}
-
       <QuoteHeader
         isSpecialTour={isSpecialTour}
         isReadOnly={isReadOnly}
@@ -608,6 +600,7 @@ export default function QuoteDetailPage() {
         onClose={() => setShowLocalPricingDialog(false)}
         totalParticipants={totalParticipants}
         onConfirm={handleLocalPricingConfirm}
+        initialTiers={localTiers}
       />
     </div>
   )

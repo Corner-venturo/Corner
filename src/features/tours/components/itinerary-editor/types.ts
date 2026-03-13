@@ -1,9 +1,25 @@
 /**
- * PackageItineraryDialog 類型定義
+ * 行程編輯器類型定義
  */
 
 import type { FlightInfo } from '@/types/flight.types'
-import type { ProposalPackage, Proposal } from '@/types/proposal.types'
+
+/** 行程編輯器上下文（取代 ProposalPackage + Proposal） */
+export interface ItineraryEditorContext {
+  id: string              // 用於 key，可以是 tour.id
+  itinerary_id?: string | null
+  start_date?: string | null
+  end_date?: string | null
+  days?: number | null
+  country_id?: string | null
+  airport_code?: string | null
+  destination?: string | null
+  version_name?: string
+  quote_id?: string | null
+  group_size?: number | null
+  workspace_id: string
+  title: string
+}
 
 /** 行程表表單資料 */
 export interface ItineraryFormData {
@@ -71,12 +87,11 @@ export interface PreviewDayData {
   accommodation: string
 }
 
-/** Dialog Props */
+/** Dialog Props（使用 ItineraryEditorContext 取代 ProposalPackage + Proposal） */
 export interface PackageItineraryDialogProps {
   isOpen: boolean
   onClose: () => void
-  pkg: ProposalPackage
-  proposal: Proposal
+  context: ItineraryEditorContext
   onItineraryCreated?: (itineraryId?: string) => void
 }
 

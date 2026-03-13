@@ -3916,20 +3916,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "designer_drafts_package_id_fkey"
-            columns: ["package_id"]
-            isOneToOne: false
-            referencedRelation: "proposal_packages"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "designer_drafts_proposal_id_fkey"
-            columns: ["proposal_id"]
-            isOneToOne: false
-            referencedRelation: "proposals"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "designer_drafts_tour_id_fkey"
             columns: ["tour_id"]
             isOneToOne: false
@@ -6296,7 +6282,6 @@ export type Database = {
           price_tiers: Json | null
           pricing_details: Json | null
           pricing_style: string | null
-          proposal_package_id: string | null
           return_flight: Json | null
           show_cancellation_policy: boolean | null
           show_faqs: boolean | null
@@ -6369,7 +6354,6 @@ export type Database = {
           price_tiers?: Json | null
           pricing_details?: Json | null
           pricing_style?: string | null
-          proposal_package_id?: string | null
           return_flight?: Json | null
           show_cancellation_policy?: boolean | null
           show_faqs?: boolean | null
@@ -6442,7 +6426,6 @@ export type Database = {
           price_tiers?: Json | null
           pricing_details?: Json | null
           pricing_style?: string | null
-          proposal_package_id?: string | null
           return_flight?: Json | null
           show_cancellation_policy?: boolean | null
           show_faqs?: boolean | null
@@ -6516,13 +6499,6 @@ export type Database = {
             columns: ["parent_id"]
             isOneToOne: false
             referencedRelation: "itineraries"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "itineraries_proposal_package_id_fkey"
-            columns: ["proposal_package_id"]
-            isOneToOne: false
-            referencedRelation: "proposal_packages"
             referencedColumns: ["id"]
           },
           {
@@ -10843,238 +10819,6 @@ export type Database = {
         }
         Relationships: []
       }
-      proposal_packages: {
-        Row: {
-          confirmed_requirements: Json | null
-          country_id: string | null
-          created_at: string
-          created_by: string | null
-          days: number | null
-          destination: string | null
-          end_date: string | null
-          group_size: number | null
-          handbook_id: string | null
-          id: string
-          is_active: boolean | null
-          is_selected: boolean | null
-          itinerary_id: string | null
-          itinerary_type: string | null
-          main_city_id: string | null
-          nights: number | null
-          notes: string | null
-          participant_counts: Json | null
-          proposal_id: string | null
-          quote_id: string | null
-          start_date: string | null
-          timeline_data: Json | null
-          updated_at: string
-          updated_by: string | null
-          version_name: string
-          version_number: number
-          workspace_id: string | null
-        }
-        Insert: {
-          confirmed_requirements?: Json | null
-          country_id?: string | null
-          created_at?: string
-          created_by?: string | null
-          days?: number | null
-          destination?: string | null
-          end_date?: string | null
-          group_size?: number | null
-          handbook_id?: string | null
-          id?: string
-          is_active?: boolean | null
-          is_selected?: boolean | null
-          itinerary_id?: string | null
-          itinerary_type?: string | null
-          main_city_id?: string | null
-          nights?: number | null
-          notes?: string | null
-          participant_counts?: Json | null
-          proposal_id?: string | null
-          quote_id?: string | null
-          start_date?: string | null
-          timeline_data?: Json | null
-          updated_at?: string
-          updated_by?: string | null
-          version_name: string
-          version_number: number
-          workspace_id?: string | null
-        }
-        Update: {
-          confirmed_requirements?: Json | null
-          country_id?: string | null
-          created_at?: string
-          created_by?: string | null
-          days?: number | null
-          destination?: string | null
-          end_date?: string | null
-          group_size?: number | null
-          handbook_id?: string | null
-          id?: string
-          is_active?: boolean | null
-          is_selected?: boolean | null
-          itinerary_id?: string | null
-          itinerary_type?: string | null
-          main_city_id?: string | null
-          nights?: number | null
-          notes?: string | null
-          participant_counts?: Json | null
-          proposal_id?: string | null
-          quote_id?: string | null
-          start_date?: string | null
-          timeline_data?: Json | null
-          updated_at?: string
-          updated_by?: string | null
-          version_name?: string
-          version_number?: number
-          workspace_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "proposal_packages_proposal_id_fkey"
-            columns: ["proposal_id"]
-            isOneToOne: false
-            referencedRelation: "proposals"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "proposal_packages_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      proposals: {
-        Row: {
-          _deleted: boolean | null
-          _needs_sync: boolean | null
-          _synced_at: string | null
-          archive_reason: string | null
-          archived_at: string | null
-          code: string
-          converted_at: string | null
-          converted_by: string | null
-          converted_tour_id: string | null
-          country_id: string | null
-          created_at: string
-          created_by: string | null
-          customer_email: string | null
-          customer_id: string | null
-          customer_name: string | null
-          customer_phone: string | null
-          description: string | null
-          destination: string | null
-          expected_end_date: string | null
-          expected_start_date: string | null
-          flexible_dates: boolean | null
-          group_size: number | null
-          id: string
-          main_city_id: string | null
-          notes: string | null
-          participant_counts: Json | null
-          selected_package_id: string | null
-          status: string
-          title: string
-          updated_at: string
-          updated_by: string | null
-          workspace_id: string
-        }
-        Insert: {
-          _deleted?: boolean | null
-          _needs_sync?: boolean | null
-          _synced_at?: string | null
-          archive_reason?: string | null
-          archived_at?: string | null
-          code: string
-          converted_at?: string | null
-          converted_by?: string | null
-          converted_tour_id?: string | null
-          country_id?: string | null
-          created_at?: string
-          created_by?: string | null
-          customer_email?: string | null
-          customer_id?: string | null
-          customer_name?: string | null
-          customer_phone?: string | null
-          description?: string | null
-          destination?: string | null
-          expected_end_date?: string | null
-          expected_start_date?: string | null
-          flexible_dates?: boolean | null
-          group_size?: number | null
-          id?: string
-          main_city_id?: string | null
-          notes?: string | null
-          participant_counts?: Json | null
-          selected_package_id?: string | null
-          status?: string
-          title: string
-          updated_at?: string
-          updated_by?: string | null
-          workspace_id: string
-        }
-        Update: {
-          _deleted?: boolean | null
-          _needs_sync?: boolean | null
-          _synced_at?: string | null
-          archive_reason?: string | null
-          archived_at?: string | null
-          code?: string
-          converted_at?: string | null
-          converted_by?: string | null
-          converted_tour_id?: string | null
-          country_id?: string | null
-          created_at?: string
-          created_by?: string | null
-          customer_email?: string | null
-          customer_id?: string | null
-          customer_name?: string | null
-          customer_phone?: string | null
-          description?: string | null
-          destination?: string | null
-          expected_end_date?: string | null
-          expected_start_date?: string | null
-          flexible_dates?: boolean | null
-          group_size?: number | null
-          id?: string
-          main_city_id?: string | null
-          notes?: string | null
-          participant_counts?: Json | null
-          selected_package_id?: string | null
-          status?: string
-          title?: string
-          updated_at?: string
-          updated_by?: string | null
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "proposals_customer_id_fkey"
-            columns: ["customer_id"]
-            isOneToOne: false
-            referencedRelation: "customers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "proposals_selected_package_fkey"
-            columns: ["selected_package_id"]
-            isOneToOne: false
-            referencedRelation: "proposal_packages"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "proposals_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       quote_categories: {
         Row: {
           created_at: string | null
@@ -11399,14 +11143,13 @@ export type Database = {
           is_pinned: boolean | null
           issue_date: string | null
           itinerary_id: string | null
-          main_city_id: string | null
+          airport_code: string | null
           name: string | null
           nights: number | null
           notes: string | null
           number_of_people: number | null
           other_city_ids: string[] | null
           participant_counts: Json | null
-          proposal_package_id: string | null
           quick_quote_items: Json | null
           quote_type: string | null
           received_amount: number | null
@@ -11470,14 +11213,13 @@ export type Database = {
           is_pinned?: boolean | null
           issue_date?: string | null
           itinerary_id?: string | null
-          main_city_id?: string | null
+          airport_code?: string | null
           name?: string | null
           nights?: number | null
           notes?: string | null
           number_of_people?: number | null
           other_city_ids?: string[] | null
           participant_counts?: Json | null
-          proposal_package_id?: string | null
           quick_quote_items?: Json | null
           quote_type?: string | null
           received_amount?: number | null
@@ -11541,14 +11283,13 @@ export type Database = {
           is_pinned?: boolean | null
           issue_date?: string | null
           itinerary_id?: string | null
-          main_city_id?: string | null
+          airport_code?: string | null
           name?: string | null
           nights?: number | null
           notes?: string | null
           number_of_people?: number | null
           other_city_ids?: string[] | null
           participant_counts?: Json | null
-          proposal_package_id?: string | null
           quick_quote_items?: Json | null
           quote_type?: string | null
           received_amount?: number | null
@@ -11581,20 +11322,6 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "quotes_main_city_id_fkey"
-            columns: ["main_city_id"]
-            isOneToOne: false
-            referencedRelation: "cities"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "quotes_proposal_package_id_fkey"
-            columns: ["proposal_package_id"]
-            isOneToOne: false
-            referencedRelation: "proposal_packages"
             referencedColumns: ["id"]
           },
           {
@@ -14400,13 +14127,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "tour_control_forms_package_id_fkey"
-            columns: ["package_id"]
-            isOneToOne: true
-            referencedRelation: "proposal_packages"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "tour_control_forms_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
@@ -15735,13 +15455,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "tour_requests_proposal_package_id_fkey"
-            columns: ["proposal_package_id"]
-            isOneToOne: false
-            referencedRelation: "proposal_packages"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "tour_requests_recipient_workspace_id_fkey"
             columns: ["recipient_workspace_id"]
             isOneToOne: false
@@ -16121,7 +15834,7 @@ export type Database = {
           contract_status: string
           contract_template: string | null
           controller_id: string | null
-          converted_from_proposal: boolean | null
+          airport_code: string | null
           country_id: string | null
           created_at: string
           created_by: string | null
@@ -16145,15 +15858,12 @@ export type Database = {
           locked_itinerary_version: number | null
           locked_quote_id: string | null
           locked_quote_version: number | null
-          main_city_id: string | null
           max_participants: number | null
           modification_reason: string | null
           name: string
           outbound_flight: Json | null
           price: number | null
           profit: number
-          proposal_id: string | null
-          proposal_package_id: string | null
           quote_cost_structure: Json | null
           quote_id: string | null
           return_date: string | null
@@ -16188,7 +15898,7 @@ export type Database = {
           contract_status?: string
           contract_template?: string | null
           controller_id?: string | null
-          converted_from_proposal?: boolean | null
+          airport_code?: string | null
           country_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -16212,15 +15922,12 @@ export type Database = {
           locked_itinerary_version?: number | null
           locked_quote_id?: string | null
           locked_quote_version?: number | null
-          main_city_id?: string | null
           max_participants?: number | null
           modification_reason?: string | null
           name: string
           outbound_flight?: Json | null
           price?: number | null
           profit?: number
-          proposal_id?: string | null
-          proposal_package_id?: string | null
           quote_cost_structure?: Json | null
           quote_id?: string | null
           return_date?: string | null
@@ -16255,7 +15962,7 @@ export type Database = {
           contract_status?: string
           contract_template?: string | null
           controller_id?: string | null
-          converted_from_proposal?: boolean | null
+          airport_code?: string | null
           country_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -16279,15 +15986,12 @@ export type Database = {
           locked_itinerary_version?: number | null
           locked_quote_id?: string | null
           locked_quote_version?: number | null
-          main_city_id?: string | null
           max_participants?: number | null
           modification_reason?: string | null
           name?: string
           outbound_flight?: Json | null
           price?: number | null
           profit?: number
-          proposal_id?: string | null
-          proposal_package_id?: string | null
           quote_cost_structure?: Json | null
           quote_id?: string | null
           return_date?: string | null
@@ -16329,27 +16033,6 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tours_main_city_id_fkey"
-            columns: ["main_city_id"]
-            isOneToOne: false
-            referencedRelation: "cities"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tours_proposal_id_fkey"
-            columns: ["proposal_id"]
-            isOneToOne: false
-            referencedRelation: "proposals"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tours_proposal_package_id_fkey"
-            columns: ["proposal_package_id"]
-            isOneToOne: false
-            referencedRelation: "proposal_packages"
             referencedColumns: ["id"]
           },
           {

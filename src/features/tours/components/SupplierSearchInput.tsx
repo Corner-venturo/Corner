@@ -1,22 +1,18 @@
 'use client'
-/**
- * SupplierSearchInput - 供應商搜尋/新建組件
- *
- * 功能：
- * 1. 搜尋現有供應商
- * 2. 選擇供應商自動帶入聯絡資訊
- * 3. 沒有時可新建供應商
- */
-
 import React, { useState, useEffect, useRef } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Search, Plus, Loader2, Building2 } from 'lucide-react'
 import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { logger } from '@/lib/utils/logger'
-import { PROPOSAL_LABELS } from '../constants'
 
-// 供應商資料（完整欄位）
+const SUPPLIER_SEARCH_LABELS = {
+  placeholder: '輸入供應商名稱',
+  notFound: (term: string) => `找不到「${term}」`,
+  useAs: (term: string) => `使用「${term}」`,
+  contactLabel: '聯絡人: ',
+}
+
 export interface Supplier {
   id: string
   code: string
@@ -32,7 +28,7 @@ interface SupplierSearchInputProps {
   value: string
   onChange: (value: string) => void
   onSupplierSelect?: (supplier: Supplier) => void
-  category?: string // 優先顯示同類別供應商
+  category?: string
   placeholder?: string
   className?: string
 }
@@ -42,7 +38,7 @@ export function SupplierSearchInput({
   onChange,
   onSupplierSelect,
   category,
-  placeholder = PROPOSAL_LABELS.supplierSearch.placeholder,
+  placeholder = SUPPLIER_SEARCH_LABELS.placeholder,
   className = '',
 }: SupplierSearchInputProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -52,36 +48,26 @@ export function SupplierSearchInput({
   const inputRef = useRef<HTMLInputElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // 搜尋供應商
   useEffect(() => {
     const searchSuppliers = async () => {
       if (!searchTerm || searchTerm.length < 2) {
         setSuppliers([])
         return
       }
-
       setLoading(true)
       try {
-        // 將 category 轉換為 supplier type（activity → attraction）
         const supplierType = category === 'activity' ? 'attraction' : category
-
-        // 查詢供應商（包含完整欄位）
-
         let query = dynamicFrom('suppliers')
           .select('id, code, name, contact_person, phone, type')
           .ilike('name', `%${searchTerm}%`)
           .eq('is_active', true)
           .limit(15)
-
         const { data, error } = await query
-
         if (error) {
           logger.error('搜尋供應商失敗:', error.message || error)
           setSuppliers([])
           return
         }
-
-        // 排序：同類別優先
         let sortedData = (data as Supplier[]) || []
         if (supplierType && sortedData.length > 0) {
           sortedData = sortedData.sort((a, b) => {
@@ -90,7 +76,6 @@ export function SupplierSearchInput({
             return aMatch - bMatch
           })
         }
-
         setSuppliers(sortedData.slice(0, 10))
       } catch (error) {
         const err = error as Error
@@ -100,12 +85,10 @@ export function SupplierSearchInput({
         setLoading(false)
       }
     }
-
     const debounce = setTimeout(searchSuppliers, 300)
     return () => clearTimeout(debounce)
   }, [searchTerm, category])
 
-  // 點擊外部關閉
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -117,12 +100,10 @@ export function SupplierSearchInput({
         setIsOpen(false)
       }
     }
-
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // 選擇供應商
   const handleSelect = (supplier: Supplier) => {
     setSearchTerm(supplier.name)
     onChange(supplier.name)
@@ -130,7 +111,6 @@ export function SupplierSearchInput({
     setIsOpen(false)
   }
 
-  // 輸入變更
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value
     setSearchTerm(val)
@@ -141,10 +121,7 @@ export function SupplierSearchInput({
   return (
     <div className={`relative ${className}`}>
       <div className="relative">
-        <Search
-          size={14}
-          className="absolute left-2 top-1/2 -translate-y-1/2 text-morandi-secondary"
-        />
+        <Search size={14} className="absolute left-2 top-1/2 -translate-y-1/2 text-morandi-secondary" />
         <Input
           ref={inputRef}
           value={searchTerm}
@@ -154,14 +131,9 @@ export function SupplierSearchInput({
           className="h-7 text-sm pl-7"
         />
         {loading && (
-          <Loader2
-            size={14}
-            className="absolute right-2 top-1/2 -translate-y-1/2 animate-spin text-morandi-secondary"
-          />
+          <Loader2 size={14} className="absolute right-2 top-1/2 -translate-y-1/2 animate-spin text-morandi-secondary" />
         )}
       </div>
-
-      {/* 下拉選單 */}
       {isOpen && searchTerm.length >= 2 && (
         <div
           ref={dropdownRef}
@@ -170,20 +142,11 @@ export function SupplierSearchInput({
           {suppliers.length === 0 && !loading ? (
             <div className="p-3 text-center">
               <p className="text-sm text-morandi-secondary mb-2">
-                {PROPOSAL_LABELS.supplierSearch.notFound(searchTerm)}
+                {SUPPLIER_SEARCH_LABELS.notFound(searchTerm)}
               </p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-1 text-xs"
-                onClick={() => {
-                  // 使用輸入的名稱作為新供應商
-                  onChange(searchTerm)
-                  setIsOpen(false)
-                }}
-              >
+              <Button variant="outline" size="sm" className="gap-1 text-xs" onClick={() => { onChange(searchTerm); setIsOpen(false) }}>
                 <Plus size={12} />
-                {PROPOSAL_LABELS.supplierSearch.useAs(searchTerm)}
+                {SUPPLIER_SEARCH_LABELS.useAs(searchTerm)}
               </Button>
             </div>
           ) : (
@@ -198,12 +161,7 @@ export function SupplierSearchInput({
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-sm truncate">{supplier.name}</div>
                     <div className="text-xs text-morandi-secondary flex gap-2">
-                      {supplier.contact_person && (
-                        <span>
-                          {PROPOSAL_LABELS.supplierSearch.contactLabel}
-                          {supplier.contact_person}
-                        </span>
-                      )}
+                      {supplier.contact_person && <span>{SUPPLIER_SEARCH_LABELS.contactLabel}{supplier.contact_person}</span>}
                       {supplier.phone && <span>{supplier.phone}</span>}
                     </div>
                   </div>

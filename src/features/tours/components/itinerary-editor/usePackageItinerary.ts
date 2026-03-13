@@ -1,6 +1,7 @@
 /**
  * usePackageItinerary - 行程表對話框核心 Hook
  * 管理所有狀態和邏輯
+ * 重構：使用 ItineraryEditorContext 取代 ProposalPackage + Proposal
  */
 
 'use client'
@@ -10,18 +11,18 @@ import { useAuthStore } from '@/stores'
 import { useFlightSearch } from '@/hooks'
 import { useItineraries, createItinerary } from '@/data'
 import { supabase } from '@/lib/supabase/client'
-import { dynamicFrom } from '@/lib/supabase/typed-client'
 import type { Json } from '@/lib/supabase/types'
 import type { Itinerary, ItineraryVersionRecord } from '@/stores/types'
-import type { ProposalPackage, Proposal } from '@/types/proposal.types'
 import type { FlightInfo } from '@/types/flight.types'
 import { logger } from '@/lib/utils/logger'
 import { alert } from '@/lib/ui/alert-dialog'
 import { stripHtml } from '@/lib/utils/string-utils'
 import { syncItineraryToQuote } from '@/lib/utils/itinerary-quote-sync'
+import { useSyncItineraryToCore } from '@/features/tours/hooks/useTourItineraryItems'
 import { isFeatureAvailable } from '@/lib/feature-restrictions'
 import { toast } from 'sonner'
 import type {
+  ItineraryEditorContext,
   ItineraryFormData,
   DailyScheduleItem,
   SimpleActivity,
@@ -33,32 +34,31 @@ import {
   getPreviewDailyData as getPreviewData,
   generatePrintHtml,
 } from './format-itinerary'
-import { PROPOSAL_LABELS } from '../../constants'
+import { ITINERARY_EDITOR_LABELS } from './labels'
 
 interface UsePackageItineraryOptions {
   isOpen: boolean
-  pkg: ProposalPackage
-  proposal: Proposal
+  context: ItineraryEditorContext
   onClose: () => void
   onItineraryCreated?: (itineraryId?: string) => void
 }
 
 export function usePackageItinerary({
   isOpen,
-  pkg,
-  proposal,
+  context: ctx,
   onClose,
   onItineraryCreated,
 }: UsePackageItineraryOptions) {
   const { items: itineraries, refresh } = useItineraries()
   const create = createItinerary
   const { user: currentUser } = useAuthStore()
+  const { syncToCore } = useSyncItineraryToCore()
 
   // 判斷是否為國內旅遊（台灣）
   const isDomestic = useMemo(() => {
-    const dest = pkg.destination?.toLowerCase() || ''
+    const dest = ctx.destination?.toLowerCase() || ''
     return dest.includes('台灣') || dest.includes('taiwan') || dest === 'tw'
-  }, [pkg.destination])
+  }, [ctx.destination])
 
   // 基本狀態
   const [isCreating, setIsCreating] = useState(false)
@@ -102,8 +102,8 @@ export function usePackageItinerary({
       setFormData(prev => ({ ...prev, returnFlight: flight }))
       setReturnFlightNumber('')
     },
-    departureDate: outboundFlightDate || pkg?.start_date || '',
-    days: String(pkg?.days || ''),
+    departureDate: outboundFlightDate || ctx?.start_date || '',
+    days: String(ctx?.days || ''),
   })
 
   // 版本控制狀態
@@ -135,13 +135,13 @@ export function usePackageItinerary({
 
   // 計算天數
   const calculateDays = useCallback(() => {
-    if (!pkg.start_date || !pkg.end_date) return pkg.days || 5
-    const start = new Date(pkg.start_date)
-    const end = new Date(pkg.end_date)
+    if (!ctx.start_date || !ctx.end_date) return ctx.days || 5
+    const start = new Date(ctx.start_date)
+    const end = new Date(ctx.end_date)
     const diffTime = Math.abs(end.getTime() - start.getTime())
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
     return Math.max(1, Math.min(diffDays, 30))
-  }, [pkg.start_date, pkg.end_date, pkg.days])
+  }, [ctx.start_date, ctx.end_date, ctx.days])
 
   // 從行程表載入每日資料
   const loadDailyDataFromItinerary = useCallback(
@@ -172,7 +172,7 @@ export function usePackageItinerary({
           if (idx > 0) {
             const prevAccommodation = dailyData![idx - 1]?.accommodation
             sameAsPrevious =
-              Boolean(day.accommodation?.includes('同上')) ||
+              Boolean(day.accommodation?.includes('續住')) ||
               Boolean(prevAccommodation && day.accommodation === prevAccommodation)
           }
           const activities = (day.activities || []).map((act, actIdx) => ({
@@ -247,33 +247,33 @@ export function usePackageItinerary({
       setViewMode('edit')
       hasInitializedDailyScheduleRef.current = false
       setFormData({
-        title: proposal.title || pkg.version_name,
+        title: ctx.title || ctx.version_name || '',
         description: '',
         outboundFlight: null,
         returnFlight: null,
       })
       setOutboundFlightNumber('')
-      setOutboundFlightDate(pkg.start_date || '')
+      setOutboundFlightDate(ctx.start_date || '')
       setReturnFlightNumber('')
-      setReturnFlightDate(pkg.end_date || '')
+      setReturnFlightDate(ctx.end_date || '')
 
       const loadData = async () => {
-        if (pkg.itinerary_id) {
-          logger.log('[PackageItineraryDialog] 直接從資料庫載入行程表:', pkg.itinerary_id)
+        if (ctx.itinerary_id) {
+          logger.log('[ItineraryEditor] 直接從資料庫載入行程表:', ctx.itinerary_id)
           const { data, error } = await supabase
             .from('itineraries')
             .select('*')
-            .eq('id', pkg.itinerary_id)
+            .eq('id', ctx.itinerary_id)
             .single()
 
           if (!error && data) {
             logger.log(
-              '[PackageItineraryDialog] 載入成功，版本數:',
+              '[ItineraryEditor] 載入成功，版本數:',
               (data.version_records as unknown[])?.length || 0
             )
             setDirectLoadedItinerary(data as unknown as Itinerary)
           } else {
-            logger.error('[PackageItineraryDialog] 載入失敗:', error)
+            logger.error('[ItineraryEditor] 載入失敗:', error)
           }
         }
         await refresh()
@@ -287,25 +287,22 @@ export function usePackageItinerary({
     }
   }, [
     isOpen,
-    pkg.itinerary_id,
-    pkg.start_date,
-    pkg.end_date,
-    pkg.version_name,
-    proposal.title,
+    ctx.itinerary_id,
+    ctx.start_date,
+    ctx.end_date,
+    ctx.version_name,
+    ctx.title,
     refresh,
   ])
 
-  // 已關聯的行程表
+  // 已關聯的行程表（透過 itinerary_id 查找）
   const linkedItineraries = useMemo(() => {
-    logger.log(
-      `[PackageItineraryDialog] pkg.id = ${pkg.id}, pkg.itinerary_id = ${pkg.itinerary_id}`
-    )
     const filtered = itineraries.filter(i => {
       if (i._deleted) return false
-      return i.proposal_package_id === pkg.id || (pkg.itinerary_id && i.id === pkg.itinerary_id)
+      return ctx.itinerary_id && i.id === ctx.itinerary_id
     })
     return filtered
-  }, [itineraries, pkg.id, pkg.itinerary_id])
+  }, [itineraries, ctx.itinerary_id])
 
   // 當資料載入完成後初始化每日行程
   useEffect(() => {
@@ -315,7 +312,7 @@ export function usePackageItinerary({
 
       const itinerary =
         directLoadedItinerary ||
-        linkedItineraries.find(i => i.id === pkg.itinerary_id || i.proposal_package_id === pkg.id)
+        linkedItineraries.find(i => i.id === ctx.itinerary_id)
 
       if (itinerary) {
         loadDailyDataFromItinerary(itinerary, -1, days)
@@ -340,8 +337,7 @@ export function usePackageItinerary({
     isOpen,
     directLoadedItinerary,
     linkedItineraries,
-    pkg.itinerary_id,
-    pkg.id,
+    ctx.itinerary_id,
     calculateDays,
     loadDailyDataFromItinerary,
   ])
@@ -350,9 +346,9 @@ export function usePackageItinerary({
   const existingItinerary = useMemo(() => {
     return (
       directLoadedItinerary ||
-      linkedItineraries.find(i => i.id === pkg.itinerary_id || i.proposal_package_id === pkg.id)
+      linkedItineraries.find(i => i.id === ctx.itinerary_id)
     )
-  }, [directLoadedItinerary, linkedItineraries, pkg.itinerary_id, pkg.id])
+  }, [directLoadedItinerary, linkedItineraries, ctx.itinerary_id])
 
   const isEditMode = Boolean(existingItinerary)
 
@@ -367,7 +363,7 @@ export function usePackageItinerary({
       setSelectedVersionIndex(index)
       const itinerary =
         directLoadedItinerary ||
-        linkedItineraries.find(i => i.id === pkg.itinerary_id || i.proposal_package_id === pkg.id)
+        linkedItineraries.find(i => i.id === ctx.itinerary_id)
       if (itinerary) {
         loadDailyDataFromItinerary(itinerary, index, calculateDays())
       }
@@ -375,8 +371,7 @@ export function usePackageItinerary({
     [
       directLoadedItinerary,
       linkedItineraries,
-      pkg.itinerary_id,
-      pkg.id,
+      ctx.itinerary_id,
       calculateDays,
       loadDailyDataFromItinerary,
     ]
@@ -528,14 +523,14 @@ export function usePackageItinerary({
     const record = versionRecords[selectedVersionIndex]
     return (
       record?.note ||
-      PROPOSAL_LABELS.brochurePreview.versionLabel(record?.version || selectedVersionIndex + 1)
+      ITINERARY_EDITOR_LABELS.brochurePreview.versionLabel(record?.version || selectedVersionIndex + 1)
     )
   }, [selectedVersionIndex, versionRecords, existingItinerary])
 
   // 產生預覽資料
   const getPreviewDailyData = useCallback((): PreviewDayData[] => {
-    return getPreviewData(dailySchedule, pkg.start_date || null)
-  }, [dailySchedule, pkg.start_date])
+    return getPreviewData(dailySchedule, ctx.start_date || null)
+  }, [dailySchedule, ctx.start_date])
 
   // 列印預覽
   const handlePrintPreview = useCallback(() => {
@@ -546,8 +541,8 @@ export function usePackageItinerary({
     const printContent = generatePrintHtml({
       title: formData.title,
       companyName: currentUser?.workspace_code || '旅行社',
-      destination: pkg.destination || pkg.country_id || '',
-      startDate: pkg.start_date || null,
+      destination: ctx.destination || ctx.country_id || '',
+      startDate: ctx.start_date || null,
       isDomestic,
       outboundFlight: formData.outboundFlight,
       returnFlight: formData.returnFlight,
@@ -562,9 +557,9 @@ export function usePackageItinerary({
     formData.title,
     formData.outboundFlight,
     formData.returnFlight,
-    pkg.start_date,
-    pkg.destination,
-    pkg.country_id,
+    ctx.start_date,
+    ctx.destination,
+    ctx.country_id,
     currentUser?.workspace_code,
     isDomestic,
   ])
@@ -582,15 +577,15 @@ export function usePackageItinerary({
 
   // AI 生成
   const handleAiGenerate = useCallback(async () => {
-    const destinationName = pkg.destination || ''
-    const cityId = pkg.main_city_id || ''
-    const countryId = pkg.country_id || ''
+    const destinationName = ctx.destination || ''
+    const airportCode = ctx.airport_code || ''
+    const countryId = ctx.country_id || ''
 
-    if (!destinationName && !cityId && !countryId) {
+    if (!destinationName && !airportCode && !countryId) {
       toast.error('請先設定目的地')
       return
     }
-    if (!pkg.start_date) {
+    if (!ctx.start_date) {
       toast.error('請先設定出發日期')
       return
     }
@@ -603,10 +598,10 @@ export function usePackageItinerary({
 
       logger.log('[AI Generate] Request:', {
         destination: destinationName,
-        cityId,
+        airportCode,
         countryId,
         numDays,
-        departureDate: pkg.start_date,
+        departureDate: ctx.start_date,
         theme: aiTheme,
       })
 
@@ -615,10 +610,10 @@ export function usePackageItinerary({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           destination: destinationName,
-          cityId: cityId,
+          cityId: airportCode,
           countryId: countryId,
           numDays,
-          departureDate: pkg.start_date,
+          departureDate: ctx.start_date,
           arrivalTime: aiArrivalTime,
           departureTime: aiDepartureTime,
           theme: aiTheme,
@@ -675,10 +670,10 @@ export function usePackageItinerary({
       setAiGenerating(false)
     }
   }, [
-    pkg.destination,
-    pkg.start_date,
-    pkg.main_city_id,
-    pkg.country_id,
+    ctx.destination,
+    ctx.start_date,
+    ctx.airport_code,
+    ctx.country_id,
     aiArrivalTime,
     aiDepartureTime,
     aiTheme,
@@ -694,7 +689,7 @@ export function usePackageItinerary({
 
       const formattedDailyItinerary = formatDailyItinerary({
         dailySchedule,
-        startDate: pkg.start_date || null,
+        startDate: ctx.start_date || null,
         getPreviousAccommodation,
       })
 
@@ -708,8 +703,8 @@ export function usePackageItinerary({
           .update({
             title: formData.title,
             daily_itinerary: formattedDailyItinerary,
-            country: pkg.country_id || '',
-            city: pkg.main_city_id || '',
+            country: ctx.country_id || '',
+            city: ctx.airport_code || '',
             outbound_flight: formData.outboundFlight
               ? {
                   airline: formData.outboundFlight.airline,
@@ -743,7 +738,14 @@ export function usePackageItinerary({
         }
 
         logger.log('行程表更新成功')
-        await syncItineraryToQuote(existingItinerary.id, formattedDailyItinerary, pkg.id)
+        await syncItineraryToQuote(existingItinerary.id, formattedDailyItinerary)
+
+        // 同步到核心表
+        syncToCore({
+          itinerary_id: existingItinerary.id,
+          tour_id: null,
+          daily_itinerary: formattedDailyItinerary,
+        }).catch(err => logger.warn('核心表同步失敗（不影響儲存）:', err))
 
         const { data: refreshedData } = await supabase
           .from('itineraries')
@@ -768,15 +770,14 @@ export function usePackageItinerary({
           tour_code: '',
           status: '開團',
           author_name: authorName,
-          departure_date: pkg.start_date || '',
-          country: pkg.country_id || '',
-          city: pkg.main_city_id || '',
+          departure_date: ctx.start_date || '',
+          country: ctx.country_id || '',
+          city: ctx.airport_code || '',
           daily_itinerary: formattedDailyItinerary,
           description: formData.description,
           cover_image: '',
           features: [],
           focus_cards: [],
-          proposal_package_id: pkg.id,
           workspace_id: workspaceId,
           outbound_flight: formData.outboundFlight
             ? {
@@ -813,12 +814,12 @@ export function usePackageItinerary({
         if (newItinerary?.id) {
           logger.log('行程表建立成功:', newItinerary.id)
 
-          await dynamicFrom('proposal_packages')
-            .update({
-              itinerary_id: newItinerary.id,
-              itinerary_type: 'simple',
-            })
-            .eq('id', pkg.id)
+          // 同步到核心表
+          syncToCore({
+            itinerary_id: newItinerary.id,
+            tour_id: null,
+            daily_itinerary: formattedDailyItinerary,
+          }).catch(err => logger.warn('核心表同步失敗（不影響儲存）:', err))
 
           await alert('行程表建立成功', 'success')
           onItineraryCreated?.(newItinerary.id)
@@ -847,7 +848,7 @@ export function usePackageItinerary({
     }
   }, [
     dailySchedule,
-    pkg,
+    ctx,
     formData,
     isEditMode,
     existingItinerary,
@@ -856,6 +857,7 @@ export function usePackageItinerary({
     onItineraryCreated,
     onClose,
     create,
+    syncToCore,
   ])
 
   // 另存新版本
@@ -869,7 +871,7 @@ export function usePackageItinerary({
     try {
       const formattedDailyItinerary = formatDailyItinerary({
         dailySchedule,
-        startDate: pkg.start_date || null,
+        startDate: ctx.start_date || null,
         getPreviousAccommodation,
         includeSameAccommodation: true,
       })
@@ -877,7 +879,7 @@ export function usePackageItinerary({
       const newVersion: ItineraryVersionRecord = {
         id: crypto.randomUUID(),
         version: versionRecords.length + 1,
-        note: PROPOSAL_LABELS.brochurePreview.versionLabel(versionRecords.length + 1),
+        note: ITINERARY_EDITOR_LABELS.brochurePreview.versionLabel(versionRecords.length + 1),
         daily_itinerary: formattedDailyItinerary,
         features: existingItinerary.features || [],
         focus_cards: existingItinerary.focus_cards || [],
@@ -914,7 +916,7 @@ export function usePackageItinerary({
     existingItinerary,
     dailySchedule,
     versionRecords,
-    pkg.start_date,
+    ctx.start_date,
     getPreviousAccommodation,
     onItineraryCreated,
   ])

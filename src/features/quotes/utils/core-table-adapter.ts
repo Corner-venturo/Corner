@@ -121,6 +121,18 @@ export function coreItemsToCostCategories(items: TourItineraryItem[]): CostCateg
     targetCategory.items.push(costItem)
   }
 
+  // 住宿：自動標記續住（同一飯店名稱連續天 → is_same_as_previous）
+  const accCat = categories.find(c => c.id === 'accommodation')
+  if (accCat) {
+    const sorted = accCat.items.slice().sort((a, b) => (a.day ?? 0) - (b.day ?? 0))
+    for (let i = 0; i < sorted.length; i++) {
+      if (i > 0 && sorted[i].name && sorted[i].name === sorted[i - 1].name) {
+        sorted[i].is_same_as_previous = true
+      }
+    }
+    accCat.items = sorted
+  }
+
   // 計算各分類 total
   for (const cat of categories) {
     cat.total = cat.items.reduce((sum, item) => sum + (item.total || 0), 0)

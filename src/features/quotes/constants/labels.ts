@@ -8,7 +8,7 @@ export const ACCOMMODATION_ITEM_ROW_LABELS = {
   備註: '備註',
   刪除: '刪除',
 
-  LABEL_1440: '同上 (',
+  LABEL_1440: '續住 (',
 }
 
 export const CATEGORY_SECTION_LABELS = {
@@ -18,8 +18,8 @@ export const CATEGORY_SECTION_LABELS = {
   查看參考報價: '查看參考報價',
   成人: '成人',
 
-  ADD_2985: '新增天數',
   ADD: '新增',
+  新增房型: '新增房型',
   LABEL_138: '交通',
   LABEL_8731: '導遊',
   LABEL_475: '兒童',

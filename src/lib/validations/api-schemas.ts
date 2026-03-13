@@ -102,16 +102,6 @@ export const createLinkPaySchema = z.object({
 })
 
 // ==========================================
-// 提案轉團
-// ==========================================
-
-export const convertToTourSchema = z.object({
-  proposal_id: z.string().min(1, '缺少提案 ID'),
-  version_id: z.string().min(1, '缺少版本 ID'),
-  workspace_id: z.string().min(1, '缺少工作區 ID'),
-})
-
-// ==========================================
 // Bot 通知
 // ==========================================
 
@@ -264,20 +254,6 @@ export const issueAllowanceSchema = z.object({
     )
     .min(1, '至少需要一個折讓項目'),
   operatedBy: z.string().optional(),
-})
-
-// ==========================================
-// 提案轉團（擴充）
-// ==========================================
-
-export const convertToTourFullSchema = z.object({
-  proposal_id: z.string().min(1, '缺少提案 ID'),
-  package_id: z.string().min(1, '缺少套件 ID'),
-  city_code: z.string().min(1, '缺少城市代碼'),
-  departure_date: z.string().min(1, '缺少出發日期'),
-  tour_name: z.string().optional(),
-  contact_person: z.string().optional(),
-  contact_phone: z.string().optional(),
 })
 
 // ==========================================

@@ -156,8 +156,8 @@ export function useTourEdit(params: UseTourEditParams) {
     let cityCode = ''
     let citiesList: Array<{ id: string; code: string; name: string }> = []
 
-    // Find by country_id and main_city_id
-    if (tour.country_id && tour.main_city_id) {
+    // Find by country_id and airport_code
+    if (tour.country_id && tour.airport_code) {
       const matchedCountry = activeCountries.find(c => c.id === tour.country_id)
       if (matchedCountry) {
         countryCode = matchedCountry.code
@@ -168,7 +168,7 @@ export function useTourEdit(params: UseTourEditParams) {
             code: c.airport_code || '',
             name: c.name,
           }))
-        const matchedCity = citiesList.find(city => city.id === tour.main_city_id)
+        const matchedCity = citiesList.find(city => city.id === tour.airport_code)
         if (matchedCity) {
           cityCode = matchedCity.code
         }
@@ -405,7 +405,7 @@ export function useTourEdit(params: UseTourEditParams) {
       // Find selected country and city
       let location = formData.customLocation
       let countryId = tour.country_id
-      let mainCityId = tour.main_city_id
+      let mainCityId = tour.airport_code
 
       if (formData.countryCode !== '__custom__') {
         const selectedCountry = activeCountries.find(c => c.code === formData.countryCode)
@@ -436,7 +436,7 @@ export function useTourEdit(params: UseTourEditParams) {
         name: formData.name.trim(),
         location,
         country_id: countryId,
-        main_city_id: mainCityId,
+        airport_code: mainCityId,
         departure_date: formData.departure_date,
         return_date: formData.return_date,
         description: formData.description.trim(),

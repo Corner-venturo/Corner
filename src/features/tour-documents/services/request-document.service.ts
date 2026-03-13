@@ -3,21 +3,22 @@
  * 需求單文件存取層（支援多版本）
  */
 
-import { supabase } from '@/lib/supabase/client'
+import { dynamicFrom } from '@/lib/supabase/typed-client'
 import type { RequestDocument, CreateRequestDocumentInput } from '@/types/tour-documents.types'
+
+const requestDocumentsDb = () => dynamicFrom('request_documents')
 
 /**
  * 取得需求單的所有文件（按版本排序）
  */
 export async function getRequestDocuments(requestId: string): Promise<RequestDocument[]> {
-  const { data, error } = await supabase
-    .from('request_documents')
+  const { data, error } = await requestDocumentsDb()
     .select('*')
     .eq('request_id', requestId)
     .order('created_at', { ascending: true })
 
   if (error) throw error
-  return data || []
+  return (data || []) as unknown as RequestDocument[]
 }
 
 /**
@@ -28,8 +29,7 @@ export async function createRequestDocument(
   workspaceId: string,
   userId: string
 ): Promise<RequestDocument> {
-  const { data, error } = await supabase
-    .from('request_documents')
+  const { data, error } = await requestDocumentsDb()
     .insert({
       workspace_id: workspaceId,
       request_id: input.request_id,
@@ -40,10 +40,10 @@ export async function createRequestDocument(
       file_size: input.file_size,
       mime_type: input.mime_type,
       note: input.note,
-      reply_type: 'sent',  // 我方發送
+      reply_type: 'sent',
       status: '草稿',
       created_by: userId,
-    } as any)
+    })
     .select()
     .single()
 
@@ -52,12 +52,12 @@ export async function createRequestDocument(
 }
 
 /**
- * 🆕 上傳供應商回覆
+ * 上傳供應商回覆
  */
 export async function uploadSupplierReply(
   input: {
     request_id: string
-    parent_document_id: string  // 關聯到哪個需求單版本
+    parent_document_id: string
     file_name: string
     file_url: string
     file_size?: number
@@ -68,15 +68,14 @@ export async function uploadSupplierReply(
   workspaceId: string,
   userId: string
 ): Promise<RequestDocument> {
-  const { data, error } = await supabase
-    .from('request_documents')
+  const { data, error } = await requestDocumentsDb()
     .insert({
       workspace_id: workspaceId,
       request_id: input.request_id,
       parent_document_id: input.parent_document_id,
       document_type: '供應商回覆',
-      version: 'reply',  // 供應商回覆不需要版本號
-      reply_type: 'received',  // 供應商回覆
+      version: 'reply',
+      reply_type: 'received',
       file_name: input.file_name,
       file_url: input.file_url,
       file_size: input.file_size,
@@ -86,7 +85,7 @@ export async function uploadSupplierReply(
       status: '已收到',
       received_at: new Date().toISOString(),
       created_by: userId,
-    } as any)
+    })
     .select()
     .single()
 
@@ -104,7 +103,6 @@ export async function getNextVersion(requestId: string): Promise<string> {
     return 'v1.0'
   }
 
-  // 找出最大版本號
   const versions = documents.map(d => d.version).filter(v => v.match(/^v\d+\.\d+$/))
   if (versions.length === 0) {
     return 'v1.0'
@@ -128,8 +126,7 @@ export async function markDocumentAsSent(
   sentVia: string,
   sentTo: string
 ): Promise<RequestDocument> {
-  const { data, error } = await supabase
-    .from('request_documents')
+  const { data, error } = await requestDocumentsDb()
     .update({
       status: '已發送',
       sent_at: new Date().toISOString(),
@@ -141,7 +138,7 @@ export async function markDocumentAsSent(
     .single()
 
   if (error) throw error
-  return data
+  return data as unknown as RequestDocument
 }
 
 /**
@@ -151,8 +148,7 @@ export async function markDocumentAsReceived(
   documentId: string,
   receivedFrom: string
 ): Promise<RequestDocument> {
-  const { data, error } = await supabase
-    .from('request_documents')
+  const { data, error } = await requestDocumentsDb()
     .update({
       status: '已收到',
       received_at: new Date().toISOString(),
@@ -163,14 +159,14 @@ export async function markDocumentAsReceived(
     .single()
 
   if (error) throw error
-  return data
+  return data as unknown as RequestDocument
 }
 
 /**
  * 刪除文件
  */
 export async function deleteRequestDocument(documentId: string): Promise<void> {
-  const { error } = await supabase.from('request_documents').delete().eq('id', documentId)
+  const { error } = await requestDocumentsDb().delete().eq('id', documentId)
 
   if (error) throw error
 }

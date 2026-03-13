@@ -18,13 +18,15 @@ export const useAccommodationOperations = ({
 }: UseAccommodationOperationsProps) => {
   // 住宿：新增房型（在所有現有天數都新增同樣的房型）
   const handleAddAccommodationRoomType = useCallback(() => {
-    if (accommodationDays === 0) return // 必須先有天數
+    // 從現有住宿項目算出有哪些天
+    const accCat = categories.find(c => c.id === 'accommodation')
+    const existingDays = new Set(accCat?.items.map(i => i.day).filter(Boolean) as number[])
+    if (existingDays.size === 0) return
 
     const timestamp = Date.now()
     const newItems: CostItem[] = []
 
-    // 為每一天都新增同樣的房型
-    for (let day = 1; day <= accommodationDays; day++) {
+    for (const day of existingDays) {
       newItems.push({
         id: `accommodation-day${day}-${timestamp}`,
         name: '',
@@ -32,7 +34,7 @@ export const useAccommodationOperations = ({
         unit_price: null,
         total: 0,
         note: '',
-        day: day,
+        day,
         room_type: '',
       })
     }
@@ -48,7 +50,7 @@ export const useAccommodationOperations = ({
         return cat
       })
     )
-  }, [accommodationDays, setCategories])
+  }, [categories, setCategories])
 
   // 住宿：新增天數（只新增住宿，不自動帶入餐食）
   const handleAddAccommodationDay = useCallback(() => {

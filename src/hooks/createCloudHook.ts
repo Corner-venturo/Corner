@@ -75,10 +75,6 @@ const WORKSPACE_SCOPED_TABLES = [
   'orders',
   'customers',
 
-  // === 提案系統 ===
-  'proposals',
-  // 'proposal_packages' - 沒有 workspace_id 欄位，透過 proposal_id 關聯到 proposals
-
   // === 行程與報價 ===
   'quotes',
   'itineraries',

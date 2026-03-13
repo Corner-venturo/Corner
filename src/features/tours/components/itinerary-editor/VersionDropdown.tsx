@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import type { ItineraryVersionRecord, Itinerary } from '@/stores/types'
 import { stripHtml } from '@/lib/utils/string-utils'
-import { VERSION_DROPDOWN_LABELS } from '../../constants/labels'
+import { VERSION_DROPDOWN_LABELS } from './labels'
 
 interface VersionDropdownProps {
   existingItinerary: Itinerary | undefined

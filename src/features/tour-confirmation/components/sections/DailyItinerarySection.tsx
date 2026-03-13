@@ -111,7 +111,7 @@ export function DailyItinerarySection({ itinerary }: DailyItinerarySectionProps)
                           <span className="flex-1 flex items-center">
                             住：{day.accommodation}
                             {(day.isSameAccommodation ||
-                              day.accommodation.includes(DAILY_ITINERARY_SECTION_LABELS.同上)) && (
+                              day.accommodation.includes(DAILY_ITINERARY_SECTION_LABELS.續住)) && (
                               <Check size={14} className="ml-1 text-morandi-green/40" />
                             )}
                           </span>

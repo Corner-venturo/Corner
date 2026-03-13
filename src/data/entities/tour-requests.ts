@@ -57,7 +57,6 @@ export interface TourRequest {
   confirmed_by_name: string | null
   recipient_workspace_id: string | null
   target_workspace_id: string | null
-  proposal_package_id: string | null
   driver_name: string | null
   driver_phone: string | null
   plate_number: string | null

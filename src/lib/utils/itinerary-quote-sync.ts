@@ -31,10 +31,10 @@ interface DailyItineraryDay {
 }
 
 // Database helpers using dynamicFrom (for tables with JSONB columns requiring custom types)
-const proposalPackagesDb = () => dynamicFrom('proposal_packages')
 const itinerariesDb = () => dynamicFrom('itineraries')
 const quotesDb = () => dynamicFrom('quotes')
 const toursDb = () => dynamicFrom('tours')
+const coreItemsDb = () => dynamicFrom('tour_itinerary_items')
 
 /**
  * 將行程表的每日餐食轉換為報價單的 meals 分類格式
@@ -90,17 +90,17 @@ function convertDailyItineraryToMeals(dailyItinerary: DailyItineraryDay[]): Cost
 /**
  * 將行程表的住宿資訊轉換為報價單的 accommodation 分類格式
  * - 每天獨立一筆（quantity 用於房間數，不是晚數）
- * - 續住（同上）會解析成實際飯店名稱
+ * - 續住會解析成實際飯店名稱
  * - 最後一天不住宿
  */
 function convertDailyItineraryToAccommodation(dailyItinerary: DailyItineraryDay[]): CostItem[] {
   const items: CostItem[] = []
 
-  // 解析「同上 (xxx)」格式，取得實際飯店名稱
-  const getActualHotelName = (accommodation: string): string => {
-    const match = accommodation.match(/^同上\s*\((.+)\)$/)
-    if (match) return match[1]
-    return accommodation
+  // 解析「續住 (xxx)」格式，取得實際飯店名稱
+  const getActualHotelName = (accommodation: string): { name: string; isSameAsPrevious: boolean } => {
+    const match = accommodation.match(/^續住\s*\((.+)\)$/)
+    if (match) return { name: match[1], isSameAsPrevious: true }
+    return { name: accommodation, isSameAsPrevious: false }
   }
 
   for (let i = 0; i < dailyItinerary.length; i++) {
@@ -113,8 +113,8 @@ function convertDailyItineraryToAccommodation(dailyItinerary: DailyItineraryDay[
 
     if (!day.accommodation) continue
 
-    // 解析實際飯店名稱（處理「同上」格式）
-    const hotelName = getActualHotelName(day.accommodation)
+    // 解析實際飯店名稱（處理「續住」格式）
+    const { name: hotelName, isSameAsPrevious } = getActualHotelName(day.accommodation)
 
     items.push({
       id: generateUUID(),
@@ -123,6 +123,7 @@ function convertDailyItineraryToAccommodation(dailyItinerary: DailyItineraryDay[
       unit_price: 0,
       total: 0,
       day: dayNum,
+      is_same_as_previous: isSameAsPrevious,
     })
   }
 
@@ -219,25 +220,22 @@ function convertTimelineToAccommodation(days: TimelineDay[]): CostItem[] {
  *
  * @param itineraryId 行程表 ID
  * @param dailyItinerary 每日行程資料（可選，如果不提供會從資料庫讀取）
- * @param proposalPackageId 提案套件 ID（可選，用於直接查找報價單）
  */
 export async function syncItineraryToQuote(
   itineraryId: string,
-  dailyItinerary?: DailyItineraryDay[],
-  proposalPackageId?: string
+  dailyItinerary?: DailyItineraryDay[]
 ): Promise<void> {
   try {
     let quoteId: string | null = null
     let dailyData: DailyItineraryDay[] = dailyItinerary || []
 
-    // 1. 先嘗試從行程表本身取得 proposal_package_id 或 tour_id
+    // 1. 先嘗試從行程表本身取得 tour_id
     const { data: itineraryData } = await itinerariesDb()
-      .select('proposal_package_id, tour_id, daily_itinerary')
+      .select('tour_id, daily_itinerary')
       .eq('id', itineraryId)
       .single()
 
     const itinerary = itineraryData as {
-      proposal_package_id: string | null
       tour_id: string | null
       daily_itinerary: DailyItineraryDay[] | null
     } | null
@@ -252,8 +250,7 @@ export async function syncItineraryToQuote(
       return
     }
 
-    // 嘗試獲取 quote_id（優先順序：tour > proposal_package）
-    // 1. 嘗試透過 tour_id 查找（旅遊團路徑）
+    // 嘗試透過 tour_id 查找（旅遊團路徑）
     if (itinerary?.tour_id) {
       const { data: tour } = await toursDb().select('quote_id').eq('id', itinerary.tour_id).single()
 
@@ -261,21 +258,6 @@ export async function syncItineraryToQuote(
       if (tourData?.quote_id) {
         quoteId = tourData.quote_id
         logger.log('從 tour 取得 quote_id:', quoteId)
-      }
-    }
-
-    // 2. 如果還是沒有 quote_id，嘗試透過 proposal_package_id 查找（提案路徑）
-    if (!quoteId) {
-      const pkgId = proposalPackageId || itinerary?.proposal_package_id
-
-      if (pkgId) {
-        const { data: pkg } = await proposalPackagesDb().select('quote_id').eq('id', pkgId).single()
-
-        const pkgData = pkg as { quote_id: string | null } | null
-        if (pkgData?.quote_id) {
-          quoteId = pkgData.quote_id
-          logger.log('從 proposal_package 取得 quote_id:', quoteId)
-        }
       }
     }
 
@@ -309,9 +291,8 @@ export async function syncItineraryToQuote(
     // 4. 更新 categories，保留其他分類和現有價格資訊
     const updatedCategories = existingCategories.map(cat => {
       if (cat.id === 'meals') {
-        // 合併現有的價格資訊到新項目
+        // 合併現有的價格資訊到新項目，名稱變更時加備注
         const itemsWithPrices = newMealsItems.map(newItem => {
-          // 嘗試找到相同位置（Day+餐別）的舊項目以保留價格
           const match = newItem.name.match(/Day(\d+)\s*(早餐|午餐|晚餐)/)
           if (match) {
             const dayNum = match[1]
@@ -320,10 +301,19 @@ export async function syncItineraryToQuote(
               old.name.startsWith(`Day${dayNum} ${mealType}`)
             )
             if (existingItem) {
+              // 比對餐廳名稱是否變更
+              const oldRestaurant = existingItem.name.replace(/^Day\d+\s*(早餐|午餐|晚餐)：/, '')
+              const newRestaurant = newItem.name.replace(/^Day\d+\s*(早餐|午餐|晚餐)：/, '')
+              let note = existingItem.note
+              if (oldRestaurant && newRestaurant && oldRestaurant !== newRestaurant) {
+                const changeNote = `原：${oldRestaurant}`
+                note = note ? `${changeNote}\n${note}` : changeNote
+              }
               return {
                 ...newItem,
                 unit_price: existingItem.unit_price,
                 total: existingItem.total,
+                note,
               }
             }
           }
@@ -336,16 +326,22 @@ export async function syncItineraryToQuote(
         }
       }
       if (cat.id === 'accommodation') {
-        // 住宿：保留現有價格資訊
+        // 住宿：保留現有價格資訊，名稱變更時加備注
         const itemsWithPrices = newAccommodationItems.map(newItem => {
-          // 嘗試找到相同天數的舊項目以保留價格
           const existingItem = cat.items.find(old => old.day === newItem.day)
           if (existingItem) {
+            // 比對飯店名稱是否變更
+            let note = existingItem.note
+            if (existingItem.name && newItem.name && existingItem.name !== newItem.name) {
+              const changeNote = `原：${existingItem.name}`
+              note = note ? `${changeNote}\n${note}` : changeNote
+            }
             return {
               ...newItem,
               unit_price: existingItem.unit_price,
               total: existingItem.total,
               room_type: existingItem.room_type,
+              note,
             }
           }
           return newItem
@@ -357,16 +353,20 @@ export async function syncItineraryToQuote(
         }
       }
       if (cat.id === 'activities') {
-        // 活動（景點）：用 day + 景點名稱匹配舊項目，保留已填價格
+        // 活動（景點）：用 day 匹配舊項目，保留已填價格，名稱變更時加備注
         const itemsWithPrices = newActivitiesItems.map(newItem => {
-          const existingItem = cat.items.find(
-            old => old.day === newItem.day && old.name === newItem.name
-          )
+          const existingItem = cat.items.find(old => old.day === newItem.day)
           if (existingItem) {
+            let note = existingItem.note
+            if (existingItem.name && newItem.name && existingItem.name !== newItem.name) {
+              const changeNote = `原：${existingItem.name}`
+              note = note ? `${changeNote}\n${note}` : changeNote
+            }
             return {
               ...newItem,
               unit_price: existingItem.unit_price,
               total: existingItem.total,
+              note,
             }
           }
           return newItem
@@ -427,6 +427,14 @@ export async function syncItineraryToQuote(
       throw error
     } else {
       logger.log('已同步行程表資料到報價單:', quoteId)
+
+      // 更新核心表項目的 quote_status → 'drafted'（消除黃色提示）
+      if (itinerary?.tour_id) {
+        await coreItemsDb()
+          .update({ quote_status: 'drafted' })
+          .eq('tour_id', itinerary.tour_id)
+          .eq('quote_status', 'none')
+      }
     }
   } catch (error) {
     logger.error('同步行程表到報價單失敗:', error)

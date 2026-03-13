@@ -3,7 +3,6 @@
  */
 
 import type { Tour } from '@/stores/types'
-import type { ProposalPackage } from '@/types/proposal.types'
 
 // ============================================
 // Props
@@ -11,14 +10,12 @@ import type { ProposalPackage } from '@/types/proposal.types'
 
 export interface RequirementsListProps {
   tourId?: string
-  proposalPackageId?: string
   quoteId?: string | null
   onOpenRequestDialog?: (data: {
     category: string
     supplierName: string
     items: { serviceDate: string | null; title: string; quantity: number; note?: string }[]
     tour?: Tour
-    pkg?: ProposalPackage
     startDate: string | null
   }) => void
   className?: string

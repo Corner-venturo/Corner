@@ -76,12 +76,6 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
     quote?.tour_id ?? null
   )
 
-  // 檢查核心表是否有行程更新但報價還沒看過的項目
-  const hasCoreChanges = useMemo(() => {
-    if (!quote || coreItems.length === 0) return false
-    return coreItems.some(item => item.quote_status === 'none')
-  }, [coreItems, quote?.id])
-
   // 行程資料（用於列印報價單）
   const itinerary = useMemo(() => {
     if (!quote?.tour_id) return null
@@ -237,6 +231,7 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
   const [showQuotationPreview, setShowQuotationPreview] = useState(false)
   const [showLinkTourDialog, setShowLinkTourDialog] = useState(false)
   const [showLocalPricingDialog, setShowLocalPricingDialog] = useState(false)
+  const [localTiers, setLocalTiers] = useState<LocalTier[]>([])
 
   const [previewParticipantCounts, setPreviewParticipantCounts] =
     useState<ParticipantCounts | null>(null)
@@ -320,6 +315,9 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
   // Local pricing handler
   const handleLocalPricingConfirm = useCallback(
     (tiers: LocalTier[], _matchedTierIndex: number) => {
+      // 儲存檔次資料（持久化）
+      setLocalTiers(tiers)
+
       const sortedTiers = [...tiers].sort((a, b) => a.participants - b.participants)
       let currentTierIdx = 0
       for (let i = 0; i < sortedTiers.length; i++) {
@@ -329,9 +327,10 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
       }
       const currentLocalPrice = sortedTiers[currentTierIdx]?.unitPrice || 0
 
-      const newTierPricings = sortedTiers.map((tier, index) => {
-        const participantCount = index === 0 ? totalParticipants : tier.participants
-        const localUnitPrice = index === 0 ? currentLocalPrice : tier.unitPrice
+      // 產生檻次表：全部使用用戶輸入的檻次人數
+      const newTierPricings = sortedTiers.map((tier) => {
+        const participantCount = tier.participants
+        const localUnitPrice = tier.unitPrice
         const newCounts = calculateTierParticipantCounts(participantCount, participantCounts)
         const baseCosts = calculateTierCosts(categories, newCounts, participantCounts)
         const newCosts = {
@@ -420,12 +419,6 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
         resourceId={quote.id}
         resourceName={QUOTE_DETAIL_EMBED_LABELS.此報價單}
       />
-
-      {hasCoreChanges && (
-        <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2 rounded-md text-sm">
-          行程表已更新，有新的項目尚未報價。儲存時會自動更新。
-        </div>
-      )}
 
       {showHeader && (
         <QuoteHeader
@@ -601,6 +594,7 @@ export function QuoteDetailEmbed({ quoteId, showHeader = true }: QuoteDetailEmbe
         onClose={() => setShowLocalPricingDialog(false)}
         totalParticipants={totalParticipants}
         onConfirm={handleLocalPricingConfirm}
+        initialTiers={localTiers}
       />
     </div>
   )

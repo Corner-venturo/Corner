@@ -50,11 +50,11 @@ export function HotelConfirmationSection({
       return
 
     const isSame =
-      day.isSameAccommodation || day.accommodation.includes(DAILY_ITINERARY_SECTION_LABELS.同上)
-    // 提取實際飯店名稱（去掉「同上」前綴）
+      day.isSameAccommodation || day.accommodation.includes(DAILY_ITINERARY_SECTION_LABELS.續住)
+    // 提取實際飯店名稱（去掉「續住」前綴）
     let hotelName = day.accommodation
     if (isSame && day.accommodation.includes('(')) {
-      hotelName = day.accommodation.replace(/同上\s*\(([^)]+)\)/, '$1').trim()
+      hotelName = day.accommodation.replace(/續住\s*\(([^)]+)\)/, '$1').trim()
     }
 
     nightlyAccommodations.push({

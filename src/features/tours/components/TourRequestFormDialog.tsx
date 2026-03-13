@@ -8,7 +8,7 @@
  * 3. 開新視窗列印（避免 Dialog z-index 問題）
  */
 
-import { PROPOSAL_FORM_LABELS } from '../constants/labels'
+import { TOUR_REQUEST_FORM_LABELS as PROPOSAL_FORM_LABELS } from '../constants/labels'
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -30,7 +30,6 @@ import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { useAuthStore, useEmployeeStore } from '@/stores'
 import { useToast } from '@/components/ui/use-toast'
 import { logger } from '@/lib/utils/logger'
-import type { Proposal, ProposalPackage } from '@/types/proposal.types'
 import type { Tour } from '@/stores/types'
 import type { Database } from '@/lib/supabase/types'
 import {
@@ -105,9 +104,6 @@ const CATEGORY_NAMES: Record<string, string> = {
 interface TourRequestFormDialogProps {
   isOpen: boolean
   onClose: () => void
-  // 提案套件模式
-  pkg?: ProposalPackage | null
-  proposal?: Proposal | null
   // 旅遊團模式
   tour?: Tour | null
   // 從需求確認單傳入的資料
@@ -129,8 +125,6 @@ interface TourRequestFormDialogProps {
 export function TourRequestFormDialog({
   isOpen,
   onClose,
-  pkg,
-  proposal,
   tour,
   category,
   supplierName,
@@ -187,8 +181,8 @@ export function TourRequestFormDialog({
   // 載入公司 Logo（用於新視窗列印）
   const logoUrl = usePrintLogo(isOpen)
 
-  // 判斷是否有足夠資料（支援 pkg 模式或 tour 模式）
-  const hasValidData = pkg || tour
+  // 判斷是否有足夠資料
+  const hasValidData = !!tour
 
   // 選擇供應商時自動帶入資訊
   const handleSupplierSelect = (supplier: SupplierData) => {
@@ -381,9 +375,9 @@ export function TourRequestFormDialog({
         <div class="tour-info">
           <div class="tour-grid">
             <div>${TOUR_REQUEST_FORM_DIALOG_LABELS.團號}${tourCode || tour?.code || '-'}</div>
-            <div>${TOUR_REQUEST_FORM_DIALOG_LABELS.團名}${tourName || tour?.name || proposal?.title || '-'}</div>
-            <div>${TOUR_REQUEST_FORM_DIALOG_LABELS.出發日期}${formatDate(departureDate || pkg?.start_date)}</div>
-            <div>${TOUR_REQUEST_FORM_DIALOG_LABELS.人數}${pax || proposal?.group_size || '-'} ${TOUR_REQUEST_FORM_DIALOG_LABELS.人}</div>
+            <div>${TOUR_REQUEST_FORM_DIALOG_LABELS.團名}${tourName || tour?.name || '-'}</div>
+            <div>${TOUR_REQUEST_FORM_DIALOG_LABELS.出發日期}${formatDate(departureDate || tour?.departure_date)}</div>
+            <div>${TOUR_REQUEST_FORM_DIALOG_LABELS.人數}${pax || tour?.max_participants || '-'} ${TOUR_REQUEST_FORM_DIALOG_LABELS.人}</div>
           </div>
         </div>
 
@@ -841,13 +835,13 @@ export function TourRequestFormDialog({
               <div>
                 <span className="text-morandi-secondary">{PROPOSAL_FORM_LABELS.LABEL_168}</span>
                 <span className="font-medium ml-1">
-                  {tourName || tour?.name || proposal?.title || '-'}
+                  {tourName || tour?.name || '-'}
                 </span>
               </div>
               <div>
                 <span className="text-morandi-secondary">{PROPOSAL_FORM_LABELS.LABEL_2816}</span>
                 <span className="font-medium ml-1">
-                  {formatDate(departureDate || tour?.departure_date || pkg?.start_date)}
+                  {formatDate(departureDate || tour?.departure_date)}
                 </span>
               </div>
               <div>
@@ -856,7 +850,6 @@ export function TourRequestFormDialog({
                   {pax ||
                     tour?.current_participants ||
                     tour?.max_participants ||
-                    proposal?.group_size ||
                     '-'}{' '}
                   人
                 </span>

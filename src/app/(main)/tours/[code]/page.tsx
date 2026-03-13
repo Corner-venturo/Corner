@@ -17,7 +17,7 @@ import { TOUR_DETAIL_PAGE_LABELS } from '@/features/tours/constants/labels'
 
 const TourRequestFormDialog = dynamic(
   () =>
-    import('@/features/proposals/components/TourRequestFormDialog').then(
+    import('@/features/tours/components/TourRequestFormDialog').then(
       m => m.TourRequestFormDialog
     ),
   { ssr: false }

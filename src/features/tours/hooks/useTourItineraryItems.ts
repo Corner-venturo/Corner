@@ -234,7 +234,7 @@ export function useSyncItineraryToCore() {
           if (day.activities) {
             for (const activity of day.activities) {
               // 活動：檢查同一天同一活動是否已有項目（用 title 比對）
-              const already_exists = (existing_items ?? []).some(
+              const already_exists = items_with_downstream.some(
                 item =>
                   item.day_number === day_number &&
                   item.category === ITINERARY_ITEM_CATEGORIES.ACTIVITIES &&
@@ -268,7 +268,7 @@ export function useSyncItineraryToCore() {
             ]
             for (const [meal_name, sub_cat] of meal_entries) {
               // 餐食：檢查同一天同一餐是否已有項目（不管狀態）
-              const already_exists = (existing_items ?? []).some(
+              const already_exists = items_with_downstream.some(
                 item =>
                   item.day_number === day_number &&
                   item.category === ITINERARY_ITEM_CATEGORIES.MEALS &&
@@ -295,16 +295,16 @@ export function useSyncItineraryToCore() {
           // Accommodation — 續住時解析完整飯店名稱
           if (day.accommodation) {
             let resolvedAccommodation = day.accommodation
-            if (day.isSameAccommodation || resolvedAccommodation.startsWith('同上')) {
-              // 從「同上 (XXX)」提取飯店名，或往前找上一天的住宿
-              const match = resolvedAccommodation.match(/同上\s*[（(](.+?)[）)]/)
+            if (day.isSameAccommodation || resolvedAccommodation.startsWith('續住')) {
+              // 從「續住 (XXX)」提取飯店名，或往前找上一天的住宿
+              const match = resolvedAccommodation.match(/續住\s*[（(](.+?)[）)]/)
               if (match) {
                 resolvedAccommodation = match[1]
               } else if (day_index > 0) {
                 // 往前找最近一天有住宿的
                 for (let prev = day_index - 1; prev >= 0; prev--) {
                   const prevAcc = daily_itinerary[prev].accommodation
-                  if (prevAcc && !prevAcc.startsWith('同上')) {
+                  if (prevAcc && !prevAcc.startsWith('續住')) {
                     resolvedAccommodation = prevAcc
                     break
                   }
@@ -313,7 +313,7 @@ export function useSyncItineraryToCore() {
             }
 
             // 住宿：檢查同一天是否已有任何住宿項目（不管狀態）
-            const already_exists = (existing_items ?? []).some(
+            const already_exists = items_with_downstream.some(
               item =>
                 item.day_number === day_number &&
                 item.category === ITINERARY_ITEM_CATEGORIES.ACCOMMODATION

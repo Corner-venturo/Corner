@@ -54,20 +54,14 @@ export const useQuoteState = () => {
 
   // SWR 自動載入行程表
 
-  // 找到關聯的行程表（優先用 itinerary_id，備援用 proposal_package_id）
+  // 找到關聯的行程表（用 itinerary_id 直接關聯）
   const linkedItinerary = useMemo(() => {
-    // 1. 優先用 itinerary_id 直接關聯
     if (quote?.itinerary_id) {
       const itinerary = itineraries.find(i => i.id === quote.itinerary_id)
       if (itinerary) return itinerary
     }
-    // 2. 備援：用 proposal_package_id 找關聯的行程表
-    if (quote?.proposal_package_id) {
-      const itinerary = itineraries.find(i => i.proposal_package_id === quote.proposal_package_id)
-      if (itinerary) return itinerary
-    }
     return null
-  }, [quote?.itinerary_id, quote?.proposal_package_id, itineraries])
+  }, [quote?.itinerary_id, itineraries])
 
   // === 核心表資料（有 tour_id 的報價單直接讀核心表）===
   const { items: coreItems, refresh: refreshCoreItems } = useTourItineraryItemsByTour(

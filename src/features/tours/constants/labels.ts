@@ -592,10 +592,6 @@ export const COMP_TOURS_LABELS = {
   CAPACITY_SHORT: (n: number) => `${n}人`,
   VEHICLE_COUNT_SHORT: (n: number) => `共 ${n} 輛車`,
 
-  // TourItineraryDialog
-  CREATE_PACKAGE_FAILED_LOG: '建立 proposal_package 失敗:',
-  UPDATE_TOUR_LINK_FAILED_LOG: '更新旅遊團關聯失敗:',
-  CREATE_PACKAGE_ERROR_LOG: '建立 package 錯誤:',
 }
 
 // CheckinSettings 模組的 UI 標籤
@@ -803,7 +799,6 @@ export const TOUR_ITINERARY_TAB_LABELS = {
   飯店內用餐: '飯店內用餐',
   機上: '機上',
   續住: '續住',
-  同上: '同上',
   簡易行程編輯: '簡易行程編輯',
   列印模式: '列印模式',
   編輯模式: '編輯模式',
@@ -862,7 +857,7 @@ export const TOUR_ITINERARY_TAB_LABELS = {
   住宿設定: '住宿設定',
   住宿: '住宿',
   第N晚: (n: number) => `第 ${n} 晚`,
-  續住_同上一晚: '續住（同上一晚）',
+  續住_同上一晚: '續住（同前一晚）',
   搜尋飯店: '搜尋飯店...',
   手動輸入飯店名稱: '手動輸入飯店名稱',
   關閉: '關閉',
@@ -1277,3 +1272,84 @@ export const TOUR_HEALTH_LABELS = {
 
 // Add missing tab labels used by TourTabs
 // (If not already in COMP_TOURS_LABELS above, they're in the large generated object)
+
+export const TOUR_REQUEST_FORM_LABELS = {
+  COMPANY: '公司：',
+  PHONE: '電話：',
+  FAX: '傳真：',
+  SALES: '業務：',
+  ASSISTANT: '助理：',
+  SUPPLIER: '廠商：',
+  CITY: '城市：',
+  CONTACT: '聯絡人：',
+  LABEL_3621: '角落旅行社',
+  LABEL_7720: '我方資訊',
+  LABEL_3340: '廠商資訊',
+  LABEL_3785: '團號：',
+  LABEL_168: '團名：',
+  LABEL_2816: '出發日期：',
+  LABEL_8361: '人數：',
+  LABEL_9413: '單價',
+  REMARKS: '備註',
+  ACTIONS: '操作',
+  ADD_2089: '新增項目',
+  CLOSE: '關閉',
+  LABEL_4890: '建立請款單',
+  PRINT: '列印',
+}
+
+export const ADD_MANUAL_REQUEST_DIALOG_LABELS = {
+  間數: '間數',
+  人數: '人數',
+  台數: '台數',
+  數量: '數量',
+}
+
+export const PACKAGE_LIST_PANEL_LABELS = {
+  住宿: '住宿',
+  餐飲: '餐飲',
+  交通: '交通',
+  其他: '其他',
+}
+
+export const TOUR_REQUEST_FORM_DIALOG_LABELS = {
+  日期: '日期',
+  房型: '房型',
+  餐別: '餐別',
+  路線_車型: '路線/車型',
+  項目: '項目',
+  門票_活動: '門票/活動',
+  角落旅行社: '角落旅行社',
+  需求: '需求',
+  需求單: '需求單',
+  人: '人',
+  人數: '人數',
+  請允許彈出視窗以進行列印: '請允許彈出視窗以進行列印',
+  需求單已發送並存檔: '需求單已發送並存檔',
+  狀態已更新為_已發送: '狀態已更新為「已發送」',
+  存檔失敗: '存檔失敗',
+  請重試或聯繫系統管理員: '請重試或聯繫系統管理員',
+  關閉: '關閉',
+  列印: '列印',
+  我方資訊: '我方資訊',
+  廠商資訊: '廠商資訊',
+  公司: '公司：',
+  電話: '電話：',
+  傳真: '傳真：',
+  業務: '業務：',
+  助理: '助理：',
+  廠商: '廠商：',
+  城市: '城市：',
+  聯絡人: '聯絡人：',
+  團號: '團號：',
+  團名: '團名：',
+  出發日期: '出發日期：',
+  單價: '單價',
+  備註: '備註',
+  接收供應商: '接收供應商',
+  不發送_列印模式: '不發送（列印模式）',
+  發送: '發送',
+  發送失敗: '發送失敗',
+  需求單已發送: '需求單已發送',
+  已發送至供應商: '已發送至供應商 ',
+}

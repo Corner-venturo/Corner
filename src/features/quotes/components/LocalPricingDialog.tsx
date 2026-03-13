@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -25,6 +25,7 @@ interface LocalPricingDialogProps {
   onClose: () => void
   totalParticipants: number
   onConfirm: (tiers: LocalTier[], matchedTierIndex: number) => void
+  initialTiers?: LocalTier[]
 }
 
 export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
@@ -32,12 +33,22 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
   onClose,
   totalParticipants,
   onConfirm,
+  initialTiers,
 }) => {
-  const [tiers, setTiers] = useState<LocalTier[]>([
-    { id: `tier-${Date.now()}`, participants: 0, unitPrice: 0 },
-  ])
+  const [tiers, setTiers] = useState<LocalTier[]>(
+    initialTiers && initialTiers.length > 0
+      ? initialTiers
+      : [{ id: `tier-${Date.now()}`, participants: 0, unitPrice: 0 }]
+  )
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [matchedTierIndex, setMatchedTierIndex] = useState(0)
+
+  // 當對話框開啟且有 initialTiers 時，同步 tiers 狀態
+  useEffect(() => {
+    if (isOpen && initialTiers && initialTiers.length > 0) {
+      setTiers(initialTiers)
+    }
+  }, [isOpen, initialTiers])
 
   // 新增檻次
   const handleAddTier = () => {
@@ -116,7 +127,6 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
   // 關閉對話框
   const handleClose = () => {
     setShowConfirmation(false)
-    setTiers([{ id: `tier-${Date.now()}`, participants: 0, unitPrice: 0 }])
     onClose()
   }
 

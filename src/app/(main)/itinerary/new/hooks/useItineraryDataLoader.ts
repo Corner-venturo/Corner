@@ -368,7 +368,7 @@ export function useItineraryDataLoader({
       }
 
       const country = tour.country_id ? countries.find(c => c.id === tour.country_id) : null
-      const city = tour.main_city_id ? cities.find(c => c.id === tour.main_city_id) : null
+      const city = tour.airport_code ? cities.find(c => c.id === tour.airport_code) : null
 
       const departureDate = tour.departure_date ? new Date(tour.departure_date) : new Date()
       const returnDate = tour.return_date ? new Date(tour.return_date) : new Date()

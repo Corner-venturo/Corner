@@ -3,8 +3,10 @@
  * 旅遊團其他檔案存取層（護照/簽證/Logo等）
  */
 
-import { supabase } from '@/lib/supabase/client'
+import { dynamicFrom } from '@/lib/supabase/typed-client'
 import type { TourFile, FileCategory } from '@/types/tour-documents.types'
+
+const tourFilesDb = () => dynamicFrom('tour_files')
 
 /**
  * 取得團的檔案（依分類）
@@ -13,7 +15,7 @@ export async function getTourFiles(
   tourId: string,
   category?: FileCategory
 ): Promise<TourFile[]> {
-  let query = supabase.from('tour_files').select('*').eq('tour_id', tourId)
+  let query = tourFilesDb().select('*').eq('tour_id', tourId)
 
   if (category) {
     query = query.eq('category', category)
@@ -44,8 +46,7 @@ export async function getTourFileCounts(tourId: string): Promise<Record<FileCate
 
   await Promise.all(
     categories.map(async category => {
-      const { count } = await supabase
-        .from('tour_files')
+      const { count } = await tourFilesDb()
         .select('id', { count: 'exact', head: true })
         .eq('tour_id', tourId)
         .eq('category', category)
@@ -76,8 +77,7 @@ export async function createTourFile(
   workspaceId: string,
   userId: string
 ): Promise<TourFile> {
-  const { data, error } = await supabase
-    .from('tour_files')
+  const { data, error } = await tourFilesDb()
     .insert({
       workspace_id: workspaceId,
       ...input,
@@ -101,8 +101,7 @@ export async function updateTourFile(
     tags?: string[]
   }
 ): Promise<TourFile> {
-  const { data, error } = await supabase
-    .from('tour_files')
+  const { data, error } = await tourFilesDb()
     .update(input)
     .eq('id', fileId)
     .select()
@@ -116,7 +115,7 @@ export async function updateTourFile(
  * 刪除檔案記錄
  */
 export async function deleteTourFile(fileId: string): Promise<void> {
-  const { error } = await supabase.from('tour_files').delete().eq('id', fileId)
+  const { error } = await tourFilesDb().delete().eq('id', fileId)
 
   if (error) throw error
 }
@@ -125,8 +124,7 @@ export async function deleteTourFile(fileId: string): Promise<void> {
  * 關聯檔案到需求單
  */
 export async function linkFileToRequest(fileId: string, requestId: string): Promise<TourFile> {
-  const { data, error } = await supabase
-    .from('tour_files')
+  const { data, error } = await tourFilesDb()
     .update({ related_request_id: requestId })
     .eq('id', fileId)
     .select()
@@ -140,8 +138,7 @@ export async function linkFileToRequest(fileId: string, requestId: string): Prom
  * 取消檔案關聯
  */
 export async function unlinkFileFromRequest(fileId: string): Promise<TourFile> {
-  const { data, error } = await supabase
-    .from('tour_files')
+  const { data, error } = await tourFilesDb()
     .update({ related_request_id: null })
     .eq('id', fileId)
     .select()

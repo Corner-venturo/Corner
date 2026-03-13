@@ -25,7 +25,7 @@ import { uploadFile } from '../services/file-upload.service'
 import { createRequestDocument, getNextVersion } from '../services/request-document.service'
 import { createTourFile } from '../services/tour-file.service'
 import type { TourRequestDetail, RequestDocument } from '@/types/tour-documents.types'
-import { useAuth } from '@/stores/auth-store'
+import { useAuthStore } from '@/stores/auth-store'
 
 interface RequestDetailViewProps {
   requestId: string
@@ -33,7 +33,9 @@ interface RequestDetailViewProps {
 }
 
 export function RequestDetailView({ requestId, onBack }: RequestDetailViewProps) {
-  const { currentUser, currentWorkspace } = useAuth()
+  const user = useAuthStore(state => state.user)
+  const currentUserId = user?.id
+  const currentWorkspaceId = user?.workspace_id
   const [loading, setLoading] = useState(true)
   const [request, setRequest] = useState<TourRequestDetail | null>(null)
   const [uploading, setUploading] = useState(false)
@@ -58,7 +60,7 @@ export function RequestDetailView({ requestId, onBack }: RequestDetailViewProps)
 
   // 上傳新版本（需求單文件 - 我方發送）
   const handleUploadDocument = async (files: File[]) => {
-    if (!request || !currentUser || !currentWorkspace) return
+    if (!request || !currentUserId || !currentWorkspaceId) return
 
     try {
       setUploading(true)
@@ -87,8 +89,8 @@ export function RequestDetailView({ requestId, onBack }: RequestDetailViewProps)
             file_size: size,
             mime_type: file.type,
           },
-          currentWorkspace.id,
-          currentUser.id
+          currentWorkspaceId,
+          currentUserId
         )
       }
 
@@ -103,8 +105,8 @@ export function RequestDetailView({ requestId, onBack }: RequestDetailViewProps)
   }
 
   // 🆕 上傳供應商回覆（關聯到指定的需求單版本）
-  const handleUploadSupplierReply = async (files: File[], parentDocumentId: string) => {
-    if (!request || !currentUser || !currentWorkspace) return
+  const handleUploadSupplierReply = async (parentDocumentId: string, files: File[]) => {
+    if (!request || !currentUserId || !currentWorkspaceId) return
 
     try {
       setUploading(true)
@@ -134,8 +136,8 @@ export function RequestDetailView({ requestId, onBack }: RequestDetailViewProps)
             mime_type: file.type,
             received_from: request.supplier_name || undefined,
           },
-          currentWorkspace.id,
-          currentUser.id
+          currentWorkspaceId,
+          currentUserId
         )
       }
 
@@ -151,7 +153,7 @@ export function RequestDetailView({ requestId, onBack }: RequestDetailViewProps)
 
   // 上傳相關檔案
   const handleUploadRelatedFile = async (files: File[]) => {
-    if (!request || !currentUser || !currentWorkspace) return
+    if (!request || !currentUserId || !currentWorkspaceId) return
 
     try {
       setUploading(true)
@@ -173,8 +175,8 @@ export function RequestDetailView({ requestId, onBack }: RequestDetailViewProps)
             mime_type: file.type,
             related_request_id: request.id,
           },
-          currentWorkspace.id,
-          currentUser.id
+          currentWorkspaceId,
+          currentUserId
         )
       }
 

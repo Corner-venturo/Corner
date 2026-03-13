@@ -3,7 +3,7 @@
  * 需求單資料存取層
  */
 
-import { supabase } from '@/lib/supabase/client'
+import { dynamicFrom } from '@/lib/supabase/typed-client'
 import type {
   TourRequest,
   CreateTourRequestInput,
@@ -11,12 +11,15 @@ import type {
   TourRequestDetail,
 } from '@/types/tour-documents.types'
 
+const tourRequestsDb = () => dynamicFrom('tour_requests')
+const requestDocumentsDb = () => dynamicFrom('request_documents')
+const tourFilesDb = () => dynamicFrom('tour_files')
+
 /**
  * 取得團的所有需求單
  */
 export async function getTourRequests(tourId: string): Promise<TourRequest[]> {
-  const { data, error } = await supabase
-    .from('tour_requests')
+  const { data, error } = await tourRequestsDb()
     .select('*')
     .eq('tour_id', tourId)
     .order('created_at', { ascending: false })
@@ -30,8 +33,7 @@ export async function getTourRequests(tourId: string): Promise<TourRequest[]> {
  */
 export async function getTourRequestDetail(requestId: string): Promise<TourRequestDetail | null> {
   // 主需求單
-  const { data: request, error: requestError } = await supabase
-    .from('tour_requests')
+  const { data: request, error: requestError } = await tourRequestsDb()
     .select('*')
     .eq('id', requestId)
     .single()
@@ -40,15 +42,13 @@ export async function getTourRequestDetail(requestId: string): Promise<TourReque
   if (!request) return null
 
   // 文件版本
-  const { data: documents } = await supabase
-    .from('request_documents')
+  const { data: documents } = await requestDocumentsDb()
     .select('*')
     .eq('request_id', requestId)
     .order('created_at', { ascending: true })
 
   // 相關檔案
-  const { data: related_files } = await supabase
-    .from('tour_files')
+  const { data: related_files } = await tourFilesDb()
     .select('*')
     .eq('related_request_id', requestId)
     .order('created_at', { ascending: false })
@@ -68,8 +68,7 @@ export async function createTourRequest(
   workspaceId: string,
   userId: string
 ): Promise<TourRequest> {
-  const { data, error } = await supabase
-    .from('tour_requests')
+  const { data, error } = await tourRequestsDb()
     .insert({
       workspace_id: workspaceId,
       tour_id: input.tour_id,
@@ -96,8 +95,7 @@ export async function updateTourRequest(
   input: UpdateTourRequestInput,
   userId: string
 ): Promise<TourRequest> {
-  const { data, error } = await supabase
-    .from('tour_requests')
+  const { data, error } = await tourRequestsDb()
     .update({
       ...input,
       updated_by: userId,
@@ -114,7 +112,7 @@ export async function updateTourRequest(
  * 刪除需求單
  */
 export async function deleteTourRequest(requestId: string): Promise<void> {
-  const { error } = await supabase.from('tour_requests').delete().eq('id', requestId)
+  const { error } = await tourRequestsDb().delete().eq('id', requestId)
 
   if (error) throw error
 }
@@ -147,8 +145,7 @@ export async function markRequestAsReplied(
   repliedBy: string,
   userId: string
 ): Promise<TourRequest> {
-  const { data, error } = await supabase
-    .from('tour_requests')
+  const { data, error } = await tourRequestsDb()
     .update({
       status: '已回覆',
       replied_at: new Date().toISOString(),
@@ -171,8 +168,7 @@ export async function closeTourRequest(
   closeNote: string,
   userId: string
 ): Promise<TourRequest> {
-  const { data, error } = await supabase
-    .from('tour_requests')
+  const { data, error } = await tourRequestsDb()
     .update({
       status: '結案',
       closed_at: new Date().toISOString(),

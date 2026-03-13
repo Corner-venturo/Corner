@@ -613,7 +613,7 @@ export function itineraryToTemplateData(itinerary: {
 
 /**
  * 從時間軸行程資料轉換為 TemplateData
- * 用於將 proposal_packages.timeline_data 轉換為手冊可用的格式
+ * 用於將時間軸行程資料轉換為手冊可用的格式
  */
 export function timelineToTemplateData(timeline: TimelineItineraryData): TemplateData {
   // 轉換每日行程（給行程總覽頁用）

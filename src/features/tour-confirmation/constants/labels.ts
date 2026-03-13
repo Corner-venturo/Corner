@@ -175,7 +175,7 @@ export const ITEM_EDIT_DIALOG_ADDITIONAL_LABELS = {
 export const DAILY_ITINERARY_SECTION_LABELS = {
   新增說明: '新增說明',
   飯店早餐: '飯店早餐',
-  同上: '同上',
+  續住: '續住',
   輸入說明文字_例如_提醒客戶帶護照: '輸入說明文字，例如：提醒客戶帶護照...',
 }
 

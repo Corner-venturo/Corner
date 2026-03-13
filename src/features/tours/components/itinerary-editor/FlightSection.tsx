@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { DatePicker } from '@/components/ui/date-picker'
 import type { FlightInfo, FlightSegmentInfo } from '@/types/flight.types'
-import { FLIGHT_SECTION_LABELS, TOUR_REQUEST_FORM_DIALOG_LABELS } from '../../constants/labels'
+import { FLIGHT_SECTION_LABELS, TOUR_REQUEST_FORM_DIALOG_LABELS } from './labels'
 
 interface FlightSectionProps {
   // 去程

@@ -181,9 +181,9 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
           // 沒有行程表，從旅遊團帶入基本資料
           setCurrentItineraryId(null)
 
-          // 從旅遊團的 country_id 和 main_city_id 帶入國家城市
+          // 從旅遊團的 country_id 和 airport_code 帶入國家城市
           const tourCountry = countries.find(c => c.id === tour.country_id)
-          const tourCity = cities.find(c => c.id === tour.main_city_id)
+          const tourCity = cities.find(c => c.id === tour.airport_code)
 
           setTourData(prev => ({
             ...prev,
@@ -191,7 +191,7 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
             departureDate: tour.departure_date || '',
             tourCode: tour.code || '',
             country: tourCountry?.id || '',
-            city: tourCity?.airport_code || tour.main_city_id || '',
+            city: tourCity?.airport_code || tour.airport_code || '',
           }))
         }
       } catch (err) {
@@ -204,7 +204,7 @@ export function TourWebpageTab({ tour }: TourWebpageTabProps) {
     if (itineraries.length > 0 || !loading) {
       loadItinerary()
     }
-  }, [tour.id, tour.country_id, tour.main_city_id, itineraries, countries, cities])
+  }, [tour.id, tour.country_id, tour.airport_code, itineraries, countries, cities])
 
   // 載入行程表資料的函數
   const loadItineraryData = useCallback(

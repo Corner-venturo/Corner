@@ -121,6 +121,17 @@ export async function unlinkTourItineraries(tourId: string): Promise<number> {
   }
 
   if (linkedItineraries && linkedItineraries.length > 0) {
+    // 先清除 tour_itinerary_items 的 itinerary_id 外鍵（避免 FK constraint）
+    const itineraryIds = linkedItineraries.map(i => i.id)
+    const { error: unlinkError } = await supabase
+      .from('tour_itinerary_items')
+      .update({ itinerary_id: null })
+      .in('itinerary_id', itineraryIds)
+    if (unlinkError) {
+      logger.error('解除核心表行程關聯失敗:', unlinkError.message)
+      throw unlinkError
+    }
+
     const { error } = await supabase
       .from('itineraries')
       .delete()
@@ -163,28 +174,3 @@ export async function fetchPnrsByLocators(locators: string[]): Promise<unknown[]
   return data ?? []
 }
 
-/**
- * 取得提案轉開團所需的資料
- */
-export async function fetchProposalConvertData(proposalId: string, packageId: string) {
-  const [proposalRes, packageRes, itineraryRes] = await Promise.all([
-    supabase.from('proposals').select('*').eq('id', proposalId).single(),
-    supabase.from('proposal_packages').select('*').eq('id', packageId).single(),
-    supabase
-      .from('itineraries')
-      .select('outbound_flight, return_flight')
-      .eq('proposal_package_id', packageId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-  ])
-
-  if (proposalRes.error) throw proposalRes.error
-  if (packageRes.error) throw packageRes.error
-
-  return {
-    proposal: proposalRes.data,
-    package: packageRes.data,
-    itinerary: itineraryRes.data,
-  }
-}

@@ -8,7 +8,9 @@ interface AccommodationItemRowProps {
   item: CostItem
   categoryId: string
   day: number
+  dayIndex: number
   roomIndex: number
+  roomCount: number
   prevDayHotelName?: string // 前一天的飯店名稱（用於續住顯示）
   isReadOnly?: boolean
   handleUpdateItem: (
@@ -18,19 +20,19 @@ interface AccommodationItemRowProps {
     value: unknown
   ) => void
   handleRemoveItem: (categoryId: string, itemId: string) => void
-  onToggleSameAsPrevious?: (itemId: string, isSame: boolean, prevHotelName: string) => void
 }
 
 export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
   item,
   categoryId,
   day,
+  dayIndex,
   roomIndex,
+  roomCount,
   prevDayHotelName,
   isReadOnly,
   handleUpdateItem,
   handleRemoveItem,
-  onToggleSameAsPrevious,
 }) => {
   // 簡潔輸入框樣式（右側多留空間避免被 table-divider 遮到）
   const inputClass = 'input-no-focus w-full pl-1 pr-3 py-1 text-sm bg-transparent'
@@ -43,35 +45,18 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
     <tr
       className={cn(
         'border-b border-morandi-container/60 hover:bg-morandi-container/5 transition-colors',
-        isSameAsPrevious && 'bg-morandi-gold/5'
+        dayIndex % 2 === 1 && 'bg-muted/40'
       )}
     >
-      {/* 分類欄：第一個房型顯示天數 + 續住選項 */}
-      <td className="py-3 px-4 text-sm text-morandi-primary text-center table-divider">
-        {roomIndex === 0 ? (
-          <div className="flex flex-col items-center gap-1">
-            <span>DAY{day}</span>
-            {canShowSameAsPrevious && (
-              <label className="flex items-center gap-1 cursor-pointer text-xs">
-                <input
-                  type="checkbox"
-                  checked={isSameAsPrevious}
-                  onChange={e => {
-                    if (onToggleSameAsPrevious) {
-                      onToggleSameAsPrevious(item.id, e.target.checked, prevDayHotelName)
-                    }
-                  }}
-                  disabled={isReadOnly}
-                  className="w-3 h-3 rounded border-border text-morandi-gold focus:ring-morandi-gold"
-                />
-                <span className="text-morandi-secondary">{ACCOMMODATION_ITEM_ROW_LABELS.續住}</span>
-              </label>
-            )}
-          </div>
-        ) : (
-          ''
-        )}
-      </td>
+      {/* 分類欄：第一個房型顯示天數，合併儲存格 */}
+      {roomIndex === 0 && (
+        <td
+          className="py-3 px-4 text-sm text-morandi-primary text-center table-divider"
+          rowSpan={roomCount}
+        >
+          DAY{day}
+        </td>
+      )}
 
       {/* 項目欄：房型名稱（續住時顯示提示） */}
       <td className="py-3 px-4 text-sm text-morandi-primary text-center table-divider">
@@ -134,7 +119,7 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
             placeholder={ACCOMMODATION_ITEM_ROW_LABELS.備註}
             disabled={isReadOnly || isSameAsPrevious}
           />
-          {!isReadOnly && (
+          {!isReadOnly && roomIndex !== 0 && (
             <button
               onClick={() => handleRemoveItem(categoryId, item.id)}
               className="ml-2 w-4 h-4 flex items-center justify-center text-xs text-morandi-secondary hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-all flex-shrink-0"
