@@ -81,6 +81,9 @@ export function RequirementsList({
   // 隱藏項目展開狀態
   const [expandedHiddenCategories, setExpandedHiddenCategories] = useState<Set<string>>(new Set())
 
+  // 🆕 產生需求單狀態
+  const [generatingRequests, setGeneratingRequests] = useState(false)
+
   const mode = tourId ? 'tour' : 'proposal'
 
   // ============================================
@@ -309,6 +312,50 @@ export function RequirementsList({
     [itemsByCategory, tour, pkg, startDate, onOpenRequestDialog]
   )
 
+  // 🆕 產生需求單
+  const handleGenerateRequests = useCallback(async () => {
+    if (!linkedQuoteId || !tourId || !user?.workspace_id) {
+      toast({
+        title: '無法產生需求單',
+        description: '缺少必要資訊（報價單或旅遊團）',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    try {
+      setGeneratingRequests(true)
+
+      const { createRequestFromQuote } = await import(
+        '@/features/tour-documents/services/create-request-from-quote.service'
+      )
+
+      const result = await createRequestFromQuote({
+        quoteId: linkedQuoteId,
+        tourId: tourId,
+        workspaceId: user.workspace_id,
+        userId: user.id,
+      })
+
+      toast({
+        title: '需求單已產生',
+        description: `成功建立 ${result.count} 張需求單`,
+      })
+
+      // 重新載入資料
+      await loadData(false)
+    } catch (error) {
+      logger.error('產生需求單失敗', error)
+      toast({
+        title: '產生需求單失敗',
+        description: error instanceof Error ? error.message : '未知錯誤',
+        variant: 'destructive',
+      })
+    } finally {
+      setGeneratingRequests(false)
+    }
+  }, [linkedQuoteId, tourId, user, toast, loadData])
+
   const totalItems = quoteItems.length
 
   // ============================================
@@ -347,19 +394,35 @@ export function RequirementsList({
               {COMP_REQUIREMENTS_LABELS.刷新}
             </Button>
             {mode === 'tour' && quoteItems.length > 0 && (
-              <Button
-                size="sm"
-                onClick={handleGenerateConfirmationSheet}
-                disabled={generatingSheet}
-                className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-              >
-                {generatingSheet ? (
-                  <Loader2 size={14} className="animate-spin" />
-                ) : (
-                  <ClipboardList size={14} />
-                )}
-                {COMP_REQUIREMENTS_LABELS.產生團確單}
-              </Button>
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleGenerateRequests}
+                  disabled={generatingRequests}
+                  className="gap-1"
+                >
+                  {generatingRequests ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <FileText size={14} />
+                  )}
+                  產生需求單
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleGenerateConfirmationSheet}
+                  disabled={generatingSheet}
+                  className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                >
+                  {generatingSheet ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <ClipboardList size={14} />
+                  )}
+                  {COMP_REQUIREMENTS_LABELS.產生團確單}
+                </Button>
+              </>
             )}
           </div>
         </div>
