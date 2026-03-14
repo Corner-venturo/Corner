@@ -6,12 +6,24 @@
 
 ---
 
+## ⭐ 新手？從這裡開始！
+
+**→ [START_HERE.md](./START_HERE.md)** 📖
+
+這是你的第一站，包含：
+- 5種角色的導航路徑
+- 文檔分類和重要性
+- 學習建議和檢查清單
+
+---
+
 ## 🎯 快速開始
 
 ### 你想做什麼？
 
 | 需求 | 看哪個文檔 |
 |------|-----------|
+| **理解核心邏輯** | **[CORE_LOGIC.md](./CORE_LOGIC.md)** ⭐ |
 | 找某個功能在哪個檔案 | [COMPLETE_SYSTEMS_MAP.md](./COMPLETE_SYSTEMS_MAP.md) |
 | 找某個函數怎麼實作 | [FUNCTIONS_INDEX.md](./FUNCTIONS_INDEX.md) |
 | 找某個按鈕的處理邏輯 | [BUTTONS_INDEX.md](./BUTTONS_INDEX.md) |
@@ -34,6 +46,8 @@
 company/
 ├─ README.md ⭐ (你現在在這裡)
 │
+├─ START_HERE.md 🚀 新手第一站
+├─ CORE_LOGIC.md 🧠 核心邏輯總覽
 ├─ MASTER_INDEX.md 📋 主索引（整合所有文檔）
 │
 ├─ 自動掃描索引（11個）
@@ -64,7 +78,7 @@ company/
 ### 場景 1：我要開發一個新功能
 
 ```
-1. 先看 GAME_GUIDE.md - 理解整個系統怎麼運作
+1. 先看 CORE_LOGIC.md - 理解核心邏輯
 2. 再看 CREATOR_KNOWLEDGE.md - 理解核心表原則
 3. 找相關功能 → COMPLETE_SYSTEMS_MAP.md
 4. 找相關函數 → FUNCTIONS_INDEX.md
@@ -141,8 +155,8 @@ tour_itinerary_items = 唯一寫入點
 
 ```
 總檔案數：824
-總文檔數：17
-總文檔行數：~6200+
+總文檔數：19
+總文檔行數：~7200+
 
 自動掃描索引：11個
 深度知識文檔：6個
