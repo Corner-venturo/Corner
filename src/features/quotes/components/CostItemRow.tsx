@@ -37,6 +37,9 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
   
   // 判斷是否需要隱藏數量欄位（餐廳、活動固定是個人分攤，不需要數量）
   const hideQuantity = categoryId === 'meals' || categoryId === 'activities'
+  
+  // 判斷是否為 Local 報價（禁止直接編輯單價，只能透過視窗修改）
+  const isLocalPricing = item.name?.includes('Local 報價')
 
   // 簡潔輸入框樣式（右側多留空間避免被 table-divider 遮到）
   const inputClass = 'input-no-focus w-full pl-1 pr-3 py-1 text-sm bg-transparent'
@@ -110,7 +113,9 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
             onChange={val => handleUpdateItem(categoryId, item.id, 'unit_price', val)}
             formula={item.unit_price_formula}
             onFormulaChange={f => handleUpdateItem(categoryId, item.id, 'unit_price_formula', f)}
-            className={`${inputClass} text-center`}
+            className={`${inputClass} text-center ${isLocalPricing ? 'cursor-not-allowed opacity-60' : ''}`}
+            disabled={isLocalPricing}
+            title={isLocalPricing ? '請點擊「Local 報價」按鈕修改' : undefined}
           />
         )}
       </td>
@@ -125,8 +130,10 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
             type="text"
             value={item.note || ''}
             onChange={e => handleUpdateItem(categoryId, item.id, 'note', e.target.value)}
-            className={`${inputClass} flex-1`}
+            className={`${inputClass} flex-1 ${isLocalPricing ? 'cursor-not-allowed opacity-80' : ''}`}
             placeholder={ACCOMMODATION_ITEM_ROW_LABELS.備註}
+            disabled={isLocalPricing}
+            title={isLocalPricing ? 'Local 報價階梯資訊（自動產生）' : undefined}
           />
           <div className="flex items-center gap-1 ml-2 flex-shrink-0">
             {/* 資源選擇按鈕（餐廳/飯店/景點） */}
