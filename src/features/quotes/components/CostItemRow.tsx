@@ -34,6 +34,9 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
   const isMealItem = categoryId === 'meals'
   // 判斷是否為自理餐（顯示為淡色）
   const isSelfArranged = item.is_self_arranged
+  
+  // 判斷是否需要隱藏數量欄位（餐廳、活動固定是個人分攤，不需要數量）
+  const hideQuantity = categoryId === 'meals' || categoryId === 'activities'
 
   // 簡潔輸入框樣式（右側多留空間避免被 table-divider 遮到）
   const inputClass = 'input-no-focus w-full pl-1 pr-3 py-1 text-sm bg-transparent'
@@ -62,15 +65,17 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
           />
         </div>
       </td>
-      <td className="py-3 px-4 text-sm text-morandi-secondary text-center table-divider">
-        <CalcInput
-          value={item.quantity}
-          onChange={val => handleUpdateItem(categoryId, item.id, 'quantity', val)}
-          formula={item.quantity_formula}
-          onFormulaChange={f => handleUpdateItem(categoryId, item.id, 'quantity_formula', f)}
-          className={`${inputClass} text-center`}
-        />
-      </td>
+      {!hideQuantity && (
+        <td className="py-3 px-4 text-sm text-morandi-secondary text-center table-divider">
+          <CalcInput
+            value={item.quantity}
+            onChange={val => handleUpdateItem(categoryId, item.id, 'quantity', val)}
+            formula={item.quantity_formula}
+            onFormulaChange={f => handleUpdateItem(categoryId, item.id, 'quantity_formula', f)}
+            className={`${inputClass} text-center`}
+          />
+        </td>
+      )}
       <td className="py-3 px-4 text-sm text-morandi-secondary text-center table-divider">
         {item.name === CATEGORY_SECTION_LABELS.成人 ? (
           <CalcInput
