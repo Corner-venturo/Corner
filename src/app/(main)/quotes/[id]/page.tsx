@@ -309,16 +309,22 @@ export default function QuoteDetailPage() {
             item => !item.name.startsWith(QUOTE_PAGE_LABELS.LOCAL_QUOTE)
           )
 
-          // 新增 Local 報價項目（顯示用）
-          const newItem: CostItem = {
-            id: `local-${Date.now()}`,
-            name: QUOTE_PAGE_LABELS.LOCAL_QUOTE,
-            quantity: 1,
-            unit_price: currentLocalPrice,
-            total: 0, // 不參與計算，砍次表會單獨處理
-            note: `目前適用: $${currentLocalPrice.toLocaleString()}/人 | ${sortedTiers.map(t => `${t.participants}人=$${t.unitPrice.toLocaleString()}`).join(' / ')}`,
-          }
-          groupTransportCategory.items.push(newItem)
+          // 新增多個 Local 報價項目（每個階梯一個列）
+          sortedTiers.forEach((tier, index) => {
+            // 判斷是否為目前適用的階梯
+            const isCurrentTier = tier.participants <= totalParticipants && 
+              (index === sortedTiers.length - 1 || sortedTiers[index + 1].participants > totalParticipants)
+            
+            const newItem: CostItem = {
+              id: `local-${tier.participants}-${Date.now()}`,
+              name: `${QUOTE_PAGE_LABELS.LOCAL_QUOTE} ${tier.participants}人`,
+              quantity: 1,
+              unit_price: tier.unitPrice,
+              total: 0, // 不參與計算，砍次表會單獨處理
+              note: isCurrentTier ? '✓ 目前適用' : '',
+            }
+            groupTransportCategory.items.push(newItem)
+          })
         }
         return newCategories
       })
