@@ -39,6 +39,7 @@ import { CATEGORIES } from './requirements-list.types'
 import { COMP_REQUIREMENTS_LABELS } from './constants/labels'
 import { parseQuoteItems, groupItemsByCategory } from './parse-quote-items'
 import { useConfirmationSheet } from './use-confirmation-sheet'
+import { CoreTableRequestDialog } from '@/features/tours/components/CoreTableRequestDialog'
 
 // ============================================
 // Component
@@ -71,6 +72,11 @@ export function RequirementsList({
 
   // 🆕 產生需求單狀態
   const [generatingRequests, setGeneratingRequests] = useState(false)
+  
+  // 🆕 從核心表產生需求單
+  const [showCoreRequestDialog, setShowCoreRequestDialog] = useState(false)
+  const [selectedSupplierName, setSelectedSupplierName] = useState<string>('')
+  const [selectedCategory, setSelectedCategory] = useState<string>('')
 
   // ============================================
   // 載入資料
@@ -273,6 +279,16 @@ export function RequirementsList({
       })
     },
     [itemsByCategory, tour, startDate, onOpenRequestDialog]
+  )
+  
+  // 🆕 從核心表產生需求單
+  const openCoreRequestDialog = useCallback(
+    (category: string, supplierName: string) => {
+      setSelectedCategory(category)
+      setSelectedSupplierName(supplierName)
+      setShowCoreRequestDialog(true)
+    },
+    []
   )
 
   // 🆕 產生單一供應商的需求單
@@ -618,16 +634,33 @@ export function RequirementsList({
                                 {isHidden ? <Eye size={14} /> : <EyeOff size={14} />}
                               </Button>
                             )}
-                            {isFirstRowForSupplier && item.supplierName && onOpenRequestDialog && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => openRequestDialog(cat.key, item.supplierName)}
-                                className="h-7 w-7 p-0 text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10"
-                                title={COMP_REQUIREMENTS_LABELS.產生需求單}
-                              >
-                                <FileText size={14} />
-                              </Button>
+                            {isFirstRowForSupplier && item.supplierName && (
+                              <>
+                                {/* 從報價單產生（新功能） */}
+                                {tour && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => openCoreRequestDialog(cat.key, item.supplierName)}
+                                    className="h-7 w-7 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                    title="從報價單產生需求單（自動帶入資料）"
+                                  >
+                                    <ClipboardList size={14} />
+                                  </Button>
+                                )}
+                                {/* 手動產生（舊功能） */}
+                                {onOpenRequestDialog && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => openRequestDialog(cat.key, item.supplierName)}
+                                    className="h-7 w-7 p-0 text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10"
+                                    title="手動建立需求單"
+                                  >
+                                    <FileText size={14} />
+                                  </Button>
+                                )}
+                              </>
                             )}
                           </div>
                         </td>
@@ -693,6 +726,19 @@ export function RequirementsList({
         )}
       </div>
 
+      {/* 從核心表產生需求單 Dialog */}
+      {tour && (
+        <CoreTableRequestDialog
+          isOpen={showCoreRequestDialog}
+          onClose={() => {
+            setShowCoreRequestDialog(false)
+            loadData(false) // 關閉後重新載入資料
+          }}
+          tour={tour}
+          supplierName={selectedSupplierName}
+          category={selectedCategory}
+        />
+      )}
     </>
   )
 }
