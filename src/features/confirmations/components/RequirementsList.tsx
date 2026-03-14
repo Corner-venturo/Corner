@@ -634,33 +634,16 @@ export function RequirementsList({
                                 {isHidden ? <Eye size={14} /> : <EyeOff size={14} />}
                               </Button>
                             )}
-                            {isFirstRowForSupplier && item.supplierName && (
-                              <>
-                                {/* 從報價單產生（新功能） */}
-                                {tour && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => openCoreRequestDialog(cat.key, item.supplierName)}
-                                    className="h-7 w-7 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                    title="從報價單產生需求單（自動帶入資料）"
-                                  >
-                                    <ClipboardList size={14} />
-                                  </Button>
-                                )}
-                                {/* 手動產生（舊功能） */}
-                                {onOpenRequestDialog && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => openRequestDialog(cat.key, item.supplierName)}
-                                    className="h-7 w-7 p-0 text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10"
-                                    title="手動建立需求單"
-                                  >
-                                    <FileText size={14} />
-                                  </Button>
-                                )}
-                              </>
+                            {isFirstRowForSupplier && item.supplierName && tour && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => openCoreRequestDialog(cat.key, item.supplierName)}
+                                className="h-7 w-7 p-0 text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10"
+                                title="列印需求單"
+                              >
+                                <FileText size={14} />
+                              </Button>
                             )}
                           </div>
                         </td>

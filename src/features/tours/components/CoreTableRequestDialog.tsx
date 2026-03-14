@@ -312,25 +312,19 @@ export function CoreTableRequestDialog({
     setPrinting(true)
 
     try {
-      // 1. 儲存需求單狀態
-      const { error: insertError } = await supabase.from('tour_requests').insert({
-        tour_id: tour.id,
-        tour_code: tour.code,
-        tour_name: tour.name,
-        supplier_id: resolvedSupplierId,
-        supplier_name: supplierName,
-        category,
-        title: `${CATEGORY_LABELS[category] || category}需求單`,
-        status: 'sent',
-        is_from_core: true, // ← 標記為核心表模式
-        workspace_id: user?.workspace_id || '',
-        created_by: user?.id,
-        created_by_name: user?.chinese_name || user?.name || '',
-      })
+      // 1. 更新核心表狀態（request_status）
+      const coreItemIds = coreItems.map(item => item.id)
+      const { error: updateError } = await supabase
+        .from('tour_itinerary_items')
+        .update({
+          request_status: 'sent',
+          request_sent_at: new Date().toISOString(),
+        })
+        .in('id', coreItemIds)
 
-      if (insertError) {
-        logger.error('儲存需求單狀態失敗:', insertError)
-        throw insertError
+      if (updateError) {
+        logger.error('更新核心表狀態失敗:', updateError)
+        throw updateError
       }
 
       // 2. 產生 PDF 並列印
