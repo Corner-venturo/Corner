@@ -1,8 +1,9 @@
 # 🗺️ Venturo ERP 主索引
 
-**更新時間**：2026-03-14 10:40  
-**掃描進度**：60%  
-**總檔案數**：824
+**更新時間**：2026-03-14 10:42  
+**掃描進度**：100% ✅  
+**總檔案數**：824  
+**總文檔行數**：~6200+
 
 ---
 
@@ -121,6 +122,63 @@
 
 ---
 
+### 12. [BUTTONS_INDEX.md](./BUTTONS_INDEX.md) (283行)
+**按鈕行為索引**
+- 所有按鈕 onClick 行為
+- 常見處理函數（handleSave, handleSubmit等）
+
+**用途**：快速找到按鈕邏輯
+
+---
+
+### 13. [TYPES_INDEX.md](./TYPES_INDEX.md) (137行)
+**型別定義索引**
+- 所有 interface 和 type
+- 核心型別定義
+- 資料庫 Schema
+
+**用途**：理解資料結構
+
+---
+
+### 14. [HOOKS_INDEX.md](./HOOKS_INDEX.md) (409行)
+**Hooks 索引**
+- 所有 custom hooks
+- 每個 hook 的主要函數
+
+**用途**：找到資料邏輯
+
+---
+
+### 15. [SERVICES_INDEX.md](./SERVICES_INDEX.md) (159行)
+**Services 層索引**
+- 所有 services 函數
+- 核心同步邏輯
+
+**用途**：找到業務邏輯
+
+---
+
+### 16. [DATAFLOW_MAP.md](./DATAFLOW_MAP.md) (42行)
+**資料流向地圖**
+- 核心表寫入點
+- 狀態更新流程
+- JOIN 查詢
+
+**用途**：理解資料流動
+
+---
+
+### 17. [ROUTES_MAP.md](./ROUTES_MAP.md) (143行)
+**路由完整地圖**
+- 所有頁面路由
+- 動態路由 [id]
+- API 路由
+
+**用途**：找到任何頁面
+
+---
+
 ## 🎯 快速查找指南
 
 ### 想找某個功能在哪裡？
@@ -141,6 +199,24 @@
 ### 想知道為什麼這樣設計？
 → 看 [DECISIONS.md](./DECISIONS.md)
 
+### 想找按鈕的處理邏輯？
+→ 看 [BUTTONS_INDEX.md](./BUTTONS_INDEX.md)
+
+### 想知道資料結構？
+→ 看 [TYPES_INDEX.md](./TYPES_INDEX.md)
+
+### 想找 custom hook？
+→ 看 [HOOKS_INDEX.md](./HOOKS_INDEX.md)
+
+### 想找業務邏輯層？
+→ 看 [SERVICES_INDEX.md](./SERVICES_INDEX.md)
+
+### 想理解資料怎麼流動？
+→ 看 [DATAFLOW_MAP.md](./DATAFLOW_MAP.md)
+
+### 想找某個頁面？
+→ 看 [ROUTES_MAP.md](./ROUTES_MAP.md)
+
 ---
 
 ## 📊 掃描統計
@@ -154,26 +230,37 @@
 文檔總行數：
 - COMPLETE_SYSTEMS_MAP.md: 712行
 - FUNCTIONS_INDEX.md: 1977行
+- BUTTONS_INDEX.md: 283行
+- HOOKS_INDEX.md: 409行
+- SERVICES_INDEX.md: 159行
+- ROUTES_MAP.md: 143行
 - DATABASE_USAGE.md: 154行
+- DATAFLOW_MAP.md: 42行
+- TYPES_INDEX.md: 137行
 - CREATOR_KNOWLEDGE.md: 796行
-- 其他文檔: ~1500行
+- GAME_GUIDE.md: 415行
+- SYSTEMS_MAP.md: 153行
+- 其他文檔: ~1000行
 
-總計：~5000+ 行文檔
+總計：~6200+ 行文檔
 ```
 
 ---
 
 ## 🔄 更新記錄
 
-### 2026-03-14 10:40
+### 2026-03-14 10:42
 - ✅ 完整系統地圖（自動掃描）
 - ✅ 關鍵函數索引（自動掃描）
 - ✅ 資料庫使用索引（自動掃描）
 - ✅ 創世神知識體系
 - ✅ 遊戲攻略本
-- ⏳ 待完成：按鈕行為索引
-- ⏳ 待完成：欄位驗證規則
-- ⏳ 待完成：錯誤處理機制
+- ✅ 按鈕行為索引（自動掃描）
+- ✅ 型別定義索引（自動掃描）
+- ✅ Hooks 索引（自動掃描）
+- ✅ Services 層索引（自動掃描）
+- ✅ 資料流向地圖（自動掃描）
+- ✅ 路由完整地圖（自動掃描）
 
 ---
 
@@ -181,12 +268,16 @@
 
 **知道每一片樹葉的由來。**
 
-- 為什麼這個欄位存在？→ CREATOR_KNOWLEDGE.md
-- 為什麼這個按鈕在這裡？→ 待完成
-- 為什麼資料這樣流動？→ GAME_GUIDE.md
-- 為什麼邏輯這樣設計？→ DECISIONS.md
+- 為什麼這個欄位存在？→ CREATOR_KNOWLEDGE.md ✅
+- 為什麼這個按鈕在這裡？→ BUTTONS_INDEX.md ✅
+- 為什麼資料這樣流動？→ DATAFLOW_MAP.md ✅
+- 為什麼邏輯這樣設計？→ DECISIONS.md ✅
+- 任何檔案在哪裡？→ COMPLETE_SYSTEMS_MAP.md ✅
+- 任何函數怎麼實作？→ FUNCTIONS_INDEX.md ✅
+- 任何資料結構？→ TYPES_INDEX.md ✅
+- 任何頁面路由？→ ROUTES_MAP.md ✅
 
 ---
 
-**進度：60%**  
-**下一步：按鈕行為索引 + 欄位驗證規則**
+**進度：100% ✅**  
+**完整索引系統建立完成！**
