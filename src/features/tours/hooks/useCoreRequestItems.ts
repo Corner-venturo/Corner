@@ -132,9 +132,8 @@ async function fetchTotalPax(tourId: string): Promise<number> {
   try {
     const { data, error } = await supabase
       .from('orders')
-      .select('adult, child_with_bed, child_no_bed, infant')
+      .select('member_count')
       .eq('tour_id', tourId)
-      .in('status', ['confirmed', 'paid']) // 只計算已確認或已付款的訂單
 
     if (error) {
       logger.error('讀取訂單總人數失敗:', error)
@@ -146,13 +145,7 @@ async function fetchTotalPax(tourId: string): Promise<number> {
     }
 
     return data.reduce((total, order) => {
-      return (
-        total +
-        (order.adult || 0) +
-        (order.child_with_bed || 0) +
-        (order.child_no_bed || 0) +
-        (order.infant || 0)
-      )
+      return total + (order.member_count || 0)
     }, 0)
   } catch (err) {
     logger.error('fetchTotalPax 錯誤:', err)
