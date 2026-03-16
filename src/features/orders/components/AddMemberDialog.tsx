@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { PassportUploadZone } from './PassportUploadZone'
 import type { ProcessedFile } from '../types/order-member.types'
+import type { PendingConfirmation } from '../hooks/usePassportUpload'
 import { COMP_ORDERS_LABELS } from '../constants/labels'
 
 interface AddMemberDialogProps {
@@ -33,6 +34,12 @@ interface AddMemberDialogProps {
   onBatchUpload: () => void
   /** 可選：更新檔案預覽（用於圖片增強後） */
   onUpdateFilePreview?: (index: number, newPreview: string) => void
+  /** 重複確認 */
+  pendingConfirmations?: PendingConfirmation[]
+  onConfirmUpdate?: (index: number) => void
+  onRejectUpdate?: (index: number) => void
+  onConfirmAllUpdates?: () => void
+  onRejectAllUpdates?: () => void
 }
 
 export function AddMemberDialog({
@@ -52,6 +59,11 @@ export function AddMemberDialog({
   onRemoveFile,
   onBatchUpload,
   onUpdateFilePreview,
+  pendingConfirmations,
+  onConfirmUpdate,
+  onRejectUpdate,
+  onConfirmAllUpdates,
+  onRejectAllUpdates,
 }: AddMemberDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -103,6 +115,51 @@ export function AddMemberDialog({
             onBatchUpload={onBatchUpload}
             onUpdateFilePreview={onUpdateFilePreview}
           />
+
+          {/* 重複成員確認區 */}
+          {pendingConfirmations && pendingConfirmations.length > 0 && (
+            <div className="space-y-2 p-3 border border-morandi-gold/30 rounded-lg bg-morandi-gold/5">
+              <div className="text-sm font-medium text-morandi-gold">
+                發現 {pendingConfirmations.length} 筆重複資料，需要確認：
+              </div>
+              {pendingConfirmations.map((item, i) => (
+                <div
+                  key={`${item.matchedMember.id}-${item.matchType}`}
+                  className="flex items-center justify-between gap-2 p-2 bg-card rounded border"
+                >
+                  <div className="text-sm flex-1 min-w-0">
+                    <span className="font-medium">
+                      {item.customer.name || item.matchedMember.chinese_name}
+                    </span>
+                    <span className="text-muted-foreground ml-1">— {item.confirmMessage}</span>
+                  </div>
+                  <div className="flex gap-1 shrink-0">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => onRejectUpdate?.(i)}
+                    >
+                      跳過
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => onConfirmUpdate?.(i)}
+                    >
+                      更新
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              <div className="flex gap-2 pt-1">
+                <Button size="sm" variant="outline" onClick={onRejectAllUpdates}>
+                  全部跳過
+                </Button>
+                <Button size="sm" onClick={onConfirmAllUpdates}>
+                  全部更新
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

@@ -48,8 +48,10 @@ interface ExistingMember {
 interface DuplicateCheckResult {
   isDuplicate: boolean
   reason: string
-  matchType?: 'exact' | 'name_only' // exact = 完全重複, name_only = 只有姓名符合
+  matchType?: 'exact' | 'name_only' | 'passport_match' | 'name_birthday_match'
   matchedMember?: ExistingMember // 符合的現有成員
+  needsConfirmation?: boolean // 需要使用者確認是否更新
+  confirmMessage?: string // 確認對話框訊息
 }
 
 interface UsePassportOcrReturn {
@@ -134,18 +136,21 @@ export function usePassportOcr(): UsePassportOcrReturn {
         return existingMembers.find(m => m[field] === value)
       }
 
-      // 1. 護照號碼完全符合 → 跳過
+      // 1. 護照號碼完全符合 → 需要使用者確認是否更新
       if (passportNumber && existingPassports.has(passportNumber)) {
         const matched = findMatchedMember('passport_number', passportNumber)
+        const displayName = chineseName || matched?.chinese_name || ''
         return {
-          isDuplicate: true,
+          isDuplicate: false,
+          needsConfirmation: true,
           reason: COMP_ORDERS_LABELS.護照號碼重複,
-          matchType: 'exact',
+          matchType: 'passport_match',
           matchedMember: matched,
+          confirmMessage: `${displayName} 已存在（護照號碼相同）。是否更新護照照片和資料？`,
         }
       }
 
-      // 2. 身分證號完全符合 → 跳過
+      // 2. 身分證號完全符合 → 自動跳過（完全相同的人）
       if (idNumber && existingIdNumbers.has(idNumber)) {
         const matched = findMatchedMember('id_number', idNumber)
         return {
@@ -156,16 +161,19 @@ export function usePassportOcr(): UsePassportOcrReturn {
         }
       }
 
-      // 3. 姓名+生日完全符合 → 跳過
+      // 3. 姓名+生日完全符合 → 需要使用者確認（可能換了新護照）
       if (nameBirthKey && existingNameBirthKeys.has(nameBirthKey)) {
         const matched = existingMembers.find(
           m => m.chinese_name === cleanChineseName && m.birth_date === birthDate
         )
+        const displayName = chineseName || matched?.chinese_name || ''
         return {
-          isDuplicate: true,
+          isDuplicate: false,
+          needsConfirmation: true,
           reason: COMP_ORDERS_LABELS.姓名_生日重複,
-          matchType: 'exact',
+          matchType: 'name_birthday_match',
           matchedMember: matched,
+          confirmMessage: `${displayName} 已存在（姓名+生日相同）。護照號碼不同，是否換了新護照？要更新嗎？`,
         }
       }
 

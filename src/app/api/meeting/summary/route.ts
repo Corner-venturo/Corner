@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerAuth } from '@/lib/auth/server-auth'
+import { ApiError } from '@/lib/api/response'
 
 interface MeetingMessage {
   user: string
@@ -6,6 +8,11 @@ interface MeetingMessage {
 }
 
 export async function POST(req: NextRequest) {
+  // 🔒 安全修復 2026-03-15：需要認證
+  const auth = await getServerAuth()
+  if (!auth.success) {
+    return ApiError.unauthorized('請先登入')
+  }
   try {
     const { messages } = await req.json()
 

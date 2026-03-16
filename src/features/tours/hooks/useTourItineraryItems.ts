@@ -116,7 +116,8 @@ function mealToItem(
   service_date: string | null,
   itinerary_id: string,
   tour_id: string | null,
-  workspace_id: string
+  workspace_id: string,
+  resource_id?: string
 ): TourItineraryItemInsert | null {
   if (!meal_name || meal_name.trim() === '') return null
   return {
@@ -129,6 +130,8 @@ function mealToItem(
     sub_category,
     title: meal_name,
     service_date: service_date || null,
+    resource_type: resource_id ? 'restaurant' : null,
+    resource_id: resource_id || null,
   }
 }
 
@@ -140,7 +143,8 @@ function accommodationToItem(
   service_date: string | null,
   itinerary_id: string,
   tour_id: string | null,
-  workspace_id: string
+  workspace_id: string,
+  resource_id?: string
 ): TourItineraryItemInsert | null {
   if (!accommodation || accommodation.trim() === '') return null
   return {
@@ -152,6 +156,8 @@ function accommodationToItem(
     category: ITINERARY_ITEM_CATEGORIES.ACCOMMODATION,
     title: accommodation,
     service_date: service_date || null,
+    resource_type: resource_id ? 'hotel' : null,
+    resource_id: resource_id || null,
   }
 }
 
@@ -261,12 +267,13 @@ export function useSyncItineraryToCore() {
           // Meals
           if (day.meals) {
             const meals = day.meals as Meals
-            const meal_entries: [string, MealSubCategory][] = [
-              [meals.breakfast, MEAL_SUB_CATEGORIES.BREAKFAST],
-              [meals.lunch, MEAL_SUB_CATEGORIES.LUNCH],
-              [meals.dinner, MEAL_SUB_CATEGORIES.DINNER],
+            const mealIds = (day as unknown as Record<string, unknown>).meal_ids as { breakfast?: string; lunch?: string; dinner?: string } | undefined
+            const meal_entries: [string, MealSubCategory, string | undefined][] = [
+              [meals.breakfast, MEAL_SUB_CATEGORIES.BREAKFAST, mealIds?.breakfast],
+              [meals.lunch, MEAL_SUB_CATEGORIES.LUNCH, mealIds?.lunch],
+              [meals.dinner, MEAL_SUB_CATEGORIES.DINNER, mealIds?.dinner],
             ]
-            for (const [meal_name, sub_cat] of meal_entries) {
+            for (const [meal_name, sub_cat, meal_resource_id] of meal_entries) {
               // 餐食：檢查同一天同一餐是否已有項目（不管狀態）
               const already_exists = items_with_downstream.some(
                 item =>
@@ -274,7 +281,7 @@ export function useSyncItineraryToCore() {
                   item.category === ITINERARY_ITEM_CATEGORIES.MEALS &&
                   item.sub_category === sub_cat
               )
-              
+
               if (!already_exists) {
                 const item = mealToItem(
                   meal_name,
@@ -284,7 +291,8 @@ export function useSyncItineraryToCore() {
                   service_date,
                   itinerary_id,
                   tour_id,
-                  workspace_id
+                  workspace_id,
+                  meal_resource_id
                 )
                 if (item) new_items.push(item)
               }
@@ -320,6 +328,7 @@ export function useSyncItineraryToCore() {
             )
             
             if (!already_exists) {
+              const accommodationId = (day as unknown as Record<string, unknown>).accommodation_id as string | undefined
               const item = accommodationToItem(
                 resolvedAccommodation,
                 day_number,
@@ -327,7 +336,8 @@ export function useSyncItineraryToCore() {
                 service_date,
                 itinerary_id,
                 tour_id,
-                workspace_id
+                workspace_id,
+                accommodationId
               )
               if (item) new_items.push(item)
             }

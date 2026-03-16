@@ -8,6 +8,12 @@ import { supabase } from '@/lib/supabase/client'
 import type { TourLeader } from '@/types/tour-leader.types'
 import { COMP_EDITOR_LABELS } from '../../constants/labels'
 
+// Sanitize input to prevent SQL injection in LIKE queries
+function sanitizeInput(input: string): string {
+  // Escape SQL LIKE special characters: % _ \
+  return input.replace(/[%_\\]/g, '\\$&')
+}
+
 interface LeaderMeetingSectionProps {
   data: TourFormData
   updateNestedField: (parent: string, field: string, value: unknown) => void
@@ -81,10 +87,11 @@ export function LeaderMeetingSection({
 
     setIsSearching(true)
     try {
+      const sanitized = sanitizeInput(query)
       const { data, error } = await supabase
         .from('tour_leaders')
         .select('*')
-        .or(`name.ilike.%${query}%,english_name.ilike.%${query}%`)
+        .or(`name.ilike.%${sanitized}%,english_name.ilike.%${sanitized}%`)
         .eq('status', 'active')
         .limit(5)
 

@@ -12,6 +12,12 @@ export interface MentionResult {
 // Module-level cache: countryName → countryId
 const countryIdCache = new Map<string, string>()
 
+// Sanitize input to prevent SQL injection in LIKE queries
+function sanitizeInput(input: string): string {
+  // Escape SQL LIKE special characters: % _ \
+  return input.replace(/[%_\\]/g, '\\$&')
+}
+
 export function useMentionSearch(countryName: string, query: string, isOpen: boolean) {
   const [results, setResults] = useState<MentionResult[]>([])
   const [loading, setLoading] = useState(false)
@@ -77,7 +83,7 @@ export function useMentionSearch(countryName: string, query: string, isOpen: boo
         }
 
         if (query.trim()) {
-          q = q.ilike('name', `%${query.trim()}%`)
+          q = q.ilike('name', `%${sanitizeInput(query.trim())}%`)
         }
 
         q = q.order('name')

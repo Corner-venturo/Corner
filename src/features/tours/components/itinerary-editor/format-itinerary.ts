@@ -39,7 +39,10 @@ export function formatDailyItinerary({
     const isFirst = idx === 0
     const isLast = idx === dailySchedule.length - 1
     const defaultTitle = isFirst ? '抵達目的地' : isLast ? '返回台灣' : `第 ${day.day} 天行程`
-    const title = day.route?.trim() || defaultTitle
+    const attractionNames = (day.attractions || []).map(a => a.name).join(' → ')
+    const manualRoute = day.route?.trim() || ''
+    const combinedRoute = [attractionNames, manualRoute].filter(Boolean).join(' → ')
+    const title = combinedRoute || defaultTitle
     const breakfast = day.hotelBreakfast ? '飯店早餐' : day.meals.breakfast
     const lunch = day.lunchSelf ? '敬請自理' : day.meals.lunch
     const dinner = day.dinnerSelf ? '敬請自理' : day.meals.dinner
@@ -102,7 +105,10 @@ export function getPreviewDailyData(
     const isFirst = idx === 0
     const isLast = idx === dailySchedule.length - 1
     const defaultTitle = isFirst ? '抵達目的地' : isLast ? '返回台灣' : `第 ${day.day} 天行程`
-    const title = day.route?.trim() || defaultTitle
+    const attractionNames = (day.attractions || []).map(a => a.name).join(' → ')
+    const manualRoute = day.route?.trim() || ''
+    const combinedRoute = [attractionNames, manualRoute].filter(Boolean).join(' → ')
+    const title = combinedRoute || defaultTitle
     const breakfast = day.hotelBreakfast ? '飯店早餐' : day.meals.breakfast
     const lunch = day.lunchSelf ? '敬請自理' : day.meals.lunch
     const dinner = day.dinnerSelf ? '敬請自理' : day.meals.dinner

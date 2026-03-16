@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { getServerAuth } from '@/lib/auth/server-auth'
+import { ApiError } from '@/lib/api/response'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -10,6 +12,11 @@ function getSupabase() {
 
 // GET: Load shared room for workspace
 export async function GET(req: NextRequest) {
+  // 🔒 安全修復 2026-03-15：需要認證
+  const auth = await getServerAuth()
+  if (!auth.success) {
+    return ApiError.unauthorized('請先登入')
+  }
   const workspaceId = req.nextUrl.searchParams.get('workspace_id')
   if (!workspaceId) {
     return NextResponse.json({ error: 'workspace_id required' }, { status: 400 })
@@ -32,6 +39,11 @@ export async function GET(req: NextRequest) {
 
 // POST: Save shared room for workspace
 export async function POST(req: NextRequest) {
+  // 🔒 安全修復 2026-03-15：需要認證
+  const auth = await getServerAuth()
+  if (!auth.success) {
+    return ApiError.unauthorized('請先登入')
+  }
   const { workspace_id, room_data, user_id } = await req.json()
   if (!workspace_id || !room_data) {
     return NextResponse.json({ error: 'workspace_id and room_data required' }, { status: 400 })

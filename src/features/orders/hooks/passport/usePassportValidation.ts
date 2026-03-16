@@ -291,8 +291,29 @@ export function usePassportValidation(): UsePassportValidationReturn {
       fileIndex,
     }: UpdateMemberParams): Promise<UpdateMemberResult> => {
       try {
+        // 查詢舊護照照片 URL（上傳新照片後要刪除）
+        const { data: oldMember } = await supabase
+          .from('order_members')
+          .select('passport_image_url')
+          .eq('id', memberId)
+          .single()
+        const oldPassportUrl = oldMember?.passport_image_url as string | null
+
         // 上傳護照照片
         const passportImageUrl = await uploadPassportImage(file, workspaceId, orderId, fileIndex)
+
+        // 刪除舊護照照片（避免 Storage 孤兒檔案）
+        if (oldPassportUrl && passportImageUrl && oldPassportUrl !== passportImageUrl) {
+          try {
+            const match = oldPassportUrl.match(/passport-images\/(.+?)(?:\?|$)/)
+            if (match) {
+              await supabase.storage.from('passport-images').remove([match[1]])
+              logger.log(`已刪除舊護照照片: ${match[1]}`)
+            }
+          } catch (delErr) {
+            logger.error('刪除舊護照照片失敗（不影響更新）:', delErr)
+          }
+        }
 
         const passportNumber = customerData.passport_number || ''
         const idNumber = customerData.national_id || ''

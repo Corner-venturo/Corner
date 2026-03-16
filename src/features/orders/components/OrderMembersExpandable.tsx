@@ -1242,6 +1242,11 @@ export function OrderMembersExpandable({
         onRemoveFile={passportUpload.handleRemoveFile}
         onBatchUpload={passportUpload.handleBatchUpload}
         onUpdateFilePreview={passportUpload.handleUpdateFilePreview}
+        pendingConfirmations={passportUpload.pendingConfirmations}
+        onConfirmUpdate={passportUpload.confirmUpdate}
+        onRejectUpdate={passportUpload.rejectUpdate}
+        onConfirmAllUpdates={passportUpload.confirmAllUpdates}
+        onRejectAllUpdates={passportUpload.rejectAllUpdates}
       />
       <OrderSelectDialog
         isOpen={membersData.showOrderSelectDialog}

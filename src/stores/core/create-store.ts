@@ -26,6 +26,12 @@ import type { StoreState, StoreConfig, CreateInput, UpdateInput } from './types'
 import { AbortManager } from '../utils/abort-manager'
 import { logger } from '@/lib/utils/logger'
 
+// Validate UUID to prevent SQL injection
+function isValidUUID(uuid: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  return uuidRegex.test(uuid)
+}
+
 /**
  * 生成 UUID（相容不支援 crypto.randomUUID 的瀏覽器）
  */
@@ -194,6 +200,10 @@ export function createStore<T extends BaseEntity>(
             if (shouldCrossWorkspace(isSuperAdmin)) {
               // 跨 workspace 模式：不加過濾
             } else if (workspaceId) {
+              // 驗證 workspaceId 格式（防止 SQL injection）
+              if (!isValidUUID(workspaceId)) {
+                throw new Error(`Invalid workspace ID format: ${workspaceId}`)
+              }
               // 一般使用者或 Super Admin 預設模式：過濾到自己的 workspace
               query = query.or(`workspace_id.eq.${workspaceId},workspace_id.is.null`)
             }

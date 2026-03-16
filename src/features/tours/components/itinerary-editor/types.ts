@@ -48,11 +48,14 @@ export interface DailyScheduleItem {
     dinner: string
   }
   accommodation: string
+  accommodationId?: string
   sameAsPrevious: boolean
   hotelBreakfast: boolean
   lunchSelf: boolean
   dinnerSelf: boolean
   activities?: SimpleActivity[]
+  attractions?: Array<{ id: string; name: string }>
+  mealIds?: { breakfast?: string; lunch?: string; dinner?: string }
   note?: string
 }
 

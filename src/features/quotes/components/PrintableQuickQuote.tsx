@@ -12,6 +12,7 @@ import { X, Printer } from 'lucide-react'
 import { Quote, QuickQuoteItem } from '@/types/quote.types'
 import { supabase } from '@/lib/supabase/client'
 import { useCompanyInfo } from '@/hooks/useCompanyInfo'
+import { PrintFooter } from './printable/shared/PrintFooter'
 import {
   PRINTABLE_QUICK_QUOTE_LABELS,
   PAYMENT_INFO_LABELS,
@@ -43,10 +44,8 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
   const [isMounted, setIsMounted] = useState(false)
   const [logoUrl, setLogoUrl] = useState<string>('')
   const printContentRef = useRef<HTMLDivElement>(null)
-  const workspaceName = useAuthStore(state => state.user?.workspace_name) || ''
-  const companyFullName = workspaceName ? `${workspaceName}股份有限公司` : ''
   const ws = useWorkspaceSettings()
-  const { subtitle: companySubtitle } = useCompanyInfo()
+  const { legalName: companyFullName } = useCompanyInfo()
   const hasBankInfo = !!(ws.bank_name || ws.bank_branch || ws.bank_account)
 
   useEffect(() => {
@@ -480,7 +479,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
                   color: '#9CA3AF',
                 }}
               >
-                {workspaceName}
+                {ws?.name || ''}
               </div>
             )}
             <div className="title-area" style={{ textAlign: 'center', padding: '8px 0' }}>
@@ -1051,30 +1050,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
           </div>
 
           {/* 頁腳 */}
-          <div
-            className="footer"
-            style={{
-              marginTop: '40px',
-              paddingTop: '16px',
-              borderTop: '1px solid #F3F4F6',
-              textAlign: 'center',
-            }}
-          >
-            <div
-              className="footer-slogan"
-              style={{
-                fontSize: '13px',
-                fontStyle: 'italic',
-                color: '#9CA3AF',
-                marginBottom: '8px',
-              }}
-            >
-              {companySubtitle}
-            </div>
-            <div className="footer-copyright" style={{ fontSize: '11px', color: '#D1D5DB' }}>
-              {companyFullName} {PRINTABLE_QUICK_QUOTE_LABELS.版權前綴} {new Date().getFullYear()}
-            </div>
-          </div>
+          <PrintFooter />
         </div>
       </div>
     </div>,

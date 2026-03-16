@@ -28,6 +28,12 @@ interface DailyItineraryDay {
   meals: DailyMeals
   accommodation: string
   activities?: DailyActivity[]
+  accommodation_id?: string
+  meal_ids?: {
+    breakfast?: string
+    lunch?: string
+    dinner?: string
+  }
 }
 
 // Database helpers using dynamicFrom (for tables with JSONB columns requiring custom types)

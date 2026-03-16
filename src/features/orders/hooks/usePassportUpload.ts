@@ -37,6 +37,31 @@ interface UsePassportUploadParams {
   onSuccess: () => Promise<void> // 上傳成功後的回呼（通常是重新載入成員）
 }
 
+/** 待確認的重複成員 */
+export interface PendingConfirmation {
+  customer: {
+    name?: string
+    english_name?: string
+    passport_romanization?: string
+    passport_number?: string
+    passport_expiry?: string | null
+    national_id?: string
+    birth_date?: string | null
+    sex?: string
+  }
+  file: File
+  fileIndex: number
+  matchedMember: {
+    id: string
+    passport_number: string | null
+    id_number: string | null
+    chinese_name: string | null
+    birth_date: string | null
+  }
+  confirmMessage: string
+  matchType: string
+}
+
 /** 護照資料（用於衝突 Dialog） */
 interface PassportDataForConflict {
   passport_number?: string | null
@@ -61,6 +86,13 @@ interface UsePassportUploadReturn {
   conflicts: ActiveOrderConflict[]
   conflictPassportData: PassportDataForConflict | null
 
+  // 重複確認狀態
+  pendingConfirmations: PendingConfirmation[]
+  confirmUpdate: (index: number) => Promise<void>
+  rejectUpdate: (index: number) => void
+  confirmAllUpdates: () => Promise<void>
+  rejectAllUpdates: () => void
+
   // 操作
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>
   handleDragOver: (e: React.DragEvent<HTMLLabelElement>) => void
@@ -83,6 +115,7 @@ export function usePassportUpload({
   const [conflictPassportData, setConflictPassportData] = useState<PassportDataForConflict | null>(
     null
   )
+  const [pendingConfirmations, setPendingConfirmations] = useState<PendingConfirmation[]>([])
 
   // 使用子模組
   const fileModule = usePassportFiles()
@@ -117,6 +150,7 @@ export function usePassportUpload({
       const failedItems: string[] = []
       const duplicateItems: string[] = []
       const updatedItems: string[] = [] // 新增：更新的成員列表
+      const newPendingConfirmations: PendingConfirmation[] = []
 
       // 載入現有成員（包含 id）
       const { data: existingMembers } = await supabase
@@ -132,11 +166,24 @@ export function usePassportUpload({
           // 檢查重複
           const duplicateCheck = ocrModule.checkDuplicate(item.customer, existingMembers || [])
 
-          // 完全重複 → 跳過
+          // 完全重複（身分證號相同）→ 跳過
           if (duplicateCheck.isDuplicate) {
             duplicateCount++
             const displayName = item.customer.name || item.fileName
             duplicateItems.push(`${displayName} (${duplicateCheck.reason})`)
+            continue
+          }
+
+          // 需要使用者確認（護照號碼或姓名+生日相同）→ 收集待確認
+          if (duplicateCheck.needsConfirmation && duplicateCheck.matchedMember) {
+            newPendingConfirmations.push({
+              customer: item.customer,
+              file: compressedFiles[i],
+              fileIndex: i,
+              matchedMember: duplicateCheck.matchedMember,
+              confirmMessage: duplicateCheck.confirmMessage || duplicateCheck.reason,
+              matchType: duplicateCheck.matchType || 'exact',
+            })
             continue
           }
 
@@ -257,6 +304,11 @@ export function usePassportUpload({
         setConflictDialogOpen(true)
       }
 
+      // 設定待確認項目
+      if (newPendingConfirmations.length > 0) {
+        setPendingConfirmations(newPendingConfirmations)
+      }
+
       // 顯示結果
       let message = PASSPORT_UPLOAD_LABELS.SUCCESS_SUMMARY(result.successful, result.total)
       if (successCount > 0) {
@@ -273,6 +325,9 @@ export function usePassportUpload({
       }
       if (duplicateCount > 0) {
         message += `\n\n跳過 ${duplicateCount} 位重複成員：\n${duplicateItems.join('\n')}`
+      }
+      if (newPendingConfirmations.length > 0) {
+        message += `\n\n⚠️ 發現 ${newPendingConfirmations.length} 筆重複資料，需要確認是否更新`
       }
       if (result.googleVisionError) {
         message += `\n\n⚠️ 中文名辨識失敗：${result.googleVisionError}\n• 請至 Google Cloud Console 更新 API Key`
@@ -314,6 +369,75 @@ export function usePassportUpload({
     }
   }, [fileModule, ocrModule, validationModule, isUploading, orderId, workspaceId, onSuccess])
 
+  // 確認更新單筆重複成員
+  const confirmUpdate = useCallback(
+    async (index: number) => {
+      if (!orderId) return
+      const item = pendingConfirmations[index]
+      if (!item) return
+
+      const updateResult = await validationModule.updateOrderMember({
+        memberId: item.matchedMember.id,
+        orderId,
+        workspaceId,
+        customerData: item.customer,
+        file: item.file,
+        fileIndex: item.fileIndex,
+      })
+
+      if (updateResult.success) {
+        void alert(`已更新 ${item.customer.name || item.matchedMember.chinese_name || ''} 的資料`, 'success')
+      } else {
+        void alert(`更新失敗：${updateResult.error || '未知錯誤'}`, 'error')
+      }
+
+      setPendingConfirmations(prev => prev.filter((_, i) => i !== index))
+      await onSuccess()
+    },
+    [pendingConfirmations, orderId, workspaceId, validationModule, onSuccess]
+  )
+
+  // 拒絕更新單筆
+  const rejectUpdate = useCallback(
+    (index: number) => {
+      setPendingConfirmations(prev => prev.filter((_, i) => i !== index))
+    },
+    []
+  )
+
+  // 確認更新全部
+  const confirmAllUpdates = useCallback(async () => {
+    if (!orderId) return
+    let updatedCount = 0
+
+    for (const item of pendingConfirmations) {
+      const updateResult = await validationModule.updateOrderMember({
+        memberId: item.matchedMember.id,
+        orderId,
+        workspaceId,
+        customerData: item.customer,
+        file: item.file,
+        fileIndex: item.fileIndex,
+      })
+
+      if (updateResult.success) {
+        updatedCount++
+      }
+    }
+
+    if (updatedCount > 0) {
+      void alert(`已更新 ${updatedCount} 位成員的資料`, 'success')
+    }
+
+    setPendingConfirmations([])
+    await onSuccess()
+  }, [pendingConfirmations, orderId, workspaceId, validationModule, onSuccess])
+
+  // 拒絕全部
+  const rejectAllUpdates = useCallback(() => {
+    setPendingConfirmations([])
+  }, [])
+
   return {
     processedFiles: fileModule.processedFiles,
     isUploading,
@@ -324,6 +448,12 @@ export function usePassportUpload({
     setConflictDialogOpen,
     conflicts,
     conflictPassportData,
+    // 重複確認
+    pendingConfirmations,
+    confirmUpdate,
+    rejectUpdate,
+    confirmAllUpdates,
+    rejectAllUpdates,
     // 操作
     handleFileChange: fileModule.handleFileChange,
     handleDragOver: fileModule.handleDragOver,

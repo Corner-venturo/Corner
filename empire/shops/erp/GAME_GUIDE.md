@@ -420,6 +420,179 @@ leader_status:
 
 ---
 
+## 🎒 裝備系統（JSONB vs 關聯表）
+
+### **為什麼用關聯表而不是全部塞進 JSONB？**
+
+想像你在玩 RPG：
+
+---
+
+### **方案 A：雜物袋（JSONB）**
+
+```json
+{
+  "tour_id": "T001",
+  "name": "日本賞櫻團",
+  "members": [
+    {"name": "王小明", "room": "101", "meal": "素食"},
+    {"name": "李大華", "room": "101", "meal": "葷食"}
+  ],
+  "requests": [
+    {"supplier": "飯店A", "items": ["房間x2"], "status": "confirmed"},
+    {"supplier": "餐廳B", "items": ["晚餐x2"], "status": "pending"}
+  ],
+  "payments": [
+    {"date": "2026-03-01", "amount": 10000, "status": "paid"}
+  ]
+}
+```
+
+**遊戲比喻**：
+- 就像你把**所有物品都塞進「雜物袋」**
+- 劍、藥水、食物、任務道具全部混在一起
+- 要找東西？得把整個袋子倒出來翻
+
+**問題**：
+
+1. 🔍 **找不到東西** 
+   - 「咦，我的藥水在哪？」（查詢困難）
+   - SQL: `WHERE payments::jsonb @> '[{"status": "pending"}]'` ← 慢
+
+2. ⚠️ **拿錯東西**
+   - 誤把毒藥當藥水（資料驗證困難）
+   - 可以塞任何奇怪的資料進去
+
+3. 📊 **無法分類**
+   - 不能按「武器」「藥水」分類（無法 JOIN）
+   - 想計算「每個供應商的總需求」？幾乎不可能
+
+4. 🐢 **袋子太重**
+   - 每次打開袋子都要載入所有物品（效能差）
+   - 即使只要看付款記錄，也得載入整個 tour
+
+---
+
+### **方案 B：分類倉庫（關聯表）**
+
+```
+tours (主表)
+├── tour_members (團員倉庫)
+├── tour_requests (需求倉庫)
+└── tour_payments (付款倉庫)
+```
+
+**遊戲比喻**：
+- 就像你有**「武器倉庫」「藥水倉庫」「食物倉庫」**
+- 每個倉庫有專屬管理員（foreign key）
+- 要找劍？去武器倉庫。要找藥水？去藥水倉庫
+
+**優點**：
+
+1. ⚡ **快速查找**
+   ```sql
+   -- ✅ 找所有還沒付款的團
+   SELECT t.* FROM tours t
+   JOIN tour_payments p ON p.tour_id = t.id
+   WHERE p.status = 'pending'
+   ```
+
+2. 🛡️ **強制規則**
+   - 不能把毒藥放進藥水倉庫（foreign key 驗證）
+   - `tour_members.tour_id REFERENCES tours(id)`
+
+3. 🔗 **彈性查詢**
+   ```sql
+   -- ✅ 找出所有欠款團的業務員
+   SELECT s.name, COUNT(*) 
+   FROM tours t
+   JOIN tour_payments p ON p.tour_id = t.id
+   JOIN staff s ON s.id = t.salesperson_id
+   WHERE p.status = 'pending'
+   GROUP BY s.name
+   ```
+
+4. 🚀 **省空間**
+   - 只載入需要的倉庫（效能好）
+   - 查付款記錄不用載入團員資料
+
+---
+
+### **你擔心的「資料不同步」問題**
+
+**擔心**：
+> 「多個表會造成資料不同步，例如改了 tours 但忘記改 tour_members」
+
+**遊戲解釋**：
+- 就像你在 RPG 裡刪除了「公會」，但成員還在成員倉庫
+- 不是「多倉庫」的錯，是**「沒設好門禁」**
+
+**解決方案**：Foreign Key + Cascade
+
+```sql
+CREATE TABLE tour_members (
+  id UUID PRIMARY KEY,
+  tour_id TEXT REFERENCES tours(id) ON DELETE CASCADE
+)
+```
+
+**遊戲比喻**：
+- `ON DELETE CASCADE` = 「公會解散時，自動清空成員倉庫」
+- `REFERENCES` = 「不能加入不存在的公會」
+
+**你現有的表已經有這個**：
+```sql
+tour_members.tour_id REFERENCES tours(id) ON DELETE CASCADE ✅
+tour_requests.tour_id REFERENCES tours(id) ON DELETE CASCADE ✅
+```
+
+**所以不會不同步**。刪除團時，所有關聯資料會自動刪除。
+
+---
+
+### **什麼時候用 JSONB？**
+
+**✅ 用 JSONB**：
+- **彈性欄位**（每個團的「自訂欄位」不一樣）
+- **不需查詢的設定**（UI 偏好設定、顏色主題）
+- **版本記錄**（保存舊版報價單的快照）
+
+**你現有的設計已經很聰明**：
+```sql
+tours.features (JSONB) ✅           -- 團體特色（彈性）
+tours.quote_cost_structure (JSONB) ✅  -- 報價快照（版本記錄）
+tours.confirmed_requirements (JSONB) ✅ -- 確認需求（版本記錄）
+```
+
+**❌ 不用 JSONB**：
+- **需要查詢的資料**（團員、付款、需求單）
+- **需要計算的資料**（總金額、數量）
+- **需要關聯的資料**（供應商、訂單）
+
+---
+
+### **結論：你現有的設計是對的**
+
+```
+tours (核心表) 
+├── 基本欄位（團號、名稱、日期）
+├── JSONB 欄位（features, quote_cost_structure, confirmed_requirements）
+└── 關聯表（tour_members, tour_requests, tour_payments）
+```
+
+**這就是最佳實踐**：
+- ✅ 核心資料用欄位（快速查詢）
+- ✅ 彈性設定用 JSONB（不需查詢）
+- ✅ 關聯資料用關聯表（保持一致性）
+
+**不建議改成「全部 JSONB」**：
+- ❌ 查詢慢（找欠款團要掃描所有 JSON）
+- ❌ 無法驗證（可以塞錯誤資料）
+- ❌ 無法計算（總金額、統計報表）
+- ❌ 無法關聯（JOIN 供應商、業務員）
+
+---
+
 ## 🚀 進階攻略（待補完）
 
 - [ ] 每個按鈕的詳細行為

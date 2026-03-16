@@ -12,6 +12,12 @@ import { getServerAuth } from '@/lib/auth/server-auth'
 import type { Customer } from '@/types/customer.types'
 import { logger } from '@/lib/utils/logger'
 
+// Sanitize input to prevent SQL injection in LIKE queries
+function sanitizeInput(input: string): string {
+  // Escape SQL LIKE special characters: % _ \
+  return input.replace(/[%_\\]/g, '\\$&')
+}
+
 // ============================================
 // 型別定義
 // ============================================
@@ -63,7 +69,8 @@ export async function getPaginatedCustomers({
 
   // 可選搜尋條件
   if (search) {
-    query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%,email.ilike.%${search}%`)
+    const sanitized = sanitizeInput(search)
+    query = query.or(`name.ilike.%${sanitized}%,phone.ilike.%${sanitized}%,email.ilike.%${sanitized}%`)
   }
 
   // 分頁

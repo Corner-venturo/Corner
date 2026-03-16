@@ -5,13 +5,20 @@ import { successResponse, ApiError } from '@/lib/api/response'
 import { logger } from '@/lib/utils/logger'
 import { validateBody } from '@/lib/api/validation'
 import { getEmployeeDataSchema } from '@/lib/validations/api-schemas'
+import { getServerAuth } from '@/lib/auth/server-auth'
 
 /**
  * 取得員工資料 API
  * 用於登入成功後取得員工詳細資料
  * 不驗證密碼（密碼已由 Supabase Auth 驗證）
+ * 🔒 安全修復 2026-03-15：需要先登入才能取得員工資料
  */
 export async function POST(request: NextRequest) {
+  // 🔒 檢查認證
+  const auth = await getServerAuth()
+  if (!auth.success) {
+    return ApiError.unauthorized('請先登入')
+  }
   try {
     const validation = await validateBody(request, getEmployeeDataSchema)
     if (!validation.success) return validation.error
